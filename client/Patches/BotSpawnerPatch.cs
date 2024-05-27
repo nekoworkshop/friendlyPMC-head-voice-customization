@@ -28,7 +28,23 @@ namespace friendlyPMC.Patches
             float dist;
             BotZone zone = __instance.GetClosestZone(position, out dist);
 
-            await __instance.method_1(side, zone, DebugBotProfileChooser.Auto, true);
+            BossLocationSpawn bossLocationSpawn = new BossLocationSpawn();
+            bossLocationSpawn.BossZone = zone.NameZone;
+            bossLocationSpawn.Time = -1f;
+            bossLocationSpawn.Delay = 0f;
+            bossLocationSpawn.TriggerId = "";
+            bossLocationSpawn.TriggerName = "";
+            bossLocationSpawn.BossChance = 100f;
+            bossLocationSpawn.BossName = "sptBear";
+            bossLocationSpawn.BossDifficult = BotDifficulty.normal.ToString();
+            bossLocationSpawn.BossEscortAmount = 0.ToString();
+            bossLocationSpawn.BossEscortDifficult = BotDifficulty.normal.ToString();
+            bossLocationSpawn.BossEscortType = WildSpawnType.followerBully.ToString();
+            bossLocationSpawn.ParseMainTypesTypes();
+            bossLocationSpawn.ForceSpawn = true;
+            bossLocationSpawn.IgnoreMaxBots = true;
+
+            await __instance.BossSpawner.Spawn(bossLocationSpawn, new BotSpawnParams());
         }
 
         protected override MethodBase GetTargetMethod()
@@ -42,7 +58,7 @@ namespace friendlyPMC.Patches
             BossPlayer.Instance.AddBossPlayer(player.ProfileId, player);
 
             // spawn a friendly bot
-            Task.Delay(8000).ContinueWith(t =>
+            Task.Delay(2000).ContinueWith(t =>
             {
                 Components.Logger.LogInfo("Spawn a friendly");
                 Instance.SpawnBot(__instance, player);

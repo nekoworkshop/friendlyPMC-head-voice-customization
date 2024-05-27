@@ -6,7 +6,7 @@ namespace friendlyPMC.Components
     {
         public FollowerBrain(BotOwner owner) : base(owner)
         {
-
+            AddLayers();
         }
         /** Exposed method for adding brain layers so it can be patched by addons **/
         public void AddLayers()
@@ -37,7 +37,7 @@ namespace friendlyPMC.Components
 
         public override string ShortName()
         {
-            return "FlBPlayer";
+            return "FLBPlayer";
         }
 
         public override GClass578 EventsPriority()
