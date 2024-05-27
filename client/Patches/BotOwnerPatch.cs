@@ -1,13 +1,8 @@
 ﻿using Aki.Reflection.Patching;
 using EFT;
-using HarmonyLib;
 using friendlyPMC.Components;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using HarmonyLib;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace friendlyPMC.Patches
 {
@@ -16,7 +11,7 @@ namespace friendlyPMC.Patches
     {
         protected override MethodBase GetTargetMethod()
         {
-            return AccessTools.Method(typeof(BotOwner),"method_9");
+            return AccessTools.Method(typeof(BotOwner), "method_9");
 
         }
 

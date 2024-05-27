@@ -68,8 +68,8 @@ namespace friendlyPMC.Components
             {
                 // on follow me request from the boss, just come closer to the boss or get out of hold position
                 case BotRequestType.followMe:
-                    
-                    botOwner_0.BotTalk.TrySay(EPhraseTrigger.Roger,false);
+
+                    botOwner_0.BotTalk.TrySay(EPhraseTrigger.Roger, false);
 
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.followerPatrol, "flwMRF");
 
@@ -88,7 +88,7 @@ namespace friendlyPMC.Components
                         return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.holdPosition, "req:stayHidden");
                     }
 
-                    botOwner_0.BotTalk.TrySay(EPhraseTrigger.Going,false);
+                    botOwner_0.BotTalk.TrySay(EPhraseTrigger.Going, false);
 
                     GetCoverPoint(botOwner_0.Position, 30f);
 
@@ -141,7 +141,7 @@ namespace friendlyPMC.Components
                 CustomNavigationPoint point1 = null;
                 float distance = searchRadius;
                 float range = 0;
-                
+
                 List<CustomNavigationPoint> availablePoints = new List<CustomNavigationPoint>();
 
                 foreach (CustomNavigationPoint point in customNavigationPoints)
@@ -158,11 +158,11 @@ namespace friendlyPMC.Components
                     }
                 }
                 // get a random point
-                if(availablePoints.Count > 0)
+                if (availablePoints.Count > 0)
                 {
                     point1 = availablePoints.Random();
                 }
-                
+
 
                 if (point1 != null)
                 {

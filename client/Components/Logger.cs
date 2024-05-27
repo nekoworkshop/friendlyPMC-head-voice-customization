@@ -5,7 +5,8 @@ namespace friendlyPMC.Components
     internal class Logger
     {
         public static ManualLogSource Instance;
-        public Logger() { 
+        public Logger()
+        {
             Instance = BepInEx.Logging.Logger.CreateLogSource("friendlyPMC");
         }
 

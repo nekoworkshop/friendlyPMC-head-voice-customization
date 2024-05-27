@@ -1,20 +1,10 @@
 ﻿using Aki.Reflection.Patching;
 using EFT;
-using System;
-using System.Threading.Tasks;
-using System.Reflection;
-using Comfort.Common;
-using BepInEx.Logging;
 using friendlyPMC.Components;
-using System.Threading;
-using UnityEngine;
-using Aki.Common.Http;
-using static RootMotion.FinalIK.IKSolver;
-using UnityEngine.AI;
 using HarmonyLib;
-using EFT.Game.Spawning;
-using EFT.Bots;
-using System.Data;
+using System.Reflection;
+using System.Threading.Tasks;
+using UnityEngine;
 
 namespace friendlyPMC.Patches
 {
@@ -38,7 +28,7 @@ namespace friendlyPMC.Patches
             float dist;
             BotZone zone = __instance.GetClosestZone(position, out dist);
 
-            await __instance.method_1(side, zone,DebugBotProfileChooser.Auto,true);
+            await __instance.method_1(side, zone, DebugBotProfileChooser.Auto, true);
         }
 
         protected override MethodBase GetTargetMethod()

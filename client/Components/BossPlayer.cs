@@ -1,16 +1,8 @@
-﻿using EFT;
-using EFT.UI.Ragfair;
+﻿using Comfort.Common;
+using EFT;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine.AI;
 using UnityEngine;
-using Comfort.Common;
-using Aki.Common.Http;
-using EFT.Ballistics;
 
 namespace friendlyPMC.Components
 {
@@ -25,7 +17,7 @@ namespace friendlyPMC.Components
         {
             aBossLogic = new AIBossPlayerLogic(player, this);
 
-            
+
         }
 
         public new AIBossPlayerLogic GetBossLogic()
@@ -35,7 +27,7 @@ namespace friendlyPMC.Components
 
         public void AddEnemy(BotOwner bot)
         {
-            if(!bossEnemies.Contains(bot))
+            if (!bossEnemies.Contains(bot))
             {
                 bossEnemies.Add(bot);
 
@@ -48,7 +40,7 @@ namespace friendlyPMC.Components
                     RemoveEnemy(bot);
                 };
             }
-            
+
         }
         public void RemoveEnemy(BotOwner bot)
         {
@@ -65,7 +57,7 @@ namespace friendlyPMC.Components
 
         public void prioritizeEnemy(BotOwner follower)
         {
-  
+
             // make the closest enemy of boss, the enemy
             if (bossEnemies.Count > 0)
             {
@@ -97,7 +89,7 @@ namespace friendlyPMC.Components
     {
         private Player _player;
         private pitAIBossPlayer _aiplayer;
-        public AIBossPlayerLogic(Player player, pitAIBossPlayer aiplayer) : base(null,null)
+        public AIBossPlayerLogic(Player player, pitAIBossPlayer aiplayer) : base(null, null)
         {
             player.HealthController.ApplyDamageEvent += OnHit;
             _player = player;
@@ -114,8 +106,9 @@ namespace friendlyPMC.Components
                 try
                 {
                     _aiplayer.bossGroup.CheckAndAddEnemy(damageInfo.Player.AIData.BotOwner);
-                    
-                } catch(Exception)
+
+                }
+                catch (Exception)
                 {
                     Components.Logger.LogInfo("Can't add enemy to group");
                 }
@@ -126,7 +119,7 @@ namespace friendlyPMC.Components
 
         public override void Activate()
         {
-            
+
         }
 
         public override void BossLogicUpdate()
@@ -145,7 +138,7 @@ namespace friendlyPMC.Components
 
         public override void SetPatrolMode()
         {
-            
+
         }
     }
     internal class BossPlayer
@@ -174,7 +167,7 @@ namespace friendlyPMC.Components
             _bosses[name] = playerBoss;
 
             // get info about ALL available covers
-            if(navigationPoints == null)
+            if (navigationPoints == null)
             {
                 AICoversData[] aICoversData = UnityEngine.Object.FindObjectsOfType<AICoversData>();
 
@@ -214,11 +207,13 @@ namespace friendlyPMC.Components
 
         public void RemoveBossPlayer(string name)
         {
-            if (_bosses.ContainsKey(name) && _bosses[name] != null) {
+            if (_bosses.ContainsKey(name) && _bosses[name] != null)
+            {
                 pitAIBossPlayer boss = _bosses[name];
                 boss.Followers.ForEach(fl =>
                 {
-                    _followers.ForEach(follower => {
+                    _followers.ForEach(follower =>
+                    {
                         if (follower.IsBot(fl))
                         {
                             _followers.Remove(follower);
@@ -227,7 +222,7 @@ namespace friendlyPMC.Components
                     });
                 });
 
-               
+
 
                 boss.Dispose();
                 _bosses.Remove(name);
@@ -237,9 +232,11 @@ namespace friendlyPMC.Components
         public BotFollowerPlayer AddFollower(BotOwner bot, pitAIBossPlayer player)
         {
             BotFollowerPlayer _follower = null;
-            
-            _followers.ForEach(follower => {
-                if (follower.IsBot(bot)) {
+
+            _followers.ForEach(follower =>
+            {
+                if (follower.IsBot(bot))
+                {
                     _follower = follower;
                 }
             });
@@ -249,7 +246,7 @@ namespace friendlyPMC.Components
                 _followers.Remove(_follower);
             }
 
-            _follower = new BotFollowerPlayer(bot,player);
+            _follower = new BotFollowerPlayer(bot, player);
 
             _followers.Add(_follower);
 
@@ -261,7 +258,8 @@ namespace friendlyPMC.Components
 
             BotFollowerPlayer _follower = null;
 
-            _followers.ForEach(follower => {
+            _followers.ForEach(follower =>
+            {
                 if (follower.IsBot(bot))
                 {
                     _follower = follower;
@@ -280,20 +278,23 @@ namespace friendlyPMC.Components
         {
             BotFollowerPlayer _follower = null;
 
-            foreach (var item in _followers) { 
-                if (item.IsBot(bot)) {
+            foreach (var item in _followers)
+            {
+                if (item.IsBot(bot))
+                {
                     _follower = item;
                     break;
                 }
             }
 
-            if (_follower != null) {
-                if (boss == null) 
-                    return true; 
-                
+            if (_follower != null)
+            {
+                if (boss == null)
+                    return true;
+
                 else if (bot.BotFollower.BossToFollow != null && bot.BotFollower.BossToFollow.Player().ProfileId == boss.Player().ProfileId)
                     return true;
-                
+
                 return false;
             }
             return false;
@@ -301,7 +302,8 @@ namespace friendlyPMC.Components
 
         public pitAIBossPlayer GetBossPlayer(string name)
         {
-            if (!_bosses.ContainsKey(name) || _bosses[name] == null) {
+            if (!_bosses.ContainsKey(name) || _bosses[name] == null)
+            {
                 return null;
             }
             return _bosses[name];
@@ -311,7 +313,8 @@ namespace friendlyPMC.Components
         {
             List<BotFollowerPlayer> botFollowers = new List<BotFollowerPlayer>();
 
-            if (!_bosses.ContainsKey(name) || _bosses[name] == null) {
+            if (!_bosses.ContainsKey(name) || _bosses[name] == null)
+            {
                 return botFollowers;
             }
 
@@ -319,7 +322,8 @@ namespace friendlyPMC.Components
 
             foreach (var item in _followers)
             {
-                if(item.GetBoss() == player) {
+                if (item.GetBoss() == player)
+                {
                     botFollowers.Add(item);
                 }
             }

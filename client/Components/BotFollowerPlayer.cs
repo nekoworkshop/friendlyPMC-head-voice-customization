@@ -16,23 +16,24 @@ namespace friendlyPMC.Components
             _bot = bot;
             _player = player;
 
-            
+
             // deactivate old layers
             var baseBrain = _bot.Brain.BaseBrain;
             // guess work because we cannot access the private property dictionary_0 where the layers are, but no brain has 20 layers, usually it's 10
-            for(int i = 1; i < 20;i++)
+            for (int i = 1; i < 20; i++)
             {
                 try
                 {
                     _bot.Brain.BaseBrain.method_3(i);
-                } catch (Exception)
+                }
+                catch (Exception)
                 {
 
                 }
             }
 
             // bot might be following someone, reset that
-            if(_bot.BotFollower.HaveBoss)
+            if (_bot.BotFollower.HaveBoss)
             {
                 _bot.BotFollower.BossToFollow.RemoveFollower(_bot);
                 _bot.BotFollower.BossToFollow = null;
@@ -106,7 +107,7 @@ namespace friendlyPMC.Components
 
                 Logger.LogInfo($"Bot {_bot.Profile.Nickname} is now a follower of {_player.Player().Profile.Nickname}");
             });
-            
+
         }
 
         private void OnDead(EDamageType damageType)

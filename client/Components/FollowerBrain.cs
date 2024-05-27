@@ -6,7 +6,7 @@ namespace friendlyPMC.Components
     {
         public FollowerBrain(BotOwner owner) : base(owner)
         {
-           
+
         }
         /** Exposed method for adding brain layers so it can be patched by addons **/
         public void AddLayers()

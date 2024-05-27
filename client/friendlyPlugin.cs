@@ -1,19 +1,7 @@
-﻿using Aki.Reflection.Patching;
-using BepInEx;
-using BepInEx.Logging;
-using BepInEx.Configuration;
-using DrakiaXYZ.BigBrain.Brains;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using friendlyPMC.Patches;
-using HarmonyLib;
-using EFT;
-using System.Reflection;
-using Logger = friendlyPMC.Components.Logger;
+﻿using BepInEx;
 using friendlyPMC.Components;
+using friendlyPMC.Patches;
+using Logger = friendlyPMC.Components.Logger;
 
 namespace friendlyPMC
 {
@@ -28,7 +16,7 @@ namespace friendlyPMC
             new Logger();
 
             new BossPlayer();
-            
+
             new PlayerPatch().Enable();
 
             new BotSpawnerAddPlayerPatch().Enable();

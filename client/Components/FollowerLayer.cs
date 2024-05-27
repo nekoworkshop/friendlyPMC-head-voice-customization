@@ -104,7 +104,9 @@ namespace friendlyPMC.Components
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.alternativePatrol, "RESER");
                 }
                 return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.simplePatrol, "Basic");
-            } else {
+            }
+            else
+            {
                 if (botOwner_0.Memory.IsInCover)
                 {
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.heal, "first aid");

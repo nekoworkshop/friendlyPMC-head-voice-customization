@@ -1,19 +1,10 @@
-﻿using Aki.Common.Http;
-using Aki.Reflection.Patching;
+﻿using Aki.Reflection.Patching;
 using EFT;
 using friendlyPMC.Components;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using static RootMotion.FinalIK.IKSolver;
-using UnityEngine.AI;
-using UnityEngine;
-
-using Comfort.Common;
 using HarmonyLib;
+using System;
+using System.Reflection;
+using UnityEngine;
 
 namespace friendlyPMC.Patches
 {
@@ -37,10 +28,11 @@ namespace friendlyPMC.Patches
                 // if BOT is already a follower, on "follow me" we make the bot come closer to the BOSS
                 if (posibleExecuter.BotFollower.HaveBoss && playerBoss.Followers.Find(it => it == posibleExecuter))
                 {
-;                   if (BossPlayer.Instance.IsFollower(posibleExecuter, playerBoss))
+                    ; if (BossPlayer.Instance.IsFollower(posibleExecuter, playerBoss))
                     {
                         __result = true;
-                    } else
+                    }
+                    else
                     {
                         // bot signals "NO"
                         posibleExecuter.BotTalk.TrySay(EPhraseTrigger.Negative);
@@ -50,7 +42,7 @@ namespace friendlyPMC.Patches
                     return false;
 
                 }
-                
+
                 else if (player.Side == posibleExecuter.Side)
                 {
                     // add BOT as follower to the player BOSS if limit was not reached
@@ -155,7 +147,7 @@ namespace friendlyPMC.Patches
             Components.Logger.LogInfo("TryActivateGoToPointRequest is : " + requester.Profile.Nickname);
 
             return true;
-           
+
         }
     }
 

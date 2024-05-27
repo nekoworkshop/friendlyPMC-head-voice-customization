@@ -48,175 +48,208 @@ namespace friendlyPMC.Components
 
         public override AICoreActionResultStruct<BotLogicDecision> GetDecision()
         {
-            bool hasBossRequest = botOwner_0.BotFollower.HaveBoss && botOwner_0.BotRequestController.CurRequest != null && botOwner_0.BotRequestController.CurRequest.Requester == botOwner_0.BotFollower.BossToFollow.Player();
-            BotRequest currRequest = hasBossRequest ? botOwner_0.BotRequestController.CurRequest : null;
-
-            // partial re-creation of fight decisions in GClass47
-            AICoreActionResultStruct<BotLogicDecision>? aicoreActionResultStruct = InFightLogic();
-
-            if (aicoreActionResultStruct != null)
+            try
             {
-                coverTimeRunner = 0f;
-                return aicoreActionResultStruct.Value;
-            }
+                bool hasBossRequest = botOwner_0.BotFollower.HaveBoss && botOwner_0.BotRequestController.CurRequest != null && botOwner_0.BotRequestController.CurRequest.Requester == botOwner_0.BotFollower.BossToFollow.Player();
+                BotRequest currRequest = hasBossRequest ? botOwner_0.BotRequestController.CurRequest : null;
 
-            // weapons has no bullets
-            if (!botOwner_0.WeaponManager.HaveBullets)
-            {
-                // - reload while moving to cover
-                if (!botOwner_0.Memory.IsInCover)
+                // partial re-creation of fight decisions in GClass47
+                AICoreActionResultStruct<BotLogicDecision>? aicoreActionResultStruct = InFightLogic();
+
+                if (aicoreActionResultStruct != null)
                 {
                     coverTimeRunner = 0f;
-                    botOwner_0.WeaponManager.Reload.TryReload();
-                    GetClosestCoverPoint(botOwner_0.Position);
-                    return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "doRun");
+                    return aicoreActionResultStruct.Value;
                 }
-            }
+
+                // weapons has no bullets
+                if (!botOwner_0.WeaponManager.HaveBullets)
+                {
+                    // - reload while moving to cover
+                    if (!botOwner_0.Memory.IsInCover)
+                    {
+                        coverTimeRunner = 0f;
+                        botOwner_0.WeaponManager.Reload.TryReload();
+                        GetClosestCoverPoint(botOwner_0.Position);
+                        return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "doRun");
+                    }
+                }
 
 
-            AIBossPlayerLogic gclass363_0 = HasBoss() ? botOwner_0.BotFollower.BossToFollow.GetBossLogic() as AIBossPlayerLogic : null;
-            bool bossUnderAttack = gclass363_0 != null && gclass363_0.IsHitted;
+                AIBossPlayerLogic gclass363_0 = HasBoss() ? botOwner_0.BotFollower.BossToFollow.GetBossLogic() as AIBossPlayerLogic : null;
+                bool bossUnderAttack = gclass363_0 != null && gclass363_0.IsHitted;
 
 
-            if (method_2())
-            {
-                coverTimeRunner = 0f;
-                return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.dogFight, "cdg");
+                if (method_2())
+                {
+                    coverTimeRunner = 0f;
+                    return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.dogFight, "cdg");
 
-            }
-            // damaged and has healers
-            if (botOwner_0.Medecine.FirstAid.Have2Do || botOwner_0.Medecine.SurgicalKit.HaveWork)
-            {
+                }
+                // damaged and has healers
+                if (botOwner_0.Medecine.FirstAid.Have2Do || botOwner_0.Medecine.SurgicalKit.HaveWork)
+                {
+                    if (!botOwner_0.Memory.HaveEnemy)
+                    {
+                        coverTimeRunner = 0f;
+                        return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.heal, "heal2");
+                    }
+                    if (!CheckMedsToStop(botOwner_0))
+                    {
+                        coverTimeRunner = 0f;
+                        if (!botOwner_0.Memory.IsInCover)
+                        {
+                            GetCoverPoint(botOwner_0.Position, searchRadius);
+                            return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "doRun");
+                        }
+                        return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.heal, "heal1");
+                    }
+                }
+
+                // TO DO : implement check currRequest
+
                 if (!botOwner_0.Memory.HaveEnemy)
                 {
                     coverTimeRunner = 0f;
-                    return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.heal, "heal2");
-                }
-                if (!CheckMedsToStop(botOwner_0))
-                {
-                    coverTimeRunner = 0f;
-                    if (!botOwner_0.Memory.IsInCover)
+                    if (HasBoss())
                     {
-                        GetCoverPoint(botOwner_0.Position, searchRadius);
-                        return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "doRun");
-                    }
-                    return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.heal, "heal1");
-                }
-            }
-
-            // TO DO : implement check currRequest
-
-            if (!botOwner_0.Memory.HaveEnemy)
-            {
-                coverTimeRunner = 0f;
-                if (HasBoss())
-                {
-                    botOwner_0.GoToSomePointData.SetPoint(GetBoss().Position);
-                    return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.goToPoint, "comeToBoss-noEnemy");
-                } else
-                {
-                    return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.simplePatrol, "roamaround");
-                }
-
-            }
-            else
-            {
-                EnemyInfo goalEnemy = botOwner_0.Memory.GoalEnemy;
-                // in cover, but enemy not visible
-                if (botOwner_0.Memory.IsInCover && !goalEnemy.IsVisible)
-                {
-                    // - boss under attack, get close to boss
-                    if (bossUnderAttack)
-                    {
-                        coverTimeRunner = 0f;
-                        GetClosestCoverPoint(GetBoss().Position);
-                        // -- is close enough, try to provide suppression
-                        if(customNavigationPoint_0 != null && (botOwner_0.Position - customNavigationPoint_0.Position).sqrMagnitude < 10f)
-                        {
-                            return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.suppressFire, "interuptAttack");
-                        }
-
-                        return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMoving, "comeToBoss-underAttack");
-                    }
-                    // - else stay in cover until time runs out
-                    if (coverTimeRunner == 0f)
-                    {
-                        coverTimeRunner = 1f;
-
-                        return new AICoreActionResultStruct<BotLogicDecision>(HoldFor(UnityEngine.Random.Range(2f, 5f)), "waitabit");
-                    }
-                    // - then proceed to approach the enemy
-                    else
-                    {
-                        coverTimeRunner = 0f;
-                        // -- find closes cover the enemy and aproach him from that way
-                        if (HasCloseCoverToEnemy())
-                            return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMoving, "closeIn1");
-                        // -- else just rush him
-                        return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToEnemy, "confrontEnemey");
-                    }
-                   
-                }
-                // not in cover and enemy not visible
-                else if (!goalEnemy.IsVisible)
-                {
-                    coverTimeRunner = 0f;
-                    // - boss under attack, get back to him
-                    if (bossUnderAttack)
-                    {
-                        GetClosestCoverPoint(GetBoss().Position);
-                        return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMoving, "backToBoss");
-                    }
-                    // - else search for the enemy
-                    Vector3 enemyLastSeenPos = goalEnemy.EnemyLastPosition;
-                    Vector3 myPOs = botOwner_0.Position;
-
-                    if ((enemyLastSeenPos - myPOs).sqrMagnitude < 15f)
-                    {
-                        return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.search, "searchEnemy");
+                        botOwner_0.GoToSomePointData.SetPoint(GetBoss().Position);
+                        return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.goToPoint, "comeToBoss-noEnemy");
                     }
                     else
                     {
-                        // - if enemy is close enough, go after him
-                        if ((enemyLastSeenPos - myPOs).sqrMagnitude < 70f)
-                        {
-                            GetClosestCoverPoint(enemyLastSeenPos);
-                            if (customNavigationPoint_0 != null)
-                            {
-                                return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "getCloser");
-                            }
-                            else
-                            {
-                                return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.goToEnemy, "rushEnemyLastPosition");
-                            }
-                        // - else stick to boss
-                        } else 
-                        {
-                            return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.followerPatrol, "stickCloseToBoss");
-                        }
+                        return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.simplePatrol, "roamaround");
                     }
-                }
 
-                // not in cover and enemy is visible
-                if (!botOwner_0.Memory.IsInCover && goalEnemy.IsVisible)
+                }
+                else
                 {
-                    coverTimeRunner = 0f;
-                    // can't shoot
-                    if (!goalEnemy.CanShoot)
+                    EnemyInfo goalEnemy = botOwner_0.Memory.GoalEnemy;
+                    // in cover, but enemy not visible
+                    if (botOwner_0.Memory.IsInCover && !goalEnemy.IsVisible)
                     {
-                        // -- find cover if can't shoot
-                        if ( (HasBoss() && HasCloseCoverToBoss()) || this.customNavigationPoint_0 == null)
+                        // - boss under attack, get close to boss
+                        if (bossUnderAttack)
                         {
-                            if(!HasBoss()) GetClosestCoverPoint(botOwner_0.Position);
-                            return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.goToCoverPoint, "CantShootFindCover");
-                            // -- no cover, still can't shoot, just provide suppression
+                            coverTimeRunner = 0f;
+                            GetClosestCoverPoint(GetBoss().Position);
+                            // -- is close enough, try to provide suppression
+                            if (customNavigationPoint_0 != null && (botOwner_0.Position - customNavigationPoint_0.Position).sqrMagnitude < 10f)
+                            {
+                                return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.suppressFire, "interuptAttack");
+                            }
+
+                            return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMoving, "comeToBoss-underAttack");
+                        }
+                        // - else stay in cover until time runs out
+                        if (coverTimeRunner == 0f)
+                        {
+                            coverTimeRunner = 1f;
+
+                            return new AICoreActionResultStruct<BotLogicDecision>(HoldFor(UnityEngine.Random.Range(2f, 5f)), "waitabit");
+                        }
+                        // - then proceed to approach the enemy
+                        else
+                        {
+                            coverTimeRunner = 0f;
+                            // -- find closes cover the enemy and aproach him from that way
+                            if (HasCloseCoverToEnemy())
+                                return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMoving, "closeIn1");
+                            // -- else just rush him
+                            return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToEnemy, "confrontEnemey");
+                        }
+
+                    }
+                    // not in cover and enemy not visible
+                    else if (!goalEnemy.IsVisible)
+                    {
+                        coverTimeRunner = 0f;
+                        // - boss under attack, get back to him
+                        if (bossUnderAttack)
+                        {
+                            GetClosestCoverPoint(GetBoss().Position);
+                            return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMoving, "backToBoss");
+                        }
+                        // - else search for the enemy
+                        Vector3 enemyLastSeenPos = goalEnemy.EnemyLastPosition;
+                        Vector3 myPOs = botOwner_0.Position;
+
+                        if ((enemyLastSeenPos - myPOs).sqrMagnitude < 15f)
+                        {
+                            return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.search, "searchEnemy");
                         }
                         else
                         {
-                            return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.suppressFire, "intimidate");
+                            // - if enemy is close enough, go after him
+                            if ((enemyLastSeenPos - myPOs).sqrMagnitude < 70f)
+                            {
+                                GetClosestCoverPoint(enemyLastSeenPos);
+                                if (customNavigationPoint_0 != null)
+                                {
+                                    return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "getCloser");
+                                }
+                                else
+                                {
+                                    return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.goToEnemy, "rushEnemyLastPosition");
+                                }
+                                // - else stick to boss
+                            }
+                            else
+                            {
+                                return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.followerPatrol, "stickCloseToBoss");
+                            }
                         }
+                    }
 
-                    // can shoot
+                    // not in cover and enemy is visible
+                    if (!botOwner_0.Memory.IsInCover && goalEnemy.IsVisible)
+                    {
+                        coverTimeRunner = 0f;
+                        // can't shoot
+                        if (!goalEnemy.CanShoot)
+                        {
+                            // -- find cover if can't shoot
+                            if ((HasBoss() && HasCloseCoverToBoss()) || this.customNavigationPoint_0 == null)
+                            {
+                                if (!HasBoss()) GetClosestCoverPoint(botOwner_0.Position);
+                                return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.goToCoverPoint, "CantShootFindCover");
+                                // -- no cover, still can't shoot, just provide suppression
+                            }
+                            else
+                            {
+                                return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.suppressFire, "intimidate");
+                            }
+
+                            // can shoot
+                        }
+                        else
+                        {
+                            // - shoot while moving to cover
+                            GetClosestCoverPoint(botOwner_0.Position);
+                            if (customNavigationPoint_0 != null)
+                            {
+                                return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMoving, "AToCvr");
+                                // - can't move to cover or enemy too close, just shoot
+                            }
+                            else
+                            {
+                                return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.shootFromPlace, "attack");
+                            }
+
+                        }
+                    }
+
+                    // in cover and enemy is visible
+                    // - can shoot from cover
+                    if (goalEnemy.CanShoot)
+                    {
+                        return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.shootFromPlace, "sfc");
+                        // - get new cover, close to the enemy
+                    }
+                    else if (HasCloseCoverToEnemy())
+                    {
+                        return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMoving, "closeIn2");
+                        // - can't get a new cover, provide supression
                     }
                     else
                     {
@@ -224,41 +257,17 @@ namespace friendlyPMC.Components
                         GetClosestCoverPoint(botOwner_0.Position);
                         if (customNavigationPoint_0 != null)
                         {
-                            return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMoving, "AToCvr");
-                        // - can't move to cover or enemy too close, just shoot
+                            return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "findCoverToShoot");
                         }
-                        else
-                        {
-                            return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.shootFromPlace, "attack");
-                        }
-
+                        // - supression fire
+                        return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.suppressFire, "intimidate");
                     }
-                }
 
-                // in cover and enemy is visible
-                // - can shoot from cover
-                if (goalEnemy.CanShoot)
-                {
-                    return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.shootFromPlace, "sfc");
-                // - get new cover, close to the enemy
                 }
-                else if (HasCloseCoverToEnemy())
-                {
-                    return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMoving, "closeIn2");
-                // - can't get a new cover, provide supression
-                }
-                else
-                {
-                    // - shoot while moving to cover
-                    GetClosestCoverPoint(botOwner_0.Position);
-                    if (customNavigationPoint_0 != null)
-                    {
-                        return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "findCoverToShoot");
-                    }
-                    // - supression fire
-                    return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.suppressFire, "intimidate");
-                }
-
+            } catch (Exception e)
+            {
+                Logger.LogInfo(e.Message);
+                return new AICoreActionResultStruct<BotLogicDecision>(BaseLogicLayerClass.HoldOrCover(botOwner_0), "Error");
             }
 
         }
@@ -311,7 +320,7 @@ namespace friendlyPMC.Components
                 return new AICoreActionEndStruct("bossHit", true);
             }
 
-            GetCoverPoint(botOwner_0.Position,searchRadius);
+            GetCoverPoint(botOwner_0.Position, searchRadius);
 
             return this.gstruct7_1;
         }
@@ -360,14 +369,14 @@ namespace friendlyPMC.Components
                 foreach (CustomNavigationPoint point in customNavigationPoints)
                 {
                     if (
-                            point.IsFreeById(botOwner_0.Id) && 
-                            !point.IsSpotted && 
+                            point.IsFreeById(botOwner_0.Id) &&
+                            !point.IsSpotted &&
                             (
-                                !botOwner_0.Memory.HaveEnemy || 
+                                !botOwner_0.Memory.HaveEnemy ||
                                 (
-                                    point.IsFreeById(botOwner_0.Memory.GoalEnemy.Owner.Id) && 
-                                    point.IsDangerPositionFarEnough(new Vector3[] { botOwner_0.Memory.GoalEnemy.CurrPosition },5f)
-                                )  
+                                    point.IsFreeById(botOwner_0.Memory.GoalEnemy.Owner.Id) &&
+                                    point.IsDangerPositionFarEnough(new Vector3[] { botOwner_0.Memory.GoalEnemy.CurrPosition }, 5f)
+                                )
                             )
                         )
                     {
@@ -407,7 +416,7 @@ namespace friendlyPMC.Components
 
             GetClosestCoverPoint(centerPosition);
             // not too far
-            if(customNavigationPoint_0 != null && (botOwner_0.Position - customNavigationPoint_0.Position).sqrMagnitude > 10f)
+            if (customNavigationPoint_0 != null && (botOwner_0.Position - customNavigationPoint_0.Position).sqrMagnitude > 10f)
             {
                 customNavigationPoint_0 = null;
             }
