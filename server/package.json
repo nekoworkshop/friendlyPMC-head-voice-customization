@@ -1,0 +1,24 @@
+{
+	"name": "friendlyPMC",
+	"version": "2.0.1",
+	"main": "src/Squad.js",
+	"license": "See License file",
+	"author": "Pit Alex",
+	"akiVersion": "3.8.*",
+	"scripts": {
+		"setup:environment": "npm i",
+		"build:unzipped": "copyfiles -e \"./node_modules/**/*.*\" -e \"./dist/**/*.*\" -e \"./package-lock.json\" -e \"./tsconfig.json\" -e \"./src/Squad.js\" -e \"./src/PlayGround.ts\" -e \"./types/**/*\" \"./**/*.*\" ./friendlyPMC",
+		"zip:files": "bestzip ./friendlypmc-2.0.0.zip friendlyPMC/",
+		"build:zip": "npm run clean:environment && npm run build:unzipped && npm run zip:files",
+		"clean:environment": "node -e \"require('fs').rm('mod.zip', ()=>{})\" && node -e \"require('fs').rm('./dist/',{recursive:true},()=>{})\""
+	},
+	"devDependencies": {
+		"@types/node": "^16.18.10",
+		"bestzip": "2.2.1",
+		"copyfiles": "2.4.1",
+		"typescript": "4.9.4"
+	},
+	"dependencies": {
+		"tsyringe": "^4.7.0"
+	}
+}
