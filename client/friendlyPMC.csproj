@@ -37,6 +37,10 @@
     <Reference Include="aki-custom">
       <HintPath>..\spt\aki-custom.dll</HintPath>
     </Reference>
+    <Reference Include="aki-singleplayer, Version=3.8.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\XboxGames\AKI-Streets-3.8.0\BepInEx\plugins\spt\aki-singleplayer.dll</HintPath>
+    </Reference>
     <Reference Include="Aki.Common">
       <HintPath>..\..\..\EscapeFromTarkov_Data\Managed\Aki.Common.dll</HintPath>
     </Reference>
@@ -58,6 +62,16 @@
     <Reference Include="Comfort.Unity">
       <HintPath>..\..\..\EscapeFromTarkov_Data\Managed\Comfort.Unity.dll</HintPath>
     </Reference>
+    <Reference Include="DissonanceVoip, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\XboxGames\AKI-Streets-3.8.0\EscapeFromTarkov_Data\Managed\DissonanceVoip.dll</HintPath>
+    </Reference>
+    <Reference Include="DOTween">
+      <HintPath>..\..\..\XboxGames\AKI-Streets-3.8.0\EscapeFromTarkov_Data\Managed\DOTween.dll</HintPath>
+    </Reference>
+    <Reference Include="DOTween.Modules">
+      <HintPath>..\..\..\XboxGames\AKI-Streets-3.8.0\EscapeFromTarkov_Data\Managed\DOTween.Modules.dll</HintPath>
+    </Reference>
     <Reference Include="DrakiaXYZ-BigBrain">
       <HintPath>..\DrakiaXYZ-BigBrain.dll</HintPath>
     </Reference>
@@ -72,6 +86,9 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
+    <Reference Include="Unity.Collections">
+      <HintPath>..\UnityToolkit\Unity.Collections.dll</HintPath>
+    </Reference>
     <Reference Include="Unity.TextMeshPro">
       <HintPath>..\..\..\EscapeFromTarkov_Data\Managed\Unity.TextMeshPro.dll</HintPath>
     </Reference>
@@ -101,7 +118,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Components\BossPlayer.cs" />
+    <Compile Include="Components\AIBossPlayer.cs" />
     <Compile Include="Components\BotFollowerPlayer.cs" />
     <Compile Include="Components\FollowerBrain.cs" />
     <Compile Include="Components\FollowerFightLayer.cs" />
@@ -109,8 +126,11 @@
     <Compile Include="Components\FollowerReceiver.cs" />
     <Compile Include="Components\FollowerRequestLayer.cs" />
     <Compile Include="Components\Logger.cs" />
+    <Compile Include="Modules\BossPlayers.cs" />
+    <Compile Include="Modules\Receivers.cs" />
     <Compile Include="Patches\BotGroupRequestPatch.cs" />
     <Compile Include="Patches\BotOwnerPatch.cs" />
+    <Compile Include="Patches\BotRecieverPatch.cs" />
     <Compile Include="Patches\BotSpawnerPatch.cs" />
     <Compile Include="Patches\CreateNodePatch.cs" />
     <Compile Include="Patches\PlayerPatch.cs" />

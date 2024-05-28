@@ -1,4 +1,5 @@
 ﻿using EFT;
+using friendlyPMC.Modules;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -68,7 +69,7 @@ namespace friendlyPMC.Components
                 {
                     coverTimeRunner = 0f;
                     botOwner_0.WeaponManager.Reload.TryReload();
-                    GetClosestCoverPoint(botOwner_0.Position);
+                    GetClosestCoverPoint(botOwner_0.GetPlayer.Transform.position);
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "doRun");
                 }
             }
@@ -77,7 +78,6 @@ namespace friendlyPMC.Components
             AIBossPlayerLogic gclass363_0 = HasBoss() ? botOwner_0.BotFollower.BossToFollow.GetBossLogic() as AIBossPlayerLogic : null;
             bool bossUnderAttack = gclass363_0 != null && gclass363_0.IsHitted;
 
-            Logger.LogInfo("reached position #1");
             if (method_2())
             {
                 coverTimeRunner = 0f;
@@ -97,7 +97,7 @@ namespace friendlyPMC.Components
                     coverTimeRunner = 0f;
                     if (!botOwner_0.Memory.IsInCover)
                     {
-                        GetCoverPoint(botOwner_0.Position, searchRadius);
+                        GetCoverPoint(botOwner_0.GetPlayer.Transform.position, searchRadius);
                         return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "doRun");
                     }
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.heal, "heal1");
@@ -108,7 +108,7 @@ namespace friendlyPMC.Components
 
             if (!botOwner_0.Memory.HaveEnemy)
             {
-                Logger.LogInfo("reached position #2");
+
                 coverTimeRunner = 0f;
                 if (HasBoss())
                 {
@@ -133,7 +133,7 @@ namespace friendlyPMC.Components
                         coverTimeRunner = 0f;
                         GetClosestCoverPoint(GetBoss().Position);
                         // -- is close enough, try to provide suppression
-                        if (customNavigationPoint_0 != null && (botOwner_0.Position - customNavigationPoint_0.Position).sqrMagnitude < 10f)
+                        if (customNavigationPoint_0 != null && (botOwner_0.GetPlayer.Transform.position - customNavigationPoint_0.Position).sqrMagnitude < 10f)
                         {
                             return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.suppressFire, "interuptAttack");
                         }
@@ -171,7 +171,7 @@ namespace friendlyPMC.Components
                     }
                     // - else search for the enemy
                     Vector3 enemyLastSeenPos = goalEnemy.EnemyLastPosition;
-                    Vector3 myPOs = botOwner_0.Position;
+                    Vector3 myPOs = botOwner_0.GetPlayer.Transform.position;
 
                     if ((enemyLastSeenPos - myPOs).sqrMagnitude < 15f)
                     {
@@ -210,7 +210,7 @@ namespace friendlyPMC.Components
                         // -- find cover if can't shoot
                         if ((HasBoss() && HasCloseCoverToBoss()) || this.customNavigationPoint_0 == null)
                         {
-                            if (!HasBoss()) GetClosestCoverPoint(botOwner_0.Position);
+                            if (!HasBoss()) GetClosestCoverPoint(botOwner_0.GetPlayer.Transform.position);
                             return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.goToCoverPoint, "CantShootFindCover");
                             // -- no cover, still can't shoot, just provide suppression
                         }
@@ -224,7 +224,7 @@ namespace friendlyPMC.Components
                     else
                     {
                         // - shoot while moving to cover
-                        GetClosestCoverPoint(botOwner_0.Position);
+                        GetClosestCoverPoint(botOwner_0.GetPlayer.Transform.position);
                         if (customNavigationPoint_0 != null)
                         {
                             return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMoving, "AToCvr");
@@ -354,7 +354,7 @@ namespace friendlyPMC.Components
 
             this.coverTimer = 2f + Time.time;
 
-            List<CustomNavigationPoint> customNavigationPoints = BossPlayer.Instance.GetCovers();
+            List<CustomNavigationPoint> customNavigationPoints = BossPlayers.Instance.GetCovers();
 
             if (customNavigationPoints.Count > 0)
             {
@@ -368,7 +368,8 @@ namespace friendlyPMC.Components
                             (
                                 !botOwner_0.Memory.HaveEnemy ||
                                 (
-                                    point.IsFreeById(botOwner_0.Memory.GoalEnemy.Owner.Id)
+                                    point.IsFreeById(botOwner_0.Memory.GoalEnemy.Owner.Id) &&
+                                    point.IsDangerPositionFarEnough(new Vector3[] { botOwner_0.Memory.GoalEnemy.CurrPosition }, 7f)
                                 )
                             )
                         )
@@ -420,7 +421,7 @@ namespace friendlyPMC.Components
         private void GetCoverPoint(Vector3 centerPosition, float searchRadius)
         {
 
-            List<CustomNavigationPoint> customNavigationPoints = BossPlayer.Instance.GetCovers();
+            List<CustomNavigationPoint> customNavigationPoints = BossPlayers.Instance.GetCovers();
 
             if (customNavigationPoints.Count > 0)
             {

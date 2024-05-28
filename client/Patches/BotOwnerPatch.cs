@@ -1,6 +1,7 @@
 ﻿using Aki.Reflection.Patching;
 using EFT;
-using friendlyPMC.Components;
+
+using friendlyPMC.Modules;
 using HarmonyLib;
 using System.Reflection;
 
@@ -24,7 +25,7 @@ namespace friendlyPMC.Patches
             {
                 __instance.StandBy.GetHit();
 
-                AIBossPlayer player = BossPlayer.Instance.GetBossPlayer(damageInfo.Player.iPlayer.ProfileId);
+                AIBossPlayer player = BossPlayers.Instance.GetBossPlayer(damageInfo.Player.iPlayer.ProfileId);
 
                 if (player != null && player.Followers.Find(it => it == __instance) && __instance.BotFollower.BossToFollow == player)
                 {
@@ -52,7 +53,7 @@ namespace friendlyPMC.Patches
         [PatchPrefix]
         private static bool PatchPrefix(BotOwner __instance, ref bool __result)
         {   // skip checking bot's role if we have made this bot a follower of a boss player
-            if (BossPlayer.Instance.IsFollower(__instance))
+            if (BossPlayers.Instance.IsFollower(__instance))
             {
                 __result = true;
                 return false;

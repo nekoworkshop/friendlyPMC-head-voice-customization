@@ -1,4 +1,5 @@
 ﻿using EFT;
+using friendlyPMC.Modules;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -113,7 +114,7 @@ namespace friendlyPMC.Components
                 }
                 if (method_11(20f))
                 {
-                    GetCoverPoint(botOwner_0.Position, 20f);
+                    GetCoverPoint(botOwner_0.GetPlayer.Transform.position, 20f);
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "goforheal");
                 }
                 return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.heal, "heal now");
@@ -171,7 +172,7 @@ namespace friendlyPMC.Components
 
         private void GetCoverPoint(Vector3 centerPosition, float searchRadius)
         {
-            List<CustomNavigationPoint> customNavigationPoints = BossPlayer.Instance.GetCovers();
+            List<CustomNavigationPoint> customNavigationPoints = BossPlayers.Instance.GetCovers();
 
             if (customNavigationPoints.Count > 0)
             {

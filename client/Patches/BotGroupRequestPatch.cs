@@ -1,6 +1,8 @@
 ﻿using Aki.Reflection.Patching;
+using Comfort.Common;
 using EFT;
 using friendlyPMC.Components;
+using friendlyPMC.Modules;
 using HarmonyLib;
 using System;
 using System.Reflection;
@@ -10,35 +12,38 @@ namespace friendlyPMC.Patches
 {
     internal class FollowRequestPatch : ModulePatch
     {
+
+        public static int followLimit = 2;
         protected override MethodBase GetTargetMethod()
         {
-            return typeof(BotGroupRequestController).GetMethod("TryAskFollowMeRequest", BindingFlags.Public | BindingFlags.Instance);
+            return AccessTools.Method(typeof(BotGroupRequestController),"TryAskFollowMeRequest");
 
         }
         [PatchPrefix]
         private static bool PatchPrefix(BotGroupRequestController __instance, ref bool __result, IPlayer player, BotOwner posibleExecuter)
         {
 
-            pitAIBossPlayer playerBoss = BossPlayer.Instance.GetBossPlayer(player.ProfileId);
+            pitAIBossPlayer playerBoss = BossPlayers.Instance.GetBossPlayer(player.ProfileId);
+
 
             if (playerBoss != null && posibleExecuter != null)
             {
-
-
-                // if BOT is already a follower, on "follow me" we make the bot come closer to the BOSS
-                if (posibleExecuter.BotFollower.HaveBoss && playerBoss.Followers.Find(it => it == posibleExecuter))
+                // if BOT is already a follower, allow "follow me" request to take place
+                if (BossPlayers.Instance.IsFollower(posibleExecuter, playerBoss))
                 {
-                    ; if (BossPlayer.Instance.IsFollower(posibleExecuter, playerBoss))
+                    Components.Logger.LogInfo("Called TryAskFollowMeRequest");
+                    try
                     {
-                        __result = true;
-                    }
-                    else
+                        return true;
+
+
+                    } catch (Exception e)
                     {
-                        // bot signals "NO"
-                        posibleExecuter.BotTalk.TrySay(EPhraseTrigger.Negative);
-                        posibleExecuter.Gesture.TryGestus(EGesture.Bad, true);
-                        __result = false;
+                        Logger.LogInfo("Error : " + e.ToString());
                     }
+                    
+
+                    __result = false;
                     return false;
 
                 }
@@ -46,34 +51,35 @@ namespace friendlyPMC.Patches
                 else if (player.Side == posibleExecuter.Side)
                 {
                     // add BOT as follower to the player BOSS if limit was not reached
-                    if (playerBoss.Followers.Count < 2)
+                    if (playerBoss.Followers.Count < followLimit)
                     {
 
-                        BotFollowerPlayer _follower = BossPlayer.Instance.AddFollower(posibleExecuter, playerBoss);
+                        BossPlayers.Instance.AddFollower(posibleExecuter, playerBoss);
                         // bot signals "OK"
-                        _follower.GetBot().BotTalk.TrySay(EPhraseTrigger.Roger);
-                        _follower.GetBot().Gesture.TryGestus(EGesture.Good, true);
+                        posibleExecuter.BotTalk.TrySay(EPhraseTrigger.Roger);
+                        posibleExecuter.Gesture.TryGestus(EGesture.Good, true);
 
                     }
-                    else
+                    else if(!BossPlayers.Instance.IsFollower(posibleExecuter))
                     {
                         // bot signals "NO"
                         posibleExecuter.BotTalk.TrySay(EPhraseTrigger.Negative);
                         posibleExecuter.Gesture.TryGestus(EGesture.Bad, true);
-
-                        Components.Logger.LogInfo($"Cannot add {posibleExecuter.Profile.Nickname} as follower to player {player.Profile.Nickname}, limit reached");
                     }
 
+                    __result = false;
+                    return false;
+                } else
+                {
+                    // bot signals "NO"
+                    posibleExecuter.BotTalk.TrySay(EPhraseTrigger.Toxic);
+                    posibleExecuter.Gesture.TryGestus(EGesture.FuckYou, true);
                     __result = false;
                     return false;
                 }
 
             }
-            else
-            {
-                Components.Logger.LogInfo($"{player.Profile.Nickname} is not a BOSS, falling back to default");
-            }
-
+            // allow default to take place
             return true;
         }
     }
@@ -82,90 +88,33 @@ namespace friendlyPMC.Patches
     {
         protected override MethodBase GetTargetMethod()
         {
-            //
-            return typeof(BotGroupRequestController).GetMethod("TryAskHoldRequest", BindingFlags.Public | BindingFlags.Instance);
+            return AccessTools.Method(typeof(BotGroupRequestController), "TryActivateWait");
+
         }
-
-        [PatchPostfix]
-        private static bool PatchPostfix(BotGroupRequestController __instance, ref bool __result, IPlayer player, BotOwner posibleExecuter)
-
+        [PatchPrefix]
+        private static bool PatchPrefix(BotGroupRequestController __instance, IPlayer player, BotOwner posibleExecuter)
         {
 
-            pitAIBossPlayer playerBoss = BossPlayer.Instance.GetBossPlayer(player.ProfileId);
+            pitAIBossPlayer playerBoss = BossPlayers.Instance.GetBossPlayer(player.ProfileId);
+
 
             if (playerBoss != null && posibleExecuter != null)
             {
-                // if BOT is already a follower, on "follow me" we make the bot come closer to the BOSS
-                if (posibleExecuter.BotFollower.HaveBoss && playerBoss.Followers.Find(it => it == posibleExecuter))
+                // boss can only send hold requests to it's followers
+                if (BossPlayers.Instance.IsFollower(posibleExecuter, playerBoss))
                 {
-                    if (BossPlayer.Instance.IsFollower(posibleExecuter, playerBoss))
-                    {
-                        Components.Logger.LogInfo("Bosss said 'hold position'");
-                        __result = true;
-                    }
-                    else
-                    {
-                        // bot signals "NO"
-                        posibleExecuter.BotTalk.TrySay(EPhraseTrigger.Negative);
-                        posibleExecuter.Gesture.TryGestus(EGesture.Bad, true);
-                        __result = false;
-                    }
-                    return false;
 
+                    return true;
                 }
+
+                // bot signals "NO"
+                posibleExecuter.BotTalk.TrySay(EPhraseTrigger.Negative);
+                posibleExecuter.Gesture.TryGestus(EGesture.Bad, true);
+
+                return false;
             }
-
+            // allow default to take place
             return true;
-        }
-    }
-
-    internal class ActivateGoToCheckRequestPatch : ModulePatch
-    {
-        protected override MethodBase GetTargetMethod()
-        {
-            //
-            return typeof(BotGroupRequestController).GetMethod("TryActivateGoToCheckRequest", BindingFlags.Public | BindingFlags.Instance);
-        }
-        [PatchPostfix]
-        private static void PatchPostfix()
-        {
-            Components.Logger.LogInfo("Called TryActivateGoToCheckRequest");
-        }
-    }
-
-    internal class ActivateGoToPointRequestPatch : ModulePatch
-    {
-        protected override MethodBase GetTargetMethod()
-        {
-            //
-            return typeof(BotGroupRequestController).GetMethod("TryActivateGoToPointRequest", BindingFlags.Public | BindingFlags.Instance);
-        }
-        [PatchPrefix]
-        private static bool PatchPrefix(BotGroupRequestController __instance, ref bool __result, IPlayer requester, Vector3 point, Action completeCallback = null, Action disposeCallback = null)
-
-        {
-            Components.Logger.LogInfo("TryActivateGoToPointRequest is : " + requester.Profile.Nickname);
-
-            return true;
-
-        }
-    }
-
-    internal class ActivateSuppressionRequest : ModulePatch
-    {
-        protected override MethodBase GetTargetMethod()
-        {
-            return AccessTools.Method(typeof(BotGroupRequestController), "TryActivateSuppressionRequest");
-        }
-
-        [PatchPrefix]
-        private static bool PatchPrefix(BotGroupRequestController __instance, ref bool __result, IPlayer requester, BotOwner posibleExecuter)
-
-        {
-            Components.Logger.LogInfo("TryActivateSuppressionRequest is : " + requester.Profile.Nickname);
-
-            return true;
-
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using EFT;
+using friendlyPMC.Modules;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -35,8 +36,7 @@ namespace friendlyPMC.Components
             if (
                     (
                         // boss can throw all types of requests
-                        botOwner_0.BotRequestController.CurRequest.Requester == botOwner_0.BotFollower.BossToFollow.Player() &&
-                        botOwner_0.BotRequestController.CurRequest.BotRequestType != BotRequestType.followMe
+                        botOwner_0.BotRequestController.CurRequest.Requester == botOwner_0.BotFollower.BossToFollow.Player()
                     ) ||
                     (
                         // teammates only some
@@ -70,44 +70,60 @@ namespace friendlyPMC.Components
                 case BotRequestType.followMe:
 
                     botOwner_0.BotTalk.TrySay(EPhraseTrigger.Roger, false);
-
-                    return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.followerPatrol, "flwMRF");
+                    botOwner_0.BotRequestController.CurRequest.Complete();
+                    return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.followerPatrol, "backToFLB");
 
                 // stay in place
                 case BotRequestType.hold:
                 case BotRequestType.wait:
                     botOwner_0.BotTalk.TrySay(EPhraseTrigger.Roger, false);
+                    botOwner_0.Gesture.TryGestus(EGesture.Good,false);
 
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.holdPosition, "req:holdPos");
 
                 // spread out requests
                 case BotRequestType.getInCover:
                 case BotRequestType.hide:
+
                     if (botOwner_0.Memory.IsInCover)
                     {
+                        botOwner_0.BotTalk.TrySay(EPhraseTrigger.Going, false);
                         return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.holdPosition, "req:stayHidden");
                     }
 
-                    botOwner_0.BotTalk.TrySay(EPhraseTrigger.Going, false);
-
-                    GetCoverPoint(botOwner_0.Position, 30f);
-
-                    if (!botOwner_0.CanSprintPlayer)
+                    if (customNavigationPoint_0 != null)
                     {
-                        return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.goToCoverPoint, "req:goHide");
+                        botOwner_0.BotTalk.TrySay(EPhraseTrigger.Going, false);
+                        if (!botOwner_0.CanSprintPlayer)
+                        {
+                            return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.goToCoverPoint, "req:goHide");
+                        }
+                        return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "req:runHide");
+                    } else
+                    {
+                        botOwner_0.BotRequestController.CurRequest.Dispose();
+
+                        return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.holdPosition, "req:cantHide");
                     }
-                    return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "req:runHide");
 
                 case BotRequestType.suppressionFire:
                     botOwner_0.BotTalk.TrySay(EPhraseTrigger.Covering, true);
+                    //botOwner_0.BotRequestController.CurRequest.Dispose();
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.suppressFire, "req:suppressFire");
 
                 case BotRequestType.attackClose:
                     botOwner_0.BotTalk.TrySay(EPhraseTrigger.Roger, true);
-                    return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.goToEnemy, "req:attackClose");
+                    GetCoverPoint(botOwner_0.Memory.GoalEnemy.EnemyLastPosition, 15f);
+                    //botOwner_0.BotRequestController.CurRequest.Dispose();
+
+                    if (customNavigationPoint_0 != null)
+                        return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMoving, "req:attackClose1");
+                    else
+                        return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.goToEnemy, "req:attackClose2");
             }
 
-            return new AICoreActionResultStruct<BotLogicDecision>(BaseLogicLayerClass.HoldOrCover(botOwner_0), "Error");
+            botOwner_0.BotTalk.TrySay(EPhraseTrigger.Negative, false);
+            return new AICoreActionResultStruct<BotLogicDecision>(HoldOrCover(botOwner_0), "req:Error");
         }
 
 
@@ -134,7 +150,7 @@ namespace friendlyPMC.Components
 
 
 
-            List<CustomNavigationPoint> customNavigationPoints = BossPlayer.Instance.GetCovers();
+            List<CustomNavigationPoint> customNavigationPoints = BossPlayers.Instance.GetCovers();
 
             if (customNavigationPoints.Count > 0)
             {

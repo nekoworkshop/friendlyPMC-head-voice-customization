@@ -1,5 +1,6 @@
 ﻿using Comfort.Common;
 using EFT;
+using friendlyPMC.Modules;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -40,35 +41,44 @@ namespace friendlyPMC.Components
             }
 
             // deactivate old brain
-            _bot.Brain.Agent.method_9(new AICoreActionEndStruct("BrainSwitch"));
+            if (_bot.Brain.BaseBrain.CurLayerInfo != null && _bot.Brain.BaseBrain.CurLayerInfo.IsActive)
+            {
+                string name = _bot.Brain.BaseBrain.CurLayerInfo.Name();
+                _bot.Brain.Agent.Deactivate(name);
+                _bot.Brain.BaseBrain.CurLayerInfo.IsActive = false;
+            }
             _bot.Brain.Agent.Dispose();
             _bot.Brain.BaseBrain.Dispose();
             _bot.BotsController.AICoreController.Stop();
+            
             _bot.Receiver.Dispose();
-            // wait for deactivation to take effect
-            Task.Delay(1).ContinueWith(t =>
-            {
-                // add special follower settings
-                SetlFollowerSettings(_bot);
 
-                // add the new follower brain
-                _bot.Brain.BaseBrain = GetFollowerBrain(_bot);
-                _bot.Brain.Agent = GetFollowerAIAgent(_bot);
-                _bot.Receiver = GetBotReceiver(_bot);
-                _bot.BotsController.AICoreController.Activate();
+            // add special follower settings
+            SetlFollowerSettings(_bot);
 
-                _bot.BotTalk.SetSilence(0f); // let the bot talk
+            // add a new receiver
+            _bot.Receiver = GetFollowerReceiver(bot);
+            _bot.Receiver.Init();
 
-                // make bot follower of player
-                _player.OfferBot(_bot);
-                _bot.Tactic.SetTactic(BotsGroup.BotCurrentTactic.Protect);
+            // add the new follower brain
+            _bot.Brain.BaseBrain = GetFollowerBrain(_bot);
+            _bot.Brain.Agent = GetFollowerAIAgent(_bot);
+                
+            _bot.BotsController.AICoreController.Activate();
+
+            _bot.BotTalk.SetSilence(0f); // let the bot talk
+                
+
+            // make bot follower of player
+            _player.OfferBot(_bot);
+            _bot.Tactic.SetTactic(BotsGroup.BotCurrentTactic.Protect);
 
                 // force activate following patrol mode
-                if (!_bot.BotFollower.PatrolDataFollower.IsInited)
-                {
-                    _bot.BotFollower.PatrolDataFollower.IsInited = true;
-                }
-                _bot.BotFollower.PatrolDataFollower.ManualUpdate();
+            if (!_bot.BotFollower.PatrolDataFollower.IsInited)
+            {
+                _bot.BotFollower.PatrolDataFollower.IsInited = true;
+            }
+            _bot.BotFollower.PatrolDataFollower.ManualUpdate();
 
                 // make all followers have the same group
                 if (_bot.BotsGroup != null)
@@ -103,16 +113,15 @@ namespace friendlyPMC.Components
                 }
 
 
-                _bot.GetPlayer.HealthController.DiedEvent += OnDead;
+            _bot.GetPlayer.HealthController.DiedEvent += OnDead;
 
-                Logger.LogInfo($"Bot {_bot.Profile.Nickname} is now a follower of {_player.Player().Profile.Nickname}");
-            });
+            Logger.LogInfo($"Bot {_bot.Profile.Nickname} is now a follower of {_player.Player().Profile.Nickname}");
 
         }
 
         private void OnDead(EDamageType damageType)
         {
-            BossPlayer.Instance.RemoveFollower(_bot, _player);
+            BossPlayers.Instance.RemoveFollower(_bot, _player);
         }
 
         /** Exposed so that it can be patched by addons **/
@@ -127,11 +136,7 @@ namespace friendlyPMC.Components
 
             return new AICoreAgentClass<BotLogicDecision>(bot.BotsController.AICoreController, bot.Brain.BaseBrain, GClass460.ActionsList(bot), bot.gameObject, name, new Func<BotLogicDecision, GClass134>(bot.Brain.method_0));
         }
-        /** Exposed so that it can be patched by addons **/
-        public FollowerReceiver GetBotReceiver(BotOwner bot)
-        {
-            return new FollowerReceiver(bot);
-        }
+        
         /** Exposed so that it can be patched by addons **/
         public void SetlFollowerSettings(BotOwner bot)
         {
@@ -172,6 +177,12 @@ namespace friendlyPMC.Components
 
             // refill weapons
             bot.WeaponManager.Reload.AddAmmoToPockets(bot.WeaponManager.CurrentWeapon.CurrentAmmoTemplate._id, 100);
+        }
+
+        /** Exposed so that it can be patched by addons **/
+        public FollowerReceiver GetFollowerReceiver(BotOwner bot)
+        {
+            return new FollowerReceiver(bot);
         }
 
         public bool IsBot(BotOwner bot)
