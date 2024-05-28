@@ -35,8 +35,7 @@ namespace friendlyPMC.Components
             if (
                     (
                         // boss can throw all types of requests
-                        botOwner_0.BotRequestController.CurRequest.Requester == botOwner_0.BotFollower.BossToFollow.Player() &&
-                        botOwner_0.BotRequestController.CurRequest.BotRequestType != BotRequestType.followMe
+                        botOwner_0.BotRequestController.CurRequest.Requester == botOwner_0.BotFollower.BossToFollow.Player()
                     ) ||
                     (
                         // teammates only some

@@ -57,7 +57,10 @@ namespace friendlyPMC.Components
                 _bot.Receiver = GetBotReceiver(_bot);
                 _bot.BotsController.AICoreController.Activate();
 
+                _bot.Receiver.Init();
+
                 _bot.BotTalk.SetSilence(0f); // let the bot talk
+                
 
                 // make bot follower of player
                 _player.OfferBot(_bot);

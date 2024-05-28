@@ -37,6 +37,10 @@
     <Reference Include="aki-custom">
       <HintPath>..\spt\aki-custom.dll</HintPath>
     </Reference>
+    <Reference Include="aki-singleplayer, Version=3.8.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\XboxGames\AKI-Streets-3.8.0\BepInEx\plugins\spt\aki-singleplayer.dll</HintPath>
+    </Reference>
     <Reference Include="Aki.Common">
       <HintPath>..\..\..\EscapeFromTarkov_Data\Managed\Aki.Common.dll</HintPath>
     </Reference>
@@ -57,6 +61,10 @@
     </Reference>
     <Reference Include="Comfort.Unity">
       <HintPath>..\..\..\EscapeFromTarkov_Data\Managed\Comfort.Unity.dll</HintPath>
+    </Reference>
+    <Reference Include="DissonanceVoip, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\XboxGames\AKI-Streets-3.8.0\EscapeFromTarkov_Data\Managed\DissonanceVoip.dll</HintPath>
     </Reference>
     <Reference Include="DrakiaXYZ-BigBrain">
       <HintPath>..\DrakiaXYZ-BigBrain.dll</HintPath>
@@ -119,6 +127,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Actions\" />
+    <Folder Include="Models\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

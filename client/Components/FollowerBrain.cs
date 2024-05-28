@@ -16,7 +16,7 @@ namespace friendlyPMC.Components
             FollowerLayer followLayer = new FollowerLayer(_owner, 51);
             method_0(1, followLayer, true);
             // - requests
-            GClass69 layer4 = new FollowerRequestLayer(_owner, 70);
+            GClass69 layer4 = new FollowerRequestLayer(_owner, 61);
             method_0(2, layer4, true);
             // - fight
             GClass47 layer6 = new FollowerFightLayer(_owner, 60);

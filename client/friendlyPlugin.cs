@@ -1,21 +1,28 @@
-﻿using BepInEx;
+﻿using Aki.Reflection.Patching;
+using Aki.Reflection.Utils;
+using BepInEx;
+using Comfort.Common;
+using EFT;
 using friendlyPMC.Components;
 using friendlyPMC.Patches;
+using System.Reflection;
 using Logger = friendlyPMC.Components.Logger;
 
 namespace friendlyPMC
 {
-    [BepInPlugin("xyz.pit.companion", "[pit-friendlyPMC]", "0.1")]
-    [BepInDependency("xyz.drakia.bigbrain", "0.4.0.0")]
+    [BepInPlugin("xyz.pit.companion", "[pit-friendlyPMC]", "1.0.0")]
     [BepInDependency("com.spt-aki.core", "3.8.0")]
+    [BepInDependency("xyz.drakia.bigbrain", "0.4.0.0")]
+    [BepInDependency("xyz.drakia.waypoints")]
     public class friendlyPMC : BaseUnityPlugin
     {
         private void Awake()
         {
-
             new Logger();
-
-            new BossPlayer();
+            
+            if(BossPlayer.Instance == null) { 
+                new BossPlayer();
+            }
 
             new PlayerPatch().Enable();
 
@@ -25,9 +32,6 @@ namespace friendlyPMC
             new BotOwnerDamagePatch().Enable();
 
             new FollowRequestPatch().Enable();
-            new HoldRequestPatch().Enable();
-            new ActivateGoToCheckRequestPatch().Enable();
-            new ActivateGoToPointRequestPatch().Enable();
 
             new CreateNodePatch().Enable();
         }

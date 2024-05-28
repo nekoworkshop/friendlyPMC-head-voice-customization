@@ -150,6 +150,8 @@ namespace friendlyPMC.Components
             Instance = this;
             _bosses = new Dictionary<string, pitAIBossPlayer>();
             _followers = new List<BotFollowerPlayer> { };
+
+            Logger.LogInfo("BossPlayer Instanced");
         }
 
         private Dictionary<string, pitAIBossPlayer> _bosses { get; set; }
@@ -157,12 +159,24 @@ namespace friendlyPMC.Components
 
         private List<CustomNavigationPoint> navigationPoints;
 
-        public void AddBossPlayer(string name, Player player)
+        public pitAIBossPlayer AddBossPlayer(Player player)
         {
             WildSpawnType roleType = player.Profile.Info.Settings.Role;
             player.Profile.Info.Settings.Role = WildSpawnType.bossKnight; // temp switch to boss role
             pitAIBossPlayer playerBoss = new pitAIBossPlayer(player);
             player.Profile.Info.Settings.Role = roleType; // revert role back to original
+
+            if(!playerBoss.IAmBoos)
+            {
+                Logger.LogInfo($"Could not make player {player.Profile.Nickname} as BOSS!");
+                return null;
+            } else
+            {
+
+                Logger.LogInfo($"Made player {player.Profile.Nickname} a BOSS");
+            }
+
+            string name = player.ProfileId;
 
             _bosses[name] = playerBoss;
 
@@ -203,11 +217,13 @@ namespace friendlyPMC.Components
 
                 navigationPoints = customNavigationPoints;
             }
+
+            return playerBoss;
         }
 
         public void RemoveBossPlayer(string name)
         {
-            if (_bosses.ContainsKey(name) && _bosses[name] != null)
+            if (_bosses.ContainsKey(name))
             {
                 pitAIBossPlayer boss = _bosses[name];
                 boss.Followers.ForEach(fl =>
@@ -276,6 +292,12 @@ namespace friendlyPMC.Components
 
         public bool IsFollower(BotOwner bot, AIBossPlayer boss = null)
         {
+
+            if(boss != null)
+            {
+                return bot.BotFollower.BossToFollow != null && bot.BotFollower.BossToFollow == boss;
+            }
+
             BotFollowerPlayer _follower = null;
 
             foreach (var item in _followers)
@@ -287,22 +309,17 @@ namespace friendlyPMC.Components
                 }
             }
 
-            if (_follower != null)
-            {
-                if (boss == null)
-                    return true;
-
-                else if (bot.BotFollower.BossToFollow != null && bot.BotFollower.BossToFollow.Player().ProfileId == boss.Player().ProfileId)
-                    return true;
-
-                return false;
-            }
-            return false;
+            return _follower != null;
         }
 
         public pitAIBossPlayer GetBossPlayer(string name)
         {
-            if (!_bosses.ContainsKey(name) || _bosses[name] == null)
+            Logger.LogInfo($"Boss name {name}");
+            foreach (var item in _bosses.Keys)
+            {
+                Logger.LogInfo($"_bosses key {item}");
+            }
+            if (!_bosses.ContainsKey(name))
             {
                 return null;
             }

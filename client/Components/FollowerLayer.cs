@@ -113,7 +113,7 @@ namespace friendlyPMC.Components
                 }
                 if (method_11(20f))
                 {
-                    GetCoverPoint(botOwner_0.Position, 20f);
+                    GetCoverPoint(botOwner_0.GetPlayer.Transform.position, 20f);
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "goforheal");
                 }
                 return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.heal, "heal now");

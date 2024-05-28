@@ -11,7 +11,7 @@ namespace friendlyPMC.Components
 
         public new void method_0(BotEventHandler.GClass599 info)
         {
-            Logger.LogInfo("phase was " + info.phrase.ToString());
+            Logger.LogInfo("Phrase was " + info.phrase.ToString());
             base.method_0(info);
         }
     }
