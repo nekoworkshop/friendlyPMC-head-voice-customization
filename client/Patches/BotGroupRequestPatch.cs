@@ -26,6 +26,7 @@ namespace friendlyPMC.Patches
             pitAIBossPlayer playerBoss = BossPlayers.Instance.GetBossPlayer(player.ProfileId);
 
 
+
             if (playerBoss != null && posibleExecuter != null)
             {
                 // if BOT is already a follower, allow "follow me" request to take place

@@ -22,6 +22,18 @@ using friendlyPMC.Modules;
 using BotCacheClass = GClass591;
 using IProfileData = GClass592;
 
+using BotCacheClass = GClass591;
+using IProfileData = GClass592;
+
+
+using EFT;
+using Aki.PrePatch;
+using System.Threading;
+using System;
+using UnityEngine.AI;
+using System.Threading.Tasks;
+
+
 namespace friendlyPMC.Patches
 {
 
