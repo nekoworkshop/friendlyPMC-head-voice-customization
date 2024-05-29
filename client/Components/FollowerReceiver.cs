@@ -64,17 +64,8 @@ namespace friendlyPMC.Components
 
         public virtual void PhraseSaid(BotEventHandler.GClass599 info)
         {
-            if (info.phrase == EPhraseTrigger.Cooperation)
-            {
-                if (!BossPlayers.Instance.IsFollower(botOwner_0) && !botOwner_0.BotFollower.HaveBoss)
-                {
-                    botOwner_0.BotsGroup.RequestsController.TryAskFollowMeRequest(info.PlayerRequester, botOwner_0);
-                }
-            }
-            else
-            {
-                base.method_0(info);
-            }
+            Components.Logger.LogInfo("PhraseSaid called");
+            base.method_0(info);
         }
 
     }

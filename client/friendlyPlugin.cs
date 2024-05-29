@@ -38,6 +38,7 @@ namespace friendlyPMC
 
             new BotRecieverInitPatch().Enable();
             new BotRecieverDisposePatch().Enable();
+            new BotReceiverPhrasePatch().Enable();
 
 
         }

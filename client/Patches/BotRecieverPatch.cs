@@ -63,4 +63,34 @@ namespace friendlyPMC.Patches
             return true;
         }
     }
+
+    internal class BotReceiverPhrasePatch : ModulePatch
+    {
+
+        protected override MethodBase GetTargetMethod()
+        {
+            return AccessTools.Method(typeof(BotReceiver), "method_0");
+        }
+
+        [PatchPrefix]
+        private static bool PatchPrefix(BotReceiver __instance, BotEventHandler.GClass599 info)
+        {
+
+            /*BotOwner botOwner = (BotOwner)AccessTools.Field(typeof(BotReceiver), "botOwner_0").GetValue(__instance);
+            if (botOwner != null)
+            {
+                if (info.phrase == EPhraseTrigger.Cooperation)
+                {
+                    Components.Logger.LogInfo("Cooperate");
+                    if (!BossPlayers.Instance.IsFollower(botOwner) && !botOwner.BotFollower.HaveBoss && BossPlayers.Instance.IsBoss(info.PlayerRequester.ProfileId))
+                    {
+                        botOwner.BotsGroup.RequestsController.TryAskFollowMeRequest(info.PlayerRequester, botOwner);
+                        return false;
+                    }
+                }
+            }*/
+
+            return true;
+        }
+    }
 }

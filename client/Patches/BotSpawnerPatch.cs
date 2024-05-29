@@ -22,17 +22,6 @@ using friendlyPMC.Modules;
 using BotCacheClass = GClass591;
 using IProfileData = GClass592;
 
-using BotCacheClass = GClass591;
-using IProfileData = GClass592;
-
-
-using EFT;
-using Aki.PrePatch;
-using System.Threading;
-using System;
-using UnityEngine.AI;
-using System.Threading.Tasks;
-
 
 namespace friendlyPMC.Patches
 {
@@ -48,6 +37,11 @@ namespace friendlyPMC.Patches
         public CancellationToken GetCancelToken()
         {
             return cancelSource.Token;
+        }
+
+        public void Cancel()
+        {
+            cancelSource.Cancel();
         }
     }
 
@@ -73,7 +67,7 @@ namespace friendlyPMC.Patches
 
                 BossPlayers.Instance.AddFollower(bot, player);
 
-                Components.Logger.LogInfo("Spawned bot " + bot.Profile.Nickname);
+                Components.Logger.LogInfo("Spawn: spawned bot " + bot.Profile.Nickname);
 
             });
 
@@ -90,10 +84,11 @@ namespace friendlyPMC.Patches
 
         }
 
-        public async Task<bool> SpawnBot(BotSpawner __instance, pitAIBossPlayer player)
+        public void SpawnBot(BotSpawner __instance, pitAIBossPlayer player)
         {
-            try {
-                
+            try
+            {
+
 
                 float dist;
 
@@ -111,18 +106,20 @@ namespace friendlyPMC.Patches
                 var boCreator = (IBotCreator)AccessTools.Field(typeof(BotSpawner), "_botCreator").GetValue(__instance);
                 if (boCreator == null)
                 {
-                    Components.Logger.LogInfo("boCreator is null");
-                    return false;
+                    Components.Logger.LogInfo("SpawnError: boCreator is null");
+                    return;
                 }
 
                 WildSpawnType type;
-                if(side == EPlayerSide.Bear)
+                if (side == EPlayerSide.Bear)
                 {
                     type = sptBear;
-                } else if (side == EPlayerSide.Usec)
+                }
+                else if (side == EPlayerSide.Usec)
                 {
                     type = sptUsec;
-                } else
+                }
+                else
                 {
                     type = WildSpawnType.assault;
                 }
@@ -131,30 +128,41 @@ namespace friendlyPMC.Patches
 
                 CancelToken token = new CancelToken();
 
-                Components.Logger.LogInfo("Preparing to spawn");
+                Components.Logger.LogInfo("Spawn: Preparing to spawn");
 
-                BotCacheClass bot = await BotCacheClass.Create(botData, boCreator, 1, token).ConfigureAwait(false);
+                var syncContext = new SynchronizationContext();
 
-                if(bot != null)
+                syncContext.Post(_ =>
                 {
-                    bot.AddPosition(position, closestCorePoint.Id);
+                    Task<BotCacheClass> botCreate = BotCacheClass.Create(botData, boCreator, 1, token);
 
-                    Components.Logger.LogInfo("Activate Bot");
+                    botCreate.ContinueWith(task =>
+                    {
+                        if (task.IsFaulted)
+                        {
+                            Components.Logger.LogInfo($"SpawnError: Task failed with exception: {task.Exception}");
+                        }
+                        else if (task.IsCanceled)
+                        {
+                            Components.Logger.LogInfo("SpawnError: Task was canceled");
+                        }
+                        else
+                        {
+                            BotCacheClass bot = task.Result;
+                            bot.AddPosition(position, closestCorePoint.Id);
+                            Components.Logger.LogInfo("Spawn: Activate Bot");
 
-                    ActivateBot(__instance, boCreator, zone, bot, token.GetCancelToken(), player);
+                            ActivateBot(__instance, boCreator, zone, bot, token.GetCancelToken(), player);
+                        }
+                    });
 
-                    return true;
-                } else
-                {
-                    Components.Logger.LogInfo("BotCacheClass resulted in null");
-                    return false;
-                }
+                },null);
+                
 
 
             } catch (Exception ex)
             {
-                Components.Logger.LogInfo($"Error : {ex.Message}");
-                return false;
+                Components.Logger.LogInfo($"SpawnError : {ex.Message}");
             }
         }
 
@@ -172,23 +180,7 @@ namespace friendlyPMC.Patches
             {
                 Components.Logger.LogInfo("Spawn a friendly");
 
-                Task<bool> spawnTask = Instance.SpawnBot(__instance, playerBoss);
-
-                spawnTask.ContinueWith(task =>
-                {
-                    if (task.IsCompleted)
-                    {
-                        bool result = task.Result;
-                        if (result)
-                        {
-                            Components.Logger.LogInfo("Spawn worked");
-                        }
-                        else
-                        {
-                            Components.Logger.LogInfo("Spawn failed");
-                        }
-                    }
-                });
+                Instance.SpawnBot(__instance, playerBoss);
             });
         }
     }

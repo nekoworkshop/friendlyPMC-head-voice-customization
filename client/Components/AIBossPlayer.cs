@@ -21,7 +21,7 @@ namespace friendlyPMC.Components
 
         }
 
-        public AIBossPlayerLogic GetBossLogic()
+        public new AIBossPlayerLogic GetBossLogic()
         {
             Logger.LogInfo("Get Boss Logic");
             return aBossLogic;
@@ -81,7 +81,7 @@ namespace friendlyPMC.Components
             }
         }
 
-        public void Dispose()
+        public new void Dispose()
         {
             Logger.LogInfo("Boss Disposed");
             base.Dispose();
