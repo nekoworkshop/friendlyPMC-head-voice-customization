@@ -21,6 +21,7 @@ using friendlyPMC.Modules;
 
 using BotCacheClass = GClass591;
 using IProfileData = GClass592;
+using System.Collections.Generic;
 
 
 namespace friendlyPMC.Patches
@@ -86,7 +87,52 @@ namespace friendlyPMC.Patches
 
         public void SpawnBot(BotSpawner __instance, pitAIBossPlayer player)
         {
+
             try
+            {
+                float dist;
+
+                Vector3 position = player.Position;
+                EPlayerSide side = player.Player().Side;
+
+                BotZone zone = __instance.GetClosestZone(position, out dist);
+                WildSpawnType sptBear = (WildSpawnType)AkiBotsPrePatcher.sptBearValue;
+                WildSpawnType sptUsec = (WildSpawnType)AkiBotsPrePatcher.sptUsecValue;
+
+                WildSpawnType type;
+                if (side == EPlayerSide.Bear)
+                {
+                    type = sptBear;
+                }
+                else if (side == EPlayerSide.Usec)
+                {
+                    type = sptUsec;
+                }
+                else
+                {
+                    type = WildSpawnType.assault;
+                }
+
+                IProfileData botData = new IProfileData(side, type, BotDifficulty.hard, 5f, null);
+
+                var task = __instance.ActivateBotsWithoutWave(2, botData);
+                task.GetAwaiter().OnCompleted(() =>
+                {
+                    if (task.IsFaulted)
+                    {
+                        Components.Logger.LogInfo($"SpawnError: Task failed with exception: {task.Exception}");
+                    }
+                    else if (task.IsCanceled)
+                    {
+                        Components.Logger.LogInfo("SpawnError: Task was canceled");
+                    }
+                });
+
+            } catch (Exception ex)
+            {
+                Components.Logger.LogInfo($"SpawnError : {ex.Message}");
+            }
+            /*try
             {
 
 
@@ -124,7 +170,7 @@ namespace friendlyPMC.Patches
                     type = WildSpawnType.assault;
                 }
 
-                IProfileData botData = new IProfileData(side, type, BotDifficulty.hard, 1f, null);
+                IProfileData botData = new IProfileData(side, type, BotDifficulty.hard, 10f, null);
 
                 CancelToken token = new CancelToken();
 
@@ -135,6 +181,8 @@ namespace friendlyPMC.Patches
                 syncContext.Post(_ =>
                 {
                     Task<BotCacheClass> botCreate = BotCacheClass.Create(botData, boCreator, 1, token);
+                    
+                    botCreate.ConfigureAwait(false);
 
                     botCreate.ContinueWith(task =>
                     {
@@ -163,7 +211,7 @@ namespace friendlyPMC.Patches
             } catch (Exception ex)
             {
                 Components.Logger.LogInfo($"SpawnError : {ex.Message}");
-            }
+            }*/
         }
 
         protected override MethodBase GetTargetMethod()
@@ -176,12 +224,9 @@ namespace friendlyPMC.Patches
         {
             pitAIBossPlayer playerBoss = BossPlayers.Instance.AddBossPlayer(player);
             // spawn a friendly bot
-            Task.Delay(5000).ContinueWith( t =>
-            {
-                Components.Logger.LogInfo("Spawn a friendly");
+            Components.Logger.LogInfo("Spawn a friendly");
 
-                Instance.SpawnBot(__instance, playerBoss);
-            });
+            Instance.SpawnBot(__instance, playerBoss);
         }
     }
 }

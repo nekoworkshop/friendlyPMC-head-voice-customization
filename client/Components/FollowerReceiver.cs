@@ -11,14 +11,11 @@ namespace friendlyPMC.Components
     {
         public FollowerReceiver(BotOwner owner) : base(owner)
         {
-            Logger.LogInfo("New Receiever constructed");
-
             Receivers.AddReciever(owner.ProfileId, this);
         }
 
         public virtual void Initiate()
         {
-            Logger.LogInfo("New Receiever initiated");
             Singleton<BotEventHandler>.Instance.OnQETilt += base.method_4;
             Singleton<BotEventHandler>.Instance.OnGestusShow += GestusShown;
             Singleton<BotEventHandler>.Instance.OnPhraseSay += PhraseSaid;
@@ -64,7 +61,6 @@ namespace friendlyPMC.Components
 
         public virtual void PhraseSaid(BotEventHandler.GClass599 info)
         {
-            Components.Logger.LogInfo("PhraseSaid called");
             base.method_0(info);
         }
 

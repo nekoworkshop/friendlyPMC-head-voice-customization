@@ -81,7 +81,7 @@ namespace friendlyPMC.Components
             }
         }
 
-        public new void Dispose()
+        public void DisposeBoss()
         {
             Logger.LogInfo("Boss Disposed");
             base.Dispose();
@@ -97,8 +97,6 @@ namespace friendlyPMC.Components
             player.HealthController.ApplyDamageEvent += OnHit;
             _player = player;
             _aiplayer = aiplayer;
-
-            //botsController.GetClosestZone
         }
 
         public void OnHit(EBodyPart bodyPart, float damage, DamageInfo damageInfo)
@@ -108,15 +106,17 @@ namespace friendlyPMC.Components
                 _lastTimeHit = Time.time;
                 try
                 {
-                    _aiplayer.bossGroup.CheckAndAddEnemy(damageInfo.Player.AIData.BotOwner);
+                    if (_aiplayer.bossGroup != null)
+                    {
+                        _aiplayer.bossGroup.CheckAndAddEnemy(damageInfo.Player.AIData.BotOwner);
+                        _aiplayer.AddEnemy(damageInfo.Player.AIData.BotOwner);
+                    }
 
                 }
                 catch (Exception)
                 {
                     Components.Logger.LogInfo("Can't add enemy to group");
                 }
-
-                _aiplayer.AddEnemy(damageInfo.Player.AIData.BotOwner);
             }
         }
 

@@ -94,21 +94,33 @@ namespace friendlyPMC.Modules
             if (_bosses.ContainsKey(name))
             {
                 pitAIBossPlayer boss = _bosses[name];
+
+                List<BotOwner> ownersToRemove = new List<BotOwner>();
+                List<BotFollowerPlayer> followersToRemove = new List<BotFollowerPlayer>();
+
                 boss.Followers.ForEach(fl =>
                 {
+                    ownersToRemove.Add(fl);
                     _followers.ForEach(follower =>
                     {
                         if (follower.IsBot(fl))
                         {
-                            _followers.Remove(follower);
-                            boss.RemoveFollower(fl);
+                            followersToRemove.Add(follower);
                         }
                     });
                 });
 
+                ownersToRemove.ForEach(follower =>
+                {
+                    boss.RemoveFollower(follower);
+                });
 
+                followersToRemove.ForEach(_follower =>
+                {
+                    _followers.Remove(_follower);
+                });
 
-                boss.Dispose();
+                boss.DisposeBoss();
                 _bosses.Remove(name);
             }
         }

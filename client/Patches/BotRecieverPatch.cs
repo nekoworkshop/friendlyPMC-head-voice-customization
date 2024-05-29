@@ -76,19 +76,30 @@ namespace friendlyPMC.Patches
         private static bool PatchPrefix(BotReceiver __instance, BotEventHandler.GClass599 info)
         {
 
-            /*BotOwner botOwner = (BotOwner)AccessTools.Field(typeof(BotReceiver), "botOwner_0").GetValue(__instance);
+            BotOwner botOwner = (BotOwner)AccessTools.Field(typeof(BotReceiver), "botOwner_0").GetValue(__instance);
             if (botOwner != null)
             {
+                Components.Logger.LogInfo("Intercept Phrase Say");
                 if (info.phrase == EPhraseTrigger.Cooperation)
                 {
-                    Components.Logger.LogInfo("Cooperate");
-                    if (!BossPlayers.Instance.IsFollower(botOwner) && !botOwner.BotFollower.HaveBoss && BossPlayers.Instance.IsBoss(info.PlayerRequester.ProfileId))
+                    IPlayer requester = info.PlayerRequester;
+
+                    Components.Logger.LogInfo("Intercept Cooperation");
+                    if (requester != null && (botOwner.GetPlayer.Transform.position - requester.Transform.position).sqrMagnitude < 10f)
                     {
-                        botOwner.BotsGroup.RequestsController.TryAskFollowMeRequest(info.PlayerRequester, botOwner);
-                        return false;
+
+
+                        Components.Logger.LogInfo("Try Cooperate");
+                        if (!BossPlayers.Instance.IsFollower(botOwner) && !botOwner.BotFollower.HaveBoss && BossPlayers.Instance.IsBoss(requester.ProfileId))
+                        {
+                            botOwner.BotsGroup.RequestsController.TryAskFollowMeRequest(requester, botOwner);
+                            return false;
+                        }
                     }
+
                 }
-            }*/
+
+            }
 
             return true;
         }

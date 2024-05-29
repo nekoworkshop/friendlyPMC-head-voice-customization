@@ -211,9 +211,12 @@ namespace friendlyPMC.Components
                         if ((HasBoss() && HasCloseCoverToBoss()) || this.customNavigationPoint_0 == null)
                         {
                             if (!HasBoss()) GetClosestCoverPoint(botOwner_0.GetPlayer.Transform.position);
-                            return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.goToCoverPoint, "CantShootFindCover");
+                            if(customNavigationPoint_0 != null)
+                                return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "cantShootFindCover");
                             // -- no cover, still can't shoot, just provide suppression
-                        }
+                            else
+                                return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.dogFight, "justFight");
+                        }   
                         else
                         {
                             return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.suppressFire, "intimidate");
