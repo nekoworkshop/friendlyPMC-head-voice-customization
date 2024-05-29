@@ -1,4 +1,5 @@
 ﻿using Aki.Reflection.Patching;
+using Comfort.Common;
 using EFT;
 using friendlyPMC.Components;
 using friendlyPMC.Modules;
@@ -12,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace friendlyPMC.Patches
 {
-    internal class BotRecieverInitPatch : ModulePatch
+    internal class BotReceiverInitPatch : ModulePatch
     {
         protected override MethodBase GetTargetMethod()
         {
@@ -38,7 +39,7 @@ namespace friendlyPMC.Patches
         }
     }
 
-    internal class BotRecieverDisposePatch : ModulePatch
+    internal class BotReceiverDisposePatch : ModulePatch
     {
         protected override MethodBase GetTargetMethod()
         {
@@ -79,26 +80,25 @@ namespace friendlyPMC.Patches
             BotOwner botOwner = (BotOwner)AccessTools.Field(typeof(BotReceiver), "botOwner_0").GetValue(__instance);
             if (botOwner != null)
             {
-                Components.Logger.LogInfo("Intercept Phrase Say");
+                // on cooperation, starting following the boss player
                 if (info.phrase == EPhraseTrigger.Cooperation)
                 {
                     IPlayer requester = info.PlayerRequester;
 
-                    Components.Logger.LogInfo("Intercept Cooperation");
                     if (requester != null && (botOwner.GetPlayer.Transform.position - requester.Transform.position).sqrMagnitude < 10f)
                     {
-
 
                         Components.Logger.LogInfo("Try Cooperate");
                         if (!BossPlayers.Instance.IsFollower(botOwner) && !botOwner.BotFollower.HaveBoss && BossPlayers.Instance.IsBoss(requester.ProfileId))
                         {
+                            // this will switch the BotReceiever to our own, so the rest can be altered there
                             botOwner.BotsGroup.RequestsController.TryAskFollowMeRequest(requester, botOwner);
                             return false;
                         }
                     }
 
                 }
-
+                
             }
 
             return true;

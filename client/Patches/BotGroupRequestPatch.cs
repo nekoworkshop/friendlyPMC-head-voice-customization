@@ -32,7 +32,6 @@ namespace friendlyPMC.Patches
                 // if BOT is already a follower, allow "follow me" request to take place
                 if (BossPlayers.Instance.IsFollower(posibleExecuter, playerBoss))
                 {
-                    Components.Logger.LogInfo("Called TryAskFollowMeRequest");
                     try
                     {
                         return true;

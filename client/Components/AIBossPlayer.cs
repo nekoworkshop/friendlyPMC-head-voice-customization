@@ -4,6 +4,7 @@ using friendlyPMC.Modules;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using static UnityEngine.EventSystems.EventTrigger;
 
 namespace friendlyPMC.Components
 {
@@ -57,7 +58,7 @@ namespace friendlyPMC.Components
             return bossEnemies;
         }
 
-        public void prioritizeEnemy(BotOwner follower)
+        public void PrioritizeEnemy(BotOwner follower)
         {
 
             // make the closest enemy of boss, the enemy
@@ -79,6 +80,26 @@ namespace friendlyPMC.Components
                     follower.Memory.AddEnemy(newEnemy, botSettingsClass, false);
                 }
             }
+        }
+
+        public BotOwner ClosestEnemy()
+        {
+            BotOwner enemy = null;
+
+            if (bossEnemies.Count > 0)
+            {
+                float dist = Mathf.Infinity;
+                
+                foreach (var item in bossEnemies)
+                {
+                    if ((this.Position - item.Position).sqrMagnitude < dist)
+                    {
+                        enemy = item;
+                    }
+                }
+            }
+
+            return enemy;
         }
 
         public void DisposeBoss()
@@ -130,7 +151,7 @@ namespace friendlyPMC.Components
             Logger.LogInfo("prioritize enemies");
             _aiplayer.Followers.ForEach(follower =>
             {
-                _aiplayer.prioritizeEnemy(follower);
+                _aiplayer.PrioritizeEnemy(follower);
             });
         }
 

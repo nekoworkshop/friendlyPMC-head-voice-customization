@@ -17,14 +17,18 @@ namespace friendlyPMC
     [BepInDependency("xyz.drakia.waypoints")]
     public class friendlyPMC : BaseUnityPlugin
     {
+        public static bool awaken;
         private void Awake()
         {
-            new Logger();
             
-            if(BossPlayers.Instance == null) { 
-                new BossPlayers();
-                new Receivers();
-            }
+            if(awaken) return;
+            awaken = true;
+
+            new Logger();
+
+            new BossPlayers();
+            new Receivers();
+            new InteractableObjects();
 
             new PlayerPatch().Enable();
 
@@ -36,8 +40,8 @@ namespace friendlyPMC
             new FollowRequestPatch().Enable();
             new HoldRequestPatch().Enable();
 
-            new BotRecieverInitPatch().Enable();
-            new BotRecieverDisposePatch().Enable();
+            new BotReceiverInitPatch().Enable();
+            new BotReceiverDisposePatch().Enable();
             new BotReceiverPhrasePatch().Enable();
 
             new QuickPanelPatch().Enable();

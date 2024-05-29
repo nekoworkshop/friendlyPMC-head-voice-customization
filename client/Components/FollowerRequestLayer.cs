@@ -90,10 +90,11 @@ namespace friendlyPMC.Components
                         botOwner_0.BotTalk.TrySay(EPhraseTrigger.Going, false);
                         return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.holdPosition, "req:stayHidden");
                     }
-
+                    GetCoverPoint(botOwner_0.GetPlayer.Transform.position, 30f);
                     if (customNavigationPoint_0 != null)
                     {
                         botOwner_0.BotTalk.TrySay(EPhraseTrigger.Going, false);
+                        botOwner_0.BotRequestController.CurRequest.Complete();
                         if (!botOwner_0.CanSprintPlayer)
                         {
                             return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.goToCoverPoint, "req:goHide");
@@ -101,20 +102,20 @@ namespace friendlyPMC.Components
                         return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "req:runHide");
                     } else
                     {
-                        botOwner_0.BotRequestController.CurRequest.Dispose();
+                        botOwner_0.BotRequestController.CurRequest.Complete();
 
                         return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.holdPosition, "req:cantHide");
                     }
 
                 case BotRequestType.suppressionFire:
                     botOwner_0.BotTalk.TrySay(EPhraseTrigger.Covering, true);
-                    //botOwner_0.BotRequestController.CurRequest.Dispose();
+                    botOwner_0.BotRequestController.CurRequest.Complete();
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.suppressFire, "req:suppressFire");
 
                 case BotRequestType.attackClose:
                     botOwner_0.BotTalk.TrySay(EPhraseTrigger.Roger, true);
                     GetCoverPoint(botOwner_0.Memory.GoalEnemy.EnemyLastPosition, 15f);
-                    //botOwner_0.BotRequestController.CurRequest.Dispose();
+                    botOwner_0.BotRequestController.CurRequest.Complete();
 
                     if (customNavigationPoint_0 != null)
                         return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMoving, "req:attackClose1");

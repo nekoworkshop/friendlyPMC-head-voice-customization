@@ -114,12 +114,18 @@ namespace friendlyPMC.Components
 
 
             _bot.GetPlayer.HealthController.DiedEvent += OnDead;
+            _bot.LeaveData.OnLeave += OnLeave;
 
             Logger.LogInfo($"Bot {_bot.Profile.Nickname} is now a follower of {_player.Player().Profile.Nickname}");
 
         }
-
-        private void OnDead(EDamageType damageType)
+        /** Exposed so that it can be patched by addons **/
+        public void OnDead(EDamageType damageType)
+        {
+            BossPlayers.Instance.RemoveFollower(_bot, _player);
+        }
+        /** Exposed so that it can be patched by addons **/
+        public void OnLeave(BotOwner _bot)
         {
             BossPlayers.Instance.RemoveFollower(_bot, _player);
         }
@@ -199,6 +205,14 @@ namespace friendlyPMC.Components
         {
             if (_bot == null) return null;
             return _player;
+        }
+
+        public void Dismiss()
+        {
+            _bot.Receiver.Dispose();
+            _bot.Receiver = new BotReceiver(_bot);
+            _bot.Receiver.Init();
+            // @TODO : see what else can be reverted
         }
     }
 }

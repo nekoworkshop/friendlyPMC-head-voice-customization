@@ -32,13 +32,19 @@ namespace friendlyPMC.Patches
                 bool flag = lootItem != null && lootItem.ItemOwner.RootItem.GetItemComponent<KeyComponent>() != null;
                 bool flag2 = lootItem != null && lootItem.ItemOwner.RootItem is GClass2737;
                 bool flag3 = lootItem != null && (lootItem.ItemOwner.RootItem is Weapon || lootItem.ItemOwner.RootItem.GetItemComponent<KnifeComponent>() != null);
+
                 __instance.method_7(EPhraseTrigger.LootKey, flag);
                 __instance.method_7(EPhraseTrigger.LootMoney, flag2);
                 __instance.method_7(EPhraseTrigger.LootWeapon, flag3);
                 __instance.method_7(EPhraseTrigger.LootGeneric, lootItem != null && !flag && !flag2 && !flag3);
+                
                 Corpse x = player.InteractableObject as Corpse;
+                // modification here
+                InteractableObjects.SetCurCorpse(x);
+
                 __instance.method_7(EPhraseTrigger.LootBody, x != null);
                 __instance.method_7(EPhraseTrigger.CheckHim, x != null);
+                
                 __instance.method_7(EPhraseTrigger.LootContainer, player.InteractableObject as LootableContainer != null);
                 Door door = player.InteractableObject as Door;
                 __instance.method_7(EPhraseTrigger.OpenDoor, door != null);

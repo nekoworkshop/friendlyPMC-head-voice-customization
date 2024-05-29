@@ -149,7 +149,7 @@ namespace friendlyPMC.Modules
             return _follower;
         }
 
-        public void RemoveFollower(BotOwner bot, pitAIBossPlayer player)
+        public void RemoveFollower(BotOwner bot, pitAIBossPlayer player,bool dismissed = false)
         {
 
             BotFollowerPlayer _follower = null;
@@ -167,9 +167,16 @@ namespace friendlyPMC.Modules
                 _followers.Remove(_follower);
                 if (player.bossGroup != null)
                     player.bossGroup.RemoveAlly(bot);
+                
+                // reset the bot receiever
+                if (dismissed && bot.HealthController.IsAlive)
+                {
+                    _follower.Dismiss();
+                }
             }
 
             player.RemoveFollower(bot);
+
         }
 
         public bool IsFollower(BotOwner bot, AIBossPlayer boss = null)
@@ -179,6 +186,8 @@ namespace friendlyPMC.Modules
             {
                 return bot.BotFollower.BossToFollow != null && bot.BotFollower.BossToFollow == boss;
             }
+            
+            if (bot.BotFollower.BossToFollow == null) return false;
 
             BotFollowerPlayer _follower = null;
 

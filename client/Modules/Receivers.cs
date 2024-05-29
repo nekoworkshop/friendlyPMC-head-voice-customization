@@ -14,7 +14,7 @@ namespace friendlyPMC.Modules
                 followerReceivers = new Dictionary<string, FollowerReceiver>();
             }
         }
-        public static void AddReciever(string id, FollowerReceiver receiver)
+        public static void AddReceiver(string id, FollowerReceiver receiver)
         {
             if(followerReceivers.ContainsKey(id))
             {
@@ -28,7 +28,7 @@ namespace friendlyPMC.Modules
             followerReceivers.Add(id, receiver);
         }
 
-        public static void RemoveReciever(FollowerReceiver receiver)
+        public static void RemoveReceiver(FollowerReceiver receiver)
         {
             foreach (var item in followerReceivers)
             {
