@@ -14,11 +14,16 @@ namespace friendlyPMC.Components
 
         public BotsGroup bossGroup = null;
 
+
         private List<BotOwner> bossEnemies = new List<BotOwner>();
-        public pitAIBossPlayer(Player player) : base(player)
+        public pitAIBossPlayer(Player player, BotZone zone, IBotGame botGame) : base(player)
         {
             aBossLogic = new AIBossPlayerLogic(player, this);
+            GameDateTime time = new GameDateTime(new DateTime(), new DateTime(), 1);
+            
+            //BotOwner dummyBot = BotOwner.Create(player, null, time, botGame.BotsController, true, null);
 
+            //bossGroup = new BotsGroup(zone, botGame, dummyBot, new List<BotOwner>(), null, new List<Player>(),false);
 
         }
 
@@ -104,6 +109,10 @@ namespace friendlyPMC.Components
 
         public void DisposeBoss()
         {
+            if(bossGroup != null)
+            {
+                bossGroup.RemoveInfo(this.Player());
+            }
             Logger.LogInfo("Boss Disposed");
             base.Dispose();
             aBossLogic.Dispose();

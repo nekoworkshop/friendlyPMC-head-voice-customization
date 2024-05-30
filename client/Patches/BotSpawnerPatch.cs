@@ -21,7 +21,11 @@ using friendlyPMC.Modules;
 
 using BotCacheClass = GClass591;
 using IProfileData = GClass592;
+using Comfort.Common;
 using System.Collections.Generic;
+using static BoxFracture;
+using UnityEngine.Profiling;
+using System.Security.Policy;
 
 
 namespace friendlyPMC.Patches
@@ -56,162 +60,100 @@ namespace friendlyPMC.Patches
             if (Instance == null) Instance = this;
         }
 
-        private void ActivateBot(BotSpawner __instance,IBotCreator botCreator, BotZone botZone, BotCacheClass botData, CancellationToken cancelToken, pitAIBossPlayer player)
+
+        public void SpawnBossFollowers(BotSpawner __instance, pitAIBossPlayer player)
         {
+            float dist;
 
-            BotSpawner.Class934 data = new BotSpawner.Class934();
-  
-            data.botSpawner_0 = __instance;
-            data.data = botData;
-            data.stopWatch = new Stopwatch();
-            data.callback = new Action<BotOwner>((BotOwner bot) => {
+            Vector3 position = player.Position;
+            EPlayerSide side = player.Player().Side;
 
-                BossPlayers.Instance.AddFollower(bot, player);
+            BotZone zone = __instance.GetClosestZone(position, out dist);
+            WildSpawnType sptBear = (WildSpawnType)AkiBotsPrePatcher.sptBearValue;
+            WildSpawnType sptUsec = (WildSpawnType)AkiBotsPrePatcher.sptUsecValue;
 
-                Components.Logger.LogInfo("Spawn: spawned bot " + bot.Profile.Nickname);
+            var coversData = __instance.BotGame.BotsController.CoversData;
+            var groupPoint = coversData.GetClosest(position);
+            var closestCorePoint = groupPoint.CorePointInGame;
 
-            });
-
-            data.stopWatch.Start();
-
-            data.shallBeGroup = (data.data.SpawnParams != null && data.data.SpawnParams.ShallBeGroup != null && data.data.SpawnParams.ShallBeGroup.Group && data.data.SpawnParams.ShallBeGroup.RemainCount > 0);
-
-            if (data.shallBeGroup)
+            WildSpawnType type;
+            if (side == EPlayerSide.Bear)
             {
-                data.data.SpawnParams.ShallBeGroup.DescreaseCount();
+                type = sptBear;
+            }
+            else if (side == EPlayerSide.Usec)
+            {
+                type = sptUsec;
+            }
+            else
+            {
+                type = WildSpawnType.assault;
             }
 
-            botCreator.ActivateBot(botData, botZone, data.shallBeGroup, __instance.GetGroupAndSetEnemies, data.method_0, cancelToken);
+            IProfileData botData = new IProfileData(side, type, BotDifficulty.hard, 0f, null);
 
-        }
+            CancelToken token = new CancelToken();
 
-        public void SpawnBot(BotSpawner __instance, pitAIBossPlayer player)
-        {
+            var boCreator = (IBotCreator)AccessTools.Field(typeof(BotSpawner), "_botCreator").GetValue(__instance);
+            var spawnSystem = (ISpawnSystem)AccessTools.Field(typeof(BotSpawner), "_spawnSystem").GetValue(__instance); 
+            if(boCreator != null && spawnSystem != null) {
+                BossSpawnerClass BossSpawner = new BossSpawnerClass(spawnSystem, __instance, boCreator, new BotZone[] { zone });
 
-            try
-            {
-                float dist;
+                Components.Logger.LogInfo("Preparing to spawn followers");
 
-                Vector3 position = player.Position;
-                EPlayerSide side = player.Player().Side;
 
-                BotZone zone = __instance.GetClosestZone(position, out dist);
-                WildSpawnType sptBear = (WildSpawnType)AkiBotsPrePatcher.sptBearValue;
-                WildSpawnType sptUsec = (WildSpawnType)AkiBotsPrePatcher.sptUsecValue;
-
-                WildSpawnType type;
-                if (side == EPlayerSide.Bear)
+                if (SynchronizationContext.Current == null)
                 {
-                    type = sptBear;
-                }
-                else if (side == EPlayerSide.Usec)
-                {
-                    type = sptUsec;
-                }
-                else
-                {
-                    type = WildSpawnType.assault;
+
+                    SynchronizationContext context = new SynchronizationContext();
+                    SynchronizationContext.SetSynchronizationContext(context);
+
                 }
 
-                IProfileData botData = new IProfileData(side, type, BotDifficulty.hard, 5f, null);
+                Task<BotCacheClass> botCreate = BotCacheClass.Create(botData, boCreator, 1, token);
 
-                var task = __instance.ActivateBotsWithoutWave(2, botData);
-                task.GetAwaiter().OnCompleted(() =>
+                botCreate.ConfigureAwait(false);
+
+                botCreate.ContinueWith(task =>
                 {
                     if (task.IsFaulted)
                     {
-                        Components.Logger.LogInfo($"SpawnError: Task failed with exception: {task.Exception}");
+                        Components.Logger.LogInfo($"Create Task failed with exception: {task.Exception}");
+                        return null;
                     }
                     else if (task.IsCanceled)
                     {
-                        Components.Logger.LogInfo("SpawnError: Task was canceled");
+                        Components.Logger.LogInfo("Create Task was canceled");
+                        return null;
+                    }
+                    else
+                    {
+                        BotCacheClass bot = task.Result;
+                        bot.AddPosition(position, closestCorePoint.Id);
+                        Components.Logger.LogInfo("Activating followers");
+
+                        Task newTask = BossSpawner.method_6(bot, null, zone, 1, botData, (BotOwner bt) =>
+                        {
+                            Components.Logger.LogInfo("Followers activated");
+                        });
+
+                        return newTask;
+                    }
+                }).Unwrap().ContinueWith(task =>
+                {
+                    if (task.IsFaulted)
+                    {
+                        Components.Logger.LogInfo($"Spawn Task failed with exception: {task.Exception}");
+                    }
+                    else if (task.IsCanceled)
+                    {
+                        Components.Logger.LogInfo("Spawn Task was canceled");
                     }
                 });
 
-            } catch (Exception ex)
-            {
-                Components.Logger.LogInfo($"SpawnError : {ex.Message}");
             }
-            /*try
-            {
 
-
-                float dist;
-
-                Vector3 position = player.Position;
-                EPlayerSide side = player.Player().Side;
-
-                BotZone zone = __instance.GetClosestZone(position, out dist);
-                WildSpawnType sptBear = (WildSpawnType)AkiBotsPrePatcher.sptBearValue;
-                WildSpawnType sptUsec = (WildSpawnType)AkiBotsPrePatcher.sptUsecValue;
-
-                var coversData = __instance.BotGame.BotsController.CoversData;
-                var groupPoint = coversData.GetClosest(position);
-                var closestCorePoint = groupPoint.CorePointInGame;
-
-                var boCreator = (IBotCreator)AccessTools.Field(typeof(BotSpawner), "_botCreator").GetValue(__instance);
-                if (boCreator == null)
-                {
-                    Components.Logger.LogInfo("SpawnError: boCreator is null");
-                    return;
-                }
-
-                WildSpawnType type;
-                if (side == EPlayerSide.Bear)
-                {
-                    type = sptBear;
-                }
-                else if (side == EPlayerSide.Usec)
-                {
-                    type = sptUsec;
-                }
-                else
-                {
-                    type = WildSpawnType.assault;
-                }
-
-                IProfileData botData = new IProfileData(side, type, BotDifficulty.hard, 10f, null);
-
-                CancelToken token = new CancelToken();
-
-                Components.Logger.LogInfo("Spawn: Preparing to spawn");
-
-                var syncContext = new SynchronizationContext();
-
-                syncContext.Post(_ =>
-                {
-                    Task<BotCacheClass> botCreate = BotCacheClass.Create(botData, boCreator, 1, token);
-                    
-                    botCreate.ConfigureAwait(false);
-
-                    botCreate.ContinueWith(task =>
-                    {
-                        if (task.IsFaulted)
-                        {
-                            Components.Logger.LogInfo($"SpawnError: Task failed with exception: {task.Exception}");
-                        }
-                        else if (task.IsCanceled)
-                        {
-                            Components.Logger.LogInfo("SpawnError: Task was canceled");
-                        }
-                        else
-                        {
-                            BotCacheClass bot = task.Result;
-                            bot.AddPosition(position, closestCorePoint.Id);
-                            Components.Logger.LogInfo("Spawn: Activate Bot");
-
-                            ActivateBot(__instance, boCreator, zone, bot, token.GetCancelToken(), player);
-                        }
-                    });
-
-                },null);
-                
-
-
-            } catch (Exception ex)
-            {
-                Components.Logger.LogInfo($"SpawnError : {ex.Message}");
-            }*/
+            
         }
 
         protected override MethodBase GetTargetMethod()
@@ -222,11 +164,15 @@ namespace friendlyPMC.Patches
         [PatchPostfix]
         private static void PatchPostfix(BotSpawner __instance, Player player)
         {
-            pitAIBossPlayer playerBoss = BossPlayers.Instance.AddBossPlayer(player);
-            // spawn a friendly bot
-            Components.Logger.LogInfo("Spawn a friendly");
+            float dist;
+            Vector3 position = player.Transform.position;
 
-            Instance.SpawnBot(__instance, playerBoss);
+            BotZone zone = __instance.GetClosestZone(position, out dist);
+
+            pitAIBossPlayer playerBoss = BossPlayers.Instance.AddBossPlayer(player,zone, __instance.BotGame);
+
+            // spawn a friendly bot
+            //Instance.SpawnBossFollowers(__instance, playerBoss);
         }
     }
 }

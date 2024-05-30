@@ -73,6 +73,9 @@ namespace friendlyPMC.Components
                     }
                 }
 
+                if (botOwner_0.BotRequestController.CurRequest != null && botOwner_0.BotRequestController.CurRequest.BotRequestType == BotRequestType.doorOpen)
+                    return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.doorOpen, "doorOpen");
+
                 botOwner_0.PatrollingData.SetTargetMoveSpeed();
                 botOwner_0.PatrollingData.PointChooser.ShallChangeWay(false);
 
@@ -84,9 +87,6 @@ namespace friendlyPMC.Components
 
                 PatrolWay way = botOwner_0.PatrollingData.Way;
 
-
-                bool hasBossRequest = botOwner_0.BotFollower.HaveBoss && botOwner_0.BotRequestController.CurRequest != null && botOwner_0.BotRequestController.CurRequest.Requester == botOwner_0.BotFollower.BossToFollow.Player();
-                BotRequest currRequest = hasBossRequest ? botOwner_0.BotRequestController.CurRequest : null;
 
                 if (HasBoss())
                 {

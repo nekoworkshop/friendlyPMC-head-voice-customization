@@ -116,6 +116,10 @@
     <Reference Include="UnityEngine.InputModule">
       <HintPath>..\..\..\EscapeFromTarkov_Data\Managed\UnityEngine.InputModule.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine.PhysicsModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\XboxGames\AKI-Streets-3.8.0\EscapeFromTarkov_Data\Managed\UnityEngine.PhysicsModule.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine.TextRenderingModule">
       <HintPath>..\..\..\EscapeFromTarkov_Data\Managed\UnityEngine.TextRenderingModule.dll</HintPath>
     </Reference>
@@ -127,16 +131,18 @@
     <Compile Include="Components\AIBossPlayer.cs" />
     <Compile Include="Components\BotFollowerPlayer.cs" />
     <Compile Include="Components\FollowerBrain.cs" />
+    <Compile Include="Components\FollowerDoorOpener.cs" />
     <Compile Include="Components\FollowerFightLayer.cs" />
     <Compile Include="Components\FollowerLayer.cs" />
     <Compile Include="Components\FollowerReceiver.cs" />
     <Compile Include="Components\FollowerRequestLayer.cs" />
     <Compile Include="Components\Logger.cs" />
     <Compile Include="Modules\BossPlayers.cs" />
+    <Compile Include="Modules\InteractableObjects.cs" />
     <Compile Include="Modules\Receivers.cs" />
     <Compile Include="Patches\BotGroupRequestPatch.cs" />
     <Compile Include="Patches\BotOwnerPatch.cs" />
-    <Compile Include="Patches\BotRecieverPatch.cs" />
+    <Compile Include="Patches\BotReceiverPatch.cs" />
     <Compile Include="Patches\BotSpawnerPatch.cs" />
     <Compile Include="Patches\CreateNodePatch.cs" />
     <Compile Include="Patches\PlayerPatch.cs" />

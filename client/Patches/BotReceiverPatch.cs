@@ -88,10 +88,9 @@ namespace friendlyPMC.Patches
                     if (requester != null && (botOwner.GetPlayer.Transform.position - requester.Transform.position).sqrMagnitude < 10f)
                     {
 
-                        Components.Logger.LogInfo("Try Cooperate");
                         if (!BossPlayers.Instance.IsFollower(botOwner) && !botOwner.BotFollower.HaveBoss && BossPlayers.Instance.IsBoss(requester.ProfileId))
                         {
-                            // this will switch the BotReceiever to our own, so the rest can be altered there
+                            // this will switch the BotReceiver to our own, so the rest can be altered there
                             botOwner.BotsGroup.RequestsController.TryAskFollowMeRequest(requester, botOwner);
                             return false;
                         }

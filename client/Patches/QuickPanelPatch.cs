@@ -37,33 +37,37 @@ namespace friendlyPMC.Patches
                 __instance.method_7(EPhraseTrigger.LootMoney, flag2);
                 __instance.method_7(EPhraseTrigger.LootWeapon, flag3);
                 __instance.method_7(EPhraseTrigger.LootGeneric, lootItem != null && !flag && !flag2 && !flag3);
-                
-                Corpse x = player.InteractableObject as Corpse;
+
                 // modification here
+                Corpse x = player.InteractableObject as Corpse;
                 InteractableObjects.SetCurCorpse(x);
 
                 __instance.method_7(EPhraseTrigger.LootBody, x != null);
                 __instance.method_7(EPhraseTrigger.CheckHim, x != null);
                 
                 __instance.method_7(EPhraseTrigger.LootContainer, player.InteractableObject as LootableContainer != null);
+
+                // modification here
                 Door door = player.InteractableObject as Door;
+                InteractableObjects.SetCurDoor(door);
+
                 __instance.method_7(EPhraseTrigger.OpenDoor, door != null);
                 __instance.method_7(EPhraseTrigger.LockedDoor, door != null && (door.DoorState == EDoorState.Locked || door.DoorState == EDoorState.Shut));
 
                 // modification is here
-                if(player.InteractablePlayer != null && player.InteractablePlayer.IsAI)
+                if (player.InteractablePlayer != null && player.InteractablePlayer.IsAI)
                 {
-                    if(player.InteractablePlayer.AIData.BotOwner.BotFollower.HaveBoss)
+                    if (BossPlayers.Instance.IsFollower(player.InteractablePlayer.AIData.BotOwner))
                     {
                         __instance.method_7(EPhraseTrigger.Cooperation, false);
 
                         return false;
-                    } else
+                    }
+                    else
                     {
-                        __instance.method_7(EPhraseTrigger.Cooperation,true);
+                        __instance.method_7(EPhraseTrigger.Cooperation, true);
                     }
                 }
-                
                 return false;
             }
 

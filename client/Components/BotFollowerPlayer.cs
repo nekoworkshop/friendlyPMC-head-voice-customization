@@ -101,9 +101,11 @@ namespace friendlyPMC.Components
                         });
 
                         _player.bossGroup = _bot.BotsGroup;
-                        _player.bossGroup.AddAlly(_player.Player().AIData.Player);
+                        _player.bossGroup.AddAlly((Player)_player.Player());
+                        _player.bossGroup.OnEnemyAdd += OnAddEnemyGroup;
 
-                    }
+
+                }
                     else
                     {
                         _bot.BotsGroup.RemoveAlly(_bot);
@@ -115,6 +117,7 @@ namespace friendlyPMC.Components
 
             _bot.GetPlayer.HealthController.DiedEvent += OnDead;
             _bot.LeaveData.OnLeave += OnLeave;
+            _bot.Memory.OnAddEnemy += OnAddEnemy;
 
             Logger.LogInfo($"Bot {_bot.Profile.Nickname} is now a follower of {_player.Player().Profile.Nickname}");
 
@@ -128,6 +131,25 @@ namespace friendlyPMC.Components
         public void OnLeave(BotOwner _bot)
         {
             BossPlayers.Instance.RemoveFollower(_bot, _player);
+        }
+        public void OnAddEnemy(IPlayer player)
+        {
+            // how does the boss get added as Enemy?? - fix it
+            if(player != null && player == _player) {
+                _bot.Memory.DeleteInfoAboutEnemy(player);
+                _bot.BotsGroup.RemoveEnemy(player);
+                _bot.BotsGroup.AddAlly((Player)_player.Player());
+            }
+        }
+
+        public void OnAddEnemyGroup(IPlayer player, EBotEnemyCause cause)
+        {
+            // how does the boss get added as Enemy?? - fix it
+            if (player != null && player == _player)
+            {
+                _bot.BotsGroup.RemoveEnemy(_player.Player());
+                _bot.BotsGroup.AddAlly((Player)_player.Player());
+            }
         }
 
         /** Exposed so that it can be patched by addons **/
@@ -213,6 +235,9 @@ namespace friendlyPMC.Components
             _bot.Receiver = new BotReceiver(_bot);
             _bot.Receiver.Init();
             // @TODO : see what else can be reverted
+            _bot.GetPlayer.HealthController.DiedEvent -= OnDead;
+            _bot.LeaveData.OnLeave -= OnLeave;
+            _bot.Memory.OnAddEnemy -= OnAddEnemy;
         }
     }
 }

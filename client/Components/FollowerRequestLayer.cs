@@ -28,7 +28,21 @@ namespace friendlyPMC.Components
 
         public override bool ShallUseNow()
         {
-            if (botOwner_0.BotRequestController.CurRequest == null)
+            BotRequest currRequest = botOwner_0.BotRequestController.CurRequest;
+            List<BotRequestType> enemyAllowedRequests = new List<BotRequestType>();
+            enemyAllowedRequests.Add(BotRequestType.getInCover);
+            enemyAllowedRequests.Add(BotRequestType.hide);
+            enemyAllowedRequests.Add(BotRequestType.suppressionFire);
+            enemyAllowedRequests.Add(BotRequestType.followMe);
+            enemyAllowedRequests.Add(BotRequestType.suppressionFire);
+
+            List<BotRequestType> allyAllowedRequest = new List<BotRequestType>();
+            allyAllowedRequest.Add(BotRequestType.getInCover);
+            allyAllowedRequest.Add(BotRequestType.hide);
+            allyAllowedRequest.Add(BotRequestType.throwGrenade);
+            allyAllowedRequest.Add(BotRequestType.throwGrenadeFromPlace);
+
+            if (currRequest == null)
             {
                 return false;
             }
@@ -36,17 +50,13 @@ namespace friendlyPMC.Components
             if (
                     (
                         // boss can throw all types of requests
-                        botOwner_0.BotRequestController.CurRequest.Requester == botOwner_0.BotFollower.BossToFollow.Player()
+                        currRequest.Requester == botOwner_0.BotFollower.BossToFollow.Player() &&
+                        // - the rest is handled by followerfight layer
+                        (!botOwner_0.Memory.HaveEnemy || enemyAllowedRequests.Contains(currRequest.BotRequestType))
                     ) ||
                     (
                         // teammates only some
-                        botOwner_0.BotsGroup.Contains(botOwner_0.BotRequestController.CurRequest.Requester.AIData.BotOwner) &&
-                        (
-                            botOwner_0.BotRequestController.CurRequest.BotRequestType == BotRequestType.getInCover ||
-                            botOwner_0.BotRequestController.CurRequest.BotRequestType == BotRequestType.hide ||
-                            botOwner_0.BotRequestController.CurRequest.BotRequestType == BotRequestType.throwGrenade ||
-                            botOwner_0.BotRequestController.CurRequest.BotRequestType == BotRequestType.throwGrenadeFromPlace
-                        )
+                        botOwner_0.BotsGroup.Contains(currRequest.Requester.AIData.BotOwner) && allyAllowedRequest.Contains(currRequest.BotRequestType)
                     )
                 )
             {
@@ -112,15 +122,8 @@ namespace friendlyPMC.Components
                     botOwner_0.BotRequestController.CurRequest.Complete();
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.suppressFire, "req:suppressFire");
 
-                case BotRequestType.attackClose:
-                    botOwner_0.BotTalk.TrySay(EPhraseTrigger.Roger, true);
-                    GetCoverPoint(botOwner_0.Memory.GoalEnemy.EnemyLastPosition, 15f);
-                    botOwner_0.BotRequestController.CurRequest.Complete();
-
-                    if (customNavigationPoint_0 != null)
-                        return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMoving, "req:attackClose1");
-                    else
-                        return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.goToEnemy, "req:attackClose2");
+                case BotRequestType.doorOpen:
+                    return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.doorOpen, "doorOpen");
             }
 
             botOwner_0.BotTalk.TrySay(EPhraseTrigger.Negative, false);

@@ -13,11 +13,13 @@ namespace friendlyPMC.Modules
 
         private Corpse _currCorpse;
 
+        private Door _currDoor;
+
 
         public InteractableObjects() { 
             if(Instance == null)
             {
-                Instance = new InteractableObjects();
+                Instance = this;
             }
         }
 
@@ -32,5 +34,13 @@ namespace friendlyPMC.Modules
             return Instance._currCorpse;
         }
 
+        public static void SetCurDoor(Door door) {
+        
+            Instance._currDoor = door;
+        }
+        public static Door GetCurDoor()
+        {
+            return Instance._currDoor;
+        }
     }
 }

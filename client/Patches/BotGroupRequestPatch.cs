@@ -1,6 +1,8 @@
-﻿using Aki.Reflection.Patching;
+﻿using Aki.Common.Http;
+using Aki.Reflection.Patching;
 using Comfort.Common;
 using EFT;
+using EFT.Interactive;
 using friendlyPMC.Components;
 using friendlyPMC.Modules;
 using HarmonyLib;
@@ -32,19 +34,7 @@ namespace friendlyPMC.Patches
                 // if BOT is already a follower, allow "follow me" request to take place
                 if (BossPlayers.Instance.IsFollower(posibleExecuter, playerBoss))
                 {
-                    try
-                    {
-                        return true;
-
-
-                    } catch (Exception e)
-                    {
-                        Logger.LogInfo("Error : " + e.ToString());
-                    }
-                    
-
-                    __result = false;
-                    return false;
+                    return true;
 
                 }
 
@@ -117,4 +107,5 @@ namespace friendlyPMC.Patches
             return true;
         }
     }
+
 }

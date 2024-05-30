@@ -46,6 +46,8 @@ namespace friendlyPMC
 
             new QuickPanelPatch().Enable();
 
+            new CreateNodePatch().Enable();
+
 
         }
 

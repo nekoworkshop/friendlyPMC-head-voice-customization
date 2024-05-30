@@ -1,8 +1,10 @@
 ﻿using Comfort.Common;
 using EFT;
+using EFT.Interactive;
 using friendlyPMC.Components;
 using friendlyPMC.Modules;
 using System;
+using System.Threading.Tasks;
 using UnityEngine;
 
 namespace friendlyPMC.Components
@@ -62,8 +64,9 @@ namespace friendlyPMC.Components
 
         public virtual void PhraseSaid(BotEventHandler.GClass599 info)
         {
+
             // on cover me, get closer to the boss
-            if (info.phrase == EPhraseTrigger.CoverMe)
+            if (info.phrase == EPhraseTrigger.CoverMe || info.phrase == EPhraseTrigger.FollowMe || info.phrase == EPhraseTrigger.Regroup)
             {
                 IPlayer requester = info.PlayerRequester;
                 pitAIBossPlayer boss = BossPlayers.Instance.GetBossPlayer(requester.ProfileId);
@@ -107,8 +110,61 @@ namespace friendlyPMC.Components
 
                     return;
                 }
-                // on dismiss remove the bot from being a follower
-            } else if (info.phrase == EPhraseTrigger.OnYourOwn)
+
+            }
+            // attack close
+            else if (info.phrase == EPhraseTrigger.Gogogo)
+            {
+                IPlayer requester = info.PlayerRequester;
+                pitAIBossPlayer boss = BossPlayers.Instance.GetBossPlayer(requester.ProfileId);
+                if (requester != null && boss != null && BossPlayers.Instance.IsFollower(botOwner_0, boss))
+                {
+                    botOwner_0.BotsGroup.RequestsController.TryActivateGoToCheckRequest(boss.Player(), botOwner_0);
+                }
+            }
+            // loot dead body
+            else if (info.phrase == EPhraseTrigger.CheckHim || info.phrase == EPhraseTrigger.LootBody)
+            {
+                IPlayer requester = info.PlayerRequester;
+                pitAIBossPlayer boss = BossPlayers.Instance.GetBossPlayer(requester.ProfileId);
+                if (BossPlayers.Instance.IsBoss(requester.ProfileId))
+                {
+                    if (BossPlayers.Instance.IsFollower(botOwner_0, boss) && (botOwner_0.GetPlayer.Transform.position - boss.Position).sqrMagnitude < 12f)
+                    {
+                        //@TODO - have bot loot the body - check looting bots mod
+                    }
+
+                    return;
+                }
+
+            }
+            // open door request
+            else if (info.phrase == EPhraseTrigger.OpenDoor)
+            {
+
+                IPlayer requester = info.PlayerRequester;
+                pitAIBossPlayer boss = BossPlayers.Instance.GetBossPlayer(requester.ProfileId);
+                if (BossPlayers.Instance.IsBoss(requester.ProfileId))
+                {
+                    if (BossPlayers.Instance.IsFollower(botOwner_0, boss) && (botOwner_0.GetPlayer.Transform.position - boss.Position).sqrMagnitude < 12f)
+                    {
+                        Door door = InteractableObjects.GetCurDoor();
+                        if (door != null)
+                        {
+                            Task.Delay(1000).ContinueWith(t =>
+                            {
+                                botOwner_0.BotsGroup.RequestsController.TryActivateOpenDoorRequest(requester, door, null);
+                            });
+                        }
+                    }
+
+                    return;
+                }
+
+
+            }
+            // on dismiss remove the bot from being a follower
+            else if (info.phrase == EPhraseTrigger.OnYourOwn)
             {
                 IPlayer requester = info.PlayerRequester;
                 pitAIBossPlayer boss = BossPlayers.Instance.GetBossPlayer(requester.ProfileId);
@@ -129,25 +185,6 @@ namespace friendlyPMC.Components
 
                     return;
                 }
-            } else if (info.phrase == EPhraseTrigger.CheckHim || info.phrase == EPhraseTrigger.LootBody)
-            {
-                IPlayer requester = info.PlayerRequester;
-                pitAIBossPlayer boss = BossPlayers.Instance.GetBossPlayer(requester.ProfileId);
-                if (BossPlayers.Instance.IsBoss(requester.ProfileId))
-                {
-                    if (BossPlayers.Instance.IsFollower(botOwner_0, boss) && (botOwner_0.GetPlayer.Transform.position - boss.Position).sqrMagnitude < 12f)
-                    {
-                        //@TODO - have bot loot the body
-                    }
-
-                        return;
-                }
-
-            } else if(info.phrase == EPhraseTrigger.OpenDoor)
-            { 
-            } else
-            {
-                Logger.LogInfo("Phrase was " + info.phrase.ToString());
             }
             base.method_0(info);
         }
