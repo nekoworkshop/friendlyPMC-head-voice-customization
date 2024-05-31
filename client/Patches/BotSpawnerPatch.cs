@@ -94,10 +94,29 @@ namespace friendlyPMC.Patches
             followerWave.WildSpawnType = type;
             followerWave.IsPlayers = false;
             followerWave.SpawnAreaName = zone.NameZone;
-            followerWave.Time = 10f;
+            followerWave.Time = -1f;
             followerWave.WithCheckMinMax = false;
 
-            __instance.ActivateBotsByWave(followerWave);
+            if (SynchronizationContext.Current == null)
+            {
+                type = WildSpawnType.assault;
+                SynchronizationContext context = new SynchronizationContext();
+                SynchronizationContext.SetSynchronizationContext(context);
+            }
+
+            Task waveSpawn = __instance.ActivateBotsByWave(followerWave);
+            waveSpawn.ConfigureAwait(false);
+            waveSpawn.ContinueWith(task =>
+            {
+                if (task.IsFaulted)
+                {
+                    Components.Logger.LogInfo($"SpawnError: Task failed with exception: {task.Exception}");
+                }
+                else if (task.IsCanceled)
+                {
+                    Components.Logger.LogInfo("SpawnError: Task was canceled");
+                }
+            });
         }
 
         protected override MethodBase GetTargetMethod()

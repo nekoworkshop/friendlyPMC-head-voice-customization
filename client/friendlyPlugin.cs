@@ -36,6 +36,8 @@ namespace friendlyPMC
 
             new BotOwnerIsFolowerPatch().Enable();
             new BotOwnerDamagePatch().Enable();
+            
+            new BotGroupIsEnemyPatch().Enable();
 
             new FollowRequestPatch().Enable();
             new HoldRequestPatch().Enable();
@@ -47,8 +49,6 @@ namespace friendlyPMC
             new QuickPanelPatch().Enable();
 
             new CreateNodePatch().Enable();
-
-
         }
 
     }

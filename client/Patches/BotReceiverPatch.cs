@@ -85,7 +85,7 @@ namespace friendlyPMC.Patches
                 {
                     IPlayer requester = info.PlayerRequester;
 
-                    if (requester != null && (botOwner.GetPlayer.Transform.position - requester.Transform.position).sqrMagnitude < 10f)
+                    if (requester != null && (botOwner.GetPlayer.Transform.position - requester.Transform.position).sqrMagnitude < 12f)
                     {
 
                         if (!BossPlayers.Instance.IsFollower(botOwner) && !botOwner.BotFollower.HaveBoss && BossPlayers.Instance.IsBoss(requester.ProfileId))

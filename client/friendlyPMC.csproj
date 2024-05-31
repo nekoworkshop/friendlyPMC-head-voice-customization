@@ -140,6 +140,7 @@
     <Compile Include="Modules\BossPlayers.cs" />
     <Compile Include="Modules\InteractableObjects.cs" />
     <Compile Include="Modules\Receivers.cs" />
+    <Compile Include="Patches\BotGroupIsEnemyPatch.cs" />
     <Compile Include="Patches\BotGroupRequestPatch.cs" />
     <Compile Include="Patches\BotOwnerPatch.cs" />
     <Compile Include="Patches\BotReceiverPatch.cs" />

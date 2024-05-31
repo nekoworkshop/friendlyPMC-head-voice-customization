@@ -133,7 +133,7 @@ namespace friendlyPMC.Components
                             enemyInfo = botOwner_0.Memory.GoalEnemy;
                             BotOwner newEnemy = boss.ClosestEnemy();
 
-                            if (newEnemy != null && (botOwner_0.GetPlayer.Transform.position - enemyInfo.Person.Transform.position).sqrMagnitude > 30f)
+                            if (newEnemy != null && (enemyInfo == null || (botOwner_0.GetPlayer.Transform.position - enemyInfo.Person.Transform.position).sqrMagnitude > 20f))
                             {
                                 BotSettingsClass botSettingsClass = new BotSettingsClass(Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(newEnemy.ProfileId), boss.bossGroup, EBotEnemyCause.callForHelp1);
 
@@ -165,10 +165,22 @@ namespace friendlyPMC.Components
                 // open door request
                 else if (info.phrase == EPhraseTrigger.OpenDoor && !botOwner_0.Memory.HaveEnemy)
                 {
-
-                    if ((botOwner_0.GetPlayer.Transform.position - boss.Position).sqrMagnitude < 10f)
+                    Door door = InteractableObjects.GetCurDoor();
+                    BotOwner closest = null;
+                    float dist = 10f;
+                    boss.Followers.ForEach(fl =>
                     {
-                        Door door = InteractableObjects.GetCurDoor();
+                        Vector3 pos = fl.GetPlayer.Transform.position;
+                        float fldist = (door.TrackableTransform.position - pos).sqrMagnitude;
+                        if (fldist < dist)
+                        {
+                            closest = fl;
+                            dist = fldist;
+                        }
+
+                    });
+                    // the closest bot shall open the door
+                    if(closest != null && closest == botOwner_0) {
                         botOwner_0.BotsGroup.RequestsController.TryActivateOpenDoorRequest(requester, door, null);
                     }
 
