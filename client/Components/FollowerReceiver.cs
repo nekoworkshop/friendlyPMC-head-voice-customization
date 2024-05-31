@@ -166,24 +166,27 @@ namespace friendlyPMC.Components
                 else if (info.phrase == EPhraseTrigger.OpenDoor && !botOwner_0.Memory.HaveEnemy)
                 {
                     Door door = InteractableObjects.GetCurDoor();
-                    BotOwner closest = null;
-                    float dist = 10f;
-                    boss.Followers.ForEach(fl =>
+                    if (door != null)
                     {
-                        Vector3 pos = fl.GetPlayer.Transform.position;
-                        float fldist = (door.TrackableTransform.position - pos).sqrMagnitude;
-                        if (fldist < dist)
+                        BotOwner closest = null;
+                        float dist = 10f;
+                        boss.Followers.ForEach(fl =>
                         {
-                            closest = fl;
-                            dist = fldist;
+                            Vector3 pos = fl.GetPlayer.Transform.position;
+                            float fldist = (door.TrackableTransform.position - pos).sqrMagnitude;
+                            if (fldist < dist)
+                            {
+                                closest = fl;
+                                dist = fldist;
+                            }
+
+                        });
+                        // the closest bot shall open the door
+                        if (closest != null && closest == botOwner_0)
+                        {
+                            botOwner_0.BotsGroup.RequestsController.TryActivateOpenDoorRequest(requester, door, null);
                         }
-
-                    });
-                    // the closest bot shall open the door
-                    if(closest != null && closest == botOwner_0) {
-                        botOwner_0.BotsGroup.RequestsController.TryActivateOpenDoorRequest(requester, door, null);
                     }
-
                 }
                 // on dismiss remove the bot from being a follower
                 else if (info.phrase == EPhraseTrigger.OnYourOwn)

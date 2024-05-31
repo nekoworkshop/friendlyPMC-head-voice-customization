@@ -135,6 +135,17 @@ namespace friendlyPMC.Components
         }
 
 
+        public override AICoreActionEndStruct EndDoorOpenRequest()
+        {
+            BotRequest curRequest = this.botOwner_0.BotRequestController.CurRequest;
+
+            if (curRequest != null && curRequest.BotRequestType == BotRequestType.doorOpen && !(botOwner_0.DoorOpener.Interacting || botOwner_0.DoorOpener.NearDoor))
+            {
+                return this.gstruct7_1;
+            }
+            return this.gstruct7_0;
+        }
+
         public override CustomNavigationPoint FindPoint(CoverSearchData data, Func<CoverSearchData, CustomNavigationPoint> p, bool checkCurrent)
         {
             if (this.customNavigationPoint_0 != null && (!this.customNavigationPoint_0.IsFreeById(this.botOwner_0.Id) || this.customNavigationPoint_0.IsSpotted))

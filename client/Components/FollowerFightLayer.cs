@@ -119,7 +119,6 @@ namespace friendlyPMC.Components
                 ordersAreAttack = false;
             }
 
-            // TO DO : implement check currRequest
             if (!botOwner_0.Memory.HaveEnemy)
             {
 

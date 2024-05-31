@@ -35,8 +35,7 @@ namespace friendlyPMC.Components
             if (!this.bool_0)
             {
                 Vector3 position = this.GClass509_0.Door.transform.position;
-                // modification here
-                this.botOwner_0.GoToPoint(position, true, -1f, false, false, true, false);
+                this.botOwner_0.GoToPoint(position, true, -1f, false, true, true, false);
                 this.bool_0 = true;
             }
             if (!this.botOwner_0.Mover.IsComeTo(0.5f, false))
@@ -53,7 +52,7 @@ namespace friendlyPMC.Components
 
         public void method_5()
         {
-            this.float_0 = Time.time + this.botOwner_0.Settings.FileSettings.Move.UPDATE_TIME_RECAL_WAY;
+            this.float_0 = Time.time + 2f;
             this.bool_0 = false;
         }
     }
@@ -74,9 +73,10 @@ namespace friendlyPMC.Components
                 return;
             }
 
-            if ((botOwner_0.Position - GClass509_0.Door.transform.position).sqrMagnitude < 2f)
+            if ((botOwner_0.Position - GClass509_0.Door.transform.position).sqrMagnitude < 0.5f)
             {
                 botOwner_0.DoorOpener.Interact(GClass509_0.Door, EInteractionType.Open);
+
                 return;
             }
 

@@ -21,8 +21,6 @@ namespace friendlyPMC.Patches
             if(type == BotLogicDecision.doorOpen && BossPlayers.Instance.IsFollower(bot))
             {
                 __result = new FollowerDoorOpener(bot, bot.BotRequestController.CurRequest as GClass509);
-                bot.BotRequestController.CurRequest.Complete();
-                bot.BotRequestController.CurRequest = null;
                 return false;
             }
             
