@@ -34,13 +34,15 @@ namespace friendlyPMC
 
             new BotSpawnerAddPlayerPatch().Enable();
 
-            new BotOwnerIsFolowerPatch().Enable();
-            new BotOwnerDamagePatch().Enable();
-            
             new BotGroupIsEnemyPatch().Enable();
+
+            new BotOwnerIsFolowerPatch().Enable();
+
+            new BotOwnerDamagePatch().Enable();
 
             new FollowRequestPatch().Enable();
             new HoldRequestPatch().Enable();
+            new GoToCheckRequestPatsh().Enable();
 
             new BotReceiverInitPatch().Enable();
             new BotReceiverDisposePatch().Enable();
@@ -48,7 +50,7 @@ namespace friendlyPMC
 
             new QuickPanelPatch().Enable();
 
-            new CreateNodePatch().Enable();
+            new CreateNodePatch().Enable();        
         }
 
     }

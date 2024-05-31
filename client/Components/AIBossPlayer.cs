@@ -37,7 +37,6 @@ namespace friendlyPMC.Components
 
         public new AIBossPlayerLogic GetBossLogic()
         {
-            Logger.LogInfo("Get Boss Logic");
             return aBossLogic;
         }
 
@@ -81,7 +80,7 @@ namespace friendlyPMC.Components
                 float dist = Mathf.Infinity;
                 foreach (var item in bossEnemies)
                 {
-                    if ((this.Position - item.Position).sqrMagnitude < dist)
+                    if ((this.Position - item.Position).magnitude < dist)
                     {
                         newEnemy = item;
                     }
@@ -105,7 +104,7 @@ namespace friendlyPMC.Components
                 
                 foreach (var item in bossEnemies)
                 {
-                    if ((this.Position - item.Position).sqrMagnitude < dist)
+                    if ((this.Position - item.Position).magnitude < dist)
                     {
                         enemy = item;
                     }
@@ -122,7 +121,6 @@ namespace friendlyPMC.Components
                 bossGroup.RemoveInfo(this.Player());
             }
             aBossLogic.Dispose();
-            base.Dispose();
 
             Logger.LogInfo("Player Boss Disposed");
         }

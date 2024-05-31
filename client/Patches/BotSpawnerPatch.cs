@@ -97,6 +97,7 @@ namespace friendlyPMC.Patches
 
             var boCreator = (IBotCreator)AccessTools.Field(typeof(BotSpawner), "_botCreator").GetValue(__instance);
             var spawnSystem = (ISpawnSystem)AccessTools.Field(typeof(BotSpawner), "_spawnSystem").GetValue(__instance);
+            var _delayedSpawnBotsInfo = (GClass584)AccessTools.Field(typeof(BotSpawner), "_delayedSpawnBotsInfo").GetValue(__instance);
             if (boCreator != null && spawnSystem != null)
             {
                 if (SynchronizationContext.Current == null)
@@ -113,20 +114,49 @@ namespace friendlyPMC.Patches
                     if (task.IsFaulted)
                     {
                         Components.Logger.LogInfo($"Create Task failed with exception: {task.Exception}");
+                        return null;
                     }
                     else if (task.IsCanceled)
                     {
                         Components.Logger.LogInfo("Create Task was canceled");
+                        return null;
                     }
                     else
                     {
                         var data = task.Result;
+                        
                         Components.Logger.LogInfo("Continuing creation");
+
                         ISpawnPoint[] array = spawnSystem.SelectAISpawnPoints(ESpawnCategory.Bot, data, zone, 2, null, ActionIfNotEnoughPoints.DuplicateIfAtLeastOne);
-                        __instance.method_6(array.ToList<ISpawnPoint>(), zone, data, (BotOwner bot)=>{
+
+                        if (SynchronizationContext.Current == null)
+                        {
+                            SynchronizationContext context = new SynchronizationContext();
+                            SynchronizationContext.SetSynchronizationContext(context);
+                        }
+
+                        Task newTask = __instance.method_6(array.ToList<ISpawnPoint>(), zone, data, (BotOwner bot)=>{
                             Components.Logger.LogInfo("Bots created");
                         },token.GetCancelToken());
-                        new GClass583(zone, 2, data);
+
+                        newTask.ConfigureAwait(false);
+
+                        _delayedSpawnBotsInfo.Add(new GClass583(zone, 2, data));
+
+                        return newTask;
+                    }
+                }).Unwrap().ContinueWith(task =>
+                {
+                    if (task != null)
+                    {
+                        if (task.IsFaulted)
+                        {
+                            Components.Logger.LogInfo($"Spawn Task failed with exception: {task.Exception}");
+                        }
+                        else if (task.IsCanceled)
+                        {
+                            Components.Logger.LogInfo("Spawn Task was canceled");
+                        }
                     }
                 });
 

@@ -17,7 +17,7 @@ namespace friendlyPMC.Components
         private float coverTimer = 0f;
         private float coverTimeRunner = 0f;
 
-        private float float_2 = 0f;
+        private float suppressTime = 0f;
 
         private bool ordersAreHold = false;
         private bool ordersAreAttack = false;
@@ -154,8 +154,10 @@ namespace friendlyPMC.Components
                         coverTimeRunner = 0f;
                         GetClosestCoverPoint(GetBoss().Position);
                         // -- is close enough, try to provide suppression
-                        if (customNavigationPoint_0 != null && (botOwner_0.GetPlayer.Transform.position - customNavigationPoint_0.Position).sqrMagnitude < 10f)
+                        if (customNavigationPoint_0 != null && (botOwner_0.GetPlayer.Transform.position - customNavigationPoint_0.Position).magnitude < 10f)
                         {
+                            suppressTime = Time.time + 2f;
+                            botOwner_0.BotTalk.TrySay(EPhraseTrigger.Covering, true);
                             return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.suppressFire, "interuptAttack");
                         }
                         if (!ordersAreHold) 
@@ -200,7 +202,7 @@ namespace friendlyPMC.Components
                     // - else search for the enemy
                     Vector3 enemyLastSeenPos = goalEnemy.EnemyLastPosition;
                     Vector3 myPOs = botOwner_0.GetPlayer.Transform.position;
-                    float distToEnemy = (enemyLastSeenPos - myPOs).sqrMagnitude;
+                    float distToEnemy = (enemyLastSeenPos - myPOs).magnitude;
 
                     if (distToEnemy < 10f && !ordersAreHold)
                     {
@@ -358,6 +360,23 @@ namespace friendlyPMC.Components
             return this.gstruct7_1;
         }
 
+        public override AICoreActionEndStruct EndSuppressFire()
+        {
+            BotRequest curRequest = this.botOwner_0.BotRequestController.CurRequest;
+            if (curRequest != null && curRequest.BotRequestType == BotRequestType.suppressionFire)
+            {
+                if(suppressTime < Time.time)
+                {
+                    suppressTime = 0;
+                    curRequest.Complete();
+
+                    return this.gstruct7_0;
+                }
+                return this.gstruct7_1;
+            }
+            return this.gstruct7_0;
+        }
+
         public override CustomNavigationPoint FindPoint(CoverSearchData data, Func<CoverSearchData, CustomNavigationPoint> p, bool checkCurrent)
         {
             if (this.customNavigationPoint_0 != null && (!this.customNavigationPoint_0.IsFreeById(this.botOwner_0.Id) || this.customNavigationPoint_0.IsSpotted))
@@ -399,7 +418,7 @@ namespace friendlyPMC.Components
                             )
                         )
                     {
-                        float range = (centerPosition - point.Position).sqrMagnitude;
+                        float range = (centerPosition - point.Position).magnitude;
                         if (range < distance)
                         {
                             point1 = point;
@@ -435,7 +454,7 @@ namespace friendlyPMC.Components
 
             GetClosestCoverPoint(centerPosition);
             // not too far
-            if (customNavigationPoint_0 != null && (botOwner_0.GetPlayer.Transform.position - customNavigationPoint_0.Position).sqrMagnitude > 10f)
+            if (customNavigationPoint_0 != null && (botOwner_0.GetPlayer.Transform.position - customNavigationPoint_0.Position).magnitude > 10f)
             {
                 customNavigationPoint_0 = null;
             }
@@ -460,7 +479,7 @@ namespace friendlyPMC.Components
                 {
                     if (point.IsFreeById(botOwner_0.Id) && !point.IsSpotted)
                     {
-                        range = (centerPosition - point.Position).sqrMagnitude;
+                        range = (centerPosition - point.Position).magnitude;
                         if (range < distance)
                         {
                             distance = range;

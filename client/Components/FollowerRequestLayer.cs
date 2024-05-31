@@ -10,6 +10,7 @@ namespace friendlyPMC.Components
     internal class FollowerRequestLayer : GClass69
     {
         float coverTimer = 0f;
+        float suppressTime = 0f;
 
         private CustomNavigationPoint customNavigationPoint_0;
         public FollowerRequestLayer(BotOwner bot, int priority) : base(bot, priority)
@@ -35,7 +36,6 @@ namespace friendlyPMC.Components
                 BotRequestType.hide,
                 BotRequestType.suppressionFire,
                 BotRequestType.followMe,
-                BotRequestType.suppressionFire
             };
 
             List<BotRequestType> allyAllowedRequest = new List<BotRequestType>
@@ -123,7 +123,7 @@ namespace friendlyPMC.Components
 
                 case BotRequestType.suppressionFire:
                     botOwner_0.BotTalk.TrySay(EPhraseTrigger.Covering, true);
-                    botOwner_0.BotRequestController.CurRequest.Complete();
+                    suppressTime = Time.time + 2f;
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.suppressFire, "req:suppressFire");
 
                 case BotRequestType.doorOpen:
@@ -141,6 +141,22 @@ namespace friendlyPMC.Components
 
             if (curRequest != null && curRequest.BotRequestType == BotRequestType.doorOpen && !(botOwner_0.DoorOpener.Interacting || botOwner_0.DoorOpener.NearDoor))
             {
+                return this.gstruct7_1;
+            }
+            return this.gstruct7_0;
+        }
+        public override AICoreActionEndStruct EndSuppressFire()
+        {
+            BotRequest curRequest = this.botOwner_0.BotRequestController.CurRequest;
+            if (curRequest != null && curRequest.BotRequestType == BotRequestType.suppressionFire)
+            {
+                if (suppressTime < Time.time)
+                {
+                    suppressTime = 0;
+                    curRequest.Complete();
+
+                    return this.gstruct7_0;
+                }
                 return this.gstruct7_1;
             }
             return this.gstruct7_0;
@@ -183,7 +199,7 @@ namespace friendlyPMC.Components
                 {
                     if (point.IsFreeById(botOwner_0.Id) && !point.IsSpotted)
                     {
-                        range = (centerPosition - point.Position).sqrMagnitude;
+                        range = (centerPosition - point.Position).magnitude;
                         if (range < distance)
                         {
                             distance = range;

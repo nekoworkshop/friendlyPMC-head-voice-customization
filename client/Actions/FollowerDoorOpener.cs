@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace friendlyPMC.Components
+namespace friendlyPMC.Actions
 {
     internal class GClass168_0 : BaseNodeClass
     {
@@ -38,7 +38,7 @@ namespace friendlyPMC.Components
                 this.botOwner_0.GoToPoint(position, true, -1f, false, true, true, false);
                 this.bool_0 = true;
             }
-            if (!this.botOwner_0.Mover.IsComeTo(0.5f, false))
+            if (!this.botOwner_0.Mover.IsComeTo(1f, false))
             {
                 return;
             }
@@ -52,7 +52,7 @@ namespace friendlyPMC.Components
 
         public void method_5()
         {
-            this.float_0 = Time.time + 2f;
+            this.float_0 = Time.time + 1f;
             this.bool_0 = false;
         }
     }
@@ -73,7 +73,7 @@ namespace friendlyPMC.Components
                 return;
             }
 
-            if ((botOwner_0.Position - GClass509_0.Door.transform.position).sqrMagnitude < 0.5f)
+            if ((botOwner_0.Position - GClass509_0.Door.transform.position).magnitude < 1f)
             {
                 botOwner_0.DoorOpener.Interact(GClass509_0.Door, EInteractionType.Open);
 

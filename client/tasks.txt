@@ -1,2 +1,2 @@
-- 	EPhraseTrigger.Cooperation should be the one that triggers the bot to be a follower. Can be done in BotReceiver, in place of followMe
--	BotReceiver can also be modified so that the bot accepts more requests
+- 	night vision of the bots needs to be increased
+-

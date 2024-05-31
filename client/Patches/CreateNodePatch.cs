@@ -1,6 +1,6 @@
 ﻿using Aki.Reflection.Patching;
 using EFT;
-using friendlyPMC.Components;
+using friendlyPMC.Actions;
 using friendlyPMC.Modules;
 using HarmonyLib;
 using System.Reflection;

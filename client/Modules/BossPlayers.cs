@@ -119,8 +119,11 @@ namespace friendlyPMC.Modules
                 {
                     _followers.Remove(_follower);
                 });
+                
+                boss.Followers.Clear();
 
                 boss.DisposeBoss();
+
                 _bosses.Remove(name);
             }
         }

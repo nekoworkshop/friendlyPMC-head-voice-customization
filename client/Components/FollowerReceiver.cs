@@ -13,7 +13,7 @@ namespace friendlyPMC.Components
     
     internal class FollowerReceiver : BotReceiver
     {
-        private readonly float maxGestusDistance = 10f;
+        private readonly float maxGestusDistance = 20f;
         public FollowerReceiver(BotOwner owner) : base(owner)
         {
             Receivers.AddReceiver(owner.ProfileId, this);
@@ -43,7 +43,7 @@ namespace friendlyPMC.Components
 
             EGesture gesture = data.Gesture;
             bool isBossCommunicating = BossPlayers.Instance.IsFollower(botOwner_0) && botOwner_0.BotFollower.BossToFollow.IsMe(data.Player);
-            float gestusDistance = (botOwner_0.GetPlayer.Transform.position - data.Player.Transform.position).sqrMagnitude;
+            float gestusDistance = (botOwner_0.GetPlayer.Transform.position - data.Player.Transform.position).magnitude;
 
             bool shouldDefault = !BossPlayers.Instance.IsFollower(botOwner_0) && !BossPlayers.Instance.IsBoss(data.Player.ProfileId);
 
@@ -119,7 +119,7 @@ namespace friendlyPMC.Components
                 } // on supression, switch enemy priority
                 else if (info.phrase == EPhraseTrigger.Suppress)
                 {
-                    if ((botOwner_0.GetPlayer.Transform.position - requester.Transform.position).sqrMagnitude < 15f)
+                    if ((botOwner_0.GetPlayer.Transform.position - requester.Transform.position).magnitude < 15f)
                     {
                         EnemyInfo enemyInfo;
                         if (!botOwner_0.Memory.HaveEnemy)
@@ -133,7 +133,7 @@ namespace friendlyPMC.Components
                             enemyInfo = botOwner_0.Memory.GoalEnemy;
                             BotOwner newEnemy = boss.ClosestEnemy();
 
-                            if (newEnemy != null && (enemyInfo == null || (botOwner_0.GetPlayer.Transform.position - enemyInfo.Person.Transform.position).sqrMagnitude > 20f))
+                            if (newEnemy != null && (enemyInfo == null || (botOwner_0.GetPlayer.Transform.position - enemyInfo.Person.Transform.position).magnitude > 20f))
                             {
                                 BotSettingsClass botSettingsClass = new BotSettingsClass(Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(newEnemy.ProfileId), boss.bossGroup, EBotEnemyCause.callForHelp1);
 
@@ -156,7 +156,7 @@ namespace friendlyPMC.Components
                 } // loot dead body
                 else if ((info.phrase == EPhraseTrigger.CheckHim || info.phrase == EPhraseTrigger.LootBody) && !botOwner_0.Memory.HaveEnemy)
                 {
-                    if ((botOwner_0.GetPlayer.Transform.position - boss.Position).sqrMagnitude < 10f)
+                    if ((botOwner_0.GetPlayer.Transform.position - boss.Position).magnitude < 10f)
                     {
                         //@TODO - have bot loot the body - check looting bots mod
                     }
@@ -173,7 +173,7 @@ namespace friendlyPMC.Components
                         boss.Followers.ForEach(fl =>
                         {
                             Vector3 pos = fl.GetPlayer.Transform.position;
-                            float fldist = (door.TrackableTransform.position - pos).sqrMagnitude;
+                            float fldist = (door.TrackableTransform.position - pos).magnitude;
                             if (fldist < dist)
                             {
                                 closest = fl;

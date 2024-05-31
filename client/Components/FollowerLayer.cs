@@ -186,7 +186,7 @@ namespace friendlyPMC.Components
                 {
                     if (point.IsFreeById(botOwner_0.Id) && !point.IsSpotted)
                     {
-                        range = (centerPosition - point.Position).sqrMagnitude;
+                        range = (centerPosition - point.Position).magnitude;
                         if (range < distance)
                         {
                             distance = range;
