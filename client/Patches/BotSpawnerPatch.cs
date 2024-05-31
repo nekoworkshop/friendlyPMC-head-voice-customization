@@ -26,6 +26,7 @@ using System.Collections.Generic;
 using static BoxFracture;
 using UnityEngine.Profiling;
 using System.Security.Policy;
+using DG.Tweening.Core.Easing;
 
 
 namespace friendlyPMC.Patches
@@ -72,10 +73,6 @@ namespace friendlyPMC.Patches
             WildSpawnType sptBear = (WildSpawnType)AkiBotsPrePatcher.sptBearValue;
             WildSpawnType sptUsec = (WildSpawnType)AkiBotsPrePatcher.sptUsecValue;
 
-            var coversData = __instance.BotGame.BotsController.CoversData;
-            var groupPoint = coversData.GetClosest(position);
-            var closestCorePoint = groupPoint.CorePointInGame;
-
             WildSpawnType type;
             if (side == EPlayerSide.Bear)
             {
@@ -90,70 +87,17 @@ namespace friendlyPMC.Patches
                 type = WildSpawnType.assault;
             }
 
-            IProfileData botData = new IProfileData(side, type, BotDifficulty.hard, 0f, null);
+            BotWaveDataClass followerWave = new BotWaveDataClass();
+            followerWave.BotsCount = 2;
+            followerWave.Side = side;
+            followerWave.Difficulty = BotDifficulty.hard;
+            followerWave.WildSpawnType = type;
+            followerWave.IsPlayers = false;
+            followerWave.SpawnAreaName = zone.NameZone;
+            followerWave.Time = 10f;
+            followerWave.WithCheckMinMax = false;
 
-            CancelToken token = new CancelToken();
-
-            var boCreator = (IBotCreator)AccessTools.Field(typeof(BotSpawner), "_botCreator").GetValue(__instance);
-            var spawnSystem = (ISpawnSystem)AccessTools.Field(typeof(BotSpawner), "_spawnSystem").GetValue(__instance); 
-            if(boCreator != null && spawnSystem != null) {
-                BossSpawnerClass BossSpawner = new BossSpawnerClass(spawnSystem, __instance, boCreator, new BotZone[] { zone });
-
-                Components.Logger.LogInfo("Preparing to spawn followers");
-
-
-                if (SynchronizationContext.Current == null)
-                {
-
-                    SynchronizationContext context = new SynchronizationContext();
-                    SynchronizationContext.SetSynchronizationContext(context);
-
-                }
-
-                Task<BotCacheClass> botCreate = BotCacheClass.Create(botData, boCreator, 1, token);
-
-                botCreate.ConfigureAwait(false);
-
-                botCreate.ContinueWith(task =>
-                {
-                    if (task.IsFaulted)
-                    {
-                        Components.Logger.LogInfo($"Create Task failed with exception: {task.Exception}");
-                        return null;
-                    }
-                    else if (task.IsCanceled)
-                    {
-                        Components.Logger.LogInfo("Create Task was canceled");
-                        return null;
-                    }
-                    else
-                    {
-                        BotCacheClass bot = task.Result;
-                        bot.AddPosition(position, closestCorePoint.Id);
-                        Components.Logger.LogInfo("Activating followers");
-
-                        Task newTask = BossSpawner.method_6(bot, null, zone, 1, botData, (BotOwner bt) =>
-                        {
-                            Components.Logger.LogInfo("Followers activated");
-                        });
-
-                        return newTask;
-                    }
-                }).Unwrap().ContinueWith(task =>
-                {
-                    if (task.IsFaulted)
-                    {
-                        Components.Logger.LogInfo($"Spawn Task failed with exception: {task.Exception}");
-                    }
-                    else if (task.IsCanceled)
-                    {
-                        Components.Logger.LogInfo("Spawn Task was canceled");
-                    }
-                });
-
-            }
-
-            
+            __instance.ActivateBotsByWave(followerWave);
         }
 
         protected override MethodBase GetTargetMethod()
@@ -172,7 +116,7 @@ namespace friendlyPMC.Patches
             pitAIBossPlayer playerBoss = BossPlayers.Instance.AddBossPlayer(player,zone, __instance.BotGame);
 
             // spawn a friendly bot
-            //Instance.SpawnBossFollowers(__instance, playerBoss);
+            Instance.SpawnBossFollowers(__instance, playerBoss);
         }
     }
 }

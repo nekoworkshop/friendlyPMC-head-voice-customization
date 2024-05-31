@@ -163,7 +163,7 @@ namespace friendlyPMC.Components
                             return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMoving, "comeToBoss-underAttack");
                     }
                     // - else stay in cover until time runs out
-                    if (coverTimeRunner == 0f && !ordersAreAttack)
+                    if (coverTimeRunner == 0f && !ordersAreAttack && !ordersAreHold)
                     {
                         coverTimeRunner = 1f;
 
@@ -181,7 +181,7 @@ namespace friendlyPMC.Components
                             return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMoving, "backToBoss");
                         // -- else just fight
                         else
-                            return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.shootFromCover, "justFight3");
+                            return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.dogFight, "justFight3");
                     }
 
                 }

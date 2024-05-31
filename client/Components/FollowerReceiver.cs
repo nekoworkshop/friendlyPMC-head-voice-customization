@@ -1,4 +1,5 @@
-﻿using Comfort.Common;
+﻿using Aki.Common.Http;
+using Comfort.Common;
 using EFT;
 using EFT.Interactive;
 using friendlyPMC.Components;
@@ -12,6 +13,7 @@ namespace friendlyPMC.Components
     
     internal class FollowerReceiver : BotReceiver
     {
+        private readonly float maxGestusDistance = 10f;
         public FollowerReceiver(BotOwner owner) : base(owner)
         {
             Receivers.AddReceiver(owner.ProfileId, this);
@@ -40,17 +42,53 @@ namespace friendlyPMC.Components
         {
 
             EGesture gesture = data.Gesture;
+            bool isBossCommunicating = BossPlayers.Instance.IsFollower(botOwner_0) && botOwner_0.BotFollower.BossToFollow.IsMe(data.Player);
+            float gestusDistance = (botOwner_0.GetPlayer.Transform.position - data.Player.Transform.position).sqrMagnitude;
+
+            bool shouldDefault = !BossPlayers.Instance.IsFollower(botOwner_0) && !BossPlayers.Instance.IsBoss(data.Player.ProfileId);
+
             if (gesture == EGesture.Stop)
             {
-                if (BossPlayers.Instance.IsFollower(botOwner_0) && botOwner_0.BotFollower.BossToFollow.IsMe(data.Player))
+                if (isBossCommunicating)
                 {
-                    botOwner_0.BotsGroup.RequestsController.TryAskHoldRequest(data.Player, botOwner_0);
-                } else if(
-                    !BossPlayers.Instance.IsFollower(botOwner_0) && 
-                    (
-                        !botOwner_0.BotFollower.HaveBoss || !BossPlayers.Instance.IsBoss(botOwner_0.BotFollower.BossToFollow.Player().ProfileId)
-                    )
-                )
+                    if (gestusDistance < maxGestusDistance)
+                    {
+                        botOwner_0.BotsGroup.RequestsController.TryAskHoldRequest(data.Player, botOwner_0);
+                    }
+                } else if(shouldDefault)
+                {
+                    base.method_6(data);
+                }
+            } 
+            else if(gesture == EGesture.ComeToMe)
+            {
+                if (isBossCommunicating)
+                {
+                    if (gestusDistance < maxGestusDistance)
+                    {
+                        botOwner_0.BotsGroup.RequestsController.TryAskFollowMeRequest(data.Player, botOwner_0);
+                    }
+                }
+                else if (shouldDefault)
+                {
+                    base.method_6(data);
+                }
+            }
+            else if(gesture == EGesture.ThatDirection)
+            {
+                if (isBossCommunicating)
+                {
+                    if (gestusDistance < maxGestusDistance)
+                    {
+                        if( botOwner_0.Memory.HaveEnemy)
+                            botOwner_0.BotsGroup.RequestsController.TryActivateGoToCheckRequest(data.Player, botOwner_0);
+                        else
+                        {
+                            //@TODO - need to tell the bot to go to where the boss is pointing
+                        }
+                    }
+                }
+                else if (shouldDefault)
                 {
                     base.method_6(data);
                 }
@@ -64,129 +102,96 @@ namespace friendlyPMC.Components
 
         public virtual void PhraseSaid(BotEventHandler.GClass599 info)
         {
+            IPlayer requester = info.PlayerRequester;
 
-            // on cover me, get closer to the boss
-            if (info.phrase == EPhraseTrigger.CoverMe || info.phrase == EPhraseTrigger.FollowMe || info.phrase == EPhraseTrigger.Regroup)
+            bool isBossCommunicating = requester !=null && BossPlayers.Instance.IsFollower(botOwner_0) && botOwner_0.BotFollower.BossToFollow.IsMe(requester);
+            bool shouldDefault = requester == null &&!BossPlayers.Instance.IsFollower(botOwner_0) && !BossPlayers.Instance.IsBoss(requester.ProfileId);
+            
+            if(isBossCommunicating)
             {
-                IPlayer requester = info.PlayerRequester;
                 pitAIBossPlayer boss = BossPlayers.Instance.GetBossPlayer(requester.ProfileId);
-                if (requester != null && boss != null && BossPlayers.Instance.IsFollower(botOwner_0, boss))
+
+                // on cover me, get closer to the boss
+                if (info.phrase == EPhraseTrigger.CoverMe || info.phrase == EPhraseTrigger.FollowMe || info.phrase == EPhraseTrigger.Regroup)
                 {
                     boss.bossGroup.RequestsController.TryAskFollowMeRequest(requester, botOwner_0);
                     return;
-                }
-            }
-            // on supression, switch enemy priority
-            else if (info.phrase == EPhraseTrigger.Suppress)
-            {
-                IPlayer requester = info.PlayerRequester;
-                pitAIBossPlayer boss = BossPlayers.Instance.GetBossPlayer(requester.ProfileId);
-                if (requester != null && boss != null && BossPlayers.Instance.IsFollower(botOwner_0, boss) && (botOwner_0.GetPlayer.Transform.position - requester.Transform.position).sqrMagnitude < 15f)
+                } // on supression, switch enemy priority
+                else if (info.phrase == EPhraseTrigger.Suppress)
                 {
-                    EnemyInfo enemyInfo;
-                    if (!botOwner_0.Memory.HaveEnemy)
+                    if ((botOwner_0.GetPlayer.Transform.position - requester.Transform.position).sqrMagnitude < 15f)
                     {
-                        boss.PrioritizeEnemy(botOwner_0);
-                        enemyInfo = botOwner_0.Memory.GoalEnemy;
-
-                    }
-                    else
-                    {
-                        enemyInfo = botOwner_0.Memory.GoalEnemy;
-                        BotOwner newEnemy = boss.ClosestEnemy();
-
-                        if (newEnemy != null && (botOwner_0.GetPlayer.Transform.position - enemyInfo.Person.Transform.position).sqrMagnitude > 30f)
+                        EnemyInfo enemyInfo;
+                        if (!botOwner_0.Memory.HaveEnemy)
                         {
-                            BotSettingsClass botSettingsClass = new BotSettingsClass(Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(newEnemy.ProfileId), boss.bossGroup, EBotEnemyCause.callForHelp1);
-
-                            botOwner_0.Memory.AddEnemy(newEnemy, botSettingsClass, false);
-
+                            boss.PrioritizeEnemy(botOwner_0);
                             enemyInfo = botOwner_0.Memory.GoalEnemy;
+
                         }
+                        else
+                        {
+                            enemyInfo = botOwner_0.Memory.GoalEnemy;
+                            BotOwner newEnemy = boss.ClosestEnemy();
+
+                            if (newEnemy != null && (botOwner_0.GetPlayer.Transform.position - enemyInfo.Person.Transform.position).sqrMagnitude > 30f)
+                            {
+                                BotSettingsClass botSettingsClass = new BotSettingsClass(Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(newEnemy.ProfileId), boss.bossGroup, EBotEnemyCause.callForHelp1);
+
+                                botOwner_0.Memory.AddEnemy(newEnemy, botSettingsClass, false);
+
+                                enemyInfo = botOwner_0.Memory.GoalEnemy;
+                            }
+                        }
+
+                        if (enemyInfo != null)
+                            boss.bossGroup.RequestsController.TryAskSuppressionRequest(requester, enemyInfo);
+
+                        return;
                     }
 
-                    if (enemyInfo != null)
-                        boss.bossGroup.RequestsController.TryAskSuppressionRequest(requester, enemyInfo);
-
-                    return;
-                }
-
-            }
-            // attack close
-            else if (info.phrase == EPhraseTrigger.Gogogo)
-            {
-                IPlayer requester = info.PlayerRequester;
-                pitAIBossPlayer boss = BossPlayers.Instance.GetBossPlayer(requester.ProfileId);
-                if (requester != null && boss != null && BossPlayers.Instance.IsFollower(botOwner_0, boss))
+                } // attack close
+                else if (info.phrase == EPhraseTrigger.Gogogo)
                 {
                     botOwner_0.BotsGroup.RequestsController.TryActivateGoToCheckRequest(boss.Player(), botOwner_0);
-                }
-            }
-            // loot dead body
-            else if (info.phrase == EPhraseTrigger.CheckHim || info.phrase == EPhraseTrigger.LootBody)
-            {
-                IPlayer requester = info.PlayerRequester;
-                pitAIBossPlayer boss = BossPlayers.Instance.GetBossPlayer(requester.ProfileId);
-                if (BossPlayers.Instance.IsBoss(requester.ProfileId))
+                } // loot dead body
+                else if ((info.phrase == EPhraseTrigger.CheckHim || info.phrase == EPhraseTrigger.LootBody) && !botOwner_0.Memory.HaveEnemy)
                 {
-                    if (BossPlayers.Instance.IsFollower(botOwner_0, boss) && (botOwner_0.GetPlayer.Transform.position - boss.Position).sqrMagnitude < 12f)
+                    if ((botOwner_0.GetPlayer.Transform.position - boss.Position).sqrMagnitude < 10f)
                     {
                         //@TODO - have bot loot the body - check looting bots mod
                     }
 
-                    return;
                 }
-
-            }
-            // open door request
-            else if (info.phrase == EPhraseTrigger.OpenDoor)
-            {
-
-                IPlayer requester = info.PlayerRequester;
-                pitAIBossPlayer boss = BossPlayers.Instance.GetBossPlayer(requester.ProfileId);
-                if (BossPlayers.Instance.IsBoss(requester.ProfileId))
+                // open door request
+                else if (info.phrase == EPhraseTrigger.OpenDoor && !botOwner_0.Memory.HaveEnemy)
                 {
-                    if (BossPlayers.Instance.IsFollower(botOwner_0, boss) && (botOwner_0.GetPlayer.Transform.position - boss.Position).sqrMagnitude < 12f)
+
+                    if ((botOwner_0.GetPlayer.Transform.position - boss.Position).sqrMagnitude < 10f)
                     {
                         Door door = InteractableObjects.GetCurDoor();
-                        if (door != null)
-                        {
-                            Task.Delay(1000).ContinueWith(t =>
-                            {
-                                botOwner_0.BotsGroup.RequestsController.TryActivateOpenDoorRequest(requester, door, null);
-                            });
-                        }
+                        botOwner_0.BotsGroup.RequestsController.TryActivateOpenDoorRequest(requester, door, null);
                     }
 
-                    return;
                 }
-
-
-            }
-            // on dismiss remove the bot from being a follower
-            else if (info.phrase == EPhraseTrigger.OnYourOwn)
-            {
-                IPlayer requester = info.PlayerRequester;
-                pitAIBossPlayer boss = BossPlayers.Instance.GetBossPlayer(requester.ProfileId);
-                if (BossPlayers.Instance.IsBoss(requester.ProfileId))
+                // on dismiss remove the bot from being a follower
+                else if (info.phrase == EPhraseTrigger.OnYourOwn)
                 {
-                    if (BossPlayers.Instance.IsFollower(botOwner_0, boss) && (botOwner_0.GetPlayer.Transform.position - boss.Position).sqrMagnitude < 10f)
+                    BotFollowerPlayer follower = BossPlayers.Instance.GetBossFollowers(boss.Player().ProfileId).Find((BotFollowerPlayer fl) =>
                     {
-                        BotFollowerPlayer follower = BossPlayers.Instance.GetBossFollowers(boss.Player().ProfileId).Find((BotFollowerPlayer fl) =>
-                        {
-                            return fl.IsBot(botOwner_0);
-                        });
+                        return fl.IsBot(botOwner_0);
+                    });
 
-                        if (follower != null)
-                        {
-                            BossPlayers.Instance.RemoveFollower(botOwner_0, boss, true);
-                        }
+                    if (follower != null)
+                    {
+                        BossPlayers.Instance.RemoveFollower(botOwner_0, boss, true);
                     }
 
-                    return;
                 }
+
+            } else if(shouldDefault)
+            {
+                base.method_0(info);
             }
-            base.method_0(info);
         }
 
     }

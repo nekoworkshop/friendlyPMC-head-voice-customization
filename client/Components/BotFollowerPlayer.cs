@@ -73,46 +73,47 @@ namespace friendlyPMC.Components
             _player.OfferBot(_bot);
             _bot.Tactic.SetTactic(BotsGroup.BotCurrentTactic.Protect);
 
-                // force activate following patrol mode
+            // force activate following patrol mode
             if (!_bot.BotFollower.PatrolDataFollower.IsInited)
             {
                 _bot.BotFollower.PatrolDataFollower.IsInited = true;
             }
             _bot.BotFollower.PatrolDataFollower.ManualUpdate();
 
-                // make all followers have the same group
-                if (_bot.BotsGroup != null)
-                {   // - if there is no group yet, take the bot's group
-                    if (_player.bossGroup == null)
+             // make all followers have the same group
+             if (_bot.BotsGroup != null)
+             {
+                // - if there is no group yet, take the bot's group
+                if (_player.bossGroup == null)
+                {
+                    int count = _bot.BotsGroup.MembersCount;
+                    List<BotOwner> membersToRemove = new List<BotOwner>();
+                    for (int i = 0; i < count; i++)
                     {
-                        int count = _bot.BotsGroup.MembersCount;
-                        List<BotOwner> membersToRemove = new List<BotOwner>();
-                        for (int i = 0; i < count; i++)
+                        BotOwner member = _bot.BotsGroup.Member(i);
+                        if (member.ProfileId != _bot.ProfileId)
                         {
-                            BotOwner member = _bot.BotsGroup.Member(i);
-                            if (member.ProfileId != _bot.ProfileId)
-                            {
-                                membersToRemove.Add(member);
-                            }
+                            membersToRemove.Add(member);
                         }
-                        membersToRemove.ForEach(mem =>
-                        {
-                            _bot.BotsGroup.RemoveAlly(mem);
-                        });
-
-                        _player.bossGroup = _bot.BotsGroup;
-                        _player.bossGroup.AddAlly((Player)_player.Player());
-                        _player.bossGroup.OnEnemyAdd += OnAddEnemyGroup;
-
-
-                }
-                    else
-                    {
-                        _bot.BotsGroup.RemoveAlly(_bot);
-                        _player.bossGroup.AddMember(_bot, false);
                     }
+                    membersToRemove.ForEach(mem =>
+                    {
+                        _bot.BotsGroup.RemoveAlly(mem);
+                    });
+
+                    _player.bossGroup = _bot.BotsGroup;
+                    _player.bossGroup.AddAlly((Player)_player.Player());
+                    _player.bossGroup.OnEnemyAdd += OnAddEnemyGroup;
+
 
                 }
+                else
+                {
+                    _bot.BotsGroup.RemoveAlly(_bot);
+                    _player.bossGroup.AddMember(_bot, false);
+                }
+
+             }
 
 
             _bot.GetPlayer.HealthController.DiedEvent += OnDead;
@@ -132,19 +133,19 @@ namespace friendlyPMC.Components
         {
             BossPlayers.Instance.RemoveFollower(_bot, _player);
         }
+        // how does the boss get added as Enemy?? - fix it
         public void OnAddEnemy(IPlayer player)
         {
-            // how does the boss get added as Enemy?? - fix it
+            
             if(player != null && player == _player) {
                 _bot.Memory.DeleteInfoAboutEnemy(player);
                 _bot.BotsGroup.RemoveEnemy(player);
                 _bot.BotsGroup.AddAlly((Player)_player.Player());
             }
         }
-
+        // how does the boss get added as Enemy Group?? - fix it
         public void OnAddEnemyGroup(IPlayer player, EBotEnemyCause cause)
         {
-            // how does the boss get added as Enemy?? - fix it
             if (player != null && player == _player)
             {
                 _bot.BotsGroup.RemoveEnemy(_player.Player());
@@ -234,10 +235,13 @@ namespace friendlyPMC.Components
             _bot.Receiver.Dispose();
             _bot.Receiver = new BotReceiver(_bot);
             _bot.Receiver.Init();
-            // @TODO : see what else can be reverted
+            
             _bot.GetPlayer.HealthController.DiedEvent -= OnDead;
             _bot.LeaveData.OnLeave -= OnLeave;
             _bot.Memory.OnAddEnemy -= OnAddEnemy;
+            _player.bossGroup.OnEnemyAdd -= OnAddEnemyGroup;
+
+            // @TODO : see what else can be reverted
         }
     }
 }

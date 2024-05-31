@@ -20,7 +20,7 @@ namespace friendlyPMC.Components
 
         public override string Name()
         {
-            return "FollowerBossPlayer";
+            return "FLBPlayer";
         }
         private bool HasBoss()
         {

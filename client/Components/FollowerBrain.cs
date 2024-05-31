@@ -9,7 +9,7 @@ namespace friendlyPMC.Components
             AddLayers();
         }
         /** Exposed method for adding brain layers so it can be patched by addons **/
-        public void AddLayers()
+        public virtual void AddLayers()
         {
             // order matters for which layer get the initial priority
             // - follow
@@ -30,7 +30,7 @@ namespace friendlyPMC.Components
             // - ExURequest - what is that?
             GClass68 layer2 = new GClass68(_owner, 90);
             method_0(6, layer2, true);
-            // - stay at position
+            // - stay at position in prone mode
             GClass104 layer8 = new GClass104(_owner, 10, false, CoverLevel.Lay);
             method_0(7, layer8, true);
         }

@@ -20,11 +20,19 @@ namespace friendlyPMC.Components
         {
             aBossLogic = new AIBossPlayerLogic(player, this);
             GameDateTime time = new GameDateTime(new DateTime(), new DateTime(), 1);
-            
-            //BotOwner dummyBot = BotOwner.Create(player, null, time, botGame.BotsController, true, null);
+
+            Player dummyPlayer = new Player();
+            dummyPlayer.Profile = new Profile();
+            //BotOwner dummyBot = BotOwner.Create(dummyPlayer, null, time, botGame.BotsController,true, null);
 
             //bossGroup = new BotsGroup(zone, botGame, dummyBot, new List<BotOwner>(), null, new List<Player>(),false);
 
+            //bossGroup.RemoveAlly(dummyBot);
+
+            //bossGroup.AddAlly(player);
+
+            dummyPlayer.Dispose();
+            //dummyBot.Dispose();
         }
 
         public new AIBossPlayerLogic GetBossLogic()
@@ -113,9 +121,10 @@ namespace friendlyPMC.Components
             {
                 bossGroup.RemoveInfo(this.Player());
             }
-            Logger.LogInfo("Boss Disposed");
-            base.Dispose();
             aBossLogic.Dispose();
+            base.Dispose();
+
+            Logger.LogInfo("Player Boss Disposed");
         }
     }
     internal class AIBossPlayerLogic : GClass363

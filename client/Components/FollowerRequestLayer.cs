@@ -29,18 +29,22 @@ namespace friendlyPMC.Components
         public override bool ShallUseNow()
         {
             BotRequest currRequest = botOwner_0.BotRequestController.CurRequest;
-            List<BotRequestType> enemyAllowedRequests = new List<BotRequestType>();
-            enemyAllowedRequests.Add(BotRequestType.getInCover);
-            enemyAllowedRequests.Add(BotRequestType.hide);
-            enemyAllowedRequests.Add(BotRequestType.suppressionFire);
-            enemyAllowedRequests.Add(BotRequestType.followMe);
-            enemyAllowedRequests.Add(BotRequestType.suppressionFire);
+            List<BotRequestType> enemyAllowedRequests = new List<BotRequestType>
+            {
+                BotRequestType.getInCover,
+                BotRequestType.hide,
+                BotRequestType.suppressionFire,
+                BotRequestType.followMe,
+                BotRequestType.suppressionFire
+            };
 
-            List<BotRequestType> allyAllowedRequest = new List<BotRequestType>();
-            allyAllowedRequest.Add(BotRequestType.getInCover);
-            allyAllowedRequest.Add(BotRequestType.hide);
-            allyAllowedRequest.Add(BotRequestType.throwGrenade);
-            allyAllowedRequest.Add(BotRequestType.throwGrenadeFromPlace);
+            List<BotRequestType> allyAllowedRequest = new List<BotRequestType>
+            {
+                BotRequestType.getInCover,
+                BotRequestType.hide,
+                BotRequestType.throwGrenade,
+                BotRequestType.throwGrenadeFromPlace
+            };
 
             if (currRequest == null)
             {
@@ -50,7 +54,7 @@ namespace friendlyPMC.Components
             if (
                     (
                         // boss can throw all types of requests
-                        currRequest.Requester == botOwner_0.BotFollower.BossToFollow.Player() &&
+                        botOwner_0.BotFollower.BossToFollow != null && currRequest.Requester == botOwner_0.BotFollower.BossToFollow.Player() &&
                         // - the rest is handled by followerfight layer
                         (!botOwner_0.Memory.HaveEnemy || enemyAllowedRequests.Contains(currRequest.BotRequestType))
                     ) ||
