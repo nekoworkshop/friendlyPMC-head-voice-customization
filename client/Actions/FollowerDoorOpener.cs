@@ -38,7 +38,7 @@ namespace friendlyPMC.Actions
                 this.botOwner_0.GoToPoint(position, true, -1f, false, true, true, false);
                 this.bool_0 = true;
             }
-            if (!this.botOwner_0.Mover.IsComeTo(1f, false))
+            if (!this.botOwner_0.Mover.IsComeTo(0.5f, false))
             {
                 return;
             }
@@ -73,7 +73,7 @@ namespace friendlyPMC.Actions
                 return;
             }
 
-            if ((botOwner_0.Position - GClass509_0.Door.transform.position).magnitude < 1f)
+            if ((botOwner_0.Position - GClass509_0.Door.transform.position).magnitude < 0.5f)
             {
                 botOwner_0.DoorOpener.Interact(GClass509_0.Door, EInteractionType.Open);
 
@@ -82,6 +82,7 @@ namespace friendlyPMC.Actions
 
             gclass168_0.Update();
         }
+
 
         private GClass168_0 gclass168_0;
     }

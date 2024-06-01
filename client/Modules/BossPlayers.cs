@@ -26,11 +26,11 @@ namespace friendlyPMC.Modules
 
         private List<CustomNavigationPoint> navigationPoints;
 
-        public pitAIBossPlayer AddBossPlayer(Player player, BotZone zone, IBotGame botGame)
+        public pitAIBossPlayer AddBossPlayer(Player player)
         {
             WildSpawnType roleType = player.Profile.Info.Settings.Role;
             player.Profile.Info.Settings.Role = WildSpawnType.bossKnight; // temp switch to boss role
-            pitAIBossPlayer playerBoss = new pitAIBossPlayer(player,zone,botGame);
+            pitAIBossPlayer playerBoss = new pitAIBossPlayer(player);
             player.Profile.Info.Settings.Role = roleType; // revert role back to original
 
             if (!playerBoss.IAmBoos)
@@ -245,11 +245,6 @@ namespace friendlyPMC.Modules
         public List<CustomNavigationPoint> GetCovers()
         {
             return navigationPoints;
-        }
-
-        public void SpawnFollowers()
-        {
-
         }
     }
 }

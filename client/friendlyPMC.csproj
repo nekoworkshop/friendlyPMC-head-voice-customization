@@ -62,15 +62,12 @@
     <Reference Include="Comfort.Unity">
       <HintPath>..\..\..\EscapeFromTarkov_Data\Managed\Comfort.Unity.dll</HintPath>
     </Reference>
+    <Reference Include="CommonExtensions">
+      <HintPath>..\..\..\XboxGames\AKI-Streets-3.8.0\EscapeFromTarkov_Data\Managed\CommonExtensions.dll</HintPath>
+    </Reference>
     <Reference Include="DissonanceVoip, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\XboxGames\AKI-Streets-3.8.0\EscapeFromTarkov_Data\Managed\DissonanceVoip.dll</HintPath>
-    </Reference>
-    <Reference Include="DOTween">
-      <HintPath>..\..\..\XboxGames\AKI-Streets-3.8.0\EscapeFromTarkov_Data\Managed\DOTween.dll</HintPath>
-    </Reference>
-    <Reference Include="DOTween.Modules">
-      <HintPath>..\..\..\XboxGames\AKI-Streets-3.8.0\EscapeFromTarkov_Data\Managed\DOTween.Modules.dll</HintPath>
     </Reference>
     <Reference Include="DrakiaXYZ-BigBrain">
       <HintPath>..\DrakiaXYZ-BigBrain.dll</HintPath>
@@ -86,12 +83,19 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Threading" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
+    <Reference Include="UniTask">
+      <HintPath>..\UnityToolkit\UniTask.dll</HintPath>
+    </Reference>
+    <Reference Include="UniTask.DOTween">
+      <HintPath>..\UnityToolkit\UniTask.DOTween.dll</HintPath>
+    </Reference>
     <Reference Include="Unity.Collections">
       <HintPath>..\UnityToolkit\Unity.Collections.dll</HintPath>
     </Reference>
@@ -128,6 +132,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Actions\FollowerPatrol.cs" />
     <Compile Include="Actions\FollowerRushEnemy.cs" />
     <Compile Include="Components\AIBossPlayer.cs" />
     <Compile Include="Components\BotFollowerPlayer.cs" />

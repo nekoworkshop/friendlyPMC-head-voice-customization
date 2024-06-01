@@ -12,7 +12,7 @@ namespace friendlyPMC.Actions
     {
         public FollowerRushEnemy(Player requester, Vector3 pos, Action completeCallback, Action disposeCallback) : base(requester,pos,completeCallback,disposeCallback)
         {
-
+            BotRequestType = BotRequestType.attackClose;
         }
 
         public override bool CanProceed()

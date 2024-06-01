@@ -1,6 +1,8 @@
 ﻿using Comfort.Common;
 using EFT;
+using friendlyPMC.Actions;
 using friendlyPMC.Modules;
+using HarmonyLib;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -73,12 +75,25 @@ namespace friendlyPMC.Components
             _player.OfferBot(_bot);
             _bot.Tactic.SetTactic(BotsGroup.BotCurrentTactic.Protect);
 
-            // force activate following patrol mode
-            if (!_bot.BotFollower.PatrolDataFollower.IsInited)
+            // activate new following patrol mode
+            try
             {
+                _bot.BotFollower.PatrolDataFollower.Dispose();
+
+                AccessTools.Field(typeof(PatrolDataFollower), "followerAIBase").SetValue(_bot.BotFollower.PatrolDataFollower, new FollowerPatrol(player.realPlayer, _bot));
+                _bot.BotFollower.PatrolDataFollower.Activate();
                 _bot.BotFollower.PatrolDataFollower.IsInited = true;
+                _bot.BotFollower.PatrolDataFollower.ManualUpdate();
+            } catch(Exception e)
+            {
+                Logger.LogInfo("Could not activate new follower patrol mode : " + e.Message);
+                _bot.BotFollower.PatrolDataFollower.InitPlayer(player.realPlayer);
+                if (!_bot.BotFollower.PatrolDataFollower.IsInited)
+                {
+                    _bot.BotFollower.PatrolDataFollower.IsInited = true;
+                }
+                _bot.BotFollower.PatrolDataFollower.ManualUpdate();
             }
-            _bot.BotFollower.PatrolDataFollower.ManualUpdate();
 
              // make all followers have the same group
              if (_bot.BotsGroup != null)

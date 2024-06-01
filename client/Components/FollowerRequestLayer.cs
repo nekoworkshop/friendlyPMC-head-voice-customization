@@ -11,6 +11,7 @@ namespace friendlyPMC.Components
     {
         float coverTimer = 0f;
         float suppressTime = 0f;
+        float doorOpenTimer = 0f;
 
         private CustomNavigationPoint customNavigationPoint_0;
         public FollowerRequestLayer(BotOwner bot, int priority) : base(bot, priority)
@@ -49,6 +50,11 @@ namespace friendlyPMC.Components
             if (currRequest == null)
             {
                 return false;
+            }
+
+            if(currRequest.BotRequestType == BotRequestType.doorOpen)
+            {
+                return currRequest.CanProceed();
             }
 
             if (
@@ -127,6 +133,7 @@ namespace friendlyPMC.Components
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.suppressFire, "req:suppressFire");
 
                 case BotRequestType.doorOpen:
+                    doorOpenTimer = Time.time + 5f;
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.doorOpen, "doorOpen");
             }
 
@@ -139,7 +146,13 @@ namespace friendlyPMC.Components
         {
             BotRequest curRequest = this.botOwner_0.BotRequestController.CurRequest;
 
-            if (curRequest != null && curRequest.BotRequestType == BotRequestType.doorOpen && !(botOwner_0.DoorOpener.Interacting || botOwner_0.DoorOpener.NearDoor))
+            if(doorOpenTimer < Time.time)
+            {
+                curRequest.Complete();
+                return this.gstruct7_0;
+            }
+
+            if (curRequest != null && curRequest.BotRequestType == BotRequestType.doorOpen && !botOwner_0.DoorOpener.Interacting)
             {
                 return this.gstruct7_1;
             }

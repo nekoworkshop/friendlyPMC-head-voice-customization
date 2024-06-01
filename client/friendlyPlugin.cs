@@ -15,6 +15,7 @@ namespace friendlyPMC
     [BepInDependency("com.spt-aki.core", "3.8.0")]
     [BepInDependency("xyz.drakia.bigbrain", "0.4.0.0")]
     [BepInDependency("xyz.drakia.waypoints")]
+    [BepInDependency("com.Arys.UnityToolkit")]
     public class friendlyPMC : BaseUnityPlugin
     {
         public static bool awaken;

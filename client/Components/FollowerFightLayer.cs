@@ -11,7 +11,9 @@ namespace friendlyPMC.Components
     internal class FollowerFightLayer : GClass47
     {
 
-        private readonly float searchRadius = 30f;
+        private readonly float searchRadius = 70f;
+        private readonly float enemySearchRadius = 50f;
+        private readonly float nearSearchRadius = 25f;
 
 
         private float coverTimer = 0f;
@@ -152,7 +154,7 @@ namespace friendlyPMC.Components
                     if (bossUnderAttack)
                     {
                         coverTimeRunner = 0f;
-                        GetClosestCoverPoint(GetBoss().Position);
+                        GetClosetCoverPointGroup(GetBoss().Position,nearSearchRadius);
                         // -- is close enough, try to provide suppression
                         if (customNavigationPoint_0 != null && (botOwner_0.GetPlayer.Transform.position - customNavigationPoint_0.Position).magnitude < 10f)
                         {
@@ -213,7 +215,7 @@ namespace friendlyPMC.Components
                         // - if enemy is close enough, go after him
                         if (distToEnemy < 20f || ordersAreAttack)
                         {
-                            GetClosestCoverPoint(enemyLastSeenPos);
+                            GetClosetCoverPointGroup(enemyLastSeenPos, enemySearchRadius);
                             if (customNavigationPoint_0 != null)
                             {
                                 return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "getCloser");
@@ -248,7 +250,7 @@ namespace friendlyPMC.Components
                         // -- find cover if can't shoot
                         if ((HasBoss() && HasCloseCoverToBoss()) || this.customNavigationPoint_0 == null)
                         {
-                            if (!HasBoss()) GetClosestCoverPoint(botOwner_0.GetPlayer.Transform.position);
+                            if (!HasBoss()) GetClosetCoverPointGroup(botOwner_0.GetPlayer.Transform.position,searchRadius);
                             if(customNavigationPoint_0 != null)
                                 return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "cantShootFindCover");
                             // -- no cover, still can't shoot, just provide suppression
@@ -265,7 +267,7 @@ namespace friendlyPMC.Components
                     else
                     {
                         // - shoot while moving to cover
-                        GetClosestCoverPoint(botOwner_0.GetPlayer.Transform.position);
+                        GetClosetCoverPointGroup(botOwner_0.GetPlayer.Transform.position,searchRadius);
                         if (customNavigationPoint_0 != null)
                         {
                             return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMoving, "AToCvr");
@@ -294,7 +296,7 @@ namespace friendlyPMC.Components
                 else
                 {
                     // - shoot while moving to cover
-                    GetClosestCoverPoint(botOwner_0.GetPlayer.Transform.position);
+                    GetClosetCoverPointGroup(botOwner_0.GetPlayer.Transform.position,nearSearchRadius);
                     if (customNavigationPoint_0 != null)
                     {
                         return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "findCoverToShoot");
@@ -407,7 +409,7 @@ namespace friendlyPMC.Components
                 foreach (CustomNavigationPoint point in customNavigationPoints)
                 {
                     if (
-                            point.IsFreeById(botOwner_0.Id) &&
+                            IsPointFreeGroup(point) &&
                             !point.IsSpotted &&
                             (
                                 !botOwner_0.Memory.HaveEnemy ||
@@ -443,7 +445,7 @@ namespace friendlyPMC.Components
             pitAIBossPlayer playerBoss = (pitAIBossPlayer)botOwner_0.BotFollower.BossToFollow;
             Vector3 centerPosition = playerBoss.Position;
 
-            GetClosestCoverPoint(centerPosition);
+            GetClosetCoverPointGroup(centerPosition, searchRadius);
 
             return customNavigationPoint_0 != null;
         }
@@ -452,7 +454,7 @@ namespace friendlyPMC.Components
         {
             Vector3 centerPosition = botOwner_0.Memory.GoalEnemy.Person.Position;
 
-            GetClosestCoverPoint(centerPosition);
+            GetClosetCoverPointGroup(centerPosition,enemySearchRadius);
             // not too far
             if (customNavigationPoint_0 != null && (botOwner_0.GetPlayer.Transform.position - customNavigationPoint_0.Position).magnitude > 10f)
             {
@@ -477,7 +479,7 @@ namespace friendlyPMC.Components
 
                 foreach (CustomNavigationPoint point in customNavigationPoints)
                 {
-                    if (point.IsFreeById(botOwner_0.Id) && !point.IsSpotted)
+                    if (IsPointFreeGroup(point) && !point.IsSpotted)
                     {
                         range = (centerPosition - point.Position).magnitude;
                         if (range < distance)
@@ -505,6 +507,81 @@ namespace friendlyPMC.Components
                     customNavigationPoint_0 = null;
                 }
             }
+
+        }
+
+        private void GetClosetCoverPointGroup(Vector3 centerPosition, float searchRadius)
+        {
+
+            List<CustomNavigationPoint> customNavigationPoints = BossPlayers.Instance.GetCovers();
+
+            if (customNavigationPoints.Count > 0)
+            {
+                CustomNavigationPoint point1 = null;
+
+                int minFollowers = 1;
+                int maxFollowers = HasBoss() ? GetBoss().Followers.Count : 1;
+                float maxInnerRadius = searchRadius;
+                float minInnerRadius = 0f;
+                int numFollowers = HasBoss() ? GetBoss().Followers.Count : 1;
+
+                float innerRadius = ((numFollowers - minFollowers) / (float)(maxFollowers - minFollowers)) * (maxInnerRadius - minInnerRadius) + minInnerRadius;
+
+                List<CustomNavigationPoint> availablePoints = new List<CustomNavigationPoint>();
+
+                foreach (CustomNavigationPoint point in customNavigationPoints)
+                {
+                    if (IsPointFreeGroup(point) && !point.IsSpotted)
+                    {
+                        float range = (centerPosition - point.Position).magnitude;
+                        if (range < maxInnerRadius)
+                        {
+                            maxInnerRadius = range;
+                            point1 = point;
+                            if (numFollowers > 1 && range < innerRadius)
+                            {
+                                availablePoints.Add(point);
+                            }
+                            
+
+                        }
+                    }
+                }
+                // get a random point
+                if (availablePoints.Count > 0)
+                {
+                    point1 = availablePoints.Random();
+                }
+
+
+                if (point1 != null)
+                {
+                    customNavigationPoint_0 = point1;
+                    botOwner_0.Memory.SetCoverPoints(point1);
+                }
+                else
+                {
+                    customNavigationPoint_0 = null;
+                }
+            }
+
+        }
+
+        private bool IsPointFreeGroup(CustomNavigationPoint point)
+        {
+            if (!HasBoss()) return point.IsFreeById(botOwner_0.Id);
+            
+            bool isfree = true;
+
+            foreach (var follower in GetBoss().Followers)
+            {
+                if(!point.IsFreeById(follower.Id))
+                {
+                    isfree = false;
+                    break;
+                } 
+            }
+            return isfree;
 
         }
     }

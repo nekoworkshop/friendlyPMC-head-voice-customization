@@ -150,17 +150,39 @@ namespace friendlyPMC.Components
                     }
 
                 } // attack close
-                else if (info.phrase == EPhraseTrigger.Gogogo)
+                else if (info.phrase == EPhraseTrigger.GoForward)
                 {
-                    botOwner_0.BotsGroup.RequestsController.TryActivateGoToCheckRequest(boss.Player(), botOwner_0);
+                    if (botOwner_0.Memory.HaveEnemy)
+                        botOwner_0.BotsGroup.RequestsController.TryActivateGoToCheckRequest(boss.Player(), botOwner_0);
+                    else
+                    {
+                        //@TODO - need to tell the bot to go to where the boss is pointing
+                    }
+                    
                 } // loot dead body
                 else if ((info.phrase == EPhraseTrigger.CheckHim || info.phrase == EPhraseTrigger.LootBody) && !botOwner_0.Memory.HaveEnemy)
                 {
-                    if ((botOwner_0.GetPlayer.Transform.position - boss.Position).magnitude < 10f)
+                    BotOwner closest = null;
+                    float dist = 10f;
+                    Corpse corpse = InteractableObjects.GetCurCorpse();
+                    if (corpse != null)
                     {
-                        //@TODO - have bot loot the body - check looting bots mod
-                    }
+                        boss.Followers.ForEach(fl =>
+                        {
+                            Vector3 pos = fl.GetPlayer.Transform.position;
+                            float fldist = (corpse.transform.position - pos).magnitude;
+                            //fl.HealthController.
+                            if (fldist < dist)
+                            {
+                                closest = fl;
+                                dist = fldist;
+                            }
 
+                        });
+                        if (closest != null && closest == botOwner_0)
+                        {
+                        }
+                    }
                 }
                 // open door request
                 else if (info.phrase == EPhraseTrigger.OpenDoor && !botOwner_0.Memory.HaveEnemy)
@@ -173,7 +195,7 @@ namespace friendlyPMC.Components
                         boss.Followers.ForEach(fl =>
                         {
                             Vector3 pos = fl.GetPlayer.Transform.position;
-                            float fldist = (door.TrackableTransform.position - pos).magnitude;
+                            float fldist = (door.transform.position - pos).magnitude;
                             if (fldist < dist)
                             {
                                 closest = fl;

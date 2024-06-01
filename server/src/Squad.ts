@@ -117,7 +117,7 @@ class friendlyPMC {
 
 		// same side hostile is being changed elsewhere - do this to avoid unwanted outcome
 		PMCBOT.chanceSameSideIsHostilePercent = -1;
-		// this is what actually makes bots follow you (when they aren't glitching that is)
+		// this is what actually makes bots follow you
 		for (let lvl in globals.config.FenceSettings.Levels) {
 			globals.config.FenceSettings.Levels[lvl].BotFollowChance = 100;
 			globals.config.FenceSettings.Levels[lvl].ScavAttackSupport = true;
@@ -169,6 +169,25 @@ class friendlyPMC {
 			locations[altLocation].base.OpenZones = openZonesMap[altLocation].join(",");
 			this.Logger.info(`Opened ${locations[altLocation].base.OpenZones} for bots in ${locations[altLocation].base.Name} location`);
 		}
+
+		/* for (const id in locations) {
+			const loc: ILocations["bigmap"] = locations[id];
+			if (!loc.base || loc.base.Name == "Private Sector" || loc.base.Name == "Terminal" || loc.base.Name == "Town" || loc.base.Name == "Suburbs" || loc.base.Name == "Arena") continue;
+
+			loc.base.waves.push({
+				BotPreset: "hard",
+				BotSide: "Bear",
+				SpawnPoints: "CoopZone",
+				//@ts-ignore
+				WildSpawnType: "sptBear",
+				isPlayers: false,
+				number: loc.base.waves.length,
+				slots_max: 2,
+				slots_min: 2,
+				time_max: 10,
+				time_min: 5,
+			});
+		} */
 	}
 
 	private _makeFriendlyOrHostile(diff: Difficulty, pmcType: string) {

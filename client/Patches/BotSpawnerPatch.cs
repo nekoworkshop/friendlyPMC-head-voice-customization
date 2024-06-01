@@ -5,7 +5,7 @@ using Aki.PrePatch;
 using HarmonyLib;
 
 using UnityEngine;
-using UnityEngine.AI;
+using Cysharp.Threading.Tasks;
 
 using EFT;
 
@@ -13,8 +13,7 @@ using System.Threading;
 using System;
 using System.Reflection;
 using System.Diagnostics;
-using System.Threading.Tasks;
-using System.Runtime.CompilerServices;
+
 
 using friendlyPMC.Components;
 using friendlyPMC.Modules;
@@ -22,13 +21,8 @@ using friendlyPMC.Modules;
 using BotCacheClass = GClass591;
 using IProfileData = GClass592;
 using Comfort.Common;
-using System.Collections.Generic;
-using static BoxFracture;
-using UnityEngine.Profiling;
-using System.Security.Policy;
-using DG.Tweening.Core.Easing;
-using EFT.Game.Spawning;
-using System.Linq;
+
+
 
 
 namespace friendlyPMC.Patches
@@ -63,17 +57,30 @@ namespace friendlyPMC.Patches
             if (Instance == null) Instance = this;
         }
 
+        private AICorePoint GetClosestCorePoint(Vector3 position)
+        {
+            var botGame = Singleton<IBotGame>.Instance;
+            var coversData = botGame.BotsController.CoversData;
+            var groupPoint = coversData.GetClosest(position);
+            return groupPoint.CorePointInGame;
+        }
 
-        public void SpawnBossFollowers(BotSpawner __instance, pitAIBossPlayer player)
+
+        private async UniTask SpawnGroupBots(pitAIBossPlayer player)
         {
             float dist;
+            
+            var botSpawnerClass = Singleton<IBotGame>.Instance.BotsController.BotSpawner;
+            var botCreator = AccessTools.Field(botSpawnerClass.GetType(), "_botCreator").GetValue(botSpawnerClass) as IBotCreator;
+            var cancellationTokenSource = AccessTools.Field(typeof(BotSpawner), "_cancellationTokenSource").GetValue(botSpawnerClass) as CancellationTokenSource;
+            
+            var method10 = AccessTools.Method(typeof(BotSpawner), "method_10");
 
             Vector3 position = player.Position;
             EPlayerSide side = player.Player().Side;
 
-            BotZone zone = __instance.GetClosestZone(position, out dist);
+            BotZone zone = botSpawnerClass.GetClosestZone(position, out dist);
 
-            Components.Logger.LogInfo(zone.NameZone + " ; " + zone.ShortName);
             WildSpawnType sptBear = (WildSpawnType)AkiBotsPrePatcher.sptBearValue;
             WildSpawnType sptUsec = (WildSpawnType)AkiBotsPrePatcher.sptUsecValue;
 
@@ -91,94 +98,43 @@ namespace friendlyPMC.Patches
                 type = WildSpawnType.assault;
             }
 
-            CancelToken token = new CancelToken();
-
             IProfileData botData = new IProfileData(side, type, BotDifficulty.hard, 0f, null);
+            BotCacheClass bot = await BotCacheClass.Create(botData, botCreator, 2, botSpawnerClass);
 
-            var boCreator = (IBotCreator)AccessTools.Field(typeof(BotSpawner), "_botCreator").GetValue(__instance);
-            var spawnSystem = (ISpawnSystem)AccessTools.Field(typeof(BotSpawner), "_spawnSystem").GetValue(__instance);
-            var _delayedSpawnBotsInfo = (GClass584)AccessTools.Field(typeof(BotSpawner), "_delayedSpawnBotsInfo").GetValue(__instance);
-            if (boCreator != null && spawnSystem != null)
+            var closestCorePoint = GetClosestCorePoint(position);
+            bot.AddPosition(position, closestCorePoint.Id);
+
+            Stopwatch stopWatch = new Stopwatch();
+
+
+
+            Components.Logger.LogInfo("Spawn followers");
+
+            botCreator.ActivateBot(bot, zone, false, new Func<BotOwner, BotZone, BotsGroup>(botSpawnerClass.GetGroupAndSetEnemies), new Action<BotOwner>((BotOwner owner) =>
             {
-                if (SynchronizationContext.Current == null)
+                bool shallBeGroup = bot.SpawnParams?.ShallBeGroup != null;
+
+
+                stopWatch.Start();
+                method10.Invoke(botSpawnerClass, new object[] { owner, bot, new Action<BotOwner>((BotOwner follower)=>
                 {
-                    SynchronizationContext context = new SynchronizationContext();
-                    SynchronizationContext.SetSynchronizationContext(context);
-                }
+                    Components.Logger.LogInfo("Follower " + follower.Profile.Nickname + " ready");
+                    var Timer = StaticManager.Instance.TimerManager.MakeTimer(TimeSpan.FromSeconds(2.0), false);
+
+                    Timer.OnTimer += () =>
+                    {
+                        BossPlayers.Instance.AddFollower(follower,player);
+                        follower.BotTalk.TrySay(EPhraseTrigger.Ready);
+                    };
+                    
+                }) , shallBeGroup, stopWatch });
                 
-                Task<BotCacheClass> botCreate = BotCacheClass.Create(botData, boCreator, 2, token);
+                Components.Logger.LogInfo("Activating followers");
 
-                botCreate.ConfigureAwait(false);
-                botCreate.ContinueWith(task =>
-                {
-                    if (task.IsFaulted)
-                    {
-                        Components.Logger.LogInfo($"Create Task failed with exception: {task.Exception}");
-                        return null;
-                    }
-                    else if (task.IsCanceled)
-                    {
-                        Components.Logger.LogInfo("Create Task was canceled");
-                        return null;
-                    }
-                    else
-                    {
-                        var data = task.Result;
-                        
-                        Components.Logger.LogInfo("Continuing creation");
+            }), cancellationTokenSource.Token);
 
-                        ISpawnPoint[] array = spawnSystem.SelectAISpawnPoints(ESpawnCategory.Bot, data, zone, 2, null, ActionIfNotEnoughPoints.DuplicateIfAtLeastOne);
-
-                        if (SynchronizationContext.Current == null)
-                        {
-                            SynchronizationContext context = new SynchronizationContext();
-                            SynchronizationContext.SetSynchronizationContext(context);
-                        }
-
-                        Task newTask = __instance.method_6(array.ToList<ISpawnPoint>(), zone, data, (BotOwner bot)=>{
-                            Components.Logger.LogInfo("Bots created");
-                        },token.GetCancelToken());
-
-                        newTask.ConfigureAwait(false);
-
-                        _delayedSpawnBotsInfo.Add(new GClass583(zone, 2, data));
-
-                        return newTask;
-                    }
-                }).Unwrap().ContinueWith(task =>
-                {
-                    if (task != null)
-                    {
-                        if (task.IsFaulted)
-                        {
-                            Components.Logger.LogInfo($"Spawn Task failed with exception: {task.Exception}");
-                        }
-                        else if (task.IsCanceled)
-                        {
-                            Components.Logger.LogInfo("Spawn Task was canceled");
-                        }
-                    }
-                });
-
-            }
-                BotWaveDataClass followerWave = new BotWaveDataClass();
-            followerWave.BotsCount = 2;
-            followerWave.Side = side;
-            followerWave.Difficulty = BotDifficulty.hard;
-            followerWave.WildSpawnType = type;
-            followerWave.IsPlayers = false;
-            followerWave.SpawnAreaName = zone.NameZone;
-            followerWave.Time = 11f;
-            followerWave.WithCheckMinMax = false;
-
-            try
-            {
-                __instance.BotGame.BotsController.ActivateBotsByWave(followerWave);
-            } catch (Exception ex)
-            {
-                Components.Logger.LogInfo($"SpawnError: {ex.Message}");
-            }
         }
+        
 
         protected override MethodBase GetTargetMethod()
         {
@@ -193,10 +149,16 @@ namespace friendlyPMC.Patches
 
             BotZone zone = __instance.GetClosestZone(position, out dist);
 
-            pitAIBossPlayer playerBoss = BossPlayers.Instance.AddBossPlayer(player,zone, __instance.BotGame);
-            
+            pitAIBossPlayer playerBoss = BossPlayers.Instance.AddBossPlayer(player);
+
             // spawn a friendly bot
-            Instance.SpawnBossFollowers(__instance, playerBoss);
+            var Timer = StaticManager.Instance.TimerManager.MakeTimer(TimeSpan.FromSeconds(10.0), false);
+
+            Timer.OnTimer += () =>
+            {
+                Instance.SpawnGroupBots(playerBoss).Forget();
+            };
+            
         }
     }
 }

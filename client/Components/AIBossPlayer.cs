@@ -14,25 +14,13 @@ namespace friendlyPMC.Components
 
         public BotsGroup bossGroup = null;
 
+        public readonly Player realPlayer;
 
         private List<BotOwner> bossEnemies = new List<BotOwner>();
-        public pitAIBossPlayer(Player player, BotZone zone, IBotGame botGame) : base(player)
+        public pitAIBossPlayer(Player player) : base(player)
         {
+            realPlayer = player;
             aBossLogic = new AIBossPlayerLogic(player, this);
-            GameDateTime time = new GameDateTime(new DateTime(), new DateTime(), 1);
-
-            Player dummyPlayer = new Player();
-            dummyPlayer.Profile = new Profile();
-            //BotOwner dummyBot = BotOwner.Create(dummyPlayer, null, time, botGame.BotsController,true, null);
-
-            //bossGroup = new BotsGroup(zone, botGame, dummyBot, new List<BotOwner>(), null, new List<Player>(),false);
-
-            //bossGroup.RemoveAlly(dummyBot);
-
-            //bossGroup.AddAlly(player);
-
-            dummyPlayer.Dispose();
-            //dummyBot.Dispose();
         }
 
         public new AIBossPlayerLogic GetBossLogic()
@@ -87,9 +75,15 @@ namespace friendlyPMC.Components
                 }
                 if (newEnemy != null)
                 {
-                    BotSettingsClass botSettingsClass = new BotSettingsClass(Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(newEnemy.ProfileId), bossGroup, EBotEnemyCause.initCauseEnemy);
+                    BotSettingsClass botSettingsClass = new BotSettingsClass(Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(newEnemy.ProfileId), bossGroup, EBotEnemyCause.checkAddTODO);
 
                     follower.Memory.AddEnemy(newEnemy, botSettingsClass, false);
+                    EnemyInfo info;
+                    follower.EnemiesController.EnemyInfos.TryGetValue(newEnemy.GetPlayer, out info);
+                    if(info != null)
+                    {
+                        info.PriorityIndex = 0;
+                    }
                 }
             }
         }
@@ -164,7 +158,6 @@ namespace friendlyPMC.Components
 
         public override void BossLogicUpdate()
         {
-            Logger.LogInfo("prioritize enemies");
             _aiplayer.Followers.ForEach(follower =>
             {
                 _aiplayer.PrioritizeEnemy(follower);

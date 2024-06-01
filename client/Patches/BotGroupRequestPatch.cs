@@ -125,7 +125,7 @@ namespace friendlyPMC.Patches
 
             if (BossPlayers.Instance.IsFollower(posibleExecuter, playerBoss))
             {
-                if (posibleExecuter.Memory.LastEnemy != null)
+                if (posibleExecuter.Memory.HaveEnemy)
                 {
                     Vector3 enemyLastPosition = posibleExecuter.Memory.LastEnemy.EnemyLastPosition;
                     if (posibleExecuter.BotRequestController.TryStopCurrent(Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(player.ProfileId), true))
