@@ -137,8 +137,8 @@ namespace friendlyPMC.Components
                     {
                         botOwner_0.BotRequestController.SetCurrentRequest(new FollowerRegroup(requester));
 
-                    }
-                    botOwner_0.BotsGroup.RequestsController.TryAskFollowMeRequest(requester, botOwner_0);
+                    } else 
+                        botOwner_0.BotsGroup.RequestsController.TryAskFollowMeRequest(requester, botOwner_0);
                     return;
                 } // on supression, switch enemy priority
                 else if (info.phrase == EPhraseTrigger.Suppress)
@@ -148,7 +148,7 @@ namespace friendlyPMC.Components
                         EnemyInfo enemyInfo;
                         if (!botOwner_0.Memory.HaveEnemy)
                         {
-                            boss.PrioritizeEnemy(botOwner_0);
+                            boss.PrioritizeEnemy(boss.ClosestEnemy(), botOwner_0);
                             enemyInfo = botOwner_0.Memory.GoalEnemy;
 
                         }

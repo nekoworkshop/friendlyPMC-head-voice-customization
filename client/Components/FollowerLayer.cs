@@ -178,7 +178,6 @@ namespace friendlyPMC.Components
             {
                 CustomNavigationPoint point1 = null;
                 float distance = searchRadius;
-                float range = 0;
 
                 List<CustomNavigationPoint> availablePoints = new List<CustomNavigationPoint>();
 
@@ -186,8 +185,8 @@ namespace friendlyPMC.Components
                 {
                     if (point.IsFreeById(botOwner_0.Id) && !point.IsSpotted)
                     {
-                        range = (centerPosition - point.Position).magnitude;
-                        if (range < distance)
+                        float range = (centerPosition - point.Position).sqrMagnitude;
+                        if (range < distance * distance)
                         {
                             distance = range;
                             availablePoints.Add(point);

@@ -46,7 +46,7 @@ namespace friendlyPMC.Actions
                 this.float_3 = Time.time + GClass760.Random(1f, 2f);
                 float num = Mathf.Abs((this.bool_0 ? this.vector3_0 : (this.player_0.Position - this.botOwner_0.Position)).magnitude);
                 bool flag2;
-                bool flag = (flag2 = (num < 10f)) != this.bool_1;
+                bool flag = (flag2 = (num < 5.2f)) != this.bool_1;
                 this.bool_1 = flag2;
                 if (flag2)
                 {

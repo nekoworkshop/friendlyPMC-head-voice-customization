@@ -58,32 +58,20 @@ namespace friendlyPMC.Components
             return bossEnemies;
         }
 
-        public void PrioritizeEnemy(BotOwner follower)
+        public void PrioritizeEnemy(BotOwner follower, BotOwner enemy)
         {
 
             // make the closest enemy of boss, the enemy
-            if (bossEnemies.Count > 0)
+            if(enemy != null)
             {
-                BotOwner newEnemy = null;
-                float dist = Mathf.Infinity;
-                foreach (var item in bossEnemies)
-                {
-                    if ((this.Position - item.Position).magnitude < dist)
-                    {
-                        newEnemy = item;
-                    }
-                }
-                if (newEnemy != null)
-                {
-                    BotSettingsClass botSettingsClass = new BotSettingsClass(Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(newEnemy.ProfileId), bossGroup, EBotEnemyCause.checkAddTODO);
+                BotSettingsClass botSettingsClass = new BotSettingsClass(Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(enemy.ProfileId), bossGroup, EBotEnemyCause.checkAddTODO);
 
-                    follower.Memory.AddEnemy(newEnemy, botSettingsClass, false);
-                    EnemyInfo info;
-                    follower.EnemiesController.EnemyInfos.TryGetValue(newEnemy.GetPlayer, out info);
-                    if(info != null)
-                    {
-                        info.PriorityIndex = 0;
-                    }
+                follower.Memory.AddEnemy(enemy, botSettingsClass, false);
+                EnemyInfo info;
+                follower.EnemiesController.EnemyInfos.TryGetValue(enemy.GetPlayer, out info);
+                if (info != null)
+                {
+                    info.PriorityIndex = 0;
                 }
             }
         }
@@ -98,9 +86,11 @@ namespace friendlyPMC.Components
                 
                 foreach (var item in bossEnemies)
                 {
-                    if ((this.Position - item.Position).magnitude < dist)
+                    float range = (this.Position - item.Position).sqrMagnitude;
+                    if (range < dist)
                     {
                         enemy = item;
+                        dist = range;
                     }
                 }
             }
@@ -158,10 +148,7 @@ namespace friendlyPMC.Components
 
         public override void BossLogicUpdate()
         {
-            _aiplayer.Followers.ForEach(follower =>
-            {
-                _aiplayer.PrioritizeEnemy(follower);
-            });
+
         }
 
         public override void Dispose()
