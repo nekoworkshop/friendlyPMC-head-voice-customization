@@ -119,7 +119,7 @@ namespace friendlyPMC.Components
                     _player.bossGroup = _bot.BotsGroup;
                     _player.bossGroup.AddAlly((Player)_player.Player());
                     _player.bossGroup.OnEnemyAdd += OnAddEnemyGroup;
-
+                    _player.bossGroup.AnyBodyShootImmediately = true;
 
                 }
                 else
@@ -211,13 +211,14 @@ namespace friendlyPMC.Components
             // - friendly bot never gets tired
             bot.GetPlayer.Physical.Stamina.ForceMode = true;
             bot.GetPlayer.Physical.HandsStamina.ForceMode = true;
+            bot.GetPlayer.HealthController.DisableMetabolism();
             // - give bot perma medkits
-            bot.Medecine.FirstAid.Dispose();
-            bot.Medecine.FirstAid = new GClass413(bot, new Action<bool>(bot.Medecine.method_0));
+            /*bot.Medecine.FirstAid.Dispose();
+            bot.Medecine.FirstAid = new FollowerMeds(bot, new Action<bool>(bot.Medecine.method_0));
             bot.Medecine.SurgicalKit.Dispose();
             bot.Medecine.SurgicalKit = new GClass416(bot, new Action<bool>(bot.Medecine.method_0));
             bot.Medecine.FirstAid.Activate();
-            bot.Medecine.SurgicalKit.Activate();
+            bot.Medecine.SurgicalKit.Activate();*/
 
             // refill weapons
             bot.WeaponManager.Reload.AddAmmoToPockets(bot.WeaponManager.CurrentWeapon.CurrentAmmoTemplate._id, 100);
@@ -255,7 +256,9 @@ namespace friendlyPMC.Components
             _bot.LeaveData.OnLeave -= OnLeave;
             _bot.Memory.OnAddEnemy -= OnAddEnemy;
             _player.bossGroup.OnEnemyAdd -= OnAddEnemyGroup;
-
+            _bot.GetPlayer.Physical.Stamina.ForceMode = false;
+            _bot.GetPlayer.Physical.HandsStamina.ForceMode = false;
+            _bot.BotFollower.PatrolDataFollower.Dispose();
             // @TODO : see what else can be reverted
         }
     }

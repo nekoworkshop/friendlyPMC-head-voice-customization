@@ -2,6 +2,7 @@
 using Comfort.Common;
 using EFT;
 using EFT.Interactive;
+using friendlyPMC.Actions;
 using friendlyPMC.Components;
 using friendlyPMC.Modules;
 using System;
@@ -110,11 +111,34 @@ namespace friendlyPMC.Components
             if(isBossCommunicating)
             {
                 pitAIBossPlayer boss = BossPlayers.Instance.GetBossPlayer(requester.ProfileId);
-
-                // on cover me, get closer to the boss
-                if (info.phrase == EPhraseTrigger.CoverMe || info.phrase == EPhraseTrigger.FollowMe || info.phrase == EPhraseTrigger.Regroup)
+                // on cover me, whoever is not close enough to the boss, come to him
+                if (info.phrase == EPhraseTrigger.CoverMe || info.phrase == EPhraseTrigger.NeedHelp)
                 {
-                    boss.bossGroup.RequestsController.TryAskFollowMeRequest(requester, botOwner_0);
+                    if ((botOwner_0.GetPlayer.Transform.position - requester.Transform.position).magnitude < 15f)
+                    {
+                        Player alivePlayerByProfileID = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(requester.ProfileId);
+                        if (botOwner_0.BotRequestController.TryStopCurrent(alivePlayerByProfileID.GetPlayer, true))
+                        {
+                            var @class = new FollowerCoverMe(alivePlayerByProfileID.GetPlayer);
+                            if (@class.CanRequest(alivePlayerByProfileID.GetPlayer))
+                            {
+                                @class.AddPossibleExecutors(botOwner_0);
+                                alivePlayerByProfileID.AIData.AskRequests.TryAdd(@class, botOwner_0.BotsGroup.RequestsController);
+                            }
+                        }
+                    }
+
+                    return;
+                }
+                // on regroup or follow me, get closer to the boss
+                else if (info.phrase == EPhraseTrigger.FollowMe || info.phrase == EPhraseTrigger.Regroup)
+                {
+                    if (botOwner_0.Memory.HaveEnemy && info.phrase == EPhraseTrigger.Regroup)
+                    {
+                        botOwner_0.BotRequestController.SetCurrentRequest(new FollowerRegroup(requester));
+
+                    }
+                    botOwner_0.BotsGroup.RequestsController.TryAskFollowMeRequest(requester, botOwner_0);
                     return;
                 } // on supression, switch enemy priority
                 else if (info.phrase == EPhraseTrigger.Suppress)
@@ -153,12 +177,12 @@ namespace friendlyPMC.Components
                 else if (info.phrase == EPhraseTrigger.GoForward)
                 {
                     if (botOwner_0.Memory.HaveEnemy)
-                        botOwner_0.BotsGroup.RequestsController.TryActivateGoToCheckRequest(boss.Player(), botOwner_0);
+                        botOwner_0.BotsGroup.RequestsController.TryActivateGoToCheckRequest(info.PlayerRequester, botOwner_0);
                     else
                     {
                         //@TODO - need to tell the bot to go to where the boss is pointing
                     }
-                    
+
                 } // loot dead body
                 else if ((info.phrase == EPhraseTrigger.CheckHim || info.phrase == EPhraseTrigger.LootBody) && !botOwner_0.Memory.HaveEnemy)
                 {
@@ -203,7 +227,7 @@ namespace friendlyPMC.Components
                             }
 
                         });
-                        // the closest bot shall open the door
+                        // - the closest bot shall open the door
                         if (closest != null && closest == botOwner_0)
                         {
                             botOwner_0.BotsGroup.RequestsController.TryActivateOpenDoorRequest(requester, door, null);

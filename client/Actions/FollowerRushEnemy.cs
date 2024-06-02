@@ -14,6 +14,14 @@ namespace friendlyPMC.Actions
         {
             BotRequestType = BotRequestType.attackClose;
         }
+        
+        public override EBotRequestMode RequestMode
+        {
+            get
+            {
+                return EBotRequestMode.Fight;
+            }
+        }
 
         public override bool CanProceed()
         {

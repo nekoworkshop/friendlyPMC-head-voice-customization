@@ -36,7 +36,7 @@ namespace friendlyPMC.Components
                 BotRequestType.getInCover,
                 BotRequestType.hide,
                 BotRequestType.suppressionFire,
-                BotRequestType.followMe,
+                BotRequestType.warnPlayer,
             };
 
             List<BotRequestType> allyAllowedRequest = new List<BotRequestType>
@@ -78,19 +78,12 @@ namespace friendlyPMC.Components
 
         public override AICoreActionResultStruct<BotLogicDecision> GetDecision()
         {
-            if (botOwner_0.BotRequestController.CurRequest != null)
-            {
-
-                Logger.Instance.LogInfo("BotRequestController was " + botOwner_0.BotRequestController.CurRequest.BotRequestType);
-            }
-
             switch (botOwner_0.BotRequestController.CurRequest.BotRequestType)
             {
                 // on follow me request from the boss, just come closer to the boss or get out of hold position
                 case BotRequestType.followMe:
-
+                case BotRequestType.warnPlayer:
                     botOwner_0.BotTalk.TrySay(EPhraseTrigger.Roger, false);
-                    botOwner_0.BotRequestController.CurRequest.Complete();
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.followerPatrol, "backToFLB");
 
                 // stay in place
@@ -212,7 +205,7 @@ namespace friendlyPMC.Components
                 {
                     if (point.IsFreeById(botOwner_0.Id) && !point.IsSpotted)
                     {
-                        range = (centerPosition - point.Position).magnitude;
+                        range = (centerPosition - point.Position).sqrMagnitude;
                         if (range < distance)
                         {
                             distance = range;

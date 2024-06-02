@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine.AI;
 using UnityEngine;
+using friendlyPMC.Modules;
 
 namespace friendlyPMC.Actions
 {
@@ -37,6 +38,7 @@ namespace friendlyPMC.Actions
 
         public void Update()
         {
+            Components.Logger.LogInfo("Follower Patrol Update");
             this.botOwner_0.LookData.SetLookPointByHearing(null);
 
             if (this.float_3 < Time.time)
@@ -44,7 +46,7 @@ namespace friendlyPMC.Actions
                 this.float_3 = Time.time + GClass760.Random(1f, 2f);
                 float num = Mathf.Abs((this.bool_0 ? this.vector3_0 : (this.player_0.Position - this.botOwner_0.Position)).magnitude);
                 bool flag2;
-                bool flag = (flag2 = (num < 5.2f)) != this.bool_1;
+                bool flag = (flag2 = (num < 10f)) != this.bool_1;
                 this.bool_1 = flag2;
                 if (flag2)
                 {
@@ -57,6 +59,35 @@ namespace friendlyPMC.Actions
                     if (this.float_4 < Time.time || flag)
                     {
                         this.float_4 = Time.time + 8f;
+
+                        /*List<CustomNavigationPoint> nearPoints = BossPlayers.Instance.GetCovers();
+
+                        float maxDist = 10f;
+                        float radius = maxDist;
+
+                        CustomNavigationPoint nearPoint = null;
+                        nearPoints.ForEach((point) =>
+                        {
+                            float dist = (botOwner_0.BotFollower.BossToFollow.Player().Transform.position - point.Position).magnitude;
+                            if (dist < radius && point.IsFreeById(botOwner_0.Id))
+                            {
+                                nearPoint = point;
+                                radius = dist;
+                            }
+                        });
+
+                        if (nearPoint != null)
+                        {
+                            botOwner_0.Memory.SetCoverPoints(nearPoint);
+
+                            var status = this.botOwner_0.Mover.GoToPoint(nearPoint, true, true);
+                            if (status != NavMeshPathStatus.PathComplete)
+                            {
+                                this.botOwner_0.StopMove();
+                                return;
+                            }
+                        }*/
+
                         float num2 = (float)GClass760.RandomSing() * GClass760.Random(0.3f, 3.5f);
                         float num3 = (float)GClass760.RandomSing() * GClass760.Random(0.3f, 3.5f);
                         float x = num2 + this.player_0.Position.x;
