@@ -121,27 +121,6 @@ namespace friendlyPMC.Patches
         [PatchPrefix]
         private static bool PatchPrefix(BotGroupRequestController __instance, IPlayer player, BotOwner posibleExecuter)
         {
-            pitAIBossPlayer playerBoss = BossPlayers.Instance.GetBossPlayer(player.ProfileId);
-
-            if (BossPlayers.Instance.IsFollower(posibleExecuter, playerBoss))
-            {
-                if (posibleExecuter.Memory.HaveEnemy)
-                {
-                    Vector3 enemyLastPosition = posibleExecuter.Memory.LastEnemy.EnemyLastPosition;
-                    if (posibleExecuter.BotRequestController.TryStopCurrent(Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(player.ProfileId), true))
-                    {
-                        GClass506 gclass = new FollowerRushEnemy(Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(player.ProfileId), enemyLastPosition, null, null);
-                        if (__instance.method_0(player, gclass, posibleExecuter))
-                        {
-                            gclass.AddPossibleExecutors(posibleExecuter);
-                            return false;
-                        }
-                        posibleExecuter.BotRequestController.TrySayNegative(player, gclass.BotRequestType);
-                    }
-                }
-
-                return false;
-            }
             return true;
         }
     }

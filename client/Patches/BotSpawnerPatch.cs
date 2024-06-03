@@ -21,6 +21,7 @@ using friendlyPMC.Modules;
 using BotCacheClass = GClass591;
 using IProfileData = GClass592;
 using Comfort.Common;
+using System.Collections.Generic;
 
 
 
@@ -69,11 +70,16 @@ namespace friendlyPMC.Patches
         private async UniTask SpawnGroupBots(pitAIBossPlayer player)
         {
             float dist;
-            
+
             var botSpawnerClass = Singleton<IBotGame>.Instance.BotsController.BotSpawner;
-            var botCreator = AccessTools.Field(botSpawnerClass.GetType(), "_botCreator").GetValue(botSpawnerClass) as IBotCreator;
+            var botCreator = AccessTools.Field(typeof(BotSpawner), "_botCreator").GetValue(botSpawnerClass) as IBotCreator;
             var cancellationTokenSource = AccessTools.Field(typeof(BotSpawner), "_cancellationTokenSource").GetValue(botSpawnerClass) as CancellationTokenSource;
-            
+            var botGame = AccessTools.Field(typeof(BotSpawner), "_game").GetValue(botSpawnerClass) as IBotGame;
+            var deadBodiesController = AccessTools.Field(typeof(BotSpawner), "_deadBodiesController").GetValue(botSpawnerClass) as DeadBodiesController;
+            var allPlayers = AccessTools.Field(typeof(BotSpawner), "_allPlayers").GetValue(botSpawnerClass) as List<Player>;
+            var spawnGroups = AccessTools.Field(typeof(BotSpawner), "_groups").GetValue(botSpawnerClass) as BotZoneGroupsDictionary;
+            var allBotZones = AccessTools.Field(typeof(BotSpawner), "_allBotZones").GetValue(botSpawnerClass) as BotZone[];
+
             var method10 = AccessTools.Method(typeof(BotSpawner), "method_10");
 
             Vector3 position = player.Position;
@@ -98,8 +104,13 @@ namespace friendlyPMC.Patches
                 type = WildSpawnType.assault;
             }
 
-            IProfileData botData = new IProfileData(side, type, BotDifficulty.hard, 0f, null);
-            BotCacheClass bot = await BotCacheClass.Create(botData, botCreator, 2, botSpawnerClass);
+            int memberCount = 2;
+
+            BotSpawnParams @params = new BotSpawnParams();
+            @params.ShallBeGroup = new ShallBeGroupParams(true,false, memberCount+1);
+
+            IProfileData botData = new IProfileData(side, type, BotDifficulty.hard, 0f, @params);
+            BotCacheClass bot = await BotCacheClass.Create(botData, botCreator, memberCount, botSpawnerClass);
 
             var closestCorePoint = GetClosestCorePoint(position);
             bot.AddPosition(position, closestCorePoint.Id);
@@ -107,10 +118,12 @@ namespace friendlyPMC.Patches
             Stopwatch stopWatch = new Stopwatch();
 
 
-
             Components.Logger.LogInfo("Spawn followers");
 
-            botCreator.ActivateBot(bot, zone, false, new Func<BotOwner, BotZone, BotsGroup>(botSpawnerClass.GetGroupAndSetEnemies), new Action<BotOwner>((BotOwner owner) =>
+
+            BotsGroup followerGroup = null;
+
+            botCreator.ActivateBot(bot, zone, true, new Func<BotOwner, BotZone, BotsGroup>(botSpawnerClass.GetGroupAndSetEnemies), new Action<BotOwner>((BotOwner owner) =>
             {
                 bool shallBeGroup = bot.SpawnParams?.ShallBeGroup != null;
 
@@ -124,7 +137,15 @@ namespace friendlyPMC.Patches
                     Timer.OnTimer += () =>
                     {
                         BossPlayers.Instance.AddFollower(follower,player);
-                        follower.BotTalk.TrySay(EPhraseTrigger.Ready);
+                        follower.BotTalk.Say(EPhraseTrigger.Ready,true);
+
+                        if(followerGroup != null) {
+                            followerGroup = player.bossGroup;
+                            allBotZones.ExecuteForEach((zn) =>
+                            {
+                                spawnGroups.AddNoKey(followerGroup,zn);
+                            });
+                        }
                     };
                     
                 }) , shallBeGroup, stopWatch });

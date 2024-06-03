@@ -1,4 +1,5 @@
-﻿using EFT;
+﻿using Aki.Common.Http;
+using EFT;
 using friendlyPMC.Modules;
 using System;
 using System.Collections.Generic;
@@ -44,7 +45,14 @@ namespace friendlyPMC.Components
                 BotRequestType.getInCover,
                 BotRequestType.hide,
                 BotRequestType.throwGrenade,
-                BotRequestType.throwGrenadeFromPlace
+                BotRequestType.throwGrenadeFromPlace,
+                BotRequestType.suppressionFire
+            };
+
+            List<BotRequestType> generalRequests = new List<BotRequestType>
+            {
+               BotRequestType.wait,
+               BotRequestType.followMe
             };
 
             if (currRequest == null)
@@ -62,7 +70,8 @@ namespace friendlyPMC.Components
                         // boss can throw all types of requests
                         botOwner_0.BotFollower.BossToFollow != null && currRequest.Requester == botOwner_0.BotFollower.BossToFollow.Player() &&
                         // - the rest is handled by followerfight layer
-                        (!botOwner_0.Memory.HaveEnemy || enemyAllowedRequests.Contains(currRequest.BotRequestType))
+                        (botOwner_0.Memory.HaveEnemy && enemyAllowedRequests.Contains(currRequest.BotRequestType)) ||
+                        (!botOwner_0.Memory.HaveEnemy && generalRequests.Contains(currRequest.BotRequestType))
                     ) ||
                     (
                         // teammates only some
@@ -78,16 +87,22 @@ namespace friendlyPMC.Components
 
         public override AICoreActionResultStruct<BotLogicDecision> GetDecision()
         {
-            switch (botOwner_0.BotRequestController.CurRequest.BotRequestType)
+            BotRequest request = botOwner_0.BotRequestController.CurRequest;
+
+            if (request != null)
+            {
+                Logger.LogInfo("General request received is " + request.BotRequestType.ToString());
+            }
+
+            switch (request.BotRequestType)
             {
                 // on follow me request from the boss, just come closer to the boss or get out of hold position
                 case BotRequestType.followMe:
-                case BotRequestType.warnPlayer:
                     botOwner_0.BotTalk.TrySay(EPhraseTrigger.Roger, false);
+                    request.Complete();
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.followerPatrol, "backToFLB");
 
                 // stay in place
-                case BotRequestType.hold:
                 case BotRequestType.wait:
                     botOwner_0.BotTalk.TrySay(EPhraseTrigger.Roger, false);
                     botOwner_0.Gesture.TryGestus(EGesture.Good,false);
@@ -107,7 +122,7 @@ namespace friendlyPMC.Components
                     if (customNavigationPoint_0 != null)
                     {
                         botOwner_0.BotTalk.TrySay(EPhraseTrigger.Going, false);
-                        botOwner_0.BotRequestController.CurRequest.Complete();
+                        request.Complete();
                         if (!botOwner_0.CanSprintPlayer)
                         {
                             return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.goToCoverPoint, "req:goHide");
@@ -115,7 +130,7 @@ namespace friendlyPMC.Components
                         return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "req:runHide");
                     } else
                     {
-                        botOwner_0.BotRequestController.CurRequest.Complete();
+                        request.Complete();
 
                         return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.holdPosition, "req:cantHide");
                     }
@@ -196,7 +211,7 @@ namespace friendlyPMC.Components
             if (customNavigationPoints.Count > 0)
             {
                 CustomNavigationPoint point1 = null;
-                float distance = searchRadius * searchRadius;
+                float distance = searchRadius;
 
                 List<CustomNavigationPoint> availablePoints = new List<CustomNavigationPoint>();
 
@@ -204,7 +219,7 @@ namespace friendlyPMC.Components
                 {
                     if (point.IsFreeById(botOwner_0.Id) && !point.IsSpotted)
                     {
-                        float range = (centerPosition - point.Position).sqrMagnitude;
+                        float range = (centerPosition - point.Position).magnitude;
                         if (range < distance)
                         {
                             distance = range;

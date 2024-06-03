@@ -16,10 +16,10 @@ namespace friendlyPMC.Components
             FollowerLayer followLayer = new FollowerLayer(_owner, 51);
             method_0(1, followLayer, true);
             // - requests
-            GClass69 layer4 = new FollowerRequestLayer(_owner, 61);
+            FollowerRequestLayer layer4 = new FollowerRequestLayer(_owner, 55);
             method_0(2, layer4, true);
             // - fight
-            GClass47 layer6 = new FollowerFightLayer(_owner, 60);
+            FollowerFightLayer layer6 = new FollowerFightLayer(_owner, 60);
             method_0(3, layer6, true);
             // - grenade
             GClass36 layer = new GClass36(_owner, 130);
@@ -33,6 +33,9 @@ namespace friendlyPMC.Components
             // - stay at position in prone mode
             GClass104 layer8 = new GClass104(_owner, 10, false, CoverLevel.Lay);
             method_0(7, layer8, true);
+            // - item taker
+            FollowerLootTaker layer9 = new FollowerLootTaker(_owner, 40);
+            method_0(8, layer9, true);
         }
 
         public override string ShortName()

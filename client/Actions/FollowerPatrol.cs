@@ -28,12 +28,16 @@ namespace friendlyPMC.Actions
 
         private GClass424 gclass424_0;
 
+        public bool IsInited { get; set; }
+
+
         public FollowerPatrol(Player player, BotOwner owner) : base(owner)
         {
             this.vector3_0 = owner.Position;
             this.player_0 = player;
 
             this.gclass424_0 = this.botOwner_0.Memory.botObserveData;
+            this.IsInited = true;
         }
 
         public void Update()

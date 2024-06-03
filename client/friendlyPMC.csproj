@@ -133,6 +133,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Actions\FollowerCoverMe.cs" />
+    <Compile Include="Actions\FollowerDefend.cs" />
     <Compile Include="Actions\FollowerPatrol.cs" />
     <Compile Include="Actions\FollowerRegroup.cs" />
     <Compile Include="Actions\FollowerRushEnemy.cs" />
@@ -142,6 +143,7 @@
     <Compile Include="Actions\FollowerDoorOpener.cs" />
     <Compile Include="Components\FollowerFightLayer.cs" />
     <Compile Include="Components\FollowerLayer.cs" />
+    <Compile Include="Components\FollowerLootTaker.cs" />
     <Compile Include="Components\FollowerMeds.cs" />
     <Compile Include="Components\FollowerReceiver.cs" />
     <Compile Include="Components\FollowerRequestLayer.cs" />
@@ -149,6 +151,7 @@
     <Compile Include="Modules\BossPlayers.cs" />
     <Compile Include="Modules\InteractableObjects.cs" />
     <Compile Include="Modules\Receivers.cs" />
+    <Compile Include="Patches\BotEnemiesControllerPatch.cs" />
     <Compile Include="Patches\BotGroupIsEnemyPatch.cs" />
     <Compile Include="Patches\BotGroupRequestPatch.cs" />
     <Compile Include="Patches\BotOwnerPatch.cs" />

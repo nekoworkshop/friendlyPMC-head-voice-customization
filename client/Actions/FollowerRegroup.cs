@@ -12,7 +12,7 @@ namespace friendlyPMC.Actions
         {
             if (Executor == null) return false;
 
-            return (Executor.GetPlayer.Transform.position - Requester.Transform.position).sqrMagnitude > 10f * 10f;
+            return (Executor.GetPlayer.Transform.position - Requester.Transform.position).magnitude > 10f;
         }
 
         public override bool CanRequest(BotOwner requester)
@@ -20,12 +20,14 @@ namespace friendlyPMC.Actions
             if (Executor == null) return false;
 
             EnemyInfo goalEnemy = Executor.Memory.HaveEnemy ? Executor.Memory.GoalEnemy : null;
-            if (goalEnemy != null && ((Executor.Memory.GoalEnemy.EnemyLastPosition - Executor.GetPlayer.Transform.position).sqrMagnitude > 15f * 15f || !Executor.Memory.GoalEnemy.IsVisible))
+            if (goalEnemy == null) return true;
+
+            if ((Executor.Memory.GoalEnemy.EnemyLastPosition - Executor.GetPlayer.Transform.position).magnitude > 15f || !Executor.Memory.GoalEnemy.IsVisible)
             {
                 return true;
             }
 
-            return true;
+            return false;
         }
 
         public override EBotRequestMode RequestMode

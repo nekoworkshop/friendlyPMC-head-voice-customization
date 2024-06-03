@@ -4,17 +4,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using UnityEngine;
 
 namespace friendlyPMC.Actions
 {
-    internal class FollowerRushEnemy : GClass506
+    internal class FollowerDefend : BotRequest
     {
-        public FollowerRushEnemy(Player requester, Vector3 pos, Action completeCallback, Action disposeCallback, BotRequestType request = BotRequestType.attackClose) : base(requester,pos,completeCallback,disposeCallback)
-        {
-            BotRequestType = request;
+        public FollowerDefend(BotOwner bot, BotRequestType request = BotRequestType.wait) : base(bot, request) { 
+            
         }
-        
+
+        public override bool CanRequest(BotOwner requester)
+        {
+            return true;
+        }
         public override EBotRequestMode RequestMode
         {
             get

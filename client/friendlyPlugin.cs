@@ -36,10 +36,10 @@ namespace friendlyPMC
             new BotSpawnerAddPlayerPatch().Enable();
 
             new BotGroupIsEnemyPatch().Enable();
+            new BotEnemiesControllerPatch().Enable();
+            new BotOwnerDamagePatch().Enable();
 
             new BotOwnerIsFolowerPatch().Enable();
-
-            new BotOwnerDamagePatch().Enable();
 
             new FollowRequestPatch().Enable();
             new HoldRequestPatch().Enable();

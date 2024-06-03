@@ -76,7 +76,7 @@ namespace friendlyPMC.Components
             _bot.Tactic.SetTactic(BotsGroup.BotCurrentTactic.Protect);
 
             // activate new following patrol mode
-            try
+            /*try
             {
                 _bot.BotFollower.PatrolDataFollower.Dispose();
 
@@ -85,15 +85,15 @@ namespace friendlyPMC.Components
                 _bot.BotFollower.PatrolDataFollower.IsInited = true;
                 _bot.BotFollower.PatrolDataFollower.ManualUpdate();
             } catch(Exception e)
-            {
-                Logger.LogInfo("Could not activate new follower patrol mode : " + e.Message);
+            {*/
+                //Logger.LogInfo("Could not activate new follower patrol mode : " + e.Message);
                 _bot.BotFollower.PatrolDataFollower.InitPlayer(player.realPlayer);
                 if (!_bot.BotFollower.PatrolDataFollower.IsInited)
                 {
                     _bot.BotFollower.PatrolDataFollower.IsInited = true;
                 }
                 _bot.BotFollower.PatrolDataFollower.ManualUpdate();
-            }
+            /*}*/
 
              // make all followers have the same group
              if (_bot.BotsGroup != null)
