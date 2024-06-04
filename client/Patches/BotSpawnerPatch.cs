@@ -107,7 +107,7 @@ namespace friendlyPMC.Patches
             int memberCount = 2;
 
             BotSpawnParams @params = new BotSpawnParams();
-            @params.ShallBeGroup = new ShallBeGroupParams(true,false, memberCount+1);
+            @params.ShallBeGroup = new ShallBeGroupParams(true,false, memberCount+2);
 
             IProfileData botData = new IProfileData(side, type, BotDifficulty.hard, 0f, @params);
             BotCacheClass bot = await BotCacheClass.Create(botData, botCreator, memberCount, botSpawnerClass);
@@ -123,7 +123,16 @@ namespace friendlyPMC.Patches
 
             BotsGroup followerGroup = null;
 
-            botCreator.ActivateBot(bot, zone, true, new Func<BotOwner, BotZone, BotsGroup>(botSpawnerClass.GetGroupAndSetEnemies), new Action<BotOwner>((BotOwner owner) =>
+            botCreator.ActivateBot(bot, zone, true, new Func<BotOwner, BotZone, BotsGroup>((BotOwner bt, BotZone zn) =>
+            {
+                if(followerGroup == null)
+                {
+                    BotsGroup group = botSpawnerClass.GetGroupAndSetEnemies(bt, zn);
+                    followerGroup = group;
+                }
+
+                return followerGroup;
+            }), new Action<BotOwner>((BotOwner owner) =>
             {
                 bool shallBeGroup = bot.SpawnParams?.ShallBeGroup != null;
 
@@ -136,16 +145,28 @@ namespace friendlyPMC.Patches
 
                     Timer.OnTimer += () =>
                     {
+                        if(followerGroup != null && player.bossGroup == null)
+                        {
+                            player.bossGroup = followerGroup;
+
+                            player.bossGroup.AddAlly(player.realPlayer);
+                            player.bossGroup.Lock();
+                            
+                            player.bossGroup.AnyBodyShootImmediately = true;
+
+                            player.bossGroup.OnEnemyAdd += (IPlayer pl, EBotEnemyCause cause)=>
+                            {
+                                if (pl != null && player.Player().ProfileId == pl.ProfileId)
+                                {
+                                    player.bossGroup.RemoveEnemy(player.Player());
+                                    player.bossGroup.AddAlly(player.realPlayer);
+                                }
+                            };
+                        }
+
                         BossPlayers.Instance.AddFollower(follower,player);
                         follower.BotTalk.Say(EPhraseTrigger.Ready,true);
-
-                        if(followerGroup != null) {
-                            followerGroup = player.bossGroup;
-                            allBotZones.ExecuteForEach((zn) =>
-                            {
-                                spawnGroups.AddNoKey(followerGroup,zn);
-                            });
-                        }
+                        
                     };
                     
                 }) , shallBeGroup, stopWatch });

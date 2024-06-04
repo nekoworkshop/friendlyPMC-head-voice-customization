@@ -68,6 +68,7 @@ namespace friendlyPMC.Modules
                 {
                     var thrownItems = (HashSet<LootItem>)AccessTools.Field(typeof(BotItemTaker), "_thrownItems").GetValue(bot.ItemTaker);
                     thrownItems.Add(item);
+                    AccessTools.Field(typeof(BotItemTaker), "_itemToTake").SetValue(bot.ItemTaker,item);
                 } catch (Exception ex)
                 {
                     Components.Logger.LogInfo("SetTaker Error : " + ex.Message);

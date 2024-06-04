@@ -93,7 +93,7 @@ class friendlyPMC {
 
 					const serverPmcProfile = serverProfile.characters.pmc;
 
-					const remainingCounter = serverPmcProfile?.Stats.Eft.OverallCounters.Items.find((x) => x.Key.includes("UsecRaidRemainKills"));
+					const remainingCounter = serverPmcProfile?.Stats.Eft.OverallCounters.Items.find(x => x.Key.includes("UsecRaidRemainKills"));
 					if (remainingCounter) {
 						remainingCounter.Value = 0;
 					}
@@ -236,7 +236,6 @@ class friendlyPMC {
 				Core.GESTUS_ANYWAY_CHANCE = 0;
 				Core.START_DIST_TO_COV = 20000.0;
 				Core.MAX_DIST_TO_COV = 20000.0;
-				// no idea what these do but put them in there
 				Core.MAX_REQUESTS__PER_GROUP = 9999;
 				Core.MAX_REQUESTS_PER_GROUP = 9999;
 

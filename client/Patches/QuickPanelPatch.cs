@@ -33,6 +33,9 @@ namespace friendlyPMC.Patches
                 bool flag2 = lootItem != null && lootItem.ItemOwner.RootItem is GClass2737;
                 bool flag3 = lootItem != null && (lootItem.ItemOwner.RootItem is Weapon || lootItem.ItemOwner.RootItem.GetItemComponent<KnifeComponent>() != null);
 
+
+                InteractableObjects.SetCurLootItem(lootItem);
+
                 __instance.method_7(EPhraseTrigger.LootKey, flag);
                 __instance.method_7(EPhraseTrigger.LootMoney, flag2);
                 __instance.method_7(EPhraseTrigger.LootWeapon, flag3);

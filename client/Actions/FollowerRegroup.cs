@@ -17,17 +17,7 @@ namespace friendlyPMC.Actions
 
         public override bool CanRequest(BotOwner requester)
         {
-            if (Executor == null) return false;
-
-            EnemyInfo goalEnemy = Executor.Memory.HaveEnemy ? Executor.Memory.GoalEnemy : null;
-            if (goalEnemy == null) return true;
-
-            if ((Executor.Memory.GoalEnemy.EnemyLastPosition - Executor.GetPlayer.Transform.position).magnitude > 15f || !Executor.Memory.GoalEnemy.IsVisible)
-            {
-                return true;
-            }
-
-            return false;
+            return true;
         }
 
         public override EBotRequestMode RequestMode

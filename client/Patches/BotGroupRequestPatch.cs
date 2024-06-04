@@ -16,7 +16,7 @@ namespace friendlyPMC.Patches
     internal class FollowRequestPatch : ModulePatch
     {
 
-        public static int followLimit = 2;
+        public static int followLimit = 3;
         protected override MethodBase GetTargetMethod()
         {
             return AccessTools.Method(typeof(BotGroupRequestController),"TryAskFollowMeRequest");

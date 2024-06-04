@@ -10,7 +10,6 @@ using friendlyPMC.Modules;
 
 namespace friendlyPMC.Actions
 {
-    /** A blend between GClass427 (simple follow) and GClass484 (close cover with stop) **/
     internal class FollowerPatrol : GClass362
     {
 
@@ -26,23 +25,29 @@ namespace friendlyPMC.Actions
 
         private bool bool_1;
 
-        private GClass424 gclass424_0;
+        private CustomNavigationPoint lastCoverPoint;
+        private bool nocover = false;
 
         public bool IsInited { get; set; }
 
+        private float reachDist = 10f;
+
+
+        public readonly BotOwner botOwner;
 
         public FollowerPatrol(Player player, BotOwner owner) : base(owner)
         {
-            this.vector3_0 = owner.Position;
-            this.player_0 = player;
+            vector3_0 = owner.Position;
+            player_0 = player;
 
-            this.gclass424_0 = this.botOwner_0.Memory.botObserveData;
-            this.IsInited = true;
+            IsInited = true;
+
+            botOwner = owner;
         }
 
         public void Update()
         {
-            Components.Logger.LogInfo("Follower Patrol Update");
+
             this.botOwner_0.LookData.SetLookPointByHearing(null);
 
             if (this.float_3 < Time.time)
@@ -50,7 +55,7 @@ namespace friendlyPMC.Actions
                 this.float_3 = Time.time + GClass760.Random(1f, 2f);
                 float num = Mathf.Abs((this.bool_0 ? this.vector3_0 : (this.player_0.Position - this.botOwner_0.Position)).magnitude);
                 bool flag2;
-                bool flag = (flag2 = (num < 5.2f)) != this.bool_1;
+                bool flag = (flag2 = (num < reachDist)) != this.bool_1;
                 this.bool_1 = flag2;
                 if (flag2)
                 {
@@ -64,56 +69,73 @@ namespace friendlyPMC.Actions
                     {
                         this.float_4 = Time.time + 8f;
 
-                        /*List<CustomNavigationPoint> nearPoints = BossPlayers.Instance.GetCovers();
-
-                        float maxDist = 10f;
-                        float radius = maxDist;
-
                         CustomNavigationPoint nearPoint = null;
-                        nearPoints.ForEach((point) =>
+
+                        if (lastCoverPoint == null && !nocover)
                         {
-                            float dist = (botOwner_0.BotFollower.BossToFollow.Player().Transform.position - point.Position).magnitude;
-                            if (dist < radius && point.IsFreeById(botOwner_0.Id))
+                            List<CustomNavigationPoint> coverPoints = BossPlayers.Instance.GetCovers();
+
+                            float maxDist = reachDist;
+                            float radius = maxDist;
+
+                            List<CustomNavigationPoint> availCover = new List<CustomNavigationPoint> ();
+                            coverPoints.ForEach((point) =>
                             {
-                                nearPoint = point;
-                                radius = dist;
-                            }
-                        });
+                                float dist = (botOwner.BotFollower.BossToFollow.Player().Transform.position - point.Position).magnitude;
+                                if (dist < radius && point.IsFreeById(botOwner.Id))
+                                {
+                                    availCover.Add(point);
+                                    radius = dist;
+                                }
+                            });
+
+                            nearPoint = availCover.GetRandomItem();
+                        }
+                        else
+                            nearPoint = lastCoverPoint;
 
                         if (nearPoint != null)
                         {
-                            botOwner_0.Memory.SetCoverPoints(nearPoint);
+                            lastCoverPoint = nearPoint;
+                            botOwner.Memory.SetCoverPoints(nearPoint);
 
-                            var status = this.botOwner_0.Mover.GoToPoint(nearPoint, true, true);
+                            var status = botOwner.Mover.GoToPoint(nearPoint, true, true);
                             if (status != NavMeshPathStatus.PathComplete)
                             {
-                                this.botOwner_0.StopMove();
+                                botOwner.StopMove();
                                 return;
                             }
-                        }*/
 
-                        float num2 = (float)GClass760.RandomSing() * GClass760.Random(0.3f, 3.5f);
-                        float num3 = (float)GClass760.RandomSing() * GClass760.Random(0.3f, 3.5f);
+                            return;
+                        }
+
+                        nocover = true;
+                        float minR = Mathf.Min(1f, reachDist * 0.19f);
+                        float maxR = Mathf.Min(5f, reachDist * 0.65f);
+                        float num2 = (float)GClass760.RandomSing() * GClass760.Random(minR, maxR);
+                        float num3 = (float)GClass760.RandomSing() * GClass760.Random(minR, maxR);
                         float x = num2 + this.player_0.Position.x;
                         float z = num3 + this.player_0.Position.z;
                         NavMeshHit navMeshHit;
                         if (!NavMesh.SamplePosition(new Vector3(x, this.player_0.Position.y, z), out navMeshHit, 2f, -1))
                         {
-                            this.botOwner_0.StopMove();
+                            botOwner.StopMove();
                             return;
                         }
-                        if (this.botOwner_0.GoToPoint(navMeshHit.position, true, -1f, false, true, true, false) != NavMeshPathStatus.PathComplete)
+                        if (botOwner.GoToPoint(navMeshHit.position, true, -1f, false, true, true, false) != NavMeshPathStatus.PathComplete)
                         {
-                            this.botOwner_0.StopMove();
+                            botOwner.StopMove();
                             return;
                         }
                     }
                 }
                 else
                 {
-                    this.method_0();
-                    bool val = num > 10.5f;
-                    this.botOwner_0.Mover.Sprint(val, true);
+                    lastCoverPoint = null;
+                    nocover = false;
+                    method_0();
+                    bool val = num > 14f;
+                    botOwner.Mover.Sprint(val, true);
                 }
             }
         }
@@ -151,6 +173,84 @@ namespace friendlyPMC.Actions
             return navMeshPathStatus;
         }
 
+        public void SetReachDist(float dist)
+        {
+            reachDist = dist;    
+        }
+    }
 
+    internal class FollowerPatrolInstances
+    {
+        private List<FollowerPatrol> followerPatrols = new List<FollowerPatrol>();
+
+        public static FollowerPatrolInstances Instance;
+
+        public FollowerPatrolInstances()
+        {
+            if (Instance == null) Instance = this;
+        }
+
+        public static void AddPatrol(FollowerPatrol followerPatrol)
+        {
+            Instance.followerPatrols.Add(followerPatrol);
+        }
+
+        public static void RemovePatrol(FollowerPatrol followerPatrol)
+        {
+            if(Instance.followerPatrols.Contains(followerPatrol))
+            {
+                Instance.followerPatrols.Remove(followerPatrol);
+            };
+        }
+
+        public static List<FollowerPatrol> GetPatrols()
+        {
+            return Instance.followerPatrols;
+        }
+
+        public static FollowerPatrol GetPatrol(BotOwner bot)
+        {
+            FollowerPatrol patrol = null;
+            foreach (var item in Instance.followerPatrols)
+            {
+                if(item.botOwner.ProfileId ==  bot.ProfileId)
+                {
+                    patrol = item;
+                    break;
+                }
+            }
+
+            return patrol;
+        }
+
+        public static void SetNearPatrol(BotOwner bot)
+        {
+            var patrol = GetPatrol(bot);
+            if (patrol != null)
+            {
+                patrol.SetReachDist(10f);
+            }
+
+            if (!bot.Memory.HaveEnemy)
+            {
+                bot.BotTalk.TrySay(EPhraseTrigger.Roger, false);
+                bot.Gesture.TryGestus(EGesture.Good, false);
+            }
+        }
+
+        public static void SetFarPatrol(BotOwner bot)
+        {
+            var patrol = GetPatrol(bot);
+            if (patrol != null)
+            {
+                patrol.SetReachDist(25f);
+            }
+
+            if (!bot.Memory.HaveEnemy)
+            {
+                bot.BotTalk.TrySay(EPhraseTrigger.Roger, false);
+                bot.Gesture.TryGestus(EGesture.Good, false);
+            }
+        }
     }
 }

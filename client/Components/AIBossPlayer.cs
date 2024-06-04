@@ -113,6 +113,8 @@ namespace friendlyPMC.Components
     {
         private Player _player;
         private pitAIBossPlayer _aiplayer;
+
+        private string tactic;
         public AIBossPlayerLogic(Player player, pitAIBossPlayer aiplayer) : base(null, null)
         {
             player.HealthController.ApplyDamageEvent += OnHit;
@@ -159,6 +161,19 @@ namespace friendlyPMC.Components
         public override void SetPatrolMode()
         {
 
+        }
+
+        public void SetTactic(string prefTactic)
+        {
+            if (prefTactic == null) tactic = null;
+
+            else if (prefTactic == "push") tactic = "push";
+            else tactic = "defend";
+        }
+
+        public string GetTactic()
+        {
+            return tactic;
         }
     }
 }

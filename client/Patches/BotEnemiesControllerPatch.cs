@@ -19,6 +19,7 @@ namespace friendlyPMC.Patches
             return AccessTools.Method(typeof(BotEnemiesController), "SetInfo");
 
         }
+        // how does boss player randomly get added as Enemy?? - fix it
         [PatchPostfix]
         private static void PatchPostfix(BotEnemiesController __instance, IPlayer enemy, EnemyInfo info)
         {

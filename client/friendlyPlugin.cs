@@ -3,6 +3,7 @@ using Aki.Reflection.Utils;
 using BepInEx;
 using Comfort.Common;
 using EFT;
+using friendlyPMC.Actions;
 using friendlyPMC.Components;
 using friendlyPMC.Modules;
 using friendlyPMC.Patches;
@@ -28,7 +29,6 @@ namespace friendlyPMC
             new Logger();
 
             new BossPlayers();
-            new Receivers();
             new InteractableObjects();
 
             new PlayerPatch().Enable();
@@ -39,12 +39,16 @@ namespace friendlyPMC
             new BotEnemiesControllerPatch().Enable();
             new BotOwnerDamagePatch().Enable();
 
+            new FollowerPatrolInstances();
             new BotOwnerIsFolowerPatch().Enable();
+            new PatrolDataFollowerPatch().Enable();
 
             new FollowRequestPatch().Enable();
             new HoldRequestPatch().Enable();
             new GoToCheckRequestPatsh().Enable();
 
+
+            new Receivers();
             new BotReceiverInitPatch().Enable();
             new BotReceiverDisposePatch().Enable();
             new BotReceiverPhrasePatch().Enable();

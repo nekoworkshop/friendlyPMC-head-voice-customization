@@ -33,11 +33,34 @@ namespace friendlyPMC.Components
 
         public FollowerFightLayer(BotOwner bot, int priority) : base(bot, priority)
         {
+            
+        }
 
+        public void SetBossFightTactic()
+        {
+            if (HasBoss())
+            {
+                if (GetBoss().GetBossLogic().GetTactic() == "push") rushTactic = true;
+                else if (GetBoss().GetBossLogic().GetTactic() == "defend") holdTactic = true;
+                else
+                {
+                    rushTactic = false;
+                    holdTactic = false;
+                }
+            }
+            else
+            {
+                rushTactic = false;
+                holdTactic = false;
+            }
         }
 
         public override string Name()
         {
+            if (holdTactic) tactic = "defend";
+            else if (rushTactic) tactic = "push";
+            else tactic = "balance";
+
             return "FBPFight:" + tactic;
         }
         public override bool ShallUseNow()
@@ -45,9 +68,7 @@ namespace friendlyPMC.Components
             if(
                 botOwner_0.BotRequestController.CurRequest != null && HasBoss() && GetBoss().Player().ProfileId == botOwner_0.BotRequestController.CurRequest.Requester.ProfileId && 
                 (
-                    botOwner_0.BotRequestController.CurRequest.BotRequestType == BotRequestType.warnPlayer ||
-                    botOwner_0.BotRequestController.CurRequest.BotRequestType == BotRequestType.attackClose || 
-                    botOwner_0.BotRequestController.CurRequest.BotRequestType == BotRequestType.hold
+                    botOwner_0.BotRequestController.CurRequest.BotRequestType == BotRequestType.warnPlayer
                 )
              )
             {
@@ -178,7 +199,15 @@ namespace friendlyPMC.Components
             }
 
             // If the bot is not in cover, find the closest cover and move to it
-            GetClosestCoverPoint(botOwner_0.GetPlayer.Transform.position, searchRadius);
+            if(HasBoss())
+            {
+                GetClosetCoverPointGroup(GetBoss().Position, searchRadius);
+            } 
+            else 
+            { 
+                GetClosestCoverPoint(botOwner_0.GetPlayer.Transform.position, searchRadius);
+            }
+
             if (customNavigationPoint_0 != null)
             {
                 return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "moveToCover");
@@ -207,11 +236,11 @@ namespace friendlyPMC.Components
             if (ordersAreReqroup)
             {
                 Vector3 bossPosition = GetBoss().Position;
-                GetClosetCoverPointGroup(bossPosition, 70f); // Adjust the radius as needed
+                GetClosetCoverPointGroup(bossPosition, searchRadius); // Adjust the radius as needed
 
                 if (customNavigationPoint_0 != null)
                 {
-                    float dist = 20f;
+                    float dist = 15f;
                     if ((customNavigationPoint_0.Position - botOwner_0.GetPlayer.Transform.position).magnitude > dist)
                     {
                         return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "regroupToBossFast");
@@ -262,11 +291,11 @@ namespace friendlyPMC.Components
                 }
             }
 
-            // Check the distance to the enemy using sqrMagnitude
+            // Check the distance to the enemy if we can rush him (exclude snipers since they cannot be reached)
             float distanceToEnemySqr = (botOwner_0.Memory.GoalEnemy.CurrPosition - botOwner_0.GetPlayer.Transform.position).magnitude;
             float closeDistanceThresholdSqr = 50f;
 
-            if (distanceToEnemySqr < closeDistanceThresholdSqr)
+            if (distanceToEnemySqr < closeDistanceThresholdSqr && !botOwner_0.Memory.GoalEnemy.Owner.IsRole(WildSpawnType.marksman))
             {
                 return EngageEnemy();
             }
@@ -279,9 +308,12 @@ namespace friendlyPMC.Components
         public override AICoreActionResultStruct<BotLogicDecision> GetDecision()
         {
 
+            rushTactic = false;
+            holdTactic = false;
+
             BotRequest request = botOwner_0.BotRequestController.CurRequest;
             // accept requests only from teammates and boss
-            if (request != null && request.Requester != botOwner_0.BotFollower.BossToFollow.Player() && !botOwner_0.BotsGroup.Contains(request.Requester.AIData.BotOwner))
+            if (request != null && !(request.Requester.ProfileId == botOwner_0.BotFollower.BossToFollow.Player().ProfileId || botOwner_0.BotsGroup.Contains(request.Requester.AIData.BotOwner)))
             {
                 request = null;
             }
@@ -309,37 +341,24 @@ namespace friendlyPMC.Components
             {
                 ordersAreAttack = false;
             }
-
+            // warn request is actually regroup
             if (request != null && request.BotRequestType == BotRequestType.warnPlayer)
             {
-                tactic = "balance";
                 ordersAreReqroup = true;
-                rushTactic = false;
-                holdTactic = false;
-                botOwner_0.BotTalk.TrySay(EPhraseTrigger.Roger, false);
-                botOwner_0.Gesture.TryGestus(EGesture.Good, false);
             }
             else
             {
                 ordersAreReqroup = false;
             }
 
-            if (request != null && request.BotRequestType == BotRequestType.attackClose)
+            if (HasBoss() && GetBoss().GetBossLogic().GetTactic() == "push")
             {
-                tactic = "push";
                 rushTactic = true;
-                holdTactic = false;
-                botOwner_0.BotTalk.TrySay(EPhraseTrigger.Roger, false);
-                botOwner_0.Gesture.TryGestus(EGesture.Good, false);
             }
 
-            if (request != null && request.BotRequestType == BotRequestType.hold)
+            if (HasBoss() && GetBoss().GetBossLogic().GetTactic() == "defend")
             {
-                tactic = "defend";
-                rushTactic = false;
                 holdTactic = true;
-                botOwner_0.BotTalk.TrySay(EPhraseTrigger.Roger, false);
-                botOwner_0.Gesture.TryGestus(EGesture.Good, false);
             }
 
             // partial re-creation of fight decisions in GClass47

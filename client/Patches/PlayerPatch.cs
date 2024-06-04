@@ -50,7 +50,6 @@ namespace friendlyPMC.Patches
         {
             if (@event == EPhraseTrigger.Cooperation)
             {
-                Logger.LogInfo("Let's Cooperate");
                 if (Singleton<BotEventHandler>.Instantiated)
                 {
                     Singleton<BotEventHandler>.Instance.SayPhrase(__instance, @event);

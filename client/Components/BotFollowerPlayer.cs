@@ -74,26 +74,34 @@ namespace friendlyPMC.Components
             // make bot follower of player
             _player.OfferBot(_bot);
             _bot.Tactic.SetTactic(BotsGroup.BotCurrentTactic.Protect);
+            (_bot.Brain.BaseBrain as FollowerBrain).SetBossTactic();
 
             // activate new following patrol mode
-            /*try
-            {
-                _bot.BotFollower.PatrolDataFollower.Dispose();
+            try
+            { 
 
-                AccessTools.Field(typeof(PatrolDataFollower), "followerAIBase").SetValue(_bot.BotFollower.PatrolDataFollower, new FollowerPatrol(player.realPlayer, _bot));
-                _bot.BotFollower.PatrolDataFollower.Activate();
+                var followerAIBase = AccessTools.Field(typeof(PatrolDataFollower), "followerAIBase").GetValue(_bot.BotFollower.PatrolDataFollower) as GClass480;
+
+                if (followerAIBase != null)
+                {
+                    followerAIBase.Dispose();
+                }
+
+                FollowerPatrolInstances.AddPatrol(new FollowerPatrol(player.realPlayer, bot));
+
                 _bot.BotFollower.PatrolDataFollower.IsInited = true;
                 _bot.BotFollower.PatrolDataFollower.ManualUpdate();
+
             } catch(Exception e)
-            {*/
-                //Logger.LogInfo("Could not activate new follower patrol mode : " + e.Message);
+            {
+                Logger.LogInfo("Could not activate new follower patrol mode : " + e.Message);
                 _bot.BotFollower.PatrolDataFollower.InitPlayer(player.realPlayer);
                 if (!_bot.BotFollower.PatrolDataFollower.IsInited)
                 {
                     _bot.BotFollower.PatrolDataFollower.IsInited = true;
                 }
                 _bot.BotFollower.PatrolDataFollower.ManualUpdate();
-            /*}*/
+            }
 
              // make all followers have the same group
              if (_bot.BotsGroup != null)
@@ -118,6 +126,7 @@ namespace friendlyPMC.Components
 
                     _player.bossGroup = _bot.BotsGroup;
                     _player.bossGroup.AddAlly((Player)_player.Player());
+                    _player.bossGroup.Lock();
                     _player.bossGroup.OnEnemyAdd += OnAddEnemyGroup;
                     _player.bossGroup.AnyBodyShootImmediately = true;
 
@@ -127,8 +136,7 @@ namespace friendlyPMC.Components
                     _bot.BotsGroup.RemoveAlly(_bot);
                     _player.bossGroup.AddMember(_bot, false);
                 }
-
-             }
+            }
 
 
             _bot.GetPlayer.HealthController.DiedEvent += OnDead;
@@ -138,15 +146,32 @@ namespace friendlyPMC.Components
             Logger.LogInfo($"Bot {_bot.Profile.Nickname} is now a follower of {_player.Player().Profile.Nickname}");
 
         }
+
+        public void ClearFollowerPatrol(BotOwner bot)
+        {
+            var patrols = FollowerPatrolInstances.GetPatrols();
+            foreach (var item in patrols)
+            {
+                if (item.botOwner.ProfileId == bot.ProfileId)
+                {
+                    patrols.Remove(item);
+                    break;
+                }
+            }
+        }
+
         /** Exposed so that it can be patched by addons **/
         public void OnDead(EDamageType damageType)
         {
             BossPlayers.Instance.RemoveFollower(_bot, _player);
+            ClearFollowerPatrol(_bot);
+
         }
         /** Exposed so that it can be patched by addons **/
         public void OnLeave(BotOwner _bot)
         {
             BossPlayers.Instance.RemoveFollower(_bot, _player);
+            ClearFollowerPatrol(_bot);
         }
         // how does the boss get added as Enemy?? - fix it
         public void OnAddEnemy(IPlayer player)
@@ -190,7 +215,7 @@ namespace friendlyPMC.Components
             settings.FileSettings.Move.REACH_DIST = 1.5f;
             settings.FileSettings.Move.REACH_DIST_COVER = 2f;
             settings.FileSettings.Move.REACH_DIST_RUN = 1f;
-            settings.FileSettings.Mind.TIME_TO_FORGOR_ABOUT_ENEMY_SEC = 30f;
+            settings.FileSettings.Mind.TIME_TO_FORGOR_ABOUT_ENEMY_SEC = 20f;
 
             settings.FileSettings.Mind.CAN_TALK = true;
             settings.FileSettings.Mind.CAN_STAND_BY = true;
@@ -255,7 +280,10 @@ namespace friendlyPMC.Components
             _bot.GetPlayer.HealthController.DiedEvent -= OnDead;
             _bot.LeaveData.OnLeave -= OnLeave;
             _bot.Memory.OnAddEnemy -= OnAddEnemy;
-            _player.bossGroup.OnEnemyAdd -= OnAddEnemyGroup;
+            
+            if(_bot.BotsGroup != null)
+                _bot.BotsGroup.OnEnemyAdd -= OnAddEnemyGroup;
+
             _bot.GetPlayer.Physical.Stamina.ForceMode = false;
             _bot.GetPlayer.Physical.HandsStamina.ForceMode = false;
             _bot.BotFollower.PatrolDataFollower.Dispose();

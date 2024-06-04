@@ -106,6 +106,7 @@ namespace friendlyPMC.Modules
                         if (follower.IsBot(fl))
                         {
                             followersToRemove.Add(follower);
+                            follower.ClearFollowerPatrol(fl);
                         }
                     });
                 });

@@ -132,38 +132,60 @@ namespace friendlyPMC.Components
                 Logger.LogInfo("Boss said " + info.phrase.ToString());
 
                 pitAIBossPlayer boss = BossPlayers.Instance.GetBossPlayer(requester.ProfileId);
-                // on cover me, whoever is not close enough to the boss, come to him
-                if (info.phrase == EPhraseTrigger.CoverMe || info.phrase == EPhraseTrigger.NeedHelp)
+                // on cover me, make bot follow boss near
+                if (info.phrase == EPhraseTrigger.CoverMe)
+                {
+                    FollowerPatrolInstances.SetNearPatrol(botOwner_0);
+
+                    return;
+                }
+                // on get back make bot follow boss at a distance
+                else if(info.phrase == EPhraseTrigger.GetBack)
+                {
+                    FollowerPatrolInstances.SetFarPatrol(botOwner_0);
+                    return;
+                }
+                // on need help get the closest bot to come near the boss
+                else if(info.phrase == EPhraseTrigger.NeedHelp)
                 {
                     if ((botOwner_0.GetPlayer.Transform.position - requester.Transform.position).magnitude < 15f)
                     {
                         Player alivePlayerByProfileID = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(requester.ProfileId);
-                        if (botOwner_0.BotRequestController.TryStopCurrent(alivePlayerByProfileID.GetPlayer, true))
-                        {
-                            var @class = new FollowerCoverMe(alivePlayerByProfileID.GetPlayer);
-                            if (@class.CanRequest(alivePlayerByProfileID.GetPlayer))
-                            {
-                                @class.AddPossibleExecutors(botOwner_0);
-                                alivePlayerByProfileID.AIData.AskRequests.TryAdd(@class, botOwner_0.BotsGroup.RequestsController);
-                            }
-                        }
-                    }
 
-                    return;
-                }
-                // on regroup or follow me, get closer to the boss
-                else if (info.phrase == EPhraseTrigger.FollowMe || info.phrase == EPhraseTrigger.Regroup)
-                {
-                    if (botOwner_0.Memory.HaveEnemy && info.phrase == EPhraseTrigger.Regroup)
-                    {
-                        Player alivePlayerByProfileID = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(requester.ProfileId);
-
-                        if (botOwner_0.BotRequestController.TryStopCurrent(alivePlayerByProfileID.GetPlayer, true))
+                        if (botOwner_0.BotRequestController.TryStopCurrent(alivePlayerByProfileID, true))
                         {
                             FollowerRegroup gclass = new FollowerRegroup(requester);
 
-                            gclass.AddPossibleExecutors(botOwner_0);
-                            botOwner_0.AIData.AskRequests.TryAdd(gclass, botOwner_0.BotsGroup.RequestsController);
+                           
+                            if(botOwner_0.BotsGroup.RequestsController.TryAddRequest(gclass))
+                            {
+                                gclass.AddPossibleExecutors(botOwner_0);
+                                gclass.SetGroup(botOwner_0.BotsGroup.RequestsController);
+                            }
+                        }
+                    }
+                }
+                // on regroup all get closer to the boss
+                else if (info.phrase == EPhraseTrigger.Regroup)
+                {
+                    if (botOwner_0.Memory.HaveEnemy)
+                    {
+                        Player alivePlayerByProfileID = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(requester.ProfileId);
+
+                        if (botOwner_0.BotRequestController.TryStopCurrent(alivePlayerByProfileID, false))
+                        {
+                            FollowerRegroup gclass = new FollowerRegroup(requester);
+
+                            if (botOwner_0.BotsGroup.RequestsController.TryAddRequest(gclass))
+                            {
+                                gclass.AddPossibleExecutors(botOwner_0);
+                                gclass.SetGroup(botOwner_0.BotsGroup.RequestsController);
+                                if ((botOwner_0.GetPlayer.Transform.position - requester.Transform.position).magnitude < 10f)
+                                {
+                                    botOwner_0.BotTalk.TrySay(EPhraseTrigger.Roger, false);
+                                    botOwner_0.Gesture.TryGestus(EGesture.Good, false);
+                                }
+                            }
                         }
 
                     }
@@ -173,7 +195,7 @@ namespace friendlyPMC.Components
                 } // on supression, switch enemy priority
                 else if (info.phrase == EPhraseTrigger.Suppress)
                 {
-                    if ((botOwner_0.GetPlayer.Transform.position - requester.Transform.position).magnitude < 15f)
+                    if ((botOwner_0.GetPlayer.Transform.position - requester.Transform.position).magnitude < 17f)
                     {
                         EnemyInfo enemyInfo;
                         if (!botOwner_0.Memory.HaveEnemy)
@@ -204,41 +226,56 @@ namespace friendlyPMC.Components
                     }
 
                 } // attack close
-                else if (info.phrase == EPhraseTrigger.Fire || info.phrase == EPhraseTrigger.Gogogo)
+                else if (info.phrase == EPhraseTrigger.Fire)
                 {
-                    if (botOwner_0.Memory.HaveEnemy) 
-                    { 
+                    BossPlayers.Instance.GetBossPlayer(requester.ProfileId).GetBossLogic().SetTactic("push");
 
-                        Vector3 enemyLastPosition = botOwner_0.Memory.LastEnemy.EnemyLastPosition;
-                        Player alivePlayerByProfileID = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(requester.ProfileId);
+                    if((botOwner_0.GetPlayer.Transform.position - requester.Transform.position).magnitude < 10f)
+                    {
+                        botOwner_0.BotTalk.TrySay(EPhraseTrigger.Roger, false);
+                        botOwner_0.Gesture.TryGestus(EGesture.Good, false);
+                    }
+                }
+                // temporary  attack close
+                else if (info.phrase == EPhraseTrigger.GoForward)
+                {
+                    Vector3 enemyLastPosition = botOwner_0.Position;
+                    if (botOwner_0.Memory.HaveEnemy)
+                    {
 
-                        if (botOwner_0.BotRequestController.TryStopCurrent(alivePlayerByProfileID.GetPlayer, true))
-                        {
-                            GClass506 gclass = new FollowerRushEnemy(Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(requester.ProfileId), enemyLastPosition, null, null, info.phrase == EPhraseTrigger.Fire ? BotRequestType.attackClose : BotRequestType.goToPoint);
+                        enemyLastPosition = botOwner_0.Memory.LastEnemy.EnemyLastPosition;
 
-                            gclass.AddPossibleExecutors(botOwner_0);
-                            botOwner_0.AIData.AskRequests.TryAdd(gclass, botOwner_0.BotsGroup.RequestsController);
-                        }
                     }
 
-                }
-                else if (info.phrase == EPhraseTrigger.HoldPosition)
-                {
                     Player alivePlayerByProfileID = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(requester.ProfileId);
 
-                    if (botOwner_0.BotRequestController.TryStopCurrent(alivePlayerByProfileID.GetPlayer, true))
-                    {
-                        BotRequest gclass = new FollowerDefend(botOwner_0, BotRequestType.hold);
+                    FollowerRushEnemy gclass = new FollowerRushEnemy(alivePlayerByProfileID, enemyLastPosition, null, null, BotRequestType.goToPoint);
+                    gclass.AddPossibleExecutors(botOwner_0);
+                    botOwner_0.BotsGroup.RequestsController.TryAddRequest(gclass);
+                }
+                // hold position
+                else if (info.phrase == EPhraseTrigger.HoldPosition)
+                {
+  
+                    BossPlayers.Instance.GetBossPlayer(requester.ProfileId).GetBossLogic().SetTactic("defend");
 
-                        gclass.AddPossibleExecutors(botOwner_0);
-                        alivePlayerByProfileID.AIData.AskRequests.TryAdd(gclass, botOwner_0.BotsGroup.RequestsController);
+                    if ((botOwner_0.GetPlayer.Transform.position - requester.Transform.position).magnitude < 10f)
+                    {
+                        botOwner_0.BotTalk.TrySay(EPhraseTrigger.Roger, false);
+                        botOwner_0.Gesture.TryGestus(EGesture.Good, false);
                     }
 
                 }
+                // temporary hold position
                 else if (info.phrase == EPhraseTrigger.Stop)
                 {
                     botOwner_0.BotsGroup.RequestsController.TryAskHoldRequest(requester, botOwner_0);
 
+                }
+                // reset boss tactic
+                else if(info.phrase == EPhraseTrigger.Gogogo)
+                {
+                    BossPlayers.Instance.GetBossPlayer(requester.ProfileId).GetBossLogic().SetTactic(null);
                 }
                 // open door request
                 else if (info.phrase == EPhraseTrigger.OpenDoor && !botOwner_0.Memory.HaveEnemy)
@@ -270,13 +307,14 @@ namespace friendlyPMC.Components
                     }
                 }
                 // loot item
-                else if ((info.phrase == EPhraseTrigger.LootGeneric) && !botOwner_0.Memory.HaveEnemy)
+                else if ((info.phrase == EPhraseTrigger.LootGeneric || info.phrase == EPhraseTrigger.LootWeapon) && !botOwner_0.Memory.HaveEnemy)
                 {
-                    BotOwner closest = null;
-                    float dist = 15f;
+                    Logger.LogInfo("Trigger take item");
                     LootItem  item = InteractableObjects.GetCurLootItem();
                     if (item != null)
                     {
+                        float dist = Mathf.Infinity;
+                        BotOwner closest = null;
                         boss.Followers.ForEach(fl =>
                         {
                             Vector3 pos = fl.GetPlayer.Transform.position;
@@ -289,11 +327,10 @@ namespace friendlyPMC.Components
                             }
 
                         });
-                        if (closest != null && closest == botOwner_0)
+                        if (closest != null && closest.ProfileId == botOwner_0.ProfileId)
                         {
                             Logger.LogInfo("Tell bot " + botOwner_0.Profile.Nickname + " to loot");
                             InteractableObjects.SetTaker(botOwner_0, item);
-                            InteractableObjects.SetCurLootItem(null);
                         }
                     }
                 }

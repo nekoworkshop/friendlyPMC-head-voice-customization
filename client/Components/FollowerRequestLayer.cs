@@ -26,7 +26,7 @@ namespace friendlyPMC.Components
             {
                 return "FBPReq:" + botOwner_0.BotRequestController.CurRequest.BotRequestType.ToString();
             }
-            return "FollowReqNull";
+            return "FBPReq:Null";
         }
 
         public override bool ShallUseNow()
@@ -37,7 +37,6 @@ namespace friendlyPMC.Components
                 BotRequestType.getInCover,
                 BotRequestType.hide,
                 BotRequestType.suppressionFire,
-                BotRequestType.warnPlayer,
             };
 
             List<BotRequestType> allyAllowedRequest = new List<BotRequestType>
