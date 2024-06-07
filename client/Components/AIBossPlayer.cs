@@ -3,6 +3,7 @@ using EFT;
 using friendlyPMC.Modules;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 
 namespace friendlyPMC.Components
@@ -17,11 +18,18 @@ namespace friendlyPMC.Components
 
         private List<BotOwner> bossEnemies = new List<BotOwner>();
 
+        private List<CustomNavigationPoint> coverPoints;
+
+        private float coverTimer = 0f;
         public pitAIBossPlayer(Player player) : base(player)
         {
             realPlayer = player;
             aBossLogic = new AIBossPlayerLogic(player, this);
+            coverPoints = new List<CustomNavigationPoint>();
+            
             player.HealthController.DiedEvent += OnDead;
+
+            GetAreaCovers();
         }
 
         private void OnDead(EDamageType _damageType)
@@ -32,6 +40,45 @@ namespace friendlyPMC.Components
         public new AIBossPlayerLogic GetBossLogic()
         {
             return aBossLogic;
+        }
+
+        public List<CustomNavigationPoint> GetAreaCovers()
+        {
+            if(coverTimer >= Time.time)
+            {
+                return coverPoints;
+            }
+
+            coverTimer = Time.time + 2.5f;
+
+            Task.Run(() =>
+            {
+
+                List<CustomNavigationPoint> covers = new List<CustomNavigationPoint>();
+                float radius = 100f;
+                float lastDist = 0f;
+                Vector3 centerPos = realPlayer.Transform.position;
+
+                BossPlayers.Instance.GetCovers().ForEach(point =>
+                {
+                    float sqrDist = (centerPos - point.Position).sqrMagnitude;
+
+                    if (sqrDist <= lastDist)
+                    {
+                        covers.Add(point);
+
+                    } 
+                    else if (Vector3.Distance(centerPos, point.Position) <= radius)
+                    {
+                        lastDist = sqrDist;
+                        covers.Add(point);
+                    }
+                });
+
+                coverPoints = covers;
+            });
+
+            return coverPoints;
         }
 
         public void AddEnemy(BotOwner bot)
@@ -110,7 +157,7 @@ namespace friendlyPMC.Components
 
             if (bossGroup != null)
             {
-                bossGroup.RemoveInfo(this.Player());
+                bossGroup.RemoveInfo(Player());
             }
             aBossLogic.Dispose();
 
@@ -123,22 +170,22 @@ namespace friendlyPMC.Components
         private pitAIBossPlayer _aiplayer;
         public AIBossPlayerLogic(Player player, pitAIBossPlayer aiplayer) : base(null, null)
         {
-            player.HealthController.ApplyDamageEvent += OnHit;
+            player.BeingHitAction += OnHit;
             _player = player;
             _aiplayer = aiplayer;
         }
 
-        public void OnHit(EBodyPart bodyPart, float damage, DamageInfo damageInfo)
+        public void OnHit(DamageInfo arg1, EBodyPart arg2, float arg3)
         {
-            if (damage > 0f && damageInfo.Player != null && damageInfo.Player.IsAI && !BossPlayers.Instance.IsFollower(damageInfo.Player.AIData.BotOwner))
+            if (arg1.Player != null && arg1.Player.IsAI && !BossPlayers.Instance.IsFollower(arg1.Player.AIData.BotOwner))
             {
                 _lastTimeHit = Time.time;
                 try
                 {
                     if (_aiplayer.bossGroup != null)
                     {
-                        _aiplayer.bossGroup.CheckAndAddEnemy(damageInfo.Player.AIData.BotOwner);
-                        _aiplayer.AddEnemy(damageInfo.Player.AIData.BotOwner);
+                        _aiplayer.bossGroup.CheckAndAddEnemy(arg1.Player.AIData.BotOwner);
+                        _aiplayer.AddEnemy(arg1.Player.AIData.BotOwner);
                     }
 
                 }
@@ -162,11 +209,7 @@ namespace friendlyPMC.Components
 
         public override void Dispose()
         {
-            try
-            {
-                _player.HealthController.ApplyDamageEvent -= OnHit;
-            }
-            catch { }
+            _player.BeingHitAction -= OnHit;
         }
 
         public override void SetPatrolMode()

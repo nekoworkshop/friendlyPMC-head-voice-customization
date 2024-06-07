@@ -98,6 +98,17 @@ namespace friendlyPMC.Components
             return false;
         }
 
+
+        private bool HasBoss()
+        {
+            return botOwner_0.BotFollower.HaveBoss;
+        }
+
+        private pitAIBossPlayer GetBoss()
+        {
+            return (pitAIBossPlayer)botOwner_0.BotFollower.BossToFollow;
+        }
+
         public override AICoreActionResultStruct<BotLogicDecision> GetDecision()
         {
             BotRequest request = botOwner_0.BotRequestController.CurRequest;
@@ -131,7 +142,7 @@ namespace friendlyPMC.Components
                         botOwner_0.BotTalk.TrySay(EPhraseTrigger.Going, false);
                         return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.holdPosition, "req:stayHidden");
                     }
-                    GetCoverPoint(botOwner_0.GetPlayer.Transform.position, 30f);
+                    GetCoverPoint(botOwner_0.GetPlayer.Transform.position, 50f);
                     if (customNavigationPoint_0 != null)
                     {
                         botOwner_0.BotTalk.TrySay(EPhraseTrigger.Going, false);
@@ -219,7 +230,7 @@ namespace friendlyPMC.Components
 
 
 
-            List<CustomNavigationPoint> customNavigationPoints = BossPlayers.Instance.GetCovers();
+            List<CustomNavigationPoint> customNavigationPoints = HasBoss() ? GetBoss().GetAreaCovers() : BossPlayers.Instance.GetCovers();
 
             if (customNavigationPoints.Count > 0)
             {

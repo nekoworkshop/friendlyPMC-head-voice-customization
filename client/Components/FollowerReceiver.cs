@@ -140,34 +140,29 @@ namespace friendlyPMC.Components
                 if (info.phrase == EPhraseTrigger.CoverMe)
                 {
                     FollowerPatrolInstances.SetNearPatrol(botOwner_0);
-
-                    return;
                 }
                 // on get back make bot follow boss at a distance
                 else if(info.phrase == EPhraseTrigger.GetBack)
                 {
                     FollowerPatrolInstances.SetFarPatrol(botOwner_0);
-                    return;
+
                 }
                 // on need help get the closest bot to come near the boss
                 else if(info.phrase == EPhraseTrigger.NeedHelp)
                 {
-                    if (isClose)
+                    (botOwner_0.Brain.BaseBrain as FollowerBrain).BossOrdersChanged();
+
+                    Player alivePlayerByProfileID = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(requester.ProfileId);
+
+                    if (botOwner_0.BotRequestController.TryStopCurrent(alivePlayerByProfileID, true))
                     {
-                        (botOwner_0.Brain.BaseBrain as FollowerBrain).BossOrdersChanged();
+                        FollowerRegroup gclass = new FollowerRegroup(requester);
 
-                        Player alivePlayerByProfileID = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(requester.ProfileId);
 
-                        if (botOwner_0.BotRequestController.TryStopCurrent(alivePlayerByProfileID, true))
+                        if (botOwner_0.BotsGroup.RequestsController.TryAddRequest(gclass))
                         {
-                            FollowerRegroup gclass = new FollowerRegroup(requester);
-
-                           
-                            if(botOwner_0.BotsGroup.RequestsController.TryAddRequest(gclass))
-                            {
-                                gclass.AddPossibleExecutors(botOwner_0);
-                                gclass.SetGroup(botOwner_0.BotsGroup.RequestsController);
-                            }
+                            gclass.AddPossibleExecutors(botOwner_0);
+                            gclass.SetGroup(botOwner_0.BotsGroup.RequestsController);
                         }
                     }
                 }
@@ -194,8 +189,7 @@ namespace friendlyPMC.Components
                     }
                     else
                         botOwner_0.BotsGroup.RequestsController.TryAskFollowMeRequest(requester, botOwner_0);
-                    
-                    return;
+
 
                 } // on supression, switch enemy priority
                 else if (info.phrase == EPhraseTrigger.Suppress)
@@ -226,8 +220,6 @@ namespace friendlyPMC.Components
 
                         if (enemyInfo != null)
                             boss.bossGroup.RequestsController.TryAskSuppressionRequest(requester, enemyInfo);
-
-                        return;
                     }
 
                 } // attack close
@@ -252,16 +244,16 @@ namespace friendlyPMC.Components
 
                         enemyLastPosition = botOwner_0.Memory.LastEnemy.EnemyLastPosition;
 
-                    }
+                        Player alivePlayerByProfileID = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(requester.ProfileId);
 
-                    Player alivePlayerByProfileID = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(requester.ProfileId);
+                        FollowerRushEnemy gclass = new FollowerRushEnemy(alivePlayerByProfileID, enemyLastPosition, null, null, BotRequestType.goToPoint);
 
-                    FollowerRushEnemy gclass = new FollowerRushEnemy(alivePlayerByProfileID, enemyLastPosition, null, null, BotRequestType.goToPoint);
-                  
-                    if(botOwner_0.BotsGroup.RequestsController.TryAddRequest(gclass))
-                    {
-                        gclass.AddPossibleExecutors(botOwner_0);
-                        gclass.SetGroup(botOwner_0.BotsGroup.RequestsController);
+                        if (botOwner_0.BotsGroup.RequestsController.TryAddRequest(gclass))
+                        {
+                            gclass.AddPossibleExecutors(botOwner_0);
+                            gclass.SetGroup(botOwner_0.BotsGroup.RequestsController);
+                        }
+
                     }
                 }
                 // hold position
@@ -280,7 +272,7 @@ namespace friendlyPMC.Components
                 // temporary hold position
                 else if (info.phrase == EPhraseTrigger.Stop)
                 {
-                    if (isClose)
+                    if (botOwner_0.Memory.HaveEnemy)
                     {
                         if(!notBusy) botOwner_0.BotsGroup.RequestsController.TryAskHoldRequest(requester, botOwner_0);
                         else botOwner_0.BotsGroup.RequestsController.TryActivateWait(requester, botOwner_0);

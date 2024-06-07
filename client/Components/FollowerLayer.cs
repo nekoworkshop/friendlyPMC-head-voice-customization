@@ -27,6 +27,11 @@ namespace friendlyPMC.Components
             return botOwner_0.BotFollower.HaveBoss;
         }
 
+        private pitAIBossPlayer GetBoss()
+        {
+            return (pitAIBossPlayer)botOwner_0.BotFollower.BossToFollow;
+        }
+
         public override AICoreActionResultStruct<BotLogicDecision> GetDecision()
         {
 
@@ -73,9 +78,6 @@ namespace friendlyPMC.Components
                     }
                 }
 
-                if (botOwner_0.BotRequestController.CurRequest != null && botOwner_0.BotRequestController.CurRequest.BotRequestType == BotRequestType.doorOpen)
-                    return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.doorOpen, "doorOpen");
-
                 botOwner_0.PatrollingData.SetTargetMoveSpeed();
                 botOwner_0.PatrollingData.PointChooser.ShallChangeWay(false);
 
@@ -114,7 +116,8 @@ namespace friendlyPMC.Components
                 }
                 if (method_11(20f))
                 {
-                    GetCoverPoint(botOwner_0.GetPlayer.Transform.position, 20f);
+                    GetCoverPoint(botOwner_0.GetPlayer.Transform.position, 50f);
+                    if (this.customNavigationPoint_0 != null)
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "goforheal");
                 }
                 return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.heal, "heal now");
@@ -172,12 +175,12 @@ namespace friendlyPMC.Components
 
         private void GetCoverPoint(Vector3 centerPosition, float searchRadius)
         {
-            List<CustomNavigationPoint> customNavigationPoints = BossPlayers.Instance.GetCovers();
+            List<CustomNavigationPoint> customNavigationPoints = HasBoss() ? GetBoss().GetAreaCovers() : BossPlayers.Instance.GetCovers();
 
             if (customNavigationPoints.Count > 0)
             {
                 CustomNavigationPoint point1 = null;
-                float distance = searchRadius;
+                float distance = searchRadius * searchRadius;
 
                 List<CustomNavigationPoint> availablePoints = new List<CustomNavigationPoint>();
 
@@ -185,7 +188,7 @@ namespace friendlyPMC.Components
                 {
                     if (point.IsFreeById(botOwner_0.Id) && !point.IsSpotted)
                     {
-                        float range = (centerPosition - point.Position).magnitude;
+                        float range = (centerPosition - point.Position).sqrMagnitude;
                         if (range < distance)
                         {
                             distance = range;
