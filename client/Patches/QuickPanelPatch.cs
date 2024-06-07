@@ -33,7 +33,7 @@ namespace friendlyPMC.Patches
                 bool flag2 = lootItem != null && lootItem.ItemOwner.RootItem is GClass2737;
                 bool flag3 = lootItem != null && (lootItem.ItemOwner.RootItem is Weapon || lootItem.ItemOwner.RootItem.GetItemComponent<KnifeComponent>() != null);
 
-
+                // modification here
                 InteractableObjects.SetCurLootItem(lootItem);
 
                 __instance.method_7(EPhraseTrigger.LootKey, flag);

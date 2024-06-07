@@ -1,13 +1,6 @@
-﻿using Aki.Reflection.Patching;
-using Aki.Reflection.Utils;
-using BepInEx;
-using Comfort.Common;
-using EFT;
-using friendlyPMC.Actions;
-using friendlyPMC.Components;
-using friendlyPMC.Modules;
+﻿using BepInEx;
+
 using friendlyPMC.Patches;
-using System.Reflection;
 using Logger = friendlyPMC.Components.Logger;
 
 namespace friendlyPMC
@@ -22,16 +15,15 @@ namespace friendlyPMC
         public static bool awaken;
         private void Awake()
         {
-            
-            if(awaken) return;
-            awaken = true;
 
-            new Logger();
+            if (!awaken)
+            {
+                awaken = true;
+                new Logger();
+            }
 
-            new BossPlayers();
-            new InteractableObjects();
+            new AIBossPlayerDisposePatch().Enable();
 
-            new PlayerPatch().Enable();
 
             new BotSpawnerAddPlayerPatch().Enable();
 
@@ -39,7 +31,7 @@ namespace friendlyPMC
             new BotEnemiesControllerPatch().Enable();
             new BotOwnerDamagePatch().Enable();
 
-            new FollowerPatrolInstances();
+            
             new BotOwnerIsFolowerPatch().Enable();
             new PatrolDataFollowerPatch().Enable();
 
@@ -48,14 +40,18 @@ namespace friendlyPMC
             new GoToCheckRequestPatsh().Enable();
 
 
-            new Receivers();
+            
             new BotReceiverInitPatch().Enable();
             new BotReceiverDisposePatch().Enable();
             new BotReceiverPhrasePatch().Enable();
 
             new QuickPanelPatch().Enable();
 
-            new CreateNodePatch().Enable();        
+            new CreateNodePatch().Enable();
+            new GetClosePointsPatch().Enable();
+
+            new BotsControllerPatch().Enable();
+            new LocalGamePatch().Enable();
         }
 
     }

@@ -59,22 +59,36 @@ namespace friendlyPMC.Components
                 return false;
             }
 
-            if(currRequest.BotRequestType == BotRequestType.doorOpen)
+            if (currRequest.BotRequestType == BotRequestType.doorOpen)
             {
                 return currRequest.CanProceed();
+            }
+
+            pitAIBossPlayer boss = null;
+            if (botOwner_0.BotFollower.BossToFollow != null)
+            {
+                boss = BossPlayers.Instance.GetBossPlayer(botOwner_0.BotFollower.BossToFollow.Player().ProfileId);
             }
 
             if (
                     (
                         // boss can throw all types of requests
-                        botOwner_0.BotFollower.BossToFollow != null && currRequest.Requester == botOwner_0.BotFollower.BossToFollow.Player() &&
+                        boss != null &&
                         // - the rest is handled by followerfight layer
                         (botOwner_0.Memory.HaveEnemy && enemyAllowedRequests.Contains(currRequest.BotRequestType)) ||
                         (!botOwner_0.Memory.HaveEnemy && generalRequests.Contains(currRequest.BotRequestType))
                     ) ||
                     (
                         // teammates only some
-                        botOwner_0.BotsGroup.Contains(currRequest.Requester.AIData.BotOwner) && allyAllowedRequest.Contains(currRequest.BotRequestType)
+                        (
+                            boss != null && 
+                            boss.Followers.Contains(currRequest.Requester.AIData.BotOwner) && allyAllowedRequest.Contains(currRequest.BotRequestType) 
+                        ) ||
+                        (
+                            boss == null &&
+                            botOwner_0.BotsGroup.Contains(currRequest.Requester.AIData.BotOwner)
+                        )
+                        
                     )
                 )
             {

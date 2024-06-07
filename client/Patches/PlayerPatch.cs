@@ -10,51 +10,18 @@ using UnityEngine;
 
 namespace friendlyPMC.Patches
 {
-    internal class PlayerPatch : ModulePatch
+
+    internal class AIBossPlayerDisposePatch : ModulePatch
     {
         protected override MethodBase GetTargetMethod()
         {
-            return AccessTools.Method(typeof(Player), "OnDead");
-        }
-
-        [PatchPostfix]
-        private static void PatchPostfix(Player __instance)
-        {
-            BossPlayers.Instance.RemoveBossPlayer(__instance.ProfileId);
-        }
-    }
-
-    internal class SessionEndPatch : ModulePatch
-    {
-        protected override MethodBase GetTargetMethod()
-        {
-            return AccessTools.Method(typeof(Player), "OnGameSessionEnd");
-        }
-
-        [PatchPostfix]
-        private static void PatchPostfix(Player __instance)
-        {
-            BossPlayers.Instance.RemoveBossPlayer(__instance.ProfileId);
-        }
-    }
-
-    internal class PlayerSayPatch : ModulePatch
-    {
-        protected override MethodBase GetTargetMethod()
-        {
-            return AccessTools.Method(typeof(Player), "Say");
+            return AccessTools.Method(typeof(AIBossPlayer), "Dispose");
         }
 
         [PatchPrefix]
-        private static bool PatchPrefix(Player __instance, EPhraseTrigger @event, bool demand = false, float delay = 0f, ETagStatus mask = (ETagStatus)0, int probability = 100, bool aggressive = false)
+        private static bool PatchPrefix(AIBossPlayer __instance)
         {
-            if (@event == EPhraseTrigger.Cooperation)
-            {
-                if (Singleton<BotEventHandler>.Instantiated)
-                {
-                    Singleton<BotEventHandler>.Instance.SayPhrase(__instance, @event);
-                }
-            }
+            if (BossPlayers.Instance.RemoveBossPlayer(__instance.Player().ProfileId)) return false;
 
             return true;
         }

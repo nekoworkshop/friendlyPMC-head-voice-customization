@@ -1,5 +1,6 @@
 ﻿using friendlyPMC.Components;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace friendlyPMC.Modules
 {
@@ -7,13 +8,37 @@ namespace friendlyPMC.Modules
     {
         private static Dictionary<string, FollowerReceiver> followerReceivers;
 
+        private static Receivers Instance;
+
         public Receivers()
         {
-            if (followerReceivers == null)
+            if (Instance == null)
             {
-                followerReceivers = new Dictionary<string, FollowerReceiver>();
+                if (followerReceivers == null)
+                {
+                    followerReceivers = new Dictionary<string, FollowerReceiver>();
+                }
+                Instance = this;
             }
         }
+        
+        public void Destroy()
+        {
+            foreach (var item in followerReceivers)
+            {
+                item.Value.Dispose();
+            }
+            followerReceivers.Clear();
+        }
+
+        public static void Dispose()
+        {
+            if(Instance != null)
+            {
+                Instance.Destroy();
+            }
+        }
+
         public static void AddReceiver(string id, FollowerReceiver receiver)
         {
             if(followerReceivers.ContainsKey(id))

@@ -60,11 +60,13 @@ namespace friendlyPMC.Actions
                 if (flag2)
                 {
                     this.botOwner_0.Mover.Sprint(false, true);
+                    
                     if (this.bool_0)
                     {
                         this.botOwner_0.StopMove();
                         return;
                     }
+
                     if (this.float_4 < Time.time || flag)
                     {
                         this.float_4 = Time.time + 8f;
@@ -103,6 +105,7 @@ namespace friendlyPMC.Actions
                             if (status != NavMeshPathStatus.PathComplete)
                             {
                                 botOwner.StopMove();
+                                botOwner.SetPose(0.5f);
                                 return;
                             }
 
@@ -183,11 +186,25 @@ namespace friendlyPMC.Actions
     {
         private List<FollowerPatrol> followerPatrols = new List<FollowerPatrol>();
 
-        public static FollowerPatrolInstances Instance;
+        private static FollowerPatrolInstances Instance;
 
         public FollowerPatrolInstances()
         {
             if (Instance == null) Instance = this;
+        }
+
+        public void Destroy()
+        {
+            followerPatrols.Clear();
+        }
+
+        public static void Dispose()
+        {
+            if(Instance != null)
+            {
+                Instance.Destroy();
+                Instance = null;
+            }
         }
 
         public static void AddPatrol(FollowerPatrol followerPatrol)

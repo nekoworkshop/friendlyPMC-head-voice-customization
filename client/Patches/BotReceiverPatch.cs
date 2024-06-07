@@ -81,7 +81,7 @@ namespace friendlyPMC.Patches
             if (botOwner != null)
             {
                 // on cooperation, starting following the boss player
-                if (info.phrase == EPhraseTrigger.Cooperation)
+                if (info.phrase == EPhraseTrigger.Cooperation || info.phrase == EPhraseTrigger.FollowMe)
                 {
                     IPlayer requester = info.PlayerRequester;
 

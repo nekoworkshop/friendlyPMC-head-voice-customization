@@ -1,6 +1,7 @@
 ﻿using EFT;
 using friendlyPMC.Components;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,19 +13,38 @@ namespace friendlyPMC.Modules
     {
         public static BossPlayers Instance;
 
+        private Dictionary<string, pitAIBossPlayer> _bosses { get; set; }
+        private List<BotFollowerPlayer> _followers { get; set; }
+        private List<int> _botsGroup { get; set; }
+
+        private List<CustomNavigationPoint> navigationPoints;
+
+        private List<string> _removedBosses;
+
+
         public BossPlayers()
         {
-            Instance = this;
+            if (Instance == null)
+            {
+                Instance = this;
+            }
             _bosses = new Dictionary<string, pitAIBossPlayer>();
             _followers = new List<BotFollowerPlayer> { };
+            _removedBosses = new List<string> { };
+            _botsGroup = new List<int> { };
 
             Logger.LogInfo("BossPlayer Instanced");
         }
 
-        private Dictionary<string, pitAIBossPlayer> _bosses { get; set; }
-        private List<BotFollowerPlayer> _followers { get; set; }
-
-        private List<CustomNavigationPoint> navigationPoints;
+        public static void Dispose()
+        {
+            if (Instance != null)
+            {
+                Instance.Destroy();
+                Instance = null;
+            }
+        }
+       
 
         public pitAIBossPlayer AddBossPlayer(Player player)
         {
@@ -40,11 +60,15 @@ namespace friendlyPMC.Modules
             }
             else
             {
-
                 Logger.LogInfo($"Made player {player.Profile.Nickname} a BOSS");
             }
 
             string name = player.ProfileId;
+
+            if (_removedBosses.Contains(name))
+            {
+                _removedBosses.Remove(name);
+            }
 
             _bosses[name] = playerBoss;
 
@@ -89,7 +113,7 @@ namespace friendlyPMC.Modules
             return playerBoss;
         }
 
-        public void RemoveBossPlayer(string name)
+        public bool RemoveBossPlayer(string name)
         {
             if (_bosses.ContainsKey(name))
             {
@@ -126,7 +150,27 @@ namespace friendlyPMC.Modules
                 boss.DisposeBoss();
 
                 _bosses.Remove(name);
+                _removedBosses.Add(name);
+                return true;
             }
+            else if (_removedBosses.Contains(name))
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        public void Destroy()
+        {
+            ICollection<string> keys = _bosses.Keys;
+            foreach (string key in keys)
+            {
+                RemoveBossPlayer(key);
+            }
+            _bosses = null;
+            _removedBosses = null;
+            _followers = null;
         }
 
         public BotFollowerPlayer AddFollower(BotOwner bot, pitAIBossPlayer player)
@@ -205,6 +249,21 @@ namespace friendlyPMC.Modules
             }
 
             return _follower != null;
+        }
+
+        public void AddFollowerGroup(int id)
+        {
+            if (!_botsGroup.Contains(id)) _botsGroup.Add(id);
+        }
+
+        public bool IsFollowerGroup(int id)
+        {
+            return _botsGroup.Contains(id);
+        }
+
+        public void removeFollowerGroup(int id)
+        {
+            if(_botsGroup.Contains(id)) _botsGroup.Remove(id);
         }
 
         public bool IsBoss(string id)

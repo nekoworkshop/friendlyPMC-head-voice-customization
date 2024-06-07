@@ -1,5 +1,6 @@
 ﻿using Aki.Reflection.Patching;
 using EFT;
+using friendlyPMC.Modules;
 using HarmonyLib;
 using System;
 using System.Collections.Generic;
@@ -7,26 +8,26 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
 
 namespace friendlyPMC.Patches
 {
-    internal class BotGroupIsEnemyPatch : ModulePatch
+    internal class GetClosePointsPatch : ModulePatch
     {
         protected override MethodBase GetTargetMethod()
         {
-            return AccessTools.Method(typeof(BotsGroup), "method_0");
 
+            return AccessTools.Method(typeof(CoverPointMaster), nameof(CoverPointMaster.GetClosePoints));
         }
+
         [PatchPrefix]
-        private static bool PatchPrefix(BotsGroup __instance, ref bool __result, IPlayer player)
+        public static bool Prefix(Vector3 pos, BotOwner bot, float dist, ref List<CustomNavigationPoint> __result)
         {
-            // fix Usecs turning hostile because of UsecRaidRemainKills
-            if (player.Profile.Info.Side == EPlayerSide.Usec)
+            if (BossPlayers.Instance.IsFollower(bot))
             {
-                __result = false;
+                __result = BossPlayers.Instance.GetCovers();
                 return false;
             }
-
             return true;
         }
     }

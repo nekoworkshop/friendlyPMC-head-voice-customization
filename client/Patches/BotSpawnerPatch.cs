@@ -107,7 +107,7 @@ namespace friendlyPMC.Patches
             int memberCount = 2;
 
             BotSpawnParams @params = new BotSpawnParams();
-            @params.ShallBeGroup = new ShallBeGroupParams(true,false, memberCount+2);
+            @params.ShallBeGroup = new ShallBeGroupParams(true,false, memberCount);
 
             IProfileData botData = new IProfileData(side, type, BotDifficulty.hard, 0f, @params);
             BotCacheClass bot = await BotCacheClass.Create(botData, botCreator, memberCount, botSpawnerClass);
@@ -148,6 +148,7 @@ namespace friendlyPMC.Patches
                         if(followerGroup != null && player.bossGroup == null)
                         {
                             player.bossGroup = followerGroup;
+                            BossPlayers.Instance.AddFollowerGroup(followerGroup.Id);
 
                             player.bossGroup.AddAlly(player.realPlayer);
                             player.bossGroup.Lock();

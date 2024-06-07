@@ -33,7 +33,7 @@ namespace friendlyPMC.Components
             GClass104 layer8 = new GClass104(_owner, 10, false, CoverLevel.Lay);
             method_0(7, layer8, true);
             // - item taker
-            FollowerLootLayer layer9 = new FollowerLootLayer(_owner, 70);
+            FollowerLootLayer layer9 = new FollowerLootLayer(_owner, 58);
             method_0(8, layer9, true);
         }
 
@@ -47,9 +47,15 @@ namespace friendlyPMC.Components
             return new GClass578(1, 75, 45, 76);
         }
 
-        public void SetBossTactic()
+        public void SetBossTactic(string tactic)
         {
-            fightLayer.SetBossFightTactic();
+            fightLayer.SetBossFightTactic(tactic);
+            BossOrdersChanged();
+        }
+
+        public void BossOrdersChanged()
+        {
+            fightLayer.OrdersChanged();
         }
     }
 }

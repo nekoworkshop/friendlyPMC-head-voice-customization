@@ -3,7 +3,9 @@ using EFT;
 using friendlyPMC.Modules;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.AI;
 
 namespace friendlyPMC.Components
 {
@@ -27,26 +29,30 @@ namespace friendlyPMC.Components
         private bool holdTactic = false;
         private bool rushTactic = true;
 
+        private bool ordersChanged = false;
+
         private bool bossUnderAttack = false;
 
         private string tactic = "balance";
+
 
         public FollowerFightLayer(BotOwner bot, int priority) : base(bot, priority)
         {
             
         }
 
-        public void SetBossFightTactic()
+        public void SetBossFightTactic(string tactic)
         {
-            if (HasBoss())
+            if (tactic == "push")
             {
-                if (GetBoss().GetBossLogic().GetTactic() == "push") rushTactic = true;
-                else if (GetBoss().GetBossLogic().GetTactic() == "defend") holdTactic = true;
-                else
-                {
-                    rushTactic = false;
-                    holdTactic = false;
-                }
+                rushTactic = true;
+                holdTactic = false;
+            }
+            else if (tactic == "defend") 
+            {
+                holdTactic = true;
+                rushTactic |= false;
+            
             }
             else
             {
@@ -88,9 +94,24 @@ namespace friendlyPMC.Components
             return (pitAIBossPlayer)botOwner_0.BotFollower.BossToFollow;
         }
 
+        private bool ShallGoNearBoss()
+        {
+            EnemyInfo goalEnemy = this.botOwner_0.Memory.GoalEnemy;
+            return ((botOwner_0.Position - GetBoss().Position).sqrMagnitude > 20f && goalEnemy == null || (goalEnemy.HaveSeen && Time.time - goalEnemy.PersonalLastSeenTime > 10f));
+        }
+
         private bool TimeToHeal()
         {
             return Time.time - this.botOwner_0.Memory.GoalEnemy.PersonalLastSeenTime >= 30f && (this.botOwner_0.Medecine.FirstAid.Have2Do || this.botOwner_0.Medecine.SurgicalKit.HaveWork);
+        }
+
+        public void OrdersChanged()
+        {
+            ordersChanged = true;
+            Task.Delay(1000).ContinueWith(t =>
+            {
+                ordersChanged = false;
+            });
         }
 
         private AICoreActionResultStruct<BotLogicDecision> EngageEnemy()
@@ -145,7 +166,7 @@ namespace friendlyPMC.Components
                 }
                 else
                 {
-                    return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.dogFight, "noCloseCoverEnemy");
+                    return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.dogFight, "DogFight");
                 }
             }
 
@@ -176,7 +197,11 @@ namespace friendlyPMC.Components
                 // If the bot is not in cover, find the closest cover and move to it
                 if (!botOwner_0.Memory.IsInCover)
                 {
-                    GetClosestCoverPoint(botOwner_0.GetPlayer.Transform.position, searchRadius);
+                    GetClosestCoverPoint(GetBoss().Position, nearSearchRadius);
+                    
+                    if (customNavigationPoint_0 != null)
+                        GetClosestCoverPoint(botOwner_0.GetPlayer.Transform.position, searchRadius);
+
                     if (customNavigationPoint_0 != null)
                     {
                         return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "runToHeal");
@@ -194,43 +219,49 @@ namespace friendlyPMC.Components
                 {
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.shootFromCover, "shootFromCover");
                 }
+
+                if(HasBoss() && ShallGoNearBoss())
+                {
+                    GetClosetCoverPointGroup(GetBoss().Position, searchRadius);
+                    if (customNavigationPoint_0 != null)
+                    {
+                        return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "moveCloserToBoss");
+                    }
+                }
                 // Otherwise, hold position
                 return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.holdPosition, "holdPositionInCover");
             }
 
             // If the bot is not in cover, find the closest cover and move to it
+            bool nearBoss = false;
             if(HasBoss())
             {
                 GetClosetCoverPointGroup(GetBoss().Position, searchRadius);
+                nearBoss = true;
             } 
             else 
             { 
-                GetClosestCoverPoint(botOwner_0.GetPlayer.Transform.position, searchRadius);
+                GetClosestCoverPoint(botOwner_0.GetPlayer.Transform.position, nearSearchRadius);
             }
 
             if (customNavigationPoint_0 != null)
             {
-                return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "moveToCover");
+                return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, nearBoss ? "moveCloserToBoss" : "moveToCover");
             }
 
             // Fallback decision if no cover is found
-            return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.dogFight, "fallbackDogFight");
+            return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.dogFight, "DogFight");
         }
 
 
         public AICoreActionResultStruct<BotLogicDecision> DecideTactic()
         {
-            // Check if the bot needs to heal
+            
+            /*// Check if the bot needs to heal
             if (botOwner_0.Medecine.FirstAid.Have2Do || botOwner_0.Medecine.SurgicalKit.HaveWork)
             {
                 return DefendPosition();
-            }
-
-            // Check if the enemy is visible and can be shot
-            if (botOwner_0.Memory.GoalEnemy.IsVisible && botOwner_0.Memory.GoalEnemy.CanShoot)
-            {
-                return EngageEnemy();
-            }
+            }*/
 
             // Check if the bot has received the regroup command
             if (ordersAreReqroup)
@@ -256,8 +287,9 @@ namespace friendlyPMC.Components
                 }
             }
 
-            if (ordersAreAttack || rushTactic) return EngageEnemy();
-            else if (ordersAreHold || holdTactic) return DefendPosition();
+           
+            if (ordersAreHold || holdTactic) return DefendPosition();
+            else if (ordersAreAttack || rushTactic) return EngageEnemy();
 
             // Check if the boss is under attack
             if (bossUnderAttack)
@@ -308,9 +340,6 @@ namespace friendlyPMC.Components
         public override AICoreActionResultStruct<BotLogicDecision> GetDecision()
         {
 
-            rushTactic = false;
-            holdTactic = false;
-
             BotRequest request = botOwner_0.BotRequestController.CurRequest;
             // accept requests only from teammates and boss
             if (request != null && !(request.Requester.ProfileId == botOwner_0.BotFollower.BossToFollow.Player().ProfileId || botOwner_0.BotsGroup.Contains(request.Requester.AIData.BotOwner)))
@@ -351,16 +380,6 @@ namespace friendlyPMC.Components
                 ordersAreReqroup = false;
             }
 
-            if (HasBoss() && GetBoss().GetBossLogic().GetTactic() == "push")
-            {
-                rushTactic = true;
-            }
-
-            if (HasBoss() && GetBoss().GetBossLogic().GetTactic() == "defend")
-            {
-                holdTactic = true;
-            }
-
             // partial re-creation of fight decisions in GClass47
             AICoreActionResultStruct<BotLogicDecision>? aicoreActionResultStruct = InFightLogic();
 
@@ -373,6 +392,12 @@ namespace friendlyPMC.Components
             {
                 return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.dogFight, "cdg");
 
+            }
+
+            // Check if the enemy is visible and can be shot
+            if (botOwner_0.Memory.GoalEnemy.IsVisible && botOwner_0.Memory.GoalEnemy.CanShoot)
+            {
+                return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.shootFromPlace, "shootEnemy");
             }
 
             // damaged and has healers
@@ -511,6 +536,57 @@ namespace friendlyPMC.Components
         {
             return base.EndRunToEnemy();
         }
+
+        public AICoreActionEndStruct EndGetInClose()
+        {
+            if (this.botOwner_0.Memory.HaveEnemy && this.botOwner_0.Memory.GoalEnemy.CanShoot)
+            {
+                return new AICoreActionEndStruct("enemy.canSh", true);
+            }
+
+            return base.EndRunToCover();
+        }     
+
+        public override AICoreActionEndStruct ShallEndCurrentDecision(AICoreActionResultStruct<BotLogicDecision> curDecision)
+        {
+
+            List<string> ordersIgnoreDecisions = new List<string>
+            {
+                "moveCloserToBoss",
+                "runToHeal",
+                "healInCover",
+                "DogFight",
+                "shootEnemy",
+                "shootFromCover",
+                "moveCloserToBoss"
+            };
+
+            // orders changed
+            if(ordersChanged && !ordersIgnoreDecisions.Contains(curDecision.Reason))
+            {
+                return gstruct7_0;
+            }
+
+            // boss recall
+            if(
+                !ordersIgnoreDecisions.Contains(curDecision.Reason) &&
+                botOwner_0.BotRequestController.CurRequest != null &&
+                botOwner_0.BotRequestController.CurRequest.BotRequestType == BotRequestType.warnPlayer &&
+                botOwner_0.Memory.HaveEnemy && !botOwner_0.Memory.GoalEnemy.IsVisible
+            )
+            {
+                return gstruct7_0;
+            }
+
+            if (curDecision.Reason == "getInCloseFast")
+            {
+                return EndGetInClose();
+            }
+
+            return base.ShallEndCurrentDecision(curDecision);
+        }
+
+
         public override CustomNavigationPoint FindPoint(CoverSearchData data, Func<CoverSearchData, CustomNavigationPoint> p, bool checkCurrent)
         {
             if (this.customNavigationPoint_0 != null && (!this.customNavigationPoint_0.IsFreeById(this.botOwner_0.Id) || this.customNavigationPoint_0.IsSpotted))
@@ -590,15 +666,11 @@ namespace friendlyPMC.Components
             {
                 CustomNavigationPoint point1 = null;
 
-                int minFollowers = 1;
-                int maxFollowers = HasBoss() ? GetBoss().Followers.Count : 1;
                 float maxInnerRadius = searchRadius;
-                float minInnerRadius = 0f;
-                int numFollowers = HasBoss() ? GetBoss().Followers.Count : 1;
 
-                float innerRadius = ((numFollowers - minFollowers) / (float)(maxFollowers - minFollowers)) * (maxInnerRadius - minInnerRadius) + minInnerRadius;
+                Vector3 botPosition = botOwner_0.Transform.position;
 
-                List<CustomNavigationPoint> availablePoints = new List<CustomNavigationPoint>();
+                NavMeshPath navMeshPath = new NavMeshPath();
 
                 foreach (CustomNavigationPoint point in customNavigationPoints)
                 {
@@ -608,24 +680,22 @@ namespace friendlyPMC.Components
                         float range = 0;
                         
                         range = delta.magnitude;
-
                         if (range < maxInnerRadius)
                         {
+                            navMeshPath.ClearCorners();
+                            bool resut = NavMesh.CalculatePath(botPosition, point.Position, -1, navMeshPath);
+                            if (resut && navMeshPath.status == NavMeshPathStatus.PathComplete)
+                            {
+                                
+                                float dist = navMeshPath.CalculatePathLength();
+                                Logger.LogInfo("NavMeshPath dist " + dist);
+                            }
                             maxInnerRadius = range;
                             point1 = point;
-                            if (numFollowers > 1 && delta.magnitude < innerRadius)
-                            {
-                                availablePoints.Add(point);
-                            }
 
 
                         }
                     }
-                }
-                // get a random point
-                if (availablePoints.Count > 0)
-                {
-                    point1 = availablePoints.Random();
                 }
 
 
@@ -659,6 +729,7 @@ namespace friendlyPMC.Components
 
                 foreach (CustomNavigationPoint point in customNavigationPoints)
                 {
+
                     if (IsPointFreeGroup(point) && !point.IsSpotted)
                     {
                         float range = (centerPosition - point.Position).magnitude;

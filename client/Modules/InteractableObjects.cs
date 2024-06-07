@@ -29,6 +29,22 @@ namespace friendlyPMC.Modules
             }
         }
 
+        public void Destroy()
+        {
+            _currCorpse = null;
+            _currDoor = null;
+            _lootItem = null;
+            _taker = null;
+        }
+
+        public static void Dispose()
+        {
+            if(Instance != null)
+            {
+                Instance.Destroy();
+                Instance = null;
+            }
+        }
 
         public static void SetCurCorpse(Corpse corpse)
         {

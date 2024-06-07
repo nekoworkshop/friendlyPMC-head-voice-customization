@@ -4,7 +4,6 @@ using friendlyPMC.Modules;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using static UnityEngine.EventSystems.EventTrigger;
 
 namespace friendlyPMC.Components
 {
@@ -17,10 +16,17 @@ namespace friendlyPMC.Components
         public readonly Player realPlayer;
 
         private List<BotOwner> bossEnemies = new List<BotOwner>();
+
         public pitAIBossPlayer(Player player) : base(player)
         {
             realPlayer = player;
             aBossLogic = new AIBossPlayerLogic(player, this);
+            player.HealthController.DiedEvent += OnDead;
+        }
+
+        private void OnDead(EDamageType _damageType)
+        {
+            BossPlayers.Instance.RemoveBossPlayer(realPlayer.ProfileId);
         }
 
         public new AIBossPlayerLogic GetBossLogic()
@@ -100,7 +106,9 @@ namespace friendlyPMC.Components
 
         public void DisposeBoss()
         {
-            if(bossGroup != null)
+            realPlayer.HealthController.DiedEvent -= OnDead;
+
+            if (bossGroup != null)
             {
                 bossGroup.RemoveInfo(this.Player());
             }
@@ -113,8 +121,6 @@ namespace friendlyPMC.Components
     {
         private Player _player;
         private pitAIBossPlayer _aiplayer;
-
-        private string tactic;
         public AIBossPlayerLogic(Player player, pitAIBossPlayer aiplayer) : base(null, null)
         {
             player.HealthController.ApplyDamageEvent += OnHit;
@@ -142,6 +148,7 @@ namespace friendlyPMC.Components
                 }
             }
         }
+        
 
         public override void Activate()
         {
@@ -155,7 +162,11 @@ namespace friendlyPMC.Components
 
         public override void Dispose()
         {
-            _player.HealthController.ApplyDamageEvent -= OnHit;
+            try
+            {
+                _player.HealthController.ApplyDamageEvent -= OnHit;
+            }
+            catch { }
         }
 
         public override void SetPatrolMode()
@@ -163,17 +174,5 @@ namespace friendlyPMC.Components
 
         }
 
-        public void SetTactic(string prefTactic)
-        {
-            if (prefTactic == null) tactic = null;
-
-            else if (prefTactic == "push") tactic = "push";
-            else tactic = "defend";
-        }
-
-        public string GetTactic()
-        {
-            return tactic;
-        }
     }
 }
