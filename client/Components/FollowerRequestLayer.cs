@@ -142,7 +142,7 @@ namespace friendlyPMC.Components
                         botOwner_0.BotTalk.TrySay(EPhraseTrigger.Going, false);
                         return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.holdPosition, "req:stayHidden");
                     }
-                    GetCoverPoint(botOwner_0.GetPlayer.Transform.position, 50f);
+                    GetCoverPoint(botOwner_0.GetPlayer.Transform.position, 40f);
                     if (customNavigationPoint_0 != null)
                     {
                         botOwner_0.BotTalk.TrySay(EPhraseTrigger.Going, false);

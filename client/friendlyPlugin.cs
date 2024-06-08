@@ -48,7 +48,7 @@ namespace friendlyPMC
             new QuickPanelPatch().Enable();
 
             new CreateNodePatch().Enable();
-            new GetClosePointsPatch().Enable();
+            //new GetClosePointsPatch().Enable();
 
             new BotsControllerPatch().Enable();
             new LocalGamePatch().Enable();

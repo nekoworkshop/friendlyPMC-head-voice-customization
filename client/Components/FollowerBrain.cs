@@ -1,13 +1,26 @@
 ﻿using EFT;
+using friendlyPMC.Actions;
+using friendlyPMC.Modules;
+using System;
+using UnityEngine;
 
 namespace friendlyPMC.Components
 {
     internal class FollowerBrain : BaseBrain
     {
         FollowerFightLayer fightLayer;
-        public FollowerBrain(BotOwner owner) : base(owner)
+
+        private pitAIBossPlayer _boss;
+        public FollowerBrain(BotOwner owner, pitAIBossPlayer boss) : base(owner)
         {
             AddLayers();
+
+            _boss = boss;
+
+            owner.GetPlayer.HealthController.DiedEvent += OnDead;
+            owner.LeaveData.OnLeave += OnLeave;
+            owner.Memory.OnAddEnemy += OnAddEnemy;
+
         }
         /** Exposed method for adding brain layers so it can be patched by addons **/
         public virtual void AddLayers()
@@ -45,6 +58,60 @@ namespace friendlyPMC.Components
         public override GClass578 EventsPriority()
         {
             return new GClass578(1, 75, 45, 76);
+        }
+
+        public virtual void OnDead(EDamageType damageType)
+        {
+            BossPlayers.Instance.RemoveFollower(_owner, _boss);
+            ClearFollowerPatrol();
+
+        }
+
+        public virtual void OnLeave(BotOwner _bot)
+        {
+            BossPlayers.Instance.RemoveFollower(_owner, _boss);
+            ClearFollowerPatrol();
+        }
+
+
+        public virtual void OnAddEnemy(IPlayer player)
+        {
+            // how does the boss get added as Enemy?? - fix it
+            if (player != null && player.ProfileId == _boss.Player().ProfileId)
+            {
+                _owner.Memory.DeleteInfoAboutEnemy(player);
+                _owner.BotsGroup.RemoveEnemy(player);
+                _owner.BotsGroup.AddAlly((Player)_boss.Player());
+            }
+        }
+
+        public void ClearFollowerPatrol()
+        {
+            var patrols = FollowerPatrolInstances.GetPatrols();
+            foreach (var item in patrols)
+            {
+                if (item.botOwner.ProfileId == _owner.ProfileId)
+                {
+                    patrols.Remove(item);
+                    break;
+                }
+            }
+        }
+
+        public override void Dispose()
+        {
+
+            Dismissed();
+            base.Dispose();
+        }
+
+        public virtual void Dismissed()
+        { 
+            ClearFollowerPatrol();
+
+            _owner.GetPlayer.HealthController.DiedEvent -= OnDead;
+            _owner.LeaveData.OnLeave -= OnLeave;
+            _owner.Memory.OnAddEnemy -= OnAddEnemy;
         }
 
         public void SetBossTactic(string tactic)

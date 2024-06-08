@@ -22,6 +22,7 @@ using BotCacheClass = GClass591;
 using IProfileData = GClass592;
 using Comfort.Common;
 using System.Collections.Generic;
+using EFT.InventoryLogic;
 
 
 
@@ -110,7 +111,16 @@ namespace friendlyPMC.Patches
             @params.ShallBeGroup = new ShallBeGroupParams(true,false, memberCount);
 
             IProfileData botData = new IProfileData(side, type, BotDifficulty.hard, 0f, @params);
+
             BotCacheClass bot = await BotCacheClass.Create(botData, botCreator, memberCount, botSpawnerClass);
+            // copy player equipment
+            bot.Profiles.ForEach(profile =>
+            {
+                if (profile != null)
+                {
+                    profile.Inventory.Equipment = player.Player().Profile.Inventory.Equipment.CloneItem(null);
+                }
+            });
 
             var closestCorePoint = GetClosestCorePoint(position);
             bot.AddPosition(position, closestCorePoint.Id);
@@ -122,6 +132,8 @@ namespace friendlyPMC.Patches
 
 
             BotsGroup followerGroup = null;
+
+            bool sayRoger = true;
 
             botCreator.ActivateBot(bot, zone, true, new Func<BotOwner, BotZone, BotsGroup>((BotOwner bt, BotZone zn) =>
             {
@@ -166,8 +178,11 @@ namespace friendlyPMC.Patches
                         }
 
                         BossPlayers.Instance.AddFollower(follower,player);
-                        follower.BotTalk.Say(EPhraseTrigger.Ready,true);
-                        
+
+                        if(sayRoger)
+                            follower.BotTalk.Say(EPhraseTrigger.Attention,true);
+
+                        sayRoger = false;
                     };
                     
                 }) , shallBeGroup, stopWatch });

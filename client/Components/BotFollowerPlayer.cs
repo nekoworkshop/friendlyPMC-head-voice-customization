@@ -66,7 +66,7 @@ namespace friendlyPMC.Components
             _bot.Receiver.Init();
 
             // add the new follower brain
-            _bot.Brain.BaseBrain = GetFollowerBrain(_bot);
+            _bot.Brain.BaseBrain = GetFollowerBrain(_bot, _player);
             _bot.Brain.Agent = GetFollowerAIAgent(_bot);
                 
             _bot.BotsController.AICoreController.Activate();
@@ -76,7 +76,8 @@ namespace friendlyPMC.Components
 
             // make bot follower of player
             _player.OfferBot(_bot);
-
+            // force bot to turn off light
+            _bot.BotLight.TurnOff(false, true);
             // activate new following patrol mode
             try
             { 
@@ -129,7 +130,14 @@ namespace friendlyPMC.Components
                     BossPlayers.Instance.AddFollowerGroup(_player.bossGroup.Id);
                     _player.bossGroup.AddAlly((Player)_player.Player());
                     _player.bossGroup.Lock();
-                    _player.bossGroup.OnEnemyAdd += OnAddEnemyGroup;
+                    _player.bossGroup.OnEnemyAdd += (IPlayer pl, EBotEnemyCause cause) =>
+                    {
+                        if (pl != null && player.Player().ProfileId == pl.ProfileId)
+                        {
+                            player.bossGroup.RemoveEnemy(player.Player());
+                            player.bossGroup.AddAlly(player.realPlayer);
+                        }
+                    };
                     _player.bossGroup.AnyBodyShootImmediately = true;
 
                 }
@@ -140,65 +148,14 @@ namespace friendlyPMC.Components
                 }
             }
 
-
-            _bot.GetPlayer.HealthController.DiedEvent += OnDead;
-            _bot.LeaveData.OnLeave += OnLeave;
-            _bot.Memory.OnAddEnemy += OnAddEnemy;
-
             Logger.LogInfo($"Bot {_bot.Profile.Nickname} is now a follower of {_player.Player().Profile.Nickname}");
 
         }
 
-        public void ClearFollowerPatrol(BotOwner bot)
-        {
-            var patrols = FollowerPatrolInstances.GetPatrols();
-            foreach (var item in patrols)
-            {
-                if (item.botOwner.ProfileId == bot.ProfileId)
-                {
-                    patrols.Remove(item);
-                    break;
-                }
-            }
-        }
-
         /** Exposed so that it can be patched by addons **/
-        public void OnDead(EDamageType damageType)
+        public FollowerBrain GetFollowerBrain(BotOwner bot, pitAIBossPlayer boss)
         {
-            BossPlayers.Instance.RemoveFollower(_bot, _player);
-            ClearFollowerPatrol(_bot);
-
-        }
-        /** Exposed so that it can be patched by addons **/
-        public void OnLeave(BotOwner _bot)
-        {
-            BossPlayers.Instance.RemoveFollower(_bot, _player);
-            ClearFollowerPatrol(_bot);
-        }
-        // how does the boss get added as Enemy?? - fix it
-        private void OnAddEnemy(IPlayer player)
-        {
-            
-            if(player != null && player == _player) {
-                _bot.Memory.DeleteInfoAboutEnemy(player);
-                _bot.BotsGroup.RemoveEnemy(player);
-                _bot.BotsGroup.AddAlly((Player)_player.Player());
-            }
-        }
-        // how does the boss get added as Enemy Group?? - fix it
-        private void OnAddEnemyGroup(IPlayer player, EBotEnemyCause cause)
-        {
-            if (player != null && player == _player)
-            {
-                _bot.BotsGroup.RemoveEnemy(_player.Player());
-                _bot.BotsGroup.AddAlly((Player)_player.Player());
-            }
-        }
-
-        /** Exposed so that it can be patched by addons **/
-        public FollowerBrain GetFollowerBrain(BotOwner bot)
-        {
-            return new FollowerBrain(bot);
+            return new FollowerBrain(bot, boss);
         }
         /** Exposed so that it can be patched by addons **/
         public AICoreAgentClass<BotLogicDecision> GetFollowerAIAgent(BotOwner bot)
@@ -279,8 +236,8 @@ namespace friendlyPMC.Components
             bot.GetPlayer.HealthController.DisableMetabolism();
 
 
-            // refill weapons
-            bot.WeaponManager.Reload.AddAmmoToPockets(bot.WeaponManager.CurrentWeapon.CurrentAmmoTemplate._id, 100);
+            // refill main weapon
+            bot.WeaponManager.Reload.AddAmmoToPockets(bot.WeaponManager.CurrentWeapon.CurrentAmmoTemplate._id, 200);
         }
 
         /** Exposed so that it can be patched by addons **/
@@ -309,10 +266,13 @@ namespace friendlyPMC.Components
         {
             // end follower brain
             _bot.Brain.Agent.Dispose();
-            _bot.Brain.BaseBrain.Dispose();
-            _bot.BotsController.AICoreController.Stop();
+            (_bot.Brain.BaseBrain as FollowerBrain).Dispose();
+            _bot.Brain.Dispose();
+            (_bot.Receiver as FollowerReceiver).Dispose();
 
-            _bot.Receiver.Dispose();
+            if (!_bot.HealthController.IsAlive) return;
+
+            _bot.BotsController.AICoreController.Stop();
 
             // put back old settings
             _bot.Settings = _OldSettings;
@@ -324,19 +284,10 @@ namespace friendlyPMC.Components
             _bot.Receiver.Init();
 
             // add old brain
-            _bot.Brain.Dispose();
             _bot.Brain = new StandartBotBrain(_bot);
-            _bot.Brain.Activate();;
+            _bot.Brain.Activate();
 
             _bot.BotsController.AICoreController.Activate();
-            
-            // remove events
-            _bot.GetPlayer.HealthController.DiedEvent -= OnDead;
-            _bot.LeaveData.OnLeave -= OnLeave;
-            _bot.Memory.OnAddEnemy -= OnAddEnemy;
-            
-            if(_bot.BotsGroup != null)
-                _bot.BotsGroup.OnEnemyAdd -= OnAddEnemyGroup;
 
             _bot.GetPlayer.Physical.Stamina.ForceMode = false;
             _bot.GetPlayer.Physical.HandsStamina.ForceMode = false;

@@ -1,5 +1,6 @@
 ﻿using Aki.Reflection.Patching;
 using EFT;
+using friendlyPMC.Components;
 using friendlyPMC.Modules;
 using HarmonyLib;
 using System;
@@ -21,13 +22,25 @@ namespace friendlyPMC.Patches
         }
 
         [PatchPrefix]
-        public static bool Prefix(Vector3 pos, BotOwner bot, float dist, ref List<CustomNavigationPoint> __result)
+        public static bool Prefix(CoverPointMaster __instance, Vector3 pos, BotOwner bot, float dist, ref List<CustomNavigationPoint> __result)
         {
-            if (BossPlayers.Instance.IsFollower(bot))
-            {
-                __result = BossPlayers.Instance.GetCovers();
-                return false;
-            }
+            
+            return true;
+        }
+    }
+
+    internal class GetFreeClosePointPatch : ModulePatch
+    {
+        protected override MethodBase GetTargetMethod()
+        {
+
+            return AccessTools.Method(typeof(CoverPointMaster), nameof(CoverPointMaster.GetFreeClosePoint));
+        }
+
+        [PatchPrefix]
+        public static bool Prefix(CoverPointMaster __instance, Vector3 pos, BotCoversData bot, float minSDistToEnemy, ref CustomNavigationPoint __result)
+        {
+            
             return true;
         }
     }

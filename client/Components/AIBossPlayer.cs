@@ -2,6 +2,7 @@
 using EFT;
 using friendlyPMC.Modules;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -20,7 +21,7 @@ namespace friendlyPMC.Components
 
         private List<CustomNavigationPoint> coverPoints;
 
-        private float coverTimer = 0f;
+        private Coroutine coverCoroutine;
         public pitAIBossPlayer(Player player) : base(player)
         {
             realPlayer = player;
@@ -29,7 +30,8 @@ namespace friendlyPMC.Components
             
             player.HealthController.DiedEvent += OnDead;
 
-            GetAreaCovers();
+            SetAreaCovers();
+            player.StartCoroutine(UpdateCoversCoroutine());
         }
 
         private void OnDead(EDamageType _damageType)
@@ -42,15 +44,8 @@ namespace friendlyPMC.Components
             return aBossLogic;
         }
 
-        public List<CustomNavigationPoint> GetAreaCovers()
+        public void SetAreaCovers()
         {
-            if(coverTimer >= Time.time)
-            {
-                return coverPoints;
-            }
-
-            coverTimer = Time.time + 2.5f;
-
             Task.Run(() =>
             {
 
@@ -67,7 +62,7 @@ namespace friendlyPMC.Components
                     {
                         covers.Add(point);
 
-                    } 
+                    }
                     else if (Vector3.Distance(centerPos, point.Position) <= radius)
                     {
                         lastDist = sqrDist;
@@ -77,7 +72,18 @@ namespace friendlyPMC.Components
 
                 coverPoints = covers;
             });
+        }
 
+        private IEnumerator UpdateCoversCoroutine()
+        {
+            while (true)
+            {
+                SetAreaCovers();
+                yield return new WaitForSeconds(2f);
+            }
+        }
+        public List<CustomNavigationPoint> GetAreaCovers()
+        {
             return coverPoints;
         }
 
@@ -161,6 +167,12 @@ namespace friendlyPMC.Components
             }
             aBossLogic.Dispose();
 
+            // Stop the coroutine when the boss is disposed
+            if (coverCoroutine != null)
+            {
+                realPlayer.StopCoroutine(coverCoroutine);
+            }
+
             Logger.LogInfo("Player Boss Disposed");
         }
     }
@@ -191,7 +203,7 @@ namespace friendlyPMC.Components
                 }
                 catch (Exception)
                 {
-                    Components.Logger.LogInfo("Can't add enemy to group");
+                    Logger.LogInfo("Can't add enemy to group");
                 }
             }
         }

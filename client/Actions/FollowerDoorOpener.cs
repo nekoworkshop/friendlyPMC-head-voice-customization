@@ -73,7 +73,7 @@ namespace friendlyPMC.Actions
                 return;
             }
 
-            if ((botOwner_0.Position - GClass509_0.Door.transform.position).sqrMagnitude < 2f)
+            if (Vector3.Distance(botOwner_0.Position, GClass509_0.Door.transform.position) < 0.8f)
             {
                 botOwner_0.DoorOpener.Interact(GClass509_0.Door, EInteractionType.Open);
 

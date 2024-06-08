@@ -130,7 +130,6 @@ namespace friendlyPMC.Modules
                         if (follower.IsBot(fl))
                         {
                             followersToRemove.Add(follower);
-                            follower.ClearFollowerPatrol(fl);
                         }
                     });
                 });
@@ -143,6 +142,7 @@ namespace friendlyPMC.Modules
                 followersToRemove.ForEach(_follower =>
                 {
                     _followers.Remove(_follower);
+                    _follower.Dismiss();
                 });
                 
                 boss.Followers.Clear();

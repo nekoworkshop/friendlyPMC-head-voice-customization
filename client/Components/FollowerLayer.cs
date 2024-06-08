@@ -116,7 +116,7 @@ namespace friendlyPMC.Components
                 }
                 if (method_11(20f))
                 {
-                    GetCoverPoint(botOwner_0.GetPlayer.Transform.position, 50f);
+                    GetCoverPoint(botOwner_0.GetPlayer.Transform.position, 30f);
                     if (this.customNavigationPoint_0 != null)
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "goforheal");
                 }

@@ -21,7 +21,11 @@ namespace friendlyPMC.Patches
         [PatchPrefix]
         private static bool PatchPrefix(AIBossPlayer __instance)
         {
-            if (BossPlayers.Instance.RemoveBossPlayer(__instance.Player().ProfileId)) return false;
+            IPlayer player = __instance.Player();
+            if (player != null)
+            {
+                if (BossPlayers.Instance.RemoveBossPlayer(player.ProfileId)) return false;
+            }
 
             return true;
         }
