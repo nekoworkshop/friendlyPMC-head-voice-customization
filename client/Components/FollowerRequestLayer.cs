@@ -52,7 +52,8 @@ namespace friendlyPMC.Components
             {
                BotRequestType.wait,
                BotRequestType.followMe,
-               BotRequestType.goToPoint
+               BotRequestType.goToPoint,
+               BotRequestType.warnPlayer
             };
 
             if (currRequest == null)
@@ -118,6 +119,8 @@ namespace friendlyPMC.Components
             {
                 // on follow me request from the boss, just come closer to the boss or get out of hold position
                 case BotRequestType.followMe:
+                // warn is actually regroup for us
+                case BotRequestType.warnPlayer:
                     botOwner_0.BotTalk.TrySay(EPhraseTrigger.Roger, false);
                     request.Complete();
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.followerPatrol, "backToFLB");
@@ -192,7 +195,9 @@ namespace friendlyPMC.Components
 
             if(doorOpenTimer < Time.time)
             {
-                curRequest.Complete();
+                if (curRequest != null && curRequest.BotRequestType == BotRequestType.doorOpen)
+                    curRequest.Complete();
+
                 return this.gstruct7_0;
             }
 
@@ -224,18 +229,11 @@ namespace friendlyPMC.Components
             EnemyInfo goalEnemy = botOwner_0.Memory.GoalEnemy;
             if (goalEnemy != null && goalEnemy.IsVisible && goalEnemy.CanShoot)
             {
-                if(botOwner_0.BotRequestController.CurRequest !=null && botOwner_0.BotRequestController.CurRequest.BotRequestType == BotRequestType.goToPoint)
-                {
-                    botOwner_0.BotRequestController.CurRequest.Complete();
-                }
                 return new AICoreActionEndStruct("Enemy", true);
             }
+
             if (botOwner_0.GoToSomePointData.IsCome())
             {
-                if (botOwner_0.BotRequestController.CurRequest != null && botOwner_0.BotRequestController.CurRequest.BotRequestType == BotRequestType.goToPoint)
-                {
-                    botOwner_0.BotRequestController.CurRequest.Complete();
-                }
                 return new AICoreActionEndStruct("Come", true);
             }
 

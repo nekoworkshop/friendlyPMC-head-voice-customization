@@ -13,6 +13,8 @@ namespace friendlyPMC.Components
 
         private CustomNavigationPoint customNavigationPoint_0;
 
+        private float heal_time = 0f;
+
         public FollowerLayer(BotOwner bot, int priority) : base(bot, priority)
         {
             float_2 = Time.time + 60f;
@@ -112,6 +114,7 @@ namespace friendlyPMC.Components
             {
                 if (botOwner_0.Memory.IsInCover)
                 {
+                    heal_time = Time.time;
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.heal, "first aid");
                 }
                 if (method_11(20f))
@@ -120,6 +123,7 @@ namespace friendlyPMC.Components
                     if (this.customNavigationPoint_0 != null)
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "goforheal");
                 }
+                heal_time = Time.time;
                 return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.heal, "heal now");
 
             }
@@ -150,7 +154,12 @@ namespace friendlyPMC.Components
             if (!botOwner_0.Medecine.FirstAid.Have2Do && !botOwner_0.Medecine.SurgicalKit.HaveWork)
             {
                 return new AICoreActionEndStruct("EndHeal", true);
+            } else if(heal_time + 20f < Time.time) 
+            {
+                botOwner_0.AIData.Player.ActiveHealthController.RestoreFullHealth();
+                return new AICoreActionEndStruct("EndHealTimer", true);
             }
+
             return gstruct7_1;
         }
         public override bool ShallUseNow()

@@ -11,8 +11,7 @@ namespace friendlyPMC.Actions
         public override bool CanProceed()
         {
             if (Executor == null) return false;
-
-            return (Executor.GetPlayer.Transform.position - Requester.Transform.position).magnitude > 10f;
+            return true;
         }
 
         public override bool CanRequest(BotOwner requester)

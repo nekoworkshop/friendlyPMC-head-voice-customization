@@ -13,37 +13,44 @@ namespace friendlyPMC.Components
 
         }
 
+        private bool HasBoss()
+        {
+            return botOwner_0.BotFollower.HaveBoss;
+        }
+
+        private pitAIBossPlayer GetBoss()
+        {
+            return (pitAIBossPlayer)botOwner_0.BotFollower.BossToFollow;
+        }
+
         public override bool ShallUseNow()
         {
-            return this.botOwner_0.ItemTaker.HaveItemToTake() && InteractableObjects.IsToTake(botOwner_0) && !botOwner_0.Memory.HaveEnemy;
+            return this.botOwner_0.ItemTaker.HaveItemToTake() && InteractableObjects.IsToTake(botOwner_0);
         }
 
         public override AICoreActionEndStruct ShallEndCurrentDecision(AICoreActionResultStruct<BotLogicDecision> curDecision)
         {
-
             // boss recall
             if (
-                (
-                    botOwner_0.BotRequestController.CurRequest != null &&
-                    botOwner_0.BotRequestController.CurRequest.BotRequestType == BotRequestType.warnPlayer
-                )
-                ||
-                botOwner_0.Memory.HaveEnemy
+                botOwner_0.BotRequestController.CurRequest != null && HasBoss() && 
+                GetBoss().Player().ProfileId == botOwner_0.BotRequestController.CurRequest.Requester.ProfileId && 
+                botOwner_0.BotRequestController.CurRequest.BotRequestType == BotRequestType.warnPlayer
             )
             {
-                if (botOwner_0.ItemTaker.HaveItemToTake())
+                return gstruct7_0; 
+            }
+            
+            if (botOwner_0.ItemTaker.HaveItemToTake())
+            {
+                try
                 {
-                    try
-                    {
-                        var item = AccessTools.Field(typeof(BotItemTaker), "_itemToTake").GetValue(botOwner_0.ItemTaker) as LootItem;
-                        if (item != null) { }
+                    var item = AccessTools.Field(typeof(BotItemTaker), "_itemToTake").GetValue(botOwner_0.ItemTaker) as LootItem;
+                    if (item != null) { }
 
-                        botOwner_0.ItemTaker.method_6(item);
-                    }
-                    catch { }
-                
+                    botOwner_0.ItemTaker.method_6(item);
                 }
-                return gstruct7_0;
+                catch { }
+
             }
 
             return base.ShallEndCurrentDecision(curDecision);
