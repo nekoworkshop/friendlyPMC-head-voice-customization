@@ -51,7 +51,8 @@ namespace friendlyPMC.Components
             List<BotRequestType> generalRequests = new List<BotRequestType>
             {
                BotRequestType.wait,
-               BotRequestType.followMe
+               BotRequestType.followMe,
+               BotRequestType.goToPoint
             };
 
             if (currRequest == null)
@@ -113,11 +114,6 @@ namespace friendlyPMC.Components
         {
             BotRequest request = botOwner_0.BotRequestController.CurRequest;
 
-            if (request != null)
-            {
-                Logger.LogInfo("General request received is " + request.BotRequestType.ToString());
-            }
-
             switch (request.BotRequestType)
             {
                 // on follow me request from the boss, just come closer to the boss or get out of hold position
@@ -158,6 +154,22 @@ namespace friendlyPMC.Components
 
                         return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.holdPosition, "req:cantHide");
                     }
+
+                case BotRequestType.goToPoint:
+                    IPlayer requester = botOwner_0.BotRequestController.CurRequest.Requester;
+
+                    Vector3 dir = requester.LookDirection;
+                    float forwardDistance = GClass760.Random(2f, 3.5f);
+
+                    Vector3 forwardPosition = requester.Position + dir.normalized * forwardDistance;
+                    float lateralOffset = GClass760.RandomSing() * GClass760.Random(0.5f, 1.5f);
+                    Vector3 lateralDirection = Vector3.Cross(Vector3.up, dir).normalized;
+
+                    Vector3 finalPosition = forwardPosition + lateralDirection * lateralOffset;
+
+                    botOwner_0.GoToSomePointData.SetPoint(new Vector3(finalPosition.x, requester.Position.y, finalPosition.z));
+
+                    return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.goToPoint, "req:goCheck");
 
                 case BotRequestType.suppressionFire:
                     botOwner_0.BotTalk.TrySay(EPhraseTrigger.Covering, true);
@@ -205,6 +217,29 @@ namespace friendlyPMC.Components
                 return this.gstruct7_1;
             }
             return this.gstruct7_0;
+        }
+
+        public override AICoreActionEndStruct EndGoToPoint()
+        {
+            EnemyInfo goalEnemy = botOwner_0.Memory.GoalEnemy;
+            if (goalEnemy != null && goalEnemy.IsVisible && goalEnemy.CanShoot)
+            {
+                if(botOwner_0.BotRequestController.CurRequest !=null && botOwner_0.BotRequestController.CurRequest.BotRequestType == BotRequestType.goToPoint)
+                {
+                    botOwner_0.BotRequestController.CurRequest.Complete();
+                }
+                return new AICoreActionEndStruct("Enemy", true);
+            }
+            if (botOwner_0.GoToSomePointData.IsCome())
+            {
+                if (botOwner_0.BotRequestController.CurRequest != null && botOwner_0.BotRequestController.CurRequest.BotRequestType == BotRequestType.goToPoint)
+                {
+                    botOwner_0.BotRequestController.CurRequest.Complete();
+                }
+                return new AICoreActionEndStruct("Come", true);
+            }
+
+            return gstruct7_1;
         }
 
         public override CustomNavigationPoint FindPoint(CoverSearchData data, Func<CoverSearchData, CustomNavigationPoint> p, bool checkCurrent)

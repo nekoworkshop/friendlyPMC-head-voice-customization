@@ -109,20 +109,4 @@ namespace friendlyPMC.Patches
         }
     }
 
-    internal class GoToCheckRequestPatsh : ModulePatch
-    {
-        protected override MethodBase GetTargetMethod()
-        {
-
-            return AccessTools.Method(typeof(BotGroupRequestController), "TryActivateGoToCheckRequest");
-
-        }
-
-        [PatchPrefix]
-        private static bool PatchPrefix(BotGroupRequestController __instance, IPlayer player, BotOwner posibleExecuter)
-        {
-            return true;
-        }
-    }
-
 }

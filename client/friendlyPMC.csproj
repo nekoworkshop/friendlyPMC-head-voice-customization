@@ -132,6 +132,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Actions\FollowerGoCheck.cs" />
     <Compile Include="Actions\FollowerPatrol.cs" />
     <Compile Include="Actions\FollowerRegroup.cs" />
     <Compile Include="Actions\FollowerRushEnemy.cs" />

@@ -37,7 +37,6 @@ namespace friendlyPMC
 
             new FollowRequestPatch().Enable();
             new HoldRequestPatch().Enable();
-            new GoToCheckRequestPatsh().Enable();
 
 
             

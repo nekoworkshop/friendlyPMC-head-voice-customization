@@ -100,11 +100,20 @@ namespace friendlyPMC.Components
                 {
                     if (gestusDistance < maxGestusDistance)
                     {
-                        if( botOwner_0.Memory.HaveEnemy)
-                            botOwner_0.BotsGroup.RequestsController.TryActivateGoToCheckRequest(data.Player, botOwner_0);
-                        else
+                        Player alivePlayerByProfileID = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(data.Player.ProfileId);
+
+                        if (botOwner_0.BotRequestController.TryStopCurrent(alivePlayerByProfileID, false))
                         {
-                            //@TODO - need to tell the bot to go to where the boss is pointing
+                            FollowerGoCheck gclass = new FollowerGoCheck(data.Player);
+
+                            if (botOwner_0.BotsGroup.RequestsController.TryAddRequest(gclass))
+                            {
+                                
+                                (botOwner_0.Brain.BaseBrain as FollowerBrain).BossOrdersChanged();
+
+                                gclass.AddPossibleExecutors(botOwner_0);
+                                gclass.SetGroup(botOwner_0.BotsGroup.RequestsController);
+                            }
                         }
                     }
                 }
@@ -199,7 +208,7 @@ namespace friendlyPMC.Components
                         EnemyInfo enemyInfo;
                         if (!botOwner_0.Memory.HaveEnemy)
                         {
-                            boss.PrioritizeEnemy(boss.ClosestEnemy(), botOwner_0);
+                            boss.PrioritizeEnemy(botOwner_0, boss.ClosestEnemy());
                             enemyInfo = botOwner_0.Memory.GoalEnemy;
 
                         }

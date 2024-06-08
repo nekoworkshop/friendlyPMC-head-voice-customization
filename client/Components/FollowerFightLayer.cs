@@ -73,7 +73,8 @@ namespace friendlyPMC.Components
             if(
                 botOwner_0.BotRequestController.CurRequest != null && HasBoss() && GetBoss().Player().ProfileId == botOwner_0.BotRequestController.CurRequest.Requester.ProfileId && 
                 (
-                    botOwner_0.BotRequestController.CurRequest.BotRequestType == BotRequestType.warnPlayer
+                    botOwner_0.BotRequestController.CurRequest.BotRequestType == BotRequestType.warnPlayer ||
+                    (botOwner_0.Memory.HaveEnemy && botOwner_0.BotRequestController.CurRequest.BotRequestType == BotRequestType.goToPoint)
                 )
              )
             {
@@ -457,6 +458,18 @@ namespace friendlyPMC.Components
             AIBossPlayerLogic gclass363_0 = HasBoss() ? GetBoss().GetBossLogic() : null;
             bossUnderAttack = gclass363_0 != null && gclass363_0.IsHitted;
 
+            if(request != null && request.BotRequestType == BotRequestType.goToPoint)
+            {
+                if(botOwner_0.Memory.HaveEnemy)
+                {
+                    GetClosestCoverPoint(botOwner_0.Memory.GoalEnemy.EnemyLastPosition, nearSearchRadius);
+                    if (customNavigationPoint_0 != null)
+                        return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMoving, "getInCloseSlow");
+                    else
+                        return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToEnemy, "getInCloseFast");
+                }
+            }
+
             if (!botOwner_0.Memory.HaveEnemy)
             {
                 if(bossUnderAttack)
@@ -561,18 +574,54 @@ namespace friendlyPMC.Components
 
         public override AICoreActionEndStruct EndRunToEnemy()
         {
+            if (botOwner_0.Memory.HaveEnemy && botOwner_0.Memory.GoalEnemy.CanShoot)
+            {
+                return new AICoreActionEndStruct("enemy.canSh", true);
+            }
+
+            if (!botOwner_0.Memory.HaveEnemy)
+            {
+                return new AICoreActionEndStruct("enemy.None", true);
+            }
+
             return base.EndRunToEnemy();
         }
 
         public AICoreActionEndStruct EndGetInClose()
         {
-            if (this.botOwner_0.Memory.HaveEnemy && this.botOwner_0.Memory.GoalEnemy.CanShoot)
+            if (botOwner_0.Memory.HaveEnemy && botOwner_0.Memory.GoalEnemy.CanShoot)
             {
                 return new AICoreActionEndStruct("enemy.canSh", true);
             }
 
+            if(!botOwner_0.Memory.HaveEnemy)
+            {
+                return new AICoreActionEndStruct("enemy.None", true);
+            }
+
             return base.EndRunToCover();
-        }     
+        }
+
+        public override AICoreActionEndStruct EndGoToPoint()
+        {
+            BotRequest curRequest = this.botOwner_0.BotRequestController.CurRequest;
+            if (curRequest != null && curRequest.BotRequestType != BotRequestType.goToPoint)
+            {
+                return this.gstruct7_0;
+            }
+
+            if(botOwner_0.Memory.GoalEnemy.CanShoot)
+            {
+                if (botOwner_0.BotRequestController.CurRequest != null && botOwner_0.BotRequestController.CurRequest.BotRequestType == BotRequestType.goToPoint)
+                {
+                    botOwner_0.BotRequestController.CurRequest.Complete();
+                }
+
+                return new AICoreActionEndStruct("enemy.canSh", true);
+            }
+
+            return this.gstruct7_1;
+        }
 
         public override AICoreActionEndStruct ShallEndCurrentDecision(AICoreActionResultStruct<BotLogicDecision> curDecision)
         {
@@ -620,7 +669,7 @@ namespace friendlyPMC.Components
                 return gstruct7_0;
             }
 
-            if (curDecision.Reason == "getInCloseFast")
+            if (curDecision.Reason == "getInCloseFast" || curDecision.Reason == "getInCloseSlow")
             {
                 return EndGetInClose();
             }
