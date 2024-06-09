@@ -163,6 +163,7 @@
     <Compile Include="Patches\CreateNodePatch.cs" />
     <Compile Include="Patches\PatrolDataFollowerPatch.cs" />
     <Compile Include="friendlyPlugin.cs" />
+    <Compile Include="Patches\PlayerPatch.cs" />
     <Compile Include="Patches\QuickPanelPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

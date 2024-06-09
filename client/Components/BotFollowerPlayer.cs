@@ -265,33 +265,37 @@ namespace friendlyPMC.Components
         public void Dismiss()
         {
             // end follower brain
-            _bot.Brain.Agent.Dispose();
-            (_bot.Brain.BaseBrain as FollowerBrain).Dispose();
-            _bot.Brain.Dispose();
-            (_bot.Receiver as FollowerReceiver).Dispose();
+            if (_bot == null || _bot.HealthController.IsAlive) return;
+            try
+            {
+                _bot.Brain.Agent.Dispose();
+                (_bot.Brain.BaseBrain as FollowerBrain).Dispose();
+                (_bot.Receiver as FollowerReceiver).Dispose();
 
-            if (!_bot.HealthController.IsAlive) return;
+                _bot.BotsController.AICoreController.Stop();
 
-            _bot.BotsController.AICoreController.Stop();
+                // put back old settings
+                _bot.Settings = _OldSettings;
+                _bot.ENEMY_LOOK_AT_ME = Mathf.Cos(_OldSettings.FileSettings.Mind.ENEMY_LOOK_AT_ME_ANG * 0.017453292f);
+                _bot.GetPlayer.ActiveHealthController.SetDamageCoeff(_OldSettings.FileSettings.Core.DamageCoeff);
 
-            // put back old settings
-            _bot.Settings = _OldSettings;
-            _bot.ENEMY_LOOK_AT_ME = Mathf.Cos(_OldSettings.FileSettings.Mind.ENEMY_LOOK_AT_ME_ANG * 0.017453292f);
-            _bot.GetPlayer.ActiveHealthController.SetDamageCoeff(_OldSettings.FileSettings.Core.DamageCoeff);
+                // add old receiver
+                _bot.Receiver = new BotReceiver(_bot);
+                _bot.Receiver.Init();
 
-            // add old receiver
-            _bot.Receiver = new BotReceiver(_bot);
-            _bot.Receiver.Init();
+                // add old brain
+                _bot.Brain = new StandartBotBrain(_bot);
+                _bot.Brain.Activate();
 
-            // add old brain
-            _bot.Brain = new StandartBotBrain(_bot);
-            _bot.Brain.Activate();
+                _bot.BotsController.AICoreController.Activate();
 
-            _bot.BotsController.AICoreController.Activate();
-
-            _bot.GetPlayer.Physical.Stamina.ForceMode = false;
-            _bot.GetPlayer.Physical.HandsStamina.ForceMode = false;
-            _bot.BotFollower.PatrolDataFollower.Dispose();
+                _bot.GetPlayer.Physical.Stamina.ForceMode = false;
+                _bot.GetPlayer.Physical.HandsStamina.ForceMode = false;
+                _bot.BotFollower.PatrolDataFollower.Dispose();
+            } catch(Exception ex)
+            {
+                Logger.LogInfo("Error on Dismiss for a follower : " +ex.Message);
+            }
             // @TODO : see what else can be reverted
         }
     }

@@ -235,7 +235,7 @@ namespace friendlyPMC.Modules
 
             if (boss != null)
             {
-                return bot.BotFollower.BossToFollow != null && bot.BotFollower.BossToFollow == boss;
+                return bot.BotFollower.BossToFollow != null && bot.BotFollower.BossToFollow.Player().ProfileId == boss.Player().ProfileId;
             }
             
             if (bot.BotFollower.BossToFollow == null) return false;

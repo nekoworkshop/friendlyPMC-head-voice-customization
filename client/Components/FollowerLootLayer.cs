@@ -25,7 +25,7 @@ namespace friendlyPMC.Components
 
         public override bool ShallUseNow()
         {
-            return HasBoss() && InteractableObjects.IsToTake(botOwner_0);
+            return HasBoss() && botOwner_0.ItemTaker.HaveItemToTake() && InteractableObjects.IsToTake(botOwner_0);
         }
 
         public override AICoreActionEndStruct ShallEndCurrentDecision(AICoreActionResultStruct<BotLogicDecision> curDecision)
@@ -38,19 +38,6 @@ namespace friendlyPMC.Components
             )
             {
                 return gstruct7_0; 
-            }
-            
-            if (botOwner_0.ItemTaker.HaveItemToTake())
-            {
-                try
-                {
-                    var item = AccessTools.Field(typeof(BotItemTaker), "_itemToTake").GetValue(botOwner_0.ItemTaker) as LootItem;
-                    if (item != null) { }
-
-                    botOwner_0.ItemTaker.method_6(item);
-                }
-                catch { }
-
             }
 
             return base.ShallEndCurrentDecision(curDecision);

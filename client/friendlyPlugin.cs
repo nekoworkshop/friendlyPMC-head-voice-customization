@@ -3,11 +3,12 @@ using BepInEx.Configuration;
 using friendlyPMC.Patches;
 using System.Collections.Generic;
 using UnityEngine;
+using static GClass1738;
 using Logger = friendlyPMC.Components.Logger;
 
 namespace friendlyPMC
 {
-    [BepInPlugin("xyz.pit.companion", "[pit-friendlyPMC]", "1.0.0")]
+    [BepInPlugin("xyz.pit.companion", "friendlyPMC", "1.0.0")]
     [BepInDependency("com.spt-aki.core", "3.8.0")]
     [BepInDependency("xyz.drakia.bigbrain", "0.4.0.0")]
     [BepInDependency("xyz.drakia.waypoints")]
@@ -22,7 +23,6 @@ namespace friendlyPMC
         
         const string baseSettings = "Base Settings";
 
-        const string spawnSettings = "Spawn Settings";
         public static ConfigEntry<bool> squadSpawn;
         public static ConfigEntry<int> squadSize;
         public static ConfigEntry<bool> copyEquip;
@@ -51,7 +51,6 @@ namespace friendlyPMC
             new FollowRequestPatch().Enable();
             new HoldRequestPatch().Enable();
 
-
             
             new BotReceiverInitPatch().Enable();
             new BotReceiverDisposePatch().Enable();
@@ -60,16 +59,16 @@ namespace friendlyPMC
             new QuickPanelPatch().Enable();
 
             new CreateNodePatch().Enable();
-            //new GetClosePointsPatch().Enable();
 
             new BotsControllerPatch().Enable();
             new LocalGamePatch().Enable();
 
+            new AIBossPlayerDisposePatch().Enable();
 
-            squadSpawn = Config.Bind(baseSettings, "Squad Spawn", true);
+            squadSpawn = Config.Bind(baseSettings, "Squad Spawn", true, new ConfigDescription("Spawn with followers"));
             squadSize = Config.Bind(baseSettings, "Squad Size", 2, new ConfigDescription("Number of followers to spawn with", new AcceptableValueRange<int>(1, 3)));
-            copyEquip = Config.Bind(baseSettings, "Clone Equipment", true, new ConfigDescription("Followers will have the same equipments as the player"));
-            extraPickups = Config.Bind(baseSettings, "Maximum followers", 2, new ConfigDescription("Maximum number of followers the player can have, cannot be less than Squad Size if Squad Spawn is active", new AcceptableValueRange<int>(1, 4)));
+            copyEquip = Config.Bind(baseSettings, "Clone Equipment", true, new ConfigDescription("When Squad Spawn is active, spawned followers will have the same equipment as the player"));
+            extraPickups = Config.Bind(baseSettings, "Maximum followers", 2, new ConfigDescription("Maximum number of followers the player can have. Cannot be less than Squad Size if Squad Spawn is active", new AcceptableValueRange<int>(1, 4)));
 
         }
 

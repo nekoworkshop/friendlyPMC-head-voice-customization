@@ -343,7 +343,7 @@ namespace friendlyPMC.Components
                         boss.Followers.ForEach(fl =>
                         {
                             Vector3 pos = fl.GetPlayer.Transform.position;
-                            float fldist = (item.transform.position - pos).magnitude;
+                            float fldist = (item.transform.position - pos).sqrMagnitude;
                             //fl.HealthController.
                             if (fldist < dist)
                             {

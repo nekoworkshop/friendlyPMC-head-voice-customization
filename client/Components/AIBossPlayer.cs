@@ -189,7 +189,12 @@ namespace friendlyPMC.Components
 
         public void OnHit(DamageInfo arg1, EBodyPart arg2, float arg3)
         {
-            if (arg1.Player != null && arg1.Player.IsAI && !BossPlayers.Instance.IsFollower(arg1.Player.AIData.BotOwner))
+            if (
+                arg1.Player != null && arg1.Player.IsAI && 
+                arg1.Player.AIData != null && 
+                arg1.Player.AIData.BotOwner != null && 
+                !BossPlayers.Instance.IsFollower(arg1.Player.AIData.BotOwner)
+                )
             {
                 _lastTimeHit = Time.time;
                 try
