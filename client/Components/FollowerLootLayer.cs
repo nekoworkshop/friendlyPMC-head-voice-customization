@@ -25,7 +25,7 @@ namespace friendlyPMC.Components
 
         public override bool ShallUseNow()
         {
-            return this.botOwner_0.ItemTaker.HaveItemToTake() && InteractableObjects.IsToTake(botOwner_0);
+            return HasBoss() && InteractableObjects.IsToTake(botOwner_0);
         }
 
         public override AICoreActionEndStruct ShallEndCurrentDecision(AICoreActionResultStruct<BotLogicDecision> curDecision)

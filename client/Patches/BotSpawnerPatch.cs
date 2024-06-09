@@ -105,7 +105,7 @@ namespace friendlyPMC.Patches
                 type = WildSpawnType.assault;
             }
 
-            int memberCount = 2;
+            int memberCount = friendlyPMC.squadSize.Value;
 
             BotSpawnParams @params = new BotSpawnParams();
             @params.ShallBeGroup = new ShallBeGroupParams(true,false, memberCount);
@@ -114,7 +114,7 @@ namespace friendlyPMC.Patches
 
             BotCacheClass bot = await BotCacheClass.Create(botData, botCreator, memberCount, botSpawnerClass);
             // copy player equipment
-            bot.Profiles.ForEach(profile =>
+            if(friendlyPMC.copyEquip.Value) bot.Profiles.ForEach(profile =>
             {
                 if (profile != null)
                 {

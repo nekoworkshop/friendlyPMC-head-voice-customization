@@ -163,10 +163,13 @@ namespace friendlyPMC.Modules
 
         public void Destroy()
         {
-            ICollection<string> keys = _bosses.Keys;
-            foreach (string key in keys)
+            if (_bosses.Count > 0)
             {
-                RemoveBossPlayer(key);
+                List<string> keys = new List<string>(_bosses.Keys);
+                foreach (string key in keys)
+                {
+                    RemoveBossPlayer(key);
+                }
             }
             _bosses = null;
             _removedBosses = null;

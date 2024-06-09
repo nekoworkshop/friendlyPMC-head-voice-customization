@@ -170,6 +170,9 @@ namespace friendlyPMC.Components
 
                     Vector3 finalPosition = forwardPosition + lateralDirection * lateralOffset;
 
+                    botOwner_0.BotTalk.TrySay(EPhraseTrigger.Going, false);
+                    request.Complete();
+
                     botOwner_0.GoToSomePointData.SetPoint(new Vector3(finalPosition.x, requester.Position.y, finalPosition.z));
 
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.goToPoint, "req:goCheck");
@@ -249,9 +252,12 @@ namespace friendlyPMC.Components
             if (this.customNavigationPoint_0 != null)
             {
                 return this.customNavigationPoint_0;
+            } else
+            {
+                GetCoverPoint(botOwner_0.GetPlayer.Transform.position, 70f);
             }
 
-            return base.FindPoint(data, p, checkCurrent);
+            return this.customNavigationPoint_0;
         }
 
         private void GetCoverPoint(Vector3 centerPosition, float searchRadius)

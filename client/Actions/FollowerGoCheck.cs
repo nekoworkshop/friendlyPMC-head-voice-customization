@@ -12,10 +12,6 @@ namespace friendlyPMC.Actions
         public FollowerGoCheck(IPlayer requester) : base(requester, BotRequestType.goToPoint)
         {
             FollowerGoCheck _me = this;
-            Task.Delay(5000).ContinueWith(task =>
-            {
-                _me.Complete();
-            });
         }
 
         public override bool CanProceed()

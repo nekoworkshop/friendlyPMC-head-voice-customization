@@ -255,7 +255,7 @@ namespace friendlyPMC.Components
 
                         Player alivePlayerByProfileID = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(requester.ProfileId);
 
-                        FollowerRushEnemy gclass = new FollowerRushEnemy(alivePlayerByProfileID, enemyLastPosition, null, null, BotRequestType.goToPoint);
+                        FollowerRushEnemy gclass = new FollowerRushEnemy(alivePlayerByProfileID, enemyLastPosition, null, null, BotRequestType.attackClose);
 
                         if (botOwner_0.BotsGroup.RequestsController.TryAddRequest(gclass))
                         {
@@ -281,10 +281,13 @@ namespace friendlyPMC.Components
                 // temporary hold position
                 else if (info.phrase == EPhraseTrigger.Stop)
                 {
-                    if (botOwner_0.Memory.HaveEnemy)
+                    Player alivePlayerByProfileID = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(requester.ProfileId);
+                    FollowerHold holdit = new FollowerHold(alivePlayerByProfileID);
+
+                    if (botOwner_0.BotsGroup.RequestsController.TryAddRequest(holdit))
                     {
-                        if(!notBusy) botOwner_0.BotsGroup.RequestsController.TryAskHoldRequest(requester, botOwner_0);
-                        else botOwner_0.BotsGroup.RequestsController.TryActivateWait(requester, botOwner_0);
+                        holdit.AddPossibleExecutors(botOwner_0);
+                        holdit.SetGroup(botOwner_0.BotsGroup.RequestsController);
                     }
 
                 }

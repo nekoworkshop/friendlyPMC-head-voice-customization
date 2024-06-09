@@ -1,6 +1,8 @@
 ﻿using BepInEx;
-
+using BepInEx.Configuration;
 using friendlyPMC.Patches;
+using System.Collections.Generic;
+using UnityEngine;
 using Logger = friendlyPMC.Components.Logger;
 
 namespace friendlyPMC
@@ -13,16 +15,27 @@ namespace friendlyPMC
     public class friendlyPMC : BaseUnityPlugin
     {
         public static bool awaken;
+
+        internal static friendlyPMC Instance { get; private set; }
+
+        public static Dictionary<GameObject, HashSet<Material>> objectsMaterials = new Dictionary<GameObject, HashSet<Material>>();
+        
+        const string baseSettings = "Base Settings";
+
+        const string spawnSettings = "Spawn Settings";
+        public static ConfigEntry<bool> squadSpawn;
+        public static ConfigEntry<int> squadSize;
+        public static ConfigEntry<bool> copyEquip;
+        public static ConfigEntry<int> extraPickups;
         private void Awake()
         {
 
             if (!awaken)
             {
                 awaken = true;
+                Instance = this;
                 new Logger();
             }
-
-            new AIBossPlayerDisposePatch().Enable();
 
 
             new BotSpawnerAddPlayerPatch().Enable();
@@ -51,6 +64,13 @@ namespace friendlyPMC
 
             new BotsControllerPatch().Enable();
             new LocalGamePatch().Enable();
+
+
+            squadSpawn = Config.Bind(baseSettings, "Squad Spawn", true);
+            squadSize = Config.Bind(baseSettings, "Squad Size", 2, new ConfigDescription("Number of followers to spawn with", new AcceptableValueRange<int>(1, 3)));
+            copyEquip = Config.Bind(baseSettings, "Clone Equipment", true, new ConfigDescription("Followers will have the same equipments as the player"));
+            extraPickups = Config.Bind(baseSettings, "Maximum followers", 2, new ConfigDescription("Maximum number of followers the player can have, cannot be less than Squad Size if Squad Spawn is active", new AcceptableValueRange<int>(1, 4)));
+
         }
 
     }

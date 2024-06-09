@@ -78,7 +78,8 @@ namespace friendlyPMC.Components
                 (
                     botOwner_0.BotRequestController.CurRequest.BotRequestType == BotRequestType.warnPlayer ||
                     botOwner_0.BotRequestController.CurRequest.BotRequestType == BotRequestType.attackClose ||
-                    botOwner_0.BotRequestController.CurRequest.BotRequestType == BotRequestType.goToPoint
+                    botOwner_0.BotRequestController.CurRequest.BotRequestType == BotRequestType.goToPoint ||
+                    botOwner_0.BotRequestController.CurRequest.BotRequestType == BotRequestType.wait
                 )
              )
             {
@@ -691,9 +692,13 @@ namespace friendlyPMC.Components
             if (this.customNavigationPoint_0 != null)
             {
                 return this.customNavigationPoint_0;
+            } else
+            {
+                GetCoverPoint(botOwner_0.GetPlayer.Transform.position, 70f);
             }
 
-            return base.FindPoint(data, p, checkCurrent);
+
+            return this.customNavigationPoint_0;
         }
 
         private void GetClosestCoverPoint(Vector3 centerPosition, float searchRadius)

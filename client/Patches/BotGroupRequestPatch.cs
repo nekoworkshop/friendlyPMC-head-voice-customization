@@ -16,7 +16,6 @@ namespace friendlyPMC.Patches
     internal class FollowRequestPatch : ModulePatch
     {
 
-        public static int followLimit = 3;
         protected override MethodBase GetTargetMethod()
         {
             return AccessTools.Method(typeof(BotGroupRequestController),"TryAskFollowMeRequest");
@@ -38,9 +37,13 @@ namespace friendlyPMC.Patches
                     return true;
 
                 }
-
                 else if (player.Side == posibleExecuter.Side)
                 {
+                    int followLimit = friendlyPMC.extraPickups.Value;
+                    if(friendlyPMC.squadSpawn.Value)
+                    {
+                        followLimit = Math.Max(followLimit, friendlyPMC.squadSize.Value);
+                    }
                     // add BOT as follower to the player BOSS if limit was not reached
                     if (playerBoss.Followers.Count < followLimit)
                     {
