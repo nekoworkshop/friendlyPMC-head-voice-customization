@@ -210,12 +210,15 @@ namespace friendlyPMC.Patches
             pitAIBossPlayer playerBoss = BossPlayers.Instance.AddBossPlayer(player);
 
             // spawn a friendly bot
-            var Timer = StaticManager.Instance.TimerManager.MakeTimer(TimeSpan.FromSeconds(10.0), false);
-
-            Timer.OnTimer += () =>
+            if (friendlyPMC.squadSpawn.Value)
             {
-                Instance.SpawnGroupBots(playerBoss).Forget();
-            };
+                var Timer = StaticManager.Instance.TimerManager.MakeTimer(TimeSpan.FromSeconds(10.0), false);
+
+                Timer.OnTimer += () =>
+                {
+                    Instance.SpawnGroupBots(playerBoss).Forget();
+                };
+            }
             
         }
     }
