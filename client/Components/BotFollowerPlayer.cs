@@ -3,6 +3,7 @@ using EFT;
 using friendlyPMC.Actions;
 using friendlyPMC.Modules;
 using HarmonyLib;
+using LootingBots.Patch.Components;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -17,6 +18,13 @@ namespace friendlyPMC.Components
         private pitAIBossPlayer _player;
 
         private BotDifficultySettingsClass _OldSettings;
+
+        private LootingBrain _lootingBrain;
+
+        public LootingBrain LootingBrain
+        {
+            get { return _lootingBrain; }
+        }
         public BotFollowerPlayer(BotOwner bot, pitAIBossPlayer player)
         {
             _bot = bot;
@@ -106,8 +114,8 @@ namespace friendlyPMC.Components
             }
 
              // make all followers have the same group
-             if (_bot.BotsGroup != null)
-             {
+            if (_bot.BotsGroup != null)
+            {
                 // - if there is no group yet, take the bot's group
                 if (_player.bossGroup == null)
                 {
@@ -147,6 +155,8 @@ namespace friendlyPMC.Components
                     _player.bossGroup.AddMember(_bot, false);
                 }
             }
+            // add looting brain to help with pick up items
+            _lootingBrain = new LootingBrain();
 
             Logger.LogInfo($"Bot {_bot.Profile.Nickname} is now a follower of {_player.Player().Profile.Nickname}");
 
@@ -266,6 +276,10 @@ namespace friendlyPMC.Components
         {
             // end follower brain
             if (_bot == null || _bot.HealthController.IsAlive) return;
+            
+            _lootingBrain.Cleanup();
+            _lootingBrain = null;
+
             try
             {
                 _bot.Brain.Agent.Dispose();

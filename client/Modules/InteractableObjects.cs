@@ -1,6 +1,8 @@
 ﻿using EFT;
 using EFT.Interactive;
+using EFT.InventoryLogic;
 using friendlyPMC.Actions;
+using friendlyPMC.Components;
 using HarmonyLib;
 using System;
 using System.Collections.Generic;
@@ -53,16 +55,6 @@ namespace friendlyPMC.Modules
             }
         }
 
-        public static void SetCurCorpse(Corpse corpse)
-        {
-            Instance._currCorpse = corpse;
-        }
-
-        public static Corpse GetCurCorpse()
-        {
-            return Instance._currCorpse;
-        }
-
         public static void SetCurDoor(Door door) {
         
             Instance._currDoor = door;
@@ -82,20 +74,27 @@ namespace friendlyPMC.Modules
             return Instance._lootItem;
         }
 
-        public static void SetTaker(BotOwner bot, LootItem item)
+        public static void SetCurCorpse(Corpse corpse)
+        {
+            Instance._currCorpse = corpse;
+        }
+
+        public static Corpse GetCurCorpse()
+        {
+            return Instance._currCorpse;
+        }
+
+        public static void SetTaker(BotOwner bot)
         {
             Instance._taker = bot;
-            if (item != null)
+
+            BotFollowerPlayer follower = BossPlayers.Instance.GetFollower(bot);
+
+            if(follower != null)
             {
-                try
-                {
-                    var thrownItems = (HashSet<LootItem>)AccessTools.Field(typeof(BotItemTaker), "_thrownItems").GetValue(bot.ItemTaker);
-                    thrownItems.Add(item);
-                    AccessTools.Field(typeof(BotItemTaker), "_itemToTake").SetValue(bot.ItemTaker,item);
-                } catch (Exception ex)
-                {
-                    Components.Logger.LogInfo("SetTaker Error : " + ex.Message);
-                }
+                follower.LootingBrain.ActiveItem = Instance._lootItem;
+                follower.LootingBrain.LootObjectPosition = Instance._lootItem.transform.position;
+                Instance._lootItem = null;
             }
         }
         public static bool IsToTake(BotOwner bot) 

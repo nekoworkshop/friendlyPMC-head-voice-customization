@@ -354,7 +354,7 @@ namespace friendlyPMC.Components
                         });
                         if (closest != null && closest.ProfileId == botOwner_0.ProfileId)
                         {
-                            InteractableObjects.SetTaker(botOwner_0, item);
+                            InteractableObjects.SetTaker(botOwner_0);
                         }
                     }
                 }

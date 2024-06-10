@@ -1,16 +1,18 @@
 ﻿using EFT;
 using EFT.Interactive;
 using friendlyPMC.Modules;
-using HarmonyLib;
-using System.Collections.Generic;
+
+using LootingBots.Brain.Logics;
 
 namespace friendlyPMC.Components
 {
     internal class FollowerLootLayer : GClass102
     {
+
+        private BotFollowerPlayer _follower;
         public FollowerLootLayer(BotOwner bot, int priority) : base(bot, priority)
         {
-
+            
         }
 
         private bool HasBoss()
@@ -25,13 +27,18 @@ namespace friendlyPMC.Components
 
         public override bool ShallUseNow()
         {
-            return HasBoss() && botOwner_0.ItemTaker.HaveItemToTake() && InteractableObjects.IsToTake(botOwner_0);
+            return HasBoss() && InteractableObjects.IsToTake(botOwner_0);
         }
 
         public override AICoreActionEndStruct ShallEndCurrentDecision(AICoreActionResultStruct<BotLogicDecision> curDecision)
         {
-            // boss recall
+            
             if (
+                // not active item to pickup
+                _follower == null ||
+                ( _follower.LootingBrain.ActiveItem == null &&
+                _follower.LootingBrain.ActiveCorpse == null ) ||
+                // boss recall
                 botOwner_0.BotRequestController.CurRequest != null && HasBoss() && 
                 GetBoss().Player().ProfileId == botOwner_0.BotRequestController.CurRequest.Requester.ProfileId && 
                 botOwner_0.BotRequestController.CurRequest.BotRequestType == BotRequestType.warnPlayer
@@ -40,20 +47,19 @@ namespace friendlyPMC.Components
                 return gstruct7_0; 
             }
 
-            return base.ShallEndCurrentDecision(curDecision);
+            return gstruct7_1;
         }
 
         public override AICoreActionResultStruct<BotLogicDecision> GetDecision()
         {
+            _follower = BossPlayers.Instance.GetFollower(botOwner_0);
 
-            
-            if (this.botOwner_0.ItemTaker.HaveItemToTake())
+            if(_follower == null || (_follower.LootingBrain.ActiveItem == null && _follower.LootingBrain.ActiveCorpse == null))
             {
-                Logger.LogInfo("Bot " + botOwner_0.Profile.Nickname + " tries to take item");
-
-                return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.botTakeItem, "Take Item");
+                return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.followerPatrol, "Stub logic");
             }
-            return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.followerPatrol, "Stub logic");
+
+            return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.botTakeItem, "Take Item");
         }
 
     }
