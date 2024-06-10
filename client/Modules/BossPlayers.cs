@@ -21,6 +21,7 @@ namespace friendlyPMC.Modules
 
         private List<string> _removedBosses;
 
+        public bool IsDisposed = false;
 
         public BossPlayers()
         {
@@ -163,6 +164,8 @@ namespace friendlyPMC.Modules
 
         public void Destroy()
         {
+            if (IsDisposed) return;
+
             if (_bosses.Count > 0)
             {
                 List<string> keys = new List<string>(_bosses.Keys);
@@ -174,6 +177,9 @@ namespace friendlyPMC.Modules
             _bosses = null;
             _removedBosses = null;
             _followers = null;
+
+            IsDisposed = true;
+            Instance = null;
         }
 
         public BotFollowerPlayer AddFollower(BotOwner bot, pitAIBossPlayer player)

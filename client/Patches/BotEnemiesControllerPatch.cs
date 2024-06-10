@@ -23,19 +23,43 @@ namespace friendlyPMC.Patches
         [PatchPostfix]
         private static void PatchPostfix(BotEnemiesController __instance, IPlayer enemy, EnemyInfo info)
         {
-            var botOwner_0 = AccessTools.Field(typeof(BotEnemiesController), "botOwner_0").GetValue(__instance) as BotOwner;
-            pitAIBossPlayer boss = BossPlayers.Instance.GetBossPlayer(enemy.ProfileId);
-            if (botOwner_0 != null && boss != null)
+            try
             {
-                if(BossPlayers.Instance.IsFollower(botOwner_0) && boss.Player().Side == botOwner_0.Side)
+                // Access the private field 'botOwner_0' from BotEnemiesController
+                var botOwner_0 = AccessTools.Field(typeof(BotEnemiesController), "botOwner_0").GetValue(__instance) as BotOwner;
+
+                if (botOwner_0 == null)
+                {
+                    return;
+                }
+
+                // Get the boss player
+                pitAIBossPlayer boss = BossPlayers.Instance.GetBossPlayer(enemy.ProfileId);
+
+                if (boss == null)
+                {
+                    return;
+                }
+
+                // Check if botOwner_0 is a follower and if the sides match
+                if (BossPlayers.Instance.IsFollower(botOwner_0) && boss.Player().Side == botOwner_0.Side)
                 {
                     try
                     {
+                        // Attempt to remove the enemy
                         __instance.Remove(enemy);
-
-                    } catch (Exception _ex) { Components.Logger.LogInfo("Cannot remove player enemy: " + _ex.Message); }
+                    }
+                    catch (Exception _ex)
+                    {
+                        Components.Logger.LogInfo("Cannot remove player enemy: " + _ex.Message);
+                    }
                 }
             }
+            catch (Exception ex)
+            {
+                Components.Logger.LogInfo("Exception in PatchPostfix: " + ex.Message);
+            }
         }
+
     }
 }

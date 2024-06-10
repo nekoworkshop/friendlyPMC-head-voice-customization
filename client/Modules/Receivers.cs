@@ -10,6 +10,7 @@ namespace friendlyPMC.Modules
 
         private static Receivers Instance;
 
+        private bool IsDisposed = false;
         public Receivers()
         {
             if (Instance == null)
@@ -24,11 +25,17 @@ namespace friendlyPMC.Modules
         
         public void Destroy()
         {
-            foreach (var item in followerReceivers)
+            if(IsDisposed) return;
+            List<FollowerReceiver> receiversToDispose = new List<FollowerReceiver>(followerReceivers.Values);
+
+            foreach (var receiver in receiversToDispose)
             {
-                item.Value.Dispose();
+                receiver.Dispose();
             }
+
             followerReceivers.Clear();
+
+            IsDisposed = true;
         }
 
         public static void Dispose()
@@ -36,6 +43,7 @@ namespace friendlyPMC.Modules
             if(Instance != null)
             {
                 Instance.Destroy();
+                Instance = null;
             }
         }
 

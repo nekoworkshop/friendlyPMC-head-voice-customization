@@ -8,7 +8,7 @@ using Logger = friendlyPMC.Components.Logger;
 
 namespace friendlyPMC
 {
-    [BepInPlugin("xyz.pit.companion", "friendlyPMC", "3.0.1")]
+    [BepInPlugin("xyz.pit.companion", "friendlyPMC", "3.0.2")]
     [BepInDependency("com.spt-aki.core", "3.8.0")]
     [BepInDependency("xyz.drakia.bigbrain", "0.4.0.0")]
     [BepInDependency("xyz.drakia.waypoints")]
@@ -63,7 +63,7 @@ namespace friendlyPMC
             new BotsControllerPatch().Enable();
             new LocalGamePatch().Enable();
 
-            new AIBossPlayerDisposePatch().Enable();
+            new AIDataDisposePatch().Enable();
 
             squadSpawn = Config.Bind(baseSettings, "Squad Spawn", true, new ConfigDescription("Spawn with followers"));
             squadSize = Config.Bind(baseSettings, "Squad Size", 2, new ConfigDescription("Number of followers to spawn with", new AcceptableValueRange<int>(1, 3)));

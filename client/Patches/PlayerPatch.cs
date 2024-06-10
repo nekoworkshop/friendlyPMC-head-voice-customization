@@ -4,25 +4,35 @@ using EFT;
 using friendlyPMC.Components;
 using friendlyPMC.Modules;
 using HarmonyLib;
+using System;
 using System.Reflection;
 using UnityEngine;
 namespace friendlyPMC.Patches
 {
-    internal class AIBossPlayerDisposePatch : ModulePatch
+    internal class AIDataDisposePatch : ModulePatch
     {
         protected override MethodBase GetTargetMethod()
         {
-            return AccessTools.Method(typeof(AIBossPlayer), "Dispose");
+            return AccessTools.Method(typeof(AIData), "Dispose");
         }
         [PatchPrefix]
-        private static bool PatchPrefix(AIBossPlayer __instance)
+        // overwrite AIData Dispose to handle disposing AIBossPlayer
+        private static bool PatchPrefix(AIData __instance)
         {
-            IPlayer player = __instance.Player();
-            if (player != null)
+            var _movementContext = AccessTools.Field(typeof(AIData), "_movementContext").GetValue(__instance) as MovementContext;
+            _movementContext.OnTiltChanged -= __instance.method_2;
+            _movementContext.OnMotionApplied -= __instance.method_0;
+            
+            __instance.AskRequests.Dispose();
+            try
             {
-                if (BossPlayers.Instance.RemoveBossPlayer(player.ProfileId)) return false;
-            }
-            return true;
+                if (__instance.AIBossPlayer != null)
+                {
+                    __instance.AIBossPlayer.Dispose();
+                }
+            } catch { }
+
+            return false;
         }
     }
 }

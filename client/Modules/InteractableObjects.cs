@@ -22,6 +22,8 @@ namespace friendlyPMC.Modules
         private LootItem _lootItem;
 
         private BotOwner _taker;
+
+        private bool IsDisposed = false;
         public InteractableObjects() { 
             if(Instance == null)
             {
@@ -31,10 +33,15 @@ namespace friendlyPMC.Modules
 
         public void Destroy()
         {
+            if(IsDisposed) return;
+
             _currCorpse = null;
             _currDoor = null;
             _lootItem = null;
             _taker = null;
+
+            IsDisposed = true;
+            Instance = null;
         }
 
         public static void Dispose()

@@ -175,6 +175,11 @@ namespace friendlyPMC.Components
 
             Logger.LogInfo("Player Boss Disposed");
         }
+
+        public new void Dispose()
+        {
+            // do nothing
+        }
     }
     internal class AIBossPlayerLogic : GClass363
     {

@@ -188,6 +188,7 @@ namespace friendlyPMC.Actions
 
         private static FollowerPatrolInstances Instance;
 
+        private bool IsDisposed = false;
         public FollowerPatrolInstances()
         {
             if (Instance == null) Instance = this;
@@ -195,7 +196,11 @@ namespace friendlyPMC.Actions
 
         public void Destroy()
         {
+            if(IsDisposed) return;
+
             followerPatrols.Clear();
+
+            IsDisposed = true;
         }
 
         public static void Dispose()
