@@ -35,4 +35,19 @@ namespace friendlyPMC.Patches
             return false;
         }
     }
+
+    internal class AIDataContructPatch : ModulePatch
+    {
+        protected override MethodBase GetTargetMethod()
+        {
+            return AccessTools.Constructor(typeof(AIData));
+        }
+        [PatchPostfix]
+        // overwrite AIData Dispose to handle disposing AIBossPlayer
+        private static void PatchPostfix(AIData __instance, BotOwner owner, Player player)
+        {
+            var field = AccessTools.Field(typeof(AIData), "AIBossPlayer");
+            field.SetValue(__instance, null);
+        }
+    }
 }

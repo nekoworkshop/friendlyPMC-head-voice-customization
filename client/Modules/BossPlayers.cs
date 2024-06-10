@@ -260,6 +260,23 @@ namespace friendlyPMC.Modules
             return _follower != null;
         }
 
+        public BotFollowerPlayer GetFollower(BotOwner bot)
+        {
+            if (bot == null) return null;
+            
+            BotFollowerPlayer _follower = null;
+
+            foreach (var item in _followers)
+            {
+                if (item.IsBot(bot))
+                {
+                    _follower = item;
+                    break;
+                }
+            }
+            return _follower;
+
+        }
         public void AddFollowerGroup(int id)
         {
             if (!_botsGroup.Contains(id)) _botsGroup.Add(id);

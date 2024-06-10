@@ -3,14 +3,14 @@ using BepInEx.Configuration;
 using friendlyPMC.Patches;
 using System.Collections.Generic;
 using UnityEngine;
-using static GClass1738;
+
 using Logger = friendlyPMC.Components.Logger;
 
 namespace friendlyPMC
 {
-    [BepInPlugin("xyz.pit.companion", "friendlyPMC", "3.0.2")]
+    [BepInPlugin("xyz.pit.companion", "friendlyPMC", "3.0.3")]
     [BepInDependency("com.spt-aki.core", "3.8.0")]
-    [BepInDependency("xyz.drakia.bigbrain", "0.4.0.0")]
+    [BepInDependency("xyz.drakia.bigbrain")]
     [BepInDependency("xyz.drakia.waypoints")]
     [BepInDependency("com.Arys.UnityToolkit")]
     public class friendlyPMC : BaseUnityPlugin
@@ -43,7 +43,6 @@ namespace friendlyPMC
             new BotGroupIsEnemyPatch().Enable();
             new BotEnemiesControllerPatch().Enable();
             new BotOwnerDamagePatch().Enable();
-
             
             new BotOwnerIsFolowerPatch().Enable();
             new PatrolDataFollowerPatch().Enable();
@@ -51,19 +50,21 @@ namespace friendlyPMC
             new FollowRequestPatch().Enable();
             new HoldRequestPatch().Enable();
 
-            
             new BotReceiverInitPatch().Enable();
             new BotReceiverDisposePatch().Enable();
             new BotReceiverPhrasePatch().Enable();
 
             new QuickPanelPatch().Enable();
-
+            
             new CreateNodePatch().Enable();
 
             new BotsControllerPatch().Enable();
+
             new LocalGamePatch().Enable();
+            new LocalGameCleanupPatch().Enable();
 
             new AIDataDisposePatch().Enable();
+            new AIDataContructPatch().Enable();
 
             squadSpawn = Config.Bind(baseSettings, "Squad Spawn", true, new ConfigDescription("Spawn with followers"));
             squadSize = Config.Bind(baseSettings, "Squad Size", 2, new ConfigDescription("Number of followers to spawn with", new AcceptableValueRange<int>(1, 3)));
