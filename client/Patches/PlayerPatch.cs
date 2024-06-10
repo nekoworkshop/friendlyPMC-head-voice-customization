@@ -15,8 +15,9 @@ namespace friendlyPMC.Patches
         {
             return AccessTools.Method(typeof(AIData), "Dispose");
         }
+        // overwrite AIData Dispose
+        // replicate the method but keep note of AIBossPlayer being null
         [PatchPrefix]
-        // overwrite AIData Dispose to handle disposing AIBossPlayer
         private static bool PatchPrefix(AIData __instance)
         {
             var _movementContext = AccessTools.Field(typeof(AIData), "_movementContext").GetValue(__instance) as MovementContext;
@@ -26,6 +27,7 @@ namespace friendlyPMC.Patches
             __instance.AskRequests.Dispose();
             try
             {
+                // only players will have this null
                 if (__instance.AIBossPlayer != null)
                 {
                     __instance.AIBossPlayer.Dispose();
@@ -45,27 +47,49 @@ namespace friendlyPMC.Patches
         {
             return AccessTools.Constructor(typeof(AIData), new Type[] { typeof(BotOwner), typeof(Player) });
         }
+        // overwrite AIData to prevent AIBossPlayer from being set 
         [PatchPostfix]
-        // overwrite AIData Dispose to handle disposing AIBossPlayer
         private static void PatchPostfix(AIData __instance, BotOwner owner, Player player)
         {
-            if(owner == null && !player.IsAI)
+            if (owner == null && player.IsYourPlayer)
             {
-                var field = AccessTools.Field(typeof(AIData), "<AIBossPlayer>k__BackingField");
-                if (BossPlayers.Instance != null)
+                // remove old AIBossPlayer
+                try
                 {
-                    pitAIBossPlayer playerBoss = BossPlayers.Instance.GetBossPlayer(player.ProfileId);
-                    
-                    field.SetValue(__instance, playerBoss);
-                    Components.Logger.LogInfo("AIData AIBossPlayer replaced");
-                } else
+                    if (__instance.AIBossPlayer != null)
+                    {
+                        __instance.AIBossPlayer.Dispose();
+                    }
+                } catch (Exception ex)
                 {
-                    field.SetValue(__instance, null);
-                    Components.Logger.LogInfo("AIData AIBossPlayer nullify");
+                    Logger.LogInfo("Failed to dispose old AIBossPlayer: " + ex.Message);
                 }
-                
+
+                var field = AccessTools.Field(typeof(AIData), "<AIBossPlayer>k__BackingField");
+                field.SetValue(__instance, null);
+                Components.Logger.LogInfo("Set AIData AIBossPlayer NULL for " + player.Profile.Nickname);
+
             }
-            
+
+        }
+    }
+    internal class AIDataBossPlayerPatch : ModulePatch
+    {
+        protected override MethodBase GetTargetMethod()
+        {
+            return AccessTools.PropertyGetter(typeof(AIData), "AIBossPlayer");
+        }
+        // overwrite AIData to have our AIBossPlayer returned when needed
+        [PatchPrefix]
+        private static bool PatchPrefix(AIData __instance, ref AIBossPlayer __result)
+        {
+            if(BossPlayers.Instance != null && BossPlayers.Instance.IsBoss(__instance.Player.ProfileId))
+            {
+                __result = BossPlayers.Instance.GetBossPlayer(__instance.Player.ProfileId);
+                return false;
+            }
+
+            return true;
         }
     }
 }

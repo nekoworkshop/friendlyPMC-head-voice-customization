@@ -156,8 +156,7 @@ namespace friendlyPMC.Components
                 }
             }
             // add looting brain to help with pick up items
-            _lootingBrain = new LootingBrain();
-
+            //_lootingBrain = new LootingBrain();
             Logger.LogInfo($"Bot {_bot.Profile.Nickname} is now a follower of {_player.Player().Profile.Nickname}");
 
         }
@@ -174,7 +173,7 @@ namespace friendlyPMC.Components
 
             return new AICoreAgentClass<BotLogicDecision>(bot.BotsController.AICoreController, bot.Brain.BaseBrain, GClass460.ActionsList(bot), bot.gameObject, name, new Func<BotLogicDecision, GClass134>(bot.Brain.method_0));
         }
-        
+
         /** Exposed so that it can be patched by addons **/
         public void SetlFollowerSettings(BotOwner bot)
         {
@@ -197,8 +196,28 @@ namespace friendlyPMC.Components
             settings.FileSettings.Mind.CAN_TAKE_ITEMS = true;
             settings.FileSettings.Mind.TALK_WITH_QUERY = true;
             settings.FileSettings.Mind.CAN_THROW_REQUESTS = true;
+            settings.FileSettings.Mind.CAN_DROP_ITEMS = true;
+            settings.FileSettings.Mind.MEDS_ONLY_SAFE_CONTAINER = false;
+            settings.FileSettings.Mind.SURGE_KIT_ONLY_SAFE_CONTAINER = false;
+
+            settings.FileSettings.Mind.ENEMY_BY_GROUPS_PMC_PLAYERS = false;
+            settings.FileSettings.Mind.CHANCE_FUCK_YOU_ON_CONTACT_100 = 0;
+            settings.FileSettings.Mind.REVENGE_TO_GROUP = false;
+
+            settings.FileSettings.Mind.CAN_RECEIVE_PLAYER_REQUESTS_SAVAGE = _player.Player().Side == EPlayerSide.Savage;
+            settings.FileSettings.Mind.CAN_RECEIVE_PLAYER_REQUESTS_BEAR = _player.Player().Side == EPlayerSide.Bear;
+            settings.FileSettings.Mind.CAN_RECEIVE_PLAYER_REQUESTS_USEC = _player.Player().Side == EPlayerSide.Usec;
+
+            //.FileSettings.Mind.REVENGE_BOT_TYPES = new WildSpawnType[] { };
+            //settings.FileSettings.Mind.FRIENDLY_BOT_TYPES = new WildSpawnType[] { };
 
             settings.FileSettings.Patrol.PICKUP_ITEMS_TO_BACKPACK_OR_CONTAINER = true;
+            settings.FileSettings.Patrol.CHANCE_TO_PLAY_VOICE_WHEN_CLOSE = 50;
+            settings.FileSettings.Patrol.CHANCE_TO_PLAY_GESTURE_WHEN_CLOSE = 100;
+            settings.FileSettings.Patrol.CAN_PEACEFUL_LOOK = true;
+            settings.FileSettings.Patrol.FRIEND_SEARCH_SEC = 60;
+            settings.FileSettings.Patrol.FOLLOWER_START_MOVE_DELAY = 0.5f;
+            settings.FileSettings.Patrol.CAN_FRIENDLY_TILT = true;
 
             settings.FileSettings.Look.MINIMUM_VISIBLE_DIST = 15f;
 
@@ -210,6 +229,8 @@ namespace friendlyPMC.Components
             settings.FileSettings.Core.ScatteringPerMeter = 0.045f;
             settings.FileSettings.Core.ScatteringClosePerMeter = 0.12f;
             settings.FileSettings.Core.HearingSense = 0.8f;
+
+            settings.FileSettings.Cover.CHECK_CLOSEST_FRIEND = true;
 
             settings.FileSettings.Aiming.COEF_IF_MOVE = 2f;
             settings.FileSettings.Aiming.MAX_AIM_TIME = 1.5f;
@@ -236,6 +257,7 @@ namespace friendlyPMC.Components
             settings.FileSettings.Look.MAX_VISION_GRASS_METERS_FLARE_OPT = 0.25f;
             settings.FileSettings.Look.NO_GREEN_DIST = 3.0f;
             settings.FileSettings.Look.NO_GRASS_DIST = 3.0f;
+
 
             bot.Settings = settings;
             bot.ENEMY_LOOK_AT_ME = Mathf.Cos(settings.FileSettings.Mind.ENEMY_LOOK_AT_ME_ANG * 0.017453292f);

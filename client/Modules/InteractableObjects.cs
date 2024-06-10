@@ -55,18 +55,6 @@ namespace friendlyPMC.Modules
             }
         }
 
-        public static void SetCurCorpse(Corpse corpse)
-        {
-            if(Instance != null)
-            Instance._currCorpse = corpse;
-        }
-
-        public static Corpse GetCurCorpse()
-        {
-            if (Instance == null) return null;
-            return Instance._currCorpse;
-        }
-
         public static void SetCurDoor(Door door) {
 
             if (Instance != null)
@@ -92,11 +80,13 @@ namespace friendlyPMC.Modules
 
         public static void SetCurCorpse(Corpse corpse)
         {
-            Instance._currCorpse = corpse;
+            if (Instance != null)
+                Instance._currCorpse = corpse;
         }
 
         public static Corpse GetCurCorpse()
         {
+            if (Instance == null) return null;
             return Instance._currCorpse;
         }
 
@@ -108,11 +98,21 @@ namespace friendlyPMC.Modules
 
             BotFollowerPlayer follower = BossPlayers.Instance.GetFollower(bot);
 
-            if(follower != null)
+            if(follower != null && follower.LootingBrain != null)
             {
-                follower.LootingBrain.ActiveItem = Instance._lootItem;
-                follower.LootingBrain.LootObjectPosition = Instance._lootItem.transform.position;
-                Instance._lootItem = null;
+                if (Instance._lootItem != null)
+                {
+                    follower.LootingBrain.ActiveItem = Instance._lootItem;
+                    follower.LootingBrain.LootObjectPosition = Instance._lootItem.transform.position;
+                    Instance._lootItem = null;
+                }
+                else if(Instance._currCorpse != null)
+                {
+                    follower.LootingBrain.ActiveCorpse = Instance._currCorpse.gameObject.GetComponent<Player>();
+                    follower.LootingBrain.LootObjectPosition = Instance._currCorpse.transform.position;
+                    Instance._currCorpse = null;
+                }
+                
             }
         }
         public static bool IsToTake(BotOwner bot) 

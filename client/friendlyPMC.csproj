@@ -140,6 +140,7 @@
     <Compile Include="Actions\FollowerPatrol.cs" />
     <Compile Include="Actions\FollowerRegroup.cs" />
     <Compile Include="Actions\FollowerRushEnemy.cs" />
+    <Compile Include="Actions\FollowerTakeLoot.cs" />
     <Compile Include="Components\AIBossPlayer.cs" />
     <Compile Include="Components\BotFollowerPlayer.cs" />
     <Compile Include="Patches\CoverPointsPatch.cs" />

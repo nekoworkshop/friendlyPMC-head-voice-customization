@@ -352,6 +352,31 @@ namespace friendlyPMC.Components
                         }
                     }
                 }
+                else if((info.phrase == EPhraseTrigger.CheckHim || info.phrase == EPhraseTrigger.LootBody) && !botOwner_0.Memory.HaveEnemy)
+                {
+                    Corpse item = InteractableObjects.GetCurCorpse();
+                    if (item != null)
+                    {
+                        float dist = Mathf.Infinity;
+                        BotOwner closest = null;
+                        boss.Followers.ForEach(fl =>
+                        {
+                            Vector3 pos = fl.GetPlayer.Transform.position;
+                            float fldist = (item.transform.position - pos).sqrMagnitude;
+                            //fl.HealthController.
+                            if (fldist < dist)
+                            {
+                                closest = fl;
+                                dist = fldist;
+                            }
+
+                        });
+                        if (closest != null && closest.ProfileId == botOwner_0.ProfileId)
+                        {
+                            InteractableObjects.SetTaker(botOwner_0);
+                        }
+                    }
+                }
                 // on dismiss remove the bot from being a follower
                 else if (info.phrase == EPhraseTrigger.OnYourOwn)
                 {

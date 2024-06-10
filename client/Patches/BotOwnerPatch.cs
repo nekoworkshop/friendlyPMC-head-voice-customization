@@ -34,7 +34,6 @@ namespace friendlyPMC.Patches
 
                     __instance.StandBy.GetHit();
 
-                    Components.Logger.Instance.LogInfo("Friendly Fire!");
                     return false;
                 }
             }

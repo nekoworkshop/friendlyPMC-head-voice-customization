@@ -13,6 +13,7 @@ namespace friendlyPMC.Actions
         private bool bool_0 = false;
 
         private bool bool_1 = false;    
+
         public FollowerTakeLoot(BotOwner bot) : base(bot)
         {
             _follower = BossPlayers.Instance.GetFollower(bot);
@@ -20,7 +21,7 @@ namespace friendlyPMC.Actions
 
         public override void Update()
         {
-            if (_follower == null) return;
+            if (_follower == null || _follower.LootingBrain == null) return;
 
             if (!bool_0)
             {
@@ -49,6 +50,7 @@ namespace friendlyPMC.Actions
                 if (pathStatus != NavMeshPathStatus.PathComplete)
                 {
                     _follower.LootingBrain.ActiveItem = null;
+                    _follower.LootingBrain.ActiveCorpse = null;
                     InteractableObjects.ClearTaker();
                     return;
                 }
@@ -60,10 +62,12 @@ namespace friendlyPMC.Actions
                 bool_0 = true;
             }
 
-            if (botOwner_0.Mover.IsComeTo(0.5f, false))
+            
+            if (!botOwner_0.Mover.IsComeTo(0.5f, false))
             {
                 return;
             }
+
             if (!bool_1) {
                 botOwner_0.StopMove();
                 InteractableObjects.ClearTaker();

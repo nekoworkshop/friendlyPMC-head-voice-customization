@@ -35,7 +35,7 @@ namespace friendlyPMC.Components
             
             if (
                 // not active item to pickup
-                _follower == null ||
+                _follower == null || _follower.LootingBrain == null ||
                 ( _follower.LootingBrain.ActiveItem == null &&
                 _follower.LootingBrain.ActiveCorpse == null ) ||
                 // boss recall
@@ -54,7 +54,7 @@ namespace friendlyPMC.Components
         {
             _follower = BossPlayers.Instance.GetFollower(botOwner_0);
 
-            if(_follower == null || (_follower.LootingBrain.ActiveItem == null && _follower.LootingBrain.ActiveCorpse == null))
+            if(_follower == null || _follower.LootingBrain == null || (_follower.LootingBrain.ActiveItem == null && _follower.LootingBrain.ActiveCorpse == null))
             {
                 return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.followerPatrol, "Stub logic");
             }

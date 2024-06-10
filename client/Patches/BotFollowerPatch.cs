@@ -18,7 +18,7 @@ namespace friendlyPMC.Patches
             return AccessTools.Method(typeof(BotFollower), "method_1");
         }
 
-        // match method trying to look of old AIBossPlayer
+        // overwrite trying to look of old AIBossPlayer
         [PatchPrefix]
         private static bool PatchPrefix(BotFollower __instance, float? maxDist = null)
         {
