@@ -33,8 +33,6 @@ namespace friendlyPMC.Modules
             _followers = new List<BotFollowerPlayer> { };
             _removedBosses = new List<string> { };
             _botsGroup = new List<int> { };
-
-            Logger.LogInfo("BossPlayer Instanced");
         }
 
         public static void Dispose()
@@ -49,6 +47,8 @@ namespace friendlyPMC.Modules
 
         public pitAIBossPlayer AddBossPlayer(Player player)
         {
+            if(_bosses.ContainsKey(player.ProfileId)) return _bosses[player.ProfileId];
+
             WildSpawnType roleType = player.Profile.Info.Settings.Role;
             player.Profile.Info.Settings.Role = WildSpawnType.bossKnight; // temp switch to boss role
             pitAIBossPlayer playerBoss = new pitAIBossPlayer(player);

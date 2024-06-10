@@ -62,11 +62,6 @@ namespace friendlyPMC.Components
 
             bool shouldDefault = !BossPlayers.Instance.IsFollower(botOwner_0) && !BossPlayers.Instance.IsBoss(data.Player.ProfileId);
 
-            if(isBossCommunicating)
-            {
-                Logger.LogInfo("Boss gesture is " + gesture.ToString());
-            }
-
             if (gesture == EGesture.Stop)
             {
                 if (isBossCommunicating)
@@ -142,7 +137,6 @@ namespace friendlyPMC.Components
 
             if (isBossCommunicating)
             {
-                Logger.LogInfo("Boss said " + info.phrase.ToString());
 
                 pitAIBossPlayer boss = BossPlayers.Instance.GetBossPlayer(requester.ProfileId);
                 // on cover me, make bot follow boss near

@@ -51,13 +51,13 @@ namespace friendlyPMC.Patches
                     }
                     catch (Exception _ex)
                     {
-                        Components.Logger.LogInfo("Cannot remove player enemy: " + _ex.Message);
+                        Components.Logger.LogInfo("Removing boss player enemy failed: " + _ex.Message);
                     }
                 }
             }
             catch (Exception ex)
             {
-                Components.Logger.LogInfo("Exception in PatchPostfix: " + ex.Message);
+                Components.Logger.LogInfo("Exception in PatchPostfix of SetInfo: " + ex.Message);
             }
         }
 
