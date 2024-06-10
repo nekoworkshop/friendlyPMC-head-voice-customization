@@ -96,7 +96,7 @@ namespace friendlyPMC.Components
 
             } catch(Exception e)
             {
-                Logger.LogInfo("Could not activate new follower patrol mode : " + e.Message);
+                Logger.LogInfo("Failed to activate new follower patrol mode: " + e.Message);
                 _bot.BotFollower.PatrolDataFollower.InitPlayer(player.realPlayer);
                 if (!_bot.BotFollower.PatrolDataFollower.IsInited)
                 {
@@ -294,7 +294,7 @@ namespace friendlyPMC.Components
                 _bot.BotFollower.PatrolDataFollower.Dispose();
             } catch(Exception ex)
             {
-                Logger.LogInfo("Error on Dismiss for a follower : " +ex.Message);
+                Logger.LogInfo("Error on Dismiss for a follower: " +ex.Message);
             }
             // @TODO : see what else can be reverted
         }

@@ -55,35 +55,43 @@ namespace friendlyPMC.Modules
 
         public static void SetCurCorpse(Corpse corpse)
         {
+            if(Instance != null)
             Instance._currCorpse = corpse;
         }
 
         public static Corpse GetCurCorpse()
         {
+            if (Instance == null) return null;
             return Instance._currCorpse;
         }
 
         public static void SetCurDoor(Door door) {
-        
-            Instance._currDoor = door;
+
+            if (Instance != null)
+                Instance._currDoor = door;
         }
         public static Door GetCurDoor()
         {
+            if (Instance == null) return null;
             return Instance._currDoor;
         }
 
         public static void SetCurLootItem(LootItem item) 
         {
-            Instance._lootItem = item;
+            if (Instance != null)
+                Instance._lootItem = item;
         }
 
         public static LootItem GetCurLootItem()
         {
+            if (Instance == null) return null;
             return Instance._lootItem;
         }
 
         public static void SetTaker(BotOwner bot, LootItem item)
         {
+            if (Instance == null) return;
+
             Instance._taker = bot;
             if (item != null)
             {
@@ -100,11 +108,13 @@ namespace friendlyPMC.Modules
         }
         public static bool IsToTake(BotOwner bot) 
         { 
+            if (Instance == null) return false;
             return Instance._taker.GetPlayer.ProfileId == bot.GetPlayer.ProfileId;
         }
 
         public static void ClearTaker()
         {
+            if (Instance == null) return;
             Instance._taker = null;
         }
     }

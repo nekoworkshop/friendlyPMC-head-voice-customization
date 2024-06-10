@@ -31,7 +31,7 @@ namespace friendlyPMC.Components
             player.HealthController.DiedEvent += OnDead;
 
             SetAreaCovers();
-            player.StartCoroutine(UpdateCoversCoroutine());
+            coverCoroutine = player.StartCoroutine(UpdateCoversCoroutine());
         }
 
         private void OnDead(EDamageType _damageType)
@@ -179,6 +179,7 @@ namespace friendlyPMC.Components
         public new void Dispose()
         {
             // do nothing
+            Logger.LogInfo("pitAIBossPlayer Dispose called");
         }
     }
     internal class AIBossPlayerLogic : GClass363
@@ -211,9 +212,9 @@ namespace friendlyPMC.Components
                     }
 
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
-                    Logger.LogInfo("Can't add enemy to group");
+                    Logger.LogInfo("Failed to add Enemy to group: "+e.Message);
                 }
             }
         }

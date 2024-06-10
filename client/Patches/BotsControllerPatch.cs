@@ -89,7 +89,7 @@ namespace friendlyPMC.Patches
                 }
             } catch (Exception ex)
             {
-                Components.Logger.LogInfo("Could not properly fix CleanUp :" + ex.Message);
+                Components.Logger.LogInfo("CleanUp Failed :" + ex.Message);
             }
 
             return true;

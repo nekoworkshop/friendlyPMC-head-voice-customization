@@ -30,7 +30,10 @@ namespace friendlyPMC.Patches
                 {
                     __instance.AIBossPlayer.Dispose();
                 }
-            } catch { }
+            } catch(Exception ex) 
+            {
+                Components.Logger.LogInfo("Error Dispose AIBossPlayer: " + ex.Message);
+            }
 
             return false;
         }
@@ -40,14 +43,29 @@ namespace friendlyPMC.Patches
     {
         protected override MethodBase GetTargetMethod()
         {
-            return AccessTools.Constructor(typeof(AIData));
+            return AccessTools.Constructor(typeof(AIData), new Type[] { typeof(BotOwner), typeof(Player) });
         }
         [PatchPostfix]
         // overwrite AIData Dispose to handle disposing AIBossPlayer
         private static void PatchPostfix(AIData __instance, BotOwner owner, Player player)
         {
-            var field = AccessTools.Field(typeof(AIData), "AIBossPlayer");
-            field.SetValue(__instance, null);
+            if(owner == null && !player.IsAI)
+            {
+                var field = AccessTools.Field(typeof(AIData), "<AIBossPlayer>k__BackingField");
+                if (BossPlayers.Instance != null)
+                {
+                    pitAIBossPlayer playerBoss = BossPlayers.Instance.GetBossPlayer(player.ProfileId);
+                    
+                    field.SetValue(__instance, playerBoss);
+                    Components.Logger.LogInfo("AIData AIBossPlayer replaced");
+                } else
+                {
+                    field.SetValue(__instance, null);
+                    Components.Logger.LogInfo("AIData AIBossPlayer nullify");
+                }
+                
+            }
+            
         }
     }
 }
