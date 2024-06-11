@@ -138,8 +138,9 @@
     <Compile Include="Actions\FollowerGoCheck.cs" />
     <Compile Include="Actions\FollowerHold.cs" />
     <Compile Include="Actions\FollowerPatrol.cs" />
-    <Compile Include="Actions\FollowerRegroup.cs" />
-    <Compile Include="Actions\FollowerRushEnemy.cs" />
+    <Compile Include="Patches\BotTalkPatch.cs" />
+    <Compile Include="Requests\FollowerRegroup.cs" />
+    <Compile Include="Requests\FollowerRushEnemy.cs" />
     <Compile Include="Actions\FollowerTakeLoot.cs" />
     <Compile Include="Components\AIBossPlayer.cs" />
     <Compile Include="Components\BotFollowerPlayer.cs" />
@@ -170,6 +171,7 @@
     <Compile Include="Patches\PlayerPatch.cs" />
     <Compile Include="Patches\QuickPanelPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Requests\FollowerTakeLootRequest.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

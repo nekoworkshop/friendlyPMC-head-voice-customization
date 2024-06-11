@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace friendlyPMC.Actions
+namespace friendlyPMC.Requests
 {
     internal class FollowerRushEnemy : GClass506
     {

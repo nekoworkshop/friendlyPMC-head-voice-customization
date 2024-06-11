@@ -241,12 +241,13 @@ namespace friendlyPMC.Modules
 
             if (boss != null)
             {
-                return bot.BotFollower.BossToFollow != null && bot.BotFollower.BossToFollow.Player().ProfileId == boss.Player().ProfileId;
+                return bot.BotFollower.HaveBoss && bot.BotFollower.BossToFollow.Player().ProfileId == boss.Player().ProfileId;
             }
             
-            if (bot.BotFollower.BossToFollow == null) return false;
+            if (!bot.BotFollower.HaveBoss) return false;
 
             BotFollowerPlayer _follower = null;
+
 
             foreach (var item in _followers)
             {
@@ -257,7 +258,14 @@ namespace friendlyPMC.Modules
                 }
             }
 
-            return _follower != null;
+            bool result = _follower != null;
+
+            if (result)
+            {
+                Components.Logger.LogInfo($"{bot.ProfileId} is a follower");
+            }
+
+            return result;
         }
 
         public BotFollowerPlayer GetFollower(BotOwner bot)

@@ -46,7 +46,7 @@ namespace friendlyPMC.Components
             GClass104 layer8 = new GClass104(_owner, 10, false, CoverLevel.Lay);
             method_0(7, layer8, true);
             // - item taker
-            FollowerLootLayer layer9 = new FollowerLootLayer(_owner, 58);
+            FollowerLootLayer layer9 = new FollowerLootLayer(_owner, 50);
             method_0(8, layer9, true);
         }
 

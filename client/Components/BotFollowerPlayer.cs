@@ -155,9 +155,19 @@ namespace friendlyPMC.Components
                     _player.bossGroup.AddMember(_bot, false);
                 }
             }
+            
             // add looting brain to help with pick up items
-            //_lootingBrain = new LootingBrain();
-            Logger.LogInfo($"Bot {_bot.Profile.Nickname} is now a follower of {_player.Player().Profile.Nickname}");
+            _lootingBrain = _bot.GetPlayer.gameObject.GetComponent<LootingBrain>();
+
+            if (_lootingBrain == null)
+            {
+                Logger.LogInfo("No loot brain");
+            } else
+            {
+                _lootingBrain.Init(_bot);
+            }
+
+            Logger.LogInfo($"Bot {_bot.Profile.Nickname} with ID {_bot.ProfileId} is now a follower of {_player.Player().Profile.Nickname}");
 
         }
 
@@ -208,8 +218,8 @@ namespace friendlyPMC.Components
             settings.FileSettings.Mind.CAN_RECEIVE_PLAYER_REQUESTS_BEAR = _player.Player().Side == EPlayerSide.Bear;
             settings.FileSettings.Mind.CAN_RECEIVE_PLAYER_REQUESTS_USEC = _player.Player().Side == EPlayerSide.Usec;
 
-            //.FileSettings.Mind.REVENGE_BOT_TYPES = new WildSpawnType[] { };
-            //settings.FileSettings.Mind.FRIENDLY_BOT_TYPES = new WildSpawnType[] { };
+            /*settings.FileSettings.Mind.REVENGE_BOT_TYPES = new WildSpawnType[] { };
+            settings.FileSettings.Mind.FRIENDLY_BOT_TYPES = new WildSpawnType[] { };*/
 
             settings.FileSettings.Patrol.PICKUP_ITEMS_TO_BACKPACK_OR_CONTAINER = true;
             settings.FileSettings.Patrol.CHANCE_TO_PLAY_VOICE_WHEN_CLOSE = 50;
@@ -280,7 +290,7 @@ namespace friendlyPMC.Components
 
         public bool IsBot(BotOwner bot)
         {
-            return bot == _bot;
+            return _bot == null ? false : bot.ProfileId == _bot.ProfileId;
         }
 
         public BotOwner GetBot()
@@ -293,14 +303,16 @@ namespace friendlyPMC.Components
             if (_bot == null) return null;
             return _player;
         }
-
+        /** End Follower Brain **/
         public void Dismiss()
         {
-            // end follower brain
+            if (_lootingBrain != null)
+            {
+                _lootingBrain.Cleanup();
+                _lootingBrain = null;
+            }
+
             if (_bot == null || _bot.HealthController.IsAlive) return;
-            
-            _lootingBrain.Cleanup();
-            _lootingBrain = null;
 
             try
             {

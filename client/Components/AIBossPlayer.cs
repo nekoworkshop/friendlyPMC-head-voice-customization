@@ -181,6 +181,13 @@ namespace friendlyPMC.Components
             // do nothing
             Logger.LogInfo("pitAIBossPlayer Dispose called");
         }
+
+        public new void OfferBot(BotOwner bot)
+        {
+            Followers.Add(bot);
+            bot.BotFollower.PatrolDataFollower.InitPlayer(realPlayer);
+            bot.BotFollower.SetToFollow(this, Followers.Count - 1, false);
+        }
     }
     internal class AIBossPlayerLogic : GClass363
     {

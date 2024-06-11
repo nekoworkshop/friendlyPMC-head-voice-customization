@@ -59,6 +59,11 @@ namespace friendlyPMC
             new BotReceiverInitPatch().Enable();
             new BotReceiverDisposePatch().Enable();
             new BotReceiverPhrasePatch().Enable();
+            new BotTalkPatch().Enable();
+
+            new AIDataDisposePatch().Enable();
+            new AIDataContructPatch().Enable();
+            new AIDataBossPlayerPatch().Enable()
 
             new QuickPanelPatch().Enable();
             
@@ -69,9 +74,7 @@ namespace friendlyPMC
             new LocalGamePatch().Enable();
             new LocalGameCleanupPatch().Enable();
 
-            new AIDataDisposePatch().Enable();
-            new AIDataContructPatch().Enable();
-            new AIDataBossPlayerPatch().Enable();
+            ;
 
         }
 

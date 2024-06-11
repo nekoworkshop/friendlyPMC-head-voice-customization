@@ -133,8 +133,6 @@ namespace friendlyPMC.Patches
 
             BotsGroup followerGroup = null;
 
-            bool sayRoger = true;
-
             botCreator.ActivateBot(bot, zone, true, new Func<BotOwner, BotZone, BotsGroup>((BotOwner bt, BotZone zn) =>
             {
                 if(followerGroup == null)
@@ -179,10 +177,7 @@ namespace friendlyPMC.Patches
 
                         BossPlayers.Instance.AddFollower(follower,player);
 
-                        if(sayRoger)
-                            follower.BotTalk.Say(EPhraseTrigger.Attention,true);
-
-                        sayRoger = false;
+                        follower.BotTalk.TrySay(EPhraseTrigger.Ready,false);
                     };
                     
                 }) , shallBeGroup, stopWatch });

@@ -23,8 +23,6 @@ namespace friendlyPMC.Modules
 
         private LootItem _lootItem;
 
-        private BotOwner _taker;
-
         private bool IsDisposed = false;
         public InteractableObjects() { 
             if(Instance == null)
@@ -94,7 +92,6 @@ namespace friendlyPMC.Modules
         {
             if (Instance == null) return;
 
-            Instance._taker = bot;
 
             BotFollowerPlayer follower = BossPlayers.Instance.GetFollower(bot);
 
@@ -115,16 +112,6 @@ namespace friendlyPMC.Modules
                 
             }
         }
-        public static bool IsToTake(BotOwner bot) 
-        { 
-            if (Instance == null) return false;
-            return Instance._taker.GetPlayer.ProfileId == bot.GetPlayer.ProfileId;
-        }
 
-        public static void ClearTaker()
-        {
-            if (Instance == null) return;
-            Instance._taker = null;
-        }
     }
 }

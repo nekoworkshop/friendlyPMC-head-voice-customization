@@ -165,7 +165,7 @@ namespace friendlyPMC.Components
         public override bool ShallUseNow()
         {
             botOwner_0.PriorityAxeTarget.FindTarget();
-            return !(HasBoss() && botOwner_0.ItemTaker.HaveItemToTake() && InteractableObjects.IsToTake(botOwner_0));
+            return HasBoss();
         }
 
         public override CustomNavigationPoint FindPoint(CoverSearchData data, Func<CoverSearchData, CustomNavigationPoint> p, bool checkCurrent)

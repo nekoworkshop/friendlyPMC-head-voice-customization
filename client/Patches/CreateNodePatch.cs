@@ -17,7 +17,11 @@ namespace friendlyPMC.Patches
         [PatchPrefix]
         private static bool PatchPrefix(BotSpawner __instance, BotLogicDecision type, BotOwner bot, ref GClass134 __result)
         {
-            if (!BossPlayers.Instance.IsFollower(bot)) return true;
+            if (!BossPlayers.Instance.IsFollower(bot))
+            {
+                Components.Logger.LogInfo($"{ bot.ProfileId } not a follower");
+                return true;
+            }
 
             if(type == BotLogicDecision.doorOpen)
             {

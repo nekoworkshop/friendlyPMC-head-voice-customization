@@ -3,7 +3,7 @@ using Comfort.Common;
 using EFT;
 using EFT.Interactive;
 using friendlyPMC.Actions;
-using friendlyPMC.Components;
+using friendlyPMC.Requests;
 using friendlyPMC.Modules;
 using System;
 using System.Threading.Tasks;
@@ -194,7 +194,17 @@ namespace friendlyPMC.Components
                         botOwner_0.BotsGroup.RequestsController.TryAskFollowMeRequest(requester, botOwner_0);
 
 
-                } // on supression, switch enemy priority
+                }
+                // tell the bots to be quiet for a minute
+                else if(info.phrase == EPhraseTrigger.Silence)
+                {
+                    if(isClose)
+                    {
+                        botOwner_0.BotTalk.SetSilence(60f);
+                        botOwner_0.Gesture.TryGestus(EGesture.Good, false);
+                    }
+                }
+                // on supression, switch enemy priority
                 else if (info.phrase == EPhraseTrigger.Suppress)
                 {
                     if (isClose)
@@ -348,7 +358,18 @@ namespace friendlyPMC.Components
                         });
                         if (closest != null && closest.ProfileId == botOwner_0.ProfileId)
                         {
-                            InteractableObjects.SetTaker(botOwner_0);
+                            Player alivePlayerByProfileID = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(requester.ProfileId);
+
+                            if (botOwner_0.BotRequestController.TryStopCurrent(alivePlayerByProfileID, false))
+                            {
+                                FollowerTakeLootRequest gclass = new FollowerTakeLootRequest(requester);
+
+                                if (botOwner_0.BotsGroup.RequestsController.TryAddRequest(gclass))
+                                {
+                                    gclass.AddPossibleExecutors(botOwner_0);
+                                    gclass.SetGroup(botOwner_0.BotsGroup.RequestsController);
+                                }
+                            }
                         }
                     }
                 }

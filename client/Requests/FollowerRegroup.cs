@@ -1,6 +1,6 @@
 ﻿using EFT;
 
-namespace friendlyPMC.Actions
+namespace friendlyPMC.Requests
 {
     internal class FollowerRegroup : BotRequest
     {

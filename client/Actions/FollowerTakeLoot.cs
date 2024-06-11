@@ -35,13 +35,12 @@ namespace friendlyPMC.Actions
                 }
 
                 if (_follower.LootingBrain.ActiveItem != null) dest = _follower.LootingBrain.ActiveItem.transform.position;
-                else if (_follower.LootingBrain.ActiveCorpse != null) dest = _follower.LootingBrain.ActiveCorpse.Transform.position;
+                else if (_follower.LootingBrain.ActiveCorpse != null) dest = _follower.LootingBrain.ActiveCorpse.gameObject.transform.position;
 
                 if(!destset)
                 {
                     _follower.LootingBrain.ActiveItem = null;
                     _follower.LootingBrain.ActiveCorpse = null;
-                    InteractableObjects.ClearTaker();
                     return;
                 }
 
@@ -51,10 +50,10 @@ namespace friendlyPMC.Actions
                 {
                     _follower.LootingBrain.ActiveItem = null;
                     _follower.LootingBrain.ActiveCorpse = null;
-                    InteractableObjects.ClearTaker();
                     return;
                 }
 
+                _follower.LootingBrain.Destination = dest;
                 botOwner_0.SetPose(1f);
                 botOwner_0.SetTargetMoveSpeed(1f);
                 botOwner_0.Steering.LookToMovingDirection();
@@ -70,7 +69,7 @@ namespace friendlyPMC.Actions
 
             if (!bool_1) {
                 botOwner_0.StopMove();
-                InteractableObjects.ClearTaker();
+                Components.Logger.LogInfo("Start Looting");
                 _follower.LootingBrain.StartLooting();
                 bool_1 = true;
             }
