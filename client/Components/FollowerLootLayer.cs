@@ -28,62 +28,19 @@ namespace friendlyPMC.Components
 
         public override bool ShallUseNow()
         {
-            return (
-                _follower != null && _follower.LootingBrain != null && 
-                (_follower.LootingBrain.ActiveItem != null || _follower.LootingBrain.ActiveCorpse != null)
-            );
+            return InteractableObjects.IsTaker(botOwner_0);
         }
 
         public override string Name()
         {
             return "FBPLooting";
         }
-
-        private bool ShouldEnd()
-        {
-            if(
-                // not active item to pickup
-                _follower == null || _follower.LootingBrain == null ||
-                (
-                    _follower.LootingBrain.ActiveItem == null &&
-                    _follower.LootingBrain.ActiveCorpse == null
-                ) ||
-                // boss recall
-                (
-                    botOwner_0.BotRequestController.CurRequest != null && HasBoss() &&
-                    GetBoss().Player().ProfileId == botOwner_0.BotRequestController.CurRequest.Requester.ProfileId &&
-                    (
-                        botOwner_0.BotRequestController.CurRequest.BotRequestType == BotRequestType.warnPlayer ||
-                        botOwner_0.BotRequestController.CurRequest.BotRequestType == BotRequestType.followMe
-                    )
-                ) ||
-                // enemy
-                botOwner_0.Memory.HaveEnemy
-            )
-            {
-                // stop everything
-                if(_follower.LootingBrain != null)
-                {
-                    _follower.LootingBrain.ActiveItem = null;
-                    _follower.LootingBrain.ActiveCorpse = null;
-                }
-
-                return true;
-            }
-
-            return false;
-        }
-
         public override AICoreActionEndStruct EndTakeItem()
         {
 
             if (
                 // not active item to pickup
-                _follower == null || _follower.LootingBrain == null ||
-                (
-                    _follower.LootingBrain.ActiveItem == null &&
-                    _follower.LootingBrain.ActiveCorpse == null
-                ) ||
+                !InteractableObjects.IsTaker(botOwner_0) ||
                 // boss recall
                 (
                     botOwner_0.BotRequestController.CurRequest != null && HasBoss() &&
@@ -98,7 +55,7 @@ namespace friendlyPMC.Components
             )
             {
                 // stop everything
-                if (_follower.LootingBrain != null)
+                if (_follower != null && _follower.LootingBrain != null)
                 {
                     _follower.LootingBrain.ActiveItem = null;
                     _follower.LootingBrain.ActiveCorpse = null;
@@ -117,7 +74,7 @@ namespace friendlyPMC.Components
         {
             _follower = BossPlayers.Instance.GetFollower(botOwner_0);
             
-            if (_follower == null || _follower.LootingBrain == null || (_follower.LootingBrain.ActiveItem == null && _follower.LootingBrain.ActiveCorpse == null))
+            if (!InteractableObjects.IsTaker(botOwner_0) || (_follower.LootingBrain.ActiveItem == null && _follower.LootingBrain.ActiveCorpse == null))
             {
                 
                 return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.followerPatrol, "backToFLB");

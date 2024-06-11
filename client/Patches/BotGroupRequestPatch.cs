@@ -45,6 +45,7 @@ namespace friendlyPMC.Patches
                         followLimit = Math.Max(followLimit, friendlyPMC.squadSize.Value);
                     }
                     // add BOT as follower to the player BOSS if limit was not reached
+                    Components.Logger.LogInfo("Boss Followers: " + playerBoss.Followers.Count + "; Limit: " + followLimit);
                     if (playerBoss.Followers.Count < followLimit)
                     {
 
@@ -54,7 +55,7 @@ namespace friendlyPMC.Patches
                         posibleExecuter.Gesture.TryGestus(EGesture.Good, true);
 
                     }
-                    else if(!BossPlayers.Instance.IsFollower(posibleExecuter))
+                    else
                     {
                         // bot signals "NO"
                         posibleExecuter.BotTalk.TrySay(EPhraseTrigger.Negative);

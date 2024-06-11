@@ -38,7 +38,6 @@ namespace friendlyPMC.Modules
             _currCorpse = null;
             _currDoor = null;
             _lootItem = null;
-            _taker = null;
 
             IsDisposed = true;
             Instance = null;
@@ -111,6 +110,14 @@ namespace friendlyPMC.Modules
                 }
                 
             }
+        }
+
+        public static bool IsTaker(BotOwner bot)
+        {
+            var _follower = BossPlayers.Instance.GetFollower(bot);
+
+            return _follower != null && _follower.LootingBrain != null &&
+                (_follower.LootingBrain.ActiveItem != null || _follower.LootingBrain.ActiveCorpse != null);
         }
 
     }
