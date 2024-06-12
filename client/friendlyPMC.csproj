@@ -139,13 +139,12 @@
     <Compile Include="Requests\FollowerGoCheck.cs" />
     <Compile Include="Requests\FollowerHold.cs" />
     <Compile Include="Actions\FollowerPatrol.cs" />
-    <Compile Include="Patches\BotTalkPatch.cs" />
+    <Compile Include="Actions\FollowerTakeLoot.cs" />
     <Compile Include="Requests\FollowerRegroup.cs" />
     <Compile Include="Requests\FollowerRushEnemy.cs" />
-    <Compile Include="Actions\FollowerTakeLoot.cs" />
+    <Compile Include="Requests\FollowerTakeLootRequest.cs" />
     <Compile Include="Components\AIBossPlayer.cs" />
     <Compile Include="Components\BotFollowerPlayer.cs" />
-    <Compile Include="Patches\CoverPointsPatch.cs" />
     <Compile Include="Components\FollowerBrain.cs" />
     <Compile Include="Actions\FollowerDoorOpener.cs" />
     <Compile Include="Components\FollowerFightLayer.cs" />
@@ -159,7 +158,6 @@
     <Compile Include="Modules\InteractableObjects.cs" />
     <Compile Include="Modules\Receivers.cs" />
     <Compile Include="Patches\BotEnemiesControllerPatch.cs" />
-    <Compile Include="Patches\BotFollowerPatch.cs" />
     <Compile Include="Patches\BotGroupPatch.cs" />
     <Compile Include="Patches\BotGroupRequestPatch.cs" />
     <Compile Include="Patches\BotOwnerPatch.cs" />
@@ -167,11 +165,11 @@
     <Compile Include="Patches\BotsControllerPatch.cs" />
     <Compile Include="Patches\BotSpawnerPatch.cs" />
     <Compile Include="Patches\PatrolDataFollowerPatch.cs" />
+    <Compile Include="Patches\BotTalkPatch.cs" />
     <Compile Include="friendlyPlugin.cs" />
     <Compile Include="Patches\PlayerPatch.cs" />
     <Compile Include="Patches\QuickPanelPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Requests\FollowerTakeLootRequest.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

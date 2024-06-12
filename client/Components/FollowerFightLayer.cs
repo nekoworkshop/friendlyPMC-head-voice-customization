@@ -102,7 +102,8 @@ namespace friendlyPMC.Components
         private bool ShallGoNearBoss()
         {
             EnemyInfo goalEnemy = this.botOwner_0.Memory.GoalEnemy;
-            return Vector3.Distance(botOwner_0.Position, GetBoss().Position) > 20f && goalEnemy == null || (goalEnemy.HaveSeen && Time.time - goalEnemy.PersonalLastSeenTime > 10f);
+            float bossDist = Vector3.Distance(botOwner_0.Position, GetBoss().Position);
+            return bossDist > 35f ||  (bossDist > 18f && (goalEnemy == null || (goalEnemy.HaveSeen && Time.time - goalEnemy.PersonalLastSeenTime > 9f)));
         }
 
         private bool TimeToHeal()
@@ -163,7 +164,10 @@ namespace friendlyPMC.Components
                 {
                     GetClosestCoverPoint(botOwner_0.Memory.GoalEnemy.CurrPosition, searchRadius);
                     if (customNavigationPoint_0 != null)
+                    {
+                        if (botOwner_0.Memory.HaveEnemy) botOwner_0.Steering.LookToDirection(botOwner_0.Memory.GoalEnemy.CurrPosition);
                         return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMoving, "getInCloseSlow");
+                    }
                 // - enemy not visible
                 } else
                 {
@@ -179,6 +183,7 @@ namespace friendlyPMC.Components
                         // -- move in slow
                         else
                         {
+                            if (botOwner_0.Memory.HaveEnemy) botOwner_0.Steering.LookToDirection(botOwner_0.Memory.GoalEnemy.CurrPosition);
                             return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMoving, "getInCloseSlow");
                         }
                     }
@@ -197,6 +202,7 @@ namespace friendlyPMC.Components
                     GetClosestCoverPoint(enemyPos, nearSearchRadius);
                     if (customNavigationPoint_0 != null)
                     {
+                        if (botOwner_0.Memory.HaveEnemy) botOwner_0.Steering.LookToDirection(botOwner_0.Memory.GoalEnemy.CurrPosition);
                         return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMoving, "getInCloseSlow");
                     }
                 }
@@ -221,6 +227,7 @@ namespace friendlyPMC.Components
                     // -- slow
                     if (Vector3.Distance(botPosition, enemyPos) < 15f)
                     {
+                        if (botOwner_0.Memory.HaveEnemy) botOwner_0.Steering.LookToDirection(botOwner_0.Memory.GoalEnemy.CurrPosition);
                         return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMoving, "getInCloseSlow");
                     }
                     // -- fast
@@ -268,11 +275,14 @@ namespace friendlyPMC.Components
 
                 if(HasBoss() && ShallGoNearBoss())
                 {
-                    GetClosestCoverPointGroup(GetBoss().Position, searchRadius);
+                    GetClosestCoverPointGroup(GetBoss().Position, nearSearchRadius);
                     if (customNavigationPoint_0 != null)
                     {
-                        return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.followerPatrol, "moveCloserToBoss");
+                        if (botOwner_0.Memory.HaveEnemy) botOwner_0.Steering.LookToDirection(botOwner_0.Memory.GoalEnemy.CurrPosition);
+                        return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMoving, "moveCloserToBoss");
                     }
+
+                    return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.followerPatrol, "moveCloserToBossFallback");
                 }
                 // Otherwise, hold position
                 return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.holdPosition, "holdPositionInCover");
@@ -281,7 +291,15 @@ namespace friendlyPMC.Components
             // If the bot is not in cover, find the closest cover and move to it
             if(HasBoss())
             {
-                return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.followerPatrol, "moveCloserToBoss");
+                GetClosestCoverPointGroup(GetBoss().Position, nearSearchRadius);
+                if (customNavigationPoint_0 != null)
+                {
+                    if (botOwner_0.Memory.HaveEnemy) botOwner_0.Steering.LookToDirection(botOwner_0.Memory.GoalEnemy.CurrPosition);
+
+                    return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMoving, "moveCloserToBoss");
+                }
+
+                return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.followerPatrol, "moveCloserToBossFallback");
             } 
             else 
             { 
@@ -304,7 +322,7 @@ namespace friendlyPMC.Components
             Vector3 botPosition = botOwner_0.GetPlayer.Transform.position;
 
             // Check if the boss is under attack
-            if (bossUnderAttack && !botOwner_0.Memory.HaveEnemy || !botOwner_0.Memory.GoalEnemy.IsVisible)
+            if (bossUnderAttack && (!botOwner_0.Memory.HaveEnemy || !botOwner_0.Memory.GoalEnemy.IsVisible))
             {
                 // - switch the bot's enemy to the one attacking the boss
                 var closestEnemy = GetBoss().ClosestEnemy();
@@ -326,6 +344,7 @@ namespace friendlyPMC.Components
                     }
                     else
                     {
+                        if (botOwner_0.Memory.HaveEnemy) botOwner_0.Steering.LookToDirection(botOwner_0.Memory.GoalEnemy.CurrPosition);
                         return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMoving, "protectBossSlow");
                     }
                 }
@@ -644,7 +663,7 @@ namespace friendlyPMC.Components
 
             List<string> ordersIgnoreDecisions = new List<string>
             {
-                "moveCloserToBoss",
+                "moveCloserToBossFallback",
                 "runToHeal",
                 "healInCover",
                 "DogFight",

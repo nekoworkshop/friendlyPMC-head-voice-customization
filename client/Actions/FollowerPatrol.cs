@@ -48,8 +48,6 @@ namespace friendlyPMC.Actions
         public void Update()
         {
 
-            this.botOwner_0.LookData.SetLookPointByHearing(null);
-
             if (this.float_3 < Time.time)
             {
                 this.float_3 = Time.time + GClass760.Random(1f, 2f);
@@ -100,6 +98,7 @@ namespace friendlyPMC.Actions
                         {
                             lastCoverPoint = nearPoint;
                             botOwner.Memory.SetCoverPoints(nearPoint);
+                            botOwner_0.Steering.LookToMovingDirection();
 
                             var status = botOwner.Mover.GoToPoint(nearPoint, true, true);
                             if (status != NavMeshPathStatus.PathComplete)
