@@ -8,7 +8,7 @@ using Logger = friendlyPMC.Components.Logger;
 
 namespace friendlyPMC
 {
-    [BepInPlugin("xyz.pit.companion", "friendlyPMC", "3.0.3")]
+    [BepInPlugin("xyz.pit.companion", "friendlyPMC", "3.0.4")]
     [BepInDependency("com.spt-aki.core", "3.8.0")]
     [BepInDependency("xyz.drakia.bigbrain")]
     [BepInDependency("xyz.drakia.waypoints")]
@@ -59,6 +59,10 @@ namespace friendlyPMC
             new BotReceiverDisposePatch().Enable();
             new BotReceiverPhrasePatch().Enable();
 
+            new AIDataDisposePatch().Enable();
+            new AIDataContructPatch().Enable();
+            new AIDataBossPlayerPatch().Enable();
+
             new QuickPanelPatch().Enable();
             
             new CreateNodePatch().Enable();
@@ -67,11 +71,6 @@ namespace friendlyPMC
 
             new LocalGamePatch().Enable();
             new LocalGameCleanupPatch().Enable();
-
-            new AIDataDisposePatch().Enable();
-            new AIDataContructPatch().Enable();
-
-            
 
         }
 

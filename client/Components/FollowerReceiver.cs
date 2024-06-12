@@ -3,7 +3,7 @@ using Comfort.Common;
 using EFT;
 using EFT.Interactive;
 using friendlyPMC.Actions;
-using friendlyPMC.Components;
+using friendlyPMC.Requests;
 using friendlyPMC.Modules;
 using System;
 using System.Threading.Tasks;

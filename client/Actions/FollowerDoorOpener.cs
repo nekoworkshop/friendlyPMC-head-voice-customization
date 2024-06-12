@@ -1,9 +1,4 @@
 ﻿using EFT;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace friendlyPMC.Actions
@@ -30,7 +25,7 @@ namespace friendlyPMC.Actions
             }
             this.botOwner_0.SetPose(1f);
             this.botOwner_0.SetTargetMoveSpeed(0.6f);
-            this.botOwner_0.LookData.SetLookPointByHearing(null);
+            this.botOwner_0.Steering.LookToMovingDirection();
             this.botOwner_0.Sprint(false, true);
             if (!this.bool_0)
             {

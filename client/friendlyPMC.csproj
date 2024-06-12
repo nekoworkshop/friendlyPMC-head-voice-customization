@@ -135,8 +135,8 @@
     <Compile Include="Actions\FollowerGoCheck.cs" />
     <Compile Include="Actions\FollowerHold.cs" />
     <Compile Include="Actions\FollowerPatrol.cs" />
-    <Compile Include="Actions\FollowerRegroup.cs" />
-    <Compile Include="Actions\FollowerRushEnemy.cs" />
+    <Compile Include="Requests\FollowerRegroup.cs" />
+    <Compile Include="Requests\FollowerRushEnemy.cs" />
     <Compile Include="Components\AIBossPlayer.cs" />
     <Compile Include="Components\BotFollowerPlayer.cs" />
     <Compile Include="Patches\CoverPointsPatch.cs" />
