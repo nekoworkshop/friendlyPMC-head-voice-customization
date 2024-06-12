@@ -102,7 +102,8 @@ namespace friendlyPMC.Components
         private bool ShallGoNearBoss()
         {
             EnemyInfo goalEnemy = this.botOwner_0.Memory.GoalEnemy;
-            return Vector3.Distance(botOwner_0.Position, GetBoss().Position) > 20f && (goalEnemy == null || (goalEnemy.HaveSeen && Time.time - goalEnemy.PersonalLastSeenTime > 10f));
+            float bossDist = Vector3.Distance(botOwner_0.Position, GetBoss().Position);
+            return bossDist > 35f ||  (bossDist > 18f && (goalEnemy == null || (goalEnemy.HaveSeen && Time.time - goalEnemy.PersonalLastSeenTime > 9f)));
         }
 
         private bool TimeToHeal()

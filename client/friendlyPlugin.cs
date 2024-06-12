@@ -43,7 +43,7 @@ namespace friendlyPMC
             }
 
 
-            new BotSpawnerAddPlayerPatch().Enable();
+            //new BotSpawnerAddPlayerPatch().Enable();
 
             new BotGroupIsEnemyPatch().Enable();
             new BotEnemiesControllerPatch().Enable();

@@ -30,25 +30,6 @@ using EFT.InventoryLogic;
 namespace friendlyPMC.Patches
 {
 
-    internal class CancelToken : GInterface19
-    {
-        CancellationTokenSource cancelSource;
-        public CancelToken()
-        {
-            cancelSource = new CancellationTokenSource();
-        }
-
-        public CancellationToken GetCancelToken()
-        {
-            return cancelSource.Token;
-        }
-
-        public void Cancel()
-        {
-            cancelSource.Cancel();
-        }
-    }
-
     internal class BotSpawnerAddPlayerPatch : ModulePatch
     {
 
