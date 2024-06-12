@@ -37,7 +37,7 @@ namespace friendlyPMC.Patches
         [PatchPrefix]
         private static bool PatchPrefix(BotsGroup __instance, IPlayer person, EBotEnemyCause cause)
         {
-            if (cause == EBotEnemyCause.AddEnemyToAllGroups || cause == EBotEnemyCause.AddEnemyToAllGroupsInBotZone && BossPlayers.Instance.IsFollowerGroup(__instance.Id))
+            if ((cause == EBotEnemyCause.AddEnemyToAllGroups || cause == EBotEnemyCause.AddEnemyToAllGroupsInBotZone) && BossPlayers.Instance.IsFollowerGroup(__instance.Id))
             {
                 return false;
             }

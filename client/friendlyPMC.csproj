@@ -139,7 +139,6 @@
     <Compile Include="Requests\FollowerRushEnemy.cs" />
     <Compile Include="Components\AIBossPlayer.cs" />
     <Compile Include="Components\BotFollowerPlayer.cs" />
-    <Compile Include="Patches\CoverPointsPatch.cs" />
     <Compile Include="Components\FollowerBrain.cs" />
     <Compile Include="Actions\FollowerDoorOpener.cs" />
     <Compile Include="Components\FollowerFightLayer.cs" />
@@ -153,7 +152,6 @@
     <Compile Include="Modules\InteractableObjects.cs" />
     <Compile Include="Modules\Receivers.cs" />
     <Compile Include="Patches\BotEnemiesControllerPatch.cs" />
-    <Compile Include="Patches\BotFollowerPatch.cs" />
     <Compile Include="Patches\BotGroupPatch.cs" />
     <Compile Include="Patches\BotGroupRequestPatch.cs" />
     <Compile Include="Patches\BotOwnerPatch.cs" />

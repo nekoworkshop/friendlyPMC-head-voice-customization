@@ -233,13 +233,13 @@ namespace friendlyPMC.Components
 
 
             settings.FileSettings.Look.CAN_USE_LIGHT = true;
-            settings.FileSettings.Look.FULL_SECTOR_VIEW = false;
+            settings.FileSettings.Look.FULL_SECTOR_VIEW = true;// see if this is needed for followers to see better
             settings.FileSettings.Look.MAX_DIST_CLAMP_TO_SEEN_SPEED = 500.0f;
             settings.FileSettings.Look.NIGHT_VISION_ON = 75.0f;
             settings.FileSettings.Look.NIGHT_VISION_OFF = 125.0f;
             settings.FileSettings.Look.NIGHT_VISION_DIST = 125.0f;
             settings.FileSettings.Look.VISIBLE_ANG_NIGHTVISION = 90.0f;
-            settings.FileSettings.Look.LOOK_THROUGH_PERIOD_BY_HIT = 0.0f;
+            settings.FileSettings.Look.LOOK_THROUGH_PERIOD_BY_HIT = 5f;
             settings.FileSettings.Look.LightOnVisionDistance = 40.0f;
             settings.FileSettings.Look.VISIBLE_ANG_LIGHT = 30.0f;
             settings.FileSettings.Look.VISIBLE_DISNACE_WITH_LIGHT = 50.0f;

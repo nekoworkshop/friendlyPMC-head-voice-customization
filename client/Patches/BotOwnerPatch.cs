@@ -21,13 +21,12 @@ namespace friendlyPMC.Patches
         {
 
             // if BOT is getting hit by a player BOSS of which it is a follower of, do not turn hostile
-            if (damageInfo.Player != null && !damageInfo.Player.IsAI)
+            if (__instance.BotFollower.HaveBoss && BossPlayers.Instance.IsFollower(__instance) && damageInfo.Player != null)
             {
-                __instance.StandBy.GetHit();
-
+                
                 AIBossPlayer player = BossPlayers.Instance.GetBossPlayer(damageInfo.Player.iPlayer.ProfileId);
 
-                if (player != null && player.Followers.Find(it => it == __instance) && __instance.BotFollower.BossToFollow == player)
+                if(player != null && BossPlayers.Instance.IsFollower(__instance, player))
                 {
                     // - yell "friendly fire"
                     __instance.BotTalk.TrySay(EPhraseTrigger.FriendlyFire);
