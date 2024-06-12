@@ -1,8 +1,11 @@
 ﻿using EFT;
 using friendlyPMC.Components;
 using friendlyPMC.Modules;
+
 using UnityEngine;
 using UnityEngine.AI;
+
+using Cysharp.Threading.Tasks;
 
 namespace friendlyPMC.Actions
 {
@@ -44,16 +47,19 @@ namespace friendlyPMC.Actions
                     return;
                 }
 
-                NavMeshPathStatus pathStatus = botOwner_0.GoToPoint(dest, true, -1f, false, true, true, false);
+                // try get closer to the loot item/body
+                NavMeshPathStatus pathStatus = botOwner_0.GoToPoint(dest, true, -1f, false, false, true, false);
 
                 if (pathStatus != NavMeshPathStatus.PathComplete)
                 {
+                    Components.Logger.LogInfo("Path not found for loot taker");
                     _follower.LootingBrain.ActiveItem = null;
                     _follower.LootingBrain.ActiveCorpse = null;
                     return;
                 }
 
                 _follower.LootingBrain.Destination = dest;
+                _follower.LootingBrain.LootObjectPosition = dest;
                 botOwner_0.SetPose(1f);
                 botOwner_0.SetTargetMoveSpeed(1f);
                 botOwner_0.Steering.LookToMovingDirection();
@@ -70,9 +76,24 @@ namespace friendlyPMC.Actions
             if (!bool_1) {
                 botOwner_0.StopMove();
                 Components.Logger.LogInfo("Start Looting");
-                _follower.LootingBrain.StartLooting();
+                botOwner_0.SetPose(0f);
+                botOwner_0.Steering.LookToPoint(_follower.LootingBrain.LootObjectPosition);
+                // start looting the body
+                if (_follower.LootingBrain.ActiveCorpse != null)
+                    _follower.LootingBrain.StartLooting();
+                // pick up the given item
+                else
+                {
+                    PickUpItem().Forget();
+                }
+
                 bool_1 = true;
             }
+        }
+
+        private async UniTask PickUpItem()
+        {
+            await _follower.TransactionController.TryPickupItem(_follower.LootingBrain.ActiveItem.Item);
         }
     }
 }

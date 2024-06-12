@@ -19,7 +19,6 @@ namespace friendlyPMC.Patches
         {
             if (!BossPlayers.Instance.IsFollower(bot))
             {
-                Components.Logger.LogInfo($"{ bot.ProfileId } not a follower");
                 return true;
             }
 

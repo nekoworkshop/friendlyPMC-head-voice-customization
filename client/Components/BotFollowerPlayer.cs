@@ -3,12 +3,17 @@ using EFT;
 using friendlyPMC.Actions;
 using friendlyPMC.Modules;
 using HarmonyLib;
+
 using LootingBots.Patch.Components;
+using LootingBots.Patch.Util;
+using LootingBots;
+
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
+using System.Reflection;
+
 using UnityEngine;
-using static EFT.SpeedTree.TreeWind;
+
 
 namespace friendlyPMC.Components
 {
@@ -21,10 +26,18 @@ namespace friendlyPMC.Components
 
         private LootingBrain _lootingBrain;
 
+        private TransactionController _transactionController;
+
         public LootingBrain LootingBrain
         {
             get { return _lootingBrain; }
         }
+
+        public TransactionController TransactionController
+        { 
+            get { return _transactionController; } 
+        }
+
         public BotFollowerPlayer(BotOwner bot, pitAIBossPlayer player)
         {
             _bot = bot;
@@ -155,19 +168,30 @@ namespace friendlyPMC.Components
                     _player.bossGroup.AddMember(_bot, false);
                 }
             }
-            
-            // add looting brain to help with pick up items
-            _lootingBrain = _bot.GetPlayer.gameObject.GetComponent<LootingBrain>();
 
-            if (_lootingBrain == null)
-            {
-                Logger.LogInfo("No loot brain");
-            } else
-            {
-                _lootingBrain.Init(_bot);
-            }
 
             Logger.LogInfo($"Bot {_bot.Profile.Nickname} with ID {_bot.ProfileId} is now a follower of {_player.Player().Profile.Nickname}");
+
+            // initialize LootingBots inventory controller
+            Type botOwnerType = bot.GetPlayer.GetType();
+            FieldInfo botInventory = botOwnerType.BaseType.GetField(
+                "_inventoryController",
+                BindingFlags.NonPublic
+                    | BindingFlags.Static
+                    | BindingFlags.Public
+                    | BindingFlags.Instance
+            );
+            InventoryControllerClass _botInventoryController = (InventoryControllerClass)botInventory.GetValue(bot.GetPlayer);
+            _transactionController = new TransactionController(
+                    bot,
+                    _botInventoryController,
+                    new BotLog(LootingBots.LootingBots.LootLog, bot)
+                );
+            // - ensure follower will have enough amoo
+            _transactionController.AddExtraAmmo(bot.WeaponManager.CurrentWeapon);
+
+            // initialize LootingBots brain
+            _lootingBrain = _bot.GetPlayer.gameObject.GetComponent<LootingBrain>();
 
         }
 
@@ -276,10 +300,6 @@ namespace friendlyPMC.Components
             bot.GetPlayer.Physical.Stamina.ForceMode = true;
             bot.GetPlayer.Physical.HandsStamina.ForceMode = true;
             bot.GetPlayer.HealthController.DisableMetabolism();
-
-
-            // refill main weapon
-            bot.WeaponManager.Reload.AddAmmoToPockets(bot.WeaponManager.CurrentWeapon.CurrentAmmoTemplate._id, 200);
         }
 
         /** Exposed so that it can be patched by addons **/
@@ -311,6 +331,9 @@ namespace friendlyPMC.Components
                 _lootingBrain.Cleanup();
                 _lootingBrain = null;
             }
+
+            if (_transactionController != null)
+                _transactionController = null;
 
             if (_bot == null || _bot.HealthController.IsAlive) return;
 
