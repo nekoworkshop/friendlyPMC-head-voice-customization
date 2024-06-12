@@ -1,10 +1,4 @@
 ﻿using EFT;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace friendlyPMC.Actions
 {
     internal class FollowerGoCheck : BotRequest

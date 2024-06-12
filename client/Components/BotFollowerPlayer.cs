@@ -96,7 +96,7 @@ namespace friendlyPMC.Components
                 
 
             // make bot follower of player
-            _player.OfferBot(_bot);
+            _player.AddFollower(_bot);
             // force bot to turn off light
             _bot.BotLight.TurnOff(false, true);
             // activate new following patrol mode
@@ -204,8 +204,12 @@ namespace friendlyPMC.Components
         public AICoreAgentClass<BotLogicDecision> GetFollowerAIAgent(BotOwner bot)
         {
             string name = bot.name + " " + bot.Profile.Info.Settings.Role.ToString();
-
-            return new AICoreAgentClass<BotLogicDecision>(bot.BotsController.AICoreController, bot.Brain.BaseBrain, GClass460.ActionsList(bot), bot.gameObject, name, new Func<BotLogicDecision, GClass134>(bot.Brain.method_0));
+            Components.Logger.LogInfo("Using new Agent");
+            return new AICoreAgentClass<BotLogicDecision>(bot.BotsController.AICoreController, bot.Brain.BaseBrain, GClass460.ActionsList(bot), bot.gameObject, name, new Func<BotLogicDecision, GClass134>((BotLogicDecision decision) =>
+            {
+                Components.Logger.LogInfo("Using FollowerCreateNode");
+                return FollowerCreateNode.CreateNode(decision, bot);
+            }));
         }
 
         /** Exposed so that it can be patched by addons **/

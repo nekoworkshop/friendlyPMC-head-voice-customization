@@ -45,7 +45,6 @@ namespace friendlyPMC.Patches
                         followLimit = Math.Max(followLimit, friendlyPMC.squadSize.Value);
                     }
                     // add BOT as follower to the player BOSS if limit was not reached
-                    Components.Logger.LogInfo("Boss Followers: " + playerBoss.Followers.Count + "; Limit: " + followLimit);
                     if (playerBoss.Followers.Count < followLimit)
                     {
 

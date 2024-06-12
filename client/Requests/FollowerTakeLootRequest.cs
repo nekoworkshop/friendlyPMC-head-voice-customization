@@ -35,7 +35,6 @@ namespace friendlyPMC.Requests
 
         public new void AddPossibleExecutors(BotOwner bot)
         {
-            Components.Logger.LogInfo("Add Possible item Taker");
             InteractableObjects.SetTaker(bot);
             base.AddPossibleExecutors(bot);
         }

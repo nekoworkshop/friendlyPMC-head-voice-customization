@@ -108,7 +108,7 @@ namespace friendlyPMC.Modules
                     follower.LootingBrain.LootObjectPosition = Instance._currCorpse.transform.position;
                     Instance._currCorpse = null;
                 }
-                
+                Components.Logger.LogInfo("Added Possible item Taker");
             }
         }
 

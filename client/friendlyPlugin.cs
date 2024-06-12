@@ -68,8 +68,6 @@ namespace friendlyPMC
             new AIDataBossPlayerPatch().Enable();
 
             new QuickPanelPatch().Enable();
-            
-            new CreateNodePatch().Enable();
 
             new BotsControllerPatch().Enable();
 

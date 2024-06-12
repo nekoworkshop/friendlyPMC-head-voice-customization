@@ -258,14 +258,7 @@ namespace friendlyPMC.Modules
                 }
             }
 
-            bool result = _follower != null;
-
-            if (result)
-            {
-                Components.Logger.LogInfo($"{bot.ProfileId} is a follower");
-            }
-
-            return result;
+            return _follower != null;
         }
 
         public BotFollowerPlayer GetFollower(BotOwner bot)

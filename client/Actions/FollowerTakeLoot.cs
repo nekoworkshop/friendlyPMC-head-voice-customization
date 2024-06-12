@@ -20,11 +20,16 @@ namespace friendlyPMC.Actions
         public FollowerTakeLoot(BotOwner bot) : base(bot)
         {
             _follower = BossPlayers.Instance.GetFollower(bot);
+            Components.Logger.LogInfo("Take Loot Node");
         }
 
         public override void Update()
         {
-            if (_follower == null || _follower.LootingBrain == null) return;
+            if (_follower == null || _follower.LootingBrain == null)
+            {
+                Components.Logger.LogInfo("Essentials are NULL for loot taker");
+                return;
+            }
 
             if (!bool_0)
             {
@@ -44,6 +49,7 @@ namespace friendlyPMC.Actions
                 {
                     _follower.LootingBrain.ActiveItem = null;
                     _follower.LootingBrain.ActiveCorpse = null;
+                    Components.Logger.LogInfo("Destination not found for loot taker");
                     return;
                 }
 

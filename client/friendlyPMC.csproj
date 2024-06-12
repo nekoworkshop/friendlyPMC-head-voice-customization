@@ -135,8 +135,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Actions\FollowerGoCheck.cs" />
-    <Compile Include="Actions\FollowerHold.cs" />
+    <Compile Include="Modules\FollowerCreateNode.cs" />
+    <Compile Include="Requests\FollowerGoCheck.cs" />
+    <Compile Include="Requests\FollowerHold.cs" />
     <Compile Include="Actions\FollowerPatrol.cs" />
     <Compile Include="Patches\BotTalkPatch.cs" />
     <Compile Include="Requests\FollowerRegroup.cs" />
@@ -165,7 +166,6 @@
     <Compile Include="Patches\BotReceiverPatch.cs" />
     <Compile Include="Patches\BotsControllerPatch.cs" />
     <Compile Include="Patches\BotSpawnerPatch.cs" />
-    <Compile Include="Patches\CreateNodePatch.cs" />
     <Compile Include="Patches\PatrolDataFollowerPatch.cs" />
     <Compile Include="friendlyPlugin.cs" />
     <Compile Include="Patches\PlayerPatch.cs" />

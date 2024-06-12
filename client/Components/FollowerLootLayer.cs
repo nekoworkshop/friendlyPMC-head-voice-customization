@@ -79,7 +79,6 @@ namespace friendlyPMC.Components
                 
                 return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.followerPatrol, "backToFLB");
             }
-
             return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.botTakeItem, "takeItem");
         }
 

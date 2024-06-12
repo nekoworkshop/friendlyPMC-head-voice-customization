@@ -8,6 +8,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
 
 namespace friendlyPMC.Patches
 {
@@ -34,7 +35,6 @@ namespace friendlyPMC.Patches
         protected override MethodBase GetTargetMethod()
         {
             return AccessTools.Method(typeof(BotTalk), "Say");
-
         }
 
         [PatchPrefix]
