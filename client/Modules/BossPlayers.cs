@@ -56,7 +56,7 @@ namespace friendlyPMC.Modules
 
             if (!playerBoss.IAmBoos)
             {
-                Logger.LogInfo($"Could not make player {player.Profile.Nickname} as BOSS!");
+                Logger.LogInfo($"Could not make player {player.Profile.Nickname} as BOSS");
                 return null;
             }
             else

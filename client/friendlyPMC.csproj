@@ -135,6 +135,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Actions\FollowerAttackMove.cs" />
+    <Compile Include="Actions\FollowerHoldPosition.cs" />
     <Compile Include="Modules\FollowerCreateNode.cs" />
     <Compile Include="Requests\FollowerGoCheck.cs" />
     <Compile Include="Requests\FollowerHold.cs" />

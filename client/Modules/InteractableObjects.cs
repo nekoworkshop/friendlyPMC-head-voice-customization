@@ -4,6 +4,7 @@ using EFT.InventoryLogic;
 using friendlyPMC.Actions;
 using friendlyPMC.Components;
 using HarmonyLib;
+using LootingBots.Patch.Components;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -96,19 +97,51 @@ namespace friendlyPMC.Modules
 
             if(follower != null && follower.LootingBrain != null)
             {
-                if (Instance._lootItem != null)
+                var GetDestination = AccessTools.Method(typeof(LootFinder), "GetDestination");
+                if (Instance._currCorpse != null)
                 {
+                    var pl = Instance._currCorpse.gameObject.GetComponentInParent<Player>();
+                    if (pl != null)
+                    {
+                        Vector3 center = pl.Transform.position;
+                        center.y = center.y - 0.4f;
+                        var destination = (Vector3)GetDestination.Invoke(follower.LootFinder, new object[] { center });
+
+                        follower.LootingBrain.Destination = destination;
+                        follower.LootingBrain.DistanceToLoot = bot.Mover.ComputePathLengthToPoint(destination);
+
+                        follower.LootingBrain.ActiveCorpse = pl;
+                        Vector3 lookPos = pl.Transform.position;
+                        lookPos.y = lookPos.y + 0.4f;
+                        lookPos.Normalize();
+                        follower.LootingBrain.LootObjectPosition = lookPos;
+                        
+                        Instance._currCorpse = null;
+                    }
+                }
+                else if (Instance._lootItem != null)
+                {
+                    Collider collider = Instance._lootItem.GetComponentInChildren<Collider>();
+                    if (collider != null)
+                    {
+                        Vector3 center = collider.bounds.center;
+                        center.y = collider.bounds.center.y - collider.bounds.extents.y - 0.4f;
+                        var destination = (Vector3)GetDestination.Invoke(follower.LootFinder, new object[] { center });
+
+                        follower.LootingBrain.Destination = destination;
+                        follower.LootingBrain.DistanceToLoot = bot.Mover.ComputePathLengthToPoint(destination);
+                    }
+                    else
+                    {
+                        follower.LootingBrain.Destination = Instance._lootItem.transform.position;
+                        follower.LootingBrain.DistanceToLoot = bot.Mover.ComputePathLengthToPoint(Instance._lootItem.transform.position);
+                    }
+
                     follower.LootingBrain.ActiveItem = Instance._lootItem;
                     follower.LootingBrain.LootObjectPosition = Instance._lootItem.transform.position;
+
                     Instance._lootItem = null;
                 }
-                else if(Instance._currCorpse != null)
-                {
-                    follower.LootingBrain.ActiveCorpse = Instance._currCorpse.gameObject.GetComponent<Player>();
-                    follower.LootingBrain.LootObjectPosition = Instance._currCorpse.transform.position;
-                    Instance._currCorpse = null;
-                }
-                Components.Logger.LogInfo("Added Possible item Taker");
             }
         }
 
@@ -116,7 +149,7 @@ namespace friendlyPMC.Modules
         {
             var _follower = BossPlayers.Instance.GetFollower(bot);
 
-            return _follower != null && _follower.LootingBrain != null &&
+            return _follower != null && _follower.LootingBrain != null && _follower.TransactionController != null &&
                 (_follower.LootingBrain.ActiveItem != null || _follower.LootingBrain.ActiveCorpse != null);
         }
 

@@ -3,6 +3,7 @@ using EFT.Interactive;
 using friendlyPMC.Modules;
 
 using LootingBots.Brain.Logics;
+using System;
 using UnityEngine;
 
 namespace friendlyPMC.Components
@@ -38,37 +39,39 @@ namespace friendlyPMC.Components
         public override AICoreActionEndStruct EndTakeItem()
         {
 
+            return gstruct7_0;
+        }
+        public override AICoreActionEndStruct EndFollowerPatrolItem()
+        {
+            return gstruct7_0;
+        }
+
+        public override AICoreActionEndStruct ShallEndCurrentDecision(AICoreActionResultStruct<BotLogicDecision> curDecision)
+        {
             if (
-                // not active item to pickup
-                !InteractableObjects.IsTaker(botOwner_0) ||
-                // boss recall
-                (
                     botOwner_0.BotRequestController.CurRequest != null && HasBoss() &&
                     GetBoss().Player().ProfileId == botOwner_0.BotRequestController.CurRequest.Requester.ProfileId &&
                     (
                         botOwner_0.BotRequestController.CurRequest.BotRequestType == BotRequestType.warnPlayer ||
                         botOwner_0.BotRequestController.CurRequest.BotRequestType == BotRequestType.followMe
                     )
-                ) ||
-                // enemy
-                botOwner_0.Memory.HaveEnemy
-            )
+                )
             {
                 // stop everything
                 if (_follower != null && _follower.LootingBrain != null)
                 {
+
+                    _follower.LootingBrain.DisableTransactions();
+                    _follower.LootingBrain.UpdateGridStats();
+                    _follower.LootingBrain.StopAllCoroutines();
                     _follower.LootingBrain.ActiveItem = null;
                     _follower.LootingBrain.ActiveCorpse = null;
                 }
-
                 return gstruct7_0;
             }
+                
 
-            return gstruct7_1;
-        }
-        public override AICoreActionEndStruct EndFollowerPatrolItem()
-        {
-            return gstruct7_0;
+            return base.ShallEndCurrentDecision(curDecision);
         }
         public override AICoreActionResultStruct<BotLogicDecision> GetDecision()
         {
@@ -79,6 +82,7 @@ namespace friendlyPMC.Components
                 
                 return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.followerPatrol, "backToFLB");
             }
+
             return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.botTakeItem, "takeItem");
         }
 

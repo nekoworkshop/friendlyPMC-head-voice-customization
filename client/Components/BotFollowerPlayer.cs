@@ -28,6 +28,8 @@ namespace friendlyPMC.Components
 
         private TransactionController _transactionController;
 
+        private LootFinder _lootFinder;
+
         public LootingBrain LootingBrain
         {
             get { return _lootingBrain; }
@@ -36,6 +38,11 @@ namespace friendlyPMC.Components
         public TransactionController TransactionController
         { 
             get { return _transactionController; } 
+        }
+
+        public LootFinder LootFinder
+        {
+            get { return _lootFinder; }
         }
 
         public BotFollowerPlayer(BotOwner bot, pitAIBossPlayer player)
@@ -85,6 +92,20 @@ namespace friendlyPMC.Components
             // add a new receiver
             _bot.Receiver = GetFollowerReceiver(bot);
             _bot.Receiver.Init();
+            try
+            {          
+                // initialize LootingBots brain
+                _lootingBrain = _bot.GetPlayer.gameObject.GetComponent<LootingBrain>();
+                _lootFinder = _bot.GetPlayer.gameObject.GetComponent<LootFinder>();
+
+                _transactionController = AccessTools.Field(typeof(InventoryController), "_transactionController").GetValue(_lootingBrain.InventoryController) as TransactionController;
+
+
+            } catch(Exception ex)
+            {
+                Logger.LogInfo("Failed to add Looting Brain to follower: " +ex.Message);
+            }
+
 
             // add the new follower brain
             _bot.Brain.BaseBrain = GetFollowerBrain(_bot, _player);
@@ -170,29 +191,7 @@ namespace friendlyPMC.Components
             }
 
 
-            Logger.LogInfo($"Bot {_bot.Profile.Nickname} with ID {_bot.ProfileId} is now a follower of {_player.Player().Profile.Nickname}");
-
-            // initialize LootingBots inventory controller
-            Type botOwnerType = bot.GetPlayer.GetType();
-            FieldInfo botInventory = botOwnerType.BaseType.GetField(
-                "_inventoryController",
-                BindingFlags.NonPublic
-                    | BindingFlags.Static
-                    | BindingFlags.Public
-                    | BindingFlags.Instance
-            );
-            InventoryControllerClass _botInventoryController = (InventoryControllerClass)botInventory.GetValue(bot.GetPlayer);
-            _transactionController = new TransactionController(
-                    bot,
-                    _botInventoryController,
-                    new BotLog(LootingBots.LootingBots.LootLog, bot)
-                );
-            // - ensure follower will have enough amoo
-            _transactionController.AddExtraAmmo(bot.WeaponManager.CurrentWeapon);
-
-            // initialize LootingBots brain
-            _lootingBrain = _bot.GetPlayer.gameObject.GetComponent<LootingBrain>();
-
+            Logger.LogInfo($"Bot {_bot.Profile.Nickname} is now a follower of {_player.Player().Profile.Nickname}");
         }
 
         /** Exposed so that it can be patched by addons **/
@@ -204,10 +203,9 @@ namespace friendlyPMC.Components
         public AICoreAgentClass<BotLogicDecision> GetFollowerAIAgent(BotOwner bot)
         {
             string name = bot.name + " " + bot.Profile.Info.Settings.Role.ToString();
-            Components.Logger.LogInfo("Using new Agent");
-            return new AICoreAgentClass<BotLogicDecision>(bot.BotsController.AICoreController, bot.Brain.BaseBrain, GClass460.ActionsList(bot), bot.gameObject, name, new Func<BotLogicDecision, GClass134>((BotLogicDecision decision) =>
+
+            return new AICoreAgentClass<BotLogicDecision>(bot.BotsController.AICoreController, bot.Brain.BaseBrain, FollowerCreateNode.ActionsList(bot), bot.gameObject, name, new Func<BotLogicDecision, GClass134>((BotLogicDecision decision) =>
             {
-                Components.Logger.LogInfo("Using FollowerCreateNode");
                 return FollowerCreateNode.CreateNode(decision, bot);
             }));
         }
@@ -276,7 +274,7 @@ namespace friendlyPMC.Components
 
 
             settings.FileSettings.Look.CAN_USE_LIGHT = true;
-            settings.FileSettings.Look.FULL_SECTOR_VIEW = true;// see if this is needed for followers to see better
+            settings.FileSettings.Look.FULL_SECTOR_VIEW = true;
             settings.FileSettings.Look.MAX_DIST_CLAMP_TO_SEEN_SPEED = 500.0f;
             settings.FileSettings.Look.NIGHT_VISION_ON = 75.0f;
             settings.FileSettings.Look.NIGHT_VISION_OFF = 125.0f;
@@ -332,8 +330,10 @@ namespace friendlyPMC.Components
         {
             if (_lootingBrain != null)
             {
-                _lootingBrain.Cleanup();
-                _lootingBrain = null;
+                _lootingBrain.StopAllCoroutines();
+                _lootingBrain.DisableTransactions();
+                _lootingBrain.ActiveItem = null;
+                _lootingBrain.ActiveCorpse = null;
             }
 
             if (_transactionController != null)
