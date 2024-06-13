@@ -1,13 +1,17 @@
 ﻿using EFT;
 using EFT.Interactive;
 using friendlyPMC.Modules;
-using HarmonyLib;
-using System.Collections.Generic;
+
+using LootingBots.Brain.Logics;
+using System;
+using UnityEngine;
 
 namespace friendlyPMC.Components
 {
     internal class FollowerLootLayer : GClass102
     {
+
+        private BotFollowerPlayer _follower;
         public FollowerLootLayer(BotOwner bot, int priority) : base(bot, priority)
         {
 
@@ -25,35 +29,61 @@ namespace friendlyPMC.Components
 
         public override bool ShallUseNow()
         {
-            return HasBoss() && botOwner_0.ItemTaker.HaveItemToTake() && InteractableObjects.IsToTake(botOwner_0);
+            return InteractableObjects.IsTaker(botOwner_0);
+        }
+
+        public override string Name()
+        {
+            return "FBPLooting";
+        }
+        public override AICoreActionEndStruct EndTakeItem()
+        {
+
+            return gstruct7_0;
+        }
+        public override AICoreActionEndStruct EndFollowerPatrolItem()
+        {
+            return gstruct7_0;
         }
 
         public override AICoreActionEndStruct ShallEndCurrentDecision(AICoreActionResultStruct<BotLogicDecision> curDecision)
         {
-            // boss recall
             if (
-                botOwner_0.BotRequestController.CurRequest != null && HasBoss() && 
-                GetBoss().Player().ProfileId == botOwner_0.BotRequestController.CurRequest.Requester.ProfileId && 
-                botOwner_0.BotRequestController.CurRequest.BotRequestType == BotRequestType.warnPlayer
-            )
+                    botOwner_0.BotRequestController.CurRequest != null && HasBoss() &&
+                    GetBoss().Player().ProfileId == botOwner_0.BotRequestController.CurRequest.Requester.ProfileId &&
+                    (
+                        botOwner_0.BotRequestController.CurRequest.BotRequestType == BotRequestType.warnPlayer ||
+                        botOwner_0.BotRequestController.CurRequest.BotRequestType == BotRequestType.followMe
+                    )
+                )
             {
-                return gstruct7_0; 
+                // stop everything
+                if (_follower != null && _follower.LootingBrain != null)
+                {
+
+                    _follower.LootingBrain.DisableTransactions();
+                    _follower.LootingBrain.UpdateGridStats();
+                    _follower.LootingBrain.StopAllCoroutines();
+                    _follower.LootingBrain.ActiveItem = null;
+                    _follower.LootingBrain.ActiveCorpse = null;
+                }
+                return gstruct7_0;
             }
+                
 
             return base.ShallEndCurrentDecision(curDecision);
         }
-
         public override AICoreActionResultStruct<BotLogicDecision> GetDecision()
         {
-
+            _follower = BossPlayers.Instance.GetFollower(botOwner_0);
             
-            if (this.botOwner_0.ItemTaker.HaveItemToTake())
+            if (!InteractableObjects.IsTaker(botOwner_0) || (_follower.LootingBrain.ActiveItem == null && _follower.LootingBrain.ActiveCorpse == null))
             {
-                Logger.LogInfo("Bot " + botOwner_0.Profile.Nickname + " tries to take item");
-
-                return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.botTakeItem, "Take Item");
+                
+                return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.followerPatrol, "backToFLB");
             }
-            return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.followerPatrol, "Stub logic");
+
+            return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.botTakeItem, "takeItem");
         }
 
     }

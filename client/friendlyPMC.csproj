@@ -81,6 +81,9 @@
     <Reference Include="Sirenix.Serialization">
       <HintPath>..\..\..\XboxGames\AKI-Streets-3.8.0\EscapeFromTarkov_Data\Managed\Sirenix.Serialization.dll</HintPath>
     </Reference>
+    <Reference Include="skwizzy.LootingBots">
+      <HintPath>..\..\..\XboxGames\AKI-Streets-3.8.0\BepInEx\plugins\skwizzy.LootingBots.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Threading" />
@@ -132,11 +135,16 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Actions\FollowerGoCheck.cs" />
-    <Compile Include="Actions\FollowerHold.cs" />
+    <Compile Include="Actions\FollowerAttackMove.cs" />
+    <Compile Include="Actions\FollowerHoldPosition.cs" />
+    <Compile Include="Modules\FollowerCreateNode.cs" />
+    <Compile Include="Requests\FollowerGoCheck.cs" />
+    <Compile Include="Requests\FollowerHold.cs" />
     <Compile Include="Actions\FollowerPatrol.cs" />
+    <Compile Include="Actions\FollowerTakeLoot.cs" />
     <Compile Include="Requests\FollowerRegroup.cs" />
     <Compile Include="Requests\FollowerRushEnemy.cs" />
+    <Compile Include="Requests\FollowerTakeLootRequest.cs" />
     <Compile Include="Components\AIBossPlayer.cs" />
     <Compile Include="Components\BotFollowerPlayer.cs" />
     <Compile Include="Components\FollowerBrain.cs" />
@@ -158,8 +166,8 @@
     <Compile Include="Patches\BotReceiverPatch.cs" />
     <Compile Include="Patches\BotsControllerPatch.cs" />
     <Compile Include="Patches\BotSpawnerPatch.cs" />
-    <Compile Include="Patches\CreateNodePatch.cs" />
     <Compile Include="Patches\PatrolDataFollowerPatch.cs" />
+    <Compile Include="Patches\BotTalkPatch.cs" />
     <Compile Include="friendlyPlugin.cs" />
     <Compile Include="Patches\PlayerPatch.cs" />
     <Compile Include="Patches\QuickPanelPatch.cs" />

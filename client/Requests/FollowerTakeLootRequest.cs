@@ -1,23 +1,22 @@
 ﻿using EFT;
+using friendlyPMC.Modules;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace friendlyPMC.Actions
+namespace friendlyPMC.Requests
 {
-    internal class FollowerGoCheck : BotRequest
+    internal class FollowerTakeLootRequest : BotRequest
     {
-        public FollowerGoCheck(IPlayer requester) : base(requester, BotRequestType.goToPoint)
+        public FollowerTakeLootRequest(IPlayer requester) : base(requester, BotRequestType.throwGrenadeFromPlace) // dummy request
         {
-            FollowerGoCheck _me = this;
         }
 
         public override bool CanProceed()
         {
             if (Executor == null) return false;
-
             return true;
         }
 
@@ -32,6 +31,12 @@ namespace friendlyPMC.Actions
             {
                 return EBotRequestMode.Fight;
             }
+        }
+
+        public new void AddPossibleExecutors(BotOwner bot)
+        {
+            InteractableObjects.SetTaker(bot);
+            base.AddPossibleExecutors(bot);
         }
     }
 }

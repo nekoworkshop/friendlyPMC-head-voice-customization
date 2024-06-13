@@ -103,7 +103,7 @@ namespace friendlyPMC.Patches
             IProfileData botData = new IProfileData(side, type, BotDifficulty.hard, 0f, @params);
 
             BotCacheClass bot = await BotCacheClass.Create(botData, botCreator, memberCount, botSpawnerClass);
-            
+
             // copy player equipment
             if (friendlyPMC.copyEquip.Value) bot.Profiles.ForEach(profile =>
             {
@@ -119,20 +119,23 @@ namespace friendlyPMC.Patches
             Stopwatch stopWatch = new Stopwatch();
 
 
-            Components.Logger.LogInfo("Spawn followers");
-
-
-            BotsGroup followerGroup = null;
+            Components.Logger.LogInfo("Spawn Followers");
 
             botCreator.ActivateBot(bot, zone, true, new Func<BotOwner, BotZone, BotsGroup>((BotOwner bt, BotZone zn) =>
             {
-                if (followerGroup == null)
+                // make the first group be the boss' group
+                if (player.bossGroup == null)
                 {
                     BotsGroup group = botSpawnerClass.GetGroupAndSetEnemies(bt, zn);
-                    followerGroup = group;
+                    
+                    player.bossGroup = group;
+
+                    player.bossGroup.AddAlly(player.realPlayer);
+                    BossPlayers.Instance.AddFollowerGroup(player.bossGroup.Id);
+                    player.bossGroup.Lock();
                 }
 
-                return followerGroup;
+                return player.bossGroup;
             }), new Action<BotOwner>((BotOwner owner) =>
             {
                 bool shallBeGroup = bot.SpawnParams?.ShallBeGroup != null;
@@ -142,19 +145,13 @@ namespace friendlyPMC.Patches
                 botSpawnerClass.method_10(owner, bot, new Action<BotOwner>((BotOwner follower)=>
                 {
                     Components.Logger.LogInfo("Follower " + follower.Profile.Nickname + " ready");
-                    var Timer = StaticManager.Instance.TimerManager.MakeTimer(TimeSpan.FromSeconds(2.0), false);
+                    var Timer = StaticManager.Instance.TimerManager.MakeTimer(TimeSpan.FromSeconds(1.0), false);
 
                     Timer.OnTimer += () =>
                     {
-                        if(followerGroup != null && player.bossGroup == null)
+                        if(player.bossGroup != null)
                         {
-                            player.bossGroup = followerGroup;
-                            BossPlayers.Instance.AddFollowerGroup(followerGroup.Id);
-
-                            player.bossGroup.AddAlly(player.realPlayer);
-                            player.bossGroup.Lock();
-
-                            player.bossGroup.AnyBodyShootImmediately = true;
+                            Components.Logger.LogInfo("Add Follower to Boss Group");
 
                             player.bossGroup.OnEnemyAdd += (IPlayer pl, EBotEnemyCause cause)=>
                             {
@@ -172,8 +169,6 @@ namespace friendlyPMC.Patches
                     };
 
                 }) , shallBeGroup, stopWatch );
-
-                Components.Logger.LogInfo("Activating followers");
 
             }), token.GetCancelToken());
 

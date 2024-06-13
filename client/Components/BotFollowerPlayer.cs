@@ -3,6 +3,11 @@ using EFT;
 using friendlyPMC.Actions;
 using friendlyPMC.Modules;
 using HarmonyLib;
+
+using LootingBots.Patch.Components;
+using LootingBots.Patch.Util;
+using LootingBots;
+
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -18,6 +23,27 @@ namespace friendlyPMC.Components
         private pitAIBossPlayer _player;
 
         private BotDifficultySettingsClass _OldSettings;
+
+        private LootingBrain _lootingBrain;
+
+        private TransactionController _transactionController;
+
+        private LootFinder _lootFinder;
+
+        public LootingBrain LootingBrain
+        {
+            get { return _lootingBrain; }
+        }
+
+        public TransactionController TransactionController
+        { 
+            get { return _transactionController; } 
+        }
+
+        public LootFinder LootFinder
+        {
+            get { return _lootFinder; }
+        }
 
         public BotFollowerPlayer(BotOwner bot, pitAIBossPlayer player)
         {
@@ -66,6 +92,20 @@ namespace friendlyPMC.Components
             // add a new receiver
             _bot.Receiver = GetFollowerReceiver(bot);
             _bot.Receiver.Init();
+            try
+            {          
+                // initialize LootingBots brain
+                _lootingBrain = _bot.GetPlayer.gameObject.GetComponent<LootingBrain>();
+                _lootFinder = _bot.GetPlayer.gameObject.GetComponent<LootFinder>();
+
+                _transactionController = AccessTools.Field(typeof(InventoryController), "_transactionController").GetValue(_lootingBrain.InventoryController) as TransactionController;
+
+
+            } catch(Exception ex)
+            {
+                Logger.LogInfo("Failed to add Looting Brain to follower: " +ex.Message);
+            }
+
 
             // add the new follower brain
             _bot.Brain.BaseBrain = GetFollowerBrain(_bot, _player);
@@ -151,9 +191,7 @@ namespace friendlyPMC.Components
             }
 
 
-            Logger.LogInfo($"Bot {_bot.Profile.Nickname} with ID {_bot.ProfileId} is now a follower of {_player.Player().Profile.Nickname}");
-
-
+            Logger.LogInfo($"Bot {_bot.Profile.Nickname} is now a follower of {_player.Player().Profile.Nickname}");
         }
 
         /** Exposed so that it can be patched by addons **/
@@ -166,7 +204,10 @@ namespace friendlyPMC.Components
         {
             string name = bot.name + " " + bot.Profile.Info.Settings.Role.ToString();
 
-            return new AICoreAgentClass<BotLogicDecision>(bot.BotsController.AICoreController, bot.Brain.BaseBrain, GClass460.ActionsList(bot), bot.gameObject, name, new Func<BotLogicDecision, GClass134>(bot.Brain.method_0));
+            return new AICoreAgentClass<BotLogicDecision>(bot.BotsController.AICoreController, bot.Brain.BaseBrain, FollowerCreateNode.ActionsList(bot), bot.gameObject, name, new Func<BotLogicDecision, GClass134>((BotLogicDecision decision) =>
+            {
+                return FollowerCreateNode.CreateNode(decision, bot);
+            }));
         }
 
         /** Exposed so that it can be patched by addons **/
@@ -233,7 +274,7 @@ namespace friendlyPMC.Components
 
 
             settings.FileSettings.Look.CAN_USE_LIGHT = true;
-            settings.FileSettings.Look.FULL_SECTOR_VIEW = true;// see if this is needed for followers to see better
+            settings.FileSettings.Look.FULL_SECTOR_VIEW = true;
             settings.FileSettings.Look.MAX_DIST_CLAMP_TO_SEEN_SPEED = 500.0f;
             settings.FileSettings.Look.NIGHT_VISION_ON = 75.0f;
             settings.FileSettings.Look.NIGHT_VISION_OFF = 125.0f;
@@ -287,6 +328,16 @@ namespace friendlyPMC.Components
         /** End Follower Brain **/
         public void Dismiss()
         {
+            if (_lootingBrain != null)
+            {
+                _lootingBrain.StopAllCoroutines();
+                _lootingBrain.DisableTransactions();
+                _lootingBrain.ActiveItem = null;
+                _lootingBrain.ActiveCorpse = null;
+            }
+
+            if (_transactionController != null)
+                _transactionController = null;
 
             if (_bot == null || _bot.HealthController.IsAlive) return;
 

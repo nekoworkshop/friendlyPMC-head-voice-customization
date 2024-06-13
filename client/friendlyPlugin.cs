@@ -8,11 +8,12 @@ using Logger = friendlyPMC.Components.Logger;
 
 namespace friendlyPMC
 {
-    [BepInPlugin("xyz.pit.companion", "friendlyPMC", "3.0.5")]
+    [BepInPlugin("xyz.pit.companion", "friendlyPMC", "3.1.0")]
     [BepInDependency("com.spt-aki.core", "3.8.0")]
     [BepInDependency("xyz.drakia.bigbrain")]
     [BepInDependency("xyz.drakia.waypoints")]
     [BepInDependency("com.Arys.UnityToolkit")]
+    [BepInDependency("me.skwizzy.lootingbots")]
     public class friendlyPMC : BaseUnityPlugin
     {
         public static bool awaken;
@@ -59,13 +60,14 @@ namespace friendlyPMC
             new BotReceiverDisposePatch().Enable();
             new BotReceiverPhrasePatch().Enable();
 
+            new BotTalkTrySayPatch().Enable();
+            new BotTalkSayPatch().Enable();
+
             new AIDataDisposePatch().Enable();
             new AIDataContructPatch().Enable();
             new AIDataBossPlayerPatch().Enable();
 
             new QuickPanelPatch().Enable();
-            
-            new CreateNodePatch().Enable();
 
             new BotsControllerPatch().Enable();
 

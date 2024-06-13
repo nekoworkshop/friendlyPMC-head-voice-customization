@@ -14,14 +14,7 @@ import { Difficulty } from "@spt-aki/models/eft/common/tables/IBotType";
 import { MatchCallbacks } from "@spt-aki/callbacks/MatchCallbacks";
 import { LogTextColor } from "@spt-aki/models/spt/logging/LogTextColor";
 
-import { InraidController } from "@spt-aki/controllers/InraidController";
-import { SaveServer } from "@spt-aki/servers/SaveServer";
-
-import { ISaveProgressRequestData } from "@spt-aki/models/eft/inRaid/ISaveProgressRequestData";
-
-import { CustomLocationWaveService } from "@spt-aki/services/CustomLocationWaveService";
 import { ILocations } from "@spt-aki/models/spt/server/ILocations";
-import { ILocationBase } from "@spt-aki/models/eft/common/ILocationBase";
 
 import { openZonesMap } from "./AOZExports";
 
@@ -33,9 +26,6 @@ class friendlyPMC {
 
 	Logger: ILogger;
 	Bots: IBotConfig;
-	saveServer: SaveServer;
-
-	LocationWaveService: CustomLocationWaveService;
 
 	originalgetPmcDifficultySettings: BotDifficultyHelper["getPmcDifficultySettings"];
 	originalgetBotDifficulty: BotController["getBotDifficulty"];
@@ -44,8 +34,6 @@ class friendlyPMC {
 
 	preAkiLoad(container: DependencyContainer) {
 		this.Logger = container.resolve("WinstonLogger");
-		this.saveServer = container.resolve("SaveServer");
-		this.LocationWaveService = container.resolve("CustomLocationWaveService");
 
 		try {
 			this.config = Object.assign(this.config, require("../config.json"));
@@ -75,31 +63,6 @@ class friendlyPMC {
 					this.originalgetBotDifficulty = result.getBotDifficulty.bind(result);
 				}
 				result.getBotDifficulty = this.getBotDifficulty;
-			},
-			{ frequency: "Always" }
-		);
-
-		// reset UsecRaidRemainKills after each raid
-		let savePostRaidProgress;
-		let _this = this;
-		container.afterResolution(
-			"InraidController",
-			(_t, result: InraidController) => {
-				if (!savePostRaidProgress) {
-					savePostRaidProgress = result.savePostRaidProgress.bind(result);
-				}
-				result.savePostRaidProgress = (offraidData: ISaveProgressRequestData, sessionID: string) => {
-					const serverProfile = _this.saveServer.getProfile(sessionID);
-
-					const serverPmcProfile = serverProfile.characters.pmc;
-
-					const remainingCounter = serverPmcProfile?.Stats.Eft.OverallCounters.Items.find(x => x.Key.includes("UsecRaidRemainKills"));
-					if (remainingCounter) {
-						remainingCounter.Value = 0;
-					}
-
-					return savePostRaidProgress(offraidData, sessionID);
-				};
 			},
 			{ frequency: "Always" }
 		);
@@ -169,25 +132,6 @@ class friendlyPMC {
 			locations[altLocation].base.OpenZones = openZonesMap[altLocation].join(",");
 			this.Logger.info(`Opened ${locations[altLocation].base.OpenZones} for bots in ${locations[altLocation].base.Name} location`);
 		}
-
-		/* for (const id in locations) {
-			const loc: ILocations["bigmap"] = locations[id];
-			if (!loc.base || loc.base.Name == "Private Sector" || loc.base.Name == "Terminal" || loc.base.Name == "Town" || loc.base.Name == "Suburbs" || loc.base.Name == "Arena") continue;
-
-			loc.base.waves.push({
-				BotPreset: "hard",
-				BotSide: "Bear",
-				SpawnPoints: "CoopZone",
-				//@ts-ignore
-				WildSpawnType: "sptBear",
-				isPlayers: false,
-				number: loc.base.waves.length,
-				slots_max: 2,
-				slots_min: 2,
-				time_max: 10,
-				time_min: 5,
-			});
-		} */
 	}
 
 	private _makeFriendlyOrHostile(diff: Difficulty, pmcType: string) {
@@ -203,9 +147,6 @@ class friendlyPMC {
 
 		let is_hostile = this.config.sameSideHostile || false;
 
-		// some overwrites of POOP
-		diff.Core.DIST_NOT_TO_GROUP = 50;
-		diff.Core.DIST_NOT_TO_GROUP_SQR = diff.Core.DIST_NOT_TO_GROUP * diff.Core.DIST_NOT_TO_GROUP;
 		// force the friendly mind here as some mods may overwrite things
 		if (pmcType == "bear" || pmcType == "usec") {
 			Object.assign(diff.Mind, {
@@ -221,93 +162,45 @@ class friendlyPMC {
 				CAN_RECEIVE_PLAYER_REQUESTS_BEAR: !is_hostile,
 			});
 
+			const Core: { [key: string]: any } = {};
+			Core.MAX_COME_WITH_ME_REQUESTS_PER_PLAYER = 9999;
+			Core.MAX_BASE_REQUESTS_PER_PLAYER = 9999;
+			Core.MAX_HOLD_REQUESTS_PER_PLAYER = 9999;
+			Core.MAX_GO_TO_REQUESTS_PER_PLAYER = 9999;
+			Core.MAX_GET_IN_COVER_REQUESTS_PER_PLAYER = 9999;
+			Core.MAX_WAIT_REQUESTS_PER_PLAYER = 9999;
+			Core.START_ACTIVE_FOLLOW_PLAYER_EVENT = true;
+			Core.GESTUS_MAX_ANSWERS = 9999;
+			//Core.GESTUS_REQUEST_LIFETIME = 50;
+			Core.GESTUS_ANYWAY_CHANCE = 0;
+			Core.START_DIST_TO_COV = 20000.0;
+			Core.MAX_DIST_TO_COV = 20000.0;
+			Core.MAX_REQUESTS__PER_GROUP = 9999;
+			Core.MAX_REQUESTS_PER_GROUP = 9999;
+
+			Object.assign(diff.Core, Core);
+			Object.assign(diff.Mind, Core, {
+				MAX_START_AGGRESION_COEF: 9999,
+				MIN_START_AGGRESION_COEF: 9999,
+				FRIEND_AGR_KILL: 0.000001,
+				FRIEND_DEAD_AGR_LOW: -0.000001,
+			});
+
 			if (!is_hostile) {
 				// do these do anything?
-				const Core: { [key: string]: any } = {};
-				Core.MAX_COME_WITH_ME_REQUESTS_PER_PLAYER = 9999;
-				Core.MAX_BASE_REQUESTS_PER_PLAYER = 9999;
-				Core.MAX_HOLD_REQUESTS_PER_PLAYER = 9999;
-				Core.MAX_GO_TO_REQUESTS_PER_PLAYER = 9999;
-				Core.MAX_GET_IN_COVER_REQUESTS_PER_PLAYER = 9999;
-				Core.MAX_WAIT_REQUESTS_PER_PLAYER = 9999;
-				Core.START_ACTIVE_FOLLOW_PLAYER_EVENT = true;
-				Core.GESTUS_MAX_ANSWERS = 9999;
-				//Core.GESTUS_REQUEST_LIFETIME = 50;
-				Core.GESTUS_ANYWAY_CHANCE = 0;
-				Core.START_DIST_TO_COV = 20000.0;
-				Core.MAX_DIST_TO_COV = 20000.0;
-				Core.MAX_REQUESTS__PER_GROUP = 9999;
-				Core.MAX_REQUESTS_PER_GROUP = 9999;
-
-				Object.assign(diff.Core, Core);
-				Object.assign(diff.Mind, Core, {
-					MAX_START_AGGRESION_COEF: 9999,
-					MIN_START_AGGRESION_COEF: 9999,
-					FRIEND_AGR_KILL: 0.000001,
-					FRIEND_DEAD_AGR_LOW: -0.000001,
-				});
-				Object.assign(diff.Move, {
-					REACH_DIST: 0.5,
-					REACH_DIST_COVER: 2.5,
-					REACH_DIST_RUN: 0.5,
-				});
-				// friends can have grenades
-				/* if (pmcType == "bear") {
-					result.Core.CanGrenade = true;
-					result.Grenade.GrenadePrecision = 0.1;
-					result.Grenade.MAX_THROW_POWER = 18.7;
-				} */
-
-				// more stuff with no clue what it does, but they sound interesting
-				diff.Cover.CHECK_CLOSEST_FRIEND = true;
-				diff.Patrol.FRIEND_SEARCH_SEC = 60;
-				diff.Patrol.FOLLOWER_START_MOVE_DELAY = 0.5;
-				diff.Patrol.CAN_FRIENDLY_TILT = true;
-				diff.Patrol.PICKUP_ITEMS_TO_BACKPACK_OR_CONTAINER = true;
-				diff.Patrol.CAN_PEACEFUL_LOOK = true;
-				diff.Patrol.CHANCE_TO_PLAY_VOICE_WHEN_CLOSE = 70;
-				diff.Patrol.CHANCE_TO_PLAY_GESTURE_WHEN_CLOSE = 70;
 
 				if (pmcType == "bear") {
 					clearWrongEnemy(diff.Mind, "sptBear");
 					clearWrongEnemy(diff.Mind, "bear");
-					this.Logger.info(`friendlyPMC: Spawned a friendly bear bot`);
 				} else if (pmcType == "usec") {
 					clearWrongEnemy(diff.Mind, "sptUsec");
 					clearWrongEnemy(diff.Mind, "usec");
-					this.Logger.info(`friendlyPMC: Spawned a friendly usec bot`);
 				}
-			} else {
-				const change = {
-					START_DIST_TO_COV: 20000.0,
-					MAX_DIST_TO_COV: 20000.0,
-				};
-
-				Object.assign(diff.Core, change);
-				Object.assign(diff.Mind, change);
-
-				if (!is_hostile) {
-					clearWrongEnemy(diff.Mind, pmcType);
-				}
-
-				if (pmcType == "bear") this.Logger.logWithColor(`friendlyPMC: Spawned a hostile bear bot`, LogTextColor.BLUE);
-				else this.Logger.logWithColor(`friendlyPMC: Spawned a hostile usec bot`, LogTextColor.BLUE);
 			}
 			// ensure these settings are set last as they are not dependent of "is_hostile" flag
 			Object.assign(diff.Mind, {
 				ENEMY_BY_GROUPS_PMC_PLAYERS: is_hostile,
 				CAN_RECEIVE_PLAYER_REQUESTS_SAVAGE: false,
-				CHANCE_FUCK_YOU_ON_CONTACT_100: is_hostile ? diff.Mind.CHANCE_FUCK_YOU_ON_CONTACT_100 : 0,
-				CAN_TAKE_ANY_ITEM: true,
-				CAN_TAKE_ITEMS: true,
-				CAN_THROW_REQUESTS: true,
-				REVENGE_BOT_TYPES: [],
-				REVENGE_TO_GROUP: is_hostile,
-				TALK_WITH_QUERY: true,
-				MEDS_ONLY_SAFE_CONTAINER: false,
-				SURGE_KIT_ONLY_SAFE_CONTAINER: false,
-				CAN_USE_LONG_COVER_POINTS: true,
-				CAN_DROP_ITEMS: true,
 			});
 		}
 

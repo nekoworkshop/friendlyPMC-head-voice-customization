@@ -57,7 +57,7 @@ namespace friendlyPMC.Patches
             }
             catch (Exception ex)
             {
-                Components.Logger.LogInfo("Exception in PatchPostfix of SetInfo: " + ex.Message);
+                Components.Logger.LogInfo("Exception in PatchPostfix of BotEnemiesController.SetInfo: " + ex.Message);
             }
         }
 

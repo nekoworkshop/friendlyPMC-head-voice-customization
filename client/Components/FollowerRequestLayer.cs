@@ -161,7 +161,7 @@ namespace friendlyPMC.Components
                     IPlayer requester = botOwner_0.BotRequestController.CurRequest.Requester;
 
                     Vector3 dir = requester.LookDirection;
-                    float forwardDistance = GClass760.Random(2f, 3.5f);
+                    float forwardDistance = GClass760.Random(3f, 5f);
 
                     Vector3 forwardPosition = requester.Position + dir.normalized * forwardDistance;
                     float lateralOffset = GClass760.RandomSing() * GClass760.Random(0.5f, 1.5f);
