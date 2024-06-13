@@ -112,7 +112,7 @@ namespace friendlyPMC.Modules
 
                         follower.LootingBrain.ActiveCorpse = pl;
                         Vector3 lookPos = pl.Transform.position;
-                        lookPos.y = lookPos.y + 0.4f;
+                        lookPos.y = lookPos.y + 0.5f;
                         lookPos.Normalize();
                         follower.LootingBrain.LootObjectPosition = lookPos;
                         
