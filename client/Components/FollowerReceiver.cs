@@ -97,17 +97,37 @@ namespace friendlyPMC.Components
                     {
                         Player alivePlayerByProfileID = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(data.Player.ProfileId);
 
+                        (botOwner_0.Brain.BaseBrain as FollowerBrain).BossOrdersChanged();
+
+                        
                         if (botOwner_0.BotRequestController.TryStopCurrent(alivePlayerByProfileID, false))
                         {
-                            FollowerGoCheck gclass = new FollowerGoCheck(data.Player);
-
-                            if (botOwner_0.BotsGroup.RequestsController.TryAddRequest(gclass))
+                            // if has enemy, on "That direction" rush the enemy
+                            if (botOwner_0.Memory.HaveEnemy)
                             {
-                                
-                                (botOwner_0.Brain.BaseBrain as FollowerBrain).BossOrdersChanged();
 
-                                gclass.AddPossibleExecutors(botOwner_0);
-                                gclass.SetGroup(botOwner_0.BotsGroup.RequestsController);
+                                Vector3 enemyLastPosition = botOwner_0.Memory.LastEnemy.EnemyLastPosition;
+
+                                FollowerRushEnemy gclass = new FollowerRushEnemy(alivePlayerByProfileID, enemyLastPosition, null, null, BotRequestType.attackClose);
+
+                                if (botOwner_0.BotsGroup.RequestsController.TryAddRequest(gclass))
+                                {
+                                    gclass.AddPossibleExecutors(botOwner_0);
+                                    gclass.SetGroup(botOwner_0.BotsGroup.RequestsController);
+                                }
+
+                            }
+                            // else move somewhere in front of the player
+                            else
+                            {
+                                FollowerGoCheck gclass = new FollowerGoCheck(data.Player);
+
+                                if (botOwner_0.BotsGroup.RequestsController.TryAddRequest(gclass))
+                                {
+
+                                    gclass.AddPossibleExecutors(botOwner_0);
+                                    gclass.SetGroup(botOwner_0.BotsGroup.RequestsController);
+                                }
                             }
                         }
                     }
@@ -246,27 +266,41 @@ namespace friendlyPMC.Components
                         botOwner_0.Gesture.TryGestus(EGesture.Good, false);
                     }
                 }
-                // temporary  attack close
+                // move closer to enemy
                 else if (info.phrase == EPhraseTrigger.GoForward)
                 {
                     (botOwner_0.Brain.BaseBrain as FollowerBrain).BossOrdersChanged();
 
                     Vector3 enemyLastPosition = botOwner_0.Position;
-                    if (botOwner_0.Memory.HaveEnemy)
+                    Player alivePlayerByProfileID = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(requester.ProfileId);
+
+                    if (botOwner_0.BotRequestController.TryStopCurrent(alivePlayerByProfileID, false))
                     {
-
-                        enemyLastPosition = botOwner_0.Memory.LastEnemy.EnemyLastPosition;
-
-                        Player alivePlayerByProfileID = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(requester.ProfileId);
-
-                        FollowerRushEnemy gclass = new FollowerRushEnemy(alivePlayerByProfileID, enemyLastPosition, null, null, BotRequestType.attackClose);
-
-                        if (botOwner_0.BotsGroup.RequestsController.TryAddRequest(gclass))
+                        // if has enemy, on "go forward" move in closer to the enemy
+                        if (botOwner_0.Memory.HaveEnemy)
                         {
-                            gclass.AddPossibleExecutors(botOwner_0);
-                            gclass.SetGroup(botOwner_0.BotsGroup.RequestsController);
-                        }
+                            enemyLastPosition = botOwner_0.Memory.LastEnemy.EnemyLastPosition;
 
+                            FollowerRushEnemy gclass = new FollowerRushEnemy(alivePlayerByProfileID, enemyLastPosition, null, null, BotRequestType.goToPoint);
+
+                            if (botOwner_0.BotsGroup.RequestsController.TryAddRequest(gclass))
+                            {
+                                gclass.AddPossibleExecutors(botOwner_0);
+                                gclass.SetGroup(botOwner_0.BotsGroup.RequestsController);
+                            }
+
+                        }
+                        // else move somewhere in front of the player
+                        else
+                        {
+                            FollowerGoCheck gclass = new FollowerGoCheck(alivePlayerByProfileID);
+
+                            if (botOwner_0.BotsGroup.RequestsController.TryAddRequest(gclass))
+                            {
+                                gclass.AddPossibleExecutors(botOwner_0);
+                                gclass.SetGroup(botOwner_0.BotsGroup.RequestsController);
+                            }
+                        }
                     }
                 }
                 // hold position
@@ -336,8 +370,14 @@ namespace friendlyPMC.Components
                     }
                 }
                 // loot item
-                else if ((info.phrase == EPhraseTrigger.LootGeneric || info.phrase == EPhraseTrigger.LootWeapon) && !botOwner_0.Memory.HaveEnemy)
+                else if (info.phrase == EPhraseTrigger.LootGeneric || info.phrase == EPhraseTrigger.LootWeapon)
                 {
+                    if(!notBusy)
+                    {
+                        botOwner_0.BotTalk.TrySay(EPhraseTrigger.DontKnow, false);
+                        botOwner_0.Gesture.TryGestus(EGesture.Bad, false);
+                        return;
+                    }
 
                     LootItem  item = InteractableObjects.GetCurLootItem();
                     if (item != null)
@@ -373,8 +413,15 @@ namespace friendlyPMC.Components
                         }
                     }
                 }
-                else if((info.phrase == EPhraseTrigger.CheckHim || info.phrase == EPhraseTrigger.LootBody) && !botOwner_0.Memory.HaveEnemy)
+                else if(info.phrase == EPhraseTrigger.CheckHim || info.phrase == EPhraseTrigger.LootBody)
                 {
+                    if (!notBusy)
+                    {
+                        botOwner_0.BotTalk.TrySay(EPhraseTrigger.DontKnow, false);
+                        botOwner_0.Gesture.TryGestus(EGesture.Bad, false);
+                        return;
+                    }
+
                     Corpse item = InteractableObjects.GetCurCorpse();
                     if (item != null)
                     {

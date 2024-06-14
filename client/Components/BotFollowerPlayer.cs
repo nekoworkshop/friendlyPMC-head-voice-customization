@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.Reflection;
 
 using UnityEngine;
+using System.Security.Policy;
 
 
 namespace friendlyPMC.Components
@@ -50,15 +51,15 @@ namespace friendlyPMC.Components
             _bot = bot;
             _player = player;
 
-
             // deactivate old layers
             var baseBrain = _bot.Brain.BaseBrain;
             // guess work because we cannot access the private property dictionary_0 where the layers are, but no brain has 20 layers, usually it's 10
+
             for (int i = 1; i < 20; i++)
             {
                 try
                 {
-                    _bot.Brain.BaseBrain.method_3(i);
+                    baseBrain.method_3(i);
                 }
                 catch (Exception)
                 {
@@ -72,18 +73,19 @@ namespace friendlyPMC.Components
                 _bot.BotFollower.BossToFollow.RemoveFollower(_bot);
                 _bot.BotFollower.BossToFollow = null;
             }
-
             // deactivate old brain
-            if (_bot.Brain.BaseBrain.CurLayerInfo != null && _bot.Brain.BaseBrain.CurLayerInfo.IsActive)
+            if (baseBrain.CurLayerInfo != null && baseBrain.CurLayerInfo.IsActive)
             {
-                string name = _bot.Brain.BaseBrain.CurLayerInfo.Name();
+                string name = baseBrain.CurLayerInfo.Name();
                 _bot.Brain.Agent.Deactivate(name);
-                _bot.Brain.BaseBrain.CurLayerInfo.IsActive = false;
+                baseBrain.CurLayerInfo.IsActive = false;
             }
+
             _bot.Brain.Agent.Dispose();
-            _bot.Brain.BaseBrain.Dispose();
+            baseBrain.Dispose();
+
             _bot.BotsController.AICoreController.Stop();
-            
+;
             _bot.Receiver.Dispose();
 
             // add special follower settings
@@ -92,6 +94,7 @@ namespace friendlyPMC.Components
             // add a new receiver
             _bot.Receiver = GetFollowerReceiver(bot);
             _bot.Receiver.Init();
+
             try
             {          
                 // initialize LootingBots brain
@@ -110,14 +113,12 @@ namespace friendlyPMC.Components
             // add the new follower brain
             _bot.Brain.BaseBrain = GetFollowerBrain(_bot, _player);
             _bot.Brain.Agent = GetFollowerAIAgent(_bot);
-                
             _bot.BotsController.AICoreController.Activate();
 
             _bot.BotTalk.SetSilence(0f); // let the bot talk
-                
 
             // make bot follower of player
-            _player.AddFollower(_bot);
+            _player.AddFollower(_bot);;
             // force bot to turn off light
             _bot.BotLight.TurnOff(false, true);
             // activate new following patrol mode
@@ -183,7 +184,7 @@ namespace friendlyPMC.Components
                     _player.bossGroup.AnyBodyShootImmediately = true;
 
                 }
-                else
+                else if(_bot.BotsGroup.Id != _player.bossGroup.Id)
                 {
                     _bot.BotsGroup.RemoveAlly(_bot);
                     _player.bossGroup.AddMember(_bot, false);
@@ -221,8 +222,8 @@ namespace friendlyPMC.Components
             settings.FileSettings.Move.REACH_DIST_COVER = 2f;
             settings.FileSettings.Move.REACH_DIST_RUN = 1f;
 
-            settings.FileSettings.Mind.DIST_TO_STOP_RUN_ENEMY = 15f;
-            settings.FileSettings.Mind.TIME_TO_FORGOR_ABOUT_ENEMY_SEC = 15f;
+            settings.FileSettings.Mind.DIST_TO_STOP_RUN_ENEMY = 10f;
+            settings.FileSettings.Mind.TIME_TO_FORGOR_ABOUT_ENEMY_SEC = friendlyPMC.enemyRemember.Value;
             settings.FileSettings.Mind.TIME_TO_FIND_ENEMY = 6f;
 
             settings.FileSettings.Mind.CAN_TALK = true;
@@ -236,16 +237,56 @@ namespace friendlyPMC.Components
             settings.FileSettings.Mind.MEDS_ONLY_SAFE_CONTAINER = false;
             settings.FileSettings.Mind.SURGE_KIT_ONLY_SAFE_CONTAINER = false;
 
-            settings.FileSettings.Mind.ENEMY_BY_GROUPS_PMC_PLAYERS = false;
+            if (_player.realPlayer.Side != EPlayerSide.Savage)
+            {
+                settings.FileSettings.Mind.ENEMY_BY_GROUPS_PMC_PLAYERS = false;
+                settings.FileSettings.Mind.ENEMY_BY_GROUPS_SAVAGE_PLAYERS = true;
+            }
+            else
+            {
+                settings.FileSettings.Mind.ENEMY_BY_GROUPS_SAVAGE_PLAYERS = false;
+                settings.FileSettings.Mind.ENEMY_BY_GROUPS_PMC_PLAYERS = true;
+            }
+
             settings.FileSettings.Mind.CHANCE_FUCK_YOU_ON_CONTACT_100 = 0;
             settings.FileSettings.Mind.REVENGE_TO_GROUP = false;
 
-            settings.FileSettings.Mind.CAN_RECEIVE_PLAYER_REQUESTS_SAVAGE = _player.Player().Side == EPlayerSide.Savage;
-            settings.FileSettings.Mind.CAN_RECEIVE_PLAYER_REQUESTS_BEAR = _player.Player().Side == EPlayerSide.Bear;
-            settings.FileSettings.Mind.CAN_RECEIVE_PLAYER_REQUESTS_USEC = _player.Player().Side == EPlayerSide.Usec;
+            EPlayerSide playerSide = _player.Player().Side;
 
-            /*settings.FileSettings.Mind.REVENGE_BOT_TYPES = new WildSpawnType[] { };
-            settings.FileSettings.Mind.FRIENDLY_BOT_TYPES = new WildSpawnType[] { };*/
+            // force follower loyality
+            settings.FileSettings.Mind.CAN_RECEIVE_PLAYER_REQUESTS_SAVAGE = playerSide == EPlayerSide.Savage;
+            settings.FileSettings.Mind.CAN_RECEIVE_PLAYER_REQUESTS_BEAR = playerSide == EPlayerSide.Bear;
+            settings.FileSettings.Mind.CAN_RECEIVE_PLAYER_REQUESTS_USEC = playerSide == EPlayerSide.Usec;
+
+            settings.FileSettings.Mind.ENEMY_BY_GROUPS_PMC_PLAYERS = playerSide != EPlayerSide.Savage ? false : true;
+            settings.FileSettings.Mind.ENEMY_BY_GROUPS_SAVAGE_PLAYERS = playerSide == EPlayerSide.Savage ? false : true;
+            settings.FileSettings.Mind.REVENGE_FOR_SAVAGE_PLAYERS = false;
+
+            // opposing sides are always enemies
+            if (playerSide == EPlayerSide.Bear)
+            {
+                settings.FileSettings.Mind.DEFAULT_USEC_BEHAVIOUR = EWarnBehaviour.Attack;
+            }
+            else if (playerSide == EPlayerSide.Usec)
+            {
+                settings.FileSettings.Mind.DEFAULT_BEAR_BEHAVIOUR = EWarnBehaviour.Attack;
+            }
+
+            if (playerSide != EPlayerSide.Savage)
+            {
+                settings.FileSettings.Mind.DEFAULT_SAVAGE_BEHAVIOUR = EWarnBehaviour.Attack;
+            }
+            else
+            {
+                settings.FileSettings.Mind.DEFAULT_USEC_BEHAVIOUR = EWarnBehaviour.Attack;
+                settings.FileSettings.Mind.DEFAULT_BEAR_BEHAVIOUR = EWarnBehaviour.Attack;
+            }
+
+
+            // follower can turn enemy to anyone and cares about no one but the boss
+            settings.FileSettings.Mind.WARN_BOT_TYPES = new WildSpawnType[] { };
+            settings.FileSettings.Mind.REVENGE_BOT_TYPES = new WildSpawnType[] { };
+            settings.FileSettings.Mind.FRIENDLY_BOT_TYPES = new WildSpawnType[] { };
 
             settings.FileSettings.Patrol.PICKUP_ITEMS_TO_BACKPACK_OR_CONTAINER = true;
             settings.FileSettings.Patrol.CHANCE_TO_PLAY_VOICE_WHEN_CLOSE = 50;

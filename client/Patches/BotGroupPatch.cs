@@ -2,6 +2,7 @@
 using EFT;
 using friendlyPMC.Modules;
 using HarmonyLib;
+using JetBrains.Annotations;
 using System.Reflection;
 
 namespace friendlyPMC.Patches
@@ -37,7 +38,7 @@ namespace friendlyPMC.Patches
         [PatchPrefix]
         private static bool PatchPrefix(BotsGroup __instance, IPlayer person, EBotEnemyCause cause)
         {
-            if ((cause == EBotEnemyCause.AddEnemyToAllGroups || cause == EBotEnemyCause.AddEnemyToAllGroupsInBotZone) && BossPlayers.Instance.IsFollowerGroup(__instance.Id))
+            if (BossPlayers.Instance.IsFollowerGroup(__instance.Id) && BossPlayers.Instance.IsBoss(person.ProfileId))
             {
                 return false;
             }
@@ -45,4 +46,44 @@ namespace friendlyPMC.Patches
             return true;
         }
     }
+
+    internal class BotGroupCheckAndAddEnemy : ModulePatch
+    {
+        protected override MethodBase GetTargetMethod()
+        {
+            return AccessTools.Method(typeof(BotsGroup), "CheckAndAddEnemy");
+
+        }
+        [PatchPrefix]
+        private static bool PatchPrefix(BotsGroup __instance, IPlayer player, bool ignoreAI = false)
+        {
+            if (BossPlayers.Instance.IsFollowerGroup(__instance.Id) && BossPlayers.Instance.IsBoss(player.ProfileId))
+            {
+                return false;
+            }
+
+            return true;
+        }
+    }
+    internal class BotGroupReportAboutEnemyy : ModulePatch
+    {
+        protected override MethodBase GetTargetMethod()
+        {
+            return AccessTools.Method(typeof(BotsGroup), "ReportAboutEnemy");
+
+        }
+        [PatchPrefix]
+        private static bool PatchPrefix(BotsGroup __instance, [NotNull] IPlayer enemy, EEnemyPartVisibleType isVisibleOnlyBySence)
+        {
+            if (BossPlayers.Instance.IsFollowerGroup(__instance.Id) && enemy != null && BossPlayers.Instance.IsBoss(enemy.ProfileId))
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+
+    }
+
 }

@@ -1,2 +1,7 @@
 - 	night vision of the bots needs to be increased
--
+
+
+3.1.1 - changes:
+- That Direction moves nearby bots in front of the player or rush enemy
+- Go Forward moves followers in front of the player or closer to the enemy
+- added several parameters to experimenting with under settings

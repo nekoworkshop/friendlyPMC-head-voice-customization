@@ -21,7 +21,7 @@ namespace friendlyPMC.Patches
         {
 
             // if BOT is getting hit by a player BOSS of which it is a follower of, do not turn hostile
-            if (__instance.BotFollower.HaveBoss && BossPlayers.Instance.IsFollower(__instance) && damageInfo.Player != null)
+            if (__instance !=null && __instance.BotFollower != null && __instance.BotFollower.HaveBoss && BossPlayers.Instance.IsFollower(__instance) && damageInfo.Player != null)
             {
                 
                 AIBossPlayer player = BossPlayers.Instance.GetBossPlayer(damageInfo.Player.iPlayer.ProfileId);
@@ -32,6 +32,8 @@ namespace friendlyPMC.Patches
                     __instance.BotTalk.TrySay(EPhraseTrigger.FriendlyFire);
 
                     __instance.StandBy.GetHit();
+                    __instance.BotPersonalStats.GetHit(damageInfo, bodyType);
+                    __instance.Memory.GetHit(damageInfo);
 
                     return false;
                 }

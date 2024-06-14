@@ -22,6 +22,8 @@ namespace friendlyPMC.Components
         private List<CustomNavigationPoint> coverPoints;
 
         private Coroutine coverCoroutine;
+
+        private float maximumDistance = 100f;
         public pitAIBossPlayer(Player player) : base(player)
         {
             realPlayer = player;
@@ -29,6 +31,8 @@ namespace friendlyPMC.Components
             coverPoints = new List<CustomNavigationPoint>();
             
             player.HealthController.DiedEvent += OnDead;
+
+            maximumDistance = friendlyPMC.maximumRadius.Value;
 
             SetAreaCovers();
             coverCoroutine = player.StartCoroutine(UpdateCoversCoroutine());
@@ -50,7 +54,7 @@ namespace friendlyPMC.Components
             {
 
                 List<CustomNavigationPoint> covers = new List<CustomNavigationPoint>();
-                float radius = 100f;
+                float radius = maximumDistance;
                 float lastDist = 0f;
                 Vector3 centerPos = realPlayer.Transform.position;
 
@@ -219,7 +223,8 @@ namespace friendlyPMC.Components
                 {
                     if (_aiplayer.bossGroup != null)
                     {
-                        _aiplayer.bossGroup.CheckAndAddEnemy(arg1.Player.AIData.BotOwner);
+                        _aiplayer.bossGroup.CheckAndAddEnemy(arg1.Player.iPlayer);
+                        _aiplayer.bossGroup.ReportAboutEnemy(arg1.Player.iPlayer, EEnemyPartVisibleType.visible);
                         _aiplayer.AddEnemy(arg1.Player.AIData.BotOwner);
                     }
 

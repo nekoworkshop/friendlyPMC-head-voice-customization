@@ -165,7 +165,6 @@
     <Compile Include="Patches\BotOwnerPatch.cs" />
     <Compile Include="Patches\BotReceiverPatch.cs" />
     <Compile Include="Patches\BotsControllerPatch.cs" />
-    <Compile Include="Patches\BotSpawnerPatch.cs" />
     <Compile Include="Patches\PatrolDataFollowerPatch.cs" />
     <Compile Include="Patches\BotTalkPatch.cs" />
     <Compile Include="friendlyPlugin.cs" />

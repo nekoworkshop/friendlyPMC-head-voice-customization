@@ -41,8 +41,16 @@ namespace friendlyPMC.Patches
                     return;
                 }
 
-                // Check if botOwner_0 is a follower and if the sides match
-                if (BossPlayers.Instance.IsFollower(botOwner_0) && boss.Player().Side == botOwner_0.Side)
+                // Check if botOwner_0 is a follower
+                if (
+                    BossPlayers.Instance.IsFollower(botOwner_0) &&
+                    (
+                        // - was the same side boss player shooting the bot?
+                        (boss != null && boss.Player().Side == botOwner_0.Side) ||
+                        // - also prevent teammates from becoming enemies
+                        (enemy.IsAI && botOwner_0.BotsGroup.Contains(enemy.AIData.BotOwner))
+                    )
+                )
                 {
                     try
                     {
@@ -51,7 +59,7 @@ namespace friendlyPMC.Patches
                     }
                     catch (Exception _ex)
                     {
-                        Components.Logger.LogInfo("Removing boss player enemy failed: " + _ex.Message);
+                        Components.Logger.LogInfo("Removing teammate enemy failed: " + _ex.Message);
                     }
                 }
             }
