@@ -118,6 +118,20 @@ namespace friendlyPMC.Components
             {
                 // on follow me request from the boss, just come closer to the boss or get out of hold position
                 case BotRequestType.followMe:
+                    botOwner_0.BotTalk.TrySay(EPhraseTrigger.Going, false);
+                    request.Complete();
+
+                    Vector3 requestPos = botOwner_0.BotRequestController.CurRequest.Requester.Position;
+
+                    float offset = GClass760.RandomSing() * GClass760.Random(0.5f, 1.5f);
+                    Vector3 direction = Vector3.Cross(Vector3.up, requestPos).normalized;
+
+                    Vector3 finPos = requestPos + direction * offset;
+
+                    botOwner_0.GoToSomePointData.SetPoint(new Vector3(finPos.x, requestPos.y, finPos.z));
+                    botOwner_0.Steering.LookToPoint(finPos);
+                    return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.goToPoint, "req:comeHere");
+
                 // warn is actually regroup for us
                 case BotRequestType.warnPlayer:
                     botOwner_0.BotTalk.TrySay(EPhraseTrigger.Roger, false);
@@ -173,7 +187,7 @@ namespace friendlyPMC.Components
                     request.Complete();
 
                     botOwner_0.GoToSomePointData.SetPoint(new Vector3(finalPosition.x, requester.Position.y, finalPosition.z));
-
+                    botOwner_0.Steering.LookToPoint(finalPosition);
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.goToPoint, "req:goCheck");
 
                 case BotRequestType.suppressionFire:

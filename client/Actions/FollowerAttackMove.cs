@@ -11,6 +11,7 @@ namespace friendlyPMC.Actions
         {
         }
 
+
         public override void AimingAndShoot()
         {
             EnemyInfo goalEnemy = botOwner_0.Memory.GoalEnemy;
@@ -22,7 +23,7 @@ namespace friendlyPMC.Actions
 
             if (goalEnemy != null)
             {
-                botOwner_0.Steering.LookToDirection(botOwner_0.Memory.GoalEnemy.CurrPosition);
+                botOwner_0.Steering.LookToPoint(botOwner_0.Memory.GoalEnemy.CurrPosition);
             }
         }
     }
