@@ -94,19 +94,6 @@ namespace friendlyPMC.Components
 
                 return false;
             }
-            
-            if(
-                botOwner_0.BotRequestController.CurRequest != null && HasBoss() && GetBoss().Player().ProfileId == botOwner_0.BotRequestController.CurRequest.Requester.ProfileId && 
-                (
-                    botOwner_0.BotRequestController.CurRequest.BotRequestType == BotRequestType.warnPlayer ||
-                    botOwner_0.BotRequestController.CurRequest.BotRequestType == BotRequestType.attackClose ||
-                    botOwner_0.BotRequestController.CurRequest.BotRequestType == BotRequestType.goToPoint ||
-                    botOwner_0.BotRequestController.CurRequest.BotRequestType == BotRequestType.wait
-                )
-             )
-            {
-                return true;
-            }
 
             return true;
         }
@@ -125,7 +112,7 @@ namespace friendlyPMC.Components
         {
             EnemyInfo goalEnemy = this.botOwner_0.Memory.GoalEnemy;
             float bossDist = Vector3.Distance(botOwner_0.Position, GetBoss().Position);
-            return bossDist > Mathf.Min(30f,searchRadius) ||  (bossDist > Mathf.Min(15f,nearSearchRadius) && (goalEnemy == null || (goalEnemy.HaveSeen && Time.time - goalEnemy.PersonalLastSeenTime > 10f)));
+            return bossDist > friendlyPMC.maximumCoverDistance.Value ||  (bossDist > Mathf.Min(15f,nearSearchRadius) && (goalEnemy == null || (goalEnemy.HaveSeen && Time.time - goalEnemy.PersonalLastSeenTime > friendlyPMC.maximumCover.Value)));
         }
 
         private bool TimeToHeal()
@@ -497,7 +484,6 @@ namespace friendlyPMC.Components
 
             if(request != null && request.BotRequestType == BotRequestType.goToPoint)
             {
-                Components.Logger.LogInfo("Go TO POINT");
 
                 if(botOwner_0.Memory.HaveEnemy)
                 {
@@ -580,9 +566,10 @@ namespace friendlyPMC.Components
             }
 
 
+            if(request != null && request.BotRequestType == BotRequestType.throwGrenade)
+                return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.throwGrenadeFromPlace, "throwGrenadeRequest");
+
             return DecideTactic();
-
-
         }
 
         public override AICoreActionEndStruct EndHoldPosition()
@@ -620,6 +607,10 @@ namespace friendlyPMC.Components
                 }
                 return new AICoreActionEndStruct("betterCover", true);
             }
+
+
+            if (ShallGoNearBoss()) return new AICoreActionEndStruct("goNearBoss", true);
+
             if (base.method_6())
             {
                 return new AICoreActionEndStruct("EndHol", true);
@@ -638,7 +629,6 @@ namespace friendlyPMC.Components
                 return new AICoreActionEndStruct("bossHit", true);
             }
 
-            if(ShallGoNearBoss()) return new AICoreActionEndStruct("goNearBoss", true);
 
             GetCoverPoint(botOwner_0.GetPlayer.Transform.position, nearSearchRadius);
 

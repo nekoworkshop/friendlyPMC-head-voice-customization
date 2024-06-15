@@ -28,7 +28,7 @@ namespace friendlyPMC.Patches
             try
             {
                 // only players will have this null
-                if (__instance.AIBossPlayer != null)
+                if (__instance.AIBossPlayer != null && __instance.AIBossPlayer.Followers != null)
                 {
                     __instance.AIBossPlayer.Dispose();
                 }

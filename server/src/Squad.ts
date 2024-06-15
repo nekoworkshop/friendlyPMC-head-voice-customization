@@ -204,14 +204,6 @@ class friendlyPMC {
 			});
 		}
 
-		if (pmcType == "exusec" || pmcType == "rogue") {
-			Object.assign(diff.Mind, {
-				ENEMY_BY_GROUPS_PMC_PLAYERS: false,
-				REVENGE_BOT_TYPES: [],
-				DEFAULT_USEC_BEHAVIOUR: "Attack",
-			});
-		}
-
 		if (pmcType == "gifter") {
 			Object.assign(diff.Mind, {
 				ENEMY_BY_GROUPS_PMC_PLAYERS: false,

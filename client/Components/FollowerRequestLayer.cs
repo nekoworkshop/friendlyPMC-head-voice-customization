@@ -43,7 +43,6 @@ namespace friendlyPMC.Components
             {
                 BotRequestType.getInCover,
                 BotRequestType.hide,
-                BotRequestType.throwGrenade,
                 BotRequestType.suppressionFire
             };
 

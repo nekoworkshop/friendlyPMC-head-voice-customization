@@ -315,8 +315,7 @@ namespace friendlyPMC.Components
 
 
             settings.FileSettings.Look.CAN_USE_LIGHT = true;
-            settings.FileSettings.Look.FULL_SECTOR_VIEW = true;
-            settings.FileSettings.Look.MAX_DIST_CLAMP_TO_SEEN_SPEED = 500.0f;
+            settings.FileSettings.Look.FULL_SECTOR_VIEW = false; // seems this makes them too aware of everything around them
             settings.FileSettings.Look.NIGHT_VISION_ON = 75.0f;
             settings.FileSettings.Look.NIGHT_VISION_OFF = 125.0f;
             settings.FileSettings.Look.NIGHT_VISION_DIST = 125.0f;
