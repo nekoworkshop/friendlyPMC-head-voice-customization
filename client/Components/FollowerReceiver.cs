@@ -105,10 +105,7 @@ namespace friendlyPMC.Components
                             // if has enemy, on "That direction" rush the enemy
                             if (botOwner_0.Memory.HaveEnemy)
                             {
-
-                                Vector3 enemyLastPosition = botOwner_0.Memory.LastEnemy.EnemyLastPosition;
-
-                                FollowerRushEnemy gclass = new FollowerRushEnemy(alivePlayerByProfileID, enemyLastPosition, null, null, BotRequestType.attackClose);
+                                FollowerRushEnemy gclass = new FollowerRushEnemy(alivePlayerByProfileID,BotRequestType.attackClose);
 
                                 if (botOwner_0.BotsGroup.RequestsController.TryAddRequest(gclass))
                                 {
@@ -271,7 +268,6 @@ namespace friendlyPMC.Components
                 {
                     (botOwner_0.Brain.BaseBrain as FollowerBrain).BossOrdersChanged();
 
-                    Vector3 enemyLastPosition = botOwner_0.Position;
                     Player alivePlayerByProfileID = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(requester.ProfileId);
 
                     if (botOwner_0.BotRequestController.TryStopCurrent(alivePlayerByProfileID, false))
@@ -279,16 +275,13 @@ namespace friendlyPMC.Components
                         // if has enemy, on "go forward" move in closer to the enemy
                         if (botOwner_0.Memory.HaveEnemy)
                         {
-                            enemyLastPosition = botOwner_0.Memory.LastEnemy.EnemyLastPosition;
 
-                            FollowerRushEnemy gclass = new FollowerRushEnemy(alivePlayerByProfileID, enemyLastPosition, null, null, BotRequestType.goToPoint);
-
+                            FollowerRushEnemy gclass = new FollowerRushEnemy(alivePlayerByProfileID, BotRequestType.goToPoint);
                             if (botOwner_0.BotsGroup.RequestsController.TryAddRequest(gclass))
                             {
                                 gclass.AddPossibleExecutors(botOwner_0);
                                 gclass.SetGroup(botOwner_0.BotsGroup.RequestsController);
                             }
-
                         }
                         // else move somewhere in front of the player
                         else
@@ -339,6 +332,11 @@ namespace friendlyPMC.Components
                         botOwner_0.BotTalk.TrySay(EPhraseTrigger.Roger, false);
                         botOwner_0.Gesture.TryGestus(EGesture.Good, false);
                     }
+                }
+                // scan for enemies in front
+                else if(info.phrase == EPhraseTrigger.OnRepeatedContact)
+                {
+                    FollowerEnemyScan.ScanDirection(botOwner_0, info.PlayerRequester);
                 }
                 // open door request
                 else if (info.phrase == EPhraseTrigger.OpenDoor && !botOwner_0.Memory.HaveEnemy)

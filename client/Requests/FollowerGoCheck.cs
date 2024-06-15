@@ -5,7 +5,6 @@ namespace friendlyPMC.Actions
     {
         public FollowerGoCheck(IPlayer requester) : base(requester, BotRequestType.goToPoint)
         {
-            FollowerGoCheck _me = this;
         }
 
         public override bool CanProceed()

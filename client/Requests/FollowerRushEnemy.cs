@@ -8,13 +8,12 @@ using UnityEngine;
 
 namespace friendlyPMC.Requests
 {
-    internal class FollowerRushEnemy : GClass506
+    internal class FollowerRushEnemy : BotRequest
     {
-        public FollowerRushEnemy(Player requester, Vector3 pos, Action completeCallback, Action disposeCallback, BotRequestType request = BotRequestType.attackClose) : base(requester,pos,completeCallback,disposeCallback)
+        public FollowerRushEnemy(Player requester, BotRequestType request = BotRequestType.attackClose) : base(requester, request)
         {
-
         }
-        
+
         public override EBotRequestMode RequestMode
         {
             get
@@ -25,7 +24,13 @@ namespace friendlyPMC.Requests
 
         public override bool CanProceed()
         {
-            return Executor != null;
+            if (Executor == null) return false;
+            return true;
+        }
+
+        public override bool CanRequest(BotOwner requester)
+        {
+            return true;
         }
     }
 }

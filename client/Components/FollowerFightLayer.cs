@@ -393,6 +393,11 @@ namespace friendlyPMC.Components
                 request = null;
             }
 
+            if(request != null)
+            {
+                Logger.LogInfo("Fight Request is " + request.BotRequestType.ToString());
+            }
+
             if (request != null && request.BotRequestType == BotRequestType.wait)
             {
                 ordersAreHold = true;
@@ -567,6 +572,11 @@ namespace friendlyPMC.Components
 
         public override AICoreActionEndStruct EndHoldPosition()
         {
+            if(ordersChanged)
+            {
+                return new AICoreActionEndStruct("EndHol", true);
+            }
+
             AIBossPlayerLogic gclass363_0 = HasBoss() ? botOwner_0.BotFollower.BossToFollow.GetBossLogic() as AIBossPlayerLogic : null;
 
             string text;

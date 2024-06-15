@@ -184,7 +184,6 @@ namespace friendlyPMC.Components
                     Vector3 finalPosition = forwardPosition + lateralDirection * lateralOffset;
 
                     botOwner_0.BotTalk.TrySay(EPhraseTrigger.Going, false);
-                    request.Complete();
 
                     botOwner_0.GoToSomePointData.SetPoint(new Vector3(finalPosition.x, requester.Position.y, finalPosition.z));
                     botOwner_0.Steering.LookToPoint(finalPosition);
@@ -242,14 +241,23 @@ namespace friendlyPMC.Components
 
         public override AICoreActionEndStruct EndGoToPoint()
         {
+            BotRequest curRequest = this.botOwner_0.BotRequestController.CurRequest;
             EnemyInfo goalEnemy = botOwner_0.Memory.GoalEnemy;
-            if (goalEnemy != null && goalEnemy.IsVisible && goalEnemy.CanShoot)
+            if (goalEnemy != null)
             {
+                if(curRequest != null && curRequest.BotRequestType == BotRequestType.goToPoint)
+                {
+                    curRequest.Complete();
+                }
                 return new AICoreActionEndStruct("Enemy", true);
             }
 
-            if (botOwner_0.GoToSomePointData.IsCome())
+            if (botOwner_0.GoToSomePointData.IsCome() || botOwner_0.Mover.IsComeTo(0.5f,false))
             {
+                if (curRequest != null && curRequest.BotRequestType == BotRequestType.goToPoint)
+                {
+                    curRequest.Complete();
+                }
                 return new AICoreActionEndStruct("Come", true);
             }
 

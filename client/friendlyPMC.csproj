@@ -136,8 +136,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Actions\FollowerAttackMove.cs" />
+    <Compile Include="Actions\FollowerEnemyScan.cs" />
     <Compile Include="Actions\FollowerHoldPosition.cs" />
     <Compile Include="Modules\FollowerCreateNode.cs" />
+    <Compile Include="Patches\GestureMenuPatch.cs" />
     <Compile Include="Requests\FollowerGoCheck.cs" />
     <Compile Include="Requests\FollowerHold.cs" />
     <Compile Include="Actions\FollowerPatrol.cs" />

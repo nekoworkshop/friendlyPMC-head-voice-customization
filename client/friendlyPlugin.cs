@@ -82,16 +82,18 @@ namespace friendlyPMC
             new BotTalkTrySayPatch().Enable();
             new BotTalkSayPatch().Enable();
 
+            new BotsControllerPatch().Enable();
+
+            new LocalGamePatch().Enable();
+            new LocalGameCleanupPatch().Enable();
+
             new AIDataDisposePatch().Enable();
             new AIDataContructPatch().Enable();
             new AIDataBossPlayerPatch().Enable();
 
             new QuickPanelPatch().Enable();
-
-            new BotsControllerPatch().Enable();
-
-            new LocalGamePatch().Enable();
-            new LocalGameCleanupPatch().Enable();
+            new GestureMenuPatch().Enable();
+            new EPhraseTriggerPatch().Enable();
 
         }
 
