@@ -32,7 +32,8 @@ namespace friendlyPMC.Patches
                     bool flag3 = lootItem != null && (lootItem.ItemOwner.RootItem is Weapon || lootItem.ItemOwner.RootItem.GetItemComponent<KnifeComponent>() != null);
 
                     // modification here
-                    if(!flag && !flag2) InteractableObjects.SetCurLootItem(lootItem);
+                    if (lootItem != null && !flag && !flag2) InteractableObjects.SetCurLootItem(lootItem);
+                    else InteractableObjects.SetCurLootItem(null);
 
                     __instance.method_7(EPhraseTrigger.LootKey, flag);
                     __instance.method_7(EPhraseTrigger.LootMoney, flag2);
@@ -41,7 +42,13 @@ namespace friendlyPMC.Patches
 
                     // modification here
                     Corpse x = player.InteractableObject as Corpse;
-                    InteractableObjects.SetCurCorpse(x);
+                    if (x != null)
+                    {
+                        InteractableObjects.SetCurCorpse(x);
+                        InteractableObjects.SetCurLootItem(null);
+                    }
+                    else
+                        InteractableObjects.SetCurCorpse(null);
 
                     __instance.method_7(EPhraseTrigger.LootBody, x != null);
                     __instance.method_7(EPhraseTrigger.CheckHim, x != null);

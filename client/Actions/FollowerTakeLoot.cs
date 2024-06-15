@@ -96,7 +96,11 @@ namespace friendlyPMC.Actions
                 // start looting the body
                 if (_follower.LootingBrain.ActiveCorpse != null)
                 {
-                    botOwner_0.Steering.LookToPoint(_follower.LootingBrain.LootObjectPosition);
+                    Vector3 position = _follower.LootingBrain.LootObjectPosition;
+                    position.y += 0.5f;
+                    position.Normalize();
+
+                    botOwner_0.Steering.LookToPoint(position);
                     
                     var Timer = StaticManager.Instance.TimerManager.MakeTimer(TimeSpan.FromSeconds(10.0), false);
                     Timer.OnTimer += () =>

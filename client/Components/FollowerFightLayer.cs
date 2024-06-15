@@ -75,7 +75,26 @@ namespace friendlyPMC.Components
         }
         public override bool ShallUseNow()
         {
-            if(!botOwner_0.Memory.HaveEnemy) return false;
+            if (!botOwner_0.Memory.HaveEnemy)
+            {
+                if(ordersAreAttack || ordersAreHold)
+                {
+                    ordersAreAttack = false;
+                    ordersAreHold = false;
+
+                    if (
+                        botOwner_0.BotRequestController.CurRequest != null &&
+                        (botOwner_0.BotRequestController.CurRequest.BotRequestType == BotRequestType.goToPoint ||
+                        botOwner_0.BotRequestController.CurRequest.BotRequestType == BotRequestType.attackClose)
+                    )
+                    {
+                        botOwner_0.BotRequestController.CurRequest.Complete();
+                    }
+                }
+
+                return false;
+            }
+            
             if(
                 botOwner_0.BotRequestController.CurRequest != null && HasBoss() && GetBoss().Player().ProfileId == botOwner_0.BotRequestController.CurRequest.Requester.ProfileId && 
                 (
@@ -358,8 +377,7 @@ namespace friendlyPMC.Components
                 }
             }
 
-
-            if (ordersAreHold || holdTactic) return DefendPosition();
+            if ((ordersAreHold || holdTactic) && !ordersAreAttack) return DefendPosition();
             else if (ordersAreAttack || rushTactic) return EngageEnemy();
 
             // Check the distance to the enemy if we can rush him (exclude snipers since they cannot be reached)
@@ -391,11 +409,6 @@ namespace friendlyPMC.Components
             if (request != null && (botOwner_0.BotFollower.BossToFollow == null || request.Requester.ProfileId != botOwner_0.BotFollower.BossToFollow.Player().ProfileId))
             {
                 request = null;
-            }
-
-            if(request != null)
-            {
-                Logger.LogInfo("Fight Request is " + request.BotRequestType.ToString());
             }
 
             if (request != null && request.BotRequestType == BotRequestType.wait)
@@ -484,6 +497,8 @@ namespace friendlyPMC.Components
 
             if(request != null && request.BotRequestType == BotRequestType.goToPoint)
             {
+                Components.Logger.LogInfo("Go TO POINT");
+
                 if(botOwner_0.Memory.HaveEnemy)
                 {
                     Vector3 enemyPos = botOwner_0.Memory.GoalEnemy.CurrPosition;

@@ -137,6 +137,7 @@
   <ItemGroup>
     <Compile Include="Actions\FollowerAttackMove.cs" />
     <Compile Include="Actions\FollowerEnemyScan.cs" />
+    <Compile Include="Actions\FollowerGoToPoint.cs" />
     <Compile Include="Actions\FollowerHoldPosition.cs" />
     <Compile Include="Modules\FollowerCreateNode.cs" />
     <Compile Include="Patches\GestureMenuPatch.cs" />

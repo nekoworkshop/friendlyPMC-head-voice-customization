@@ -185,7 +185,7 @@ namespace friendlyPMC.Components
 
                     botOwner_0.BotTalk.TrySay(EPhraseTrigger.Going, false);
 
-                    botOwner_0.GoToSomePointData.SetPoint(new Vector3(finalPosition.x, requester.Position.y, finalPosition.z));
+                    botOwner_0.GoToSomePointData.SetPoint(finalPosition);
                     botOwner_0.Steering.LookToPoint(finalPosition);
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.goToPoint, "req:goCheck");
 

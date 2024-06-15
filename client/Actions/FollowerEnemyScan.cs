@@ -17,7 +17,7 @@ namespace friendlyPMC.Actions
             
             Components.Logger.LogInfo("Scan for Enemy");
 
-            RaycastHit[] hits = Physics.RaycastAll(player.Transform.position, direction, 110f, LayerMaskClass.PlayerMask);
+            RaycastHit[] hits = Physics.RaycastAll(player.Transform.position, direction, 150f, LayerMaskClass.PlayerMask);
 
             foreach (RaycastHit hit in hits)
             {

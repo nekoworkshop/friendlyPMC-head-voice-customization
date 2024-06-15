@@ -96,16 +96,14 @@ namespace friendlyPMC.Components
                     if (gestusDistance < maxGestusDistance)
                     {
                         Player alivePlayerByProfileID = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(data.Player.ProfileId);
-
-                        (botOwner_0.Brain.BaseBrain as FollowerBrain).BossOrdersChanged();
-
                         
                         if (botOwner_0.BotRequestController.TryStopCurrent(alivePlayerByProfileID, false))
                         {
+                            (botOwner_0.Brain.BaseBrain as FollowerBrain).BossOrdersChanged();
                             // if has enemy, on "That direction" rush the enemy
                             if (botOwner_0.Memory.HaveEnemy)
                             {
-                                FollowerRushEnemy gclass = new FollowerRushEnemy(alivePlayerByProfileID,BotRequestType.attackClose);
+                                FollowerRushEnemy gclass = new FollowerRushEnemy(botOwner_0, alivePlayerByProfileID,BotRequestType.attackClose);
 
                                 if (botOwner_0.BotsGroup.RequestsController.TryAddRequest(gclass))
                                 {
@@ -266,17 +264,16 @@ namespace friendlyPMC.Components
                 // move closer to enemy
                 else if (info.phrase == EPhraseTrigger.GoForward)
                 {
-                    (botOwner_0.Brain.BaseBrain as FollowerBrain).BossOrdersChanged();
-
                     Player alivePlayerByProfileID = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(requester.ProfileId);
 
                     if (botOwner_0.BotRequestController.TryStopCurrent(alivePlayerByProfileID, false))
                     {
+                        (botOwner_0.Brain.BaseBrain as FollowerBrain).BossOrdersChanged();
                         // if has enemy, on "go forward" move in closer to the enemy
                         if (botOwner_0.Memory.HaveEnemy)
                         {
 
-                            FollowerRushEnemy gclass = new FollowerRushEnemy(alivePlayerByProfileID, BotRequestType.goToPoint);
+                            FollowerRushEnemy gclass = new FollowerRushEnemy(botOwner_0, alivePlayerByProfileID, BotRequestType.goToPoint);
                             if (botOwner_0.BotsGroup.RequestsController.TryAddRequest(gclass))
                             {
                                 gclass.AddPossibleExecutors(botOwner_0);
@@ -372,8 +369,8 @@ namespace friendlyPMC.Components
                 {
                     if(!notBusy)
                     {
-                        botOwner_0.BotTalk.TrySay(EPhraseTrigger.DontKnow, false);
                         botOwner_0.Gesture.TryGestus(EGesture.Bad, false);
+                        botOwner_0.BotTalk.TrySay(EPhraseTrigger.Negative, false);
                         return;
                     }
 
@@ -382,18 +379,25 @@ namespace friendlyPMC.Components
                     {
                         float dist = Mathf.Infinity;
                         BotOwner closest = null;
-                        boss.Followers.ForEach(fl =>
+                        try
                         {
-                            Vector3 pos = fl.GetPlayer.Transform.position;
-                            float fldist = (item.transform.position - pos).sqrMagnitude;
-                            //fl.HealthController.
-                            if (fldist < dist)
+                            boss.Followers.ForEach(fl =>
                             {
-                                closest = fl;
-                                dist = fldist;
-                            }
+                                Vector3 pos = fl.GetPlayer.Transform.position;
+                                float fldist = (item.transform.position - pos).sqrMagnitude;
+                                //fl.HealthController.
+                                if (fldist < dist)
+                                {
+                                    closest = fl;
+                                    dist = fldist;
+                                }
 
-                        });
+                            });
+                        } catch (Exception e)
+                        { 
+                            closest = null;
+                        }
+
                         if (closest != null && closest.ProfileId == botOwner_0.ProfileId)
                         {
                             Player alivePlayerByProfileID = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(requester.ProfileId);

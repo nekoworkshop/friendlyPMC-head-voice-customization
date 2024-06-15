@@ -30,6 +30,9 @@ namespace friendlyPMC.Modules
 
             if(type == BotLogicDecision.holdPosition) 
                 return new FollowerHoldPosition(bot);
+            
+            if (type == BotLogicDecision.goToPoint)
+                return new FollowerGoToPoint(bot);
 
             return GClass460.CreateNode(type, bot);
         }
