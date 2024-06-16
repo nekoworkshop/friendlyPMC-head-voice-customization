@@ -252,7 +252,7 @@ namespace friendlyPMC.Components
             }
 
             settings.FileSettings.Mind.CHANCE_FUCK_YOU_ON_CONTACT_100 = 0;
-            settings.FileSettings.Mind.REVENGE_TO_GROUP = false;
+            settings.FileSettings.Mind.REVENGE_TO_GROUP = true;
 
             EPlayerSide playerSide = _player.Player().Side;
 
@@ -386,9 +386,11 @@ namespace friendlyPMC.Components
 
             try
             {
-                _bot.Brain.Agent.Dispose();
-                (_bot.Brain.BaseBrain as FollowerBrain).Dispose();
+
+                _bot.BotFollower.PatrolDataFollower.Dispose();
                 (_bot.Receiver as FollowerReceiver).Dispose();
+                
+                _bot.Brain.Dispose();
 
                 _bot.BotsController.AICoreController.Stop();
 
@@ -409,7 +411,7 @@ namespace friendlyPMC.Components
 
                 _bot.GetPlayer.Physical.Stamina.ForceMode = false;
                 _bot.GetPlayer.Physical.HandsStamina.ForceMode = false;
-                _bot.BotFollower.PatrolDataFollower.Dispose();
+
             } catch(Exception ex)
             {
                 Logger.LogInfo("Error on Dismiss for a follower: " +ex.Message);

@@ -140,6 +140,7 @@
     <Compile Include="Actions\FollowerGoToPoint.cs" />
     <Compile Include="Actions\FollowerHoldPosition.cs" />
     <Compile Include="Modules\FollowerCreateNode.cs" />
+    <Compile Include="Patches\BotMemoryPatch.cs" />
     <Compile Include="Patches\GestureMenuPatch.cs" />
     <Compile Include="Requests\FollowerGoCheck.cs" />
     <Compile Include="Requests\FollowerHold.cs" />
@@ -162,7 +163,6 @@
     <Compile Include="Modules\BossPlayers.cs" />
     <Compile Include="Modules\InteractableObjects.cs" />
     <Compile Include="Modules\Receivers.cs" />
-    <Compile Include="Patches\BotEnemiesControllerPatch.cs" />
     <Compile Include="Patches\BotGroupPatch.cs" />
     <Compile Include="Patches\BotGroupRequestPatch.cs" />
     <Compile Include="Patches\BotOwnerPatch.cs" />

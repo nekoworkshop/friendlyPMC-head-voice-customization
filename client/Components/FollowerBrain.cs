@@ -100,7 +100,7 @@ namespace friendlyPMC.Components
 
         public override void Dispose()
         {
-
+            Components.Logger.LogInfo("FollowerBrain Disposed");
             Dismissed();
             base.Dispose();
         }

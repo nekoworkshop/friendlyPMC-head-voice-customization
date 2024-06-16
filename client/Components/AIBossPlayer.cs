@@ -1,6 +1,7 @@
 ﻿using Comfort.Common;
 using EFT;
 using friendlyPMC.Modules;
+using HarmonyLib;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -27,6 +28,7 @@ namespace friendlyPMC.Components
         public pitAIBossPlayer(Player player) : base(player)
         {
             realPlayer = player;
+
             aBossLogic = new AIBossPlayerLogic(player, this);
             coverPoints = new List<CustomNavigationPoint>();
             
