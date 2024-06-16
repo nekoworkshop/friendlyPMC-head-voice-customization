@@ -180,8 +180,6 @@ class friendlyPMC {
 
 			Object.assign(diff.Core, Core);
 			Object.assign(diff.Mind, Core, {
-				MAX_START_AGGRESION_COEF: 9999,
-				MIN_START_AGGRESION_COEF: 9999,
 				FRIEND_AGR_KILL: 0.000001,
 				FRIEND_DEAD_AGR_LOW: -0.000001,
 			});
@@ -202,8 +200,12 @@ class friendlyPMC {
 				ENEMY_BY_GROUPS_PMC_PLAYERS: is_hostile,
 				CAN_RECEIVE_PLAYER_REQUESTS_SAVAGE: false,
 			});
+		} else if (pmcType == "assault") {
+			Object.assign(diff.Mind, {
+				FRIEND_AGR_KILL: 0.000001,
+				FRIEND_DEAD_AGR_LOW: -0.000001,
+			});
 		}
-
 		if (pmcType == "gifter") {
 			Object.assign(diff.Mind, {
 				ENEMY_BY_GROUPS_PMC_PLAYERS: false,

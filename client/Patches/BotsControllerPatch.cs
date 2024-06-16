@@ -135,9 +135,12 @@ namespace friendlyPMC.Patches
                     // prevent player from becoming group's enemy
                     bt.Settings.FileSettings.Mind.ENEMY_BY_GROUPS_PMC_PLAYERS = side != EPlayerSide.Savage ? false : true;
                     bt.Settings.FileSettings.Mind.ENEMY_BY_GROUPS_SAVAGE_PLAYERS = side == EPlayerSide.Savage ? false : true;
+
                     var old_use = bt.Settings.FileSettings.Mind.USE_ADD_TO_ENEMY_VALIDATION;
                     var old_reasons = bt.Settings.FileSettings.Mind.VALID_REASONS_TO_ADD_ENEMY;
 
+                    bt.Settings.FileSettings.Mind.USE_ADD_TO_ENEMY_VALIDATION = true;
+                    bt.Settings.FileSettings.Mind.VALID_REASONS_TO_ADD_ENEMY = new EBotEnemyCause[] { };
 
                     /*if (side != EPlayerSide.Savage)
                     {
@@ -177,7 +180,7 @@ namespace friendlyPMC.Patches
                         {
                             list.Add(item2);
                         }
-                        botsGroup = new BotsGroup(zn, botGame, bt, list, deadBodiesController, allPlayers, false);
+                        botsGroup = new BotsGroupPlayer(zn, botGame, bt, list, deadBodiesController, allPlayers, player);
                         if (_freeForAll)
                         {
                             spawnGroups.AddNoKey(botsGroup, zn);
@@ -189,8 +192,6 @@ namespace friendlyPMC.Patches
                         player.bossGroup = botsGroup;
                     }
 
-                    player.bossGroup.RemoveEnemy(player.Player()); // ensure player is not an enemy
-                    player.bossGroup.AddAlly(player.realPlayer);
                     BossPlayers.Instance.AddFollowerGroup(player.bossGroup.Id);
                     player.bossGroup.Lock();
 
@@ -226,6 +227,7 @@ namespace friendlyPMC.Patches
                 botSpawnerClass.method_10(owner, bot, new Action<BotOwner>((BotOwner follower)=>
                 {
                     Components.Logger.LogInfo("Follower " + follower.Profile.Nickname + " ready");
+
 
                     var Timer = StaticManager.Instance.TimerManager.MakeTimer(TimeSpan.FromSeconds(1.5), false);
 

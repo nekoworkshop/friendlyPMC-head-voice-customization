@@ -189,6 +189,9 @@ namespace friendlyPMC.Components
                     _bot.BotsGroup.RemoveAlly(_bot);
                     _player.bossGroup.AddMember(_bot, false);
                 }
+            } else if(_player.bossGroup != null)
+            {
+                _player.bossGroup.AddMember(_bot, false);
             }
 
 
@@ -257,10 +260,10 @@ namespace friendlyPMC.Components
             settings.FileSettings.Mind.CAN_RECEIVE_PLAYER_REQUESTS_SAVAGE = playerSide == EPlayerSide.Savage;
             settings.FileSettings.Mind.CAN_RECEIVE_PLAYER_REQUESTS_BEAR = playerSide == EPlayerSide.Bear;
             settings.FileSettings.Mind.CAN_RECEIVE_PLAYER_REQUESTS_USEC = playerSide == EPlayerSide.Usec;
-
-            settings.FileSettings.Mind.ENEMY_BY_GROUPS_PMC_PLAYERS = playerSide != EPlayerSide.Savage ? false : true;
-            settings.FileSettings.Mind.ENEMY_BY_GROUPS_SAVAGE_PLAYERS = playerSide == EPlayerSide.Savage ? false : true;
+            settings.FileSettings.Mind.FRIEND_AGR_KILL = 0.000001f;
+            settings.FileSettings.Mind.FRIEND_DEAD_AGR_LOW = -0.000001f;
             settings.FileSettings.Mind.REVENGE_FOR_SAVAGE_PLAYERS = false;
+            bot.Tactic.AggressionCoef = 0f;
 
             // opposing sides are always enemies
             if (playerSide == EPlayerSide.Bear)

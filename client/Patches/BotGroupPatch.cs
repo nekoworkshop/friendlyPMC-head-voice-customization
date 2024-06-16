@@ -1,8 +1,10 @@
 ﻿using Aki.Reflection.Patching;
 using EFT;
+using friendlyPMC.Components;
 using friendlyPMC.Modules;
 using HarmonyLib;
 using JetBrains.Annotations;
+using System.Collections.Generic;
 using System.Reflection;
 
 namespace friendlyPMC.Patches
@@ -82,8 +84,40 @@ namespace friendlyPMC.Patches
 
             return true;
         }
-
-
     }
 
+    internal class BotGroupIsPlayerEnemy : ModulePatch
+    {
+        protected override MethodBase GetTargetMethod()
+        {
+            return AccessTools.Method(typeof(BotsGroup), "IsPlayerEnemy");
+
+        }
+        [PatchPrefix]
+        private static bool PatchPrefix(BotsGroup __instance, ref bool __result, IPlayer player)
+        {
+            if(BossPlayers.Instance.IsBoss(player.ProfileId))
+            {
+                BotsGroup bossGroup = BossPlayers.Instance.GetBossPlayer(player.ProfileId).bossGroup;
+                if (bossGroup != null && __instance.Id == bossGroup.Id)
+                {
+                    __result = false;
+                    return false;
+                }
+            }
+
+            return true;
+        }
+    }
+
+    // this is used only in case of squad spawn
+    internal class BotsGroupPlayer : BotsGroup
+    {
+        public BotsGroupPlayer(BotZone zone, IBotGame botGame, BotOwner initialBot, List<BotOwner> enemies, DeadBodiesController deadBodiesController, List<Player> allPlayers, pitAIBossPlayer player) : base(zone, botGame, initialBot, enemies, deadBodiesController, allPlayers, false)
+        {
+            RemoveEnemy(player.Player());
+            AddAlly(player.realPlayer);
+            Side = player.realPlayer.Side;
+        }
+    }
 }

@@ -333,7 +333,7 @@ namespace friendlyPMC.Components
                 // scan for enemies in front
                 else if(info.phrase == EPhraseTrigger.OnRepeatedContact)
                 {
-                    FollowerEnemyScan.ScanDirection(botOwner_0, info.PlayerRequester);
+                    FollowerEnemyScan.ScanDirection(botOwner_0, info.PlayerRequester, boss.realPlayer);
                 }
                 // open door request
                 else if (info.phrase == EPhraseTrigger.OpenDoor && !botOwner_0.Memory.HaveEnemy)

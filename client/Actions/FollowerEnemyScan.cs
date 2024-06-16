@@ -1,5 +1,6 @@
 ﻿using EFT;
 using LootingBots.Patch.Util;
+using RootMotion.FinalIK;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +13,15 @@ namespace friendlyPMC.Actions
 {
     internal class FollowerEnemyScan
     {
-        public static void ScanDirection(BotOwner bot, IPlayer player)
+        public static bool CheckLook(Player from, Player to, BodyPartType botType = BodyPartType.head)
+        {
+            EnemyPart enemyPart = from.MainParts[botType];
+            Vector3 direction = to.MainParts[BodyPartType.head].Position - enemyPart.Position;
+            float magnitude = direction.magnitude;
+            RaycastHit raycastHit;
+            return Physics.Raycast(new Ray(enemyPart.Position, direction), out raycastHit, magnitude, LayerMaskClass.HighPolyWithTerrainMask);
+        }
+        public static void ScanDirection(BotOwner bot, IPlayer player, Player realPlayer)
         {
             Components.Logger.LogInfo("Scan for Enemies");
 
@@ -53,8 +62,8 @@ namespace friendlyPMC.Actions
             Player closet = null;
             foreach (var item in enemies)
             {
-                float edist = Vector3.Distance(player.Transform.position, item.Position);
-                if (edist < dist)
+                float edist = Vector3.Distance(playerPosition, item.Position);
+                if (edist < dist && (CheckLook(item, realPlayer) || CheckLook(item, realPlayer, BodyPartType.body)))
                 {
                     dist = edist;
                     closet = item;
@@ -63,33 +72,24 @@ namespace friendlyPMC.Actions
 
             if ( closet != null )
             {
-                bot.BotsGroup.AddEnemy(closet.AIData.Player, EBotEnemyCause.addBotAtGroup);
-                
-                if (bot.Memory.HaveEnemy) return;
-
-                Components.Logger.LogInfo("Add closest enemy to the group");
-                Vector3 direction = closet.Position - playerPosition;
-                float distance = direction.magnitude;
-                RaycastHit hit;
-
-                if(Physics.Raycast(player.PlayerBones.Head.position, direction,out hit, distance, LayerMaskClass.HighPolyWithTerrainMask)) {
-                    if(hit.collider != null)
-                    {
-                        var aiHit = bot.ShootData.method_4(hit.collider);
-                        if (aiHit != null && aiHit.ProfileId == closet.ProfileId)
-                        {
-                            EnemyInfo info;
-                            bot.EnemiesController.EnemyInfos.TryGetValue(aiHit.AIData.Player, out info);
-                            if(info != null)
-                            {
-                                Components.Logger.LogInfo("Make closest enemy a priority");
-                                //info.SetVisible(true);
-                                bot.Memory.GoalEnemy = info;
-                            }
-                        }
-                    }
+                if(bot.Memory.HaveEnemy)
+                {
+                    Components.Logger.LogInfo("Already engaged, add player's closest visible enemy to the group");
+                    bot.BotsGroup.AddEnemy(closet.AIData.Player, EBotEnemyCause.addBotAtGroup);
+                    return;
                 }
-                
+
+                Components.Logger.LogInfo("Try make player's closest visible enemy the priority");
+
+                bot.BotsGroup.AddEnemy(closet.AIData.Player, EBotEnemyCause.addBotAtGroup);
+
+                EnemyInfo info;
+                bot.EnemiesController.EnemyInfos.TryGetValue(closet, out info);
+                if (info != null)
+                {
+                    Components.Logger.LogInfo("Made closest enemy a priority");
+                    bot.Memory.GoalEnemy = info;
+                }
             }
         }
     }
