@@ -6,6 +6,7 @@ using HarmonyLib;
 using JetBrains.Annotations;
 using System.Collections.Generic;
 using System.Reflection;
+using UnityEngine;
 
 namespace friendlyPMC.Patches
 {
@@ -42,6 +43,12 @@ namespace friendlyPMC.Patches
         {
             if (BossPlayers.Instance.IsFollowerGroup(__instance.Id) && BossPlayers.Instance.IsBoss(person.ProfileId))
             {
+                BotsGroup bossGroup = BossPlayers.Instance.GetBossPlayer(person.ProfileId).bossGroup;
+                if (bossGroup != null && __instance.Id == bossGroup.Id)
+                {
+                    return false;
+                }
+
                 return false;
             }
 
@@ -61,6 +68,12 @@ namespace friendlyPMC.Patches
         {
             if (BossPlayers.Instance.IsFollowerGroup(__instance.Id) && BossPlayers.Instance.IsBoss(player.ProfileId))
             {
+                BotsGroup bossGroup = BossPlayers.Instance.GetBossPlayer(player.ProfileId).bossGroup;
+                if (bossGroup != null && __instance.Id == bossGroup.Id)
+                {
+                    return false;
+                }
+
                 return false;
             }
 
@@ -79,6 +92,12 @@ namespace friendlyPMC.Patches
         {
             if (BossPlayers.Instance.IsFollowerGroup(__instance.Id) && enemy != null && BossPlayers.Instance.IsBoss(enemy.ProfileId))
             {
+                BotsGroup bossGroup = BossPlayers.Instance.GetBossPlayer(enemy.ProfileId).bossGroup;
+                if (bossGroup != null && __instance.Id == bossGroup.Id)
+                {
+                    return false;
+                }
+
                 return false;
             }
 
@@ -96,7 +115,7 @@ namespace friendlyPMC.Patches
         [PatchPrefix]
         private static bool PatchPrefix(BotsGroup __instance, ref bool __result, IPlayer player)
         {
-            if(BossPlayers.Instance.IsBoss(player.ProfileId))
+            if (BossPlayers.Instance.IsBoss(player.ProfileId))
             {
                 BotsGroup bossGroup = BossPlayers.Instance.GetBossPlayer(player.ProfileId).bossGroup;
                 if (bossGroup != null && __instance.Id == bossGroup.Id)
