@@ -17,8 +17,7 @@ using UnityEngine;
 using BotCacheClass = GClass591;
 using IProfileData = GClass592;
 using Comfort.Common;
-using System.Data;
-using static EFT.SpeedTree.TreeWind;
+
 
 namespace friendlyPMC.Patches
 {
@@ -141,32 +140,6 @@ namespace friendlyPMC.Patches
 
                     bt.Settings.FileSettings.Mind.USE_ADD_TO_ENEMY_VALIDATION = true;
                     bt.Settings.FileSettings.Mind.VALID_REASONS_TO_ADD_ENEMY = new EBotEnemyCause[] { };
-
-                    /*if (side != EPlayerSide.Savage)
-                    {
-                        bt.Settings.FileSettings.Mind.USE_ADD_TO_ENEMY_VALIDATION = true;
-                        bt.Settings.FileSettings.Mind.VALID_REASONS_TO_ADD_ENEMY = new EBotEnemyCause[] { };
-
-                        bt.Settings.FileSettings.Mind.ENEMY_BOT_TYPES = new WildSpawnType[] { };
-                        foreach (WildSpawnType botType in Enum.GetValues(typeof(WildSpawnType)))
-                        {
-                            if (side == EPlayerSide.Bear && botType == sptBear) continue;
-                            else if (side == EPlayerSide.Usec && botType == sptUsec) continue;
-
-                            if (type == sptBear && (botType != sptBear || bt.Settings.FileSettings.Mind.DEFAULT_BEAR_BEHAVIOUR == EWarnBehaviour.Attack))
-                            {
-                                bt.Settings.FileSettings.Mind.ENEMY_BOT_TYPES.AddItem(botType);
-                            }
-                            else if (type == sptUsec && (botType != sptUsec || bt.Settings.FileSettings.Mind.DEFAULT_USEC_BEHAVIOUR == EWarnBehaviour.Attack))
-                            {
-                                bt.Settings.FileSettings.Mind.ENEMY_BOT_TYPES.AddItem(botType);
-                            } else
-                            {
-                                bt.Settings.FileSettings.Mind.ENEMY_BOT_TYPES.AddItem(botType);
-                            }
-                        }
-                    }*/
-
 
                     var _freeForAll = (bool)AccessTools.Field(typeof(BotSpawner), "_freeForAll").GetValue(botSpawnerClass);
 

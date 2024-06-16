@@ -225,7 +225,7 @@ namespace friendlyPMC.Components
             settings.FileSettings.Move.REACH_DIST_COVER = 2f;
             settings.FileSettings.Move.REACH_DIST_RUN = 1f;
 
-            settings.FileSettings.Mind.DIST_TO_STOP_RUN_ENEMY = 10f;
+            settings.FileSettings.Mind.DIST_TO_STOP_RUN_ENEMY = 15f;
             settings.FileSettings.Mind.TIME_TO_FORGOR_ABOUT_ENEMY_SEC = friendlyPMC.enemyRemember.Value;
             settings.FileSettings.Mind.TIME_TO_FIND_ENEMY = 6f;
 
