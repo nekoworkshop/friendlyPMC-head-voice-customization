@@ -20,16 +20,16 @@ namespace friendlyPMC.Components
 {
     internal class BotFollowerPlayer
     {
-        private BotOwner _bot;
-        private pitAIBossPlayer _player;
+        protected BotOwner _bot;
+        protected pitAIBossPlayer _player;
 
-        private BotDifficultySettingsClass _OldSettings;
+        protected BotDifficultySettingsClass _OldSettings;
 
-        private LootingBrain _lootingBrain;
+        protected LootingBrain _lootingBrain;
 
-        private TransactionController _transactionController;
+        protected TransactionController _transactionController;
 
-        private LootFinder _lootFinder;
+        protected LootFinder _lootFinder;
 
         public LootingBrain LootingBrain
         {
@@ -199,12 +199,12 @@ namespace friendlyPMC.Components
         }
 
         /** Exposed so that it can be patched by addons **/
-        public FollowerBrain GetFollowerBrain(BotOwner bot, pitAIBossPlayer boss)
+        public virtual FollowerBrain GetFollowerBrain(BotOwner bot, pitAIBossPlayer boss)
         {
             return new FollowerBrain(bot, boss);
         }
         /** Exposed so that it can be patched by addons **/
-        public AICoreAgentClass<BotLogicDecision> GetFollowerAIAgent(BotOwner bot)
+        public virtual AICoreAgentClass<BotLogicDecision> GetFollowerAIAgent(BotOwner bot)
         {
             string name = bot.name + " " + bot.Profile.Info.Settings.Role.ToString();
 
@@ -215,7 +215,7 @@ namespace friendlyPMC.Components
         }
 
         /** Exposed so that it can be patched by addons **/
-        public void SetlFollowerSettings(BotOwner bot)
+        public virtual void SetlFollowerSettings(BotOwner bot)
         {
             _OldSettings = _bot.Settings;
             // increase bot's power

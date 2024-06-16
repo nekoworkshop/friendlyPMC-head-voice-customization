@@ -101,7 +101,7 @@ namespace friendlyPMC.Patches
             BotSpawnParams @params = new BotSpawnParams();
             @params.ShallBeGroup = new ShallBeGroupParams(true, false, memberCount);
 
-            IProfileData botData = new IProfileData(side, type, BotDifficulty.hard, 0f, @params);
+            IProfileData botData = new IProfileData(side, WildSpawnType.bossKnight, BotDifficulty.hard, 0f, @params);
 
             BotCacheClass bot = await BotCacheClass.Create(botData, botCreator, memberCount, botSpawnerClass);
 
@@ -201,12 +201,14 @@ namespace friendlyPMC.Patches
                 {
                     Components.Logger.LogInfo("Follower " + follower.Profile.Nickname + " ready");
 
+                    follower.Memory.DeleteInfoAboutEnemy(player.Player()); // prevent attack of player on spawn
+
 
                     var Timer = StaticManager.Instance.TimerManager.MakeTimer(TimeSpan.FromSeconds(1.5), false);
 
                     Timer.OnTimer += () =>
                     {
-                        BossPlayers.Instance.AddFollower(follower, player);
+                        BossPlayers.Instance.AddFollower(follower, player,true);
                         follower.BotTalk.TrySay(EPhraseTrigger.Ready,false);
                     };
 

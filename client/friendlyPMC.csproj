@@ -139,6 +139,7 @@
     <Compile Include="Actions\FollowerEnemyScan.cs" />
     <Compile Include="Actions\FollowerGoToPoint.cs" />
     <Compile Include="Actions\FollowerHoldPosition.cs" />
+    <Compile Include="Components\BossFollowerPlayer.cs" />
     <Compile Include="Modules\FollowerCreateNode.cs" />
     <Compile Include="Patches\GestureMenuPatch.cs" />
     <Compile Include="Requests\FollowerGoCheck.cs" />
