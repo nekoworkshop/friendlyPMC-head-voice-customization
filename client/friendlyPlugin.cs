@@ -78,6 +78,8 @@ namespace friendlyPMC
             new BotMemoryAddEnemyPatch().Enable();
 
             new BotOwnerIsFolowerPatch().Enable();
+            new BotOwnerManualUpdatePatch().Enable();
+
             new PatrolDataFollowerPatch().Enable();
 
             new FollowRequestPatch().Enable();

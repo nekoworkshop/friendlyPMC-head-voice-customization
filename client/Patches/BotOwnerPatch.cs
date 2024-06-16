@@ -3,6 +3,8 @@ using EFT;
 
 using friendlyPMC.Modules;
 using HarmonyLib;
+using System;
+using System.Collections.Generic;
 using System.Reflection;
 
 namespace friendlyPMC.Patches
@@ -43,7 +45,7 @@ namespace friendlyPMC.Patches
         }
     }
 
-    public class BotOwnerIsFolowerPatch : ModulePatch
+    internal class BotOwnerIsFolowerPatch : ModulePatch
     {
         protected override MethodBase GetTargetMethod()
         {
@@ -59,6 +61,25 @@ namespace friendlyPMC.Patches
                 return false;
             }
             return true;
+        }
+    }
+
+    internal class BotOwnerManualUpdatePatch : ModulePatch {
+
+        public static Dictionary<string, Action<BotOwner>> BotOwnerUpdate = new Dictionary<string, Action<BotOwner>>();
+        protected override MethodBase GetTargetMethod()
+        {
+            return AccessTools.Method(typeof(BotOwner), "UpdateManual");
+        }
+        [PatchPostfix]
+        private static void PatchPostfix(BotOwner __instance)
+        {
+            if(__instance.BotState == EBotState.Active && __instance.GetPlayer.HealthController.IsAlive)
+            {
+                Action<BotOwner> OnUpdate;
+                BotOwnerUpdate.TryGetValue(__instance.ProfileId, out OnUpdate);
+                if (OnUpdate != null) OnUpdate(__instance);
+            }
         }
     }
 }

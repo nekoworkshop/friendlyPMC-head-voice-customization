@@ -218,34 +218,38 @@ namespace friendlyPMC.Patches
 
                 stopWatch.Start();
 
+                Action<BotOwner> OnBotState = new Action<BotOwner>((BotOwner me) =>
+                {
+                    me.Memory.DeleteInfoAboutEnemy(player.Player()); // prevent attack of player on spawn
+                    BossPlayers.Instance.AddFollower(me, player); // make bot a follower
+                    BotOwnerManualUpdatePatch.BotOwnerUpdate.Remove(me.ProfileId); // clear watcher
+                });
+
+                BotOwnerManualUpdatePatch.BotOwnerUpdate.Add(owner.ProfileId, OnBotState);
+
+
                 botSpawnerClass.method_10(owner, bot, new Action<BotOwner>((BotOwner follower)=>
                 {
                     Components.Logger.LogInfo("Follower " + follower.Profile.Nickname + " ready");
 
                     spawnedFollowers++;
-                    
-                    follower.Memory.DeleteInfoAboutEnemy(player.Player()); // prevent attack of player on spawn
-
-                    var Timer = StaticManager.Instance.TimerManager.MakeTimer(TimeSpan.FromSeconds(1), false);
-
-                    Timer.OnTimer += () =>
-                    {
-                        BossPlayers.Instance.AddFollower(follower, player);
-                        follower.BotTalk.TrySay(EPhraseTrigger.Ready,false);
-                    };
-
-                    if(spawnedFollowers >= memberCount)
+                    if (spawnedFollowers >= memberCount)
                     {
                         token.Cancel();
                     }
+
+                    var Timer = StaticManager.Instance.TimerManager.MakeTimer(TimeSpan.FromSeconds(2), false);
+
+                    Timer.OnTimer += () =>
+                    {
+                        follower.BotTalk.TrySay(EPhraseTrigger.Ready, false);
+                    };
 
                 }) , shallBeGroup, stopWatch );
 
             }), token.GetCancelToken());
 
         }
-
-
 
         protected override MethodBase GetTargetMethod()
         {
@@ -289,18 +293,13 @@ namespace friendlyPMC.Patches
             spawnRan = true;
 
             if (friendlyPMC.squadSpawn.Value)
-            { 
+            {
 
-                var Timer = StaticManager.Instance.TimerManager.MakeTimer(TimeSpan.FromSeconds(1), false);
-
-                Timer.OnTimer += () =>
+                BotsControllerPatch.spawnedPlayers.ForEach(playerBoss =>
                 {
-                    BotsControllerPatch.spawnedPlayers.ForEach(playerBoss =>
-                    {
 
-                        if (BotsControllerPatch.Controller != null) BotsControllerPatch.Instance.SpawnGroupBots(playerBoss).Forget();
-                    });
-                };
+                    if (BotsControllerPatch.Controller != null) BotsControllerPatch.Instance.SpawnGroupBots(playerBoss).Forget();
+                });
             }
         }
 
@@ -345,7 +344,10 @@ namespace friendlyPMC.Patches
 
             BotsControllerPatch.spawnedPlayers.Clear();
             BotsControllerPatch.Controller = null;
+
             WavesSpawnScenarioRunPatch.spawnRan = false;
+
+            BotOwnerManualUpdatePatch.BotOwnerUpdate.Clear();
 
             Components.Logger.LogInfo("Raid Ended");
 
