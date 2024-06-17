@@ -221,8 +221,15 @@ namespace friendlyPMC.Patches
                 Action<BotOwner> OnBotState = new Action<BotOwner>((BotOwner me) =>
                 {
                     me.Memory.DeleteInfoAboutEnemy(player.Player()); // prevent attack of player on spawn
+
                     BossPlayers.Instance.AddFollower(me, player); // make bot a follower
+
                     BotOwnerManualUpdatePatch.BotOwnerUpdate.Remove(me.ProfileId); // clear watcher
+
+                    if (side == EPlayerSide.Savage)
+                    {
+                        (me.Brain.BaseBrain as FollowerBrain).SetBossTactic("ally");
+                    }
                 });
 
                 BotOwnerManualUpdatePatch.BotOwnerUpdate.Add(owner.ProfileId, OnBotState);

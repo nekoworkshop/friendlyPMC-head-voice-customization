@@ -8,7 +8,7 @@ using Logger = friendlyPMC.Components.Logger;
 
 namespace friendlyPMC
 {
-    [BepInPlugin("xyz.pit.companion", "friendlyPMC", "3.1.3")]
+    [BepInPlugin("xyz.pit.companion", "friendlyPMC", "3.1.4")]
     [BepInDependency("com.spt-aki.core", "3.8.0")]
     [BepInDependency("xyz.drakia.bigbrain")]
     [BepInDependency("xyz.drakia.waypoints")]
