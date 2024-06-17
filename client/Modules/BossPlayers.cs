@@ -211,7 +211,8 @@ namespace friendlyPMC.Modules
                     break;
                 }
             }
-            if (isAIBoss)
+
+            if (!isAIBoss)
                 _follower = new BotFollowerPlayer(bot, player);
             else
                 _follower = new BossFollowerPlayer(bot, player);
