@@ -135,11 +135,19 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Components\BossFollower\KnightAssaultBuildingLayer.cs" />
+    <Compile Include="Components\BossFollower\KnightAssaultFightLayer.cs" />
+    <Compile Include="Components\BossFollower\KnightAvoidDangerLayer.cs" />
+    <Compile Include="Components\BossFollower\KnightEnemyBuildingLayer.cs" />
+    <Compile Include="Components\BossFollower\KnightFightLayer.cs" />
+    <Compile Include="Components\BossFollower\KnightWeaponMtnLayer.cs" />
     <Compile Include="Actions\FollowerAttackMove.cs" />
     <Compile Include="Actions\FollowerEnemyScan.cs" />
     <Compile Include="Actions\FollowerGoToPoint.cs" />
     <Compile Include="Actions\FollowerHoldPosition.cs" />
     <Compile Include="Components\BossFollowerPlayer.cs" />
+    <Compile Include="Components\BossFollower\BossFollowLayer.cs" />
+    <Compile Include="Components\BossFollower\KnightFollowerBrain.cs" />
     <Compile Include="Modules\FollowerCreateNode.cs" />
     <Compile Include="Patches\BotMemoryPatch.cs" />
     <Compile Include="Patches\GestureMenuPatch.cs" />
@@ -176,6 +184,8 @@
     <Compile Include="Patches\QuickPanelPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Actions\BossFollower\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

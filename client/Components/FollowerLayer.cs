@@ -9,11 +9,11 @@ namespace friendlyPMC.Components
     // GClass103 is a generic follower layer
     internal class FollowerLayer : GClass103
     {
-        private float float_2;
+        protected float float_2;
 
-        private CustomNavigationPoint customNavigationPoint_0;
+        protected CustomNavigationPoint customNavigationPoint_0;
 
-        private float heal_time = 0f;
+        protected float heal_time = 0f;
 
         public FollowerLayer(BotOwner bot, int priority) : base(bot, priority)
         {
@@ -24,12 +24,12 @@ namespace friendlyPMC.Components
         {
             return "FLBPlayer";
         }
-        private bool HasBoss()
+        protected bool HasBoss()
         {
             return botOwner_0.BotFollower.HaveBoss;
         }
 
-        private pitAIBossPlayer GetBoss()
+        protected pitAIBossPlayer GetBoss()
         {
             return (pitAIBossPlayer)botOwner_0.BotFollower.BossToFollow;
         }

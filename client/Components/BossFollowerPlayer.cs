@@ -1,5 +1,6 @@
 ﻿using Aki.PrePatch;
 using EFT;
+using friendlyPMC.Components.BossFollower;
 using HarmonyLib;
 using System;
 using System.Collections.Generic;
@@ -50,6 +51,16 @@ namespace friendlyPMC.Components
             }
 
             bot.Tactic.AggressionChange(-1f);
+        }
+
+        public override FollowerBrain GetFollowerBrain(BotOwner bot, pitAIBossPlayer boss)
+        {
+            if(bot.IsRole(WildSpawnType.bossKnight))
+            {
+                return new KnightFollowerBrain(bot, boss);
+            }
+
+            return new FollowerBrain(bot, boss);
         }
     }
 }

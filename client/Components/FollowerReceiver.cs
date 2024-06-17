@@ -417,13 +417,20 @@ namespace friendlyPMC.Components
                 }
                 else if(info.phrase == EPhraseTrigger.CheckHim || info.phrase == EPhraseTrigger.LootBody)
                 {
+                    if (botOwner_0.AIData.IAmBoss)
+                    {
+                        botOwner_0.BotTalk.TrySay(EPhraseTrigger.Negative, false);
+                        botOwner_0.Gesture.TryGestus(EGesture.Bad, false);
+                        return;
+                    }
+
                     if (!notBusy)
                     {
                         botOwner_0.BotTalk.TrySay(EPhraseTrigger.DontKnow, false);
                         botOwner_0.Gesture.TryGestus(EGesture.Bad, false);
                         return;
                     }
-
+                   
                     Corpse item = InteractableObjects.GetCurCorpse();
                     if (item != null)
                     {
