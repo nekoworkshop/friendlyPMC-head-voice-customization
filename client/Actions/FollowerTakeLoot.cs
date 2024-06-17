@@ -20,6 +20,9 @@ namespace friendlyPMC.Actions
 
         private bool bool_1 = false;    
 
+        private bool takingLoot = false;
+        private float lootTimer = 0f;
+
         public FollowerTakeLoot(BotOwner bot) : base(bot)
         {
         }
@@ -41,6 +44,18 @@ namespace friendlyPMC.Actions
             if(_follower == null)
             {
                 _follower = BossPlayers.Instance.GetFollower(botOwner_0);
+            }
+
+            if(takingLoot && lootTimer < Time.time)
+            {
+                DisableTransactions();
+                _follower.LootingBrain.StopAllCoroutines();
+                _follower.LootingBrain.ActiveItem = null;
+                _follower.LootingBrain.ActiveCorpse = null;
+                bool_0 = false;
+                bool_1 = false;
+                takingLoot = false;
+                return;
             }
 
             if (!bool_0)
@@ -101,21 +116,9 @@ namespace friendlyPMC.Actions
                     position.Normalize();
 
                     botOwner_0.Steering.LookToPoint(position);
-                    
-                    var Timer = StaticManager.Instance.TimerManager.MakeTimer(TimeSpan.FromSeconds(10.0), false);
-                    Timer.OnTimer += () =>
-                    {
-                        try
-                        {
-                            DisableTransactions();
-                            _follower.LootingBrain.StopAllCoroutines();
-                            _follower.LootingBrain.ActiveItem = null;
-                            _follower.LootingBrain.ActiveCorpse = null;
-                            bool_0 = false;
-                            bool_1 = false;
-                        }
-                        catch { }
-                    };
+
+                    takingLoot = true;
+                    lootTimer = Time.time + 10f;
 
 
                     EnableTransactions();
