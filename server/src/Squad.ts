@@ -28,7 +28,6 @@ class friendlyPMC {
 	Bots: IBotConfig;
 
 	originalgetPmcDifficultySettings: BotDifficultyHelper["getPmcDifficultySettings"];
-	originalgetBotDifficulty: BotController["getBotDifficulty"];
 
 	originalGetRaidConfiguration: MatchCallbacks["getRaidConfiguration"];
 
@@ -51,18 +50,6 @@ class friendlyPMC {
 				}
 
 				result.getPmcDifficultySettings = this.getPmcDifficultySettings;
-			},
-			{ frequency: "Always" }
-		);
-		// patch getBotDifficulty as that is where we actually make the bots be friendly
-		this.getBotDifficulty = this.getBotDifficulty.bind(this);
-		container.afterResolution(
-			"BotController",
-			(_t, result: BotController) => {
-				if (!this.originalgetBotDifficulty) {
-					this.originalgetBotDifficulty = result.getBotDifficulty.bind(result);
-				}
-				result.getBotDifficulty = this.getBotDifficulty;
 			},
 			{ frequency: "Always" }
 		);
@@ -225,13 +212,6 @@ class friendlyPMC {
 		const result = this.originalgetPmcDifficultySettings(pmcType, difficulty, usecType, bearType);
 
 		return this._makeFriendlyOrHostile(result, pmcType);
-	}
-
-	/** Overwrite get difficulity method to patch the friendly/hostile settings */
-	getBotDifficulty(type: string, difficulty: string): any {
-		let result = this.originalgetBotDifficulty(type, difficulty);
-
-		return this._makeFriendlyOrHostile(result, type);
 	}
 }
 
