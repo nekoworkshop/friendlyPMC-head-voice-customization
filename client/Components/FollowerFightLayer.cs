@@ -29,7 +29,8 @@ namespace friendlyPMC.Components
         private bool ordersAreReqroup = false;
 
         private bool holdTactic = false;
-        private bool rushTactic = true;
+        private bool rushTactic = false;
+        private bool allyTactic = false;
 
         private bool ordersChanged = false;
 
@@ -45,21 +46,20 @@ namespace friendlyPMC.Components
 
         public void SetBossFightTactic(string tactic)
         {
-            if (tactic == "push")
+            rushTactic = false;
+            holdTactic = false;
+            allyTactic = false;
+            if (tactic == "ally")
+            {
+                allyTactic = true;
+            }
+            else if(tactic == "push")
             {
                 rushTactic = true;
-                holdTactic = false;
             }
             else if (tactic == "defend") 
             {
                 holdTactic = true;
-                rushTactic |= false;
-            
-            }
-            else
-            {
-                rushTactic = false;
-                holdTactic = false;
             }
         }
 
@@ -112,7 +112,12 @@ namespace friendlyPMC.Components
         {
             EnemyInfo goalEnemy = this.botOwner_0.Memory.GoalEnemy;
             float bossDist = Vector3.Distance(botOwner_0.Position, GetBoss().Position);
-            return bossDist > friendlyPMC.maximumCoverDistance.Value ||  (bossDist > Mathf.Min(15f,nearSearchRadius) && (goalEnemy == null || (goalEnemy.HaveSeen && Time.time - goalEnemy.PersonalLastSeenTime > friendlyPMC.maximumCover.Value)));
+
+            if(allyTactic && goalEnemy != null && goalEnemy.HaveSeen && Time.time - goalEnemy.PersonalLastSeenTime < friendlyPMC.maximumCover.Value) {
+                return false;
+            }
+
+            return bossDist > Mathf.Min(friendlyPMC.maximumCoverDistance.Value, nearSearchRadius) && (goalEnemy == null || !goalEnemy.HaveSeen || (goalEnemy.HaveSeen && Time.time - goalEnemy.PersonalLastSeenTime > friendlyPMC.maximumCover.Value));
         }
 
         private bool TimeToHeal()
@@ -123,10 +128,11 @@ namespace friendlyPMC.Components
         public void OrdersChanged()
         {
             ordersChanged = true;
-            Task.Delay(1000).ContinueWith(t =>
+            var Timer = StaticManager.Instance.TimerManager.MakeTimer(TimeSpan.FromSeconds(1), false);
+            Timer.OnTimer += () =>
             {
                 ordersChanged = false;
-            });
+            };
         }
 
         private AICoreActionResultStruct<BotLogicDecision> EngageEnemy()
@@ -302,7 +308,7 @@ namespace friendlyPMC.Components
             // If the bot is not in cover, find the closest cover and move to it
             if(HasBoss())
             {
-                GetClosestCoverPointGroup(bossPosition, nearSearchRadius);
+                GetClosestCoverPointGroup( allyTactic ? botPosition :  bossPosition, nearSearchRadius);
                 if (customNavigationPoint_0 != null)
                 {
                     if(GetNavDistance(customNavigationPoint_0.Position) < sprintDistance)
@@ -364,7 +370,8 @@ namespace friendlyPMC.Components
                 }
             }
 
-            if ((ordersAreHold || holdTactic) && !ordersAreAttack) return DefendPosition();
+            if(allyTactic) return DefendPosition();
+            else if ((ordersAreHold || holdTactic) && !ordersAreAttack) return DefendPosition();
             else if (ordersAreAttack || rushTactic) return EngageEnemy();
 
             // Check the distance to the enemy if we can rush him (exclude snipers since they cannot be reached)

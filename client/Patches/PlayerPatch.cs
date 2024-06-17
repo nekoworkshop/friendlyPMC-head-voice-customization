@@ -30,7 +30,12 @@ namespace friendlyPMC.Patches
                 // only players will have this null
                 if (__instance.AIBossPlayer != null && __instance.AIBossPlayer.Followers != null)
                 {
-                    __instance.AIBossPlayer.Dispose();
+                    BotOwner[] array = __instance.AIBossPlayer.Followers.ToArray();
+                    for (int i = 0; i < array.Length; i++)
+                    {
+                        if(array[i].BotFollower != null && array[i].BotFollower.PatrolDataFollower != null) array[i].BotFollower.Dispose();
+                    }
+                    __instance.AIBossPlayer.Followers.Clear();
                 }
             } catch(Exception ex) 
             {

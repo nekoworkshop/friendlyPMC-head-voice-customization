@@ -100,7 +100,6 @@ namespace friendlyPMC.Components
 
         public override void Dispose()
         {
-
             Dismissed();
             base.Dispose();
         }
