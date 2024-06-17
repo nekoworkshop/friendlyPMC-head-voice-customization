@@ -120,6 +120,22 @@ namespace friendlyPMC.Actions
                     takingLoot = true;
                     lootTimer = Time.time + 10f;
 
+                    var Timer = StaticManager.Instance.TimerManager.MakeTimer(TimeSpan.FromSeconds(10), false);
+                    Timer.OnTimer += () =>
+                    {
+                        try
+                        {
+                            DisableTransactions();
+                            _follower.LootingBrain.StopAllCoroutines();
+                            _follower.LootingBrain.ActiveItem = null;
+                            _follower.LootingBrain.ActiveCorpse = null;
+                            bool_0 = false;
+                            bool_1 = false;
+                            takingLoot = false;
+                        }
+                        catch { }
+                    };
+
 
                     EnableTransactions();
                     _follower.LootingBrain.StartCoroutine(_follower.LootingBrain.LootCorpse());
