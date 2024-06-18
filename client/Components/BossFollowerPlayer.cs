@@ -2,6 +2,7 @@
 using EFT;
 using friendlyPMC.Components.BossFollower;
 using HarmonyLib;
+using LootingBots.Patch.Components;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,7 +14,29 @@ namespace friendlyPMC.Components
 {
     internal class BossFollowerPlayer : BotFollowerPlayer
     {
-        public BossFollowerPlayer(BotOwner bot, pitAIBossPlayer player) : base(bot, player) { 
+        public BossFollowerPlayer(BotOwner bot, pitAIBossPlayer player) : base(bot, player) {
+
+            if (_lootingBrain == null)
+            {
+                _lootingBrain = _bot.GetPlayer.gameObject.AddComponent<LootingBrain>();
+                _lootingBrain.Init(bot);
+                _transactionController = AccessTools.Field(typeof(InventoryController), "_transactionController").GetValue(_lootingBrain.InventoryController) as TransactionController;
+
+                Components.Logger.LogInfo("Loot Brain was NULL");
+            }
+
+            if (_lootFinder == null)
+            {
+                _lootFinder = _bot.GetPlayer.gameObject.AddComponent<LootFinder>();
+                _lootFinder.Init(bot);
+                Components.Logger.LogInfo("Loot Frinder was NULL");
+            }
+
+            if(_transactionController == null)
+            {
+                Components.Logger.LogInfo("_transactionController is NULL");
+            }
+           
         }
 
         public override void SetlFollowerSettings(BotOwner bot)

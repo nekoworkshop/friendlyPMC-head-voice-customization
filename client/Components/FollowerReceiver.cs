@@ -8,6 +8,7 @@ using friendlyPMC.Modules;
 using System;
 using System.Threading.Tasks;
 using UnityEngine;
+using System.Collections.Generic;
 
 namespace friendlyPMC.Components
 {
@@ -62,6 +63,40 @@ namespace friendlyPMC.Components
 
             bool shouldDefault = !BossPlayers.Instance.IsFollower(botOwner_0) && !BossPlayers.Instance.IsBoss(data.Player.ProfileId);
 
+            List<EGesture> bossNoGesture = new List<EGesture>
+            {
+                EGesture.ThatDirection
+            };
+            List<EGesture> bossBusyNoGesture = new List<EGesture>
+            {
+                EGesture.Stop,
+                EGesture.ComeToMe
+            };
+            // AI Boss followers will not take several gestures
+            if (isBossCommunicating && botOwner_0.AIData.IAmBoss)
+            {
+                if (gestusDistance < maxGestusDistance)
+                {
+                    if (bossNoGesture.Contains(gesture))
+                    {
+
+                        if (!botOwner_0.Memory.HaveEnemy) 
+                        { 
+                            botOwner_0.Gesture.TryGestus(EGesture.Bad, false);
+                            botOwner_0.BotTalk.TrySay(EPhraseTrigger.Negative, false);
+                        }
+                        return;
+                    }
+
+                    if(botOwner_0.Memory.HaveEnemy && bossBusyNoGesture.Contains(gesture))
+                    {
+                        return;
+                    }
+
+                    
+                }
+            }
+
             if (gesture == EGesture.Stop)
             {
                 if (isBossCommunicating)
@@ -95,6 +130,7 @@ namespace friendlyPMC.Components
                 {
                     if (gestusDistance < maxGestusDistance)
                     {
+
                         Player alivePlayerByProfileID = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(data.Player.ProfileId);
                         
                         if (botOwner_0.BotRequestController.TryStopCurrent(alivePlayerByProfileID, false))
@@ -148,6 +184,50 @@ namespace friendlyPMC.Components
 
             bool isClose = (botOwner_0.GetPlayer.Transform.position - requester.Transform.position).magnitude < 14f;
             bool notBusy = !botOwner_0.Memory.HaveEnemy;
+
+            List<EPhraseTrigger> bossNoPhrase = new List<EPhraseTrigger>
+            {
+                EPhraseTrigger.OpenDoor,
+                EPhraseTrigger.GetBack,
+                EPhraseTrigger.GoForward,
+                EPhraseTrigger.Gogogo
+            };
+            List<EPhraseTrigger> bossBusyNoPhrase = new List<EPhraseTrigger>
+            {
+                EPhraseTrigger.Stop,
+                EPhraseTrigger.FollowMe,
+            };
+
+            List<EPhraseTrigger> bossIgnore = new List<EPhraseTrigger>
+            {
+                EPhraseTrigger.Silence,
+                EPhraseTrigger.Fire,
+                EPhraseTrigger.GetBack,
+            };
+            // AI Boss followers will not take several commands
+            if (isBossCommunicating && botOwner_0.AIData.IAmBoss)
+            {
+                if(bossIgnore.Contains(info.phrase))
+                {
+                    return;
+                }
+
+                if (bossNoPhrase.Contains(info.phrase))
+                {
+
+                    if (!botOwner_0.Memory.HaveEnemy)
+                    {
+                        botOwner_0.Gesture.TryGestus(EGesture.Bad, false);
+                        botOwner_0.BotTalk.TrySay(EPhraseTrigger.Negative, false);
+                    }
+                    return;
+                }
+
+                if (botOwner_0.Memory.HaveEnemy && bossBusyNoPhrase.Contains(info.phrase))
+                {
+                    return;
+                }
+            }
 
 
             if (isBossCommunicating)
@@ -417,13 +497,6 @@ namespace friendlyPMC.Components
                 }
                 else if(info.phrase == EPhraseTrigger.CheckHim || info.phrase == EPhraseTrigger.LootBody)
                 {
-                    if (botOwner_0.AIData.IAmBoss)
-                    {
-                        botOwner_0.BotTalk.TrySay(EPhraseTrigger.Negative, false);
-                        botOwner_0.Gesture.TryGestus(EGesture.Bad, false);
-                        return;
-                    }
-
                     if (!notBusy)
                     {
                         botOwner_0.BotTalk.TrySay(EPhraseTrigger.DontKnow, false);

@@ -22,8 +22,10 @@ namespace friendlyPMC.Components.BossFollower
 
         public override bool ShallUseNow()
         {
-            botOwner_0.PriorityAxeTarget.FindTarget();
+
             if (!HasBoss()) return false;
+
+            botOwner_0.PriorityAxeTarget.FindTarget();
 
             if (!botOwner_0.Memory.HaveEnemy) return !InteractableObjects.IsTaker(botOwner_0);
 

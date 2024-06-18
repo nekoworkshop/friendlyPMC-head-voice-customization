@@ -234,9 +234,16 @@ namespace friendlyPMC.Patches
 
                 BotOwnerManualUpdatePatch.BotOwnerUpdate.Add(owner.ProfileId, OnBotState);
 
+                // force player side on the bot
+                if(owner.Side != side)
+                {
+                    owner.GetPlayer.Profile.Info.Side = side;
+                }
+
 
                 botSpawnerClass.method_10(owner, bot, new Action<BotOwner>((BotOwner follower)=>
                 {
+
                     Components.Logger.LogInfo("Follower " + follower.Profile.Nickname + " ready");
 
                     spawnedFollowers++;

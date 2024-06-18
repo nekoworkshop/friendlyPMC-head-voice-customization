@@ -16,7 +16,7 @@ namespace friendlyPMC.Components.BossFollower
         public override void AddLayers()
         {
             // follow layer
-            BossFollowLayer layer6 = new BossFollowLayer(_owner, 50);
+            BossFollowLayer layer6 = new BossFollowLayer(_owner, 45);
             base.method_0(1, layer6, true);
             // avoid danger
             GClass35 layer = new KnightAvoidDangerLayer(_owner, 80);
@@ -36,16 +36,19 @@ namespace friendlyPMC.Components.BossFollower
             // assault have enemy
             GClass34 layer5 = new KnightAssaultFightLayer(_owner, 50);
             base.method_0(7, layer5, true);
-            // protect birdeye
-            /*GClass64 layer7 = new GClass64(_owner, 0, ECoverPatrolControls.distances, 30f, 100f, (ECoverPointSpecial)0);
-            base.method_0(8, layer7, true);*/
-
-
+            // - item taker
+            FollowerLootLayer layer9 = new FollowerLootLayer(_owner, 40);
+            method_0(8, layer9, true);
         }
 
         public override string ShortName()
         {
             return "KnightFLW";
+        }
+
+        public void ForceRecalcShootPos()
+        {
+            this.gclass65_0_1.ForceRecalcShootPos();
         }
     }
 }
