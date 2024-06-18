@@ -2,11 +2,14 @@
 using EFT;
 using friendlyPMC.Components;
 using friendlyPMC.Modules;
-using HarmonyLib;
+using HarmonyLib; 
 using JetBrains.Annotations;
+using Sirenix.Serialization.Utilities;
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
+using static UnityEngine.EventSystems.EventTrigger;
 
 namespace friendlyPMC.Patches
 {
@@ -41,6 +44,11 @@ namespace friendlyPMC.Patches
         [PatchPrefix]
         private static bool PatchPrefix(BotsGroup __instance, IPlayer person, EBotEnemyCause cause)
         {
+            if(person == null || (person.IsAI && person.AIData?.BotOwner?.GetPlayer == null))
+            {
+                return true;
+            }
+            // prevent boss player from being added as enemy to the group
             if (BossPlayers.Instance.IsFollowerGroup(__instance.Id) && BossPlayers.Instance.IsBoss(person.ProfileId))
             {
                 BotsGroup bossGroup = BossPlayers.Instance.GetBossPlayer(person.ProfileId).bossGroup;
@@ -66,6 +74,11 @@ namespace friendlyPMC.Patches
         [PatchPrefix]
         private static bool PatchPrefix(BotsGroup __instance, IPlayer player, bool ignoreAI = false)
         {
+            if (player == null || (player.IsAI && player.AIData?.BotOwner?.GetPlayer == null))
+                return true;
+        
+
+            // prevent boss player from being added as enemy to the group
             if (BossPlayers.Instance.IsFollowerGroup(__instance.Id) && BossPlayers.Instance.IsBoss(player.ProfileId))
             {
                 BotsGroup bossGroup = BossPlayers.Instance.GetBossPlayer(player.ProfileId).bossGroup;
@@ -90,6 +103,11 @@ namespace friendlyPMC.Patches
         [PatchPrefix]
         private static bool PatchPrefix(BotsGroup __instance, [NotNull] IPlayer enemy, EEnemyPartVisibleType isVisibleOnlyBySence)
         {
+
+            if (enemy == null || (enemy.IsAI && enemy.AIData?.BotOwner?.GetPlayer == null))
+                return true;
+
+            // prevent boss player from being added as enemy to the group
             if (BossPlayers.Instance.IsFollowerGroup(__instance.Id) && enemy != null && BossPlayers.Instance.IsBoss(enemy.ProfileId))
             {
                 BotsGroup bossGroup = BossPlayers.Instance.GetBossPlayer(enemy.ProfileId).bossGroup;
@@ -115,6 +133,7 @@ namespace friendlyPMC.Patches
         [PatchPrefix]
         private static bool PatchPrefix(BotsGroup __instance, ref bool __result, IPlayer player)
         {
+
             if (BossPlayers.Instance.IsBoss(player.ProfileId))
             {
                 BotsGroup bossGroup = BossPlayers.Instance.GetBossPlayer(player.ProfileId).bossGroup;
@@ -128,7 +147,6 @@ namespace friendlyPMC.Patches
             return true;
         }
     }
-
     // this is used only in case of squad spawn
     internal class BotsGroupPlayer : BotsGroup
     {
