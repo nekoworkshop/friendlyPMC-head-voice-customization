@@ -286,6 +286,19 @@ namespace friendlyPMC.Patches
 
             pitAIBossPlayer playerBoss = BossPlayers.Instance.AddBossPlayer(player);
             spawnedPlayers.Add(playerBoss);
+
+            if(friendlyPMC.alternativeSpawn.Value == true)
+            {
+                var Timer = StaticManager.Instance.TimerManager.MakeTimer(TimeSpan.FromSeconds(friendlyPMC.squadDelay.Value), false);
+                Timer.OnTimer += () =>
+                {
+                    try
+                    {
+                        Instance.SpawnGroupBots(playerBoss).Forget();
+                    }
+                    catch (Exception e) { Components.Logger.LogInfo("Failed Alternative Squad Spawn Process " + e.Message); }
+                };
+            }
         }
     }
 
@@ -298,14 +311,32 @@ namespace friendlyPMC.Patches
             if (spawnRan) return;
 
             spawnRan = true;
+            
+            Components.Logger.LogInfo("Start Squad Spawn");
 
             if (friendlyPMC.squadSpawn.Value)
             {
-
                 BotsControllerPatch.spawnedPlayers.ForEach(playerBoss =>
                 {
 
-                    if (BotsControllerPatch.Controller != null) BotsControllerPatch.Instance.SpawnGroupBots(playerBoss).Forget();
+                    if (BotsControllerPatch.Controller != null)
+                    {
+                        if (friendlyPMC.squadDelay.Value <= 0)
+                        {
+                            BotsControllerPatch.Instance.SpawnGroupBots(playerBoss).Forget();
+                        } else
+                        {
+                            var Timer = StaticManager.Instance.TimerManager.MakeTimer(TimeSpan.FromSeconds(friendlyPMC.squadDelay.Value), false);
+                            Timer.OnTimer += () =>
+                            {
+                                try
+                                {
+                                    BotsControllerPatch.Instance.SpawnGroupBots(playerBoss).Forget();
+                                }
+                                catch(Exception e) { Components.Logger.LogInfo("Failed Delayed Squad Spawn Process " + e.Message); }
+                            };
+                        }
+                    }
                 });
             }
         }

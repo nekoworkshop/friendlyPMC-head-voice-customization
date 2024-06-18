@@ -27,8 +27,11 @@ namespace friendlyPMC
 
         public static ConfigEntry<bool> squadSpawn;
         public static ConfigEntry<int> squadSize;
+        public static ConfigEntry <int> squadDelay;
         public static ConfigEntry<bool> copyEquip;
         public static ConfigEntry<int> extraPickups;
+
+        public static ConfigEntry<bool> alternativeSpawn;
 
         public static ConfigEntry<int> enemyRemember;
 
@@ -42,13 +45,18 @@ namespace friendlyPMC
 
         public static ConfigEntry<int> scanDistance;
 
+
         private void Awake()
         {
 
             squadSpawn = Config.Bind(baseSettings, "Squad Spawn", true, new ConfigDescription("Spawn with followers"));
             squadSize = Config.Bind(baseSettings, "Squad Size", 2, new ConfigDescription("Number of followers to spawn with", new AcceptableValueRange<int>(1, 3)));
+            
             copyEquip = Config.Bind(baseSettings, "Clone Equipment", true, new ConfigDescription("When Squad Spawn is active, spawned followers will have the same equipment as the player"));
             extraPickups = Config.Bind(baseSettings, "Maximum followers", 3, new ConfigDescription("Maximum number of followers the player can have. Cannot be less than Squad Size if Squad Spawn is active", new AcceptableValueRange<int>(1, 4)));
+
+            alternativeSpawn = Config.Bind(baseSettings, "Alternative Spawn", false, new ConfigDescription("Try alternative Spawning method to help with Swag+Donuts"));
+            squadDelay = Config.Bind(baseSettings, "Squad Spawn Detaly", 0, new ConfigDescription("When Squad Spawn is active, how much to delay the spawn of the squad ( in sec.). This is useful in case you have Swag+Donuts. Set delay above 10 seconds.", new AcceptableValueRange<int>(0, 30)));
 
             regroupMinDistance = Config.Bind(miscSettings, "Regroup Minimum Distance", 7, new ConfigDescription("The minimum distance for the regroup call to have effect, in combat", new AcceptableValueRange<int>(5, 30)));
 
