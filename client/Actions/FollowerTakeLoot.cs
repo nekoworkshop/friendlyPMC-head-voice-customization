@@ -6,9 +6,9 @@ using UnityEngine;
 using UnityEngine.AI;
 
 using Cysharp.Threading.Tasks;
-using System.Security.Cryptography;
-using System.Threading.Tasks;
 using System;
+
+using Aki.SinglePlayer.Utils.Insurance;
 
 namespace friendlyPMC.Actions
 {
@@ -156,6 +156,7 @@ namespace friendlyPMC.Actions
 
             EnableTransactions();
 
+
             bool result = await _follower.TransactionController.TryPickupItem(_follower.LootingBrain.ActiveItem.Item);
 
             if(!result)
@@ -164,6 +165,9 @@ namespace friendlyPMC.Actions
                 _follower.LootingBrain.StopAllCoroutines();
                 _follower.LootingBrain.ActiveItem = null;
                 _follower.LootingBrain.ActiveCorpse = null;
+            } else 
+            {
+                InteractableObjects.StoreItem(botOwner_0.ProfileId,_follower.LootingBrain.ActiveItem.Item);
             }
 
             DisableTransactions();
