@@ -222,7 +222,7 @@ namespace friendlyPMC.Patches
                 {
                     me.Memory.DeleteInfoAboutEnemy(player.Player()); // prevent attack of player on spawn
 
-                    BossPlayers.Instance.AddFollower(me, player); // make bot a follower
+                    BossPlayers.Instance.AddFollower(me, player,true); // make bot a follower
 
                     BotOwnerManualUpdatePatch.BotOwnerUpdate.Remove(me.ProfileId); // clear watcher
 

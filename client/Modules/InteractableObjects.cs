@@ -46,7 +46,7 @@ namespace friendlyPMC.Modules
             }
 
         }
-
+        /** Send any items given to the followers back to the player **/
         public void SendStoreItems()
         {
 

@@ -64,6 +64,7 @@ namespace friendlyPMC.Components
         {
             BossPlayers.Instance.RemoveFollower(_owner, _boss);
             ClearFollowerPatrol();
+            InteractableObjects.ClearStoredItems(_owner.ProfileId);
 
         }
 
@@ -71,6 +72,7 @@ namespace friendlyPMC.Components
         {
             BossPlayers.Instance.RemoveFollower(_owner, _boss);
             ClearFollowerPatrol();
+            InteractableObjects.ClearStoredItems(_owner.ProfileId);
         }
 
 

@@ -46,10 +46,22 @@ namespace friendlyPMC.Components
             get { return _lootFinder; }
         }
 
-        public BotFollowerPlayer(BotOwner bot, pitAIBossPlayer player)
+        protected bool _IsSquadMate = false;
+
+        public bool IsSquadMate
+        {
+            get
+            {
+                return _IsSquadMate;
+            }
+        }
+
+        public BotFollowerPlayer(BotOwner bot, pitAIBossPlayer player, bool isSquad = false)
         {
             _bot = bot;
             _player = player;
+            
+            _IsSquadMate = isSquad;
 
             // deactivate old layers
             var baseBrain = _bot.Brain.BaseBrain;

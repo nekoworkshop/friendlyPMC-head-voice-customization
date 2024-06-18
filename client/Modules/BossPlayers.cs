@@ -182,7 +182,7 @@ namespace friendlyPMC.Modules
             Instance = null;
         }
 
-        public BotFollowerPlayer AddFollower(BotOwner bot, pitAIBossPlayer player)
+        public BotFollowerPlayer AddFollower(BotOwner bot, pitAIBossPlayer player, bool squadMate = false)
         {
             BotFollowerPlayer _follower = null;
 
@@ -199,7 +199,7 @@ namespace friendlyPMC.Modules
                 _followers.Remove(_follower);
             }
 
-            _follower = new BotFollowerPlayer(bot, player);
+            _follower = new BotFollowerPlayer(bot, player, squadMate);
 
             _followers.Add(_follower);
 
