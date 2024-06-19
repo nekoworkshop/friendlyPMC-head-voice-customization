@@ -9,6 +9,10 @@ using Cysharp.Threading.Tasks;
 using System;
 
 using Aki.SinglePlayer.Utils.Insurance;
+using System.Collections;
+using System.Reflection;
+using EFT.InventoryLogic;
+using System.Collections.Generic;
 
 namespace friendlyPMC.Actions
 {
@@ -139,6 +143,7 @@ namespace friendlyPMC.Actions
 
                     EnableTransactions();
                     _follower.LootingBrain.StartCoroutine(_follower.LootingBrain.LootCorpse());
+                    _follower.LootingBrain.StartCoroutine(MonitorLootingCoroutine());
                 }
                 // pick up the given item
                 else
@@ -174,6 +179,103 @@ namespace friendlyPMC.Actions
 
             bool_0 = false;
             bool_1 = false;
+        }
+
+        private IEnumerator MonitorLootingCoroutine()
+        {
+            while (botOwner_0 != null && botOwner_0.BotState == EBotState.Active && botOwner_0.HealthController.IsAlive && _follower != null &&_follower.LootingBrain.IsBotLooting)
+            {
+                yield return null; // Wait for the next frame
+            }
+
+            // Perform the task after looting is complete
+            OnLootingComplete();
+        }
+        /** Check if the bot still has the items given by the player in his inventory **/
+        private void OnLootingComplete()
+        {
+
+            if(botOwner_0.BotState != EBotState.Active || !botOwner_0.HealthController.IsAlive) return;
+
+            Type botOwnerType =  botOwner_0.GetPlayer.GetType();
+                FieldInfo botInventory = botOwnerType.BaseType.GetField(
+                    "_inventoryController",
+                    BindingFlags.NonPublic
+                        | BindingFlags.Static
+                        | BindingFlags.Public
+                        | BindingFlags.Instance
+                );
+            InventoryControllerClass _botInventoryController = (InventoryControllerClass)
+                    botInventory.GetValue(botOwner_0.GetPlayer);
+                    
+            SearchableItemClass tacVest = (SearchableItemClass)
+                _botInventoryController.Inventory.Equipment
+                    .GetSlot(EquipmentSlot.TacticalVest)
+                    .ContainedItem;
+
+            SearchableItemClass backpack = (SearchableItemClass)
+                _botInventoryController.Inventory.Equipment
+                    .GetSlot(EquipmentSlot.Backpack)
+                    .ContainedItem;
+
+            SearchableItemClass pockets = (SearchableItemClass)
+                _botInventoryController.Inventory.Equipment
+                    .GetSlot(EquipmentSlot.Pockets)
+                    .ContainedItem;
+
+            var storedItems = InteractableObjects.GetStoredItems(botOwner_0.ProfileId);
+
+            List<string> toRemove = new List<string>();
+
+            if(storedItems!= null)
+            {
+                foreach(var stored in storedItems)
+                {
+                    bool found = false;
+                    if(tacVest.Grids.Length > 0) {
+                        foreach(var item in tacVest.GetAllItems())
+                        {
+                            if(item.Id == stored.Key)
+                            {
+                                found = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    if(!found && backpack.Grids.Length > 0) {
+                        foreach(var item in backpack.GetAllItems())
+                        {
+                            if(item.Id == stored.Key)
+                            {
+                                found = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    if(!found && pockets.Grids.Length > 0) {
+                        foreach(var item in pockets.GetAllItems())
+                        {
+                            if(item.Id == stored.Key)
+                            {
+                                found = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    if(!found) {
+                        toRemove.Add(stored.Key);
+                    }
+                }
+            }
+
+            foreach(var item in toRemove)
+            {
+                InteractableObjects.RemoveStoredItem(botOwner_0.ProfileId,item);
+            }
+            
         }
     }
 }

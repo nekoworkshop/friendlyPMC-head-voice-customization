@@ -34,14 +34,14 @@ namespace friendlyPMC.Modules
 
         private bool IsDisposed = false;
 
-        private Dictionary<string,List<EFT.InventoryLogic.Item>> _lootedItems;
+        private Dictionary<string, Dictionary<string,Item>> _lootedItems;
 
         public InteractableObjects() { 
             if(Instance == null)
             {
                 Instance = this;
 
-                _lootedItems = new Dictionary<string, List<EFT.InventoryLogic.Item>>();
+                _lootedItems = new Dictionary<string, Dictionary<string,Item>>();
             }
 
         }
@@ -53,7 +53,10 @@ namespace friendlyPMC.Modules
             // loop through all looted items inside _lootedItems and add them to the list
             foreach(var stack in _lootedItems)
             {
-                stack.Value.ForEach(item => items.Add(item));
+                foreach (var item in stack.Value)
+                {
+                    items.Add(item.Value);
+                }
             }
 
             var flatItems = Singleton<ItemFactory>.Instance.TreeToFlatItems(items);
@@ -209,12 +212,35 @@ namespace friendlyPMC.Modules
         public static void StoreItem(string bot, Item item)
         {
             if(!Instance._lootedItems.ContainsKey(bot)) {
-                Instance._lootedItems.Add(bot, new List<Item>());
+                Instance._lootedItems.Add(bot, new Dictionary<string, Item>());
             }
 
-            List<Item> list = Instance._lootedItems[bot];
+            var list = Instance._lootedItems[bot];
 
-            list.Add(item.CloneItem());
+            if(!list.ContainsKey(item.Id))
+                list.Add(item.Id, item.CloneItem());
+        }
+
+        public static void RemoveStoredItem(string bot, string itemId)
+        {
+            if (Instance._lootedItems.ContainsKey(bot))
+            {
+                var list = Instance._lootedItems[bot];
+                if(list.ContainsKey(itemId))
+                {
+                    list.Remove(itemId);
+                }
+            }
+        }
+
+        public static Dictionary<string, Item> GetStoredItems(string bot)
+        {
+            if (Instance._lootedItems.ContainsKey(bot))
+            {
+                return Instance._lootedItems[bot];
+            }
+
+            return null;
         }
 
         public static void ClearStoredItems(string bot)
