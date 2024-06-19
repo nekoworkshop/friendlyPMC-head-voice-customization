@@ -64,7 +64,6 @@ class friendlyPMC {
 		);
 
 		this.getTraderById = this.getTraderById.bind(this);
-
 		container.afterResolution(
 			"TraderHelper",
 			(_t, result: TraderHelper) => {
@@ -77,6 +76,7 @@ class friendlyPMC {
 			{ frequency: "Always" }
 		);
 
+		this.getValidTraderIdByEnumValue = this.getValidTraderIdByEnumValue.bind(this);
 		container.afterResolution(
 			"TraderHelper",
 			(_t, result: TraderHelper) => {
