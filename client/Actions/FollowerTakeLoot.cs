@@ -165,7 +165,7 @@ namespace friendlyPMC.Actions
                 _follower.LootingBrain.StopAllCoroutines();
                 _follower.LootingBrain.ActiveItem = null;
                 _follower.LootingBrain.ActiveCorpse = null;
-            } else 
+            } else if(_follower.IsSquadMate)
             {
                 InteractableObjects.StoreItem(botOwner_0.ProfileId,_follower.LootingBrain.ActiveItem.Item);
             }

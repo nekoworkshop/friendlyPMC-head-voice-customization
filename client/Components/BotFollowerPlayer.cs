@@ -24,6 +24,7 @@ namespace friendlyPMC.Components
         private pitAIBossPlayer _player;
 
         private BotDifficultySettingsClass _OldSettings;
+        private string _OldGroupID;
 
         private LootingBrain _lootingBrain;
 
@@ -230,6 +231,7 @@ namespace friendlyPMC.Components
         public void SetlFollowerSettings(BotOwner bot)
         {
             _OldSettings = _bot.Settings;
+            _OldGroupID = _bot.GroupId;
             // increase bot's power
             BotDifficultySettingsClass settings = Singleton<GClass534>.Instance.GetSettings(BotDifficulty.hard, bot.Profile.Info.Settings.Role);
             // - hardcode some settings to make the bot more efficient
@@ -357,6 +359,8 @@ namespace friendlyPMC.Components
             bot.GetPlayer.Physical.Stamina.ForceMode = true;
             bot.GetPlayer.Physical.HandsStamina.ForceMode = true;
             bot.GetPlayer.HealthController.DisableMetabolism();
+            // - have followers share the same groupId as the player
+            bot.GetPlayer.Profile.Info.GroupId = _player.realPlayer.GroupId;
         }
 
         /** Exposed so that it can be patched by addons **/
@@ -408,6 +412,7 @@ namespace friendlyPMC.Components
 
                 // put back old settings
                 _bot.Settings = _OldSettings;
+                _bot.Profile.Info.GroupId = _OldGroupID;
                 _bot.ENEMY_LOOK_AT_ME = Mathf.Cos(_OldSettings.FileSettings.Mind.ENEMY_LOOK_AT_ME_ANG * 0.017453292f);
                 _bot.GetPlayer.ActiveHealthController.SetDamageCoeff(_OldSettings.FileSettings.Core.DamageCoeff);
 

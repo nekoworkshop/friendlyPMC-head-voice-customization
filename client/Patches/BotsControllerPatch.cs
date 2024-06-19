@@ -19,6 +19,7 @@ using IProfileData = GClass592;
 using Comfort.Common;
 using EFT.Bots;
 using GPUInstancer;
+using UnityEngine.Profiling;
 
 
 namespace friendlyPMC.Patches
@@ -83,6 +84,7 @@ namespace friendlyPMC.Patches
             Vector3 position = player.Position;
             EPlayerSide side = player.Player().Side;
 
+
             BotZone zone = botSpawnerClass.GetClosestZone(position, out dist);
 
             WildSpawnType sptBear = (WildSpawnType)AkiBotsPrePatcher.sptBearValue;
@@ -118,6 +120,11 @@ namespace friendlyPMC.Patches
                 {
                     profile.Inventory.Equipment = player.Player().Profile.Inventory.Equipment.CloneItem(null);
                 }
+            });
+
+            // followers should use the same groupID as the player
+            bot.Profiles.ForEach(profile => {
+                profile.Info.GroupId = player.realPlayer.GroupId;
             });
 
             var closestCorePoint = GetClosestCorePoint(Controller, position);

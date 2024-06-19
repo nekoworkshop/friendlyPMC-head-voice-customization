@@ -17,6 +17,11 @@ import { LogTextColor } from "@spt-aki/models/spt/logging/LogTextColor";
 import { ILocations } from "@spt-aki/models/spt/server/ILocations";
 
 import { openZonesMap } from "./AOZExports";
+import { TraderServiceType } from "@spt-aki/models/enums/TraderServiceType";
+import { ITraderConfig } from "@spt-aki/models/spt/config/ITraderConfig";
+import { TraderHelper } from "@spt-aki/helpers/TraderHelper";
+import { Traders } from "@spt-aki/models/enums/Traders";
+import { SetFreemanTrader } from "./Trader";
 
 class friendlyPMC {
 	config = {
@@ -30,6 +35,10 @@ class friendlyPMC {
 	originalgetPmcDifficultySettings: BotDifficultyHelper["getPmcDifficultySettings"];
 
 	originalGetRaidConfiguration: MatchCallbacks["getRaidConfiguration"];
+
+	originalGetTraderById: TraderHelper["getTraderById"];
+
+	originalGetValidTraderIdByEnumValue: TraderHelper["getValidTraderIdByEnumValue"];
 
 	preAkiLoad(container: DependencyContainer) {
 		this.Logger = container.resolve("WinstonLogger");
@@ -53,12 +62,37 @@ class friendlyPMC {
 			},
 			{ frequency: "Always" }
 		);
+
+		container.afterResolution(
+			"TraderHelper",
+			(_t, result: TraderHelper) => {
+				if (!this.originalGetTraderById) {
+					this.originalGetTraderById = result.getTraderById.bind(result);
+				}
+
+				result.getTraderById = this.getTraderById;
+			},
+			{ frequency: "Always" }
+		);
+
+		container.afterResolution(
+			"TraderHelper",
+			(_t, result: TraderHelper) => {
+				if (!this.originalGetValidTraderIdByEnumValue) {
+					this.originalGetValidTraderIdByEnumValue = result.getValidTraderIdByEnumValue.bind(result);
+				}
+
+				result.getValidTraderIdByEnumValue = this.getValidTraderIdByEnumValue;
+			},
+			{ frequency: "Always" }
+		);
 	}
 
 	postDBLoad(container: DependencyContainer) {
 		const configServer: any = container.resolve("ConfigServer");
 		const Bots: IBotConfig = configServer.getConfig("aki-bot");
 		const PMCBOT: IPmcConfig = configServer.getConfig("aki-pmc");
+		const Traders: ITraderConfig = configServer.getConfig("aki-trader");
 
 		const databaseServer = container.resolve<DatabaseServer>("DatabaseServer");
 		const tables = databaseServer.getTables();
@@ -119,6 +153,8 @@ class friendlyPMC {
 			locations[altLocation].base.OpenZones = openZonesMap[altLocation].join(",");
 			this.Logger.info(`Opened ${locations[altLocation].base.OpenZones} for bots in ${locations[altLocation].base.Name} location`);
 		}
+
+		SetFreemanTrader(tables, Traders);
 	}
 
 	private _makeFriendlyOrHostile(diff: Difficulty, pmcType: string) {
@@ -212,6 +248,25 @@ class friendlyPMC {
 		const result = this.originalgetPmcDifficultySettings(pmcType, difficulty, usecType, bearType);
 
 		return this._makeFriendlyOrHostile(result, pmcType);
+	}
+
+	getTraderById(traderId: string): Traders {
+		if (traderId == "friendlypmc-return-loot") {
+			return "FRIENDLYPMC" as any;
+		}
+
+		const result = this.originalGetTraderById(traderId);
+
+		return result;
+	}
+
+	getValidTraderIdByEnumValue(traderEnumValue: Traders): string {
+		if ((traderEnumValue as any) == "FRIENDLYPMC") {
+			return "friendlypmc-return-loot";
+		}
+		const result = this.originalGetValidTraderIdByEnumValue(traderEnumValue);
+
+		return result;
 	}
 }
 

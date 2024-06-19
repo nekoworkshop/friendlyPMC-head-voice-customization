@@ -3,7 +3,6 @@ using EFT.Interactive;
 using EFT.InventoryLogic;
 
 using Aki.Common.Http;
-using Aki.Custom.BTR.Utils;
 
 using HarmonyLib;
 using Comfort.Common;
@@ -67,7 +66,7 @@ namespace friendlyPMC.Modules
             RequestHandler.PutJson("/singleplayer/traderServices/itemDelivery", new
             {
                 items = flatItems,
-                traderId = BTRUtil.BTRTraderId
+                traderId = "friendlypmc-return-loot"
             }.ToJson(_defaultJsonConverters));
         }
 
