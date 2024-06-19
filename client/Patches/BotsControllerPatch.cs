@@ -19,6 +19,7 @@ using IProfileData = GClass592;
 using Comfort.Common;
 using EFT.Bots;
 using GPUInstancer;
+using UnityEngine.Profiling;
 
 
 namespace friendlyPMC.Patches
@@ -83,6 +84,7 @@ namespace friendlyPMC.Patches
             Vector3 position = player.Position;
             EPlayerSide side = player.Player().Side;
 
+
             BotZone zone = botSpawnerClass.GetClosestZone(position, out dist);
 
             WildSpawnType sptBear = (WildSpawnType)AkiBotsPrePatcher.sptBearValue;
@@ -118,6 +120,11 @@ namespace friendlyPMC.Patches
                 {
                     profile.Inventory.Equipment = player.Player().Profile.Inventory.Equipment.CloneItem(null);
                 }
+            });
+
+            // followers should use the same groupID as the player
+            bot.Profiles.ForEach(profile => {
+                profile.Info.GroupId = player.realPlayer.GroupId;
             });
 
             var closestCorePoint = GetClosestCorePoint(Controller, position);
@@ -222,7 +229,7 @@ namespace friendlyPMC.Patches
                 {
                     me.Memory.DeleteInfoAboutEnemy(player.Player()); // prevent attack of player on spawn
 
-                    BossPlayers.Instance.AddFollower(me, player); // make bot a follower
+                    BossPlayers.Instance.AddFollower(me, player,true); // make bot a follower
 
                     BotOwnerManualUpdatePatch.BotOwnerUpdate.Remove(me.ProfileId); // clear watcher
 
@@ -293,6 +300,19 @@ namespace friendlyPMC.Patches
 
             pitAIBossPlayer playerBoss = BossPlayers.Instance.AddBossPlayer(player);
             spawnedPlayers.Add(playerBoss);
+
+            if(friendlyPMC.alternativeSpawn.Value == true)
+            {
+                var Timer = StaticManager.Instance.TimerManager.MakeTimer(TimeSpan.FromSeconds(friendlyPMC.squadDelay.Value), false);
+                Timer.OnTimer += () =>
+                {
+                    try
+                    {
+                        Instance.SpawnGroupBots(playerBoss).Forget();
+                    }
+                    catch (Exception e) { Components.Logger.LogInfo("Failed Alternative Squad Spawn Process " + e.Message); }
+                };
+            }
         }
     }
 
@@ -305,14 +325,32 @@ namespace friendlyPMC.Patches
             if (spawnRan) return;
 
             spawnRan = true;
+            
+            Components.Logger.LogInfo("Start Squad Spawn");
 
             if (friendlyPMC.squadSpawn.Value)
             {
-
                 BotsControllerPatch.spawnedPlayers.ForEach(playerBoss =>
                 {
 
-                    if (BotsControllerPatch.Controller != null) BotsControllerPatch.Instance.SpawnGroupBots(playerBoss).Forget();
+                    if (BotsControllerPatch.Controller != null)
+                    {
+                        if (friendlyPMC.squadDelay.Value <= 0)
+                        {
+                            BotsControllerPatch.Instance.SpawnGroupBots(playerBoss).Forget();
+                        } else
+                        {
+                            var Timer = StaticManager.Instance.TimerManager.MakeTimer(TimeSpan.FromSeconds(friendlyPMC.squadDelay.Value), false);
+                            Timer.OnTimer += () =>
+                            {
+                                try
+                                {
+                                    BotsControllerPatch.Instance.SpawnGroupBots(playerBoss).Forget();
+                                }
+                                catch(Exception e) { Components.Logger.LogInfo("Failed Delayed Squad Spawn Process " + e.Message); }
+                            };
+                        }
+                    }
                 });
             }
         }

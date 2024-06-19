@@ -24,6 +24,7 @@ namespace friendlyPMC.Components
         protected pitAIBossPlayer _player;
 
         protected BotDifficultySettingsClass _OldSettings;
+        protected string _OldGroupID;
 
         protected LootingBrain _lootingBrain;
 
@@ -46,10 +47,22 @@ namespace friendlyPMC.Components
             get { return _lootFinder; }
         }
 
-        public BotFollowerPlayer(BotOwner bot, pitAIBossPlayer player)
+        protected bool _IsSquadMate = false;
+
+        public bool IsSquadMate
+        {
+            get
+            {
+                return _IsSquadMate;
+            }
+        }
+
+        public BotFollowerPlayer(BotOwner bot, pitAIBossPlayer player, bool isSquad = false)
         {
             _bot = bot;
             _player = player;
+            
+            _IsSquadMate = isSquad;
 
             // deactivate old layers
             var baseBrain = _bot.Brain.BaseBrain;
@@ -218,6 +231,7 @@ namespace friendlyPMC.Components
         public virtual void SetlFollowerSettings(BotOwner bot)
         {
             _OldSettings = _bot.Settings;
+            _OldGroupID = _bot.GroupId;
             // increase bot's power
             BotDifficultySettingsClass settings = Singleton<GClass534>.Instance.GetSettings(BotDifficulty.hard, bot.Profile.Info.Settings.Role);
             // - hardcode some settings to make the bot more efficient
@@ -345,6 +359,8 @@ namespace friendlyPMC.Components
             bot.GetPlayer.Physical.Stamina.ForceMode = true;
             bot.GetPlayer.Physical.HandsStamina.ForceMode = true;
             bot.GetPlayer.HealthController.DisableMetabolism();
+            // - have followers share the same groupId as the player
+            bot.GetPlayer.Profile.Info.GroupId = _player.realPlayer.GroupId;
         }
 
         /** Exposed so that it can be patched by addons **/
@@ -369,7 +385,7 @@ namespace friendlyPMC.Components
             return _player;
         }
         /** End Follower Brain **/
-        public void Dismiss()
+        public virtual void Dismiss()
         {
             if (_lootingBrain != null)
             {
@@ -396,6 +412,7 @@ namespace friendlyPMC.Components
 
                 // put back old settings
                 _bot.Settings = _OldSettings;
+                _bot.Profile.Info.GroupId = _OldGroupID;
                 _bot.ENEMY_LOOK_AT_ME = Mathf.Cos(_OldSettings.FileSettings.Mind.ENEMY_LOOK_AT_ME_ANG * 0.017453292f);
                 _bot.GetPlayer.ActiveHealthController.SetDamageCoeff(_OldSettings.FileSettings.Core.DamageCoeff);
 

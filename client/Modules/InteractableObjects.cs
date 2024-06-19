@@ -1,16 +1,24 @@
 ﻿using EFT;
 using EFT.Interactive;
 using EFT.InventoryLogic;
-using friendlyPMC.Actions;
-using friendlyPMC.Components;
+
+using Aki.Common.Http;
+
 using HarmonyLib;
-using LootingBots.Patch.Components;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Comfort.Common;
+
 using UnityEngine;
+
+using System;
+using System.Linq;
+using System.Reflection;
+using System.Collections.Generic;
+
+using Newtonsoft.Json;
+using LootingBots.Patch.Components;
+
+using friendlyPMC.Components;
+
 
 namespace friendlyPMC.Modules
 {
@@ -25,20 +33,68 @@ namespace friendlyPMC.Modules
         private LootItem _lootItem;
 
         private bool IsDisposed = false;
+
+        private Dictionary<string, Dictionary<string,Item>> _lootedItems;
+
         public InteractableObjects() { 
             if(Instance == null)
             {
                 Instance = this;
+
+                _lootedItems = new Dictionary<string, Dictionary<string,Item>>();
             }
+
+        }
+        /** Send any items given to the followers back to the player **/
+        public void SendStoreItems()
+        {
+
+            List<Item> items = new List<Item>();
+            // loop through all looted items inside _lootedItems and add them to the list
+            foreach(var stack in _lootedItems)
+            {
+                foreach (var item in stack.Value)
+                {
+                    items.Add(item.Value);
+                }
+            }
+
+            var flatItems = Singleton<ItemFactory>.Instance.TreeToFlatItems(items);
+
+            var converterClass = typeof(AbstractGame).Assembly.GetTypes()
+                .First(t => t.GetField("Converters", BindingFlags.Static | BindingFlags.Public) != null);
+
+            var _defaultJsonConverters = Traverse.Create(converterClass).Field<JsonConverter[]>("Converters").Value;
+
+            RequestHandler.PutJson("/singleplayer/traderServices/itemDelivery", new
+            {
+                items = flatItems,
+                traderId = "friendlypmc-return-loot"
+            }.ToJson(_defaultJsonConverters));
         }
 
         public void Destroy()
         {
             if(IsDisposed) return;
+            
+            
+            try{
+                SendStoreItems();
+            } catch(Exception e) {
+                Components.Logger.LogInfo($"Error sending store items: {e}");
+            }
+
+            foreach(var stack in _lootedItems)
+            {
+                stack.Value.Clear();
+            }
+            _lootedItems.Clear();
 
             _currCorpse = null;
             _currDoor = null;
+            
             _lootItem = null;
+            _lootedItems = null;
 
             IsDisposed = true;
             Instance = null;
@@ -151,6 +207,48 @@ namespace friendlyPMC.Modules
 
             return _follower != null && _follower.LootingBrain != null && _follower.TransactionController != null &&
                 (_follower.LootingBrain.ActiveItem != null || _follower.LootingBrain.ActiveCorpse != null);
+        }
+
+        public static void StoreItem(string bot, Item item)
+        {
+            if(!Instance._lootedItems.ContainsKey(bot)) {
+                Instance._lootedItems.Add(bot, new Dictionary<string, Item>());
+            }
+
+            var list = Instance._lootedItems[bot];
+
+            if(!list.ContainsKey(item.Id))
+                list.Add(item.Id, item.CloneItem());
+        }
+
+        public static void RemoveStoredItem(string bot, string itemId)
+        {
+            if (Instance._lootedItems.ContainsKey(bot))
+            {
+                var list = Instance._lootedItems[bot];
+                if(list.ContainsKey(itemId))
+                {
+                    list.Remove(itemId);
+                }
+            }
+        }
+
+        public static Dictionary<string, Item> GetStoredItems(string bot)
+        {
+            if (Instance._lootedItems.ContainsKey(bot))
+            {
+                return Instance._lootedItems[bot];
+            }
+
+            return null;
+        }
+
+        public static void ClearStoredItems(string bot)
+        {
+            if(Instance._lootedItems.ContainsKey(bot))
+            {
+                Instance._lootedItems.Remove(bot);
+            }
         }
 
     }

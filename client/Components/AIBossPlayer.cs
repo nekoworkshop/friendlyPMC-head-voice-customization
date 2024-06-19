@@ -7,6 +7,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
+using static UnityEngine.UI.GridLayoutGroup;
 
 namespace friendlyPMC.Components
 {
@@ -42,6 +43,20 @@ namespace friendlyPMC.Components
 
         private void OnDead(EDamageType _damageType)
         {
+            if (Followers != null && Followers.Count > 0)
+            {
+                Followers.ForEach(follower =>
+                {
+                    if (follower != null && GClass760.Random(1, 100) > friendlyPMC.returnChanceDeath.Value)
+                    {
+
+                        var flw = BossPlayers.Instance.GetFollower(follower);
+
+                        if (flw != null && flw.IsSquadMate)
+                            InteractableObjects.ClearStoredItems(follower.ProfileId);
+                    }
+                });
+            }
             BossPlayers.Instance.RemoveBossPlayer(realPlayer.ProfileId);
         }
 
