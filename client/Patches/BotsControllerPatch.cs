@@ -67,6 +67,7 @@ namespace friendlyPMC.Patches
 
         public async UniTask SpawnGroupBots(pitAIBossPlayer player)
         {
+
             float dist;
 
             CancelToken token = new CancelToken();
@@ -315,37 +316,38 @@ namespace friendlyPMC.Patches
 
         public static void SpawnFollowers()
         {
+            
+            if (friendlyPMC.alternativeSpawn.Value == true || !friendlyPMC.squadSpawn.Value) return;
+
             if (spawnRan) return;
 
             spawnRan = true;
-            
+
             Components.Logger.LogInfo("Start Squad Spawn");
 
-            if (friendlyPMC.squadSpawn.Value)
+            BotsControllerPatch.spawnedPlayers.ForEach(playerBoss =>
             {
-                BotsControllerPatch.spawnedPlayers.ForEach(playerBoss =>
-                {
 
-                    if (BotsControllerPatch.Controller != null)
+                if (BotsControllerPatch.Controller != null)
+                {
+                    if (friendlyPMC.squadDelay.Value <= 0)
                     {
-                        if (friendlyPMC.squadDelay.Value <= 0)
-                        {
-                            BotsControllerPatch.Instance.SpawnGroupBots(playerBoss).Forget();
-                        } else
-                        {
-                            var Timer = StaticManager.Instance.TimerManager.MakeTimer(TimeSpan.FromSeconds(friendlyPMC.squadDelay.Value), false);
-                            Timer.OnTimer += () =>
-                            {
-                                try
-                                {
-                                    BotsControllerPatch.Instance.SpawnGroupBots(playerBoss).Forget();
-                                }
-                                catch(Exception e) { Components.Logger.LogInfo("Failed Delayed Squad Spawn Process " + e.Message); }
-                            };
-                        }
+                        BotsControllerPatch.Instance.SpawnGroupBots(playerBoss).Forget();
                     }
-                });
-            }
+                    else
+                    {
+                        var Timer = StaticManager.Instance.TimerManager.MakeTimer(TimeSpan.FromSeconds(friendlyPMC.squadDelay.Value), false);
+                        Timer.OnTimer += () =>
+                        {
+                            try
+                            {
+                                BotsControllerPatch.Instance.SpawnGroupBots(playerBoss).Forget();
+                            }
+                            catch (Exception e) { Components.Logger.LogInfo("Failed Delayed Squad Spawn Process " + e.Message); }
+                        };
+                    }
+                }
+            });
         }
 
         protected override MethodBase GetTargetMethod()
@@ -372,6 +374,20 @@ namespace friendlyPMC.Patches
         }
     }
 
+
+    internal class Glass579RunPatch : ModulePatch
+    {
+        protected override MethodBase GetTargetMethod()
+        {
+            return AccessTools.Method(typeof(GClass579), "Run");
+
+        }
+        [PatchPostfix]
+        private static void PatchPostfix(GClass579 __instance, EBotsSpawnMode spawnMode = EBotsSpawnMode.Anyway)
+        {
+            WavesSpawnScenarioRunPatch.SpawnFollowers();
+        }
+    }
     internal class BotsControllerStopPatch : ModulePatch
     {
         protected override MethodBase GetTargetMethod()
