@@ -18,7 +18,7 @@ export function SetFreemanTrader(Tables: IDatabaseTables, Traders: ITraderConfig
 		base: {
 			_id: trdid,
 			availableInRaid: true,
-			avatar: "/files/trader/avatar/unknown.png",
+			avatar: "/files/trader/avatar/general.jpg",
 			balance_dol: 0,
 			balance_eur: 0,
 			balance_rub: 7000000,

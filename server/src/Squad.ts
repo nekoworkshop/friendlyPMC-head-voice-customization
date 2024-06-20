@@ -17,11 +17,15 @@ import { LogTextColor } from "@spt-aki/models/spt/logging/LogTextColor";
 import { ILocations } from "@spt-aki/models/spt/server/ILocations";
 
 import { openZonesMap } from "./AOZExports";
-import { TraderServiceType } from "@spt-aki/models/enums/TraderServiceType";
+
 import { ITraderConfig } from "@spt-aki/models/spt/config/ITraderConfig";
 import { TraderHelper } from "@spt-aki/helpers/TraderHelper";
 import { Traders } from "@spt-aki/models/enums/Traders";
 import { SetFreemanTrader } from "./Trader";
+
+import { ImageRouter } from "@spt-aki/routers/ImageRouter";
+import type { PostAkiModLoader } from "@spt-aki/loaders/PostAkiModLoader";
+import path from "path";
 
 class friendlyPMC {
 	config = {
@@ -88,6 +92,15 @@ class friendlyPMC {
 			},
 			{ frequency: "Always" }
 		);
+
+		const imageRouter: ImageRouter = container.resolve("ImageRouter");
+		const modLoader: PostAkiModLoader = container.resolve("PostAkiModLoader");
+
+		const folder = path.basename(__dirname);
+
+		console.log(`[${folder}] Loading friendlyPMC`);
+
+		imageRouter.addRoute("/files/trader/avatar/general.jpg", `${modLoader.getModPath("friendlyPMC")}avatar/general.jpg`);
 	}
 
 	postDBLoad(container: DependencyContainer) {
