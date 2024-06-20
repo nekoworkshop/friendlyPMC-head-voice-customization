@@ -52,6 +52,8 @@ namespace friendlyPMC.Actions
 
             if(takingLoot && lootTimer < Time.time)
             {
+                if (botOwner_0.IsDead || botOwner_0.BotState != EBotState.Active || _follower.LootingBrain == null || _follower.LootingBrain.IsBotLooting) return;
+
                 DisableTransactions();
                 _follower.LootingBrain.StopAllCoroutines();
                 _follower.LootingBrain.ActiveItem = null;
@@ -127,6 +129,7 @@ namespace friendlyPMC.Actions
                     var Timer = StaticManager.Instance.TimerManager.MakeTimer(TimeSpan.FromSeconds(10), false);
                     Timer.OnTimer += () =>
                     {
+                        if (botOwner_0.IsDead || botOwner_0.BotState != EBotState.Active || _follower.LootingBrain == null || _follower.LootingBrain.IsBotLooting) return;
                         try
                         {
                             DisableTransactions();
@@ -143,7 +146,7 @@ namespace friendlyPMC.Actions
 
                     EnableTransactions();
                     _follower.LootingBrain.StartCoroutine(_follower.LootingBrain.LootCorpse());
-                    _follower.LootingBrain.StartCoroutine(MonitorLootingCoroutine());
+                    if(_follower.IsSquadMate) _follower.LootingBrain.StartCoroutine(MonitorLootingCoroutine());
                 }
                 // pick up the given item
                 else
@@ -183,7 +186,7 @@ namespace friendlyPMC.Actions
 
         private IEnumerator MonitorLootingCoroutine()
         {
-            while (botOwner_0 != null && botOwner_0.BotState == EBotState.Active && botOwner_0.HealthController.IsAlive && _follower != null &&_follower.LootingBrain.IsBotLooting)
+            while (botOwner_0 != null && botOwner_0.BotState == EBotState.Active && botOwner_0.HealthController.IsAlive && _follower != null && _follower.LootingBrain.IsBotLooting)
             {
                 yield return null; // Wait for the next frame
             }

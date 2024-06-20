@@ -250,6 +250,7 @@ namespace friendlyPMC.Patches
 
         public async UniTask SpawnGroupBots(pitAIBossPlayer player)
         {
+
             float dist;
 
             CancelToken token = new CancelToken();
@@ -433,6 +434,9 @@ namespace friendlyPMC.Patches
 
         public static void SpawnFollowers()
         {
+            
+            if (friendlyPMC.alternativeSpawn.Value == true || !friendlyPMC.squadSpawn.Value) return;
+
             if (spawnRan) return;
 
             spawnRan = true;
@@ -502,6 +506,21 @@ namespace friendlyPMC.Patches
         }
         [PatchPostfix]
         private static void PatchPostfix(NonWavesSpawnScenario __instance)
+        {
+            WavesSpawnScenarioRunPatch.SpawnFollowers();
+        }
+    }
+
+
+    internal class Glass579RunPatch : ModulePatch
+    {
+        protected override MethodBase GetTargetMethod()
+        {
+            return AccessTools.Method(typeof(GClass579), "Run");
+
+        }
+        [PatchPostfix]
+        private static void PatchPostfix(GClass579 __instance, EBotsSpawnMode spawnMode = EBotsSpawnMode.Anyway)
         {
             WavesSpawnScenarioRunPatch.SpawnFollowers();
         }

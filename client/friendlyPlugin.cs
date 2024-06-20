@@ -111,6 +111,7 @@ namespace friendlyPMC
 
             new NonWavesSpawnScenarioRunPatch().Enable();
             new WavesSpawnScenarioRunPatch().Enable();
+            new Glass579RunPatch().Enable();
 
             new BotsControllerStopPatch().Enable();
             new LocalGameCleanupPatch().Enable();

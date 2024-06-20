@@ -96,11 +96,9 @@ class friendlyPMC {
 		const imageRouter: ImageRouter = container.resolve("ImageRouter");
 		const modLoader: PostAkiModLoader = container.resolve("PostAkiModLoader");
 
-		const folder = path.basename(__dirname);
+		const folder = path.basename(path.dirname(__dirname));
 
-		console.log(`[${folder}] Loading friendlyPMC`);
-
-		imageRouter.addRoute("/files/trader/avatar/general.jpg", `${modLoader.getModPath("friendlyPMC")}avatar/general.jpg`);
+		imageRouter.addRoute("/files/trader/avatar/general", `${modLoader.getModPath(folder)}/avatar/general.jpg`);
 	}
 
 	postDBLoad(container: DependencyContainer) {
