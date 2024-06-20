@@ -24,6 +24,7 @@ namespace friendlyPMC
         
         const string baseSettings = "Base Settings";
         const string miscSettings = "Miscellaneous";
+        const string testSettings = "Testing";
 
         public static ConfigEntry<bool> squadSpawn;
         public static ConfigEntry<int> squadSize;
@@ -46,6 +47,8 @@ namespace friendlyPMC
         public static ConfigEntry<int> scanDistance;
 
         public static ConfigEntry<int> returnChanceDeath;
+
+        public static ConfigEntry<bool> knightSpawn;
         private void Awake()
         {
 
@@ -73,6 +76,8 @@ namespace friendlyPMC
 
             fightOuterRadius = Config.Bind(miscSettings,"Combat outer radius", 50, new ConfigDescription("The upper limit to search for cover during combat relative the current goal (player or enemy)", new AcceptableValueRange<int>(30, 100)));
             fightInnerRadius = Config.Bind(miscSettings, "Combat inner radius", 30, new ConfigDescription("The lower limit to search for cover during combat relative the current goal (player or enemy)", new AcceptableValueRange<int>(15, 50)));
+
+            knightSpawn = Config.Bind(testSettings, "Spawn with Knight", false, new ConfigDescription("Experimental: Spawn with the goons squad. This works in combination with your own squad. Take note that a boss and his followers do not accept the same commands as your squad"));
 
             if (!awaken)
             {

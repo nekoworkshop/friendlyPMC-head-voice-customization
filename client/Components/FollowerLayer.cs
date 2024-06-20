@@ -24,14 +24,19 @@ namespace friendlyPMC.Components
         {
             return "FLBPlayer";
         }
-        protected bool HasBoss()
+        protected virtual bool HasBoss()
         {
             return botOwner_0.BotFollower.HaveBoss;
         }
 
-        protected pitAIBossPlayer GetBoss()
+        protected virtual pitAIBossPlayer GetBoss()
         {
             return (pitAIBossPlayer)botOwner_0.BotFollower.BossToFollow;
+        }
+
+        protected virtual Vector3 GetBossPosition()
+        {
+            return GetBoss().Position;
         }
 
         public override AICoreActionResultStruct<BotLogicDecision> GetDecision()
@@ -168,6 +173,11 @@ namespace friendlyPMC.Components
             return HasBoss() && !InteractableObjects.IsTaker(botOwner_0);
         }
 
+        protected virtual List<CustomNavigationPoint> GetNearGovers()
+        {
+            return HasBoss() ? GetBoss().GetAreaCovers() : BossPlayers.Instance.GetCovers();
+        }
+
         public override CustomNavigationPoint FindPoint(CoverSearchData data, Func<CoverSearchData, CustomNavigationPoint> p, bool checkCurrent)
         {
             if (this.customNavigationPoint_0 != null && (!this.customNavigationPoint_0.IsFreeById(this.botOwner_0.Id) || this.customNavigationPoint_0.IsSpotted))
@@ -182,9 +192,9 @@ namespace friendlyPMC.Components
             return base.FindPoint(data, p, checkCurrent);
         }
 
-        private void GetCoverPoint(Vector3 centerPosition, float searchRadius)
+        protected virtual void GetCoverPoint(Vector3 centerPosition, float searchRadius)
         {
-            List<CustomNavigationPoint> customNavigationPoints = HasBoss() ? GetBoss().GetAreaCovers() : BossPlayers.Instance.GetCovers();
+            List<CustomNavigationPoint> customNavigationPoints = GetNearGovers();
 
             if (customNavigationPoints.Count > 0)
             {

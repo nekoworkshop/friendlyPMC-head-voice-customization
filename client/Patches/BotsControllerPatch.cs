@@ -20,6 +20,7 @@ using Comfort.Common;
 using EFT.Bots;
 using GPUInstancer;
 using UnityEngine.Profiling;
+using System.Security.Policy;
 
 
 namespace friendlyPMC.Patches
@@ -58,12 +59,194 @@ namespace friendlyPMC.Patches
 
         private AICorePoint GetClosestCorePoint(BotsController _botsController,Vector3 position)
         {
-            var botGame = Singleton<IBotGame>.Instance;
             var coversData = _botsController.CoversData;
             var groupPoint = coversData.GetClosest(position);
             return groupPoint.CorePointInGame;
         }
 
+
+        private BotsGroup GetPlayerGroup(pitAIBossPlayer player, BotOwner bt, BotZone zn)
+        {
+            if(player.bossGroup != null) return player.bossGroup;
+
+            BotSpawner botSpawnerClass = Controller.BotSpawner;
+
+            var botGame = AccessTools.Field(typeof(BotSpawner), "_game").GetValue(botSpawnerClass) as IBotGame;
+
+            var spawnGroups = AccessTools.Field(typeof(BotSpawner), "_groups").GetValue(botSpawnerClass) as BotZoneGroupsDictionary;
+            var deadBodiesController = AccessTools.Field(typeof(BotSpawner), "_deadBodiesController").GetValue(botSpawnerClass) as DeadBodiesController;
+            var allPlayers = AccessTools.Field(typeof(BotSpawner), "_allPlayers").GetValue(botSpawnerClass) as List<Player>;
+
+            var allBotZones = AccessTools.Field(typeof(BotSpawner), "_allBotZones").GetValue(botSpawnerClass) as BotZone[];
+            var _freeForAll = (bool)AccessTools.Field(typeof(BotSpawner), "_freeForAll").GetValue(botSpawnerClass);
+
+            EPlayerSide side = player.realPlayer.Side;
+
+            BotsGroup botsGroup;
+            WildSpawnType role = bt.Profile.Info.Settings.Role;
+            List<BotOwner> list = new List<BotOwner>();
+
+            // botsGroup take on the values of the inital bot, attempt to prevent the group from being hostile to the player
+            bt.Settings.FileSettings.Mind.ENEMY_BY_GROUPS_PMC_PLAYERS = side != EPlayerSide.Savage ? false : true;
+            bt.Settings.FileSettings.Mind.ENEMY_BY_GROUPS_SAVAGE_PLAYERS = side == EPlayerSide.Savage ? false : true;
+
+            var oldBehaviourBear = bt.Settings.FileSettings.Mind.DEFAULT_BEAR_BEHAVIOUR;
+            var oldBehaviorUsec = bt.Settings.FileSettings.Mind.DEFAULT_USEC_BEHAVIOUR;
+            var oldBehaviorSavage = bt.Settings.FileSettings.Mind.DEFAULT_SAVAGE_BEHAVIOUR;
+
+            var old_use = bt.Settings.FileSettings.Mind.USE_ADD_TO_ENEMY_VALIDATION;
+            var old_reasons = bt.Settings.FileSettings.Mind.VALID_REASONS_TO_ADD_ENEMY;
+
+            bt.Settings.FileSettings.Mind.USE_ADD_TO_ENEMY_VALIDATION = true;
+            bt.Settings.FileSettings.Mind.VALID_REASONS_TO_ADD_ENEMY = new EBotEnemyCause[] { };
+
+            if (side == EPlayerSide.Savage)
+            {
+                bt.Settings.FileSettings.Mind.DEFAULT_SAVAGE_BEHAVIOUR = EWarnBehaviour.Ignore;
+                bt.Settings.FileSettings.Mind.DEFAULT_BEAR_BEHAVIOUR = EWarnBehaviour.Attack;
+                bt.Settings.FileSettings.Mind.DEFAULT_USEC_BEHAVIOUR = EWarnBehaviour.Attack;
+            }
+            else if (side == EPlayerSide.Bear)
+            {
+                bt.Settings.FileSettings.Mind.DEFAULT_BEAR_BEHAVIOUR = EWarnBehaviour.Ignore;
+                bt.Settings.FileSettings.Mind.DEFAULT_SAVAGE_BEHAVIOUR = EWarnBehaviour.Attack;
+            }
+            else
+            {
+                bt.Settings.FileSettings.Mind.DEFAULT_USEC_BEHAVIOUR = EWarnBehaviour.Ignore;
+                bt.Settings.FileSettings.Mind.DEFAULT_SAVAGE_BEHAVIOUR = EWarnBehaviour.Attack;
+            }
+
+            foreach (BotOwner item2 in botSpawnerClass.method_4(bt))
+            {
+                list.Add(item2);
+            }
+            botsGroup = new BotsGroupPlayer(zn, botGame, bt, list, deadBodiesController, allPlayers, player);
+            if (_freeForAll)
+            {
+                spawnGroups.AddNoKey(botsGroup, zn);
+            }
+            else
+            {
+                spawnGroups.Add(zn, side, botsGroup, false);
+            }
+            player.bossGroup = botsGroup;
+
+            BossPlayers.Instance.AddFollowerGroup(player.bossGroup.Id);
+            player.bossGroup.Lock();
+
+            player.bossGroup.OnEnemyAdd += (IPlayer pl, EBotEnemyCause cause) =>
+            {
+                if (pl != null)
+                {
+                    if (player.Player().ProfileId == pl.ProfileId)
+                    {
+                        player.bossGroup.RemoveEnemy(player.Player());
+                        player.bossGroup.AddAlly(player.realPlayer);
+                    }
+                    else if (pl.IsAI && player.bossGroup.Contains(pl.AIData.BotOwner))
+                    {
+                        player.bossGroup.RemoveEnemy(pl);
+                        player.bossGroup.AddAlly(pl.AIData.Player);
+                    }
+                }
+            };
+
+            // revert changes
+            bt.Settings.FileSettings.Mind.USE_ADD_TO_ENEMY_VALIDATION = old_use;
+            bt.Settings.FileSettings.Mind.VALID_REASONS_TO_ADD_ENEMY = old_reasons;
+            bt.Settings.FileSettings.Mind.DEFAULT_BEAR_BEHAVIOUR = oldBehaviourBear;
+            bt.Settings.FileSettings.Mind.DEFAULT_USEC_BEHAVIOUR = oldBehaviorUsec;
+            bt.Settings.FileSettings.Mind.DEFAULT_SAVAGE_BEHAVIOUR = oldBehaviorSavage;
+
+            return player.bossGroup;
+        } 
+
+        public async UniTask SpawnBossFollower(pitAIBossPlayer player, WildSpawnType boss = WildSpawnType.bossKnight, bool isFollower = false)
+        {
+            float dist;
+
+            CancelToken token = new CancelToken();
+
+            var botSpawnerClass = Controller.BotSpawner;
+            var botCreator = AccessTools.Field(typeof(BotSpawner), "_botCreator").GetValue(botSpawnerClass) as IBotCreator;
+
+
+            Vector3 position = player.Position;
+            EPlayerSide side = player.Player().Side;
+
+
+            BotZone zone = botSpawnerClass.GetClosestZone(position, out dist);
+
+            BotSpawnParams @params = new BotSpawnParams();
+            @params.ShallBeGroup = new ShallBeGroupParams(true, false, 4);
+
+            IProfileData botData = new IProfileData(side, boss, BotDifficulty.hard, 0f, @params);
+
+            BotCacheClass bot = await BotCacheClass.Create(botData, botCreator, 1, botSpawnerClass);
+
+            bot.Profiles.ForEach(profile => {
+                profile.Info.GroupId = player.realPlayer.GroupId;
+            });
+
+            var closestCorePoint = GetClosestCorePoint(Controller, position);
+            bot.AddPosition(position, closestCorePoint.Id);
+
+            Stopwatch stopWatch = new Stopwatch();
+
+            botCreator.ActivateBot(bot, zone, true, new Func<BotOwner, BotZone, BotsGroup>((BotOwner bt, BotZone zn) =>
+            {
+                return GetPlayerGroup(player, bt, zn);
+
+            }), new Action<BotOwner>((BotOwner owner) =>
+            {
+                bool shallBeGroup = bot.SpawnParams?.ShallBeGroup != null;
+
+                stopWatch.Start();
+
+                Action<BotOwner> OnBotState = new Action<BotOwner>((BotOwner me) =>
+                {
+                    me.Memory.DeleteInfoAboutEnemy(player.Player()); // prevent attack of player on spawn
+
+                    BossPlayers.Instance.AddFollower(me, player,false); // make bot a follower
+
+                    BotOwnerManualUpdatePatch.BotOwnerUpdate.Remove(me.ProfileId); // clear watcher
+                });
+
+                BotOwnerManualUpdatePatch.BotOwnerUpdate.Add(owner.ProfileId, OnBotState);
+
+                // force player side on the bot
+                if (owner.Side != side)
+                {
+                    owner.GetPlayer.Profile.Info.Side = side;
+                }
+
+                botSpawnerClass.method_10(owner, bot, new Action<BotOwner>((BotOwner follower) =>
+                {
+
+                    Components.Logger.LogInfo("Boss Ally " + follower.Profile.Nickname + " ready");
+
+                    token.Cancel();
+
+                    var Timer = StaticManager.Instance.TimerManager.MakeTimer(TimeSpan.FromSeconds(2), false);
+
+                    Timer.OnTimer += () =>
+                    {
+                        follower.BotTalk.TrySay(EPhraseTrigger.Ready, false);
+                    };
+
+                }), shallBeGroup, stopWatch);
+
+
+
+
+                if (boss == WildSpawnType.bossKnight)
+                {
+                    SpawnBossFollower(player, WildSpawnType.followerBigPipe, true).Forget();
+                }
+
+            }), token.GetCancelToken());
+        }
 
         public async UniTask SpawnGroupBots(pitAIBossPlayer player)
         {
@@ -73,13 +256,7 @@ namespace friendlyPMC.Patches
 
             var botSpawnerClass = Controller.BotSpawner;
             var botCreator = AccessTools.Field(typeof(BotSpawner), "_botCreator").GetValue(botSpawnerClass) as IBotCreator;
-
-            var botGame = AccessTools.Field(typeof(BotSpawner), "_game").GetValue(botSpawnerClass) as IBotGame;
-            var deadBodiesController = AccessTools.Field(typeof(BotSpawner), "_deadBodiesController").GetValue(botSpawnerClass) as DeadBodiesController;
-            var allPlayers = AccessTools.Field(typeof(BotSpawner), "_allPlayers").GetValue(botSpawnerClass) as List<Player>;
-            var spawnGroups = AccessTools.Field(typeof(BotSpawner), "_groups").GetValue(botSpawnerClass) as BotZoneGroupsDictionary;
-            var allBotZones = AccessTools.Field(typeof(BotSpawner), "_allBotZones").GetValue(botSpawnerClass) as BotZone[];
-            var _freeForAll = (bool)AccessTools.Field(typeof(BotSpawner), "_freeForAll").GetValue(botSpawnerClass);
+           
 
             Vector3 position = player.Position;
             EPlayerSide side = player.Player().Side;
@@ -109,7 +286,7 @@ namespace friendlyPMC.Patches
             BotSpawnParams @params = new BotSpawnParams();
             @params.ShallBeGroup = new ShallBeGroupParams(true, false, memberCount);
 
-            IProfileData botData = new IProfileData(side, WildSpawnType.bossKnight, BotDifficulty.hard, 0f, @params);
+            IProfileData botData = new IProfileData(side, type, BotDifficulty.hard, 0f, @params);
 
             BotCacheClass bot = await BotCacheClass.Create(botData, botCreator, memberCount, botSpawnerClass);
 
@@ -139,85 +316,7 @@ namespace friendlyPMC.Patches
 
             botCreator.ActivateBot(bot, zone, true, new Func<BotOwner, BotZone, BotsGroup>((BotOwner bt, BotZone zn) =>
             {
-                // make the first group be the boss' group
-                if (player.bossGroup == null)
-                {
-                    BotsGroup botsGroup;
-                    WildSpawnType role = bt.Profile.Info.Settings.Role;
-                    List<BotOwner> list = new List<BotOwner>();
-
-                    // botsGroup take on the values of the inital bot, attempt to prevent the group from being hostile to the player
-                    bt.Settings.FileSettings.Mind.ENEMY_BY_GROUPS_PMC_PLAYERS = side != EPlayerSide.Savage ? false : true;
-                    bt.Settings.FileSettings.Mind.ENEMY_BY_GROUPS_SAVAGE_PLAYERS = side == EPlayerSide.Savage ? false : true;
-
-                    var oldBehaviourBear = bt.Settings.FileSettings.Mind.DEFAULT_BEAR_BEHAVIOUR;
-                    var oldBehaviorUsec = bt.Settings.FileSettings.Mind.DEFAULT_USEC_BEHAVIOUR;
-                    var oldBehaviorSavage = bt.Settings.FileSettings.Mind.DEFAULT_SAVAGE_BEHAVIOUR;
-                    
-                    var old_use = bt.Settings.FileSettings.Mind.USE_ADD_TO_ENEMY_VALIDATION;
-                    var old_reasons = bt.Settings.FileSettings.Mind.VALID_REASONS_TO_ADD_ENEMY;
-
-                    bt.Settings.FileSettings.Mind.USE_ADD_TO_ENEMY_VALIDATION = true;
-                    bt.Settings.FileSettings.Mind.VALID_REASONS_TO_ADD_ENEMY = new EBotEnemyCause[] { };
-
-                    if(side == EPlayerSide.Savage)
-                    {
-                        bt.Settings.FileSettings.Mind.DEFAULT_SAVAGE_BEHAVIOUR = EWarnBehaviour.Ignore;
-                        bt.Settings.FileSettings.Mind.DEFAULT_BEAR_BEHAVIOUR = EWarnBehaviour.Attack;
-                        bt.Settings.FileSettings.Mind.DEFAULT_USEC_BEHAVIOUR = EWarnBehaviour.Attack;
-                    } else if(side == EPlayerSide.Bear)
-                    {
-                        bt.Settings.FileSettings.Mind.DEFAULT_BEAR_BEHAVIOUR = EWarnBehaviour.Ignore;
-                        bt.Settings.FileSettings.Mind.DEFAULT_SAVAGE_BEHAVIOUR = EWarnBehaviour.Attack;
-                    } else
-                    {
-                        bt.Settings.FileSettings.Mind.DEFAULT_USEC_BEHAVIOUR = EWarnBehaviour.Ignore;
-                        bt.Settings.FileSettings.Mind.DEFAULT_SAVAGE_BEHAVIOUR = EWarnBehaviour.Attack;
-                    }
-
-                    foreach (BotOwner item2 in botSpawnerClass.method_4(bt))
-                    {
-                        list.Add(item2);
-                    }
-                    botsGroup = new BotsGroupPlayer(zn, botGame, bt, list, deadBodiesController, allPlayers, player);
-                    if (_freeForAll)
-                    {
-                        spawnGroups.AddNoKey(botsGroup, zn);
-                    }
-                    else
-                    {
-                        spawnGroups.Add(zn, side, botsGroup, false);
-                    }
-                    player.bossGroup = botsGroup;
-
-                    BossPlayers.Instance.AddFollowerGroup(player.bossGroup.Id);
-                    player.bossGroup.Lock();
-
-                    player.bossGroup.OnEnemyAdd += (IPlayer pl, EBotEnemyCause cause) =>
-                    {
-                        if (pl != null)
-                        {
-                            if (player.Player().ProfileId == pl.ProfileId)
-                            {
-                                player.bossGroup.RemoveEnemy(player.Player());
-                                player.bossGroup.AddAlly(player.realPlayer);
-                            } else if(pl.IsAI && player.bossGroup.Contains(pl.AIData.BotOwner))
-                            {
-                                player.bossGroup.RemoveEnemy(pl);
-                                player.bossGroup.AddAlly(pl.AIData.Player);
-                            }
-                        }
-                    };
-
-                    // revert changes
-                    bt.Settings.FileSettings.Mind.USE_ADD_TO_ENEMY_VALIDATION = old_use;
-                    bt.Settings.FileSettings.Mind.VALID_REASONS_TO_ADD_ENEMY = old_reasons;
-                    bt.Settings.FileSettings.Mind.DEFAULT_BEAR_BEHAVIOUR = oldBehaviourBear;
-                    bt.Settings.FileSettings.Mind.DEFAULT_USEC_BEHAVIOUR = oldBehaviorUsec;
-                    bt.Settings.FileSettings.Mind.DEFAULT_SAVAGE_BEHAVIOUR = oldBehaviorSavage;
-                }
-
-                return player.bossGroup;
+                return GetPlayerGroup(player, bt, zn);
 
             }), new Action<BotOwner>((BotOwner owner) =>
             {
@@ -292,12 +391,7 @@ namespace friendlyPMC.Patches
                 Controller = __instance;
             }
 
-            
-            float dist;
-            Vector3 position = player.Transform.position;
-
-            BotZone zone = __instance.GetClosestZone(position, out dist);
-
+           
             pitAIBossPlayer playerBoss = BossPlayers.Instance.AddBossPlayer(player);
             spawnedPlayers.Add(playerBoss);
 
@@ -308,10 +402,27 @@ namespace friendlyPMC.Patches
                 {
                     try
                     {
+                        Components.Logger.LogInfo("Start Squad Spawn");
                         Instance.SpawnGroupBots(playerBoss).Forget();
                     }
-                    catch (Exception e) { Components.Logger.LogInfo("Failed Alternative Squad Spawn Process " + e.Message); }
+                    catch (Exception e) { Components.Logger.LogInfo("Failed Alternative Spawn Process #1: " + e.Message); }
                 };
+
+
+                if (friendlyPMC.knightSpawn.Value)
+                {
+                    var Timer2 = StaticManager.Instance.TimerManager.MakeTimer(TimeSpan.FromSeconds(friendlyPMC.squadDelay.Value + 1), false);
+                    Timer2.OnTimer += () =>
+                    {
+                        try
+                        {
+                            Components.Logger.LogInfo("Start Boss Ally Spawn");
+                            Instance.SpawnBossFollower(playerBoss).Forget();
+                        }
+                        catch (Exception e) { Components.Logger.LogInfo("Failed Alternative Spawn Process #2: " + e.Message); }
+                    };
+                    
+                }
             }
         }
     }
@@ -326,10 +437,9 @@ namespace friendlyPMC.Patches
 
             spawnRan = true;
             
-            Components.Logger.LogInfo("Start Squad Spawn");
-
             if (friendlyPMC.squadSpawn.Value)
             {
+                Components.Logger.LogInfo("Start Squad Spawn");
                 BotsControllerPatch.spawnedPlayers.ForEach(playerBoss =>
                 {
 
@@ -351,6 +461,24 @@ namespace friendlyPMC.Patches
                             };
                         }
                     }
+                });
+            }
+
+            if (friendlyPMC.knightSpawn.Value)
+            {
+                Components.Logger.LogInfo("Start Boss Ally Spawn");
+
+                BotsControllerPatch.spawnedPlayers.ForEach(playerBoss =>
+                {
+                    var Timer = StaticManager.Instance.TimerManager.MakeTimer(TimeSpan.FromSeconds(friendlyPMC.squadDelay.Value + 1), false);
+                    Timer.OnTimer += () =>
+                    {
+                        try
+                        {
+                            BotsControllerPatch.Instance.SpawnBossFollower(playerBoss).Forget();
+                        }
+                        catch (Exception e) { Components.Logger.LogInfo("Failed Delayed Boss Ally Process " + e.Message); }
+                    };
                 });
             }
         }

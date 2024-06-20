@@ -44,17 +44,17 @@ namespace friendlyPMC.Components.BossFollower
             return this.customNavigationPoint_0;
         }
 
-        private bool HasBoss()
+        protected virtual bool HasBoss()
         {
             return botOwner_0.BotFollower.HaveBoss;
         }
 
-        private pitAIBossPlayer GetBoss()
+        protected virtual pitAIBossPlayer GetBoss()
         {
             return (pitAIBossPlayer)botOwner_0.BotFollower.BossToFollow;
         }
 
-        private void GetCoverPoint(Vector3 centerPosition, float searchRadius)
+        protected virtual void GetCoverPoint(Vector3 centerPosition, float searchRadius)
         {
 
             if (this.coverTimer > Time.time) return;

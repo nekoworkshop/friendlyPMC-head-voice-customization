@@ -51,7 +51,7 @@ namespace friendlyPMC.Components.BossFollower
             float regroupMinDistance = friendlyPMC.regroupMinDistance.Value;
             float nearSearchRadius = friendlyPMC.fightInnerRadius.Value;
             float sprintDistance = 7f;
-            Vector3 bossPosition = GetBoss().Position;
+            Vector3 bossPosition = GetBossPosition();
 
             if (ordersAreReqroup && GetNavDistance(bossPosition) > regroupMinDistance && (!botOwner_0.Memory.HaveEnemy || !botOwner_0.Memory.GoalEnemy.IsVisible))
             {
@@ -78,7 +78,7 @@ namespace friendlyPMC.Components.BossFollower
             return base.GetDecision();
         }
 
-        private float GetNavDistance(Vector3 point)
+        protected float GetNavDistance(Vector3 point)
         {
             NavMeshPath navMeshPath = new NavMeshPath();
             navMeshPath.ClearCorners();
@@ -94,14 +94,14 @@ namespace friendlyPMC.Components.BossFollower
             }
         }
 
-        private void GetClosestCoverPoint(Vector3 centerPosition, float searchRadius)
+        protected virtual void GetClosestCoverPoint(Vector3 centerPosition, float searchRadius)
         {
 
             if (this.coverTimer > Time.time) return;
 
             this.coverTimer = 1f + Time.time;
 
-            List<CustomNavigationPoint> customNavigationPoints = GetBoss().GetAreaCovers();
+            List<CustomNavigationPoint> customNavigationPoints = GetNearGovers();
 
             if (customNavigationPoints.Count > 0)
             {

@@ -131,7 +131,7 @@ namespace friendlyPMC.Components
             _bot.BotTalk.SetSilence(0f); // let the bot talk
 
             // make bot follower of player
-            _player.AddFollower(_bot);;
+            _player.AddFollower(_bot);
             // force bot to turn off light
             _bot.BotLight.TurnOff(false, true);
             // activate new following patrol mode

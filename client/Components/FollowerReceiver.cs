@@ -50,7 +50,7 @@ namespace friendlyPMC.Components
 
         public bool IsAllyRequester(IPlayer requester)
         {
-            return BossPlayers.Instance.IsFollower(botOwner_0) && requester != null && botOwner_0.BotsGroup.IsAlly(requester);
+            return IsBossRequester(requester) || BossPlayers.Instance.IsFollower(botOwner_0) && requester != null && botOwner_0.BotsGroup.IsAlly(requester);
         }
 
         public virtual void GestusShown(GClass454 data)
@@ -180,6 +180,9 @@ namespace friendlyPMC.Components
             IPlayer requester = info.PlayerRequester;
 
             bool isBossCommunicating = IsBossRequester(requester);
+            
+            bool isAllyRequesting = IsAllyRequester(requester);
+
             bool shouldDefault = !BossPlayers.Instance.IsFollower(botOwner_0) && !BossPlayers.Instance.IsBoss(requester.ProfileId);
 
             bool isClose = (botOwner_0.GetPlayer.Transform.position - requester.Transform.position).magnitude < 14f;
@@ -192,7 +195,7 @@ namespace friendlyPMC.Components
                 EPhraseTrigger.GoForward,
                 EPhraseTrigger.Gogogo
             };
-            List<EPhraseTrigger> bossBusyNoPhrase = new List<EPhraseTrigger>
+            List<EPhraseTrigger> bossBusyIgnore = new List<EPhraseTrigger>
             {
                 EPhraseTrigger.Stop,
                 EPhraseTrigger.FollowMe,
@@ -204,8 +207,8 @@ namespace friendlyPMC.Components
                 EPhraseTrigger.Fire,
                 EPhraseTrigger.GetBack,
             };
-            // AI Boss followers will not take several commands
-            if (isBossCommunicating && botOwner_0.AIData.IAmBoss)
+            // AI Boss followers and AI followers of AI Bosses will not take several commands
+            if (isBossCommunicating && (botOwner_0.AIData.IAmBoss || botOwner_0.IsFollower()))
             {
                 if(bossIgnore.Contains(info.phrase))
                 {
@@ -223,12 +226,59 @@ namespace friendlyPMC.Components
                     return;
                 }
 
-                if (botOwner_0.Memory.HaveEnemy && bossBusyNoPhrase.Contains(info.phrase))
+                if (botOwner_0.Memory.HaveEnemy && bossBusyIgnore.Contains(info.phrase))
                 {
                     return;
                 }
             }
 
+
+            if(isAllyRequesting)
+            {
+                // on supression, switch enemy priority
+                if (info.phrase == EPhraseTrigger.Suppress)
+                {
+
+                    if(isBossCommunicating)
+                    {
+                        pitAIBossPlayer boss = BossPlayers.Instance.GetBossPlayer(requester.ProfileId);
+
+                        if (isClose)
+                        {
+                            EnemyInfo enemyInfo;
+                            if (!botOwner_0.Memory.HaveEnemy)
+                            {
+                                boss.PrioritizeEnemy(botOwner_0, boss.ClosestEnemy());
+                                enemyInfo = botOwner_0.Memory.GoalEnemy;
+
+                            }
+                            else
+                            {
+                                enemyInfo = botOwner_0.Memory.GoalEnemy;
+                                BotOwner newEnemy = boss.ClosestEnemy();
+
+                                if (newEnemy != null && (enemyInfo == null || (botOwner_0.GetPlayer.Transform.position - enemyInfo.Person.Transform.position).magnitude > 20f))
+                                {
+                                    BotSettingsClass botSettingsClass = new BotSettingsClass(Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(newEnemy.ProfileId), boss.bossGroup, EBotEnemyCause.callForHelp1);
+
+                                    botOwner_0.Memory.AddEnemy(newEnemy, botSettingsClass, false);
+
+                                    enemyInfo = botOwner_0.Memory.GoalEnemy;
+                                }
+                            }
+
+                            if (enemyInfo != null)
+                                boss.bossGroup.RequestsController.TryAskSuppressionRequest(requester, enemyInfo);
+                        }
+                    } else if(botOwner_0.Memory.HaveEnemy)
+                    {
+                        botOwner_0.BotsGroup.RequestsController.TryAskSuppressionRequest(requester, botOwner_0.Memory.GoalEnemy);
+                    }
+
+                    
+                    return;
+                }
+            }
 
             if (isBossCommunicating)
             {
@@ -299,38 +349,7 @@ namespace friendlyPMC.Components
                         botOwner_0.Gesture.TryGestus(EGesture.Good, false);
                     }
                 }
-                // on supression, switch enemy priority
-                else if (info.phrase == EPhraseTrigger.Suppress)
-                {
-                    if (isClose)
-                    {
-                        EnemyInfo enemyInfo;
-                        if (!botOwner_0.Memory.HaveEnemy)
-                        {
-                            boss.PrioritizeEnemy(botOwner_0, boss.ClosestEnemy());
-                            enemyInfo = botOwner_0.Memory.GoalEnemy;
-
-                        }
-                        else
-                        {
-                            enemyInfo = botOwner_0.Memory.GoalEnemy;
-                            BotOwner newEnemy = boss.ClosestEnemy();
-
-                            if (newEnemy != null && (enemyInfo == null || (botOwner_0.GetPlayer.Transform.position - enemyInfo.Person.Transform.position).magnitude > 20f))
-                            {
-                                BotSettingsClass botSettingsClass = new BotSettingsClass(Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(newEnemy.ProfileId), boss.bossGroup, EBotEnemyCause.callForHelp1);
-
-                                botOwner_0.Memory.AddEnemy(newEnemy, botSettingsClass, false);
-
-                                enemyInfo = botOwner_0.Memory.GoalEnemy;
-                            }
-                        }
-
-                        if (enemyInfo != null)
-                            boss.bossGroup.RequestsController.TryAskSuppressionRequest(requester, enemyInfo);
-                    }
-
-                } // attack close
+                // attack close
                 else if (info.phrase == EPhraseTrigger.Fire)
                 {
                     (botOwner_0.Brain.BaseBrain as FollowerBrain).SetBossTactic("push");
@@ -473,7 +492,7 @@ namespace friendlyPMC.Components
                                 }
 
                             });
-                        } catch (Exception e)
+                        } catch 
                         { 
                             closest = null;
                         }

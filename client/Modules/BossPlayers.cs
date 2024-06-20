@@ -199,7 +199,7 @@ namespace friendlyPMC.Modules
                 _followers.Remove(_follower);
             }
 
-            List<WildSpawnType> bossRoles = new List<WildSpawnType> { WildSpawnType.bossKnight };
+            List<WildSpawnType> bossRoles = new List<WildSpawnType> { WildSpawnType.bossKnight, WildSpawnType.followerBigPipe };
 
             bool isAIBoss = false;
 
