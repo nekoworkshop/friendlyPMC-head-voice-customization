@@ -13,7 +13,7 @@ namespace friendlyPMC.Components
     internal class BossFollowerPlayer : BotFollowerPlayer
     {
         public BossFollowerPlayer(BotOwner bot, pitAIBossPlayer player) : base(bot, player) {
-
+            Components.Logger.LogInfo("Create boss follower");
         }
 
         public override void SetlFollowerSettings(BotOwner bot)
@@ -51,10 +51,13 @@ namespace friendlyPMC.Components
             }
 
             bot.Tactic.AggressionChange(-1f);
+
+            Components.Logger.LogInfo("Set boss settings");
         }
 
         public override FollowerBrain GetFollowerBrain(BotOwner bot, pitAIBossPlayer boss)
         {
+            Components.Logger.LogInfo("Get boss brain");
             if(bot.IsRole(WildSpawnType.bossKnight))
             {
                 return new KnightFollowerBrain(bot, boss);

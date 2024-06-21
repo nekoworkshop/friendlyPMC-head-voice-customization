@@ -72,8 +72,19 @@ namespace friendlyPMC.Components
                 EGesture.Stop,
                 EGesture.ComeToMe
             };
+
+            bool isFollowerBoss = false;
+            foreach (WildSpawnType role in Utils.Utils.BossFollowersRoles)
+            {
+                if (botOwner_0.IsRole(role))
+                {
+                    isFollowerBoss = true;
+                    break;
+                }
+            }
+
             // AI Boss followers will not take several gestures
-            if (isBossCommunicating && botOwner_0.AIData.IAmBoss)
+            if (isBossCommunicating && isFollowerBoss)
             {
                 if (gestusDistance < maxGestusDistance)
                 {
@@ -207,8 +218,19 @@ namespace friendlyPMC.Components
                 EPhraseTrigger.Fire,
                 EPhraseTrigger.GetBack,
             };
+
+            bool isFollowerBoss = false;
+            foreach (WildSpawnType role in Utils.Utils.BossFollowersRoles)
+            {
+                if(botOwner_0.IsRole(role))
+                {
+                    isFollowerBoss = true;
+                    break;
+                }
+            }
+
             // AI Boss followers and AI followers of AI Bosses will not take several commands
-            if (isBossCommunicating && (botOwner_0.AIData.IAmBoss || botOwner_0.IsFollower()))
+            if (isBossCommunicating && isFollowerBoss)
             {
                 if(bossIgnore.Contains(info.phrase))
                 {

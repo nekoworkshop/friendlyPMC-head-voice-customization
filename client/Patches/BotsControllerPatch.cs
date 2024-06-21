@@ -21,6 +21,7 @@ using EFT.Bots;
 using GPUInstancer;
 using UnityEngine.Profiling;
 using System.Security.Policy;
+using System.Threading.Tasks;
 
 
 namespace friendlyPMC.Patches
@@ -162,11 +163,12 @@ namespace friendlyPMC.Patches
             return player.bossGroup;
         } 
 
-        public async UniTask SpawnBossFollower(pitAIBossPlayer player, WildSpawnType boss = WildSpawnType.bossKnight, bool isFollower = false)
+        public async UniTask SpawnBossFollower(pitAIBossPlayer player, WildSpawnType boss = WildSpawnType.bossKnight, CancelToken cancelToken = null)
         {
+
             float dist;
 
-            CancelToken token = new CancelToken();
+            CancelToken token = cancelToken != null ? cancelToken :  new CancelToken();
 
             var botSpawnerClass = Controller.BotSpawner;
             var botCreator = AccessTools.Field(typeof(BotSpawner), "_botCreator").GetValue(botSpawnerClass) as IBotCreator;
@@ -194,6 +196,8 @@ namespace friendlyPMC.Patches
 
             Stopwatch stopWatch = new Stopwatch();
 
+            var tcs = new TaskCompletionSource<string>();
+
             botCreator.ActivateBot(bot, zone, true, new Func<BotOwner, BotZone, BotsGroup>((BotOwner bt, BotZone zn) =>
             {
                 return GetPlayerGroup(player, bt, zn);
@@ -206,6 +210,7 @@ namespace friendlyPMC.Patches
 
                 Action<BotOwner> OnBotState = new Action<BotOwner>((BotOwner me) =>
                 {
+                    Components.Logger.LogInfo("Make bot a follower");
                     me.Memory.DeleteInfoAboutEnemy(player.Player()); // prevent attack of player on spawn
 
                     BossPlayers.Instance.AddFollower(me, player,false); // make bot a follower
@@ -221,13 +226,12 @@ namespace friendlyPMC.Patches
                     owner.GetPlayer.Profile.Info.Side = side;
                 }
 
-                botSpawnerClass.method_10(owner, bot, new Action<BotOwner>((BotOwner follower) =>
+                botSpawnerClass.method_10(owner, bot, new Action<BotOwner>(async (BotOwner follower) =>
                 {
 
                     Components.Logger.LogInfo("Boss Ally " + follower.Profile.Nickname + " ready");
 
-                    token.Cancel();
-
+                   
                     var Timer = StaticManager.Instance.TimerManager.MakeTimer(TimeSpan.FromSeconds(2), false);
 
                     Timer.OnTimer += () =>
@@ -235,17 +239,24 @@ namespace friendlyPMC.Patches
                         follower.BotTalk.TrySay(EPhraseTrigger.Ready, false);
                     };
 
+                    if (boss == WildSpawnType.bossKnight)
+                    {
+                        await SpawnBossFollower(player, WildSpawnType.followerBigPipe, token);
+
+                        token.Cancel();
+
+                        tcs.SetResult("success");
+
+                    } else
+                    {
+                        tcs.SetResult("success");
+                    }
+ 
                 }), shallBeGroup, stopWatch);
 
-
-
-
-                if (boss == WildSpawnType.bossKnight)
-                {
-                    SpawnBossFollower(player, WildSpawnType.followerBigPipe, true).Forget();
-                }
-
             }), token.GetCancelToken());
+
+            await tcs.Task;
         }
 
         public async UniTask SpawnGroupBots(pitAIBossPlayer player)
@@ -435,7 +446,7 @@ namespace friendlyPMC.Patches
         public static void SpawnFollowers()
         {
             
-            if (friendlyPMC.alternativeSpawn.Value == true || !friendlyPMC.squadSpawn.Value) return;
+            if (friendlyPMC.alternativeSpawn.Value == true) return;
 
             if (spawnRan) return;
 
@@ -479,7 +490,7 @@ namespace friendlyPMC.Patches
                     {
                         try
                         {
-                            BotsControllerPatch.Instance.SpawnBossFollower(playerBoss).Forget();
+                            BotsControllerPatch.Instance.SpawnBossFollower(playerBoss, WildSpawnType.followerBigPipe).Forget();
                         }
                         catch (Exception e) { Components.Logger.LogInfo("Failed Delayed Boss Ally Process " + e.Message); }
                     };

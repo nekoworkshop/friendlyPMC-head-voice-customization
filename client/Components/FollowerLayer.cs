@@ -180,59 +180,17 @@ namespace friendlyPMC.Components
 
         public override CustomNavigationPoint FindPoint(CoverSearchData data, Func<CoverSearchData, CustomNavigationPoint> p, bool checkCurrent)
         {
-            if (this.customNavigationPoint_0 != null && (!this.customNavigationPoint_0.IsFreeById(this.botOwner_0.Id) || this.customNavigationPoint_0.IsSpotted))
-            {
-                this.customNavigationPoint_0 = null;
-            }
-            if (this.customNavigationPoint_0 != null)
-            {
-                return this.customNavigationPoint_0;
-            }
-
-            return base.FindPoint(data, p, checkCurrent);
+            customNavigationPoint_0 = Utils.Utils.FindPoint(botOwner_0, customNavigationPoint_0);
+            return customNavigationPoint_0;
         }
 
         protected virtual void GetCoverPoint(Vector3 centerPosition, float searchRadius)
         {
-            List<CustomNavigationPoint> customNavigationPoints = GetNearGovers();
 
-            if (customNavigationPoints.Count > 0)
-            {
-                CustomNavigationPoint point1 = null;
-                float distance = searchRadius * searchRadius;
+            CustomNavigationPoint point1 = Utils.Utils.GetCoverPoint(botOwner_0, centerPosition, searchRadius);
 
-                List<CustomNavigationPoint> availablePoints = new List<CustomNavigationPoint>();
-
-                foreach (CustomNavigationPoint point in customNavigationPoints)
-                {
-                    if (point.IsFreeById(botOwner_0.Id) && !point.IsSpotted)
-                    {
-                        float range = (centerPosition - point.Position).sqrMagnitude;
-                        if (range < distance)
-                        {
-                            distance = range;
-                            availablePoints.Add(point);
-
-                        }
-                    }
-                }
-                // get a random point
-                if (availablePoints.Count > 0)
-                {
-                    point1 = availablePoints.Random();
-                }
-
-
-                if (point1 != null)
-                {
-                    customNavigationPoint_0 = point1;
-                    botOwner_0.Memory.SetCoverPoints(point1);
-                }
-                else
-                {
-                    customNavigationPoint_0 = null;
-                }
-            }
+            customNavigationPoint_0 = point1;
+            botOwner_0.Memory.SetCoverPoints(point1);
         }
     }
 }

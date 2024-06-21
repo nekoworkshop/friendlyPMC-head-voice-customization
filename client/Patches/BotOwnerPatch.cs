@@ -74,11 +74,17 @@ namespace friendlyPMC.Patches
         [PatchPostfix]
         private static void PatchPostfix(BotOwner __instance)
         {
-            if(__instance.BotState == EBotState.Active && __instance.GetPlayer.HealthController.IsAlive)
+            try
             {
-                Action<BotOwner> OnUpdate;
-                BotOwnerUpdate.TryGetValue(__instance.ProfileId, out OnUpdate);
-                if (OnUpdate != null) OnUpdate(__instance);
+                if (__instance.BotState == EBotState.Active && __instance.GetPlayer.HealthController.IsAlive)
+                {
+                    Action<BotOwner> OnUpdate;
+                    BotOwnerUpdate.TryGetValue(__instance.ProfileId, out OnUpdate);
+                    if (OnUpdate != null) OnUpdate(__instance);
+                }
+            } catch (Exception e)
+            {
+                Components.Logger.LogInfo("Exception on BotOwner UpdateManual: " + e.Message);
             }
         }
     }

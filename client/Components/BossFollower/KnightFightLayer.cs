@@ -58,59 +58,10 @@ namespace friendlyPMC.Components.BossFollower
 
             this.coverTimer = 1f + Time.time;
 
-            List<CustomNavigationPoint> customNavigationPoints = HasBoss() ? GetBoss().GetAreaCovers() : BossPlayers.Instance.GetCovers();
+            CustomNavigationPoint point = Utils.Utils.GetClosestCoverPoint(botOwner_0, centerPosition, searchRadius);
 
-            if (customNavigationPoints.Count > 0)
-            {
-                CustomNavigationPoint point1 = null;
-                float distance = searchRadius;
-
-                NavMeshPath navMeshPath = new NavMeshPath();
-                Vector3 botPosition = botOwner_0.Transform.position;
-
-                foreach (CustomNavigationPoint point in customNavigationPoints)
-                {
-                    if (
-                            point.IsFreeById(botOwner_0.Id) &&
-                            !point.IsSpotted &&
-                            (
-                                !botOwner_0.Memory.HaveEnemy ||
-                                (
-                                    point.IsFreeById(botOwner_0.Memory.GoalEnemy.Owner.Id) &&
-                                    point.IsDangerPositionFarEnough(new Vector3[] { botOwner_0.Memory.GoalEnemy.CurrPosition }, 5f)
-                                )
-                            )
-                        )
-                    {
-                        float range = Vector3.Distance(centerPosition, point.Position);
-                        if (range < distance)
-                        {
-                            navMeshPath.ClearCorners();
-                            bool resut = NavMesh.CalculatePath(botPosition, point.Position, -1, navMeshPath);
-                            if (resut && navMeshPath.status == NavMeshPathStatus.PathComplete)
-                            {
-
-                                float dist = navMeshPath.CalculatePathLength();
-                                if (dist > searchRadius)
-                                {
-                                    continue;
-                                }
-                            }
-                            point1 = point;
-                            distance = range;
-                        }
-                    }
-                }
-                if (point1 != null)
-                {
-                    customNavigationPoint_0 = point1;
-                    botOwner_0.Memory.SetCoverPoints(point1);
-                }
-                else
-                {
-                    customNavigationPoint_0 = null;
-                }
-            }
+            customNavigationPoint_0 = point;
+            botOwner_0.Memory.SetCoverPoints(point);
         }
     }
 }

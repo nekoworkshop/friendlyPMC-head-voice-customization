@@ -199,11 +199,10 @@ namespace friendlyPMC.Modules
                 _followers.Remove(_follower);
             }
 
-            List<WildSpawnType> bossRoles = new List<WildSpawnType> { WildSpawnType.bossKnight, WildSpawnType.followerBigPipe };
 
             bool isAIBoss = false;
 
-            foreach (var item in bossRoles)
+            foreach (var item in Utils.Utils.BossFollowersRoles)
             {
                 if(bot.IsRole(item))
                 {
