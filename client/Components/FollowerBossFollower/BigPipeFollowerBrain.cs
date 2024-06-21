@@ -7,10 +7,8 @@ namespace friendlyPMC.Components.FollowerBossFollower
     internal class BigPipeFollowerBrain : FollowerBrain
     {
 
-        private pitAIBossPlayer _boss;
         public BigPipeFollowerBrain(BotOwner owner, pitAIBossPlayer boss) : base(owner, boss)
         {
-            _boss = boss;
         }
 
         public override void AddLayers()

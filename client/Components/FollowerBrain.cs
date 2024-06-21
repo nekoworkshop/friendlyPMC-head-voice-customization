@@ -10,7 +10,7 @@ namespace friendlyPMC.Components
     {
         FollowerFightLayer fightLayer;
 
-        private pitAIBossPlayer _boss;
+        protected pitAIBossPlayer _boss;
         public FollowerBrain(BotOwner owner, pitAIBossPlayer boss) : base(owner)
         {
             AddLayers();

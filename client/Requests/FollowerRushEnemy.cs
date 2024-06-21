@@ -8,6 +8,8 @@ namespace friendlyPMC.Requests
         private BotOwner botOwner_0;
         public FollowerRushEnemy(BotOwner bot, Player requester, BotRequestType request = BotRequestType.attackClose) : base(requester, request)
         {
+            botOwner_0 = bot;
+
             Task.Delay(1000).ContinueWith(t =>
             {
                 if(botOwner_0.BotRequestController.CurRequest !=null && botOwner_0.BotRequestController.CurRequest.BotRequestType == request)

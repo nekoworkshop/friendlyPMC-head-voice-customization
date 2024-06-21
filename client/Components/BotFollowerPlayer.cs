@@ -72,7 +72,7 @@ namespace friendlyPMC.Components
             {
                 try
                 {
-                    baseBrain.method_3(i);
+                    if(baseBrain != null) baseBrain.method_3(i);
                 }
                 catch (Exception)
                 {
@@ -87,7 +87,7 @@ namespace friendlyPMC.Components
                 _bot.BotFollower.BossToFollow = null;
             }
             // deactivate old brain
-            if (baseBrain.CurLayerInfo != null && baseBrain.CurLayerInfo.IsActive)
+            if (baseBrain != null && baseBrain.CurLayerInfo != null && baseBrain.CurLayerInfo.IsActive)
             {
                 string name = baseBrain.CurLayerInfo.Name();
                 _bot.Brain.Agent.Deactivate(name);
@@ -95,7 +95,7 @@ namespace friendlyPMC.Components
             }
 
             _bot.Brain.Agent.Dispose();
-            baseBrain.Dispose();
+            if(baseBrain != null) baseBrain.Dispose();
 
             _bot.BotsController.AICoreController.Stop();
 ;

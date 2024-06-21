@@ -123,7 +123,6 @@ namespace friendlyPMC
             new QuickPanelPatch().Enable();
             new GestureMenuPatch().Enable();
             new EPhraseTriggerPatch().Enable();
-
         }
 
     }

@@ -66,6 +66,9 @@ namespace friendlyPMC.Components
             if (bot.IsRole(WildSpawnType.followerBigPipe))
                 return new BigPipeFollowerBrain(bot, boss);
 
+            if (bot.IsRole(WildSpawnType.followerBirdEye))
+                return new BirdEyeFollowerBrain(bot, boss);
+
             return new FollowerBrain(bot, boss);
         }
     }

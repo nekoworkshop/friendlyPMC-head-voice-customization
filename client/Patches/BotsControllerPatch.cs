@@ -161,7 +161,7 @@ namespace friendlyPMC.Patches
             bt.Settings.FileSettings.Mind.DEFAULT_SAVAGE_BEHAVIOUR = oldBehaviorSavage;
 
             return player.bossGroup;
-        } 
+        }
 
         public async UniTask SpawnBossFollower(pitAIBossPlayer player, WildSpawnType boss = WildSpawnType.bossKnight, CancelToken cancelToken = null)
         {
@@ -231,7 +231,8 @@ namespace friendlyPMC.Patches
 
                     Components.Logger.LogInfo("Boss Ally " + follower.Profile.Nickname + " ready");
 
-                   
+                    
+
                     var Timer = StaticManager.Instance.TimerManager.MakeTimer(TimeSpan.FromSeconds(2), false);
 
                     Timer.OnTimer += () =>
@@ -241,17 +242,17 @@ namespace friendlyPMC.Patches
 
                     if (boss == WildSpawnType.bossKnight)
                     {
-                        await SpawnBossFollower(player, WildSpawnType.followerBigPipe, token);
-
+                        await SpawnBossFollower(player, WildSpawnType.followerBigPipe);
+                        await SpawnBossFollower(player, WildSpawnType.followerBirdEye);
                         token.Cancel();
-
-                        tcs.SetResult("success");
-
-                    } else
-                    {
-                        tcs.SetResult("success");
                     }
- 
+                    else
+                    {
+                        token.Cancel();
+                    }
+
+                    tcs.SetResult("success");
+
                 }), shallBeGroup, stopWatch);
 
             }), token.GetCancelToken());
@@ -490,7 +491,7 @@ namespace friendlyPMC.Patches
                     {
                         try
                         {
-                            BotsControllerPatch.Instance.SpawnBossFollower(playerBoss, WildSpawnType.followerBigPipe).Forget();
+                            BotsControllerPatch.Instance.SpawnBossFollower(playerBoss).Forget();
                         }
                         catch (Exception e) { Components.Logger.LogInfo("Failed Delayed Boss Ally Process " + e.Message); }
                     };

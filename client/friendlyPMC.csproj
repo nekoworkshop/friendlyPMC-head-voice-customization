@@ -150,6 +150,7 @@
     <Compile Include="Components\BossFollower\KnightFollowerBrain.cs" />
     <Compile Include="Components\FollowerBossFollower\BigPipeArtilleryLayer.cs" />
     <Compile Include="Components\FollowerBossFollower\BigPipeFollowerBrain.cs" />
+    <Compile Include="Components\FollowerBossFollower\BirdEyeFollowerBrain.cs" />
     <Compile Include="Modules\FollowerCreateNode.cs" />
     <Compile Include="Patches\BotMemoryPatch.cs" />
     <Compile Include="Patches\GestureMenuPatch.cs" />
