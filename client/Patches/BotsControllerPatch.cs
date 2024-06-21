@@ -243,7 +243,6 @@ namespace friendlyPMC.Patches
                     if (boss == WildSpawnType.bossKnight)
                     {
                         await SpawnBossFollower(player, WildSpawnType.followerBigPipe);
-                        await SpawnBossFollower(player, WildSpawnType.followerBirdEye);
                         token.Cancel();
                     }
                     else
