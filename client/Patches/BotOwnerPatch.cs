@@ -77,7 +77,13 @@ namespace friendlyPMC.Patches
         {
             try
             {
-                if (__instance.BotState == EBotState.Active && __instance.GetPlayer.HealthController.IsAlive)
+                if (
+                    __instance != null && 
+                    __instance.BotState == EBotState.Active &&
+                    __instance.GetPlayer != null &&
+                    __instance.GetPlayer.HealthController != null &&
+                    __instance.GetPlayer.HealthController.IsAlive
+                )
                 {
                     Action<BotOwner> OnUpdate;
                     BotOwnerUpdate.TryGetValue(__instance.ProfileId, out OnUpdate);

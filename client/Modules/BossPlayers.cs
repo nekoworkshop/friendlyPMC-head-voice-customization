@@ -196,7 +196,7 @@ namespace friendlyPMC.Modules
 
             if (_follower != null)
             {
-                _followers.Remove(_follower);
+                return _follower;
             }
 
 

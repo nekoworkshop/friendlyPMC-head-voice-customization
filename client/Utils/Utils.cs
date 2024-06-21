@@ -151,7 +151,7 @@ namespace friendlyPMC.Utils
 
         }
 
-        public static CustomNavigationPoint FindPoint(BotOwner botOwner, CustomNavigationPoint customNavigationPoint)
+        public static CustomNavigationPoint FindPoint(BotOwner botOwner, CustomNavigationPoint customNavigationPoint, float searchRadius = 50f)
         {
             if (customNavigationPoint != null && (!customNavigationPoint.IsFreeById(botOwner.Id) || customNavigationPoint.IsSpotted))
             {
@@ -163,7 +163,7 @@ namespace friendlyPMC.Utils
             }
             else
             {
-                customNavigationPoint = GetCoverPoint(botOwner,botOwner.GetPlayer.Transform.position, 50f);
+                customNavigationPoint = GetCoverPoint(botOwner,botOwner.GetPlayer.Transform.position, searchRadius);
             }
 
 

@@ -210,12 +210,18 @@ namespace friendlyPMC.Patches
 
                 Action<BotOwner> OnBotState = new Action<BotOwner>((BotOwner me) =>
                 {
-                    Components.Logger.LogInfo("Make bot a follower");
                     me.Memory.DeleteInfoAboutEnemy(player.Player()); // prevent attack of player on spawn
 
                     BossPlayers.Instance.AddFollower(me, player,false); // make bot a follower
 
                     BotOwnerManualUpdatePatch.BotOwnerUpdate.Remove(me.ProfileId); // clear watcher
+
+                    if(boss == WildSpawnType.bossKnight)
+                    {
+                        SpawnBossFollower(player, WildSpawnType.followerBigPipe).Forget();
+                        SpawnBossFollower(player, WildSpawnType.followerBirdEye).Forget();
+                    }
+
                 });
 
                 BotOwnerManualUpdatePatch.BotOwnerUpdate.Add(owner.ProfileId, OnBotState);
@@ -231,8 +237,6 @@ namespace friendlyPMC.Patches
 
                     Components.Logger.LogInfo("Boss Ally " + follower.Profile.Nickname + " ready");
 
-                    
-
                     var Timer = StaticManager.Instance.TimerManager.MakeTimer(TimeSpan.FromSeconds(2), false);
 
                     Timer.OnTimer += () =>
@@ -240,15 +244,7 @@ namespace friendlyPMC.Patches
                         follower.BotTalk.TrySay(EPhraseTrigger.Ready, false);
                     };
 
-                    if (boss == WildSpawnType.bossKnight)
-                    {
-                        await SpawnBossFollower(player, WildSpawnType.followerBigPipe);
-                        token.Cancel();
-                    }
-                    else
-                    {
-                        token.Cancel();
-                    }
+                    token.Cancel();
 
                     tcs.SetResult("success");
 
