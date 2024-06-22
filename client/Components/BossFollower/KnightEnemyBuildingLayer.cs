@@ -19,11 +19,61 @@ namespace friendlyPMC.Components.BossFollower
         private float sprintDistance = 15f;
 
         protected bool ordersChanged = false;
+
+        private bool ordersAreReqroup = false;
         public KnightEnemyBuildingLayer(BotOwner bot, int priority) : base(bot, priority)
         {
 
         }
-      
+
+        public override bool ShallUseNow()
+        {
+            if (!botOwner_0.Memory.HaveEnemy)
+            {
+                if (ordersAreReqroup)
+                {
+                    ordersAreReqroup = false;
+                }
+
+                return false;
+            }
+
+
+            if (
+                   botOwner_0.BotRequestController.CurRequest != null &&
+                   botOwner_0.BotRequestController.CurRequest.BotRequestType == BotRequestType.attackClose
+               )
+            {
+
+                return false;
+            }
+
+
+            return (this.botOwner_0.Memory.HaveEnemy && this.botOwner_0.Memory.GoalEnemy.Person.AIData.EnvironmentId > 0 && Time.time - this.botOwner_0.Memory.GoalEnemy.GroupInfo.EnemyLastSeenTimeReal < 900f) || (this.botOwner_0.Memory.LastEnemy != null && this.botOwner_0.Memory.LastEnemy.Person.AIData.EnvironmentId > 0 && Time.time - this.botOwner_0.Memory.LastEnemy.GroupInfo.EnemyLastSeenTimeReal < 900f);
+        }
+
+        public override AICoreActionEndStruct ShallEndCurrentDecision(AICoreActionResultStruct<BotLogicDecision> curDecision)
+        {
+            BotRequest request = botOwner_0.BotRequestController.CurRequest;
+
+            if (!botOwner_0.Memory.HaveEnemy)
+            {
+                return gstruct7_0;
+            }
+
+            // boss recall
+            if (
+                botOwner_0.BotRequestController.CurRequest != null &&
+                botOwner_0.BotRequestController.CurRequest.BotRequestType == BotRequestType.warnPlayer &&
+                botOwner_0.Memory.HaveEnemy && !botOwner_0.Memory.GoalEnemy.IsVisible
+            )
+            {
+                return gstruct7_0;
+            }
+
+            return base.ShallEndCurrentDecision(curDecision);
+        }
+
         public override AICoreActionResultStruct<BotLogicDecision> GetDecision()
         {
 
@@ -32,32 +82,36 @@ namespace friendlyPMC.Components.BossFollower
             Vector3 botPosition = botOwner_0.GetPlayer.Transform.position;
             Vector3 bossPosition = HasBoss() ? GetBoss().Position : botPosition;
 
-            if (ordersChanged && request != null && request.BotRequestType == BotRequestType.warnPlayer)
+            // warn request is actually regroup for us
+            if (request != null && request.BotRequestType == BotRequestType.warnPlayer)
             {
-                if (Utils.Utils.GetNavDistance(botPosition, bossPosition) > friendlyPMC.regroupMinDistance.Value && (!botOwner_0.Memory.HaveEnemy || !botOwner_0.Memory.GoalEnemy.IsVisible))
+                ordersAreReqroup = true;
+            }
+            else
+            {
+                ordersAreReqroup = false;
+            }
+
+            // Check if the bot has received the regroup command
+            if (ordersAreReqroup && Utils.Utils.GetNavDistance(botPosition,bossPosition) > friendlyPMC.regroupMinDistance.Value && (!botOwner_0.Memory.HaveEnemy || !botOwner_0.Memory.GoalEnemy.IsVisible))
+            {
+                GetClosestCoverPoint(bossPosition, friendlyPMC.fightInnerRadius.Value);
+
+                if (customNavigationPoint_0 != null)
                 {
-                    GetClosestCoverPoint(bossPosition, friendlyPMC.fightInnerRadius.Value);
-                    if (customNavigationPoint_0 == null)
-                    {
-                        GetClosestCoverPoint(bossPosition, friendlyPMC.fightOuterRadius.Value);
-                    }
 
-                    if (customNavigationPoint_0 != null)
+                    if (Utils.Utils.GetNavDistance(botPosition,customNavigationPoint_0.Position) > sprintDistance)
                     {
-
-                        if (Utils.Utils.GetNavDistance(botPosition, customNavigationPoint_0.Position) > sprintDistance)
-                        {
-                            return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "regroupToBossFast");
-                        }
-                        else
-                        {
-                            return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMoving, "regroupToBossSlow");
-                        }
+                        return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "regroupToBossFast");
                     }
                     else
                     {
-                        return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.followerPatrol, "regroupFallback");
+                        return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMoving, "regroupToBossSlow");
                     }
+                }
+                else
+                {
+                    return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.followerPatrol, "regroupFallback");
                 }
             }
 

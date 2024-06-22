@@ -14,6 +14,7 @@ using System.Reflection;
 
 using UnityEngine;
 using System.Security.Policy;
+using EFT.InventoryLogic;
 
 
 namespace friendlyPMC.Components
@@ -201,6 +202,17 @@ namespace friendlyPMC.Components
             } else if(_player.bossGroup != null)
             {
                 _player.bossGroup.AddMember(_bot, false);
+            }
+
+            try
+            {
+                Weapon primWeapon = bot.AIData.Player.HandsController.Item as Weapon;
+
+                _transactionController.AddExtraAmmo(primWeapon);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogInfo("Could not add ammo to follower: " + ex.Message);
             }
 
 

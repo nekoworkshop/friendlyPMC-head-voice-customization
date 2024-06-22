@@ -45,9 +45,9 @@ namespace friendlyPMC.Utils
             return (pitAIBossPlayer)botOwner.BotFollower.BossToFollow;
         }
 
-        public static CustomNavigationPoint GetClosestCoverPoint(BotOwner botOwner, Vector3 centerPosition, float searchRadius)
+        public static CustomNavigationPoint GetClosestCoverPoint(BotOwner botOwner, Vector3 centerPosition, float searchRadius, bool useFullCover = false)
         {
-            List<CustomNavigationPoint> customNavigationPoints = HasBoss(botOwner) ? GetBoss(botOwner).GetAreaCovers() : BossPlayers.Instance.GetCovers();
+            List<CustomNavigationPoint> customNavigationPoints = HasBoss(botOwner) && !useFullCover ? GetBoss(botOwner).GetAreaCovers() : BossPlayers.Instance.GetCovers();
 
             if (customNavigationPoints.Count > 0)
             {
@@ -97,7 +97,7 @@ namespace friendlyPMC.Utils
             return null;
         }
 
-        public static CustomNavigationPoint GetCoverPoint(BotOwner botOwner, Vector3 centerPosition, float searchRadius)
+        public static CustomNavigationPoint GetCoverPoint(BotOwner botOwner, Vector3 centerPosition, float searchRadius, bool useFullCover = false)
         {
 
             List<CustomNavigationPoint> customNavigationPoints = HasBoss(botOwner) ? GetBoss(botOwner).GetAreaCovers() : BossPlayers.Instance.GetCovers();
@@ -173,10 +173,9 @@ namespace friendlyPMC.Utils
         public static CustomNavigationPoint GetApproachableCoverPoint(BotOwner botOwner, Vector3 point)
         {
             Vector3 midpoint = Vector3.Lerp(botOwner.GetPlayer.Transform.position, point, 0.5f);
-            Vector3 secondMid = Vector3.Lerp(point, midpoint, 0.5f);
-            float distance = Vector3.Distance(midpoint, secondMid);
+            float distance = Vector3.Distance(midpoint, point);
 
-            return GetCoverPoint(botOwner, secondMid, distance);
+            return GetClosestCoverPoint(botOwner, midpoint, distance,true);
         }
     }
 

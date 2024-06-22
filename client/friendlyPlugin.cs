@@ -87,7 +87,6 @@ namespace friendlyPMC
             }
 
             new BotGroupIsEnemyPatch().Enable();
-            new BotGroupCheckAndAddEnemy().Enable();
             new BotGroupReportAboutEnemyy().Enable();
             new BotGroupIsPlayerEnemy().Enable();
             new BotMemoryAddEnemyPatch().Enable();

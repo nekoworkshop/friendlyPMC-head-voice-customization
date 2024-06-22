@@ -58,41 +58,15 @@ namespace friendlyPMC.Patches
                 }
 
                 return false;
-            }
-
-            return true;
-        }
-    }
-
-    internal class BotGroupCheckAndAddEnemy : ModulePatch
-    {
-        protected override MethodBase GetTargetMethod()
-        {
-            return AccessTools.Method(typeof(BotsGroup), "CheckAndAddEnemy");
-
-        }
-        [PatchPrefix]
-        private static bool PatchPrefix(BotsGroup __instance, IPlayer player, bool ignoreAI = false)
-        {
-            if (player == null || (player.IsAI && player.AIData?.BotOwner?.GetPlayer == null))
-                return true;
-        
-
-            // prevent boss player from being added as enemy to the group
-            if (BossPlayers.Instance.IsFollowerGroup(__instance.Id) && BossPlayers.Instance.IsBoss(player.ProfileId))
+            } else if(BossPlayers.Instance.IsBoss(person.ProfileId))
             {
-                BotsGroup bossGroup = BossPlayers.Instance.GetBossPlayer(player.ProfileId).bossGroup;
-                if (bossGroup != null && __instance.Id == bossGroup.Id)
-                {
-                    return false;
-                }
-
-                return false;
+                //@TODO : if bot makes player an enemy, make the group aware of that
             }
 
             return true;
         }
     }
+
     internal class BotGroupReportAboutEnemyy : ModulePatch
     {
         protected override MethodBase GetTargetMethod()

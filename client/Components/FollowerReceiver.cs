@@ -65,11 +65,9 @@ namespace friendlyPMC.Components
 
             List<EGesture> bossNoGesture = new List<EGesture>
             {
-                EGesture.ThatDirection
             };
             List<EGesture> bossBusyNoGesture = new List<EGesture>
             {
-                EGesture.Stop,
                 EGesture.ComeToMe
             };
 

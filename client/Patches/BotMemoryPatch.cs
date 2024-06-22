@@ -61,6 +61,8 @@ namespace friendlyPMC.Patches
                 }
             }
 
+            //@TODO : if bot makes player an enemy, make the group aware of that
+
             return true;
         }
     }

@@ -189,8 +189,8 @@ namespace friendlyPMC.Patches
             if (boss == WildSpawnType.bossKnight)
             {
                 
-                bossFollowers.Add(new IProfileData(side,WildSpawnType.followerBigPipe,BotDifficulty.hard,0f,@params));
-                bossFollowers.Add(new IProfileData(side, WildSpawnType.followerBirdEye, BotDifficulty.hard, 0f, @params));
+                //bossFollowers.Add(new IProfileData(side,WildSpawnType.followerBigPipe,BotDifficulty.hard,0f,@params));
+                //bossFollowers.Add(new IProfileData(side, WildSpawnType.followerBirdEye, BotDifficulty.hard, 0f, @params));
             }
 
             BotCacheClass bot = await BotCacheClass.Create(botData, botCreator, 1, botSpawnerClass);
@@ -209,77 +209,85 @@ namespace friendlyPMC.Patches
             var closestCorePoint = GetClosestCorePoint(Controller, position);
             bot.AddPosition(position, closestCorePoint.Id);
 
+            List<Action> spanwers = new List<Action>();
+
             bot.Profiles.ForEach(profile =>
             {
-                Stopwatch stopWatch = new Stopwatch();
-                stopWatch.Start();
+                spanwers.Add(() => {
+                    Stopwatch stopWatch = new Stopwatch();
+                    stopWatch.Start();
 
-                WildSpawnType botRole = profile.Info.Settings.Role;
-                profile.Info.Side = side;
+                    WildSpawnType botRole = profile.Info.Settings.Role;
+                    profile.Info.Side = side;
 
-                // switch role on spawning as original ones glitch out
-                if (side == EPlayerSide.Bear)
-                {
-                    profile.Info.Settings.Role = (WildSpawnType)AkiBotsPrePatcher.sptBearValue;
-                }
-                else if (side == EPlayerSide.Usec)
-                {
-                    profile.Info.Settings.Role = (WildSpawnType)AkiBotsPrePatcher.sptUsecValue;
-                }
-                else
-                    profile.Info.Settings.Role = WildSpawnType.assault;
-
-                botCreator.ActivateBot(profile, new GClass590(position, closestCorePoint.Id, false), zone, true, new Func<BotOwner, BotZone, BotsGroup>((BotOwner bt, BotZone zn) =>
-                {
-                    return GetPlayerGroup(player, bt, zn);
-
-                }), new Action<BotOwner>((BotOwner owner) =>
-                {
-
-                    Action<BotOwner> OnBotState = new Action<BotOwner>((BotOwner me) =>
+                    botCreator.ActivateBot(profile, new GClass590(position, closestCorePoint.Id, false), zone, true, new Func<BotOwner, BotZone, BotsGroup>((BotOwner bt, BotZone zn) =>
                     {
-                        BotOwnerManualUpdatePatch.BotOwnerUpdate.Remove(me.ProfileId); // clear watcher
-                        // prevent attack of player on spawn
-                        me.Memory.DeleteInfoAboutEnemy(player.Player());
+                        return GetPlayerGroup(player, bt, zn);
 
-                        try
+                    }), new Action<BotOwner>((BotOwner owner) =>
+                    {
+
+                        Action<BotOwner> OnBotState = new Action<BotOwner>((BotOwner me) =>
                         {
-                            // revert role changes
-                            //me.Profile.Info.Settings.Role = botRole;
-                            BossPlayers.Instance.AddFollower(me, player, false,botRole); // make bot a follower
+                            BotOwnerManualUpdatePatch.BotOwnerUpdate.Remove(me.ProfileId); // clear watcher
+                            // prevent attack of player on spawn
+                            me.Memory.DeleteInfoAboutEnemy(player.Player());
+
+                            try
+                            {
+                                // force player side on the bot
+                                if (me.Side != side)
+                                {
+                                    me.GetPlayer.Profile.Info.Side = side;
+                                }
+                                BossPlayers.Instance.AddFollower(me, player, false, botRole); // make bot a follower
+                                var Timer = StaticManager.Instance.TimerManager.MakeTimer(TimeSpan.FromSeconds(1), false);
+
+                                Timer.OnTimer += () =>
+                                {
+                                    if (spanwers.Count > 0) {
+                                        spanwers[spanwers.Count - 1].Invoke();
+                                        spanwers.RemoveAt(spanwers.Count - 1);
+                                    } else
+                                    {
+                                        token.Cancel();
+                                    }
+                                };
+                            }
+                            catch (Exception ex)
+                            {
+                                Components.Logger.LogInfo("Spawn Boss Follower Addition failed : " + ex.Message);
+                            }
+                        });
+
+                        BotOwnerManualUpdatePatch.BotOwnerUpdate.Add(owner.ProfileId, OnBotState);
+
+                        // force player side on the bot
+                        if (owner.Side != side)
+                        {
+                            owner.GetPlayer.Profile.Info.Side = side;
                         }
-                        catch (Exception ex)
+
+                        botSpawnerClass.method_10(owner, bot, new Action<BotOwner>((BotOwner follower) =>
                         {
-                            Components.Logger.LogInfo("Spawn Boss Follower Addition failed : " + ex.Message);
-                        }
-                    });
+                            Components.Logger.LogInfo("Boss Ally " + follower.Profile.Nickname + " ready");
 
-                    BotOwnerManualUpdatePatch.BotOwnerUpdate.Add(owner.ProfileId, OnBotState);
+                            var Timer = StaticManager.Instance.TimerManager.MakeTimer(TimeSpan.FromSeconds(2), false);
 
-                    // force player side on the bot
-                    if (owner.Side != side)
-                    {
-                        owner.GetPlayer.Profile.Info.Side = side;
-                    }
+                            Timer.OnTimer += () =>
+                            {
+                                follower.BotTalk.TrySay(EPhraseTrigger.Ready, false);
+                            };
 
+                        }), true, stopWatch);
 
-                    
-
-                    botSpawnerClass.method_10(owner, bot, new Action<BotOwner>((BotOwner follower) =>
-                    {
-                        Components.Logger.LogInfo("Boss Ally " + follower.Profile.Nickname + " ready");
-
-                        var Timer = StaticManager.Instance.TimerManager.MakeTimer(TimeSpan.FromSeconds(2), false);
-
-                        Timer.OnTimer += () =>
-                        {
-                            follower.BotTalk.TrySay(EPhraseTrigger.Ready, false);
-                        };
-
-                    }), true, stopWatch);
-
-                }), token.GetCancelToken());
+                    }), token.GetCancelToken());
+                });   
             });
+
+            spanwers.Reverse();
+            spanwers[spanwers.Count - 1].Invoke();
+            spanwers.RemoveAt(spanwers.Count - 1);
         }
 
         public async UniTask SpawnGroupBots(pitAIBossPlayer player)

@@ -136,7 +136,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Components\BossFollower\KnightAssaultBuildingLayer.cs" />
-    <Compile Include="Components\BossFollower\KnightAssaultFightLayer.cs" />
     <Compile Include="Components\BossFollower\KnightAvoidDangerLayer.cs" />
     <Compile Include="Components\BossFollower\KnightEnemyBuildingLayer.cs" />
     <Compile Include="Components\BossFollower\KnightFightLayer.cs" />

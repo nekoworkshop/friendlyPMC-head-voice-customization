@@ -83,13 +83,8 @@ namespace friendlyPMC.Actions
 
                 bot.BotsGroup.AddEnemy(closet.AIData.Player, EBotEnemyCause.addBotAtGroup);
 
-                EnemyInfo info;
-                bot.EnemiesController.EnemyInfos.TryGetValue(closet, out info);
-                if (info != null)
-                {
-                    Components.Logger.LogInfo("Made closest enemy a priority");
-                    bot.Memory.GoalEnemy = info;
-                }
+                Components.Logger.LogInfo("Made closest enemy a priority");
+                bot.Memory.AddEnemy(closet, new BotSettingsClass(closet, bot.BotsGroup, EBotEnemyCause.addCauseGroup), false);
             }
         }
     }

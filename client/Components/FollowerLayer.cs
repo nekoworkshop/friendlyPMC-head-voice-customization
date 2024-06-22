@@ -56,10 +56,10 @@ namespace friendlyPMC.Components
                 {
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.peaceLook, "PeaceLook");
                 }
-                if (botOwner_0.SecondWeaponData.HaveActions())
+                /*if (botOwner_0.SecondWeaponData.HaveActions())
                 {
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.watchSecondWeapon, "Look2ndWeap");
-                }
+                }*/
 
                 if (!HasBoss())
                 {
@@ -71,10 +71,10 @@ namespace friendlyPMC.Components
                     {
                         return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.eatDrink, "EatDrinkDat");
                     }
-                    if (botOwner_0.SecondWeaponData.HaveActions())
+                    /*if (botOwner_0.SecondWeaponData.HaveActions())
                     {
                         return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.watchSecondWeapon, "Look2ndWeap");
-                    }
+                    }*/
                     if (botOwner_0.Gesture.HaveRequest())
                     {
                         return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.gesture, "Gesture");

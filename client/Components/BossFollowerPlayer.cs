@@ -25,11 +25,10 @@ namespace friendlyPMC.Components
 
         public override void SetlFollowerSettings(BotOwner bot)
         {
-            Components.Logger.LogInfo("Set boss follower settings");
 
             base.SetlFollowerSettings(bot);
 
-            EPlayerSide side = _player.Player().Side;
+            EPlayerSide side = bot.Side;
 
             WildSpawnType sptBear = (WildSpawnType)AkiBotsPrePatcher.sptBearValue;
             WildSpawnType sptUsec = (WildSpawnType)AkiBotsPrePatcher.sptUsecValue;
@@ -45,11 +44,13 @@ namespace friendlyPMC.Components
                     if (side == EPlayerSide.Bear && botType == sptBear)
                     {
                         bot.Settings.FileSettings.Mind.FRIENDLY_BOT_TYPES.AddItem(botType);
+                        bot.Settings.FileSettings.Mind.WARN_BOT_TYPES.AddItem(botType);
                         continue;
                     }
                     else if (side == EPlayerSide.Usec && botType == sptUsec)
                     {
                         bot.Settings.FileSettings.Mind.FRIENDLY_BOT_TYPES.AddItem(botType);
+                        bot.Settings.FileSettings.Mind.WARN_BOT_TYPES.AddItem(botType);
                         continue;
                     } 
                     else
