@@ -7,9 +7,12 @@ namespace friendlyPMC.Components.BossFollower
 
         GClass65 gclass65_0_1;
 
+        protected KnightAssaultFightLayer fightLayer;
+        protected KnightEnemyBuildingLayer buildingLayer;
+
         public KnightFollowerBrain(BotOwner owner, pitAIBossPlayer boss) : base(owner, boss)
         {
-            
+            owner.Tactic.IsCurTactic(BotsGroup.BotCurrentTactic.Attack);
         }
 
         public override void AddLayers()
@@ -27,14 +30,14 @@ namespace friendlyPMC.Components.BossFollower
             KnightAssaultBuildingLayer layer3 = new KnightAssaultBuildingLayer(_owner, 72);
             base.method_0(4, layer3, true);
             // enemy building
-            KnightEnemyBuildingLayer layer4 = new KnightEnemyBuildingLayer(_owner, 70);
-            base.method_0(5, layer4, true);
+            buildingLayer = new KnightEnemyBuildingLayer(_owner, 70);
+            base.method_0(5, buildingLayer, true);
             // fight logic
             this.gclass65_0_1 = new KnightFightLayer(_owner, 62);
             base.method_0(6, this.gclass65_0_1, true);
             // assault have enemy
-            KnightAssaultFightLayer layer5 = new KnightAssaultFightLayer(_owner, 50);
-            base.method_0(7, layer5, true);
+            fightLayer = new KnightAssaultFightLayer(_owner, 50);
+            base.method_0(7, fightLayer, true);
             // - item taker
             FollowerLootLayer layer9 = new FollowerLootLayer(_owner, 40);
             method_0(8, layer9, true);
@@ -48,6 +51,12 @@ namespace friendlyPMC.Components.BossFollower
         public void ForceRecalcShootPos()
         {
             this.gclass65_0_1.ForceRecalcShootPos();
+        }
+
+        public override void BossOrdersChanged()
+        {
+            fightLayer.OrdersChanged();
+            buildingLayer.OrdersChanged();
         }
     }
 }

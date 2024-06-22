@@ -57,17 +57,19 @@ namespace friendlyPMC.Components
             }
         }
 
-        public BotFollowerPlayer(BotOwner bot, pitAIBossPlayer player, bool isSquad = false)
+        protected WildSpawnType _botRole;
+
+        public BotFollowerPlayer(BotOwner bot, pitAIBossPlayer player, bool isSquad = false, WildSpawnType botRole = WildSpawnType.assault)
         {
             _bot = bot;
             _player = player;
+            _botRole = botRole == WildSpawnType.assault ? _bot.Profile.Info.Settings.Role : botRole;
             
             _IsSquadMate = isSquad;
 
             // deactivate old layers
             var baseBrain = _bot.Brain.BaseBrain;
             // guess work because we cannot access the private property dictionary_0 where the layers are, but no brain has 20 layers, usually it's 10
-
             for (int i = 1; i < 20; i++)
             {
                 try
@@ -86,6 +88,7 @@ namespace friendlyPMC.Components
                 _bot.BotFollower.BossToFollow.RemoveFollower(_bot);
                 _bot.BotFollower.BossToFollow = null;
             }
+
             // deactivate old brain
             if (baseBrain != null && baseBrain.CurLayerInfo != null && baseBrain.CurLayerInfo.IsActive)
             {
@@ -93,21 +96,16 @@ namespace friendlyPMC.Components
                 _bot.Brain.Agent.Deactivate(name);
                 baseBrain.CurLayerInfo.IsActive = false;
             }
-
             _bot.Brain.Agent.Dispose();
             if(baseBrain != null) baseBrain.Dispose();
-
             _bot.BotsController.AICoreController.Stop();
-;
             _bot.Receiver.Dispose();
-
+            
             // add special follower settings
             SetlFollowerSettings(_bot);
-
             // add a new receiver
             _bot.Receiver = GetFollowerReceiver(bot);
             _bot.Receiver.Init();
-
             try
             {          
                 // initialize LootingBots brain
@@ -122,18 +120,16 @@ namespace friendlyPMC.Components
                 Logger.LogInfo("Failed to add Looting Brain to follower: " +ex.Message);
             }
 
-
             // add the new follower brain
             _bot.Brain.BaseBrain = GetFollowerBrain(_bot, _player);
             _bot.Brain.Agent = GetFollowerAIAgent(_bot);
             _bot.BotsController.AICoreController.Activate();
-
-            _bot.BotTalk.SetSilence(0f); // let the bot talk
-
+            // let the bot talk
+            _bot.BotTalk.SetSilence(0f); 
+            // force bot to turn off light
+            if(_bot.BotLight != null) _bot.BotLight.TurnOff(false, true);
             // make bot follower of player
             _player.AddFollower(_bot);
-            // force bot to turn off light
-            _bot.BotLight.TurnOff(false, true);
             // activate new following patrol mode
             try
             { 
@@ -219,7 +215,7 @@ namespace friendlyPMC.Components
         /** Exposed so that it can be patched by addons **/
         public virtual AICoreAgentClass<BotLogicDecision> GetFollowerAIAgent(BotOwner bot)
         {
-            string name = bot.name + " " + bot.Profile.Info.Settings.Role.ToString();
+            string name = bot.name + " " + _botRole.ToString();
 
             return new AICoreAgentClass<BotLogicDecision>(bot.BotsController.AICoreController, bot.Brain.BaseBrain, FollowerCreateNode.ActionsList(bot), bot.gameObject, name, new Func<BotLogicDecision, GClass134>((BotLogicDecision decision) =>
             {
@@ -233,7 +229,7 @@ namespace friendlyPMC.Components
             _OldSettings = _bot.Settings;
             _OldGroupID = _bot.GroupId;
             // increase bot's power
-            BotDifficultySettingsClass settings = Singleton<GClass534>.Instance.GetSettings(BotDifficulty.hard, bot.Profile.Info.Settings.Role);
+            BotDifficultySettingsClass settings = Singleton<GClass534>.Instance.GetSettings(BotDifficulty.hard, _botRole);
             // - hardcode some settings to make the bot more efficient
             settings.FileSettings.Move.REACH_DIST = 1.5f;
             settings.FileSettings.Move.REACH_DIST_COVER = 2f;

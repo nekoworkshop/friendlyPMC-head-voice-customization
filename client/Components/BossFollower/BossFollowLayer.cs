@@ -1,4 +1,5 @@
 ﻿using EFT;
+using friendlyPMC.Actions;
 using friendlyPMC.Modules;
 using System;
 using System.Collections.Generic;
@@ -16,7 +17,6 @@ namespace friendlyPMC.Components.BossFollower
         protected float coverTimer = 0f;
         public BossFollowLayer(BotOwner bot, int priority) : base(bot, priority)
         {
-
         }
 
         public override bool ShallUseNow()
@@ -49,7 +49,7 @@ namespace friendlyPMC.Components.BossFollower
 
             float regroupMinDistance = friendlyPMC.regroupMinDistance.Value;
             float nearSearchRadius = friendlyPMC.fightInnerRadius.Value;
-            float sprintDistance = 7f;
+            float sprintDistance = 10f;
             Vector3 bossPosition = GetBossPosition();
 
             if (ordersAreReqroup && GetNavDistance(bossPosition) > regroupMinDistance && (!botOwner_0.Memory.HaveEnemy || !botOwner_0.Memory.GoalEnemy.IsVisible))

@@ -5,6 +5,7 @@ using HarmonyLib;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Threading.Tasks;
 using UnityEngine;
 using static UnityEngine.UI.GridLayoutGroup;
@@ -212,7 +213,19 @@ namespace friendlyPMC.Components
         {
             Followers.Add(bot);
             bot.BotFollower.PatrolDataFollower.InitPlayer(realPlayer);
-            bot.BotFollower.SetToFollow(this, Followers.Count - 1, false);
+            bot.BotFollower.Index = Followers.Count - 1;
+            bot.BotFollower.BossToFollow = this;
+            
+            bot.BotFollower.PatrolDataFollower.Activate();
+            bot.BotFollower.PatrolDataFollower.SetIndex(bot.BotFollower.Index);
+
+            PatrolMode mode = PatrolMode.follower;
+            PatrolMode mode2 = PatrolMode.simple;
+
+            PatrolPointChooserBasic pointChooser = PatrollingData.GetPointChooser(bot, mode2, bot.SpawnProfileData);
+            bot.PatrollingData.SetMode(mode, pointChooser);
+            bot.Tactic.SetTactic(BotsGroup.BotCurrentTactic.Protect, false, -1f);
+            bot.BotFollower.BossFindAction();
         }
     }
     internal class AIBossPlayerLogic : GClass363

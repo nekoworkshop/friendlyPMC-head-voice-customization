@@ -82,6 +82,7 @@ namespace friendlyPMC.Patches
                     __instance.BotState == EBotState.Active &&
                     __instance.GetPlayer != null &&
                     __instance.GetPlayer.HealthController != null &&
+                    __instance.ProfileId != null &&
                     __instance.GetPlayer.HealthController.IsAlive
                 )
                 {

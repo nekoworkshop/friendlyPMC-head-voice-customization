@@ -169,6 +169,15 @@ namespace friendlyPMC.Utils
 
             return customNavigationPoint;
         }
+
+        public static CustomNavigationPoint GetApproachableCoverPoint(BotOwner botOwner, Vector3 point)
+        {
+            Vector3 midpoint = Vector3.Lerp(botOwner.GetPlayer.Transform.position, point, 0.5f);
+            Vector3 secondMid = Vector3.Lerp(point, midpoint, 0.5f);
+            float distance = Vector3.Distance(midpoint, secondMid);
+
+            return GetCoverPoint(botOwner, secondMid, distance);
+        }
     }
 
     

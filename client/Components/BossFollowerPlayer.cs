@@ -7,16 +7,26 @@ using System;
 
 using friendlyPMC.Components.BossFollower;
 using friendlyPMC.Components.FollowerBossFollower;
+using friendlyPMC.Actions;
 
 namespace friendlyPMC.Components
 {
     internal class BossFollowerPlayer : BotFollowerPlayer
     {
-        public BossFollowerPlayer(BotOwner bot, pitAIBossPlayer player) : base(bot, player) {
+
+        public BossFollowerPlayer(BotOwner bot, pitAIBossPlayer player, WildSpawnType bossRole) : base(bot, player, false, bossRole) {
+
+            if (bossRole == WildSpawnType.followerBirdEye)
+            {
+                FollowerPatrol patrol = FollowerPatrolInstances.GetPatrol(bot);
+                patrol.SetReachDist(20f);
+            }
         }
 
         public override void SetlFollowerSettings(BotOwner bot)
         {
+            Components.Logger.LogInfo("Set boss follower settings");
+
             base.SetlFollowerSettings(bot);
 
             EPlayerSide side = _player.Player().Side;
@@ -24,7 +34,7 @@ namespace friendlyPMC.Components
             WildSpawnType sptBear = (WildSpawnType)AkiBotsPrePatcher.sptBearValue;
             WildSpawnType sptUsec = (WildSpawnType)AkiBotsPrePatcher.sptUsecValue;
 
-            if (side != EPlayerSide.Savage && !bot.IsRole(sptBear) && !bot.IsRole(sptUsec))
+            if (side != EPlayerSide.Savage)
             {
                 bot.Settings.FileSettings.Mind.ENEMY_BOT_TYPES = new WildSpawnType[] { };
                 bot.Settings.FileSettings.Mind.WARN_BOT_TYPES = new WildSpawnType[] { };
@@ -51,21 +61,21 @@ namespace friendlyPMC.Components
 
             bot.Tactic.AggressionChange(-1f);
 
-            Components.Logger.LogInfo("Set boss follower settings");
+            
         }
 
         public override FollowerBrain GetFollowerBrain(BotOwner bot, pitAIBossPlayer boss)
         {
 
-            if(bot.IsRole(WildSpawnType.bossKnight))
+            if(_botRole == WildSpawnType.bossKnight)
             {
                 return new KnightFollowerBrain(bot, boss);
             }
 
-            if (bot.IsRole(WildSpawnType.followerBigPipe))
+            if (_botRole == WildSpawnType.followerBigPipe)
                 return new BigPipeFollowerBrain(bot, boss);
 
-            if (bot.IsRole(WildSpawnType.followerBirdEye))
+            if (_botRole == WildSpawnType.followerBirdEye)
                 return new BirdEyeFollowerBrain(bot, boss);
 
             return new FollowerBrain(bot, boss);

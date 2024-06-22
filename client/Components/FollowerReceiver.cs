@@ -305,6 +305,8 @@ namespace friendlyPMC.Components
             if (isBossCommunicating)
             {
 
+                Components.Logger.LogInfo("Player Said " + info.phrase.ToString());
+
                 pitAIBossPlayer boss = BossPlayers.Instance.GetBossPlayer(requester.ProfileId);
                 // on cover me, make bot follow boss near
                 if (info.phrase == EPhraseTrigger.CoverMe)

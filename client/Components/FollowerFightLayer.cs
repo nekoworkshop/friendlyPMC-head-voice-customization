@@ -110,6 +110,8 @@ namespace friendlyPMC.Components
 
         private bool ShallGoNearBoss()
         {
+            if (!HasBoss()) return false;
+
             EnemyInfo goalEnemy = this.botOwner_0.Memory.GoalEnemy;
             float bossDist = Vector3.Distance(botOwner_0.Position, GetBoss().Position);
 

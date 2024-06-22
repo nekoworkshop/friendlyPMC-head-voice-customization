@@ -182,7 +182,7 @@ namespace friendlyPMC.Modules
             Instance = null;
         }
 
-        public BotFollowerPlayer AddFollower(BotOwner bot, pitAIBossPlayer player, bool squadMate = false)
+        public BotFollowerPlayer AddFollower(BotOwner bot, pitAIBossPlayer player, bool squadMate = false, WildSpawnType role = WildSpawnType.assault)
         {
             BotFollowerPlayer _follower = null;
 
@@ -204,7 +204,7 @@ namespace friendlyPMC.Modules
 
             foreach (var item in Utils.Utils.BossFollowersRoles)
             {
-                if(bot.IsRole(item))
+                if(role == item)
                 {
                     isAIBoss = true;
                     break;
@@ -214,7 +214,7 @@ namespace friendlyPMC.Modules
             if (!isAIBoss)
                 _follower = new BotFollowerPlayer(bot, player,squadMate);
             else
-                _follower = new BossFollowerPlayer(bot, player);
+                _follower = new BossFollowerPlayer(bot, player, role);
 
             _followers.Add(_follower);
 

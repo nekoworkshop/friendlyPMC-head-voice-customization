@@ -10,12 +10,18 @@ namespace friendlyPMC.Components.FollowerBossFollower
 {
     internal class BirdEyeFollowerBrain : FollowerBrain
     {
+
+        protected BirdEyeFightLayer fightLayer;
+        protected KnightEnemyBuildingLayer buildingLayer;
+
         public BirdEyeFollowerBrain(BotOwner owner, pitAIBossPlayer boss) : base(owner, boss)
         {
         }
 
         public override void AddLayers()
         {
+
+            Components.Logger.LogInfo("Add BirdEye Layer");
             // order matters for which layer get the initial priority
             // - follow
             BossFollowLayer followLayer = new BossFollowLayer(_owner, 51);
@@ -30,22 +36,25 @@ namespace friendlyPMC.Components.FollowerBossFollower
             KnightAssaultBuildingLayer layer3 = new KnightAssaultBuildingLayer(_owner, 72);
             base.method_0(4, layer3, true);
             // enemy building
-            KnightEnemyBuildingLayer layer4 = new KnightEnemyBuildingLayer(_owner, 70);
-            base.method_0(5, layer4, true);
-            // sniper hold
-            BirdEyeSniperLayer layer5 = new BirdEyeSniperLayer(_owner, 55);
-            method_0(6, layer5, true);
+            buildingLayer = new KnightEnemyBuildingLayer(_owner, 70);
+            base.method_0(5, buildingLayer, true);
             // sniper fight
-            BirdEyeFightLayer layer6 = new BirdEyeFightLayer(_owner, 50);
-            method_0(7, layer6, true);
+            fightLayer = new BirdEyeFightLayer(_owner, 55);
+            method_0(6, fightLayer, true);
             // - item taker
             FollowerLootLayer layer7 = new FollowerLootLayer(_owner, 40);
-            method_0(8, layer7, true);
+            method_0(7, layer7, true);
         }
 
         public override string ShortName()
         {
             return "BirdEyeFLW";
+        }
+
+        public override void BossOrdersChanged()
+        {
+            fightLayer.OrdersChanged();
+            buildingLayer.OrdersChanged();
         }
     }
 }
