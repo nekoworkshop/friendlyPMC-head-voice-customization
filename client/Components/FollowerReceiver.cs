@@ -9,6 +9,7 @@ using System;
 using System.Threading.Tasks;
 using UnityEngine;
 using System.Collections.Generic;
+using HarmonyLib;
 
 namespace friendlyPMC.Components
 {
@@ -125,7 +126,15 @@ namespace friendlyPMC.Components
                 {
                     if (gestusDistance < maxGestusDistance)
                     {
-                        botOwner_0.BotsGroup.RequestsController.TryAskFollowMeRequest(data.Player, botOwner_0);
+                        FollowerGoCheck gclass = new FollowerGoCheck(data.Player, BotRequestType.followMe);
+                        if (
+                            gclass.CanRequest(botOwner_0) &&
+                            botOwner_0.BotsGroup.RequestsController.TryAddRequest(gclass)
+                        )
+                        {
+                            gclass.AddPossibleExecutors(botOwner_0);
+                            gclass.SetGroup(botOwner_0.BotsGroup.RequestsController);
+                        }
                     }
                 }
                 else if (shouldDefault)
@@ -161,13 +170,11 @@ namespace friendlyPMC.Components
                             else
                             {
                                 FollowerGoCheck gclass = new FollowerGoCheck(data.Player);
-                                Components.Logger.LogInfo("That Direction");
                                 if (
                                     gclass.CanRequest(botOwner_0) &&
                                     botOwner_0.BotsGroup.RequestsController.TryAddRequest(gclass)
                                 )
                                 {
-                                    Components.Logger.LogInfo("That Direction Accepted");
                                     gclass.AddPossibleExecutors(botOwner_0);
                                     gclass.SetGroup(botOwner_0.BotsGroup.RequestsController);
                                 }
@@ -231,18 +238,19 @@ namespace friendlyPMC.Components
             }
 
 
-            if(info.phrase == EPhraseTrigger.Attention && isClose)
+            if (info.phrase == EPhraseTrigger.Attention && isClose)
             {
-                if(botOwner_0.BotRequestController.CurRequest != null)
+                if (botOwner_0.BotRequestController.CurRequest != null)
                 {
                     botOwner_0.BotRequestController.CurRequest.Complete();
                 }
-
-                string nm = botOwner_0.Brain.BaseBrain.CurLayerInfo.Name();
-                botOwner_0.Brain.Agent.Deactivate(nm);
-                botOwner_0.Brain.Agent.Update();
-                botOwner_0.Brain.Agent.ActivateLayer(nm);
-                botOwner_0.Brain.Agent.Update();
+                
+                if(botOwner_0.Memory.HaveEnemy)
+                {
+                    botOwner_0.Memory.DeleteInfoAboutEnemy(botOwner_0.Memory.GoalEnemy.Person);
+                }
+                // force current layer to trigger end decision
+                AccessTools.Field(typeof(BaseLogicLayerClass), "bool_1").SetValue(botOwner_0.Brain.BaseBrain.CurLayerInfo,true);
 
                 return;
             }

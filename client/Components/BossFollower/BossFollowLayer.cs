@@ -1,4 +1,5 @@
-﻿using EFT;
+﻿using Aki.Common.Http;
+using EFT;
 using friendlyPMC.Actions;
 using friendlyPMC.Modules;
 using System;
@@ -15,6 +16,9 @@ namespace friendlyPMC.Components.BossFollower
     {
 
         protected float coverTimer = 0f;
+
+        protected bool requestComeHere = false;
+        protected bool requestGoThere = false;
         public BossFollowLayer(BotOwner bot, int priority) : base(bot, priority)
         {
         }
@@ -22,18 +26,11 @@ namespace friendlyPMC.Components.BossFollower
         public override bool ShallUseNow()
         {
 
-            if (!HasBoss()) return false;
+            if (!HasBoss() || botOwner_0.Memory.HaveEnemy) return false;
 
             botOwner_0.PriorityAxeTarget.FindTarget();
 
-            if (!botOwner_0.Memory.HaveEnemy) return !InteractableObjects.IsTaker(botOwner_0);
-
-            List<BotRequestType> fightdRequests = new List<BotRequestType>
-            {
-                BotRequestType.warnPlayer // this is need help or regroup from the player
-            };
-
-            return botOwner_0.BotRequestController.CurRequest != null && fightdRequests.Contains(botOwner_0.BotRequestController.CurRequest.BotRequestType);
+            return !InteractableObjects.IsTaker(botOwner_0);
         }
 
         public override string Name()
@@ -43,7 +40,6 @@ namespace friendlyPMC.Components.BossFollower
 
         public override AICoreActionResultStruct<BotLogicDecision> GetDecision()
         {
-            
 
             BotRequest request = botOwner_0.BotRequestController.CurRequest != null ? botOwner_0.BotRequestController.CurRequest : null;
 
@@ -54,10 +50,28 @@ namespace friendlyPMC.Components.BossFollower
             float sprintDistance = 10f;
             Vector3 bossPosition = GetBossPosition();
 
-            if(!botOwner_0.Memory.HaveEnemy && request != null)
+            if(request == null)
             {
-                if (request.BotRequestType == BotRequestType.goToPoint)
+                requestGoThere = false;
+                requestComeHere = false;
+            } 
+            else if (request.BotRequestType != BotRequestType.goToPoint)
+            {
+                requestGoThere = false;
+            }
+            else if (request.BotRequestType != BotRequestType.followMe && request.BotRequestType != BotRequestType.warnPlayer)
+            {
+                requestComeHere = false;
+            }
+
+            if (!botOwner_0.Memory.HaveEnemy && request != null)
+            {
+                if (request.BotRequestType == BotRequestType.goToPoint && !requestGoThere)
                 {
+                    requestGoThere = true;
+
+                    botOwner_0.Gesture.TryGestus(EGesture.Good, false);
+
                     IPlayer requester = botOwner_0.BotRequestController.CurRequest.Requester;
 
                     Vector3 dir = requester.LookDirection;
@@ -69,26 +83,27 @@ namespace friendlyPMC.Components.BossFollower
 
                     Vector3 finalPosition = forwardPosition + lateralDirection * lateralOffset;
 
-                    botOwner_0.BotTalk.TrySay(EPhraseTrigger.Going, false);
-
                     botOwner_0.GoToSomePointData.SetPoint(finalPosition);
                     botOwner_0.Steering.LookToPoint(finalPosition);
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.goToPoint, "req:moveThere");
                 }
 
-                if (request.BotRequestType == BotRequestType.followMe)
+                if ((request.BotRequestType == BotRequestType.followMe || request.BotRequestType == BotRequestType.warnPlayer) && !requestComeHere)
                 {
-                    request.Complete();
+                    requestComeHere = true;
+                    botOwner_0.Gesture.TryGestus(EGesture.Good, false);
+
+                    IPlayer requester = botOwner_0.BotRequestController.CurRequest.Requester;
 
                     Vector3 requestPos = botOwner_0.BotRequestController.CurRequest.Requester.Position;
+                    Vector3 dir = requester.LookDirection;
 
-                    float offset = GClass760.RandomSing() * GClass760.Random(0.5f, 1.5f);
-                    Vector3 direction = Vector3.Cross(Vector3.up, requestPos).normalized;
+                    float offset = GClass760.RandomSing() * GClass760.Random(1f, 2f);
+                    Vector3 direction = Vector3.Cross(Vector3.up, dir).normalized;
 
                     Vector3 finPos = requestPos + direction * offset;
 
                     botOwner_0.GoToSomePointData.SetPoint(new Vector3(finPos.x, requestPos.y, finPos.z));
-                    botOwner_0.Steering.LookToPoint(finPos);
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.goToPoint, "req:comeHere");
                 }
 

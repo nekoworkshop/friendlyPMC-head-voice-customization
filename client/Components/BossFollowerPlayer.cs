@@ -61,8 +61,6 @@ namespace friendlyPMC.Components
             }
 
             bot.Tactic.AggressionChange(-1f);
-
-            
         }
 
         public override FollowerBrain GetFollowerBrain(BotOwner bot, pitAIBossPlayer boss)

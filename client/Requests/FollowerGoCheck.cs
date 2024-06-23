@@ -3,7 +3,7 @@ namespace friendlyPMC.Actions
 {
     internal class FollowerGoCheck : BotRequest
     {
-        public FollowerGoCheck(IPlayer requester) : base(requester, BotRequestType.goToPoint)
+        public FollowerGoCheck(IPlayer requester, BotRequestType request = BotRequestType.goToPoint) : base(requester, request)
         {
         }
 

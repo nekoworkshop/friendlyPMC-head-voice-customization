@@ -12,23 +12,7 @@ namespace friendlyPMC.Actions
 
             Vector3 point = botOwner_0.GoToSomePointData.Point;
             if(point != null)
-            _shouldSprint = GetNavDistance(point) > 15f;
-        }
-
-        private float GetNavDistance(Vector3 point)
-        {
-            NavMeshPath navMeshPath = new NavMeshPath();
-            navMeshPath.ClearCorners();
-            bool resut = NavMesh.CalculatePath(botOwner_0.Transform.position, point, -1, navMeshPath);
-
-            if (resut && navMeshPath.status == NavMeshPathStatus.PathComplete)
-            {
-                return navMeshPath.CalculatePathLength();
-            }
-            else
-            {
-                return Vector3.Distance(point, botOwner_0.Transform.position);
-            }
+            _shouldSprint = Utils.Utils.GetNavDistance(botOwner_0.GetPlayer.Transform.position, point) > 15f;
         }
 
         public override void Update()

@@ -105,6 +105,7 @@ namespace friendlyPMC.Actions
                             {
                                 botOwner.StopMove();
                                 botOwner.SetPose(0.5f);
+                                bool_0 = true;
                                 return;
                             }
 
@@ -122,11 +123,13 @@ namespace friendlyPMC.Actions
                         if (!NavMesh.SamplePosition(new Vector3(x, this.player_0.Position.y, z), out navMeshHit, 2f, -1))
                         {
                             botOwner.StopMove();
+                            bool_0 = true;
                             return;
                         }
                         if (botOwner.GoToPoint(navMeshHit.position, true, -1f, false, true, true, false) != NavMeshPathStatus.PathComplete)
                         {
                             botOwner.StopMove();
+                            bool_0 = true;
                             return;
                         }
                     }

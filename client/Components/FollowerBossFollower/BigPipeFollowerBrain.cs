@@ -7,7 +7,6 @@ namespace friendlyPMC.Components.FollowerBossFollower
     internal class BigPipeFollowerBrain : FollowerBrain
     {
 
-        protected KnightEnemyBuildingLayer buildingLayer;
 
         public BigPipeFollowerBrain(BotOwner owner, pitAIBossPlayer boss) : base(owner, boss)
         {
@@ -30,7 +29,7 @@ namespace friendlyPMC.Components.FollowerBossFollower
             KnightAssaultBuildingLayer fightLayer = new KnightAssaultBuildingLayer(_owner, 70);
             base.method_0(4, fightLayer, true);
             // enemy building
-            buildingLayer = new KnightEnemyBuildingLayer(_owner, 60);
+            KnightEnemyBuildingLayer buildingLayer = new KnightEnemyBuildingLayer(_owner, 60);
             base.method_0(5, buildingLayer, true);
             // artillerry support
             BigPipeArtilleryLayer layer5 = new BigPipeArtilleryLayer(_owner, 55);
@@ -47,7 +46,7 @@ namespace friendlyPMC.Components.FollowerBossFollower
 
         public override void BossOrdersChanged()
         {
-            buildingLayer.OrdersChanged();
+            //buildingLayer.OrdersChanged();
         }
     }
 }

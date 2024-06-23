@@ -66,7 +66,7 @@ namespace friendlyPMC.Components.FollowerBossFollower
             if (baseDecision.Action == BotLogicDecision.holdPosition && request != null && request.BotRequestType == BotRequestType.attackClose)
             {
                 GetApproachablePoint();
-                Vector3 position = HasBoss() ? GetBoss().Position : botOwner_0.GetPlayer.Transform.position;
+                Vector3 position = botOwner_0.Memory.GoalEnemy.CurrPosition;
                 if (customNavigationPoint_0 == null)
                 {
                     GetCoverPoint(position, 50f);
@@ -100,7 +100,7 @@ namespace friendlyPMC.Components.FollowerBossFollower
                 } 
                 else if (baseDecision.Reason == "noInCover" || baseDecision.Reason == "еtoCov")
                 {
-                    GetCoverPoint(botPosition, fightLongRange);
+                    GetCoverPoint(bossPosition, fightLongRange);
                 }
                 else
                 {
@@ -117,6 +117,17 @@ namespace friendlyPMC.Components.FollowerBossFollower
             return baseDecision;
         }
 
+        public override AICoreActionEndStruct ShallEndCurrentDecision(AICoreActionResultStruct<BotLogicDecision> curDecision)
+        {
+
+            if (curDecision.Reason == "getInCloseFast" || curDecision.Reason == "getInCloseSlow" || curDecision.Reason == "regroupSlow")
+            {
+                return EndGetInClose();
+            }
+
+            return base.ShallEndCurrentDecision(curDecision);
+        }
+
         public override AICoreActionEndStruct EndHoldPosition()
         {
             if (ordersChanged)
@@ -128,6 +139,21 @@ namespace friendlyPMC.Components.FollowerBossFollower
 
             if (ShallGoNearBoss()) return new AICoreActionEndStruct("goNearPlayer", true);
             return base.EndHoldPosition();
+        }
+
+        public AICoreActionEndStruct EndGetInClose()
+        {
+            if (botOwner_0.Memory.HaveEnemy && botOwner_0.Memory.GoalEnemy.CanShoot)
+            {
+                return new AICoreActionEndStruct("enemy.canSh", true);
+            }
+
+            if (!botOwner_0.Memory.HaveEnemy)
+            {
+                return new AICoreActionEndStruct("enemy.None", true);
+            }
+
+            return base.EndRunToCover();
         }
 
         protected virtual bool HasBoss()

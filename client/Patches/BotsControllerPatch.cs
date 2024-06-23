@@ -189,8 +189,8 @@ namespace friendlyPMC.Patches
             if (boss == WildSpawnType.bossKnight)
             {
                 
-                //bossFollowers.Add(new IProfileData(side,WildSpawnType.followerBigPipe,BotDifficulty.hard,0f,@params));
-                //bossFollowers.Add(new IProfileData(side, WildSpawnType.followerBirdEye, BotDifficulty.impossible, 0f, @params));
+                if(friendlyPMC.bigPipeSpawn.Value) bossFollowers.Add(new IProfileData(side,WildSpawnType.followerBigPipe,BotDifficulty.hard,0f,@params));
+                if (friendlyPMC.birdEyeSpawn.Value) bossFollowers.Add(new IProfileData(side, WildSpawnType.followerBirdEye, BotDifficulty.impossible, 0f, @params));
             }
 
             BotCacheClass bot = await BotCacheClass.Create(botData, botCreator, 1, botSpawnerClass);
@@ -198,14 +198,19 @@ namespace friendlyPMC.Patches
 
             if (bossFollowers.Count > 0)
             {
-                Components.Logger.LogInfo("Add Followers to the spawner");
-
                 foreach (var item in bossFollowers)
                 {
                     BotCacheClass flw = await BotCacheClass.Create(item, botCreator, 1, botSpawnerClass);
                     bot.AddProfiles(flw.Profiles);
                 }
+
+                if (!friendlyPMC.justKnightSpawn.Value)
+                {
+                    Profile knightProfile = bot.Profiles.Find(pr=>pr.Info.Settings.Role == WildSpawnType.bossKnight);
+                    bot.RemoveProfile(knightProfile);
+                }
             }
+
             var closestCorePoint = GetClosestCorePoint(Controller, position);
             bot.AddPosition(position, closestCorePoint.Id);
 
@@ -277,7 +282,7 @@ namespace friendlyPMC.Patches
                             }
                             catch (Exception ex)
                             {
-                                Components.Logger.LogInfo("Spawn Boss Follower Addition failed : " + ex.Message);
+                                Components.Logger.LogInfo("Failed to make Boss ally a follower: " + ex.Message);
                             }
                         });
 
@@ -543,7 +548,8 @@ namespace friendlyPMC.Patches
                     {
                         try
                         {
-                            BotsControllerPatch.Instance.SpawnBossFollower(playerBoss, WildSpawnType.followerBirdEye).Forget();
+
+                            BotsControllerPatch.Instance.SpawnBossFollower(playerBoss).Forget();
                         }
                         catch (Exception e) { Components.Logger.LogInfo("Failed Delayed Boss Ally Process " + e.Message); }
                     };

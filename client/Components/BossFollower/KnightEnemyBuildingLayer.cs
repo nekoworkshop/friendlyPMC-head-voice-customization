@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine.AI;
 using UnityEngine;
+using Aki.Common.Http;
 
 namespace friendlyPMC.Components.BossFollower
 {
@@ -17,10 +18,6 @@ namespace friendlyPMC.Components.BossFollower
         protected float coverTimer = 0f;
 
         private float sprintDistance = 15f;
-
-        protected bool ordersChanged = false;
-
-        private bool ordersAreReqroup = false;
         public KnightEnemyBuildingLayer(BotOwner bot, int priority) : base(bot, priority)
         {
 
@@ -30,18 +27,14 @@ namespace friendlyPMC.Components.BossFollower
         {
             if (!botOwner_0.Memory.HaveEnemy)
             {
-                if (ordersAreReqroup)
-                {
-                    ordersAreReqroup = false;
-                }
-
                 return false;
             }
 
 
             if (
                    botOwner_0.BotRequestController.CurRequest != null &&
-                   botOwner_0.BotRequestController.CurRequest.BotRequestType == BotRequestType.attackClose
+                   (botOwner_0.BotRequestController.CurRequest.BotRequestType == BotRequestType.attackClose ||
+                   botOwner_0.BotRequestController.CurRequest.BotRequestType == BotRequestType.warnPlayer)
                )
             {
 
@@ -54,22 +47,11 @@ namespace friendlyPMC.Components.BossFollower
 
         public override AICoreActionEndStruct ShallEndCurrentDecision(AICoreActionResultStruct<BotLogicDecision> curDecision)
         {
-            BotRequest request = botOwner_0.BotRequestController.CurRequest;
-
             if (!botOwner_0.Memory.HaveEnemy)
             {
                 return gstruct7_0;
             }
 
-            // boss recall
-            if (
-                botOwner_0.BotRequestController.CurRequest != null &&
-                botOwner_0.BotRequestController.CurRequest.BotRequestType == BotRequestType.warnPlayer &&
-                botOwner_0.Memory.HaveEnemy && !botOwner_0.Memory.GoalEnemy.IsVisible
-            )
-            {
-                return gstruct7_0;
-            }
 
             return base.ShallEndCurrentDecision(curDecision);
         }
@@ -81,39 +63,6 @@ namespace friendlyPMC.Components.BossFollower
 
             Vector3 botPosition = botOwner_0.GetPlayer.Transform.position;
             Vector3 bossPosition = HasBoss() ? GetBoss().Position : botPosition;
-
-            // warn request is actually regroup for us
-            if (request != null && request.BotRequestType == BotRequestType.warnPlayer)
-            {
-                ordersAreReqroup = true;
-            }
-            else
-            {
-                ordersAreReqroup = false;
-            }
-
-            // Check if the bot has received the regroup command
-            if (ordersAreReqroup && Utils.Utils.GetNavDistance(botPosition,bossPosition) > friendlyPMC.regroupMinDistance.Value && (!botOwner_0.Memory.HaveEnemy || !botOwner_0.Memory.GoalEnemy.IsVisible))
-            {
-                GetClosestCoverPoint(bossPosition, friendlyPMC.fightInnerRadius.Value);
-
-                if (customNavigationPoint_0 != null)
-                {
-
-                    if (Utils.Utils.GetNavDistance(botPosition,customNavigationPoint_0.Position) > sprintDistance)
-                    {
-                        return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "regroupToBossFast");
-                    }
-                    else
-                    {
-                        return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMoving, "regroupToBossSlow");
-                    }
-                }
-                else
-                {
-                    return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.followerPatrol, "regroupFallback");
-                }
-            }
 
             AICoreActionResultStruct<BotLogicDecision> baseDecision = base.GetDecision();
 
@@ -164,12 +113,6 @@ namespace friendlyPMC.Components.BossFollower
 
         public override AICoreActionEndStruct EndHoldPosition()
         {
-            if (ordersChanged)
-            {
-                return new AICoreActionEndStruct("EndHol", true);
-            }
-
-
 
             if (ShallGoNearBoss()) return new AICoreActionEndStruct("goNearPlayer", true);
             return base.EndHoldPosition();
@@ -192,16 +135,6 @@ namespace friendlyPMC.Components.BossFollower
             float bossDist = Vector3.Distance(botOwner_0.Position, GetBoss().Position);
 
             return bossDist > Mathf.Min(friendlyPMC.maximumCoverDistance.Value, friendlyPMC.regroupMinDistance.Value) && (goalEnemy == null || !goalEnemy.HaveSeen || (goalEnemy.HaveSeen && Time.time - goalEnemy.PersonalLastSeenTime > friendlyPMC.maximumCover.Value));
-        }
-
-        public void OrdersChanged()
-        {
-            ordersChanged = true;
-            var Timer = StaticManager.Instance.TimerManager.MakeTimer(TimeSpan.FromSeconds(1), false);
-            Timer.OnTimer += () =>
-            {
-                ordersChanged = false;
-            };
         }
 
         public override CustomNavigationPoint FindPoint(CoverSearchData data, Func<CoverSearchData, CustomNavigationPoint> p, bool checkCurrent)
