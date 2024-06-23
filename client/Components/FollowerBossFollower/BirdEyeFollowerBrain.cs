@@ -20,8 +20,6 @@ namespace friendlyPMC.Components.FollowerBossFollower
 
         public override void AddLayers()
         {
-
-            Components.Logger.LogInfo("Add BirdEye Layer");
             // order matters for which layer get the initial priority
             // - follow
             BossFollowLayer followLayer = new BossFollowLayer(_owner, 51);

@@ -190,7 +190,7 @@ namespace friendlyPMC.Patches
             {
                 
                 //bossFollowers.Add(new IProfileData(side,WildSpawnType.followerBigPipe,BotDifficulty.hard,0f,@params));
-                //bossFollowers.Add(new IProfileData(side, WildSpawnType.followerBirdEye, BotDifficulty.hard, 0f, @params));
+                //bossFollowers.Add(new IProfileData(side, WildSpawnType.followerBirdEye, BotDifficulty.impossible, 0f, @params));
             }
 
             BotCacheClass bot = await BotCacheClass.Create(botData, botCreator, 1, botSpawnerClass);
@@ -220,6 +220,21 @@ namespace friendlyPMC.Patches
                     WildSpawnType botRole = profile.Info.Settings.Role;
                     profile.Info.Side = side;
 
+                    // switch role on spawning as original one glitches out
+                    if (botRole == WildSpawnType.followerBigPipe || botRole == WildSpawnType.followerBirdEye)
+                    {
+                        if (side == EPlayerSide.Bear)
+                        {
+                            profile.Info.Settings.Role = (WildSpawnType)AkiBotsPrePatcher.sptBearValue;
+                        }
+                        else if (side == EPlayerSide.Usec)
+                        {
+                            profile.Info.Settings.Role = (WildSpawnType)AkiBotsPrePatcher.sptUsecValue;
+                        }
+                        else
+                            profile.Info.Settings.Role = WildSpawnType.assault;
+                    }
+
                     botCreator.ActivateBot(profile, new GClass590(position, closestCorePoint.Id, false), zone, true, new Func<BotOwner, BotZone, BotsGroup>((BotOwner bt, BotZone zn) =>
                     {
                         return GetPlayerGroup(player, bt, zn);
@@ -240,6 +255,12 @@ namespace friendlyPMC.Patches
                                 {
                                     me.GetPlayer.Profile.Info.Side = side;
                                 }
+                                
+                                if(!me.IsRole(botRole))
+                                {
+                                    me.GetPlayer.Profile.Info.Settings.Role = botRole;
+                                }
+
                                 BossPlayers.Instance.AddFollower(me, player, false, botRole); // make bot a follower
                                 var Timer = StaticManager.Instance.TimerManager.MakeTimer(TimeSpan.FromSeconds(1), false);
 
@@ -522,7 +543,7 @@ namespace friendlyPMC.Patches
                     {
                         try
                         {
-                            BotsControllerPatch.Instance.SpawnBossFollower(playerBoss).Forget();
+                            BotsControllerPatch.Instance.SpawnBossFollower(playerBoss, WildSpawnType.followerBirdEye).Forget();
                         }
                         catch (Exception e) { Components.Logger.LogInfo("Failed Delayed Boss Ally Process " + e.Message); }
                     };

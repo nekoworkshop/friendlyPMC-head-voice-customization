@@ -310,11 +310,15 @@ namespace friendlyPMC.Modules
 
         public bool IsBoss(string id)
         {
+            if(_bosses == null) return false;
+
             return _bosses.ContainsKey(id);
         }
 
         public pitAIBossPlayer GetBossPlayer(string name)
         {
+            if (_bosses == null) return null;
+
             if (!_bosses.ContainsKey(name))
             {
                 return null;
@@ -325,6 +329,8 @@ namespace friendlyPMC.Modules
         public List<BotFollowerPlayer> GetBossFollowers(string name)
         {
             List<BotFollowerPlayer> botFollowers = new List<BotFollowerPlayer>();
+
+            if (_bosses == null) return botFollowers;
 
             if (!_bosses.ContainsKey(name) || _bosses[name] == null)
             {

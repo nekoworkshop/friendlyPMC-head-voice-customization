@@ -108,7 +108,7 @@ namespace friendlyPMC.Patches
         private static bool PatchPrefix(BotsGroup __instance, ref bool __result, IPlayer player)
         {
 
-            if (BossPlayers.Instance.IsBoss(player.ProfileId))
+            if (BossPlayers.Instance != null && BossPlayers.Instance.IsBoss(player.ProfileId))
             {
                 BotsGroup bossGroup = BossPlayers.Instance.GetBossPlayer(player.ProfileId).bossGroup;
                 if (bossGroup != null && __instance.Id == bossGroup.Id)

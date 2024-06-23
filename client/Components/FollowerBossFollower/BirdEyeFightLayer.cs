@@ -16,6 +16,9 @@ namespace friendlyPMC.Components.FollowerBossFollower
 
         protected float coverTimer = 0f;
 
+        protected readonly float fightRange = 50f;
+        protected readonly float fightLongRange = 100f;
+
         public BirdEyeFightLayer(BotOwner bot, int priority) : base(bot, priority)
         {
         }
@@ -60,6 +63,30 @@ namespace friendlyPMC.Components.FollowerBossFollower
             
             AICoreActionResultStruct<BotLogicDecision> baseDecision = base.GetDecision();
 
+            if (baseDecision.Action == BotLogicDecision.holdPosition && request != null && request.BotRequestType == BotRequestType.attackClose)
+            {
+                GetApproachablePoint();
+                Vector3 position = HasBoss() ? GetBoss().Position : botOwner_0.GetPlayer.Transform.position;
+                if (customNavigationPoint_0 == null)
+                {
+                    GetCoverPoint(position, 50f);
+                }
+
+                if (customNavigationPoint_0 == null)
+                {
+                    return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.dogFight, "DogFight");
+                }
+                else
+                {
+                    if (Utils.Utils.GetNavDistance(botOwner_0.GetPlayer.Position, customNavigationPoint_0.Position) > sprintDistance)
+                    {
+                        return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "getInCloseFast");
+                    }
+
+                    return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMoving, "getInCloseSlow");
+                }
+            }
+
             if (baseDecision.Action == BotLogicDecision.runToCover)
             {
 
@@ -68,12 +95,12 @@ namespace friendlyPMC.Components.FollowerBossFollower
                     GetApproachablePoint();
                     if (customNavigationPoint_0 == null)
                     {
-                        GetClosestCoverPoint(botPosition, friendlyPMC.fightOuterRadius.Value);
+                        GetCoverPoint(botPosition, fightLongRange);
                     }
                 } 
                 else if (baseDecision.Reason == "noInCover" || baseDecision.Reason == "еtoCov")
                 {
-                    GetClosestCoverPoint(botPosition, friendlyPMC.fightOuterRadius.Value);
+                    GetCoverPoint(botPosition, fightLongRange);
                 }
                 else
                 {
@@ -152,6 +179,14 @@ namespace friendlyPMC.Components.FollowerBossFollower
 
             customNavigationPoint_0 = point;
             botOwner_0.Memory.SetCoverPoints(point);
+        }
+
+        protected virtual void GetCoverPoint(Vector3 centerPosition, float searchRadius)
+        {
+            CustomNavigationPoint point1 = Utils.Utils.GetCoverPoint(botOwner_0, centerPosition, searchRadius, true);
+
+            customNavigationPoint_0 = point1;
+            botOwner_0.Memory.SetCoverPoints(point1);
         }
 
         protected virtual void GetApproachablePoint()

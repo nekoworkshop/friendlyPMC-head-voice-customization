@@ -1,5 +1,9 @@
 ﻿using BepInEx;
 using BepInEx.Configuration;
+using Comfort.Common;
+using EFT;
+using EFT.UI;
+using friendlyPMC.Modules;
 using friendlyPMC.Patches;
 using System.Collections.Generic;
 using UnityEngine;
@@ -79,12 +83,47 @@ namespace friendlyPMC
 
             knightSpawn = Config.Bind(testSettings, "Spawn with Knight", false, new ConfigDescription("Experimental: Spawn with the goons squad. This works in combination with your own squad. Take note that a boss and his followers do not accept the same commands as your squad"));
 
+            ConsoleScreen.Processor.RegisterCommand("followerstome", delegate ()
+            {
+                GameWorld gameWorld = Singleton<GameWorld>.Instance;
+
+                bool flag = !Singleton<AbstractGame>.Instantiated;
+                if (flag)
+                {
+                    ConsoleScreen.LogError("This command may only be used inraid");
+                    return;
+                }
+
+
+                if (GamePlayerOwner.MyPlayer.HealthController == null || !GamePlayerOwner.MyPlayer.HealthController.IsAlive)
+                {
+                    return;
+                }
+
+                string id = GamePlayerOwner.MyPlayer.ProfileId;
+
+                if(BossPlayers.Instance != null)
+                {
+                    var followers = BossPlayers.Instance.GetBossFollowers(id);
+                    Vector3 position = GamePlayerOwner.MyPlayer.Transform.position;
+                    foreach ( var follower in followers)
+                    {
+                        if (follower != null && follower.GetBot().HealthController.IsAlive)
+                        {
+                            follower.GetBot().GetPlayer.Teleport(position);
+                        }
+                    }
+                }
+
+            });
+
             if (!awaken)
             {
                 awaken = true;
                 Instance = this;
                 new Logger();
             }
+
 
             new BotGroupIsEnemyPatch().Enable();
             new BotGroupReportAboutEnemyy().Enable();

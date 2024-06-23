@@ -161,10 +161,13 @@ namespace friendlyPMC.Components
                             else
                             {
                                 FollowerGoCheck gclass = new FollowerGoCheck(data.Player);
-
-                                if (botOwner_0.BotsGroup.RequestsController.TryAddRequest(gclass))
+                                Components.Logger.LogInfo("That Direction");
+                                if (
+                                    gclass.CanRequest(botOwner_0) &&
+                                    botOwner_0.BotsGroup.RequestsController.TryAddRequest(gclass)
+                                )
                                 {
-
+                                    Components.Logger.LogInfo("That Direction Accepted");
                                     gclass.AddPossibleExecutors(botOwner_0);
                                     gclass.SetGroup(botOwner_0.BotsGroup.RequestsController);
                                 }
@@ -225,6 +228,23 @@ namespace friendlyPMC.Components
                     isFollowerBoss = true;
                     break;
                 }
+            }
+
+
+            if(info.phrase == EPhraseTrigger.Attention && isClose)
+            {
+                if(botOwner_0.BotRequestController.CurRequest != null)
+                {
+                    botOwner_0.BotRequestController.CurRequest.Complete();
+                }
+
+                string nm = botOwner_0.Brain.BaseBrain.CurLayerInfo.Name();
+                botOwner_0.Brain.Agent.Deactivate(nm);
+                botOwner_0.Brain.Agent.Update();
+                botOwner_0.Brain.Agent.ActivateLayer(nm);
+                botOwner_0.Brain.Agent.Update();
+
+                return;
             }
 
             // AI Boss followers and AI followers of AI Bosses will not take several commands

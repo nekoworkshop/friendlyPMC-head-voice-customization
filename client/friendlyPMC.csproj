@@ -56,6 +56,9 @@
     <Reference Include="BepInEx">
       <HintPath>..\..\core\BepInEx.dll</HintPath>
     </Reference>
+    <Reference Include="bsg.console.core">
+      <HintPath>..\..\..\XboxGames\AKI-Streets-3.8.0\EscapeFromTarkov_Data\Managed\bsg.console.core.dll</HintPath>
+    </Reference>
     <Reference Include="Comfort">
       <HintPath>..\..\..\EscapeFromTarkov_Data\Managed\Comfort.dll</HintPath>
     </Reference>

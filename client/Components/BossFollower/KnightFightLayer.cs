@@ -148,6 +148,10 @@ namespace friendlyPMC.Components.BossFollower
 
             if(baseDecision.Action == BotLogicDecision.attackMoving && baseDecision.Reason == "am")
             {
+                if(!botOwner_0.Memory.HaveEnemy)
+                {
+                    return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.followerPatrol, "regroupToBoss");
+                }
                 GetClosestCoverPoint(botOwner_0.Memory.GoalEnemy.CurrPosition, fightRange);
 
                 if (customNavigationPoint_0 == null)
@@ -227,7 +231,7 @@ namespace friendlyPMC.Components.BossFollower
                 return gstruct7_0;
             }
 
-            if (curDecision.Reason == "getInCloseFast" || curDecision.Reason == "getInCloseSlow")
+            if (curDecision.Reason == "getInCloseFast" || curDecision.Reason == "getInCloseSlow" || curDecision.Reason == "am")
             {
                 return EndGetInClose();
             }
