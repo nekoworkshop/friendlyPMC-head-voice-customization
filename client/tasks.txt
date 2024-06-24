@@ -1,7 +1,10 @@
-- 	night vision of the bots needs to be increased
-
-
-3.1.1 - changes:
-- That Direction moves nearby bots in front of the player or rush enemy
-- Go Forward moves followers in front of the player or closer to the enemy
-- added several parameters to experimenting with under settings
+3.3.0 - changes:
+- Added "Attention" command to help with stucked bots
+- added "followerstome" console command to teleport bots to player
+- Added test for spawning with the Goons Squad, optionally just with one of them
+- Improvements on enemy approach logic
+- Bots will get their ammo refill on becoming a follower
+- Commands and Gestures that bosses listen to:
+- - Cover Me - will try to get near player
+- - That Direction - will try to approach enemy (in combat); will try to go in front of player (out of combat)
+- - Come Here - will try to go near player (out of combat)
