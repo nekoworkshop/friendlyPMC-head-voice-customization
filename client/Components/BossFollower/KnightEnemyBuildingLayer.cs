@@ -15,9 +15,10 @@ namespace friendlyPMC.Components.BossFollower
     {
 
         protected CustomNavigationPoint customNavigationPoint_0 = null;
-        protected float coverTimer = 0f;
 
         private float sprintDistance = 15f;
+        protected readonly float fightRange = 50f;
+        protected readonly float fightLongRange = 100f;
         public KnightEnemyBuildingLayer(BotOwner bot, int priority) : base(bot, priority)
         {
 
@@ -59,8 +60,6 @@ namespace friendlyPMC.Components.BossFollower
         public override AICoreActionResultStruct<BotLogicDecision> GetDecision()
         {
 
-            BotRequest request = botOwner_0.BotRequestController.CurRequest;
-
             Vector3 botPosition = botOwner_0.GetPlayer.Transform.position;
             Vector3 bossPosition = HasBoss() ? GetBoss().Position : botPosition;
 
@@ -68,7 +67,7 @@ namespace friendlyPMC.Components.BossFollower
 
             if (baseDecision.Action == BotLogicDecision.runToCover)
             {
-                GetClosestCoverPoint(bossPosition, friendlyPMC.fightOuterRadius.Value);
+                GetClosestCoverPoint(botPosition, fightRange);
 
                 if (customNavigationPoint_0 == null)
                 {
@@ -81,17 +80,17 @@ namespace friendlyPMC.Components.BossFollower
                
                 if(
                     botOwner_0.Memory.IsInCover && (!HasBoss() || 
-                    Utils.Utils.GetNavDistance(GetBoss().Position, botOwner_0.GetPlayer.Position) < friendlyPMC.fightInnerRadius.Value)
+                    Utils.Utils.GetNavDistance(GetBoss().Position, botOwner_0.GetPlayer.Position) < fightRange)
                 )
                 {
                     HoldFor(GClass760.Random(1f, 3f));
                 } else
                 {
-                    GetCoverPoint(bossPosition, friendlyPMC.fightInnerRadius.Value);
+                    GetCoverPoint(bossPosition, fightRange);
 
                     if (customNavigationPoint_0 == null)
                     {
-                        GetClosestCoverPoint(bossPosition, friendlyPMC.fightOuterRadius.Value);
+                        GetClosestCoverPoint(bossPosition, fightLongRange);
                     }
 
                     if (customNavigationPoint_0 == null)
@@ -149,10 +148,6 @@ namespace friendlyPMC.Components.BossFollower
         protected virtual void GetCoverPoint(Vector3 centerPosition, float searchRadius)
         {
 
-            if (this.coverTimer > Time.time) return;
-
-            this.coverTimer = 1.5f + Time.time;
-
             CustomNavigationPoint point1 = Utils.Utils.GetCoverPoint(botOwner_0, centerPosition, searchRadius);
 
             customNavigationPoint_0 = point1;
@@ -162,10 +157,6 @@ namespace friendlyPMC.Components.BossFollower
 
         protected virtual void GetClosestCoverPoint(Vector3 centerPosition, float searchRadius)
         {
-
-            if (this.coverTimer > Time.time) return;
-
-            this.coverTimer = 1f + Time.time;
 
             CustomNavigationPoint point = Utils.Utils.GetClosestCoverPoint(botOwner_0, centerPosition, searchRadius);
 

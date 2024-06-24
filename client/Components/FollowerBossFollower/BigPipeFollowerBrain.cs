@@ -7,7 +7,7 @@ namespace friendlyPMC.Components.FollowerBossFollower
     internal class BigPipeFollowerBrain : FollowerBrain
     {
 
-
+        BigPipeArtilleryLayer fightLayer;
         public BigPipeFollowerBrain(BotOwner owner, pitAIBossPlayer boss) : base(owner, boss)
         {
             owner.Tactic.IsCurTactic(BotsGroup.BotCurrentTactic.Attack);
@@ -26,14 +26,14 @@ namespace friendlyPMC.Components.FollowerBossFollower
             KnightWeaponMtnLayer layer2 = new KnightWeaponMtnLayer(_owner, 78);
             base.method_0(3, layer2, true);
             // assault building
-            KnightAssaultBuildingLayer fightLayer = new KnightAssaultBuildingLayer(_owner, 70);
-            base.method_0(4, fightLayer, true);
+            KnightAssaultBuildingLayer layer3 = new KnightAssaultBuildingLayer(_owner, 70);
+            base.method_0(4, layer3, true);
             // enemy building
             KnightEnemyBuildingLayer buildingLayer = new KnightEnemyBuildingLayer(_owner, 60);
             base.method_0(5, buildingLayer, true);
             // artillerry support
-            BigPipeArtilleryLayer layer5 = new BigPipeArtilleryLayer(_owner, 55);
-            base.method_0(6, layer5, true);
+            fightLayer = new BigPipeArtilleryLayer(_owner, 55);
+            base.method_0(6, fightLayer, true);
             // - item taker
             FollowerLootLayer layer7 = new FollowerLootLayer(_owner, 40);
             method_0(7, layer7, true);
@@ -46,7 +46,7 @@ namespace friendlyPMC.Components.FollowerBossFollower
 
         public override void BossOrdersChanged()
         {
-            //buildingLayer.OrdersChanged();
+            fightLayer.OrdersChanged();
         }
     }
 }

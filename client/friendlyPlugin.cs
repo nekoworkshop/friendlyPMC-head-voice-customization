@@ -59,38 +59,38 @@ namespace friendlyPMC
         private void Awake()
         {
 
-            squadSpawn = Config.Bind(baseSettings, "Squad spawn", true, new ConfigDescription("Spawn with followers"));
-            squadSize = Config.Bind(baseSettings, "Squad size", 2, new ConfigDescription("Number of followers to spawn with", new AcceptableValueRange<int>(1, 3)));
+            squadSpawn = Config.Bind(baseSettings, "1 Squad spawn", true, new ConfigDescription("Spawn with followers"));
+            squadSize = Config.Bind(baseSettings, "1.4  -  Squad size", 2, new ConfigDescription("Number of followers to spawn with", new AcceptableValueRange<int>(1, 3)));
             
-            copyEquip = Config.Bind(baseSettings, "Clone equipment", true, new ConfigDescription("When Squad Spawn is active, spawned followers will have the same equipment as the player"));
-            extraPickups = Config.Bind(baseSettings, "Maximum followers", 3, new ConfigDescription("Maximum number of followers the player can have. Cannot be less than Squad Size if Squad Spawn is active", new AcceptableValueRange<int>(1, 4)));
+            copyEquip = Config.Bind(baseSettings, "1.6  -  Clone equipment", true, new ConfigDescription("When Squad Spawn is active, spawned followers will have the same equipment as the player"));
+            extraPickups = Config.Bind(baseSettings, "2 Maximum followers", 3, new ConfigDescription("Maximum number of followers the player can have. Cannot be less than Squad Size if Squad Spawn is active", new AcceptableValueRange<int>(1, 4)));
 
-            alternativeSpawn = Config.Bind(baseSettings, "Alternative Spawn", false, new ConfigDescription("Try alternative Spawning method to help with Swag+Donuts"));
-            squadDelay = Config.Bind(baseSettings, "Squad spawn Delay", 0, new ConfigDescription("When Squad Spawn is active, how much to delay the spawn of the squad ( in sec.). This is useful in case you have Swag+Donuts. Set delay above 10 seconds.", new AcceptableValueRange<int>(0, 30)));
+            alternativeSpawn = Config.Bind(baseSettings, "1.2  -  Alternative Spawn", false, new ConfigDescription("Try alternative Spawning method to help with Swag+Donuts"));
+            squadDelay = Config.Bind(baseSettings, "1.3  -  Squad spawn Delay", 0, new ConfigDescription("When Squad Spawn is active, how much to delay the spawn of the squad ( in sec.). This is useful in case you have Swag+Donuts. Set delay above 10 seconds.", new AcceptableValueRange<int>(0, 30)));
 
-            returnChanceDeath = Config.Bind(baseSettings, "Squadmate return chance after death", 50, new ConfigDescription("Chance your followers will return the items you gave them should you die. This applies only to members you spawned with.", new AcceptableValueRange<int>(1, 100)));
+            returnChanceDeath = Config.Bind(baseSettings, "1.5  -  Squadmate return chance after death", 50, new ConfigDescription("Chance your followers will return the items you gave them should you die. This applies only to members you spawned with.", new AcceptableValueRange<int>(1, 100)));
 
-            regroupMinDistance = Config.Bind(miscSettings, "Regroup minimum distance", 7, new ConfigDescription("The minimum distance for the regroup call to have effect, in combat", new AcceptableValueRange<int>(5, 30)));
+            regroupMinDistance = Config.Bind(miscSettings, "3 Regroup minimum distance", 7, new ConfigDescription("The minimum distance for the regroup call to have effect, in combat", new AcceptableValueRange<int>(5, 30)));
 
-            maximumRadius = Config.Bind(miscSettings, "Maximum distance to Boss", 100, new ConfigDescription("The maximum distance a follower can go out relative to the player. This is applied only at the begining of a raid", new AcceptableValueRange<int>(80, 300)));
+            maximumRadius = Config.Bind(miscSettings, "1 Maximum distance to Boss", 100, new ConfigDescription("The maximum distance a follower can go out relative to the player. This is applied only at the begining of a raid", new AcceptableValueRange<int>(80, 300)));
 
-            scanDistance = Config.Bind(miscSettings, "Maximum scan distance", 140, new ConfigDescription("Maximum distance to pick up any visible enemy that the player is signaling when issuing 'Contact' phrase", new AcceptableValueRange<int>(50, 300)));
+            scanDistance = Config.Bind(miscSettings, "6 Maximum scan distance", 140, new ConfigDescription("Maximum distance to pick up any visible enemy that the player is signaling when issuing 'Contact' phrase", new AcceptableValueRange<int>(50, 300)));
 
-            enemyRemember = Config.Bind(miscSettings, "Time to forget about enemy (in sec.)", 20, new ConfigDescription("Maximum time a follower will remember an enemy. This is applied only at the begining of a raid", new AcceptableValueRange<int>(5, 60)));
+            enemyRemember = Config.Bind(miscSettings, "6,1  -  Time to forget about enemy (in sec.)", 20, new ConfigDescription("Maximum time a follower will remember an enemy. This is applied only at the begining of a raid", new AcceptableValueRange<int>(5, 60)));
 
-            maximumCover = Config.Bind(miscSettings, "Combat cover stay (in sec.)", 10, new ConfigDescription("Maximum time a follower will stay in cover when in 'defend' mode before trying to get closer to the player", new AcceptableValueRange<int>(2, 20)));
-            maximumCoverDistance = Config.Bind(miscSettings, "Combat cover distance", 30, new ConfigDescription("Maximum distance allowed between the follower and the player while the follower is in cover, when in 'defend' mode", new AcceptableValueRange<int>(10, 50)));
+            maximumCover = Config.Bind(miscSettings, "2.1  -  Combat cover stay (in sec.)", 10, new ConfigDescription("Maximum time a follower will stay in cover when in 'defend' mode before trying to get closer to the player", new AcceptableValueRange<int>(2, 20)));
+            maximumCoverDistance = Config.Bind(miscSettings, "2 Combat cover distance", 30, new ConfigDescription("Maximum distance allowed between the follower and the player while the follower is in cover, when in 'defend' mode", new AcceptableValueRange<int>(10, 50)));
 
-            fightOuterRadius = Config.Bind(miscSettings,"Combat outer radius", 50, new ConfigDescription("The upper limit to search for cover during combat relative the current goal (player or enemy)", new AcceptableValueRange<int>(30, 100)));
-            fightInnerRadius = Config.Bind(miscSettings, "Combat inner radius", 30, new ConfigDescription("The lower limit to search for cover during combat relative the current goal (player or enemy)", new AcceptableValueRange<int>(15, 50)));
+            fightOuterRadius = Config.Bind(miscSettings,"4 Combat outer radius", 50, new ConfigDescription("The upper limit to search for cover during combat relative the current goal (player or enemy)", new AcceptableValueRange<int>(30, 100)));
+            fightInnerRadius = Config.Bind(miscSettings, "5 Combat inner radius", 30, new ConfigDescription("The lower limit to search for cover during combat relative the current goal (player or enemy)", new AcceptableValueRange<int>(15, 50)));
 
-            knightSpawn = Config.Bind(testSettings, "Spawn with The Goons", false, new ConfigDescription("Experimental: Spawn with the goons squad. This works in combination with your own squad. Take note that a boss and his followers do not accept the same commands as your squad"));
+            knightSpawn = Config.Bind(testSettings, "1 Spawn with The Goons", false, new ConfigDescription("Experimental: Spawn with the goons squad. This works in combination with your own squad. Take note that a boss and his followers do not accept the same commands as your squad"));
 
-            justKnightSpawn = Config.Bind(testSettings, "Spawn with Knight", true, new ConfigDescription("Experimental: Only when Spawn with The Goons is active"));
+            justKnightSpawn = Config.Bind(testSettings, "1.1  -  Spawn with Knight", true, new ConfigDescription("Experimental: Only when Spawn with The Goons is active"));
 
-            bigPipeSpawn = Config.Bind(testSettings, "Spawn with BigPipe", true, new ConfigDescription("Experimental: Only when Spawn with The Goons is active"));
+            bigPipeSpawn = Config.Bind(testSettings, "1.2  -  Spawn with BigPipe", true, new ConfigDescription("Experimental: Only when Spawn with The Goons is active"));
 
-            birdEyeSpawn = Config.Bind(testSettings, "Spawn with BirdEye", true, new ConfigDescription("Experimental: Only when Spawn with The Goons is active"));
+            birdEyeSpawn = Config.Bind(testSettings, "1.3  -  Spawn with BirdEye", true, new ConfigDescription("Experimental: Only when Spawn with The Goons is active"));
 
             ConsoleScreen.Processor.RegisterCommand("followerstome", delegate ()
             {

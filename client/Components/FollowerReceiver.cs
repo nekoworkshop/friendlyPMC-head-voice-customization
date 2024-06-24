@@ -210,8 +210,6 @@ namespace friendlyPMC.Components
             List<EPhraseTrigger> bossNoPhrase = new List<EPhraseTrigger>
             {
                 EPhraseTrigger.OpenDoor,
-                EPhraseTrigger.GetBack,
-                EPhraseTrigger.GoForward,
                 EPhraseTrigger.Gogogo
             };
             List<EPhraseTrigger> bossBusyIgnore = new List<EPhraseTrigger>
@@ -225,6 +223,8 @@ namespace friendlyPMC.Components
                 EPhraseTrigger.Silence,
                 EPhraseTrigger.Fire,
                 EPhraseTrigger.GetBack,
+                EPhraseTrigger.GoForward,
+                EPhraseTrigger.NeedHelp
             };
 
             bool isFollowerBoss = false;
@@ -331,13 +331,31 @@ namespace friendlyPMC.Components
             if (isBossCommunicating)
             {
 
-                Components.Logger.LogInfo("Player Said " + info.phrase.ToString());
-
                 pitAIBossPlayer boss = BossPlayers.Instance.GetBossPlayer(requester.ProfileId);
                 // on cover me, make bot follow boss near
                 if (info.phrase == EPhraseTrigger.CoverMe)
                 {
-                    FollowerPatrolInstances.SetNearPatrol(botOwner_0);
+                    if (!isFollowerBoss)
+                    {
+                        FollowerPatrolInstances.SetNearPatrol(botOwner_0);
+                    } else
+                    {
+                        (botOwner_0.Brain.BaseBrain as FollowerBrain).BossOrdersChanged();
+
+                        Player alivePlayerByProfileID = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(requester.ProfileId);
+
+                        if (botOwner_0.BotRequestController.TryStopCurrent(alivePlayerByProfileID, true))
+                        {
+                            FollowerRegroup gclass = new FollowerRegroup(requester);
+
+
+                            if (botOwner_0.BotsGroup.RequestsController.TryAddRequest(gclass))
+                            {
+                                gclass.AddPossibleExecutors(botOwner_0);
+                                gclass.SetGroup(botOwner_0.BotsGroup.RequestsController);
+                            }
+                        }
+                    }
                 }
                 // on get back make bot follow boss at a distance
                 else if(info.phrase == EPhraseTrigger.GetBack)

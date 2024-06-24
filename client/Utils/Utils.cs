@@ -66,7 +66,7 @@ namespace friendlyPMC.Utils
                                 !botOwner.Memory.HaveEnemy ||
                                 (
                                     point.IsFreeById(botOwner.Memory.GoalEnemy.Owner.Id) &&
-                                    point.IsDangerPositionFarEnough(new Vector3[] { botOwner.Memory.GoalEnemy.CurrPosition }, 5f)
+                                    point.IsDangerPositionFarEnough(new Vector3[] { botOwner.Memory.GoalEnemy.CurrPosition }, 3f * 3f)
                                 )
                             )
                         )
@@ -170,12 +170,64 @@ namespace friendlyPMC.Utils
             return customNavigationPoint;
         }
 
-        public static CustomNavigationPoint GetApproachableCoverPoint(BotOwner botOwner, Vector3 point)
+        public static CustomNavigationPoint GetApproachableCoverPoint(BotOwner botOwner, Vector3 point, float mindDistance = 5f)
         {
             Vector3 midpoint = Vector3.Lerp(botOwner.GetPlayer.Transform.position, point, 0.5f);
             float distance = Vector3.Distance(midpoint, point);
 
-            return GetClosestCoverPoint(botOwner, midpoint, distance,true);
+            return GetClosestAttackCoverPoint(botOwner, midpoint, false, mindDistance);
+        }
+
+        public static CustomNavigationPoint GetClosestAttackCoverPoint(BotOwner botOwner, Vector3 centerPosition, bool useFullCover = false, float minDistance = 5f)
+        {
+            List<CustomNavigationPoint> customNavigationPoints = HasBoss(botOwner) && !useFullCover ? GetBoss(botOwner).GetAreaCovers() : BossPlayers.Instance.GetCovers();
+
+            if (customNavigationPoints.Count > 0)
+            {
+                if (customNavigationPoints.Count > 0)
+                {
+                    CustomNavigationPoint point1 = null;
+                    float distance = !useFullCover && HasBoss(botOwner) ?  friendlyPMC.maximumRadius.Value : Mathf.Infinity;
+
+                    NavMeshPath navMeshPath = new NavMeshPath();
+                    Vector3 botPosition = botOwner.Transform.position;
+
+                    ShootPointClass shootPointClass = botOwner.CurrentEnemyTargetPosition(true);
+
+                    foreach (CustomNavigationPoint point in customNavigationPoints)
+                    {
+                        if (
+                                point.IsFreeById(botOwner.Id) &&
+                                botOwner.Memory.HaveEnemy &&
+                                GClass301.CanShootToTarget(shootPointClass, point, botOwner.LookSensor.Mask, false) &&
+                                point.IsDangerPositionFarEnough(new Vector3[] { botOwner.Memory.GoalEnemy.CurrPosition }, minDistance * minDistance)
+                            )
+                        {
+                            float range = Vector3.Distance(centerPosition, point.Position);
+                            if (range < distance)
+                            {
+                                navMeshPath.ClearCorners();
+                                bool resut = NavMesh.CalculatePath(botPosition, point.Position, -1, navMeshPath);
+                                if (resut && navMeshPath.status == NavMeshPathStatus.PathComplete)
+                                {
+
+                                    float dist = navMeshPath.CalculatePathLength();
+                                    if (dist > distance)
+                                    {
+                                        continue;
+                                    }
+                                }
+                                point1 = point;
+                                distance = range;
+                            }
+                        }
+                    }
+
+                    return point1;
+                }
+            }
+
+            return null;
         }
     }
 
