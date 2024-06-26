@@ -95,7 +95,7 @@ namespace friendlyPMC.Components.BossFollower
 
                     IPlayer requester = botOwner_0.BotRequestController.CurRequest.Requester;
 
-                    Vector3 requestPos = botOwner_0.BotRequestController.CurRequest.Requester.Position;
+                    Vector3 requestPos = requester.Position;
                     Vector3 dir = requester.LookDirection;
 
                     float offset = GClass760.RandomSing() * GClass760.Random(1f, 2f);

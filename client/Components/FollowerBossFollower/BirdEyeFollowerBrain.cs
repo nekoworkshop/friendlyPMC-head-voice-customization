@@ -12,7 +12,7 @@ namespace friendlyPMC.Components.FollowerBossFollower
     {
 
         protected BirdEyeFightLayer fightLayer;
-
+        protected KnightEnemyBuildingLayer buildingLayer;
         public BirdEyeFollowerBrain(BotOwner owner, pitAIBossPlayer boss) : base(owner, boss)
         {
         }
@@ -33,8 +33,8 @@ namespace friendlyPMC.Components.FollowerBossFollower
             KnightAssaultBuildingLayer layer3 = new KnightAssaultBuildingLayer(_owner, 70);
             base.method_0(4, layer3, true);
             // enemy building
-            KnightEnemyBuildingLayer buildingLayer = new KnightEnemyBuildingLayer(_owner, 60);
-            base.method_0(5, buildingLayer, true);
+            //buildingLayer = new KnightEnemyBuildingLayer(_owner, 60);
+            //base.method_0(5, buildingLayer, true);
             // sniper fight
             fightLayer = new BirdEyeFightLayer(_owner, 55);
             method_0(6, fightLayer, true);
@@ -51,6 +51,7 @@ namespace friendlyPMC.Components.FollowerBossFollower
         public override void BossOrdersChanged()
         {
             fightLayer.OrdersChanged();
+            //buildingLayer.OrdersChanged();
         }
     }
 }

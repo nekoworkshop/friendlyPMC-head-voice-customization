@@ -95,7 +95,6 @@ namespace friendlyPMC.Patches
             var oldBehaviorUsec = bt.Settings.FileSettings.Mind.DEFAULT_USEC_BEHAVIOUR;
             var oldBehaviorSavage = bt.Settings.FileSettings.Mind.DEFAULT_SAVAGE_BEHAVIOUR;
 
-            var old_use = bt.Settings.FileSettings.Mind.USE_ADD_TO_ENEMY_VALIDATION;
             var old_reasons = bt.Settings.FileSettings.Mind.VALID_REASONS_TO_ADD_ENEMY;
 
             bt.Settings.FileSettings.Mind.USE_ADD_TO_ENEMY_VALIDATION = true;
@@ -154,7 +153,7 @@ namespace friendlyPMC.Patches
             };
 
             // revert changes
-            bt.Settings.FileSettings.Mind.USE_ADD_TO_ENEMY_VALIDATION = old_use;
+            bt.Settings.FileSettings.Mind.USE_ADD_TO_ENEMY_VALIDATION = false;
             bt.Settings.FileSettings.Mind.VALID_REASONS_TO_ADD_ENEMY = old_reasons;
             bt.Settings.FileSettings.Mind.DEFAULT_BEAR_BEHAVIOUR = oldBehaviourBear;
             bt.Settings.FileSettings.Mind.DEFAULT_USEC_BEHAVIOUR = oldBehaviorUsec;
@@ -239,6 +238,7 @@ namespace friendlyPMC.Patches
                         else
                             profile.Info.Settings.Role = WildSpawnType.assault;
                     }
+
 
                     botCreator.ActivateBot(profile, new GClass590(position, closestCorePoint.Id, false), zone, true, new Func<BotOwner, BotZone, BotsGroup>((BotOwner bt, BotZone zn) =>
                     {

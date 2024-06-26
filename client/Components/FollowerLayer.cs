@@ -167,6 +167,12 @@ namespace friendlyPMC.Components
 
             return gstruct7_1;
         }
+
+        public override AICoreActionEndStruct EndRunToCover()
+        {
+            return new AICoreActionEndStruct("enemy.None", true);
+        }
+
         public override bool ShallUseNow()
         {
             botOwner_0.PriorityAxeTarget.FindTarget();

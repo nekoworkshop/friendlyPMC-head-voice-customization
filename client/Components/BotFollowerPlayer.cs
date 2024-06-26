@@ -68,6 +68,7 @@ namespace friendlyPMC.Components
             
             _IsSquadMate = isSquad;
 
+            bool hadEnemy = _bot.Memory.HaveEnemy;
             // deactivate old layers
             var baseBrain = _bot.Brain.BaseBrain;
             // guess work because we cannot access the private property dictionary_0 where the layers are, but no brain has 20 layers, usually it's 10
@@ -192,7 +193,19 @@ namespace friendlyPMC.Components
                         }
                     };
                     _player.bossGroup.AnyBodyShootImmediately = true;
-
+                    // - - any enemy the boss has, the followers will now have
+                    try
+                    {
+                        var _initialBot = AccessTools.Field(typeof(BotsGroup), "_initialBot").GetValue(_player.bossGroup) as BotOwner;
+                        _initialBot.Settings.FileSettings.Mind.USE_ADD_TO_ENEMY_VALIDATION = false;
+                        _player.GetEnemies().ForEach(enemy =>
+                        {
+                            _player.bossGroup.AddEnemy(enemy.GetPlayer, EBotEnemyCause.initCauseEnemy);
+                        });
+                    } catch(Exception ex)
+                    {
+                        Logger.LogInfo(ex.Message);
+                    }
                 }
                 else if(_bot.BotsGroup.Id != _player.bossGroup.Id)
                 {
@@ -215,6 +228,11 @@ namespace friendlyPMC.Components
                 Logger.LogInfo("Could not add ammo to follower: " + ex.Message);
             }
 
+            // reset enemy state
+            if (!hadEnemy && _bot.Memory.HaveEnemy)
+            {
+                _bot.Memory.DeleteInfoAboutEnemy(_bot.Memory.GoalEnemy.Person);
+            }
 
             Logger.LogInfo($"Bot {_bot.Profile.Nickname} is now a follower of {_player.Player().Profile.Nickname}");
         }
@@ -250,7 +268,7 @@ namespace friendlyPMC.Components
             settings.FileSettings.Mind.DIST_TO_STOP_RUN_ENEMY = 15f;
             settings.FileSettings.Mind.TIME_TO_FORGOR_ABOUT_ENEMY_SEC = friendlyPMC.enemyRemember.Value;
             settings.FileSettings.Mind.TIME_TO_FIND_ENEMY = 6f;
-
+            settings.FileSettings.Mind.ATTACK_IMMEDIATLY_CHANCE_0_100 = 100f;
             settings.FileSettings.Mind.CAN_TALK = true;
             settings.FileSettings.Mind.CAN_STAND_BY = true;
             settings.FileSettings.Mind.CAN_EXECUTE_REQUESTS = true;

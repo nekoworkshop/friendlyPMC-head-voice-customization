@@ -154,6 +154,7 @@
     <Compile Include="Components\FollowerBossFollower\BigPipeFollowerBrain.cs" />
     <Compile Include="Components\FollowerBossFollower\BirdEyeFightLayer.cs" />
     <Compile Include="Components\FollowerBossFollower\BirdEyeFollowerBrain.cs" />
+    <Compile Include="Components\FollowerBossFollower\BirdEyeFollowLayer.cs" />
     <Compile Include="Modules\FollowerCreateNode.cs" />
     <Compile Include="Patches\BotMemoryPatch.cs" />
     <Compile Include="Patches\GestureMenuPatch.cs" />
@@ -189,6 +190,7 @@
     <Compile Include="Patches\PlayerPatch.cs" />
     <Compile Include="Patches\QuickPanelPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utils\EnemyInfo.cs" />
     <Compile Include="Utils\Utils.cs" />
   </ItemGroup>
   <ItemGroup>

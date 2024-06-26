@@ -58,9 +58,16 @@ namespace friendlyPMC.Patches
                 }
 
                 return false;
+            // any group that makes the player boss it's enemy becomes an enemy
             } else if(BossPlayers.Instance.IsBoss(person.ProfileId))
             {
-                //@TODO : if bot makes player an enemy, make the group aware of that
+                var boss = BossPlayers.Instance.GetBossPlayer(person.ProfileId);
+                if (boss.bossGroup != null)
+                    boss.bossGroup.AddEnemy(person, EBotEnemyCause.addPlayerToBoss);
+                else if(person.IsAI && person.AIData?.BotOwner?.GetPlayer != null)
+                {
+                    boss.AddEnemy(person.AIData.BotOwner);
+                }
             }
 
             return true;

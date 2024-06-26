@@ -240,7 +240,7 @@ namespace friendlyPMC.Components
             }
 
 
-            if (info.phrase == EPhraseTrigger.Attention && isClose)
+            if (info.phrase == EPhraseTrigger.Attention)
             {
                 if (botOwner_0.BotRequestController.CurRequest != null)
                 {
@@ -502,6 +502,8 @@ namespace friendlyPMC.Components
                 // scan for enemies in front
                 else if(info.phrase == EPhraseTrigger.OnRepeatedContact)
                 {
+                    (botOwner_0.Brain.BaseBrain as FollowerBrain).BossOrdersChanged();
+
                     FollowerEnemyScan.ScanDirection(botOwner_0, info.PlayerRequester, boss.realPlayer);
                 }
                 // open door request

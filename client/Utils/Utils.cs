@@ -192,14 +192,12 @@ namespace friendlyPMC.Utils
                     NavMeshPath navMeshPath = new NavMeshPath();
                     Vector3 botPosition = botOwner.Transform.position;
 
-                    ShootPointClass shootPointClass = botOwner.CurrentEnemyTargetPosition(true);
-
                     foreach (CustomNavigationPoint point in customNavigationPoints)
                     {
                         if (
                                 point.IsFreeById(botOwner.Id) &&
                                 botOwner.Memory.HaveEnemy &&
-                                GClass301.CanShootToTarget(shootPointClass, point, botOwner.LookSensor.Mask, false) &&
+                                GClass301.CanShoot(point.Position, botOwner.Memory.GoalEnemy) &&
                                 point.IsDangerPositionFarEnough(new Vector3[] { botOwner.Memory.GoalEnemy.CurrPosition }, minDistance * minDistance)
                             )
                         {
