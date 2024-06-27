@@ -75,7 +75,7 @@ namespace friendlyPMC.Components.BossFollower
             // player needs help
             if (ordersChanged && request != null && request.BotRequestType == BotRequestType.warnPlayer)
             {
-                if (Utils.Utils.GetNavDistance(botPosition, bossPosition) > friendlyPMC.regroupMinDistance.Value && (!botOwner_0.Memory.HaveEnemy || !botOwner_0.Memory.GoalEnemy.IsVisible))
+                if (!botOwner_0.Memory.HaveEnemy || !botOwner_0.Memory.GoalEnemy.IsVisible)
                 {
                     if (!botOwner_0.Memory.HaveEnemy)
                     {
