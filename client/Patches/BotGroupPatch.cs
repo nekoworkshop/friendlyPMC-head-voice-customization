@@ -13,7 +13,7 @@ using static UnityEngine.EventSystems.EventTrigger;
 
 namespace friendlyPMC.Patches
 {
-    internal class BotGroupIsEnemyPatch : ModulePatch
+    internal class BotGroupUsecEnemyPatch : ModulePatch
     {
         protected override MethodBase GetTargetMethod()
         {
@@ -49,25 +49,14 @@ namespace friendlyPMC.Patches
                 return true;
             }
 
-            bool isBoss = BossPlayers.Instance.IsBoss(person.ProfileId);
+            var plBoss = BossPlayers.Instance.GetBossPlayer(person.ProfileId);
             // prevent boss player from being added as enemy to the group
-            if (BossPlayers.Instance.IsFollowerGroup(__instance.Id) && isBoss)
+            if (BossPlayers.Instance.IsFollowerGroup(__instance.Id) && plBoss != null)
             {
-                BotsGroup bossGroup = BossPlayers.Instance.GetBossPlayer(person.ProfileId).bossGroup;
+                BotsGroup bossGroup = plBoss.bossGroup;
                 if (bossGroup != null && __instance.Id == bossGroup.Id)
                 {
                     return false;
-                }
-            // any group that makes the player boss it's enemy becomes an enemy
-            } 
-            else if(isBoss)
-            {
-                var boss = BossPlayers.Instance.GetBossPlayer(person.ProfileId);
-                if (boss.bossGroup != null)
-                    boss.bossGroup.AddEnemy(person, EBotEnemyCause.addPlayerToBoss);
-                else if(person.IsAI && person.AIData?.BotOwner?.GetPlayer != null)
-                {
-                    boss.AddEnemy(person.AIData.BotOwner);
                 }
             }
 

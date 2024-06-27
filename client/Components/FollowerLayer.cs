@@ -36,7 +36,7 @@ namespace friendlyPMC.Components
 
         protected virtual Vector3 GetBossPosition()
         {
-            return GetBoss().Position;
+            return  HasBoss() ?  GetBoss().Position : botOwner_0.GetPlayer.Transform.position;
         }
 
         public override AICoreActionResultStruct<BotLogicDecision> GetDecision()

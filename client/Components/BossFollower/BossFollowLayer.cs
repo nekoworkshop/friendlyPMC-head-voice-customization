@@ -41,20 +41,20 @@ namespace friendlyPMC.Components.BossFollower
 
         public override AICoreActionResultStruct<BotLogicDecision> GetDecision()
         {
-
             BotRequest request = botOwner_0.BotRequestController.CurRequest != null ? botOwner_0.BotRequestController.CurRequest : null;
 
             float regroupMinDistance = friendlyPMC.regroupMinDistance.Value;
             float nearSearchRadius = friendlyPMC.fightInnerRadius.Value;
+
             float sprintDistance = 10f;
             Vector3 bossPosition = GetBossPosition();
 
-            if(request == null)
+            if (request == null)
             {
                 requestGoThere = false;
                 requestComeHere = false;
                 requestRegroup = false;
-            } 
+            }
             else
             {
                 if (request.BotRequestType == BotRequestType.goToPoint)
@@ -65,7 +65,7 @@ namespace friendlyPMC.Components.BossFollower
                 {
                     requestGoThere = false;
                 }
-                
+
                 if (request.BotRequestType == BotRequestType.followMe)
                 {
                     requestComeHere = true;
@@ -74,7 +74,7 @@ namespace friendlyPMC.Components.BossFollower
                 {
                     requestComeHere = false;
                 }
-                
+
                 if (request.BotRequestType == BotRequestType.warnPlayer)
                 {
                     requestRegroup = true;
@@ -84,8 +84,8 @@ namespace friendlyPMC.Components.BossFollower
                     requestRegroup = false;
                 }
             }
-            
-            if (!botOwner_0.Memory.HaveEnemy)
+
+            if (!botOwner_0.Memory.HaveEnemy && request != null)
             {
                 if (requestGoThere)
                 {
@@ -154,7 +154,6 @@ namespace friendlyPMC.Components.BossFollower
                     }
                 }
             }
-
             return base.GetDecision();
         }
 

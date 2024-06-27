@@ -70,16 +70,8 @@ namespace friendlyPMC.Patches
             else if (!isfollower && playerBoss != null)
             {   try
                 {
-                    if (playerBoss.bossGroup != null)
-                    {
-                        playerBoss.bossGroup.AddEnemy(botOwner_0, EBotEnemyCause.checkAddTODO);
-                    }
-
-
-                } catch
-                {
-
-                }
+                    playerBoss.bossGroup?.AddEnemy(botOwner_0, EBotEnemyCause.checkAddTODO);
+                } catch {}
             }
 
             return true;
