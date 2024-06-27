@@ -269,12 +269,32 @@ namespace friendlyPMC.Components
 
         public override void Activate()
         {
-
+            if (_aiplayer.Followers.Count > 0)
+            {
+                foreach (var item in _aiplayer.Followers)
+                {
+                    if(item.IsRole(WildSpawnType.bossKnight))
+                    {
+                        item.Boss.BossLogic.Activate();
+                        break;
+                    }
+                }
+            }
         }
 
         public override void BossLogicUpdate()
         {
-
+            if (_aiplayer.Followers.Count > 0)
+            {
+                foreach (var item in _aiplayer.Followers)
+                {
+                    if (item.IsRole(WildSpawnType.bossKnight))
+                    {
+                        item.Boss.BossLogic.BossLogicUpdate();
+                        break;
+                    }
+                }
+            }
         }
 
         public override void Dispose()

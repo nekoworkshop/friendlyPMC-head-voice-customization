@@ -13,15 +13,14 @@ using System.Reflection;
 using System.Threading;
 using UnityEngine;
 
+using Aki.Common.Http;
 
 using BotCacheClass = GClass591;
 using IProfileData = GClass592;
-using Comfort.Common;
 using EFT.Bots;
-using GPUInstancer;
-using UnityEngine.Profiling;
-using System.Security.Policy;
-using System.Threading.Tasks;
+using System.Data;
+using EFT.UI;
+
 
 
 namespace friendlyPMC.Patches
@@ -81,6 +80,28 @@ namespace friendlyPMC.Patches
             var allBotZones = AccessTools.Field(typeof(BotSpawner), "_allBotZones").GetValue(botSpawnerClass) as BotZone[];
             var _freeForAll = (bool)AccessTools.Field(typeof(BotSpawner), "_freeForAll").GetValue(botSpawnerClass);
 
+
+            WildSpawnType sptBear = (WildSpawnType)AkiBotsPrePatcher.sptBearValue;
+            WildSpawnType sptUsec = (WildSpawnType)AkiBotsPrePatcher.sptUsecValue;
+
+            WildSpawnType roleh;
+            bool sameSideHostile;
+
+            if (player.Player().Side == EPlayerSide.Bear)
+            {
+                roleh = sptBear;
+            }
+            else if (player.Player().Side == EPlayerSide.Usec)
+            {
+                roleh = sptUsec;
+            }
+            else
+            {
+                roleh = WildSpawnType.assault;
+            }
+            
+            GetSameSideHostile(roleh, player.Player().Side, out sameSideHostile);
+
             EPlayerSide side = player.realPlayer.Side;
 
             BotsGroup botsGroup;
@@ -102,18 +123,18 @@ namespace friendlyPMC.Patches
 
             if (side == EPlayerSide.Savage)
             {
-                bt.Settings.FileSettings.Mind.DEFAULT_SAVAGE_BEHAVIOUR = EWarnBehaviour.Ignore;
+                bt.Settings.FileSettings.Mind.DEFAULT_SAVAGE_BEHAVIOUR = sameSideHostile ? EWarnBehaviour.Attack : EWarnBehaviour.Ignore;
                 bt.Settings.FileSettings.Mind.DEFAULT_BEAR_BEHAVIOUR = EWarnBehaviour.Attack;
                 bt.Settings.FileSettings.Mind.DEFAULT_USEC_BEHAVIOUR = EWarnBehaviour.Attack;
             }
             else if (side == EPlayerSide.Bear)
             {
-                bt.Settings.FileSettings.Mind.DEFAULT_BEAR_BEHAVIOUR = EWarnBehaviour.Ignore;
+                bt.Settings.FileSettings.Mind.DEFAULT_BEAR_BEHAVIOUR = sameSideHostile ? EWarnBehaviour.Attack : EWarnBehaviour.Ignore;
                 bt.Settings.FileSettings.Mind.DEFAULT_SAVAGE_BEHAVIOUR = EWarnBehaviour.Attack;
             }
             else
             {
-                bt.Settings.FileSettings.Mind.DEFAULT_USEC_BEHAVIOUR = EWarnBehaviour.Ignore;
+                bt.Settings.FileSettings.Mind.DEFAULT_USEC_BEHAVIOUR = sameSideHostile ? EWarnBehaviour.Attack : EWarnBehaviour.Ignore;
                 bt.Settings.FileSettings.Mind.DEFAULT_SAVAGE_BEHAVIOUR = EWarnBehaviour.Attack;
             }
 
@@ -162,6 +183,18 @@ namespace friendlyPMC.Patches
             return player.bossGroup;
         }
 
+        public void GetSameSideHostile(WildSpawnType role, EPlayerSide side, out bool isHostile)
+        {
+            isHostile = false;
+
+            BotSettingsComponents botSettingsComponents = GClass532.smethod_1(BotDifficulty.normal, role, false);
+            if(botSettingsComponents != null)
+            {
+                if (side == EPlayerSide.Bear) isHostile = botSettingsComponents.Mind.DEFAULT_BEAR_BEHAVIOUR.HasFlag(EWarnBehaviour.Attack);
+                else if (side == EPlayerSide.Usec) isHostile = botSettingsComponents.Mind.DEFAULT_USEC_BEHAVIOUR.HasFlag(EWarnBehaviour.Attack);
+                else isHostile = botSettingsComponents.Mind.DEFAULT_SAVAGE_BEHAVIOUR.HasFlag(EWarnBehaviour.Attack);
+            }
+        }
         public async UniTask SpawnBossFollower(pitAIBossPlayer player, WildSpawnType boss = WildSpawnType.bossKnight, CancelToken cancelToken = null)
         {
             
@@ -215,8 +248,44 @@ namespace friendlyPMC.Patches
 
             List<Action> spanwers = new List<Action>();
 
+
             bot.Profiles.ForEach(profile =>
             {
+                // normalize boss followers health
+                foreach (EBodyPart part in Enum.GetValues(typeof(EBodyPart)))
+                {
+                    profile.Health.BodyParts.TryGetValue(part, out var bodyPart);
+                    if(bodyPart != null)
+                    {
+                        switch (part)
+                        {
+                            case EBodyPart.Head:
+                                bodyPart.Health.Minimum = 100;
+                                bodyPart.Health.Maximum = 120;
+                                break;
+                            case EBodyPart.Chest:
+                            case EBodyPart.Stomach:
+                                bodyPart.Health.Minimum = 200;
+                                bodyPart.Health.Maximum = 240;
+                                break;
+                            case EBodyPart.RightArm:
+                            case EBodyPart.LeftArm:
+                                bodyPart.Health.Minimum = 150;
+                                bodyPart.Health.Maximum = 150;
+                                break;
+                            case EBodyPart.RightLeg:
+                            case EBodyPart.LeftLeg:
+                                bodyPart.Health.Minimum = 170;
+                                bodyPart.Health.Maximum = 170;
+                                break;
+
+                            default:
+                                break;
+                        }
+                    }
+                }
+                
+
                 spanwers.Add(() => {
                     Stopwatch stopWatch = new Stopwatch();
                     stopWatch.Start();
@@ -368,9 +437,44 @@ namespace friendlyPMC.Patches
                 }
             });
 
-            // followers should use the same groupID as the player
+            
+            
             bot.Profiles.ForEach(profile => {
+                // followers should use the same groupID as the player
                 profile.Info.GroupId = player.realPlayer.GroupId;
+                // spawned followers will have a different health than the rest
+                foreach (EBodyPart part in Enum.GetValues(typeof(EBodyPart)))
+                {
+                    profile.Health.BodyParts.TryGetValue(part, out var bodyPart);
+                    if (bodyPart != null)
+                    {
+                        switch (part)
+                        {
+                            case EBodyPart.Head:
+                                bodyPart.Health.Minimum = 40;
+                                bodyPart.Health.Maximum = 42;
+                                break;
+                            case EBodyPart.Chest:
+                            case EBodyPart.Stomach:
+                                bodyPart.Health.Minimum = 150;
+                                bodyPart.Health.Maximum = 160;
+                                break;
+                            case EBodyPart.RightArm:
+                            case EBodyPart.LeftArm:
+                                bodyPart.Health.Minimum = 100;
+                                bodyPart.Health.Maximum = 100;
+                                break;
+                            case EBodyPart.RightLeg:
+                            case EBodyPart.LeftLeg:
+                                bodyPart.Health.Minimum = 110;
+                                bodyPart.Health.Maximum = 110;
+                                break;
+
+                            default:
+                                break;
+                        }
+                    }
+                }
             });
 
             var closestCorePoint = GetClosestCorePoint(Controller, position);

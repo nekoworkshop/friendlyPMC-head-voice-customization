@@ -60,7 +60,7 @@ export function SetFreemanTrader(Tables: IDatabaseTables, Traders: ITraderConfig
 			medic: false,
 			name: "Alex Freeman",
 			nextResupply: 1703691958,
-			nickname: "general",
+			nickname: "sarge",
 			repair: {
 				availability: false,
 				currency: "5449016a4bdc2d6f028b456f",
@@ -104,7 +104,7 @@ export function SetFreemanTrader(Tables: IDatabaseTables, Traders: ITraderConfig
 	for (const locale of locales) {
 		locale[`${trdid} FullName`] = "Alex Freeman";
 		locale[`${trdid} FirstName`] = "Alex";
-		locale[`${trdid} Nickname`] = "General";
+		locale[`${trdid} Nickname`] = "Sarge";
 		locale[`${trdid} Location`] = "БТР";
 		locale[`${trdid} Description`] = "";
 	}

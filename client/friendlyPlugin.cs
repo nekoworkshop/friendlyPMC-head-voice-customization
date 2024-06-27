@@ -133,7 +133,7 @@ namespace friendlyPMC
                 new Logger();
             }
 
-
+            //new BotGroupAddEnemy().Enable();
             new BotGroupIsEnemyPatch().Enable();
             new BotGroupReportAboutEnemyy().Enable();
             new BotGroupIsPlayerEnemy().Enable();

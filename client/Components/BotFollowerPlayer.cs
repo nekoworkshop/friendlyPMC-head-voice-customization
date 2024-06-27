@@ -143,7 +143,7 @@ namespace friendlyPMC.Components
                     followerAIBase.Dispose();
                 }
 
-                FollowerPatrolInstances.AddPatrol(new FollowerPatrol(player.realPlayer, bot));
+                FollowerPatrolInstances.AddPatrol(new FollowerPatrol(player, bot));
 
                 _bot.BotFollower.PatrolDataFollower.IsInited = true;
                 _bot.BotFollower.PatrolDataFollower.ManualUpdate();

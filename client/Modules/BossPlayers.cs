@@ -263,10 +263,9 @@ namespace friendlyPMC.Modules
 
             BotFollowerPlayer _follower = null;
 
-
             foreach (var item in _followers)
             {
-                if (item.IsBot(bot))
+                if (item!= null && item.IsBot(bot))
                 {
                     _follower = item;
                     break;
@@ -284,7 +283,7 @@ namespace friendlyPMC.Modules
 
             foreach (var item in _followers)
             {
-                if (item.IsBot(bot))
+                if (item != null && item.IsBot(bot))
                 {
                     _follower = item;
                     break;

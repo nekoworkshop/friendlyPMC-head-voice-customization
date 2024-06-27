@@ -76,7 +76,7 @@ namespace friendlyPMC.Utils
                 return EnemyDistance.Close;
             }
 
-            if (distance < 65f)
+            if (distance < 56f)
             {
                 return EnemyDistance.Mid;
             }

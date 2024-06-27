@@ -8,6 +8,7 @@ using System;
 using friendlyPMC.Components.BossFollower;
 using friendlyPMC.Components.FollowerBossFollower;
 using friendlyPMC.Actions;
+using LootingBots.Patch.Util;
 
 namespace friendlyPMC.Components
 {
@@ -47,10 +48,12 @@ namespace friendlyPMC.Components
 
             }
 
-            EPlayerSide side = bot.Side;
+            EPlayerSide side = _player.Player().Side;
 
             WildSpawnType sptBear = (WildSpawnType)AkiBotsPrePatcher.sptBearValue;
             WildSpawnType sptUsec = (WildSpawnType)AkiBotsPrePatcher.sptUsecValue;
+
+            var _initialBot = AccessTools.Field(typeof(BotsGroup), "_initialBot").GetValue(_player.bossGroup) as BotOwner;
 
             if (side != EPlayerSide.Savage)
             {
@@ -62,19 +65,49 @@ namespace friendlyPMC.Components
                 {
                     if (side == EPlayerSide.Bear && botType == sptBear)
                     {
-                        bot.Settings.FileSettings.Mind.FRIENDLY_BOT_TYPES.AddItem(botType);
-                        bot.Settings.FileSettings.Mind.WARN_BOT_TYPES.AddItem(botType);
+                        if (!_initialBot.Settings.FileSettings.Mind.DEFAULT_BEAR_BEHAVIOUR.HasFlag(EWarnBehaviour.Attack))
+                        {
+                            bot.Settings.FileSettings.Mind.FRIENDLY_BOT_TYPES.AddItem(botType);
+                            bot.Settings.FileSettings.Mind.WARN_BOT_TYPES.AddItem(botType);
+                        } else
+                        {
+                            bot.Settings.FileSettings.Mind.ENEMY_BOT_TYPES.AddItem(botType);
+                        }
                         continue;
                     }
                     else if (side == EPlayerSide.Usec && botType == sptUsec)
                     {
-                        bot.Settings.FileSettings.Mind.FRIENDLY_BOT_TYPES.AddItem(botType);
-                        bot.Settings.FileSettings.Mind.WARN_BOT_TYPES.AddItem(botType);
+                        if (!_initialBot.Settings.FileSettings.Mind.DEFAULT_USEC_BEHAVIOUR.HasFlag(EWarnBehaviour.Attack))
+                        {
+                            bot.Settings.FileSettings.Mind.FRIENDLY_BOT_TYPES.AddItem(botType);
+                            bot.Settings.FileSettings.Mind.WARN_BOT_TYPES.AddItem(botType);
+                        }
+                        else
+                        {
+                            bot.Settings.FileSettings.Mind.ENEMY_BOT_TYPES.AddItem(botType);
+                        }
                         continue;
                     } 
                     else
                     {
                         bot.Settings.FileSettings.Mind.ENEMY_BOT_TYPES.AddItem(botType);
+                    }
+                }
+            } else
+            {
+                foreach (WildSpawnType botType in Enum.GetValues(typeof(WildSpawnType)))
+                {
+                    if (botType != sptBear && botType != sptUsec) 
+                    {
+                        if (!_initialBot.Settings.FileSettings.Mind.DEFAULT_SAVAGE_BEHAVIOUR.HasFlag(EWarnBehaviour.Attack))
+                        {
+                            bot.Settings.FileSettings.Mind.FRIENDLY_BOT_TYPES.AddItem(botType);
+                            bot.Settings.FileSettings.Mind.WARN_BOT_TYPES.AddItem(botType);
+                        }
+                        else
+                        {
+                            bot.Settings.FileSettings.Mind.ENEMY_BOT_TYPES.AddItem(botType);
+                        }
                     }
                 }
             }

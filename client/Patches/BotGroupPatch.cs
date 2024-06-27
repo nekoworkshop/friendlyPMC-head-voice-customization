@@ -48,18 +48,19 @@ namespace friendlyPMC.Patches
             {
                 return true;
             }
+
+            bool isBoss = BossPlayers.Instance.IsBoss(person.ProfileId);
             // prevent boss player from being added as enemy to the group
-            if (BossPlayers.Instance.IsFollowerGroup(__instance.Id) && BossPlayers.Instance.IsBoss(person.ProfileId))
+            if (BossPlayers.Instance.IsFollowerGroup(__instance.Id) && isBoss)
             {
                 BotsGroup bossGroup = BossPlayers.Instance.GetBossPlayer(person.ProfileId).bossGroup;
                 if (bossGroup != null && __instance.Id == bossGroup.Id)
                 {
                     return false;
                 }
-
-                return false;
             // any group that makes the player boss it's enemy becomes an enemy
-            } else if(BossPlayers.Instance.IsBoss(person.ProfileId))
+            } 
+            else if(isBoss)
             {
                 var boss = BossPlayers.Instance.GetBossPlayer(person.ProfileId);
                 if (boss.bossGroup != null)
@@ -89,7 +90,7 @@ namespace friendlyPMC.Patches
                 return true;
 
             // prevent boss player from being added as enemy to the group
-            if (BossPlayers.Instance.IsFollowerGroup(__instance.Id) && enemy != null && BossPlayers.Instance.IsBoss(enemy.ProfileId))
+            if (BossPlayers.Instance.IsFollowerGroup(__instance.Id) && BossPlayers.Instance.IsBoss(enemy.ProfileId))
             {
                 BotsGroup bossGroup = BossPlayers.Instance.GetBossPlayer(enemy.ProfileId).bossGroup;
                 if (bossGroup != null && __instance.Id == bossGroup.Id)

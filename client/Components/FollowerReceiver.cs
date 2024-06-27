@@ -224,9 +224,8 @@ namespace friendlyPMC.Components
                 EPhraseTrigger.Fire,
                 EPhraseTrigger.GetBack,
                 EPhraseTrigger.GoForward,
-                EPhraseTrigger.NeedHelp,
                 EPhraseTrigger.Regroup,
-                EPhraseTrigger.NeedHelp
+                EPhraseTrigger.CoverMe
             };
 
             bool isFollowerBoss = false;
@@ -340,23 +339,6 @@ namespace friendlyPMC.Components
                     if (!isFollowerBoss)
                     {
                         FollowerPatrolInstances.SetNearPatrol(botOwner_0);
-                    } else
-                    {
-                        (botOwner_0.Brain.BaseBrain as FollowerBrain).BossOrdersChanged();
-
-                        Player alivePlayerByProfileID = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(requester.ProfileId);
-
-                        if (botOwner_0.BotRequestController.TryStopCurrent(alivePlayerByProfileID, true))
-                        {
-                            FollowerRegroup gclass = new FollowerRegroup(requester);
-
-
-                            if (botOwner_0.BotsGroup.RequestsController.TryAddRequest(gclass))
-                            {
-                                gclass.AddPossibleExecutors(botOwner_0);
-                                gclass.SetGroup(botOwner_0.BotsGroup.RequestsController);
-                            }
-                        }
                     }
                 }
                 // on get back make bot follow boss at a distance
@@ -366,7 +348,7 @@ namespace friendlyPMC.Components
 
                 }
                 // on need help get the closest bot to come near the boss
-                else if(info.phrase == EPhraseTrigger.NeedHelp)
+                else if(info.phrase == EPhraseTrigger.NeedHelp || (info.phrase == EPhraseTrigger.Regroup && botOwner_0.Memory.HaveEnemy))
                 {
                     (botOwner_0.Brain.BaseBrain as FollowerBrain).BossOrdersChanged();
 
@@ -387,28 +369,7 @@ namespace friendlyPMC.Components
                 // on regroup all get closer to the boss
                 else if (info.phrase == EPhraseTrigger.Regroup)
                 {
-                    (botOwner_0.Brain.BaseBrain as FollowerBrain).BossOrdersChanged();
-
-                    if (botOwner_0.Memory.HaveEnemy)
-                    {
-                        Player alivePlayerByProfileID = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(requester.ProfileId);
-
-                        if (botOwner_0.BotRequestController.TryStopCurrent(alivePlayerByProfileID, false))
-                        {
-                            FollowerRegroup gclass = new FollowerRegroup(requester);
-
-                            if (botOwner_0.BotsGroup.RequestsController.TryAddRequest(gclass))
-                            {
-                                gclass.AddPossibleExecutors(botOwner_0);
-                                gclass.SetGroup(botOwner_0.BotsGroup.RequestsController);
-                            }
-                        }
-
-                    }
-                    else
-                        botOwner_0.BotsGroup.RequestsController.TryAskFollowMeRequest(requester, botOwner_0);
-
-
+                    botOwner_0.BotsGroup.RequestsController.TryAskFollowMeRequest(requester, botOwner_0);
                 }
                 // tell the bots to be quiet for a minute
                 else if(info.phrase == EPhraseTrigger.Silence)

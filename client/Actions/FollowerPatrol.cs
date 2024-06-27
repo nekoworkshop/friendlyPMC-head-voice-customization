@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using UnityEngine.AI;
 using UnityEngine;
 using friendlyPMC.Modules;
+using friendlyPMC.Components;
 
 namespace friendlyPMC.Actions
 {
@@ -14,6 +15,8 @@ namespace friendlyPMC.Actions
     {
 
         private readonly Player player_0;
+
+        private readonly pitAIBossPlayer boss_0;
 
         private float float_3;
 
@@ -35,14 +38,19 @@ namespace friendlyPMC.Actions
 
         public readonly BotOwner botOwner;
 
-        public FollowerPatrol(Player player, BotOwner owner) : base(owner)
+        private bool isBigPipe;
+
+        public FollowerPatrol(pitAIBossPlayer player, BotOwner owner) : base(owner)
         {
             vector3_0 = owner.Position;
-            player_0 = player;
+            player_0 = player.realPlayer;
+            boss_0 = player;
 
             IsInited = true;
 
             botOwner = owner;
+
+            isBigPipe = owner.IsRole(WildSpawnType.followerBigPipe);
         }
 
         public void Update()
@@ -50,8 +58,27 @@ namespace friendlyPMC.Actions
 
             if (this.float_3 < Time.time)
             {
+
+                Vector3 leaderPosition = player_0.Position;
+                BotOwner birdEye = null;
+                var followers = BossPlayers.Instance.GetBossFollowers(player_0.ProfileId);
+                foreach (var fl in followers)
+                {
+                    if (fl.GetBot().IsRole(WildSpawnType.followerBirdEye))
+                    {
+                        birdEye = fl.GetBot();
+                        break;
+                    };
+                }
+
+                // BigPipe will tail BirdEye instead of the player
+                if (isBigPipe && birdEye != null)
+                {
+                    leaderPosition = birdEye.GetPlayer.Transform.position;
+                }
+
                 this.float_3 = Time.time + GClass760.Random(1f, 2f);
-                float num = Mathf.Abs((this.bool_0 ? this.vector3_0 : (this.player_0.Position - this.botOwner_0.Position)).magnitude);
+                float num = Mathf.Abs((this.bool_0 ? this.vector3_0 : (leaderPosition - this.botOwner_0.Position)).magnitude);
                 bool flag2;
                 bool flag = (flag2 = (num < reachDist)) != this.bool_1;
                 this.bool_1 = flag2;
@@ -81,7 +108,7 @@ namespace friendlyPMC.Actions
                             List<CustomNavigationPoint> availCover = new List<CustomNavigationPoint> ();
                             coverPoints.ForEach((point) =>
                             {
-                                float dist = (botOwner.BotFollower.BossToFollow.Player().Transform.position - point.Position).magnitude;
+                                float dist = (leaderPosition - point.Position).magnitude;
                                 if (dist < radius && point.IsFreeById(botOwner.Id))
                                 {
                                     availCover.Add(point);
@@ -117,10 +144,10 @@ namespace friendlyPMC.Actions
                         float maxR = Mathf.Min(5f, reachDist * 0.65f);
                         float num2 = (float)GClass760.RandomSing() * GClass760.Random(minR, maxR);
                         float num3 = (float)GClass760.RandomSing() * GClass760.Random(minR, maxR);
-                        float x = num2 + this.player_0.Position.x;
-                        float z = num3 + this.player_0.Position.z;
+                        float x = num2 + leaderPosition.x;
+                        float z = num3 + leaderPosition.z;
                         NavMeshHit navMeshHit;
-                        if (!NavMesh.SamplePosition(new Vector3(x, this.player_0.Position.y, z), out navMeshHit, 2f, -1))
+                        if (!NavMesh.SamplePosition(new Vector3(x, leaderPosition.y, z), out navMeshHit, 2f, -1))
                         {
                             botOwner.StopMove();
                             bool_0 = true;
@@ -149,17 +176,36 @@ namespace friendlyPMC.Actions
         {
             this.bool_0 = false;
             NavMeshHit navMeshHit;
-            if (this.method_1(this.player_0.Position) == NavMeshPathStatus.PathComplete)
+
+            Vector3 leaderPosition = player_0.Position;
+
+            BotOwner birdEye = null;
+            var followers = BossPlayers.Instance.GetBossFollowers(player_0.ProfileId);
+            foreach(var fl in followers)
+            {
+                if (fl.GetBot().IsRole(WildSpawnType.followerBirdEye))
+                {
+                    birdEye = fl.GetBot();
+                    break;
+                };
+            }
+
+            if (isBigPipe && birdEye != null)
+            {
+                leaderPosition = birdEye.GetPlayer.Transform.position;
+            }
+
+            if (this.method_1(leaderPosition) == NavMeshPathStatus.PathComplete)
             {
                 this.bool_0 = false;
             }
-            else if (NavMesh.SamplePosition(this.player_0.Position, out navMeshHit, 2f, -1) && this.method_1(this.player_0.Position) != NavMeshPathStatus.PathComplete)
+            else if (NavMesh.SamplePosition(leaderPosition, out navMeshHit, 2f, -1) && this.method_1(leaderPosition) != NavMeshPathStatus.PathComplete)
             {
                 this.bool_0 = true;
             }
             if (this.bool_0)
             {
-                CustomNavigationPoint freeClosePoint = this.botOwner_0.Covers.GetFreeClosePoint(this.player_0.Position, 0f, false);
+                CustomNavigationPoint freeClosePoint = this.botOwner_0.Covers.GetFreeClosePoint(leaderPosition, 0f, false);
                 if (freeClosePoint != null)
                 {
                     this.bool_0 = true;
