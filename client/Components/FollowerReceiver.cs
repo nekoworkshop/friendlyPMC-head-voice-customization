@@ -224,7 +224,6 @@ namespace friendlyPMC.Components
                 EPhraseTrigger.Fire,
                 EPhraseTrigger.GetBack,
                 EPhraseTrigger.GoForward,
-                EPhraseTrigger.Regroup,
                 EPhraseTrigger.CoverMe
             };
 

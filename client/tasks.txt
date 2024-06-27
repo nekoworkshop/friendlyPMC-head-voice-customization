@@ -1,10 +1,15 @@
 3.3.0 - changes:
 - Added "Attention" command to help with stucked bots
 - added "followerstome" console command to teleport bots to player
-- Added test for spawning with the Goons Squad, optionally just with one of them
 - Improvements on enemy approach logic
 - Bots will get their ammo refill on becoming a follower
-- Commands and Gestures that bosses listen to:
-- - Cover Me - will try to get near player
+- sameSideHostile will no longer turn the followers you spawned with hostile towards you
+- Added test for spawning with the Goons Squad, optionally just with one of them
+- Commands and Gestures the goons listen to:
+- - Regroup - will try to get near player
 - - That Direction - will try to approach enemy (in combat); will try to go in front of player (out of combat)
 - - Come Here - will try to go near player (out of combat)
+
+Gameplay of the Goons:
+Knight follows the player closely, BirdEye follows the player at a distance and BigPipe follows BirdEye closely
+Knight and BigPipe have a close in combat while BirdEye tries to find spots to snipe from

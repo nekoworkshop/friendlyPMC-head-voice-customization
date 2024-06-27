@@ -19,6 +19,7 @@ namespace friendlyPMC.Components.BossFollower
 
         protected bool requestComeHere = false;
         protected bool requestGoThere = false;
+        protected bool requestRegroup = false;
         public BossFollowLayer(BotOwner bot, int priority) : base(bot, priority)
         {
         }
@@ -43,8 +44,6 @@ namespace friendlyPMC.Components.BossFollower
 
             BotRequest request = botOwner_0.BotRequestController.CurRequest != null ? botOwner_0.BotRequestController.CurRequest : null;
 
-            bool ordersAreReqroup = request != null && request.BotRequestType == BotRequestType.warnPlayer;
-
             float regroupMinDistance = friendlyPMC.regroupMinDistance.Value;
             float nearSearchRadius = friendlyPMC.fightInnerRadius.Value;
             float sprintDistance = 10f;
@@ -54,21 +53,42 @@ namespace friendlyPMC.Components.BossFollower
             {
                 requestGoThere = false;
                 requestComeHere = false;
+                requestRegroup = false;
             } 
-            else if (request.BotRequestType != BotRequestType.goToPoint)
+            else
             {
-                requestGoThere = false;
-            }
-            else if (request.BotRequestType != BotRequestType.followMe && request.BotRequestType != BotRequestType.warnPlayer)
-            {
-                requestComeHere = false;
-            }
-
-            if (!botOwner_0.Memory.HaveEnemy && request != null)
-            {
-                if (request.BotRequestType == BotRequestType.goToPoint && !requestGoThere)
+                if (request.BotRequestType == BotRequestType.goToPoint)
                 {
                     requestGoThere = true;
+                }
+                else
+                {
+                    requestGoThere = false;
+                }
+                
+                if (request.BotRequestType == BotRequestType.followMe)
+                {
+                    requestComeHere = true;
+                }
+                else
+                {
+                    requestComeHere = false;
+                }
+                
+                if (request.BotRequestType == BotRequestType.warnPlayer)
+                {
+                    requestRegroup = true;
+                }
+                else
+                {
+                    requestRegroup = false;
+                }
+            }
+            
+            if (!botOwner_0.Memory.HaveEnemy)
+            {
+                if (requestGoThere)
+                {
 
                     botOwner_0.Gesture.TryGestus(EGesture.Good, false);
 
@@ -88,9 +108,8 @@ namespace friendlyPMC.Components.BossFollower
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.goToPoint, "req:moveThere");
                 }
 
-                if ((request.BotRequestType == BotRequestType.followMe || request.BotRequestType == BotRequestType.warnPlayer) && !requestComeHere)
+                if (requestComeHere)
                 {
-                    requestComeHere = true;
                     botOwner_0.Gesture.TryGestus(EGesture.Good, false);
 
                     IPlayer requester = botOwner_0.BotRequestController.CurRequest.Requester;
@@ -112,35 +131,39 @@ namespace friendlyPMC.Components.BossFollower
                     botOwner_0.Gesture.TryGestus(EGesture.Good, false);
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.holdPosition, "req:holdPos");
                 }
-            }
 
-            
-
-            if (ordersAreReqroup && GetNavDistance(bossPosition) > regroupMinDistance && (!botOwner_0.Memory.HaveEnemy || !botOwner_0.Memory.GoalEnemy.IsVisible))
-            {
-                GetClosestCoverPoint(bossPosition, nearSearchRadius);
-
-                if (customNavigationPoint_0 != null)
+                if (requestRegroup && GetNavDistance(bossPosition) > regroupMinDistance)
                 {
+                    GetClosestCoverPoint(bossPosition, nearSearchRadius);
 
-                    if (GetNavDistance(customNavigationPoint_0.Position) > sprintDistance)
+                    if (customNavigationPoint_0 != null)
                     {
-                        return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "regroupToPlayerFast");
+
+                        if (GetNavDistance(customNavigationPoint_0.Position) > sprintDistance)
+                        {
+                            return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "regroupToPlayerFast");
+                        }
+                        else
+                        {
+                            return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMoving, "regroupToPlayerSlow");
+                        }
                     }
                     else
                     {
-                        return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMoving, "regroupToPlayerSlow");
+                        return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.followerPatrol, "regroupFallback");
                     }
-                }
-                else
-                {
-                    return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.followerPatrol, "regroupFallback");
                 }
             }
 
             return base.GetDecision();
         }
 
+        public override AICoreActionEndStruct EndGoToPoint()
+        {
+            if(botOwner_0.GoToSomePointData.IsCome()) return new AICoreActionEndStruct("point.Reached", true);
+            else if(botOwner_0.Memory.HaveEnemy) return new AICoreActionEndStruct("enemy.Has", true);
+            return new AICoreActionEndStruct(false);
+        }
         protected float GetNavDistance(Vector3 point)
         {
             return Utils.Utils.GetNavDistance(botOwner_0.GetPlayer.Transform.position,point);

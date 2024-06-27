@@ -260,13 +260,13 @@ namespace friendlyPMC.Patches
                         switch (part)
                         {
                             case EBodyPart.Head:
-                                bodyPart.Health.Minimum = 100;
+                                bodyPart.Health.Minimum = 120;
                                 bodyPart.Health.Maximum = 120;
                                 break;
                             case EBodyPart.Chest:
                             case EBodyPart.Stomach:
-                                bodyPart.Health.Minimum = 200;
-                                bodyPart.Health.Maximum = 240;
+                                bodyPart.Health.Minimum = 220;
+                                bodyPart.Health.Maximum = 220;
                                 break;
                             case EBodyPart.RightArm:
                             case EBodyPart.LeftArm:
@@ -451,13 +451,13 @@ namespace friendlyPMC.Patches
                         switch (part)
                         {
                             case EBodyPart.Head:
-                                bodyPart.Health.Minimum = 40;
+                                bodyPart.Health.Minimum = 42;
                                 bodyPart.Health.Maximum = 42;
                                 break;
                             case EBodyPart.Chest:
                             case EBodyPart.Stomach:
                                 bodyPart.Health.Minimum = 150;
-                                bodyPart.Health.Maximum = 160;
+                                bodyPart.Health.Maximum = 150;
                                 break;
                             case EBodyPart.RightArm:
                             case EBodyPart.LeftArm:

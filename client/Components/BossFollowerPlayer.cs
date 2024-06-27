@@ -20,7 +20,7 @@ namespace friendlyPMC.Components
             if (bossRole == WildSpawnType.followerBirdEye)
             {
                 FollowerPatrol patrol = FollowerPatrolInstances.GetPatrol(bot);
-                patrol.SetReachDist(20f);
+                patrol.SetReachDist(17f);
             }
         }
 
