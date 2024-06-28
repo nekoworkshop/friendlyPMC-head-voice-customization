@@ -128,6 +128,8 @@ namespace friendlyPMC.Components.FollowerBossFollower
 
             if (ordersChanged && baseDecision.Action == BotLogicDecision.holdPosition && request != null && request.BotRequestType == BotRequestType.attackClose)
             {
+                botOwner_0.BotRequestController.CurRequest.Complete();
+
                 GetApproachablePoint();
 
                 if (customNavigationPoint_0 == null)

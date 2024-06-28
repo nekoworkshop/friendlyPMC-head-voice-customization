@@ -105,6 +105,9 @@ namespace friendlyPMC.Components.BossFollower
 
                     botOwner_0.GoToSomePointData.SetPoint(finalPosition);
                     botOwner_0.Steering.LookToPoint(finalPosition);
+                    
+                    botOwner_0.BotRequestController.CurRequest.Complete();
+
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.goToPoint, "req:moveThere");
                 }
 
@@ -122,6 +125,8 @@ namespace friendlyPMC.Components.BossFollower
 
                     Vector3 finPos = requestPos + direction * offset;
 
+                    botOwner_0.BotRequestController.CurRequest.Complete();
+
                     botOwner_0.GoToSomePointData.SetPoint(new Vector3(finPos.x, requestPos.y, finPos.z));
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.goToPoint, "req:comeHere");
                 }
@@ -129,11 +134,15 @@ namespace friendlyPMC.Components.BossFollower
                 if (request.BotRequestType == BotRequestType.wait)
                 {
                     botOwner_0.Gesture.TryGestus(EGesture.Good, false);
+
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.holdPosition, "req:holdPos");
                 }
 
                 if (requestRegroup && GetNavDistance(bossPosition) > regroupMinDistance)
                 {
+                    
+                    botOwner_0.BotRequestController.CurRequest.Complete();
+
                     GetClosestCoverPoint(bossPosition, nearSearchRadius);
 
                     if (customNavigationPoint_0 != null)

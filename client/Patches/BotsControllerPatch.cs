@@ -322,6 +322,8 @@ namespace friendlyPMC.Patches
                             // prevent attack of player on spawn
                             me.Memory.DeleteInfoAboutEnemy(player.Player());
 
+                            me.GetPlayer.ActiveHealthController.RestoreFullHealth(); // ensure bot has full health
+
                             try
                             {
                                 // force player side on the bot
@@ -336,6 +338,7 @@ namespace friendlyPMC.Patches
                                 }
 
                                 BossPlayers.Instance.AddFollower(me, player, false, botRole); // make bot a follower
+
                                 var Timer = StaticManager.Instance.TimerManager.MakeTimer(TimeSpan.FromSeconds(1), false);
 
                                 Timer.OnTimer += () =>
@@ -505,6 +508,8 @@ namespace friendlyPMC.Patches
                     me.Memory.DeleteInfoAboutEnemy(player.Player()); // prevent attack of player on spawn
 
                     BossPlayers.Instance.AddFollower(me, player,true); // make bot a follower
+                    
+                    me.GetPlayer.ActiveHealthController.RestoreFullHealth(); // ensure bot has full health
 
                     if (side == EPlayerSide.Savage)
                     {

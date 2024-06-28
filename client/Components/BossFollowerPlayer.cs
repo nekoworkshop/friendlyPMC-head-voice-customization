@@ -39,14 +39,14 @@ namespace friendlyPMC.Components
                 bot.Settings.FileSettings.Shoot.LOW_DIST_TO_CHANGE_WEAPON = 30f;
                 bot.Settings.FileSettings.Shoot.FAR_DIST_TO_CHANGE_WEAPON = 68f;
                 bot.Settings.FileSettings.Shoot.DIST_TO_CHANGE_TO_MAIN = 60f;
-                bot.Settings.FileSettings.Aiming.BAD_SHOOTS_MIN = 0;
-                bot.Settings.FileSettings.Aiming.BAD_SHOOTS_MAX = 1;
-                bot.Settings.FileSettings.Aiming.BAD_SHOOTS_OFFSET = 0.5f;
-                bot.Settings.FileSettings.Aiming.BAD_SHOOTS_MAIN_COEF = 0.5f;
                 bot.Settings.FileSettings.Aiming.SCATTERING_DIST_MODIF = 0.4f;
-                bot.Settings.FileSettings.Aiming.COEF_FROM_COVER = 0.6f;
-
+                bot.Settings.FileSettings.Aiming.COEF_FROM_COVER = 0.9f;
+                bot.Settings.FileSettings.Aiming.HARD_AIM = 0.8f;
+                // bird eye, aim for the head
+                bot.Settings.FileSettings.Aiming.AIMING_TYPE = 6;
             }
+            
+            bot.Settings.FileSettings.Aiming.AIMING_TYPE = 2;
 
             EPlayerSide side = _player.Player().Side;
 

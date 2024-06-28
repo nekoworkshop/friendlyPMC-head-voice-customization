@@ -67,6 +67,8 @@ namespace friendlyPMC.Components.FollowerBossFollower
             {
                 if (Utils.Utils.GetNavDistance(botPosition, bossPosition) > friendlyPMC.regroupMinDistance.Value && (!botOwner_0.Memory.HaveEnemy || !botOwner_0.Memory.GoalEnemy.IsVisible))
                 {
+                    botOwner_0.BotRequestController.CurRequest.Complete();
+
                     if (!botOwner_0.Memory.HaveEnemy)
                     {
                         GetClosestCoverPoint(bossPosition, friendlyPMC.fightOuterRadius.Value);
