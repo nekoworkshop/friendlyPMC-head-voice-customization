@@ -524,6 +524,8 @@ namespace friendlyPMC.Components
 
             if(request != null && request.BotRequestType == BotRequestType.goToPoint)
             {
+                Components.Logger.LogInfo("Boss said to goToPoint");
+
                 if(botOwner_0.Memory.HaveEnemy)
                 {
                     Vector3 enemyPos = botOwner_0.Memory.GoalEnemy.CurrPosition;
@@ -735,7 +737,7 @@ namespace friendlyPMC.Components
                 return new AICoreActionEndStruct("EndGoTo", true);
             }
 
-            if(!botOwner_0.Memory.HaveEnemy || botOwner_0.Memory.GoalEnemy.CanShoot || botOwner_0.Memory.GoalEnemy.IsVisible)
+            if(!botOwner_0.Memory.HaveEnemy || (botOwner_0.Memory.GoalEnemy.CanShoot && botOwner_0.Memory.GoalEnemy.IsVisible))
             {
                 return new AICoreActionEndStruct("enemy.canSh", true);
             }
