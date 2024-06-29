@@ -23,7 +23,6 @@ namespace friendlyPMC.Actions
         }
         public static void ScanDirection(BotOwner bot, IPlayer player, Player realPlayer)
         {
-            Components.Logger.LogInfo("Scan for Enemies");
 
             List<Player> enemies = new List<Player>();
 
@@ -56,7 +55,6 @@ namespace friendlyPMC.Actions
                     
                     if (enemy != null && enemy.IsAI && enemy.HealthController.IsAlive && enemy.Side != player.Side)
                     {
-                        Components.Logger.LogInfo("Add enemy to the list");
                         enemies.Add(enemy);
                     }
                 }
@@ -78,12 +76,9 @@ namespace friendlyPMC.Actions
             {
                 if(bot.Memory.HaveEnemy)
                 {
-                    Components.Logger.LogInfo("Already engaged, add player's closest visible enemy to the group");
                     bot.BotsGroup.AddEnemy(closet.AIData.Player, EBotEnemyCause.checkAddTODO);
                     return;
                 }
-
-                Components.Logger.LogInfo("Try make player's closest visible enemy the priority");
 
                 bot.BotsGroup.AddEnemy(closet.AIData.Player, EBotEnemyCause.checkAddTODO);
                 bot.Memory.AddEnemy(closet, new BotSettingsClass(closet, bot.BotsGroup, EBotEnemyCause.checkAddTODO), false);
@@ -94,7 +89,6 @@ namespace friendlyPMC.Actions
                     info.PriorityIndex = 0;
                     bot.Memory.GoalEnemy = info;
                     info.SetVisible(true);
-                    Components.Logger.LogInfo("Made closest enemy a priority");
                 }
             }
         }

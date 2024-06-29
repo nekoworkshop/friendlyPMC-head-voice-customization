@@ -172,6 +172,18 @@ namespace friendlyPMC.Components.BossFollower
             else if(botOwner_0.Memory.HaveEnemy) return new AICoreActionEndStruct("enemy.Has", true);
             return new AICoreActionEndStruct(false);
         }
+
+        public override AICoreActionEndStruct EndAttackMoving()
+        {
+            if (!botOwner_0.Memory.HaveEnemy) return new AICoreActionEndStruct("enemy.None", true);
+            return base.EndAttackMoving();
+        }
+
+        public override AICoreActionEndStruct EndRunToCover()
+        {
+            if (!botOwner_0.Memory.HaveEnemy) return new AICoreActionEndStruct("enemy.None", true);
+            return base.EndRunToCover();
+        }
         protected float GetNavDistance(Vector3 point)
         {
             return Utils.Utils.GetNavDistance(botOwner_0.GetPlayer.Transform.position,point);

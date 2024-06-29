@@ -1,11 +1,14 @@
 ﻿
 using Comfort.Common;
 using EFT;
+using EFT.HealthSystem;
 using friendlyPMC.Components;
 using friendlyPMC.Modules;
 using System;
 using System.Collections.Generic;
+using System.Text;
 using UnityEngine;
+using UnityEngine.Profiling;
 
 namespace friendlyPMC.Utils
 {
@@ -140,20 +143,61 @@ namespace friendlyPMC.Utils
                         }
 
                         string botName = bt.Data.Profile.Nickname;
-                        bt.GuiContent.text = botName;
 
-                        if(!bt.Data.HealthController.IsAlive)
+                        StringBuilder stringBuilder = new StringBuilder();
+                        stringBuilder.Append(botName);
+
+                        if (!bt.Data.HealthController.IsAlive)
                         {
-                            bt.GuiContent.text += ": Dead";
+                            stringBuilder.Append(": Dead");
                         }
                         else if(bt.Data.Memory.HaveEnemy)
                         {
-                            bt.GuiContent.text += ": In Combat";
+                            stringBuilder.Append(": In Combat");
                         } 
                         else
                         {
-                            bt.GuiContent.text += ": Idle";
+                            stringBuilder.Append(": Idle");
                         }
+
+                        float hp = 0;
+                        float hpmax = 0;
+                        
+                        foreach (EBodyPart part in Enum.GetValues(typeof(EBodyPart)))
+                        {
+                            bt.Data.Profile.Health.BodyParts.TryGetValue(part, out var bodyPart);
+                            if (bodyPart != null)
+                            {
+                                switch (part)
+                                {
+                                    case EBodyPart.Head:
+                                    case EBodyPart.Chest:
+                                    case EBodyPart.Stomach:
+                                    case EBodyPart.RightArm:
+                                    case EBodyPart.LeftArm:
+                                    case EBodyPart.RightLeg:
+                                    case EBodyPart.LeftLeg:
+                                        ValueStruct value = bt.Data.HealthController.GetBodyPartHealth(part, true);
+                                        hp += value.Current;
+                                        hpmax += value.Maximum;
+                                        break;
+
+                                    default:
+                                        break;
+                                }
+                            }
+                            
+                        }
+
+                        if (hp > 0)
+                        {
+                            stringBuilder.Append(Environment.NewLine);
+                            if (hp < hpmax)
+                                stringBuilder.Append($"HP: {hp}/{hpmax}");
+                            else stringBuilder.Append($"HP: {hpmax}");
+                        }
+
+                        bt.GuiContent.text = stringBuilder.ToString();
 
                         Vector2 guiSize = guiStyle.CalcSize(bt.GuiContent);
 

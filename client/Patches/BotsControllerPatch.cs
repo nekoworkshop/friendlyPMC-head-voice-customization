@@ -224,11 +224,6 @@ namespace friendlyPMC.Patches
                 
                 if(friendlyPMC.bigPipeSpawn.Value) bossFollowers.Add(new IProfileData(side,WildSpawnType.followerBigPipe,BotDifficulty.hard,0f,@params));
                 if (friendlyPMC.birdEyeSpawn.Value) bossFollowers.Add(new IProfileData(side, WildSpawnType.followerBirdEye, BotDifficulty.impossible, 0f, @params));
-                botSpawnerClass.SetBlockedRoles(new string[] {
-                    "bossKnight",
-                    "followerBigPipe",
-                    "followerBirdEye"
-                });
             }
 
             BotCacheClass bot = await BotCacheClass.Create(botData, botCreator, 1, botSpawnerClass);
@@ -268,21 +263,25 @@ namespace friendlyPMC.Patches
                             case EBodyPart.Head:
                                 bodyPart.Health.Minimum = 120;
                                 bodyPart.Health.Maximum = 120;
+                                bodyPart.Health.Current = 120;
                                 break;
                             case EBodyPart.Chest:
                             case EBodyPart.Stomach:
                                 bodyPart.Health.Minimum = 220;
                                 bodyPart.Health.Maximum = 220;
+                                bodyPart.Health.Current = 220;
                                 break;
                             case EBodyPart.RightArm:
                             case EBodyPart.LeftArm:
                                 bodyPart.Health.Minimum = 150;
                                 bodyPart.Health.Maximum = 150;
+                                bodyPart.Health.Current = 150;
                                 break;
                             case EBodyPart.RightLeg:
                             case EBodyPart.LeftLeg:
                                 bodyPart.Health.Minimum = 170;
                                 bodyPart.Health.Maximum = 170;
+                                bodyPart.Health.Current = 170;
                                 break;
 
                             default:
@@ -462,21 +461,25 @@ namespace friendlyPMC.Patches
                             case EBodyPart.Head:
                                 bodyPart.Health.Minimum = 42;
                                 bodyPart.Health.Maximum = 42;
+                                bodyPart.Health.Current = 42;
                                 break;
                             case EBodyPart.Chest:
                             case EBodyPart.Stomach:
                                 bodyPart.Health.Minimum = 150;
                                 bodyPart.Health.Maximum = 150;
+                                bodyPart.Health.Current = 150;
                                 break;
                             case EBodyPart.RightArm:
                             case EBodyPart.LeftArm:
                                 bodyPart.Health.Minimum = 100;
                                 bodyPart.Health.Maximum = 100;
+                                bodyPart.Health.Current = 100;
                                 break;
                             case EBodyPart.RightLeg:
                             case EBodyPart.LeftLeg:
                                 bodyPart.Health.Minimum = 110;
                                 bodyPart.Health.Maximum = 110;
+                                bodyPart.Health.Current = 110;
                                 break;
 
                             default:
@@ -582,7 +585,16 @@ namespace friendlyPMC.Patches
             pitAIBossPlayer playerBoss = BossPlayers.Instance.AddBossPlayer(player);
             spawnedPlayers.Add(playerBoss);
 
-            if(friendlyPMC.alternativeSpawn.Value == true)
+            if (friendlyPMC.knightSpawn.Value)
+            {
+                if (friendlyPMC.justKnightSpawn.Value || friendlyPMC.birdEyeSpawn.Value || friendlyPMC.bigPipeSpawn.Value)
+                {
+                    Controller.BotSpawner.SetBlockedRoles(new string[] { "bossKnight", "followerBirdEye", "followerBigPipe" });
+                }
+                
+            }
+
+            if (friendlyPMC.alternativeSpawn.Value == true)
             {
                 var Timer = StaticManager.Instance.TimerManager.MakeTimer(TimeSpan.FromSeconds(friendlyPMC.squadDelay.Value), false);
                 Timer.OnTimer += () =>
@@ -611,6 +623,7 @@ namespace friendlyPMC.Patches
                     
                 }
             }
+
         }
     }
 

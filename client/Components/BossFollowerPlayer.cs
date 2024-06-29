@@ -33,15 +33,15 @@ namespace friendlyPMC.Components
 
             if (bot.IsRole(WildSpawnType.followerBirdEye))
             {
-                bot.Settings.FileSettings.Core.GainSightCoef = 0.1f;
+                bot.Settings.FileSettings.Core.GainSightCoef = 0.4f;
                 bot.Settings.FileSettings.Cover.SOUND_TO_GET_SPOTTED = 10f;
                 bot.Settings.FileSettings.Cover.SPOTTED_COVERS_RADIUS = 12f;
                 bot.Settings.FileSettings.Shoot.LOW_DIST_TO_CHANGE_WEAPON = 30f;
                 bot.Settings.FileSettings.Shoot.FAR_DIST_TO_CHANGE_WEAPON = 68f;
                 bot.Settings.FileSettings.Shoot.DIST_TO_CHANGE_TO_MAIN = 60f;
-                bot.Settings.FileSettings.Aiming.SCATTERING_DIST_MODIF = 0.4f;
+                bot.Settings.FileSettings.Aiming.SCATTERING_DIST_MODIF = 0.2f;
                 bot.Settings.FileSettings.Aiming.COEF_FROM_COVER = 0.9f;
-                bot.Settings.FileSettings.Aiming.HARD_AIM = 0.8f;
+                bot.Settings.FileSettings.Aiming.HARD_AIM = 0.9f;
                 // bird eye, aim for the head
                 bot.Settings.FileSettings.Aiming.AIMING_TYPE = 6;
             }

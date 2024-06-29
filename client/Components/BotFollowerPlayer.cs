@@ -457,7 +457,7 @@ namespace friendlyPMC.Components
 
             } catch(Exception ex)
             {
-                Logger.LogInfo("Error on Dismiss for a follower: " +ex.Message);
+                Logger.LogInfo("Error on dismiss for a follower: " +ex.Message);
             }
             // @TODO : see what else can be reverted
         }
