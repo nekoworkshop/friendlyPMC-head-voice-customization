@@ -72,11 +72,12 @@ namespace friendlyPMC.Actions
                 }
             }
 
-            if ( closet != null )
+            if ( closet != null)
             {
+
                 if(bot.Memory.HaveEnemy)
                 {
-                    bot.BotsGroup.AddEnemy(closet.AIData.Player, EBotEnemyCause.checkAddTODO);
+                    bot.BotsGroup.AddEnemy(closet, EBotEnemyCause.checkAddTODO);
                     return;
                 }
 
