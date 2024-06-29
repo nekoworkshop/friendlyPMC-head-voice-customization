@@ -10,7 +10,7 @@ namespace friendlyPMC.Requests
         {
             botOwner_0 = bot;
 
-            Task.Delay(1000).ContinueWith(t =>
+            Task.Delay(3000).ContinueWith(t =>
             {
                 if(botOwner_0.BotRequestController.CurRequest !=null && botOwner_0.BotRequestController.CurRequest.BotRequestType == request)
                 {
