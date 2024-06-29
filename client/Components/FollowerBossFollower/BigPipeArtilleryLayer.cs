@@ -128,7 +128,16 @@ namespace friendlyPMC.Components.FollowerBossFollower
 
             if (ordersChanged && baseDecision.Action == BotLogicDecision.holdPosition && request != null && request.BotRequestType == BotRequestType.attackClose)
             {
-                botOwner_0.BotRequestController.CurRequest.Complete();
+                var Timer = StaticManager.Instance.TimerManager.MakeTimer(TimeSpan.FromSeconds(2), false);
+
+                Timer.OnTimer += () =>
+                {
+                    try
+                    {
+                        botOwner_0.BotRequestController.CurRequest.Complete();
+                    }
+                    catch { }
+                };
 
                 GetApproachablePoint();
 

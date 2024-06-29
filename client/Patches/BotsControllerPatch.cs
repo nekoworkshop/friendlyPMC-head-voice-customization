@@ -224,6 +224,11 @@ namespace friendlyPMC.Patches
                 
                 if(friendlyPMC.bigPipeSpawn.Value) bossFollowers.Add(new IProfileData(side,WildSpawnType.followerBigPipe,BotDifficulty.hard,0f,@params));
                 if (friendlyPMC.birdEyeSpawn.Value) bossFollowers.Add(new IProfileData(side, WildSpawnType.followerBirdEye, BotDifficulty.impossible, 0f, @params));
+                botSpawnerClass.SetBlockedRoles(new string[] {
+                    "bossKnight",
+                    "followerBigPipe",
+                    "followerBirdEye"
+                });
             }
 
             BotCacheClass bot = await BotCacheClass.Create(botData, botCreator, 1, botSpawnerClass);

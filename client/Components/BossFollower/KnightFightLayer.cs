@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine.AI;
 using UnityEngine;
+using Newtonsoft.Json.Linq;
 
 namespace friendlyPMC.Components.BossFollower
 {
@@ -117,8 +118,15 @@ namespace friendlyPMC.Components.BossFollower
 
             if (ordersChanged && baseDecision.Action == BotLogicDecision.holdPosition && request != null && request.BotRequestType == BotRequestType.attackClose)
             {
+                var Timer = StaticManager.Instance.TimerManager.MakeTimer(TimeSpan.FromSeconds(2), false);
 
-                botOwner_0.BotRequestController.CurRequest.Complete();
+                Timer.OnTimer += () =>
+                {
+                    try
+                    {
+                        botOwner_0.BotRequestController.CurRequest.Complete();
+                    } catch { }
+                };
 
                 GetApproachablePoint();
 

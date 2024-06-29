@@ -198,19 +198,12 @@ namespace friendlyPMC
 
                 string id = GamePlayerOwner.MyPlayer.ProfileId;
 
-                Components.Logger.LogInfo("Try a Check In");
                 if (BossPlayers.Instance != null && PingTeamates.Instance != null)
                 {
                     var boss = BossPlayers.Instance.GetBossPlayer(id);
                     if (boss != null)
                     {
-                        var Timer = StaticManager.Instance.TimerManager.MakeTimer(TimeSpan.FromSeconds(1), false);
-
-                        Timer.OnTimer += () =>
-                        {
-                            Components.Logger.LogInfo("Do a Check In");
-                            PingTeamates.Instance.Ping(boss);
-                        };
+                        PingTeamates.Instance.Ping(boss);
                     }
                 }
             }

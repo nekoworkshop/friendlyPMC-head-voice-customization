@@ -46,7 +46,7 @@ namespace friendlyPMC.Utils
         {
             if (lasttime > Time.time) return;
 
-            lasttime = Time.time + 6f;
+            lasttime = Time.time + 5f;
 
             GameWorld world = Singleton<GameWorld>.Instance;
 
@@ -82,7 +82,7 @@ namespace friendlyPMC.Utils
             if(botMap.Count > 0)
             {
                 guiUpdate = true;
-                if(lasttime - 1f <= Time.time)
+                if(lasttime <= Time.time)
                 {
                     guiUpdate = false;
                     botMap.Clear();
@@ -120,7 +120,7 @@ namespace friendlyPMC.Utils
 
                 if (!guiUpdate) return;
 
-                Vector3 aboveBotHeadPos = bt.Data.Position + (Vector3.up * 1.5f);
+                Vector3 aboveBotHeadPos = bt.Data.Position + (Vector3.up * 1.55f);
                 Vector3 screenPos = Camera.main.WorldToScreenPoint(aboveBotHeadPos);
 
                 if (screenPos.z > 0)
@@ -161,14 +161,12 @@ namespace friendlyPMC.Utils
                         bt.GuiRect.y = Screen.height - ((screenPos.y * screenScale) + guiSize.y);
                         bt.GuiRect.size = guiSize;
 
-                        GUI.Box(bt.GuiRect, bt.GuiContent, guiStyle);
-
-                        Components.Logger.LogInfo("Render GUI box for " + bt.GuiContent.text + $"; X : {bt.GuiRect.x}, Y : {bt.GuiRect.y}, S: {bt.GuiRect.width} / {bt.GuiRect.height}");
+                        GUI.Box(bt.GuiRect, bt.GuiContent.text, guiStyle);
                     }
                 }
             });
 
-            guiUpdate = false;
+            //guiUpdate = false;
         }
         private void CreateGuiStyle()
         {
@@ -179,7 +177,7 @@ namespace friendlyPMC.Utils
             guiStyle.fontSize = 20;
             guiStyle.richText = true;
             guiStyle.border = new RectOffset(0, 0, 0, 0);
-            //guiStyle.normal.background = MakeTexture(new Color(0, 0, 0, 0.3f));
+            guiStyle.normal.background = MakeTexture(new Color(0, 0, 0, 0.3f));
 
             guiStyle.normal.textColor = Color.green;
 
