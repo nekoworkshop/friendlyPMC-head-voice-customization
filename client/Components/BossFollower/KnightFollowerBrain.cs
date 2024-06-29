@@ -6,7 +6,6 @@ namespace friendlyPMC.Components.BossFollower
     {
 
         KnightFightLayer gclass65_0_1;
-        KnightEnemyBuildingLayer buildingLayer;
         public KnightFollowerBrain(BotOwner owner, pitAIBossPlayer boss) : base(owner, boss)
         {
             owner.Tactic.IsCurTactic(BotsGroup.BotCurrentTactic.Attack);

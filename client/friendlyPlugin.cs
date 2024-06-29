@@ -3,9 +3,13 @@ using BepInEx.Configuration;
 using Comfort.Common;
 using EFT;
 using EFT.UI;
+using EFT.UI.Gestures;
 using friendlyPMC.Modules;
 using friendlyPMC.Patches;
+using friendlyPMC.Utils;
+using System;
 using System.Collections.Generic;
+using System.Security.Cryptography;
 using UnityEngine;
 
 using Logger = friendlyPMC.Components.Logger;
@@ -56,12 +60,14 @@ namespace friendlyPMC
         public static ConfigEntry<bool> bigPipeSpawn;
         public static ConfigEntry<bool> birdEyeSpawn;
         public static ConfigEntry<bool> justKnightSpawn;
+
+        public static ConfigEntry<KeyboardShortcut> pingKey;
         private void Awake()
         {
 
             squadSpawn = Config.Bind(baseSettings, "1 Squad spawn", true, new ConfigDescription("Spawn with followers"));
             squadSize = Config.Bind(baseSettings, "1.4  -  Squad size", 2, new ConfigDescription("Number of followers to spawn with", new AcceptableValueRange<int>(1, 3)));
-            
+
             copyEquip = Config.Bind(baseSettings, "1.6  -  Clone equipment", true, new ConfigDescription("When Squad Spawn is active, spawned followers will have the same equipment as the player"));
             extraPickups = Config.Bind(baseSettings, "2 Maximum followers", 3, new ConfigDescription("Maximum number of followers the player can have. Cannot be less than Squad Size if Squad Spawn is active", new AcceptableValueRange<int>(1, 4)));
 
@@ -69,6 +75,8 @@ namespace friendlyPMC
             squadDelay = Config.Bind(baseSettings, "1.3  -  Squad spawn Delay", 0, new ConfigDescription("When Squad Spawn is active, how much to delay the spawn of the squad ( in sec.). This is useful in case you have Swag+Donuts. Set delay above 10 seconds.", new AcceptableValueRange<int>(0, 30)));
 
             returnChanceDeath = Config.Bind(baseSettings, "1.5  -  Squadmate return chance after death", 50, new ConfigDescription("Chance your followers will return the items you gave them should you die. This applies only to members you spawned with.", new AcceptableValueRange<int>(1, 100)));
+
+            pingKey = Config.Bind(baseSettings, "2 Ping Squad", new KeyboardShortcut(KeyCode.F10), new ConfigDescription("Configurable key to trigger location of where your squad is"));
 
             regroupMinDistance = Config.Bind(miscSettings, "3 Regroup minimum distance", 7, new ConfigDescription("The minimum distance for the regroup call to have effect, in combat", new AcceptableValueRange<int>(5, 30)));
 
@@ -81,7 +89,7 @@ namespace friendlyPMC
             maximumCover = Config.Bind(miscSettings, "2.1  -  Combat cover stay (in sec.)", 10, new ConfigDescription("Maximum time a follower will stay in cover when in 'defend' mode before trying to get closer to the player", new AcceptableValueRange<int>(2, 20)));
             maximumCoverDistance = Config.Bind(miscSettings, "2 Combat cover distance", 30, new ConfigDescription("Maximum distance allowed between the follower and the player while the follower is in cover, when in 'defend' mode", new AcceptableValueRange<int>(10, 50)));
 
-            fightOuterRadius = Config.Bind(miscSettings,"4 Combat outer radius", 50, new ConfigDescription("The upper limit to search for cover during combat relative the current goal (player or enemy)", new AcceptableValueRange<int>(30, 100)));
+            fightOuterRadius = Config.Bind(miscSettings, "4 Combat outer radius", 50, new ConfigDescription("The upper limit to search for cover during combat relative the current goal (player or enemy)", new AcceptableValueRange<int>(30, 100)));
             fightInnerRadius = Config.Bind(miscSettings, "5 Combat inner radius", 30, new ConfigDescription("The lower limit to search for cover during combat relative the current goal (player or enemy)", new AcceptableValueRange<int>(15, 50)));
 
             knightSpawn = Config.Bind(testSettings, "1 Spawn with The Goons", false, new ConfigDescription("Experimental: Spawn with the goons squad. This works in combination with your own squad. Take note that a boss and his followers do not accept the same commands as your squad"));
@@ -111,11 +119,11 @@ namespace friendlyPMC
 
                 string id = GamePlayerOwner.MyPlayer.ProfileId;
 
-                if(BossPlayers.Instance != null)
+                if (BossPlayers.Instance != null)
                 {
                     var followers = BossPlayers.Instance.GetBossFollowers(id);
                     Vector3 position = GamePlayerOwner.MyPlayer.Transform.position;
-                    foreach ( var follower in followers)
+                    foreach (var follower in followers)
                     {
                         if (follower != null && follower.GetBot().HealthController.IsAlive)
                         {
@@ -125,6 +133,7 @@ namespace friendlyPMC
                 }
 
             });
+
 
             if (!awaken)
             {
@@ -172,6 +181,40 @@ namespace friendlyPMC
             new QuickPanelPatch().Enable();
             new GestureMenuPatch().Enable();
             new EPhraseTriggerPatch().Enable();
+        }
+
+        void Update()
+        {
+            GameWorld gameWorld = Singleton<GameWorld>.Instance;
+            if (gameWorld == null) return;
+
+            if (GamePlayerOwner.MyPlayer == null || GamePlayerOwner.MyPlayer.HealthController == null || !GamePlayerOwner.MyPlayer.HealthController.IsAlive)
+            {
+                return;
+            }
+
+            if (pingKey.Value.IsPressed())
+            {
+
+                string id = GamePlayerOwner.MyPlayer.ProfileId;
+
+                Components.Logger.LogInfo("Try a Check In");
+                if (BossPlayers.Instance != null && PingTeamates.Instance != null)
+                {
+                    var boss = BossPlayers.Instance.GetBossPlayer(id);
+                    if (boss != null)
+                    {
+                        var Timer = StaticManager.Instance.TimerManager.MakeTimer(TimeSpan.FromSeconds(1), false);
+
+                        Timer.OnTimer += () =>
+                        {
+                            Components.Logger.LogInfo("Do a Check In");
+                            PingTeamates.Instance.Ping(boss);
+                        };
+                    }
+                }
+            }
+
         }
 
     }

@@ -15,8 +15,6 @@ namespace friendlyPMC.Components.BossFollower
     {
         protected CustomNavigationPoint customNavigationPoint_0;
 
-        private float coverTimer = 0f;
-
         private FollowerFightLayer followerFightLayer;
 
         public KnightWeaponMtnLayer(BotOwner bot, int priority) : base(bot, priority)

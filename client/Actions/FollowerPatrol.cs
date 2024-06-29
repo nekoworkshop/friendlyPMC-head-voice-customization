@@ -96,7 +96,7 @@ namespace friendlyPMC.Actions
                     {
                         this.float_4 = Time.time + 8f;
 
-                        CustomNavigationPoint nearPoint = null;
+                        /*CustomNavigationPoint nearPoint = null;
 
                         if (lastCoverPoint == null && !nocover)
                         {
@@ -137,7 +137,7 @@ namespace friendlyPMC.Actions
                             }
 
                             return;
-                        }
+                        }*/
 
                         nocover = true;
                         float minR = Mathf.Min(1f, reachDist * 0.19f);

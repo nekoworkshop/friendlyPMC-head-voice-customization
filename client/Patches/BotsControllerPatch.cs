@@ -20,6 +20,7 @@ using IProfileData = GClass592;
 using EFT.Bots;
 using System.Data;
 using EFT.UI;
+using friendlyPMC.Utils;
 
 
 
@@ -565,6 +566,8 @@ namespace friendlyPMC.Patches
                 new Receivers();
                 new FollowerPatrolInstances();
 
+                PingTeamates.Enable();
+
                 Components.Logger.LogInfo("Raid Started");
 
                 Controller = __instance;
@@ -726,6 +729,8 @@ namespace friendlyPMC.Patches
             WavesSpawnScenarioRunPatch.spawnRan = false;
 
             BotOwnerManualUpdatePatch.BotOwnerUpdate.Clear();
+
+            PingTeamates.Disable();
 
             Components.Logger.LogInfo("Raid Ended");
 

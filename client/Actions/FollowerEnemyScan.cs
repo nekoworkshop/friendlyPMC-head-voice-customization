@@ -93,6 +93,7 @@ namespace friendlyPMC.Actions
                 {
                     info.PriorityIndex = 0;
                     bot.Memory.GoalEnemy = info;
+                    info.SetVisible(true);
                     Components.Logger.LogInfo("Made closest enemy a priority");
                 }
             }

@@ -84,6 +84,9 @@ namespace friendlyPMC.Patches
                         {
                             __instance.method_7(EPhraseTrigger.Cooperation, true);
                         }
+                    } else
+                    {
+                        __instance.method_7(EPhraseTrigger.Cooperation, false);
                     }
                 } catch (Exception e) { Components.Logger.LogInfo("Cooperation Command Failed: " + e.Message); }
 

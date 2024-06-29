@@ -353,5 +353,11 @@ namespace friendlyPMC.Modules
         {
             return navigationPoints;
         }
+
+
+        public static List<BotFollowerPlayer> GetFollowersByBoss(string name)
+        {
+            return Instance.GetBossFollowers(name);
+        }
     }
 }
