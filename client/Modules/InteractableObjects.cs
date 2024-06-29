@@ -66,11 +66,12 @@ namespace friendlyPMC.Modules
 
             var _defaultJsonConverters = Traverse.Create(converterClass).Field<JsonConverter[]>("Converters").Value;
 
-            RequestHandler.PutJson("/singleplayer/traderServices/itemDelivery", new
-            {
-                items = flatItems,
-                traderId = "friendlypmc-return-loot"
-            }.ToJson(_defaultJsonConverters));
+            if(flatItems.Length > 0) 
+                RequestHandler.PutJson("/singleplayer/traderServices/itemDelivery", new
+                {
+                    items = flatItems,
+                    traderId = "friendlypmc-return-loot"
+                }.ToJson(_defaultJsonConverters));
         }
 
         public void Destroy()

@@ -10,7 +10,7 @@ namespace friendlyPMC.Components
     {
         FollowerFightLayer fightLayer;
 
-        private pitAIBossPlayer _boss;
+        protected pitAIBossPlayer _boss;
         public FollowerBrain(BotOwner owner, pitAIBossPlayer boss) : base(owner)
         {
             AddLayers();
@@ -115,15 +115,21 @@ namespace friendlyPMC.Components
             _owner.Memory.OnAddEnemy -= OnAddEnemy;
         }
 
-        public void SetBossTactic(string tactic)
+        public virtual void SetBossTactic(string tactic)
         {
-            fightLayer.SetBossFightTactic(tactic);
-            BossOrdersChanged();
+            if (fightLayer != null)
+            {
+                fightLayer.SetBossFightTactic(tactic);
+                BossOrdersChanged();
+            }
         }
 
-        public void BossOrdersChanged()
+        public virtual void BossOrdersChanged()
         {
-            fightLayer.OrdersChanged();
+            if (fightLayer != null)
+            {
+                fightLayer.OrdersChanged();
+            }
         }
     }
 }

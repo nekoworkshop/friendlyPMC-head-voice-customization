@@ -146,10 +146,10 @@ namespace friendlyPMC.Actions
 
                     EnableTransactions();
                     _follower.LootingBrain.StartCoroutine(_follower.LootingBrain.LootCorpse());
-                    if(_follower.IsSquadMate) _follower.LootingBrain.StartCoroutine(MonitorLootingCoroutine());
+                    if (_follower.IsSquadMate) _follower.LootingBrain.StartCoroutine(MonitorLootingCoroutine());
                 }
                 // pick up the given item
-                else
+                else if (_follower.LootingBrain.ActiveItem != null && _follower.LootingBrain.ActiveItem.Item != null)
                 {
                     PickUpItem().Forget();
                 }

@@ -1,16 +1,24 @@
 ﻿using Aki.Reflection.Patching;
+using Comfort.Common;
 using EFT;
+using EFT.UI;
 using EFT.UI.Gestures;
+using friendlyPMC.Modules;
+using friendlyPMC.Utils;
 using HarmonyLib;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine.EventSystems;
+
 
 namespace friendlyPMC.Patches
 {
+
     internal class GestureMenuPatch : ModulePatch
     {
         protected override MethodBase GetTargetMethod()
@@ -52,6 +60,10 @@ namespace friendlyPMC.Patches
                 if (trigger == EPhraseTrigger.OnRepeatedContact)
                 {
                     __result = "Contact";
+                    return false;
+                } else if (trigger == EPhraseTrigger.PhraseNone)
+                {
+                    __result = "Check In";
                     return false;
                 }
             }

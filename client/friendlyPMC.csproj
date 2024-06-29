@@ -56,6 +56,9 @@
     <Reference Include="BepInEx">
       <HintPath>..\..\core\BepInEx.dll</HintPath>
     </Reference>
+    <Reference Include="bsg.console.core">
+      <HintPath>..\..\..\XboxGames\AKI-Streets-3.8.0\EscapeFromTarkov_Data\Managed\bsg.console.core.dll</HintPath>
+    </Reference>
     <Reference Include="Comfort">
       <HintPath>..\..\..\EscapeFromTarkov_Data\Managed\Comfort.dll</HintPath>
     </Reference>
@@ -102,6 +105,9 @@
     <Reference Include="Unity.Collections">
       <HintPath>..\UnityToolkit\Unity.Collections.dll</HintPath>
     </Reference>
+    <Reference Include="Unity.Postprocessing.Runtime">
+      <HintPath>..\..\..\XboxGames\AKI-Streets-3.8.0\EscapeFromTarkov_Data\Managed\Unity.Postprocessing.Runtime.dll</HintPath>
+    </Reference>
     <Reference Include="Unity.TextMeshPro">
       <HintPath>..\..\..\EscapeFromTarkov_Data\Managed\Unity.TextMeshPro.dll</HintPath>
     </Reference>
@@ -135,10 +141,23 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Components\BossFollower\KnightAssaultBuildingLayer.cs" />
+    <Compile Include="Components\BossFollower\KnightAvoidDangerLayer.cs" />
+    <Compile Include="Components\BossFollower\KnightEnemyBuildingLayer.cs" />
+    <Compile Include="Components\BossFollower\KnightFightLayer.cs" />
+    <Compile Include="Components\BossFollower\KnightWeaponMtnLayer.cs" />
     <Compile Include="Actions\FollowerAttackMove.cs" />
     <Compile Include="Actions\FollowerEnemyScan.cs" />
     <Compile Include="Actions\FollowerGoToPoint.cs" />
     <Compile Include="Actions\FollowerHoldPosition.cs" />
+    <Compile Include="Components\BossFollowerPlayer.cs" />
+    <Compile Include="Components\BossFollower\BossFollowLayer.cs" />
+    <Compile Include="Components\BossFollower\KnightFollowerBrain.cs" />
+    <Compile Include="Components\FollowerBossFollower\BigPipeArtilleryLayer.cs" />
+    <Compile Include="Components\FollowerBossFollower\BigPipeFollowerBrain.cs" />
+    <Compile Include="Components\FollowerBossFollower\BirdEyeFightLayer.cs" />
+    <Compile Include="Components\FollowerBossFollower\BirdEyeFollowerBrain.cs" />
+    <Compile Include="Components\FollowerBossFollower\BirdEyeFollowLayer.cs" />
     <Compile Include="Modules\FollowerCreateNode.cs" />
     <Compile Include="Patches\BotMemoryPatch.cs" />
     <Compile Include="Patches\GestureMenuPatch.cs" />
@@ -174,7 +193,13 @@
     <Compile Include="Patches\PlayerPatch.cs" />
     <Compile Include="Patches\QuickPanelPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utils\EnemyInfo.cs" />
+    <Compile Include="Utils\PingTeamates.cs" />
+    <Compile Include="Utils\Utils.cs" />
+    <Compile Include="Utils\WorldScreen.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Actions\BossFollower\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

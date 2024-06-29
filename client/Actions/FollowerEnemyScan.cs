@@ -16,21 +16,24 @@ namespace friendlyPMC.Actions
         public static bool CheckLook(Player from, Player to, BodyPartType botType = BodyPartType.head)
         {
             EnemyPart enemyPart = from.MainParts[botType];
-            Vector3 direction = to.MainParts[BodyPartType.head].Position - enemyPart.Position;
+            Vector3 direction = to.PlayerBones.Head.position - enemyPart.Position;
             float magnitude = direction.magnitude;
             RaycastHit raycastHit;
             return Physics.Raycast(new Ray(enemyPart.Position, direction), out raycastHit, magnitude, LayerMaskClass.HighPolyWithTerrainMask);
         }
         public static void ScanDirection(BotOwner bot, IPlayer player, Player realPlayer)
         {
-            Components.Logger.LogInfo("Scan for Enemies");
 
             List<Player> enemies = new List<Player>();
 
+            float scanDistance = friendlyPMC.scanDistance.Value;
+
+            if (bot.IsRole(WildSpawnType.followerBirdEye)) scanDistance = 300f;
+
             Vector3 playerPosition = player.Transform.position;
             Vector3 playerLookDirection = player.LookDirection;
-            float sphereRadius = friendlyPMC.scanDistance.Value / 2;
-            float sphereDistance = friendlyPMC.scanDistance.Value / 2;
+            float sphereRadius = scanDistance / 2;
+            float sphereDistance = scanDistance / 2;
 
             RaycastHit[] hits = new RaycastHit[10];
 
@@ -52,7 +55,6 @@ namespace friendlyPMC.Actions
                     
                     if (enemy != null && enemy.IsAI && enemy.HealthController.IsAlive && enemy.Side != player.Side)
                     {
-                        Components.Logger.LogInfo("Add enemy to the list");
                         enemies.Add(enemy);
                     }
                 }
@@ -70,25 +72,24 @@ namespace friendlyPMC.Actions
                 }
             }
 
-            if ( closet != null )
+            if ( closet != null)
             {
+
                 if(bot.Memory.HaveEnemy)
                 {
-                    Components.Logger.LogInfo("Already engaged, add player's closest visible enemy to the group");
-                    bot.BotsGroup.AddEnemy(closet.AIData.Player, EBotEnemyCause.addBotAtGroup);
+                    bot.BotsGroup.AddEnemy(closet, EBotEnemyCause.checkAddTODO);
                     return;
                 }
 
-                Components.Logger.LogInfo("Try make player's closest visible enemy the priority");
-
-                bot.BotsGroup.AddEnemy(closet.AIData.Player, EBotEnemyCause.addBotAtGroup);
-
+                bot.BotsGroup.AddEnemy(closet.AIData.Player, EBotEnemyCause.checkAddTODO);
+                bot.Memory.AddEnemy(closet, new BotSettingsClass(closet, bot.BotsGroup, EBotEnemyCause.checkAddTODO), false);
                 EnemyInfo info;
                 bot.EnemiesController.EnemyInfos.TryGetValue(closet, out info);
                 if (info != null)
                 {
-                    Components.Logger.LogInfo("Made closest enemy a priority");
+                    info.PriorityIndex = 0;
                     bot.Memory.GoalEnemy = info;
+                    info.SetVisible(true);
                 }
             }
         }

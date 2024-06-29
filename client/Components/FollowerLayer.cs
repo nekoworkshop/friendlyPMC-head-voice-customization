@@ -9,11 +9,11 @@ namespace friendlyPMC.Components
     // GClass103 is a generic follower layer
     internal class FollowerLayer : GClass103
     {
-        private float float_2;
+        protected float float_2;
 
-        private CustomNavigationPoint customNavigationPoint_0;
+        protected CustomNavigationPoint customNavigationPoint_0;
 
-        private float heal_time = 0f;
+        protected float heal_time = 0f;
 
         public FollowerLayer(BotOwner bot, int priority) : base(bot, priority)
         {
@@ -24,14 +24,19 @@ namespace friendlyPMC.Components
         {
             return "FLBPlayer";
         }
-        private bool HasBoss()
+        protected virtual bool HasBoss()
         {
             return botOwner_0.BotFollower.HaveBoss;
         }
 
-        private pitAIBossPlayer GetBoss()
+        protected virtual pitAIBossPlayer GetBoss()
         {
             return (pitAIBossPlayer)botOwner_0.BotFollower.BossToFollow;
+        }
+
+        protected virtual Vector3 GetBossPosition()
+        {
+            return  HasBoss() ?  GetBoss().Position : botOwner_0.GetPlayer.Transform.position;
         }
 
         public override AICoreActionResultStruct<BotLogicDecision> GetDecision()
@@ -51,10 +56,10 @@ namespace friendlyPMC.Components
                 {
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.peaceLook, "PeaceLook");
                 }
-                if (botOwner_0.SecondWeaponData.HaveActions())
+                /*if (botOwner_0.SecondWeaponData.HaveActions())
                 {
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.watchSecondWeapon, "Look2ndWeap");
-                }
+                }*/
 
                 if (!HasBoss())
                 {
@@ -66,10 +71,10 @@ namespace friendlyPMC.Components
                     {
                         return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.eatDrink, "EatDrinkDat");
                     }
-                    if (botOwner_0.SecondWeaponData.HaveActions())
+                    /*if (botOwner_0.SecondWeaponData.HaveActions())
                     {
                         return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.watchSecondWeapon, "Look2ndWeap");
-                    }
+                    }*/
                     if (botOwner_0.Gesture.HaveRequest())
                     {
                         return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.gesture, "Gesture");
@@ -162,67 +167,36 @@ namespace friendlyPMC.Components
 
             return gstruct7_1;
         }
+
+        public override AICoreActionEndStruct EndRunToCover()
+        {
+            return new AICoreActionEndStruct("enemy.None", true);
+        }
+
         public override bool ShallUseNow()
         {
             botOwner_0.PriorityAxeTarget.FindTarget();
             return HasBoss() && !InteractableObjects.IsTaker(botOwner_0);
         }
 
-        public override CustomNavigationPoint FindPoint(CoverSearchData data, Func<CoverSearchData, CustomNavigationPoint> p, bool checkCurrent)
+        protected virtual List<CustomNavigationPoint> GetNearGovers()
         {
-            if (this.customNavigationPoint_0 != null && (!this.customNavigationPoint_0.IsFreeById(this.botOwner_0.Id) || this.customNavigationPoint_0.IsSpotted))
-            {
-                this.customNavigationPoint_0 = null;
-            }
-            if (this.customNavigationPoint_0 != null)
-            {
-                return this.customNavigationPoint_0;
-            }
-
-            return base.FindPoint(data, p, checkCurrent);
+            return HasBoss() ? GetBoss().GetAreaCovers() : BossPlayers.Instance.GetCovers();
         }
 
-        private void GetCoverPoint(Vector3 centerPosition, float searchRadius)
+        public override CustomNavigationPoint FindPoint(CoverSearchData data, Func<CoverSearchData, CustomNavigationPoint> p, bool checkCurrent)
         {
-            List<CustomNavigationPoint> customNavigationPoints = HasBoss() ? GetBoss().GetAreaCovers() : BossPlayers.Instance.GetCovers();
+            customNavigationPoint_0 = Utils.Utils.FindPoint(botOwner_0, customNavigationPoint_0);
+            return customNavigationPoint_0;
+        }
 
-            if (customNavigationPoints.Count > 0)
-            {
-                CustomNavigationPoint point1 = null;
-                float distance = searchRadius * searchRadius;
+        protected virtual void GetCoverPoint(Vector3 centerPosition, float searchRadius)
+        {
 
-                List<CustomNavigationPoint> availablePoints = new List<CustomNavigationPoint>();
+            CustomNavigationPoint point1 = Utils.Utils.GetCoverPoint(botOwner_0, centerPosition, searchRadius);
 
-                foreach (CustomNavigationPoint point in customNavigationPoints)
-                {
-                    if (point.IsFreeById(botOwner_0.Id) && !point.IsSpotted)
-                    {
-                        float range = (centerPosition - point.Position).sqrMagnitude;
-                        if (range < distance)
-                        {
-                            distance = range;
-                            availablePoints.Add(point);
-
-                        }
-                    }
-                }
-                // get a random point
-                if (availablePoints.Count > 0)
-                {
-                    point1 = availablePoints.Random();
-                }
-
-
-                if (point1 != null)
-                {
-                    customNavigationPoint_0 = point1;
-                    botOwner_0.Memory.SetCoverPoints(point1);
-                }
-                else
-                {
-                    customNavigationPoint_0 = null;
-                }
-            }
+            customNavigationPoint_0 = point1;
+            botOwner_0.Memory.SetCoverPoints(point1);
         }
     }
 }

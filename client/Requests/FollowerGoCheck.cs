@@ -3,7 +3,7 @@ namespace friendlyPMC.Actions
 {
     internal class FollowerGoCheck : BotRequest
     {
-        public FollowerGoCheck(IPlayer requester) : base(requester, BotRequestType.goToPoint)
+        public FollowerGoCheck(IPlayer requester, BotRequestType request = BotRequestType.goToPoint) : base(requester, request)
         {
         }
 
@@ -14,8 +14,26 @@ namespace friendlyPMC.Actions
             return true;
         }
 
-        public override bool CanRequest(BotOwner requester)
+        public override bool CanRequest(BotOwner owner)
         {
+            if (
+                owner.IsRole(WildSpawnType.followerBirdEye)
+            )
+            {
+                if (Requester.IsAI && Requester.Profile.Info.Settings.Role == WildSpawnType.bossKnight)
+                {
+                    return true;
+                }
+                if (
+                    owner.BotFollower.BossToFollow != null &&
+                    !owner.BotFollower.BossToFollow.Followers.Exists((BotOwner follower) => follower.IsRole(WildSpawnType.bossKnight))
+                )
+                {
+                    return true;
+                }
+                return false;
+            }
+
             return true;
         }
 

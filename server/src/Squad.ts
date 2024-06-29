@@ -37,8 +37,7 @@ class friendlyPMC {
 	Bots: IBotConfig;
 
 	originalgetPmcDifficultySettings: BotDifficultyHelper["getPmcDifficultySettings"];
-
-	originalGetRaidConfiguration: MatchCallbacks["getRaidConfiguration"];
+	originalgetBotDifficulty: BotController["getBotDifficulty"];
 
 	originalGetTraderById: TraderHelper["getTraderById"];
 
@@ -63,6 +62,19 @@ class friendlyPMC {
 				}
 
 				result.getPmcDifficultySettings = this.getPmcDifficultySettings;
+			},
+			{ frequency: "Always" }
+		);
+
+		// patch getBotDifficulty as that is where we actually make the bots be friendly
+		this.getBotDifficulty = this.getBotDifficulty.bind(this);
+		container.afterResolution(
+			"BotController",
+			(_t, result: BotController) => {
+				if (!this.originalgetBotDifficulty) {
+					this.originalgetBotDifficulty = result.getBotDifficulty.bind(result);
+				}
+				result.getBotDifficulty = this.getBotDifficulty;
 			},
 			{ frequency: "Always" }
 		);
@@ -182,16 +194,17 @@ class friendlyPMC {
 		};
 
 		let is_hostile = this.config.sameSideHostile || false;
+		pmcType = pmcType.toLowerCase();
 
 		// force the friendly mind here as some mods may overwrite things
-		if (pmcType == "bear" || pmcType == "usec") {
+		if (pmcType == "bear" || pmcType == "usec" || pmcType == "sptbear" || pmcType == "sptusec") {
 			Object.assign(diff.Mind, {
-				DEFAULT_ENEMY_BEAR: pmcType == "usec" || is_hostile,
+				DEFAULT_ENEMY_BEAR: pmcType == "usec" || pmcType == "sptusec" || is_hostile,
 				DEFAULT_ENEMY_SAVAGE: true,
-				DEFAULT_ENEMY_USEC: pmcType == "bear" || is_hostile,
-				DEFAULT_BEAR_BEHAVIOUR: !is_hostile && pmcType == "bear" ? "Ignore" : "Attack",
+				DEFAULT_ENEMY_USEC: pmcType == "bear" || pmcType == "sptbear" || is_hostile,
+				DEFAULT_BEAR_BEHAVIOUR: !is_hostile && (pmcType == "bear" || pmcType == "sptbear") ? "Ignore" : "Attack",
 				DEFAULT_SAVAGE_BEHAVIOUR: "Attack",
-				DEFAULT_USEC_BEHAVIOUR: !is_hostile && pmcType == "usec" ? "Ignore" : "Attack",
+				DEFAULT_USEC_BEHAVIOUR: !is_hostile && (pmcType == "usec" || pmcType == "sptusec") ? "Ignore" : "Attack",
 				CAN_RECIVE_PLAYER_REQUESTS: !is_hostile,
 				CAN_RECEIVE_PLAYER_REQUESTS: !is_hostile,
 				CAN_RECEIVE_PLAYER_REQUESTS_USEC: !is_hostile,
@@ -261,6 +274,12 @@ class friendlyPMC {
 		const result = this.originalgetPmcDifficultySettings(pmcType, difficulty, usecType, bearType);
 
 		return this._makeFriendlyOrHostile(result, pmcType);
+	}
+	/** Overwrite get difficulity method to patch the friendly/hostile settings */
+	getBotDifficulty(type: string, difficulty: string): any {
+		let result = this.originalgetBotDifficulty(type, difficulty);
+
+		return this._makeFriendlyOrHostile(result, type);
 	}
 
 	getTraderById(traderId: string): Traders {

@@ -1,7 +1,22 @@
-- 	night vision of the bots needs to be increased
+3.3.0 - changes:
+- Added "Attention" command to help with stucked bots
+- Added "followerstome" console command to teleport bots to player
+- Improvements on enemy approach logic
+- Bots will get their ammo refill on becoming a follower
+- sameSideHostile will no longer turn the followers you spawned with hostile towards you
+- Added new command under team "Check In" which will ping the location of your followers
+- Added test for spawning with the Goons Squad, optionally just with one of them
+- Commands and Gestures the goons listen to:
+- - Regroup, Need Help (in combat) - will try to get near player
+- - That Direction - will try to approach enemy (in combat) or will try to go in front of player (out of combat)
+- - Come Here - will try to go near player (out of combat)
+
+Gameplay of the Goons:
+Knight follows the player closely, BirdEye follows the player at a distance and BigPipe follows BirdEye closely
+Knight and BigPipe have a close-in combat while BirdEye tries to find spots to snipe from
 
 
-3.1.1 - changes:
-- That Direction moves nearby bots in front of the player or rush enemy
-- Go Forward moves followers in front of the player or closer to the enemy
-- added several parameters to experimenting with under settings
+
+Features:
+- add a ping system. See how FIKA does it along with bot debug (https://github.com/project-fika/Fika-Plugin/blob/c69bff536324ca446603fb66d3542d502255b61b/Fika.Core/Coop/Players/CoopPlayer.cs#L720)
+- add trader from which you buy cards that represent type of followers

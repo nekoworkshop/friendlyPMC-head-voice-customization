@@ -182,7 +182,7 @@ namespace friendlyPMC.Modules
             Instance = null;
         }
 
-        public BotFollowerPlayer AddFollower(BotOwner bot, pitAIBossPlayer player, bool squadMate = false)
+        public BotFollowerPlayer AddFollower(BotOwner bot, pitAIBossPlayer player, bool squadMate = false, WildSpawnType role = WildSpawnType.assault)
         {
             BotFollowerPlayer _follower = null;
 
@@ -196,10 +196,25 @@ namespace friendlyPMC.Modules
 
             if (_follower != null)
             {
-                _followers.Remove(_follower);
+                return _follower;
             }
 
-            _follower = new BotFollowerPlayer(bot, player, squadMate);
+
+            bool isAIBoss = false;
+
+            foreach (var item in Utils.Utils.BossFollowersRoles)
+            {
+                if(role == item)
+                {
+                    isAIBoss = true;
+                    break;
+                }
+            }
+
+            if (!isAIBoss)
+                _follower = new BotFollowerPlayer(bot, player,squadMate);
+            else
+                _follower = new BossFollowerPlayer(bot, player, role);
 
             _followers.Add(_follower);
 
@@ -248,10 +263,9 @@ namespace friendlyPMC.Modules
 
             BotFollowerPlayer _follower = null;
 
-
             foreach (var item in _followers)
             {
-                if (item.IsBot(bot))
+                if (item!= null && item.IsBot(bot))
                 {
                     _follower = item;
                     break;
@@ -269,7 +283,7 @@ namespace friendlyPMC.Modules
 
             foreach (var item in _followers)
             {
-                if (item.IsBot(bot))
+                if (item != null && item.IsBot(bot))
                 {
                     _follower = item;
                     break;
@@ -295,11 +309,15 @@ namespace friendlyPMC.Modules
 
         public bool IsBoss(string id)
         {
+            if(_bosses == null) return false;
+
             return _bosses.ContainsKey(id);
         }
 
         public pitAIBossPlayer GetBossPlayer(string name)
         {
+            if (_bosses == null) return null;
+
             if (!_bosses.ContainsKey(name))
             {
                 return null;
@@ -310,6 +328,8 @@ namespace friendlyPMC.Modules
         public List<BotFollowerPlayer> GetBossFollowers(string name)
         {
             List<BotFollowerPlayer> botFollowers = new List<BotFollowerPlayer>();
+
+            if (_bosses == null) return botFollowers;
 
             if (!_bosses.ContainsKey(name) || _bosses[name] == null)
             {
@@ -332,6 +352,12 @@ namespace friendlyPMC.Modules
         public List<CustomNavigationPoint> GetCovers()
         {
             return navigationPoints;
+        }
+
+
+        public static List<BotFollowerPlayer> GetFollowersByBoss(string name)
+        {
+            return Instance.GetBossFollowers(name);
         }
     }
 }
