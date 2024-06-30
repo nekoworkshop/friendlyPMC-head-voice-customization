@@ -123,7 +123,7 @@ namespace friendlyPMC.Utils
 
                 if (!guiUpdate) return;
 
-                Vector3 aboveBotHeadPos = bt.Data.Position + (Vector3.up * 1.55f);
+                Vector3 aboveBotHeadPos = bt.Data.Position + (Vector3.up * 1.6f);
                 Vector3 screenPos = Camera.main.WorldToScreenPoint(aboveBotHeadPos);
 
                 if (screenPos.z > 0)
@@ -131,7 +131,7 @@ namespace friendlyPMC.Utils
 
                     int dist = Mathf.RoundToInt((bt.Data.Position - myPlayer.Transform.position).magnitude);
 
-                    if (dist < 150)
+                    if (dist < 301)
                     {
                         if (bt.GuiContent == null)
                         {
@@ -153,11 +153,10 @@ namespace friendlyPMC.Utils
                         }
                         else if(bt.Data.Memory.HaveEnemy)
                         {
-                            stringBuilder.Append(": In Combat");
-                        } 
-                        else
-                        {
-                            stringBuilder.Append(": Idle");
+                            if(bt.Data.Memory.GoalEnemy.IsVisible || bt.Data.Memory.GoalEnemy.PersonalLastSeenTime < 5f)
+                                stringBuilder.Append(": In Combat");
+                            else
+                                stringBuilder.Append(": Enemy Detected");
                         }
 
                         float hp = 0;

@@ -16,7 +16,7 @@ namespace friendlyPMC.Components
         private float nearSearchRadius = 30f;
         private float regroupMinDistance = 7f;
 
-        private readonly float coverSearchRadius = 50f;
+        private readonly float coverSearchRadius = 80f;
         private readonly float sprintDistance = 15f;
 
 
@@ -142,23 +142,9 @@ namespace friendlyPMC.Components
             Vector3 botPosition = botOwner_0.GetPlayer.Transform.position;
             Vector3 enemyPos = botOwner_0.Memory.GoalEnemy.CurrPosition;
             bool enemyVisible = botOwner_0.Memory.GoalEnemy.IsVisible;
-
-            // Check if the bot needs to heal
-            if (botOwner_0.Medecine.FirstAid.Have2Do || botOwner_0.Medecine.SurgicalKit.HaveWork)
-            {
-                // If the bot is not in cover, find the closest cover and move to it
-                if (!botOwner_0.Memory.IsInCover)
-                {
-                    GetClosestCoverPoint(botPosition, coverSearchRadius);
-                    if (customNavigationPoint_0 != null)
-                    {
-                        return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "runToHeal");
-                    }
-                }
-                // If the bot is in cover, heal
-                heal_time = Time.time;
-                return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.heal, botOwner_0.Memory.IsInCover ? "healInCover" : "healNoCover");
-            }
+            // we put this again here because other layers might use this function
+            searchRadius = friendlyPMC.fightOuterRadius.Value;
+            nearSearchRadius = friendlyPMC.fightInnerRadius.Value;
 
             // If the enemy is visible and can be shot, shoot from the current position
             if (enemyVisible && botOwner_0.Memory.GoalEnemy.CanShoot)
@@ -288,8 +274,10 @@ namespace friendlyPMC.Components
             Vector3 botPosition = botOwner_0.GetPlayer.Transform.position;
             Vector3 enemyPos =  botOwner_0.Memory.GoalEnemy.CurrPosition;
             Vector3 bossPosition = HasBoss() ? GetBoss().Position : botPosition;
+            // we put this again here because other layers might use this function
+            searchRadius = friendlyPMC.fightOuterRadius.Value;
+            nearSearchRadius = friendlyPMC.fightInnerRadius.Value;
 
-            
 
             // If the bot is already in cover
             if (botOwner_0.Memory.IsInCover)
@@ -382,7 +370,7 @@ namespace friendlyPMC.Components
                 // If the bot is not in cover, find the closest cover and move to it
                 if (!botOwner_0.Memory.IsInCover)
                 {
-                    GetClosestCoverPoint(botPosition, 100f);
+                    GetClosestCoverPoint(botPosition, coverSearchRadius);
 
                     if (customNavigationPoint_0 != null)
                     {
@@ -524,7 +512,6 @@ namespace friendlyPMC.Components
 
             if(request != null && request.BotRequestType == BotRequestType.goToPoint)
             {
-                Components.Logger.LogInfo("Boss said to goToPoint");
 
                 if(botOwner_0.Memory.HaveEnemy)
                 {
@@ -610,7 +597,14 @@ namespace friendlyPMC.Components
                 }
             }
 
-
+            // suppression fire request
+            if((!botOwner_0.Memory.HaveEnemy || !botOwner_0.Memory.GoalEnemy.IsVisible) && request != null && request.BotRequestType == BotRequestType.suppressionFire)
+            {
+                botOwner_0.BotTalk.TrySay(EPhraseTrigger.Covering, true);
+                suppressTime = Time.time + 2f;
+                return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.suppressFire, "suppressFire");
+            }
+            // throw grenate request
             if(request != null && request.BotRequestType == BotRequestType.throwGrenade)
                 return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.throwGrenadeFromPlace, "throwGrenadeRequest");
 

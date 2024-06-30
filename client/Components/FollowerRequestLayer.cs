@@ -31,23 +31,20 @@ namespace friendlyPMC.Components
 
         public override bool ShallUseNow()
         {
+            if (botOwner_0.Memory.HaveEnemy) return false;
+
             BotRequest currRequest = botOwner_0.BotRequestController.CurRequest;
-            List<BotRequestType> enemyAllowedRequests = new List<BotRequestType>
-            {
-                BotRequestType.getInCover,
-                BotRequestType.hide,
-                BotRequestType.suppressionFire,
-            };
 
             List<BotRequestType> allyAllowedRequest = new List<BotRequestType>
             {
                 BotRequestType.getInCover,
-                BotRequestType.hide,
-                BotRequestType.suppressionFire
+                BotRequestType.hide
             };
 
-            List<BotRequestType> generalRequests = new List<BotRequestType>
+            List<BotRequestType> bossRequests = new List<BotRequestType>
             {
+               BotRequestType.getInCover,
+               BotRequestType.hide,
                BotRequestType.wait,
                BotRequestType.followMe,
                BotRequestType.goToPoint,
@@ -73,22 +70,17 @@ namespace friendlyPMC.Components
             if (
                     (
                         // boss can throw all types of requests
+                        boss != null && bossRequests.Contains(currRequest.BotRequestType)
+                    ) 
+                    ||
+                    // teammates only some
+                    (
                         boss != null &&
-                        // - the rest is handled by followerfight layer
-                        (botOwner_0.Memory.HaveEnemy && enemyAllowedRequests.Contains(currRequest.BotRequestType)) ||
-                        (!botOwner_0.Memory.HaveEnemy && generalRequests.Contains(currRequest.BotRequestType))
+                        boss.Followers.Contains(currRequest.Requester.AIData.BotOwner) && allyAllowedRequest.Contains(currRequest.BotRequestType)
                     ) ||
                     (
-                        // teammates only some
-                        (
-                            boss != null && 
-                            boss.Followers.Contains(currRequest.Requester.AIData.BotOwner) && allyAllowedRequest.Contains(currRequest.BotRequestType) 
-                        ) ||
-                        (
-                            boss == null &&
-                            botOwner_0.BotsGroup.Contains(currRequest.Requester.AIData.BotOwner)
-                        )
-                        
+                        boss == null &&
+                        botOwner_0.BotsGroup.Contains(currRequest.Requester.AIData.BotOwner)
                     )
                 )
             {
@@ -187,11 +179,6 @@ namespace friendlyPMC.Components
                     botOwner_0.GoToSomePointData.SetPoint(finalPosition);
                     botOwner_0.Steering.LookToPoint(finalPosition);
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.goToPoint, "req:goCheck");
-
-                case BotRequestType.suppressionFire:
-                    botOwner_0.BotTalk.TrySay(EPhraseTrigger.Covering, true);
-                    suppressTime = Time.time + 2f;
-                    return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.suppressFire, "req:suppressFire");
 
                 case BotRequestType.doorOpen:
                     doorOpenTimer = Time.time + 5f;

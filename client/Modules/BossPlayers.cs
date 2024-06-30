@@ -359,5 +359,10 @@ namespace friendlyPMC.Modules
         {
             return Instance.GetBossFollowers(name);
         }
+
+        public static pitAIBossPlayer AddBoss(Player player)
+        {
+            return Instance.AddBossPlayer(player);
+        }
     }
 }

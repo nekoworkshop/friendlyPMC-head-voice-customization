@@ -313,6 +313,12 @@ namespace friendlyPMC.Patches
                             profile.Info.Settings.Role = WildSpawnType.assault;
                     }
 
+                    // make BirdEye not be silent!
+                    if(botRole == WildSpawnType.followerBirdEye)
+                    {
+                        profile.Skills.BotSoundGoef.SetCurrent(3100f, true);
+                    }
+
 
                     botCreator.ActivateBot(profile, new GClass590(position, closestCorePoint.Id, false), zone, true, new Func<BotOwner, BotZone, BotsGroup>((BotOwner bt, BotZone zn) =>
                     {
@@ -582,7 +588,7 @@ namespace friendlyPMC.Patches
             }
 
            
-            pitAIBossPlayer playerBoss = BossPlayers.Instance.AddBossPlayer(player);
+            pitAIBossPlayer playerBoss = BossPlayers.AddBoss(player);
             spawnedPlayers.Add(playerBoss);
 
             if (friendlyPMC.knightSpawn.Value)

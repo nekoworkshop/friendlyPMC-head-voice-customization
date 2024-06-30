@@ -172,6 +172,10 @@ namespace friendlyPMC.Components
         {
             return new AICoreActionEndStruct("enemy.None", true);
         }
+        public override AICoreActionEndStruct EndSuppressFire()
+        { 
+            return new AICoreActionEndStruct("enemy.None", true);
+        }
 
         public override bool ShallUseNow()
         {

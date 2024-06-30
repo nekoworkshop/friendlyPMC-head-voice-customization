@@ -66,7 +66,7 @@ namespace friendlyPMC.Components
             return aBossLogic;
         }
 
-        public void SetAreaCovers()
+        private void SetAreaCovers()
         {
             Task.Run(() =>
             {

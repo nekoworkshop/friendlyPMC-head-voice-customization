@@ -16,7 +16,7 @@ using Logger = friendlyPMC.Components.Logger;
 
 namespace friendlyPMC
 {
-    [BepInPlugin("xyz.pit.companion", "friendlyPMC", "3.3.1")]
+    [BepInPlugin("xyz.pit.companion", "friendlyPMC", "3.3.2")]
     [BepInDependency("com.spt-aki.core", "3.8.0")]
     [BepInDependency("xyz.drakia.bigbrain")]
     [BepInDependency("xyz.drakia.waypoints")]
@@ -66,10 +66,10 @@ namespace friendlyPMC
         {
 
             squadSpawn = Config.Bind(baseSettings, "1 Squad spawn", true, new ConfigDescription("Spawn with followers"));
-            squadSize = Config.Bind(baseSettings, "1.4  -  Squad size", 2, new ConfigDescription("Number of followers to spawn with", new AcceptableValueRange<int>(1, 3)));
+            squadSize = Config.Bind(baseSettings, "1.4  -  Squad size", 2, new ConfigDescription("Number of followers to spawn with", new AcceptableValueRange<int>(1, 20)));
 
             copyEquip = Config.Bind(baseSettings, "1.6  -  Clone equipment", true, new ConfigDescription("When Squad Spawn is active, spawned followers will have the same equipment as the player"));
-            extraPickups = Config.Bind(baseSettings, "2 Maximum followers", 3, new ConfigDescription("Maximum number of followers the player can have. Cannot be less than Squad Size if Squad Spawn is active", new AcceptableValueRange<int>(1, 4)));
+            extraPickups = Config.Bind(baseSettings, "2 Maximum followers", 3, new ConfigDescription("Maximum number of followers the player can have. Cannot be less than Squad Size if Squad Spawn is active", new AcceptableValueRange<int>(1, 30)));
 
             alternativeSpawn = Config.Bind(baseSettings, "1.2  -  Alternative Spawn", false, new ConfigDescription("Try alternative Spawning method to help with Swag+Donuts"));
             squadDelay = Config.Bind(baseSettings, "1.3  -  Squad spawn Delay", 0, new ConfigDescription("When Squad Spawn is active, how much to delay the spawn of the squad ( in sec.). This is useful in case you have Swag+Donuts. Set delay above 10 seconds.", new AcceptableValueRange<int>(0, 30)));
