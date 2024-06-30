@@ -47,7 +47,7 @@ namespace friendlyPMC.Utils
 
         public static CustomNavigationPoint GetClosestCoverPoint(BotOwner botOwner, Vector3 centerPosition, float searchRadius, bool useFullCover = false)
         {
-            List<CustomNavigationPoint> customNavigationPoints = HasBoss(botOwner) && !useFullCover ? GetBoss(botOwner).GetAreaCovers() : BossPlayers.Instance.GetCovers();
+            List<CustomNavigationPoint> customNavigationPoints = HasBoss(botOwner) && !useFullCover ? GetBoss(botOwner).GetAreaCovers() : BossPlayers.GetAICovers();
 
             if (customNavigationPoints.Count > 0)
             {
@@ -100,7 +100,7 @@ namespace friendlyPMC.Utils
         public static CustomNavigationPoint GetCoverPoint(BotOwner botOwner, Vector3 centerPosition, float searchRadius, bool useFullCover = false)
         {
 
-            List<CustomNavigationPoint> customNavigationPoints = HasBoss(botOwner) ? GetBoss(botOwner).GetAreaCovers() : BossPlayers.Instance.GetCovers();
+            List<CustomNavigationPoint> customNavigationPoints = HasBoss(botOwner) ? GetBoss(botOwner).GetAreaCovers() : BossPlayers.GetAICovers();
 
             if (customNavigationPoints.Count > 0)
             {
@@ -180,7 +180,7 @@ namespace friendlyPMC.Utils
 
         public static CustomNavigationPoint GetClosestAttackCoverPoint(BotOwner botOwner, Vector3 centerPosition, bool useFullCover = false, float minDistance = 5f)
         {
-            List<CustomNavigationPoint> customNavigationPoints = HasBoss(botOwner) && !useFullCover ? GetBoss(botOwner).GetAreaCovers() : BossPlayers.Instance.GetCovers();
+            List<CustomNavigationPoint> customNavigationPoints = HasBoss(botOwner) && !useFullCover ? GetBoss(botOwner).GetAreaCovers() : BossPlayers.GetAICovers();
 
             if (customNavigationPoints.Count > 0)
             {

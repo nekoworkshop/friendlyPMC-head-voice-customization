@@ -340,6 +340,14 @@ namespace friendlyPMC.Components.BossFollower
         {
             return followerFightLayer.EndHeal();
         }
+        public override AICoreActionEndStruct EndTakeItem()
+        {
+            return followerFightLayer.EndTakeItem();
+        }
+        public override AICoreActionEndStruct EndFollowerPatrolItem()
+        {
+            return followerFightLayer.EndFollowerPatrolItem();
+        }
 
         private void GetClosestCoverPoint(Vector3 centerPosition, float searchRadius)
         {

@@ -54,10 +54,7 @@ namespace friendlyPMC.Actions
             {
                 if (botOwner_0.IsDead || botOwner_0.BotState != EBotState.Active || _follower.LootingBrain == null || _follower.LootingBrain.IsBotLooting) return;
 
-                DisableTransactions();
-                _follower.LootingBrain.StopAllCoroutines();
-                _follower.LootingBrain.ActiveItem = null;
-                _follower.LootingBrain.ActiveCorpse = null;
+                InteractableObjects.RemoveTaker(botOwner_0);
                 bool_0 = false;
                 bool_1 = false;
                 takingLoot = false;
@@ -124,7 +121,7 @@ namespace friendlyPMC.Actions
                     botOwner_0.Steering.LookToPoint(position);
 
                     takingLoot = true;
-                    lootTimer = Time.time + 10f;
+                    lootTimer = Time.time + 15f;
 
                     var Timer = StaticManager.Instance.TimerManager.MakeTimer(TimeSpan.FromSeconds(10), false);
                     Timer.OnTimer += () =>
@@ -132,10 +129,7 @@ namespace friendlyPMC.Actions
                         if (botOwner_0.IsDead || botOwner_0.BotState != EBotState.Active || _follower.LootingBrain == null || _follower.LootingBrain.IsBotLooting) return;
                         try
                         {
-                            DisableTransactions();
-                            _follower.LootingBrain.StopAllCoroutines();
-                            _follower.LootingBrain.ActiveItem = null;
-                            _follower.LootingBrain.ActiveCorpse = null;
+                            InteractableObjects.RemoveTaker(botOwner_0);
                             bool_0 = false;
                             bool_1 = false;
                             takingLoot = false;
@@ -164,21 +158,28 @@ namespace friendlyPMC.Actions
 
             EnableTransactions();
 
-
-            bool result = await _follower.TransactionController.TryPickupItem(_follower.LootingBrain.ActiveItem.Item);
+            Item item = _follower.LootingBrain.ActiveItem.Item;
+            bool result = await _follower.TransactionController.TryPickupItem(item);
 
             if(!result)
             {
-                DisableTransactions();
-                _follower.LootingBrain.StopAllCoroutines();
-                _follower.LootingBrain.ActiveItem = null;
-                _follower.LootingBrain.ActiveCorpse = null;
+                InteractableObjects.RemoveTaker(botOwner_0);
             } else if(_follower.IsSquadMate)
             {
-                InteractableObjects.StoreItem(botOwner_0.ProfileId,_follower.LootingBrain.ActiveItem.Item);
+                DisableTransactions();
+                try
+                {
+                    InteractableObjects.StoreItem(botOwner_0.ProfileId, item);
+                }
+                catch (Exception ex)
+                {
+                    Components.Logger.LogInfo("Failed to store item for retrival: " + ex.Message);
+                }
             }
 
-            DisableTransactions();
+            // BotRequestType.throwGrenadeFromPlace is loot take
+            if (botOwner_0.BotRequestController.CurRequest != null && botOwner_0.BotRequestController.CurRequest.BotRequestType == BotRequestType.throwGrenadeFromPlace)
+                botOwner_0.BotRequestController.CurRequest.Complete();
 
             bool_0 = false;
             bool_1 = false;

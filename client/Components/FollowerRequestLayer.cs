@@ -276,7 +276,7 @@ namespace friendlyPMC.Components
 
 
 
-            List<CustomNavigationPoint> customNavigationPoints = HasBoss() ? GetBoss().GetAreaCovers() : BossPlayers.Instance.GetCovers();
+            List<CustomNavigationPoint> customNavigationPoints = HasBoss() ? GetBoss().GetAreaCovers() : BossPlayers.GetAICovers();
 
             if (customNavigationPoints.Count > 0)
             {

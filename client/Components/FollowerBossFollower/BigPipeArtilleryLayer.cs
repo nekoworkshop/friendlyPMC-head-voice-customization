@@ -250,8 +250,14 @@ namespace friendlyPMC.Components.FollowerBossFollower
         {
             return followerFightLayer.EndHeal();
         }
-
-
+        public override AICoreActionEndStruct EndTakeItem()
+        {
+            return followerFightLayer.EndTakeItem();
+        }
+        public override AICoreActionEndStruct EndFollowerPatrolItem()
+        {
+            return followerFightLayer.EndFollowerPatrolItem();
+        }
         private void GetClosestCoverPoint(Vector3 centerPosition, float searchRadius)
         {
             customNavigationPoint_0 = followerFightLayer.GetClosestCoverPoint(centerPosition,searchRadius);

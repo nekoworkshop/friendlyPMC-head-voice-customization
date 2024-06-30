@@ -27,7 +27,7 @@ namespace friendlyPMC.Components
         {
             // order matters for which layer get the initial priority
             // - follow
-            FollowerLayer followLayer = new FollowerLayer(_owner, 51);
+            FollowerLayer followLayer = new FollowerLayer(_owner, 50);
             method_0(1, followLayer, true);
             // - requests
             FollowerRequestLayer layer4 = new FollowerRequestLayer(_owner, 55);
@@ -46,7 +46,7 @@ namespace friendlyPMC.Components
             GClass104 layer8 = new GClass104(_owner, 10, false, CoverLevel.Lay);
             method_0(7, layer8, true);
             // - item taker
-            FollowerLootLayer layer9 = new FollowerLootLayer(_owner, 50);
+            FollowerLootLayer layer9 = new FollowerLootLayer(_owner, 51);
             method_0(8, layer9, true);
         }
 

@@ -210,6 +210,26 @@ namespace friendlyPMC.Modules
                 (_follower.LootingBrain.ActiveItem != null || _follower.LootingBrain.ActiveCorpse != null);
         }
 
+        public static void RemoveTaker(BotOwner bot)
+        {
+            if (Instance == null) return;
+
+
+            BotFollowerPlayer follower = BossPlayers.Instance.GetFollower(bot);
+
+            if (follower != null && follower.LootingBrain != null)
+            {
+                follower.LootingBrain.DisableTransactions();
+                follower.LootingBrain.UpdateGridStats();
+                follower.LootingBrain.StopAllCoroutines();
+                follower.LootingBrain.ActiveItem = null;
+                follower.LootingBrain.ActiveCorpse = null;
+            }
+            // BotRequestType.throwGrenadeFromPlace is loot take
+            if (bot.BotRequestController.CurRequest != null && bot.BotRequestController.CurRequest.BotRequestType == BotRequestType.throwGrenadeFromPlace)
+                bot.BotRequestController.CurRequest.Complete();
+        }
+
         public static void StoreItem(string bot, Item item)
         {
             if(!Instance._lootedItems.ContainsKey(bot)) {

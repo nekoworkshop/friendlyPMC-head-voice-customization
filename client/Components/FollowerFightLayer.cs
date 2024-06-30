@@ -753,6 +753,15 @@ namespace friendlyPMC.Components
 
             return gstruct7_1;
         }
+
+        public override AICoreActionEndStruct EndTakeItem()
+        {
+            return new AICoreActionEndStruct("enemy.Present", true);
+        }
+        public override AICoreActionEndStruct EndFollowerPatrolItem()
+        {
+            return new AICoreActionEndStruct("enemy.Present", true);
+        }
         public override AICoreActionEndStruct ShallEndCurrentDecision(AICoreActionResultStruct<BotLogicDecision> curDecision)
         {
 
@@ -858,7 +867,7 @@ namespace friendlyPMC.Components
 
             this.coverTimer = 1.5f + Time.time;
 
-            List<CustomNavigationPoint> customNavigationPoints = HasBoss() ? GetBoss().GetAreaCovers() : BossPlayers.Instance.GetCovers();
+            List<CustomNavigationPoint> customNavigationPoints = HasBoss() ? GetBoss().GetAreaCovers() : BossPlayers.GetAICovers();
 
             if (customNavigationPoints.Count > 0)
             {

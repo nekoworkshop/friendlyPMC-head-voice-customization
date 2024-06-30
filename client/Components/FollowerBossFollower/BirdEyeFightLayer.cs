@@ -357,6 +357,15 @@ namespace friendlyPMC.Components.FollowerBossFollower
             return followerFightLayer.EndHeal();
         }
 
+        public override AICoreActionEndStruct EndTakeItem()
+        {
+            return followerFightLayer.EndTakeItem();
+        }
+        public override AICoreActionEndStruct EndFollowerPatrolItem()
+        {
+            return followerFightLayer.EndFollowerPatrolItem();
+        }
+
         protected bool HasBoss()
         {
             return followerFightLayer.HasBoss();

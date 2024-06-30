@@ -177,6 +177,7 @@ namespace friendlyPMC.Components
             return new AICoreActionEndStruct("enemy.None", true);
         }
 
+
         public override bool ShallUseNow()
         {
             botOwner_0.PriorityAxeTarget.FindTarget();
@@ -185,7 +186,7 @@ namespace friendlyPMC.Components
 
         protected virtual List<CustomNavigationPoint> GetNearGovers()
         {
-            return HasBoss() ? GetBoss().GetAreaCovers() : BossPlayers.Instance.GetCovers();
+            return HasBoss() ? GetBoss().GetAreaCovers() : BossPlayers.GetAICovers();
         }
 
         public override CustomNavigationPoint FindPoint(CoverSearchData data, Func<CoverSearchData, CustomNavigationPoint> p, bool checkCurrent)

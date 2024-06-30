@@ -27,6 +27,8 @@ namespace friendlyPMC.Components
         private Coroutine coverCoroutine;
 
         private float maximumDistance = 100f;
+
+        private Vector3 lastPosition;
         public pitAIBossPlayer(Player player) : base(player)
         {
             realPlayer = player;
@@ -76,7 +78,7 @@ namespace friendlyPMC.Components
                 float lastDist = 0f;
                 Vector3 centerPos = realPlayer.Transform.position;
 
-                BossPlayers.Instance.GetCovers().ForEach(point =>
+                BossPlayers.GetAICovers().ForEach(point =>
                 {
                     float sqrDist = (centerPos - point.Position).sqrMagnitude;
 

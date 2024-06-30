@@ -364,5 +364,10 @@ namespace friendlyPMC.Modules
         {
             return Instance.AddBossPlayer(player);
         }
+
+        public static List<CustomNavigationPoint> GetAICovers()
+        {
+            return Instance.GetCovers();
+        }
     }
 }
