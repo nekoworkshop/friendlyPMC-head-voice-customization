@@ -19,7 +19,6 @@ using LootingBots.Patch.Components;
 
 using friendlyPMC.Components;
 
-
 namespace friendlyPMC.Modules
 {
     internal class InteractableObjects
@@ -225,8 +224,8 @@ namespace friendlyPMC.Modules
                 follower.LootingBrain.ActiveItem = null;
                 follower.LootingBrain.ActiveCorpse = null;
             }
-            // BotRequestType.throwGrenadeFromPlace is loot take
-            if (bot.BotRequestController.CurRequest != null && bot.BotRequestController.CurRequest.BotRequestType == BotRequestType.throwGrenadeFromPlace)
+
+            if (bot.BotRequestController.CurRequest != null && bot.BotRequestController.CurRequest.BotRequestType == (BotRequestType)CustomBotRequestType.TakeLoot)
                 bot.BotRequestController.CurRequest.Complete();
         }
 

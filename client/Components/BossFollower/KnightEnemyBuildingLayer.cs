@@ -37,7 +37,7 @@ namespace friendlyPMC.Components.BossFollower
             if (
                    botOwner_0.BotRequestController.CurRequest != null &&
                    (botOwner_0.BotRequestController.CurRequest.BotRequestType == BotRequestType.attackClose ||
-                   botOwner_0.BotRequestController.CurRequest.BotRequestType == BotRequestType.warnPlayer)
+                   botOwner_0.BotRequestController.CurRequest.BotRequestType == (BotRequestType)CustomBotRequestType.Regroup)
                )
             {
 
@@ -92,7 +92,7 @@ namespace friendlyPMC.Components.BossFollower
 
             if (baseDecision.Action == BotLogicDecision.holdPosition)
             {
-                if (ordersChanged && request != null && request.BotRequestType == BotRequestType.warnPlayer)
+                if (ordersChanged && request != null && request.BotRequestType == (BotRequestType)CustomBotRequestType.Regroup)
                 {
                     if (Utils.Utils.GetNavDistance(botPosition, bossPosition) > friendlyPMC.regroupMinDistance.Value && (!botOwner_0.Memory.HaveEnemy || !botOwner_0.Memory.GoalEnemy.IsVisible))
                     {

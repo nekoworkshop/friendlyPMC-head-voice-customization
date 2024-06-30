@@ -8,7 +8,6 @@ using UnityEngine.AI;
 using Cysharp.Threading.Tasks;
 using System;
 
-using Aki.SinglePlayer.Utils.Insurance;
 using System.Collections;
 using System.Reflection;
 using EFT.InventoryLogic;
@@ -177,8 +176,8 @@ namespace friendlyPMC.Actions
                 }
             }
 
-            // BotRequestType.throwGrenadeFromPlace is loot take
-            if (botOwner_0.BotRequestController.CurRequest != null && botOwner_0.BotRequestController.CurRequest.BotRequestType == BotRequestType.throwGrenadeFromPlace)
+
+            if (botOwner_0.BotRequestController.CurRequest != null && botOwner_0.BotRequestController.CurRequest.BotRequestType == (BotRequestType)CustomBotRequestType.TakeLoot)
                 botOwner_0.BotRequestController.CurRequest.Complete();
 
             bool_0 = false;

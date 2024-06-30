@@ -256,7 +256,6 @@ namespace friendlyPMC.Components
                     if (_aiplayer.bossGroup != null)
                     {
                         _aiplayer.bossGroup.CheckAndAddEnemy(arg1.Player.iPlayer);
-                        _aiplayer.bossGroup.ReportAboutEnemy(arg1.Player.iPlayer, EEnemyPartVisibleType.visible);
                         _aiplayer.AddEnemy(arg1.Player.AIData.BotOwner);
                     }
 

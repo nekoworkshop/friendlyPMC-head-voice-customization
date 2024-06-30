@@ -48,7 +48,7 @@ namespace friendlyPMC.Components
                BotRequestType.wait,
                BotRequestType.followMe,
                BotRequestType.goToPoint,
-               BotRequestType.warnPlayer
+               (BotRequestType)CustomBotRequestType.Regroup
             };
 
             if (currRequest == null)
@@ -123,8 +123,7 @@ namespace friendlyPMC.Components
                     botOwner_0.Steering.LookToPoint(finPos);
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.goToPoint, "req:comeHere");
 
-                // warn is actually regroup for us
-                case BotRequestType.warnPlayer:
+                case (BotRequestType)CustomBotRequestType.Regroup:
                     botOwner_0.BotTalk.TrySay(EPhraseTrigger.Roger, false);
                     request.Complete();
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.followerPatrol, "backToFLB");

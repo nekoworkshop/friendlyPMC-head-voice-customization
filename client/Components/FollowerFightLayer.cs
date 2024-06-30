@@ -482,8 +482,7 @@ namespace friendlyPMC.Components
                 ordersAreAttack = false;
             }
 
-            // warn request is actually regroup for us
-            if (request != null && request.BotRequestType == BotRequestType.warnPlayer)
+            if (request != null && request.BotRequestType == (BotRequestType)CustomBotRequestType.Regroup)
             {
                 ordersAreReqroup = true;
             }
@@ -608,7 +607,11 @@ namespace friendlyPMC.Components
             if(request != null && request.BotRequestType == BotRequestType.throwGrenade)
                 return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.throwGrenadeFromPlace, "throwGrenadeRequest");
 
-            return DecideTactic();
+            AICoreActionResultStruct<BotLogicDecision> decision = DecideTactic();
+
+            if (ordersAreAttack) Components.Logger.LogInfo(decision.Reason);
+
+            return decision;
         }
 
         public override AICoreActionEndStruct EndHoldPosition()
@@ -790,7 +793,7 @@ namespace friendlyPMC.Components
             if(
                 !ordersIgnoreDecisions.Contains(curDecision.Reason) &&
                 botOwner_0.BotRequestController.CurRequest != null &&
-                botOwner_0.BotRequestController.CurRequest.BotRequestType == BotRequestType.warnPlayer &&
+                botOwner_0.BotRequestController.CurRequest.BotRequestType == (BotRequestType)CustomBotRequestType.Regroup &&
                 botOwner_0.Memory.HaveEnemy && !botOwner_0.Memory.GoalEnemy.IsVisible
             )
             {

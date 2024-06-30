@@ -4,7 +4,7 @@ namespace friendlyPMC.Requests
 {
     internal class FollowerRegroup : BotRequest
     {
-        public FollowerRegroup(IPlayer requester) : base(requester, BotRequestType.warnPlayer)
+        public FollowerRegroup(IPlayer requester) : base(requester, (BotRequestType)CustomBotRequestType.Regroup)
         {
         }
 

@@ -5,8 +5,9 @@ namespace friendlyPMC.Requests
 {
     internal class FollowerTakeLootRequest : BotRequest
     {
-        public FollowerTakeLootRequest(IPlayer requester) : base(requester, BotRequestType.throwGrenadeFromPlace) // dummy request
+        public FollowerTakeLootRequest(IPlayer requester) : base(requester, (BotRequestType)CustomBotRequestType.TakeLoot)
         {
+            Components.Logger.LogInfo("Request is " + BotRequestType.ToString());
         }
 
         public override bool CanProceed()

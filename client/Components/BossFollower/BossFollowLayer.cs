@@ -75,7 +75,7 @@ namespace friendlyPMC.Components.BossFollower
                     requestComeHere = false;
                 }
 
-                if (request.BotRequestType == BotRequestType.warnPlayer)
+                if (request.BotRequestType == (BotRequestType)CustomBotRequestType.Regroup)
                 {
                     requestRegroup = true;
                 }

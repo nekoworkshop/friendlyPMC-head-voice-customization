@@ -47,7 +47,7 @@ namespace friendlyPMC.Components.FollowerBossFollower
             {
                 if (
                         botOwner_0.BotRequestController.CurRequest != null &&
-                        (botOwner_0.BotRequestController.CurRequest.BotRequestType == BotRequestType.warnPlayer ||
+                        (botOwner_0.BotRequestController.CurRequest.BotRequestType == (BotRequestType)CustomBotRequestType.Regroup ||
                         botOwner_0.BotRequestController.CurRequest.BotRequestType == BotRequestType.attackClose)
                     )
                 {
@@ -83,7 +83,7 @@ namespace friendlyPMC.Components.FollowerBossFollower
             }
 
             // player needs help
-            if (ordersChanged && request != null && request.BotRequestType == BotRequestType.warnPlayer)
+            if (ordersChanged && request != null && request.BotRequestType == (BotRequestType)CustomBotRequestType.Regroup)
             {
                 if (!botOwner_0.Memory.HaveEnemy || !botOwner_0.Memory.GoalEnemy.IsVisible)
                 {

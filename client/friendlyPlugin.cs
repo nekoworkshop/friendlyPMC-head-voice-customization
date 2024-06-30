@@ -7,8 +7,10 @@ using EFT.UI.Gestures;
 using friendlyPMC.Modules;
 using friendlyPMC.Patches;
 using friendlyPMC.Utils;
+using HarmonyLib;
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Security.Cryptography;
 using UnityEngine;
 
@@ -16,6 +18,13 @@ using Logger = friendlyPMC.Components.Logger;
 
 namespace friendlyPMC
 {
+
+    public enum CustomBotRequestType
+    {
+        TakeLoot = 20,
+        Regroup = 30
+    }
+
     [BepInPlugin("xyz.pit.companion", "friendlyPMC", "3.3.2")]
     [BepInDependency("com.spt-aki.core", "3.8.0")]
     [BepInDependency("xyz.drakia.bigbrain")]
@@ -206,6 +215,7 @@ namespace friendlyPMC
                         PingTeamates.Instance.Ping(boss);
                     }
                 }
+
             }
 
         }
