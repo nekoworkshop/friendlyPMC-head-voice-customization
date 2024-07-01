@@ -12,6 +12,9 @@ using System.Collections;
 using System.Reflection;
 using EFT.InventoryLogic;
 using System.Collections.Generic;
+using HarmonyLib;
+using LootingBots.Patch.Components;
+using LootingBots.Patch.Util;
 
 namespace friendlyPMC.Actions
 {
@@ -33,12 +36,6 @@ namespace friendlyPMC.Actions
         public void EnableTransactions()
         {
             _follower.LootingBrain.EnableTransactions();
-            _follower.LootingBrain.UpdateGridStats();
-        }
-
-        public void DisableTransactions()
-        {
-            _follower.LootingBrain.DisableTransactions();
             _follower.LootingBrain.UpdateGridStats();
         }
 
@@ -154,21 +151,34 @@ namespace friendlyPMC.Actions
         private async UniTask PickUpItem()
         {
 
+            try
+            {
 
-            EnableTransactions();
+                EnableTransactions();
 
-            Item item = _follower.LootingBrain.ActiveItem.Item;
-            bool result = await _follower.TransactionController.TryPickupItem(item);
+                Item item = _follower.LootingBrain.ActiveItem.Item;
+                bool result = false;
 
-            if(result && _follower.IsSquadMate) { 
-                try
+                result = await _follower.TransactionController.TryPickupItem(item);
+
+                if (result && _follower.IsSquadMate)
                 {
-                    InteractableObjects.StoreItem(botOwner_0.ProfileId, item);
+                    try
+                    {
+                        InteractableObjects.StoreItem(botOwner_0.ProfileId, item);
+                    }
+                    catch (Exception ex)
+                    {
+                        Components.Logger.LogInfo("Failed to store item for retrival: " + ex.Message);
+                    }
                 }
-                catch (Exception ex)
-                {
-                    Components.Logger.LogInfo("Failed to store item for retrival: " + ex.Message);
-                }
+                
+                _follower.LootingBrain.CleanupItem(result, item);
+                _follower.LootingBrain.OnLootTaskEnd(result);
+
+            } catch(Exception ex)
+            {
+                Components.Logger.LogInfo("Failed to pickup loot: " + ex.Message);
             }
 
             InteractableObjects.RemoveTaker(botOwner_0);

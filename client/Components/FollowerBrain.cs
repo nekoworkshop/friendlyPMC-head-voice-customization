@@ -78,17 +78,19 @@ namespace friendlyPMC.Components
 
         public virtual void OnDead(EDamageType damageType)
         {
-            BossPlayers.Instance.RemoveFollower(_owner, _boss);
+            BossPlayers.RemoveFollower(_owner, _boss);
             ClearFollowerPatrol();
             InteractableObjects.ClearStoredItems(_owner.ProfileId);
+            InteractableObjects.RemoveTaker(_owner);
 
         }
 
         public virtual void OnLeave(BotOwner _bot)
         {
-            BossPlayers.Instance.RemoveFollower(_owner, _boss);
+            BossPlayers.RemoveFollower(_owner, _boss);
             ClearFollowerPatrol();
             InteractableObjects.ClearStoredItems(_owner.ProfileId);
+            InteractableObjects.RemoveTaker(_owner);
         }
 
 

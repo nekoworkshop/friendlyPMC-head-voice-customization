@@ -14,6 +14,8 @@ namespace friendlyPMC.Components
         float suppressTime = 0f;
         float doorOpenTimer = 0f;
 
+        private readonly float sprintDistance = 15f;
+
         private CustomNavigationPoint customNavigationPoint_0;
         public FollowerRequestLayer(BotOwner bot, int priority) : base(bot, priority)
         {
@@ -127,9 +129,18 @@ namespace friendlyPMC.Components
                     Vector3 finPos = requestPos + direction * offset;
                     finPos.y = requester.PlayerBody.PlayerBones.Head.position.y;
 
+                    Vector3 point = new Vector3(finPos.x, requestPos.y, finPos.z);
+                    
+                    botOwner_0.GoToSomePointData.SetPoint(point);
+
+                    botOwner_0.Steering.LookToPoint(new Vector3(requestPos.x, requester.PlayerBody.PlayerBones.Head.position.y, requestPos.z));
+                    
+                    bool shouldSprint01 = Vector3.Distance(point, botOwner_0.GetPlayer.Transform.position) >= sprintDistance;
+                    botOwner_0.GoToSomePointData.UpdateToGo(shouldSprint01);
+                    if (!shouldSprint01) botOwner_0.Sprint(false);
+
                     botOwner_0.BotRequestController.CurRequest.Complete();
 
-                    botOwner_0.GoToSomePointData.SetPoint(new Vector3(finPos.x, requestPos.y, finPos.z));
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.goToPoint, "req:comeHere");
 
                 case (BotRequestType)CustomBotRequestType.Regroup:
@@ -181,6 +192,12 @@ namespace friendlyPMC.Components
 
                     botOwner_0.GoToSomePointData.SetPoint(finalPosition);
                     botOwner_0.Steering.LookToPoint(finalPosition);
+                    bool shouldSprint02 = Vector3.Distance(finalPosition, botOwner_0.GetPlayer.Transform.position) >= sprintDistance;
+                    botOwner_0.GoToSomePointData.UpdateToGo(shouldSprint02);
+                    if (!shouldSprint02) botOwner_0.Sprint(false);
+
+                    botOwner_0.BotRequestController.CurRequest.Complete();
+
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.goToPoint, "req:goCheck");
 
                 case BotRequestType.doorOpen:
@@ -189,7 +206,7 @@ namespace friendlyPMC.Components
             }
 
             botOwner_0.BotTalk.TrySay(EPhraseTrigger.Negative, false);
-            return new AICoreActionResultStruct<BotLogicDecision>(HoldOrCover(botOwner_0), "req:Error");
+            return new AICoreActionResultStruct<BotLogicDecision>(HasBoss() ? BotLogicDecision.followerPatrol : HoldOrCover(botOwner_0), "req:Error");
         }
 
 
@@ -226,31 +243,6 @@ namespace friendlyPMC.Components
                 return this.gstruct7_1;
             }
             return this.gstruct7_0;
-        }
-
-        public override AICoreActionEndStruct EndGoToPoint()
-        {
-            BotRequest curRequest = this.botOwner_0.BotRequestController.CurRequest;
-            EnemyInfo goalEnemy = botOwner_0.Memory.GoalEnemy;
-            if (goalEnemy != null)
-            {
-                if(curRequest != null && curRequest.BotRequestType == BotRequestType.goToPoint)
-                {
-                    curRequest.Complete();
-                }
-                return new AICoreActionEndStruct("Enemy", true);
-            }
-
-            if (botOwner_0.GoToSomePointData.IsCome() || botOwner_0.Mover.IsComeTo(0.5f,false))
-            {
-                if (curRequest != null && curRequest.BotRequestType == BotRequestType.goToPoint)
-                {
-                    curRequest.Complete();
-                }
-                return new AICoreActionEndStruct("Come", true);
-            }
-
-            return gstruct7_1;
         }
 
         public override CustomNavigationPoint FindPoint(CoverSearchData data, Func<CoverSearchData, CustomNavigationPoint> p, bool checkCurrent)

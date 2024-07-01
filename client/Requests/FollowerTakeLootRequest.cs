@@ -7,7 +7,7 @@ namespace friendlyPMC.Requests
     {
         public FollowerTakeLootRequest(IPlayer requester) : base(requester, (BotRequestType)CustomBotRequestType.TakeLoot)
         {
-            Components.Logger.LogInfo("Request is " + BotRequestType.ToString());
+            
         }
 
         public override bool CanProceed()

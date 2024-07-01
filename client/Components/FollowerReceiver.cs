@@ -169,15 +169,33 @@ namespace friendlyPMC.Components
                             // else move somewhere in front of the player
                             else
                             {
+                                BotOwner closest = null;
+                                float dist = Mathf.Infinity;
+                                pitAIBossPlayer boss = BossPlayers.Instance.GetBossPlayer(data.Player.ProfileId);
+                                Vector3 bossPos = boss.realPlayer.Transform.position;
+
                                 FollowerGoCheck gclass = new FollowerGoCheck(data.Player);
-                                if (
-                                    gclass.CanRequest(botOwner_0) &&
-                                    botOwner_0.BotsGroup.RequestsController.TryAddRequest(gclass)
-                                )
+
+                                boss.Followers.ForEach(fl =>
+                                {
+                                    if (!gclass.CanRequest(botOwner_0)) return;
+
+                                    Vector3 pos = fl.GetPlayer.Transform.position;
+                                    float fldist = (bossPos - pos).sqrMagnitude;
+                                    if (fldist < dist)
+                                    {
+                                        closest = fl;
+                                        dist = fldist;
+                                    }
+
+                                });
+                                // - the closest bot shall move
+                                if (closest != null && closest == botOwner_0 && botOwner_0.BotsGroup.RequestsController.TryAddRequest(gclass))
                                 {
                                     gclass.AddPossibleExecutors(botOwner_0);
                                     gclass.SetGroup(botOwner_0.BotsGroup.RequestsController);
                                 }
+                                
                             }
                         }
                     }
@@ -253,6 +271,8 @@ namespace friendlyPMC.Components
                 }
                 // force current layer to trigger end decision
                 AccessTools.Field(typeof(BaseLogicLayerClass), "bool_1").SetValue(botOwner_0.Brain.BaseBrain.CurLayerInfo,true);
+                // try to get bot unstuck in item taker logic
+                InteractableObjects.RemoveTaker(botOwner_0);
 
                 return;
             }
@@ -337,10 +357,7 @@ namespace friendlyPMC.Components
                 // on cover me, make bot follow boss near
                 if (info.phrase == EPhraseTrigger.CoverMe)
                 {
-                    if (!isFollowerBoss)
-                    {
-                        FollowerPatrolInstances.SetNearPatrol(botOwner_0);
-                    }
+                    FollowerPatrolInstances.SetNearPatrol(botOwner_0);
                 }
                 // on get back make bot follow boss at a distance
                 else if(info.phrase == EPhraseTrigger.GetBack)
@@ -602,7 +619,7 @@ namespace friendlyPMC.Components
 
                     if (follower != null)
                     {
-                        BossPlayers.Instance.RemoveFollower(botOwner_0, boss, true);
+                        BossPlayers.RemoveFollower(botOwner_0, boss, true);
                     }
 
                 }

@@ -218,9 +218,10 @@ namespace friendlyPMC.Modules
 
             if (follower != null && follower.LootingBrain != null)
             {
+                follower.LootingBrain.StopAllCoroutines();
                 follower.LootingBrain.DisableTransactions();
                 follower.LootingBrain.UpdateGridStats();
-                follower.LootingBrain.StopAllCoroutines();
+
                 follower.LootingBrain.ActiveItem = null;
                 follower.LootingBrain.ActiveCorpse = null;
             }

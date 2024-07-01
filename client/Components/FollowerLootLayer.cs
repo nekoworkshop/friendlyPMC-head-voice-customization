@@ -1,5 +1,6 @@
 ﻿using EFT;
 using EFT.Interactive;
+using EFT.InventoryLogic;
 using friendlyPMC.Modules;
 
 using LootingBots.Brain.Logics;
@@ -62,7 +63,13 @@ namespace friendlyPMC.Components
             if (!InteractableObjects.IsTaker(botOwner_0) || (_follower.LootingBrain.ActiveItem == null && _follower.LootingBrain.ActiveCorpse == null))
             {
                 InteractableObjects.RemoveTaker(botOwner_0);
-                return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.followerPatrol, "backToFLB");
+                return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.followerPatrol, "pickupError");
+            }
+            
+            if (_follower.LootingBrain.ActiveItem != null && botOwner_0.ItemTaker.method_0(_follower.LootingBrain.ActiveItem.Item) == null)
+            {
+                InteractableObjects.RemoveTaker(botOwner_0);
+                return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.followerPatrol, "noSpace");
             }
 
             return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.botTakeItem, "takeItem");

@@ -221,7 +221,7 @@ namespace friendlyPMC.Modules
             return _follower;
         }
 
-        public void RemoveFollower(BotOwner bot, pitAIBossPlayer player,bool dismissed = false)
+        public void RemoveBotFollower(BotOwner bot, pitAIBossPlayer player,bool dismissed = false)
         {
 
             BotFollowerPlayer _follower = null;
@@ -378,6 +378,11 @@ namespace friendlyPMC.Modules
         public static bool IsBossGroup(int it)
         {
             return Instance.IsFollowerGroup(it);
+        }
+
+        public static void RemoveFollower(BotOwner bot, pitAIBossPlayer player, bool dismissed = false)
+        {
+            Instance.RemoveBotFollower(bot, player, dismissed);
         }
     }
 }

@@ -70,6 +70,13 @@ namespace friendlyPMC.Components
 
             bool hadEnemy = _bot.Memory.HaveEnemy;
             // deactivate old layers
+
+            // force current layer to trigger end decision
+            try
+            {
+                AccessTools.Field(typeof(BaseLogicLayerClass), "bool_1").SetValue(_bot.Brain.BaseBrain.CurLayerInfo, true);
+            } catch { }
+
             var baseBrain = _bot.Brain.BaseBrain;
             // guess work because we cannot access the private property dictionary_0 where the layers are, but no brain has 20 layers, usually it's 10
             for (int i = 1; i < 20; i++)
@@ -89,6 +96,16 @@ namespace friendlyPMC.Components
             {
                 _bot.BotFollower.BossToFollow.RemoveFollower(_bot);
                 _bot.BotFollower.BossToFollow = null;
+            }
+            // bot might have request going on, dispose it
+            if (_bot.BotRequestController.CurRequest != null)
+            {
+                _bot.BotRequestController.CurRequest.Complete();
+            }
+            // bot might have an enemy in his mind, clear it
+            if (_bot.Memory.HaveEnemy)
+            {
+                _bot.Memory.DeleteInfoAboutEnemy(_bot.Memory.GoalEnemy.Person);
             }
 
             // deactivate old brain

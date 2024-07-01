@@ -204,8 +204,17 @@ namespace friendlyPMC.Components
         }
         public override AICoreActionEndStruct EndGoToPoint()
         {
-            if (botOwner_0.GoToSomePointData.IsCome()) return new AICoreActionEndStruct("point.Reached", true);
-            else if (botOwner_0.Memory.HaveEnemy) return new AICoreActionEndStruct("enemy.Has", true);
+            if (botOwner_0.Memory.HaveEnemy) return new AICoreActionEndStruct("enemy.Has", true);
+
+            BotRequest curRequest = this.botOwner_0.BotRequestController.CurRequest;
+            if (botOwner_0.GoToSomePointData.IsCome() || botOwner_0.Mover.IsComeTo(0.5f, false))
+            {
+                if (curRequest != null && curRequest.BotRequestType == BotRequestType.goToPoint)
+                {
+                    curRequest.Complete();
+                }
+                return new AICoreActionEndStruct("point.Reached", true);
+            }
             return new AICoreActionEndStruct(false);
         }
 
