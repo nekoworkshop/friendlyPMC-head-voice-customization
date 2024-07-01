@@ -49,14 +49,37 @@ namespace friendlyPMC.Patches
                 return true;
             }
 
-            var plBoss = BossPlayers.Instance.GetBossPlayer(person.ProfileId);
+            var plBoss = BossPlayers.GetBoss(person.ProfileId);
+            var isgroup = BossPlayers.IsBossGroup(__instance.Id);
             // prevent boss player from being added as enemy to the group
-            if (BossPlayers.Instance.IsFollowerGroup(__instance.Id) && plBoss != null)
+            if (isgroup && plBoss != null)
             {
                 BotsGroup bossGroup = plBoss.bossGroup;
                 if (bossGroup != null && __instance.Id == bossGroup.Id)
                 {
                     return false;
+                }
+            // whoever makes the player an enemy is our enemy
+            } 
+            else if (!isgroup && plBoss != null)
+            {
+                try
+                {
+                    BotsGroup bossGroup = plBoss.bossGroup;
+                    if (bossGroup != null)
+                    {
+                        var _members = AccessTools.Field(typeof(BotsGroup), "_members").GetValue(__instance) as List<BotOwner>;
+                        if (_members != null)
+                        {
+                            foreach (var item in _members)
+                            {
+                                bossGroup.AddEnemy(item, EBotEnemyCause.checkAddTODO);
+                            }
+                        }
+                    }
+                } catch (Exception ex)
+                {
+                    Components.Logger.LogInfo("Failed to make a group an enemy: "+ ex.Message);
                 }
             }
 

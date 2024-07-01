@@ -385,7 +385,7 @@ namespace friendlyPMC.Patches
 
                             Timer.OnTimer += () =>
                             {
-                                follower.BotTalk.TrySay(EPhraseTrigger.Ready, false);
+                                follower.BotTalk.TrySay(EPhraseTrigger.Ready, true);
                             };
 
                         }), true, stopWatch);
@@ -556,7 +556,7 @@ namespace friendlyPMC.Patches
 
                     Timer.OnTimer += () =>
                     {
-                        follower.BotTalk.TrySay(EPhraseTrigger.Ready, false);
+                        follower.BotTalk.TrySay(EPhraseTrigger.Ready, true);
                     };
 
                 }) , false, stopWatch );
