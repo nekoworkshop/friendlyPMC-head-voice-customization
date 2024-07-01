@@ -160,12 +160,7 @@ namespace friendlyPMC.Actions
             Item item = _follower.LootingBrain.ActiveItem.Item;
             bool result = await _follower.TransactionController.TryPickupItem(item);
 
-            if(!result)
-            {
-                InteractableObjects.RemoveTaker(botOwner_0);
-            } else if(_follower.IsSquadMate)
-            {
-                DisableTransactions();
+            if(result && _follower.IsSquadMate) { 
                 try
                 {
                     InteractableObjects.StoreItem(botOwner_0.ProfileId, item);
@@ -176,9 +171,7 @@ namespace friendlyPMC.Actions
                 }
             }
 
-
-            if (botOwner_0.BotRequestController.CurRequest != null && botOwner_0.BotRequestController.CurRequest.BotRequestType == (BotRequestType)CustomBotRequestType.TakeLoot)
-                botOwner_0.BotRequestController.CurRequest.Complete();
+            InteractableObjects.RemoveTaker(botOwner_0);
 
             bool_0 = false;
             bool_1 = false;

@@ -210,7 +210,7 @@ namespace friendlyPMC.Components
             List<EPhraseTrigger> bossNoPhrase = new List<EPhraseTrigger>
             {
                 EPhraseTrigger.OpenDoor,
-                EPhraseTrigger.Gogogo
+                EPhraseTrigger.Gogogo,
             };
             List<EPhraseTrigger> bossBusyIgnore = new List<EPhraseTrigger>
             {
@@ -224,7 +224,9 @@ namespace friendlyPMC.Components
                 EPhraseTrigger.Fire,
                 EPhraseTrigger.GetBack,
                 EPhraseTrigger.GoForward,
-                EPhraseTrigger.CoverMe
+                EPhraseTrigger.CoverMe,
+                EPhraseTrigger.CheckHim,
+                EPhraseTrigger.LootBody
             };
 
             bool isFollowerBoss = false;
@@ -562,6 +564,18 @@ namespace friendlyPMC.Components
                         BotOwner closest = null;
                         boss.Followers.ForEach(fl =>
                         {
+                            bool isAiBoss = false;
+                            foreach (WildSpawnType role in Utils.Utils.BossFollowersRoles)
+                            {
+                                if (botOwner_0.IsRole(role))
+                                {
+                                    isAiBoss = true;
+                                    break;
+                                }
+                            }
+                            
+                            if (isAiBoss) return;
+
                             Vector3 pos = fl.GetPlayer.Transform.position;
                             float fldist = (item.transform.position - pos).sqrMagnitude;
                             //fl.HealthController.

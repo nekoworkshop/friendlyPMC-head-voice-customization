@@ -25,7 +25,7 @@ namespace friendlyPMC
         Regroup = 30
     }
 
-    [BepInPlugin("xyz.pit.companion", "friendlyPMC", "3.3.2")]
+    [BepInPlugin("xyz.pit.companion", "friendlyPMC", "3.3.3")]
     [BepInDependency("com.spt-aki.core", "3.8.0")]
     [BepInDependency("xyz.drakia.bigbrain")]
     [BepInDependency("xyz.drakia.waypoints")]
@@ -75,7 +75,7 @@ namespace friendlyPMC
         {
 
             squadSpawn = Config.Bind(baseSettings, "1 Squad spawn", true, new ConfigDescription("Spawn with followers"));
-            squadSize = Config.Bind(baseSettings, "1.4  -  Squad size", 2, new ConfigDescription("Number of followers to spawn with", new AcceptableValueRange<int>(1, 20)));
+            squadSize = Config.Bind(baseSettings, "1.4  -  Squad size", 2, new ConfigDescription("Number of followers to spawn with", new AcceptableValueRange<int>(1, 30)));
 
             copyEquip = Config.Bind(baseSettings, "1.6  -  Clone equipment", true, new ConfigDescription("When Squad Spawn is active, spawned followers will have the same equipment as the player"));
             extraPickups = Config.Bind(baseSettings, "2 Maximum followers", 3, new ConfigDescription("Maximum number of followers the player can have. Cannot be less than Squad Size if Squad Spawn is active", new AcceptableValueRange<int>(1, 30)));
