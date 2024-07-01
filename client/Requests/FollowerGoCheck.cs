@@ -17,7 +17,8 @@ namespace friendlyPMC.Actions
         public override bool CanRequest(BotOwner owner)
         {
             if (
-                owner.IsRole(WildSpawnType.followerBirdEye)
+                owner.IsRole(WildSpawnType.followerBirdEye) ||
+                owner.IsRole(WildSpawnType.followerBigPipe)
             )
             {
                 if (Requester.IsAI && Requester.Profile.Info.Settings.Role == WildSpawnType.bossKnight)

@@ -177,7 +177,6 @@ namespace friendlyPMC.Components
             return new AICoreActionEndStruct("enemy.None", true);
         }
 
-
         public override bool ShallUseNow()
         {
             botOwner_0.PriorityAxeTarget.FindTarget();

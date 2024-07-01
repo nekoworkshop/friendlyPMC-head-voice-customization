@@ -10,7 +10,7 @@ namespace friendlyPMC.Components.FollowerBossFollower
         BigPipeArtilleryLayer fightLayer;
         public BigPipeFollowerBrain(BotOwner owner, pitAIBossPlayer boss) : base(owner, boss)
         {
-            owner.Tactic.IsCurTactic(BotsGroup.BotCurrentTactic.Attack);
+            _currentTactic = "Assist";
         }
 
         public override void AddLayers()

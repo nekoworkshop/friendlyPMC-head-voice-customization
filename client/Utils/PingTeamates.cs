@@ -196,6 +196,15 @@ namespace friendlyPMC.Utils
                             else stringBuilder.Append($"HP: {hpmax}");
                         }
 
+                        if (bt.Data.Brain.BaseBrain is FollowerBrain)
+                        {
+                            string tactic = (bt.Data.Brain.BaseBrain as FollowerBrain).currentTactic;
+                            if (tactic != null)
+                            {
+                                stringBuilder.Append($" | Mode: {tactic}");
+                            }
+                        }
+
                         bt.GuiContent.text = stringBuilder.ToString();
 
                         Vector2 guiSize = guiStyle.CalcSize(bt.GuiContent);

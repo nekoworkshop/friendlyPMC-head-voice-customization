@@ -14,6 +14,7 @@ namespace friendlyPMC.Components.FollowerBossFollower
         protected BirdEyeFightLayer fightLayer;
         public BirdEyeFollowerBrain(BotOwner owner, pitAIBossPlayer boss) : base(owner, boss)
         {
+            _currentTactic = "Assist";
         }
 
         public override void AddLayers()

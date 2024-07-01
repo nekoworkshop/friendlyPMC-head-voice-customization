@@ -8,7 +8,7 @@ namespace friendlyPMC.Components.BossFollower
         KnightFightLayer gclass65_0_1;
         public KnightFollowerBrain(BotOwner owner, pitAIBossPlayer boss) : base(owner, boss)
         {
-            owner.Tactic.IsCurTactic(BotsGroup.BotCurrentTactic.Attack);
+            _currentTactic = "Assist";
         }
 
         public override void AddLayers()

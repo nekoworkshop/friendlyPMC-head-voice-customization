@@ -365,9 +365,19 @@ namespace friendlyPMC.Modules
             return Instance.AddBossPlayer(player);
         }
 
+        public static pitAIBossPlayer GetBoss(string name)
+        {
+            return Instance.GetBossPlayer(name);
+        }
+
         public static List<CustomNavigationPoint> GetAICovers()
         {
             return Instance.GetCovers();
+        }
+
+        public static bool IsBossGroup(int it)
+        {
+            return Instance.IsFollowerGroup(it);
         }
     }
 }

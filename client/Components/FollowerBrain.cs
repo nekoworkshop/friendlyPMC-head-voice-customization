@@ -11,6 +11,17 @@ namespace friendlyPMC.Components
         FollowerFightLayer fightLayer;
 
         protected pitAIBossPlayer _boss;
+
+        protected string _currentTactic = null;
+
+        public string currentTactic
+        {
+            get
+            {
+                return _currentTactic;
+            }
+        }
+
         public FollowerBrain(BotOwner owner, pitAIBossPlayer boss) : base(owner)
         {
             AddLayers();
@@ -20,6 +31,9 @@ namespace friendlyPMC.Components
             owner.GetPlayer.HealthController.DiedEvent += OnDead;
             owner.LeaveData.OnLeave += OnLeave;
             owner.Memory.OnAddEnemy += OnAddEnemy;
+
+
+            _currentTactic = "Balance";
 
         }
         /** Exposed method for adding brain layers so it can be patched by addons **/
@@ -32,9 +46,11 @@ namespace friendlyPMC.Components
             // - requests
             FollowerRequestLayer layer4 = new FollowerRequestLayer(_owner, 55);
             method_0(2, layer4, true);
+            
             // - fight
             FollowerFightLayer layer6 = new FollowerFightLayer(_owner, 60);
             fightLayer = layer6;
+
             method_0(3, layer6, true);
             // - grenade
             GClass36 layer = new GClass36(_owner, 130);
@@ -122,6 +138,11 @@ namespace friendlyPMC.Components
                 fightLayer.SetBossFightTactic(tactic);
                 BossOrdersChanged();
             }
+        }
+
+        public virtual void SetTactic(string tactic)
+        {
+            _currentTactic = tactic;
         }
 
         public virtual void BossOrdersChanged()

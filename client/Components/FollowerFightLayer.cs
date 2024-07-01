@@ -52,14 +52,20 @@ namespace friendlyPMC.Components
             if (tactic == "ally")
             {
                 allyTactic = true;
+                (botOwner_0.Brain.BaseBrain as FollowerBrain).SetTactic("Assist");
             }
             else if(tactic == "push")
             {
                 rushTactic = true;
+                (botOwner_0.Brain.BaseBrain as FollowerBrain).SetTactic("Push");
             }
             else if (tactic == "defend") 
             {
                 holdTactic = true;
+                (botOwner_0.Brain.BaseBrain as FollowerBrain).SetTactic("Hold");
+            } else
+            {
+                (botOwner_0.Brain.BaseBrain as FollowerBrain).SetTactic("Balance");
             }
         }
 
