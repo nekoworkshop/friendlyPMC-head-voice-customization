@@ -105,22 +105,31 @@ namespace friendlyPMC.Components
         {
             BotRequest request = botOwner_0.BotRequestController.CurRequest;
 
+            IPlayer requester = request != null ? botOwner_0.BotRequestController.CurRequest.Requester : null;
+
+            if(request == null)
+            {
+                return new AICoreActionResultStruct<BotLogicDecision>(HoldOrCover(botOwner_0), "req:Error");
+            }
+
             switch (request.BotRequestType)
             {
                 // on follow me request from the boss, just come closer to the boss or get out of hold position
                 case BotRequestType.followMe:
-                    botOwner_0.BotTalk.TrySay(EPhraseTrigger.Going, false);
-                    request.Complete();
+                    botOwner_0.Gesture.TryGestus(EGesture.Good, false);
 
-                    Vector3 requestPos = botOwner_0.BotRequestController.CurRequest.Requester.Position;
+                    Vector3 requestPos = requester.Position;
+                    Vector3 dir01 = requester.LookDirection;
 
-                    float offset = GClass760.RandomSing() * GClass760.Random(0.5f, 1.5f);
-                    Vector3 direction = Vector3.Cross(Vector3.up, requestPos).normalized;
+                    float offset = GClass760.RandomSing() * GClass760.Random(1f, 2f);
+                    Vector3 direction = Vector3.Cross(Vector3.up, dir01).normalized;
 
                     Vector3 finPos = requestPos + direction * offset;
+                    finPos.y = requester.PlayerBody.PlayerBones.Head.position.y;
+
+                    botOwner_0.BotRequestController.CurRequest.Complete();
 
                     botOwner_0.GoToSomePointData.SetPoint(new Vector3(finPos.x, requestPos.y, finPos.z));
-                    botOwner_0.Steering.LookToPoint(finPos);
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.goToPoint, "req:comeHere");
 
                 case (BotRequestType)CustomBotRequestType.Regroup:
@@ -139,12 +148,7 @@ namespace friendlyPMC.Components
                 case BotRequestType.getInCover:
                 case BotRequestType.hide:
 
-                    if (botOwner_0.Memory.IsInCover)
-                    {
-                        botOwner_0.BotTalk.TrySay(EPhraseTrigger.Going, false);
-                        return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.holdPosition, "req:stayHidden");
-                    }
-                    GetCoverPoint(botOwner_0.GetPlayer.Transform.position, 40f);
+                    GetCoverPoint(botOwner_0.GetPlayer.Transform.position, 50f);
                     if (customNavigationPoint_0 != null)
                     {
                         botOwner_0.BotTalk.TrySay(EPhraseTrigger.Going, false);
@@ -162,16 +166,16 @@ namespace friendlyPMC.Components
                     }
 
                 case BotRequestType.goToPoint:
-                    IPlayer requester = botOwner_0.BotRequestController.CurRequest.Requester;
 
-                    Vector3 dir = requester.LookDirection;
+                    Vector3 dir02 = requester.LookDirection;
                     float forwardDistance = GClass760.Random(3f, 5f);
 
-                    Vector3 forwardPosition = requester.Position + dir.normalized * forwardDistance;
+                    Vector3 forwardPosition = requester.Position + dir02.normalized * forwardDistance;
                     float lateralOffset = GClass760.RandomSing() * GClass760.Random(0.5f, 1.5f);
-                    Vector3 lateralDirection = Vector3.Cross(Vector3.up, dir).normalized;
+                    Vector3 lateralDirection = Vector3.Cross(Vector3.up, dir02).normalized;
 
                     Vector3 finalPosition = forwardPosition + lateralDirection * lateralOffset;
+                    finalPosition.y = requester.PlayerBody.PlayerBones.Head.position.y;
 
                     botOwner_0.BotTalk.TrySay(EPhraseTrigger.Going, false);
 

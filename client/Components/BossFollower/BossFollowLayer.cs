@@ -102,6 +102,7 @@ namespace friendlyPMC.Components.BossFollower
                     Vector3 lateralDirection = Vector3.Cross(Vector3.up, dir).normalized;
 
                     Vector3 finalPosition = forwardPosition + lateralDirection * lateralOffset;
+                    finalPosition.y = requester.PlayerBody.PlayerBones.Head.position.y;
 
                     botOwner_0.GoToSomePointData.SetPoint(finalPosition);
                     botOwner_0.Steering.LookToPoint(finalPosition);
@@ -124,6 +125,7 @@ namespace friendlyPMC.Components.BossFollower
                     Vector3 direction = Vector3.Cross(Vector3.up, dir).normalized;
 
                     Vector3 finPos = requestPos + direction * offset;
+                    finPos.y = requester.PlayerBody.PlayerBones.Head.position.y;
 
                     botOwner_0.BotRequestController.CurRequest.Complete();
 
@@ -166,24 +168,7 @@ namespace friendlyPMC.Components.BossFollower
             return base.GetDecision();
         }
 
-        public override AICoreActionEndStruct EndGoToPoint()
-        {
-            if(botOwner_0.GoToSomePointData.IsCome()) return new AICoreActionEndStruct("point.Reached", true);
-            else if(botOwner_0.Memory.HaveEnemy) return new AICoreActionEndStruct("enemy.Has", true);
-            return new AICoreActionEndStruct(false);
-        }
-
-        public override AICoreActionEndStruct EndAttackMoving()
-        {
-            if (!botOwner_0.Memory.HaveEnemy) return new AICoreActionEndStruct("enemy.None", true);
-            return base.EndAttackMoving();
-        }
-
-        public override AICoreActionEndStruct EndRunToCover()
-        {
-            if (!botOwner_0.Memory.HaveEnemy) return new AICoreActionEndStruct("enemy.None", true);
-            return base.EndRunToCover();
-        }
+        
         protected float GetNavDistance(Vector3 point)
         {
             return Utils.Utils.GetNavDistance(botOwner_0.GetPlayer.Transform.position,point);

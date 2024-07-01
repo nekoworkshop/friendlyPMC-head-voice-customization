@@ -19,6 +19,11 @@ namespace friendlyPMC.Components
         {
             float_2 = Time.time + 60f;
         }
+        public override bool ShallUseNow()
+        {
+            botOwner_0.PriorityAxeTarget.FindTarget();
+            return HasBoss() && !InteractableObjects.IsTaker(botOwner_0);
+        }
 
         public override string Name()
         {
@@ -170,17 +175,38 @@ namespace friendlyPMC.Components
 
         public override AICoreActionEndStruct EndRunToCover()
         {
-            return new AICoreActionEndStruct("enemy.None", true);
+            if (!botOwner_0.Memory.HaveEnemy) return new AICoreActionEndStruct("enemy.None", true);
+            return base.EndRunToCover();
         }
         public override AICoreActionEndStruct EndSuppressFire()
         { 
             return new AICoreActionEndStruct("enemy.None", true);
         }
 
-        public override bool ShallUseNow()
+        public override AICoreActionEndStruct EndRunToEnemy()
         {
-            botOwner_0.PriorityAxeTarget.FindTarget();
-            return HasBoss() && !InteractableObjects.IsTaker(botOwner_0);
+            if (!botOwner_0.Memory.HaveEnemy)
+            {
+                return new AICoreActionEndStruct("enemy.None", true);
+            }
+
+            return base.EndRunToEnemy();
+        }
+
+        public override AICoreActionEndStruct EndAttackMoving()
+        {
+            if (!botOwner_0.Memory.HaveEnemy)
+            {
+                return new AICoreActionEndStruct("enemy.None", true);
+            }
+
+            return base.EndAttackMoving();
+        }
+        public override AICoreActionEndStruct EndGoToPoint()
+        {
+            if (botOwner_0.GoToSomePointData.IsCome()) return new AICoreActionEndStruct("point.Reached", true);
+            else if (botOwner_0.Memory.HaveEnemy) return new AICoreActionEndStruct("enemy.Has", true);
+            return new AICoreActionEndStruct(false);
         }
 
         protected virtual List<CustomNavigationPoint> GetNearGovers()
