@@ -170,15 +170,14 @@ namespace friendlyPMC.Utils
             return customNavigationPoint;
         }
 
-        public static CustomNavigationPoint GetApproachableCoverPoint(BotOwner botOwner, Vector3 point, float mindDistance = 5f)
+        public static CustomNavigationPoint GetApproachableCoverPoint(BotOwner botOwner, Vector3 point, float minDistance = 5f)
         {
             Vector3 midpoint = Vector3.Lerp(botOwner.GetPlayer.Transform.position, point, 0.5f);
-            float distance = Vector3.Distance(midpoint, point);
 
-            return GetClosestAttackCoverPoint(botOwner, midpoint, false, mindDistance);
+            return GetClosestAttackCoverPoint(botOwner, midpoint, false, minDistance);
         }
 
-        public static CustomNavigationPoint GetClosestAttackCoverPoint(BotOwner botOwner, Vector3 centerPosition, bool useFullCover = false, float minDistance = 5f)
+        public static CustomNavigationPoint GetClosestAttackCoverPoint(BotOwner botOwner, Vector3 centerPosition, bool useFullCover = false, float minDistance = 5f, float maxDistance = 120f)
         {
             List<CustomNavigationPoint> customNavigationPoints = HasBoss(botOwner) && !useFullCover ? GetBoss(botOwner).GetAreaCovers() : BossPlayers.GetAICovers();
 
@@ -202,7 +201,8 @@ namespace friendlyPMC.Utils
                             )
                         {
                             float range = Vector3.Distance(centerPosition, point.Position);
-                            if (range < distance)
+                            float enemyRange = Vector3.Distance(botOwner.Memory.GoalEnemy.CurrPosition, point.Position);
+                            if (range < distance && enemyRange <= maxDistance)
                             {
                                 navMeshPath.ClearCorners();
                                 bool resut = NavMesh.CalculatePath(botPosition, point.Position, -1, navMeshPath);

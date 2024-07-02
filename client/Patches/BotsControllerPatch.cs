@@ -317,6 +317,9 @@ namespace friendlyPMC.Patches
                     if(botRole == WildSpawnType.followerBirdEye)
                     {
                         profile.Skills.BotSoundGoef.SetCurrent(3100f, true);
+                        profile.Skills.AimMasterElite.Value = true;
+                        profile.Skills.Sniper.SetCurrent(5000f, true);
+                        profile.Skills.RecoilControl.SetCurrent(4500f, true);
                     }
 
 

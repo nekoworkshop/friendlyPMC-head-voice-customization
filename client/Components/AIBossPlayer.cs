@@ -27,8 +27,6 @@ namespace friendlyPMC.Components
         private Coroutine coverCoroutine;
 
         private float maximumDistance = 100f;
-
-        private Vector3 lastPosition;
         public pitAIBossPlayer(Player player) : base(player)
         {
             realPlayer = player;

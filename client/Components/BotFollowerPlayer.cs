@@ -285,7 +285,7 @@ namespace friendlyPMC.Components
             settings.FileSettings.Mind.DIST_TO_STOP_RUN_ENEMY = 15f;
             settings.FileSettings.Mind.TIME_TO_FORGOR_ABOUT_ENEMY_SEC = friendlyPMC.enemyRemember.Value;
             settings.FileSettings.Mind.TIME_TO_FIND_ENEMY = 6f;
-            settings.FileSettings.Mind.ATTACK_IMMEDIATLY_CHANCE_0_100 = 100f;
+            settings.FileSettings.Mind.ATTACK_IMMEDIATLY_CHANCE_0_100 = 0f;
             settings.FileSettings.Mind.CAN_TALK = true;
             settings.FileSettings.Mind.CAN_STAND_BY = true;
             settings.FileSettings.Mind.CAN_EXECUTE_REQUESTS = true;
@@ -320,7 +320,6 @@ namespace friendlyPMC.Components
             settings.FileSettings.Mind.FRIEND_AGR_KILL = 0.000001f;
             settings.FileSettings.Mind.FRIEND_DEAD_AGR_LOW = -0.000001f;
             settings.FileSettings.Mind.REVENGE_FOR_SAVAGE_PLAYERS = false;
-            bot.Tactic.AggressionCoef = 0f;
 
             // opposing sides are always enemies
             if (playerSide == EPlayerSide.Bear)
@@ -404,6 +403,8 @@ namespace friendlyPMC.Components
             bot.GetPlayer.HealthController.DisableMetabolism();
             // - have followers share the same groupId as the player
             bot.GetPlayer.Profile.Info.GroupId = _player.realPlayer.GroupId;
+
+            bot.Tactic.AggressionCoef = 1f;
         }
 
         /** Exposed so that it can be patched by addons **/
