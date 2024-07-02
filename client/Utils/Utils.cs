@@ -215,6 +215,7 @@ namespace friendlyPMC.Utils
                                         continue;
                                     }
                                 }
+                                point.CanIShootToEnemy = true;
                                 point1 = point;
                                 distance = range;
                             }

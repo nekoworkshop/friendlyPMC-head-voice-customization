@@ -5,6 +5,7 @@ using friendlyPMC.Modules;
 
 using LootingBots.Brain.Logics;
 using System;
+using System.Reflection;
 using UnityEngine;
 
 namespace friendlyPMC.Components
@@ -18,18 +19,9 @@ namespace friendlyPMC.Components
 
         }
 
-        private bool HasBoss()
-        {
-            return botOwner_0.BotFollower.HaveBoss;
-        }
-
-        private pitAIBossPlayer GetBoss()
-        {
-            return (pitAIBossPlayer)botOwner_0.BotFollower.BossToFollow;
-        }
-
         public override bool ShallUseNow()
         {
+
             return InteractableObjects.IsTaker(botOwner_0);
         }
 
@@ -41,7 +33,7 @@ namespace friendlyPMC.Components
         {
             if (!InteractableObjects.IsTaker(botOwner_0))
                 return new AICoreActionEndStruct("item.None", true);
-
+            
             return gstruct7_0;
         }
         public override AICoreActionEndStruct EndFollowerPatrolItem()
@@ -63,14 +55,15 @@ namespace friendlyPMC.Components
             if (!InteractableObjects.IsTaker(botOwner_0) || (_follower.LootingBrain.ActiveItem == null && _follower.LootingBrain.ActiveCorpse == null))
             {
                 InteractableObjects.RemoveTaker(botOwner_0);
-                return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.followerPatrol, "pickupError");
+                return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.followerPatrol, "loot.Error");
+            }
+
+            if (_follower.LootingBrain.ActiveItem.Item != null && _follower.LootingBrain.IsLootIgnored(_follower.LootingBrain.ActiveItem.Item.Id))
+            {
+                botOwner_0.Gesture.TryGestus(EGesture.Bad, false);
+                return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.followerPatrol, "item.ignore");
             }
             
-            if (_follower.LootingBrain.ActiveItem != null && botOwner_0.ItemTaker.method_0(_follower.LootingBrain.ActiveItem.Item) == null)
-            {
-                InteractableObjects.RemoveTaker(botOwner_0);
-                return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.followerPatrol, "noSpace");
-            }
 
             return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.botTakeItem, "takeItem");
         }

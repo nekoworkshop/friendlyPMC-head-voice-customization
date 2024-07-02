@@ -245,7 +245,7 @@ namespace friendlyPMC.Components
                 arg1.Player != null && arg1.Player.IsAI && 
                 arg1.Player.AIData != null && 
                 arg1.Player.AIData.BotOwner != null && 
-                !BossPlayers.Instance.IsFollower(arg1.Player.AIData.BotOwner)
+                !BossPlayers.Instance.IsFollower(arg1.Player.AIData.BotOwner,_aiplayer)
                 )
             {
                 _lastTimeHit = Time.time;

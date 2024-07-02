@@ -33,15 +33,21 @@ namespace friendlyPMC.Components.FollowerBossFollower
                 baseDecision.Reason == "usingStims" ||
                 baseDecision.Reason == "runToHeal" ||
                 baseDecision.Reason == "heal" ||
-                baseDecision.Reason == "healInCover" ||
-                botOwner_0.Memory.GoalEnemy.Owner.IsRole(WildSpawnType.marksman)
+                baseDecision.Reason == "healInCover"
 
             ) 
                 return baseDecision;
 
+            if (botOwner_0.Memory.GoalEnemy.Owner.IsRole(WildSpawnType.marksman))
+                return baseDecision;
 
 
             AICoreActionResultStruct < BotLogicDecision > supportDecision = supportLayer.GetDecision();
+
+            if(supportDecision.Action == BotLogicDecision.runToEnemyZigZag)
+            {
+                return baseDecision;
+            }
 
             if(
                 supportDecision.Action == BotLogicDecision.suppressFire || 

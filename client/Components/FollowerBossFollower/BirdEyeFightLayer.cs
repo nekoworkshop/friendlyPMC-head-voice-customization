@@ -22,16 +22,11 @@ namespace friendlyPMC.Components.FollowerBossFollower
         protected readonly float fightRange = 50f;
         protected readonly float fightLongRange = 100f;
 
-        private float float_6;
-
-        private GClass409 gclass409_0;
-
         private FollowerFightLayer followerFightLayer;
 
         private AICoreActionResultStruct<BotLogicDecision>? previousDecision = null;
         public BirdEyeFightLayer(BotOwner bot, int priority) : base(bot, priority)
         {
-            gclass409_0 = this.botOwner_0.FindPlaceToShoot.Register(60, 40, 0.2f);
 
             followerFightLayer = new FollowerFightLayer(bot, priority);
         }
@@ -45,37 +40,8 @@ namespace friendlyPMC.Components.FollowerBossFollower
         {
 
             Vector3 botPosition = botOwner_0.GetPlayer.Transform.position;
-            Vector3 bossPosition = HasBoss() ? GetBoss().Position : botPosition;
 
             bool enemyVisible = botOwner_0.Memory.GoalEnemy.IsVisible;
-
-
-            /*// Check if we have a good sniping position
-            if (gclass409_0.LastGoodPoint != null)
-            {
-                ShootPointClass shootToPoint = new ShootPointClass(botOwner_0.Memory.GoalEnemy.GetPartToShoot(), 1f);
-                Vector3 dist = (gclass409_0.LastGoodPoint.Value - botOwner_0.Position);
-                float sqrMagnitude = dist.sqrMagnitude;
-                float magnitude = dist.magnitude;
-                Vector3 firePos = gclass409_0.LastGoodPoint.Value + botOwner_0.ShootData.WeaponRootOffset;
-
-                if (GClass301.CanShootToTarget(shootToPoint, firePos, botOwner_0.LookSensor.Mask, false) && magnitude < fightRange)
-                {
-                    if (sqrMagnitude < 2f)
-                    {
-                        return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.holdPosition, "2some");
-                    }
-                    else
-                    {
-                        botOwner_0.GoToSomePointData.SetPoint(gclass409_0.LastGoodPoint.Value);
-                        return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.goToPoint, "reposition");
-                    }
-                }
-                else
-                {
-                    gclass409_0.Drop();
-                }
-            }*/
 
             if (enemyVisible)
             {
@@ -88,7 +54,7 @@ namespace friendlyPMC.Components.FollowerBossFollower
                     // enemy visbile but cannot shoot him
                     GetClosestAttackCoverPoint(botPosition);
                     // no attack cover, just find a cover 
-                    if (customNavigationPoint_0 == null) GetCoverPoint(bossPosition, fightLongRange);
+                    if (customNavigationPoint_0 == null) GetClosestCoverPoint(botPosition, fightRange);
 
                     if (customNavigationPoint_0 != null)
                     {
@@ -116,7 +82,7 @@ namespace friendlyPMC.Components.FollowerBossFollower
                     // enemy visbile but cannot shoot him
                     GetClosestAttackCoverPoint(botPosition);
                     // no attack cover, just find a new cover 
-                    if (customNavigationPoint_0 == null) GetCoverPoint(bossPosition, fightLongRange);
+                    if (customNavigationPoint_0 == null) GetClosestCoverPoint(botPosition, fightLongRange);
 
                     if (customNavigationPoint_0 != null)
                     {
@@ -151,7 +117,7 @@ namespace friendlyPMC.Components.FollowerBossFollower
                 }
 
                 // no attack cover, just find a cover 
-                if (customNavigationPoint_0 == null) GetCoverPoint(bossPosition, fightLongRange);
+                if (customNavigationPoint_0 == null) GetClosestCoverPoint(botPosition, fightLongRange);
 
                 if (customNavigationPoint_0 != null)
                 {
@@ -260,9 +226,11 @@ namespace friendlyPMC.Components.FollowerBossFollower
                 } 
                 // switch back to sniper if we are moving for a sniper shot
                 else if(
-                    decision.Action == BotLogicDecision.goToPoint &&
+                    (decision.Action == BotLogicDecision.goToPoint ||
+                    decision.Action == BotLogicDecision.runToCover) &&
+                    decision.Reason != "runToHeal" &&
                     botOwner_0.WeaponManager.Selector.LastEquipmentSlot != EquipmentSlot.FirstPrimaryWeapon &&
-                    Utils.EnemyInfo.DistanceProxy(botOwner_0, gclass409_0.LastGoodPoint.Value) >= Utils.EnemyInfo.ProxyDistance.Mid
+                    Utils.EnemyInfo.DistanceProxy(botOwner_0, customNavigationPoint_0.Position) >= Utils.EnemyInfo.ProxyDistance.Mid
                 )
                 {
                     botOwner_0.WeaponManager.Selector.TryChangeToMain();
@@ -323,28 +291,6 @@ namespace friendlyPMC.Components.FollowerBossFollower
             if (ordersChanged)
             {
                 return new AICoreActionEndStruct("EndHol", true);
-            }
-
-            if (customNavigationPoint_0 != null && !customNavigationPoint_0.CanIShootToEnemy)
-            {
-                ShootPointClass shootPoint = this.GetShootPoint();
-                Vector3 vector;
-                if (this.gclass409_0.ManualUpdateSearch(shootPoint, 20f, out vector))
-                {
-                    return new AICoreActionEndStruct("havePoint", true);
-                }
-                if (this.float_6 < Time.time)
-                {
-                    this.float_6 = Time.time + 10f;
-                    if (this.gclass409_0.ShootPositionType == EShootPositionType.stand)
-                    {
-                        this.gclass409_0.Set(EShootPositionType.lay);
-                    }
-                    else
-                    {
-                        this.gclass409_0.Set(EShootPositionType.stand);
-                    }
-                }
             }
 
             EnemyInfo goalEnemy = botOwner_0.Memory.GoalEnemy;

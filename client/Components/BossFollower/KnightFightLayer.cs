@@ -193,7 +193,7 @@ namespace friendlyPMC.Components.BossFollower
 
             if ( baseDecision.Action == BotLogicDecision.runToCover && baseDecision.Reason == "nextPosible" && HasBoss())
             {
-                GetClosestCoverPoint(GetBoss().Position, friendlyPMC.fightOuterRadius.Value);
+                GetClosestCoverPoint(bossPosition, followerFightLayer.bossOuterRadius);
                 if (customNavigationPoint_0 == null)
                 {
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.dogFight, "DogFight");

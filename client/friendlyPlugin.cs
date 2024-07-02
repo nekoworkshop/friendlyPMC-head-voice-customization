@@ -22,10 +22,11 @@ namespace friendlyPMC
     public enum CustomBotRequestType
     {
         TakeLoot = 20,
-        Regroup = 30
+        Regroup = 30,
+        OverThere = 40
     }
 
-    [BepInPlugin("xyz.pit.companion", "friendlyPMC", "3.3.4")]
+    [BepInPlugin("xyz.pit.companion", "friendlyPMC", "3.3.5")]
     [BepInDependency("com.spt-aki.core", "3.8.0")]
     [BepInDependency("xyz.drakia.bigbrain")]
     [BepInDependency("xyz.drakia.waypoints")]

@@ -178,14 +178,15 @@ namespace friendlyPMC.Components
 
                                 boss.Followers.ForEach(fl =>
                                 {
-                                    if (!gclass.CanRequest(botOwner_0)) return;
-
-                                    Vector3 pos = fl.GetPlayer.Transform.position;
-                                    float fldist = (bossPos - pos).sqrMagnitude;
-                                    if (fldist < dist)
+                                    if (gclass.CanRequest(botOwner_0))
                                     {
-                                        closest = fl;
-                                        dist = fldist;
+                                        Vector3 pos = fl.GetPlayer.Transform.position;
+                                        float fldist = (bossPos - pos).sqrMagnitude;
+                                        if (fldist < dist)
+                                        {
+                                            closest = fl;
+                                            dist = fldist;
+                                        }
                                     }
 
                                 });

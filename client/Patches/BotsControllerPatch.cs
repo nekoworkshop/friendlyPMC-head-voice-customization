@@ -318,8 +318,14 @@ namespace friendlyPMC.Patches
                     {
                         profile.Skills.BotSoundGoef.SetCurrent(3100f, true);
                         profile.Skills.AimMasterElite.Value = true;
-                        profile.Skills.Sniper.SetCurrent(5000f, true);
-                        profile.Skills.RecoilControl.SetCurrent(4500f, true);
+                        profile.Skills.Sniper.SetCurrent(5100f, true);
+                        profile.Skills.RecoilControl.SetCurrent(4700f, true);
+                    }
+
+                    if(botRole == WildSpawnType.followerBigPipe)
+                    {
+                        profile.Skills.RecoilControl.SetCurrent(4700f, true);
+                        profile.Skills.SMG.SetCurrent(5000f, true);
                     }
 
 

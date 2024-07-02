@@ -160,19 +160,17 @@ namespace friendlyPMC.Actions
                 bool result = false;
 
                 result = await _follower.TransactionController.TryPickupItem(item);
-
                 if (result && _follower.IsSquadMate)
                 {
-                    try
-                    {
-                        InteractableObjects.StoreItem(botOwner_0.ProfileId, item);
-                    }
-                    catch (Exception ex)
-                    {
-                        Components.Logger.LogInfo("Failed to store item for retrival: " + ex.Message);
-                    }
+                    InteractableObjects.StoreItem(botOwner_0.ProfileId, item);
                 }
-                
+                // mark loot as being ignored as if bot tries to get it the second item, it will end up getting stucked
+                if(!result)
+                {
+                    _follower.LootingBrain.IgnoreLoot(item.Id);
+                }
+
+                _follower.LootingBrain.InventoryController.UpdateKnownItems();
                 _follower.LootingBrain.CleanupItem(result, item);
                 _follower.LootingBrain.OnLootTaskEnd(result);
 
@@ -180,9 +178,13 @@ namespace friendlyPMC.Actions
             {
                 Components.Logger.LogInfo("Failed to pickup loot: " + ex.Message);
             }
-
-            InteractableObjects.RemoveTaker(botOwner_0);
-
+            try
+            {
+                InteractableObjects.RemoveTaker(botOwner_0);
+            } catch(Exception ex)
+            {
+                Components.Logger.LogInfo("Failed to cleanup loot: " + ex.Message);
+            }
             bool_0 = false;
             bool_1 = false;
         }

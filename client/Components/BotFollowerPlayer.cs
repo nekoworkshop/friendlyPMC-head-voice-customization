@@ -133,6 +133,7 @@ namespace friendlyPMC.Components
 
                 _transactionController = AccessTools.Field(typeof(InventoryController), "_transactionController").GetValue(_lootingBrain.InventoryController) as TransactionController;
 
+                _lootingBrain.UpdateGridStats();
 
             } catch(Exception ex)
             {
@@ -246,7 +247,7 @@ namespace friendlyPMC.Components
             }
 
             // reset enemy state
-            if (!hadEnemy && _bot.Memory.HaveEnemy)
+            if (_bot.Memory.HaveEnemy)
             {
                 _bot.Memory.DeleteInfoAboutEnemy(_bot.Memory.GoalEnemy.Person);
             }
@@ -345,7 +346,9 @@ namespace friendlyPMC.Components
             // follower can turn enemy to anyone and cares about no one but the boss
             settings.FileSettings.Mind.WARN_BOT_TYPES = new WildSpawnType[] { };
             settings.FileSettings.Mind.REVENGE_BOT_TYPES = new WildSpawnType[] { };
-            settings.FileSettings.Mind.FRIENDLY_BOT_TYPES = new WildSpawnType[] { };
+            settings.FileSettings.Mind.FRIENDLY_BOT_TYPES = new WildSpawnType[] {
+                WildSpawnType.shooterBTR
+            };
 
             settings.FileSettings.Patrol.PICKUP_ITEMS_TO_BACKPACK_OR_CONTAINER = true;
             settings.FileSettings.Patrol.CHANCE_TO_PLAY_VOICE_WHEN_CLOSE = 50;
@@ -392,6 +395,10 @@ namespace friendlyPMC.Components
             settings.FileSettings.Look.MAX_VISION_GRASS_METERS_FLARE_OPT = 0.25f;
             settings.FileSettings.Look.NO_GREEN_DIST = 3.0f;
             settings.FileSettings.Look.NO_GRASS_DIST = 3.0f;
+
+            settings.FileSettings.Hearing.CHANCE_TO_HEAR_SIMPLE_SOUND_0_1 = 0.05f;
+            settings.FileSettings.Hearing.DISPERSION_COEF = 1f;
+            settings.FileSettings.Hearing.FAR_DIST = 20f;
 
 
             bot.Settings = settings;

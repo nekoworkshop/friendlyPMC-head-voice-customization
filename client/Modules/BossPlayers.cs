@@ -254,12 +254,12 @@ namespace friendlyPMC.Modules
         public bool IsFollower(BotOwner bot, AIBossPlayer boss = null)
         {
 
-            if (boss != null)
+            if (boss != null && bot != null && bot.BotFollower.BossToFollow != null)
             {
                 return bot.BotFollower.HaveBoss && bot.BotFollower.BossToFollow.Player().ProfileId == boss.Player().ProfileId;
             }
             
-            if (!bot.BotFollower.HaveBoss) return false;
+            if (bot == null || !bot.BotFollower.HaveBoss) return false;
 
             BotFollowerPlayer _follower = null;
 

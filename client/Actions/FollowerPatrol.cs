@@ -72,7 +72,7 @@ namespace friendlyPMC.Actions
                 }
 
                 // BigPipe will tail BirdEye instead of the player
-                if (isBigPipe && birdEye != null)
+                if (isBigPipe && birdEye != null && !botOwner.Memory.HaveEnemy)
                 {
                     leaderPosition = birdEye.GetPlayer.Transform.position;
                 }

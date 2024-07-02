@@ -40,13 +40,13 @@ namespace friendlyPMC.Components
                 bot.Settings.FileSettings.Shoot.FAR_DIST_TO_CHANGE_WEAPON = 68f;
                 bot.Settings.FileSettings.Shoot.DIST_TO_CHANGE_TO_MAIN = 60f;
                 bot.Settings.FileSettings.Aiming.SCATTERING_DIST_MODIF = 0.2f;
-                bot.Settings.FileSettings.Aiming.COEF_FROM_COVER = 0.9f;
+                bot.Settings.FileSettings.Aiming.COEF_FROM_COVER = 1f;
                 bot.Settings.FileSettings.Aiming.HARD_AIM = 0.9f;
                 // bird eye, aim for the head
                 bot.Settings.FileSettings.Aiming.AIMING_TYPE = 6;
             }
             
-            bot.Settings.FileSettings.Aiming.AIMING_TYPE = 2;
+            bot.Settings.FileSettings.Aiming.AIMING_TYPE = 3;
 
             EPlayerSide side = _player.Player().Side;
 
@@ -59,7 +59,7 @@ namespace friendlyPMC.Components
             {
                 bot.Settings.FileSettings.Mind.ENEMY_BOT_TYPES = new WildSpawnType[] { };
                 bot.Settings.FileSettings.Mind.WARN_BOT_TYPES = new WildSpawnType[] { };
-                bot.Settings.FileSettings.Mind.FRIENDLY_BOT_TYPES = new WildSpawnType[] { };
+                bot.Settings.FileSettings.Mind.FRIENDLY_BOT_TYPES = new WildSpawnType[] { WildSpawnType.shooterBTR };
 
                 foreach (WildSpawnType botType in Enum.GetValues(typeof(WildSpawnType)))
                 {
@@ -88,7 +88,7 @@ namespace friendlyPMC.Components
                         }
                         continue;
                     } 
-                    else
+                    else if(botType != WildSpawnType.shooterBTR)
                     {
                         bot.Settings.FileSettings.Mind.ENEMY_BOT_TYPES.AddItem(botType);
                     }
@@ -104,7 +104,7 @@ namespace friendlyPMC.Components
                             bot.Settings.FileSettings.Mind.FRIENDLY_BOT_TYPES.AddItem(botType);
                             bot.Settings.FileSettings.Mind.WARN_BOT_TYPES.AddItem(botType);
                         }
-                        else
+                        else if (botType != WildSpawnType.shooterBTR)
                         {
                             bot.Settings.FileSettings.Mind.ENEMY_BOT_TYPES.AddItem(botType);
                         }
