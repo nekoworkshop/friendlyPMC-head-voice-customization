@@ -57,6 +57,8 @@ namespace friendlyPMC.Components
         private string tactic = "balance";
 
         private float heal_time = 0f;
+
+        protected CustomNavigationPoint customNavigationPoint_1;
         public FollowerFightLayer(BotOwner bot, int priority) : base(bot, priority)
         {
             
@@ -999,6 +1001,10 @@ namespace friendlyPMC.Components
         public CustomNavigationPoint GetCoverPoint(Vector3 centerPosition, float searchRadius)
         {
 
+            if (this.coverTimer > Time.time) return customNavigationPoint_0;
+
+            this.coverTimer = 1f + Time.time;
+
             CustomNavigationPoint point1 = Utils.Utils.GetCoverPoint(botOwner_0, centerPosition, searchRadius, true);
 
             customNavigationPoint_0 = point1;
@@ -1009,17 +1015,25 @@ namespace friendlyPMC.Components
 
         public virtual CustomNavigationPoint GetApproachablePoint()
         {
-            customNavigationPoint_0 = Utils.Utils.GetApproachableCoverPoint(botOwner_0, botOwner_0.Memory.GoalEnemy.CurrPosition);
-            botOwner_0.Memory.SetCoverPoints(customNavigationPoint_0);
-            return customNavigationPoint_0;
+            if (this.coverTimer > Time.time) return customNavigationPoint_1;
+
+            this.coverTimer = 1f + Time.time;
+
+            customNavigationPoint_1 = Utils.Utils.GetApproachableCoverPoint(botOwner_0, botOwner_0.Memory.GoalEnemy.CurrPosition);
+            botOwner_0.Memory.SetCoverPoints(customNavigationPoint_1);
+            return customNavigationPoint_1;
         }
 
         public virtual CustomNavigationPoint GetClosestAttackCoverPoint(Vector3 centerPosition, bool useFullCover = false, float minDistance = 5f, float maxDistance = 120f)
         {
-            CustomNavigationPoint cover = Utils.Utils.GetClosestAttackCoverPoint(botOwner_0, centerPosition, useFullCover, minDistance, maxDistance);
-            customNavigationPoint_0 = cover;
-            botOwner_0.Memory.SetCoverPoints(cover);
-            return cover;
+            if (this.coverTimer > Time.time) return customNavigationPoint_1;
+
+            this.coverTimer = 1f + Time.time;
+
+            customNavigationPoint_1 = Utils.Utils.GetClosestAttackCoverPoint(botOwner_0, centerPosition, useFullCover, minDistance, maxDistance);
+            customNavigationPoint_0 = customNavigationPoint_1;
+            botOwner_0.Memory.SetCoverPoints(customNavigationPoint_1);
+            return customNavigationPoint_1;
         }
 
         private void GetClosestCoverPointGroup(Vector3 centerPosition, float searchRadius)
