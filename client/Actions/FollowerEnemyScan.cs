@@ -35,7 +35,7 @@ namespace friendlyPMC.Actions
             float sphereRadius = scanDistance / 2;
             float sphereDistance = scanDistance / 2;
 
-            RaycastHit[] hits = new RaycastHit[10];
+            RaycastHit[] hits = new RaycastHit[100];
 
             int numHits = Physics.SphereCastNonAlloc(
                     new Ray(playerPosition, playerLookDirection),

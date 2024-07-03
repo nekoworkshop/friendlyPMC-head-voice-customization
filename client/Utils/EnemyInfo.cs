@@ -89,5 +89,36 @@ namespace friendlyPMC.Utils
             return EnemyDistance.Far;
 
         }
+
+        public static float GetEnemiesAtLocation(BotOwner bot, Vector3 position, float radius = 20f)
+        {
+            float nr = 0;
+
+            RaycastHit[] hits = new RaycastHit[100];
+
+            int numHits = Physics.SphereCastNonAlloc(
+                new Ray(position, Vector3.zero),
+                radius,
+                hits,
+                0f,
+                LayerMaskClass.PlayerMask
+            );
+
+            for (int i = 0; i < numHits; i++)
+            {
+                RaycastHit hit = hits[i];
+                if (hit.collider != null)
+                {
+                    var enemy = bot.ShootData.method_4(hit.collider);
+
+                    if (enemy != null && enemy.IsAI && enemy.HealthController.IsAlive && bot.EnemiesController.IsEnemy(enemy))
+                    {
+                        nr++;
+                    }
+                }
+            }
+
+            return nr;
+        }
     }
 }

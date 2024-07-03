@@ -128,7 +128,7 @@ namespace friendlyPMC.Components.BossFollower
                     } catch { }
                 };
 
-                return followerFightLayer.EngageEnemy();
+                return followerFightLayer.EngageEnemy(true);
             }
 
             // do not let Knight run long distances to an enemy

@@ -11,7 +11,6 @@ import { ILogger } from "@spt-aki/models/spt/utils/ILogger";
 
 import { Difficulty } from "@spt-aki/models/eft/common/tables/IBotType";
 
-import { MatchCallbacks } from "@spt-aki/callbacks/MatchCallbacks";
 import { LogTextColor } from "@spt-aki/models/spt/logging/LogTextColor";
 
 import { ILocations } from "@spt-aki/models/spt/server/ILocations";
@@ -25,7 +24,17 @@ import { SetFreemanTrader } from "./Trader";
 
 import { ImageRouter } from "@spt-aki/routers/ImageRouter";
 import type { PostAkiModLoader } from "@spt-aki/loaders/PostAkiModLoader";
+
+import { MailSendService } from "@spt-aki/services/MailSendService";
+
+import type { StaticRouterModService } from "@spt-aki/services/mod/staticRouter/StaticRouterModService";
+
 import path from "path";
+import { RouteAction } from "@spt-aki/di/Router";
+import { HttpResponseUtil } from "@spt-aki/utils/HttpResponseUtil";
+import { IUserDialogInfo } from "@spt-aki/models/eft/profile/IAkiProfile";
+
+import { RandomUtil } from "@spt-aki/utils/RandomUtil";
 
 class friendlyPMC {
 	config = {
@@ -35,6 +44,7 @@ class friendlyPMC {
 
 	Logger: ILogger;
 	Bots: IBotConfig;
+	mailSendService: MailSendService;
 
 	originalgetPmcDifficultySettings: BotDifficultyHelper["getPmcDifficultySettings"];
 	originalgetBotDifficulty: BotController["getBotDifficulty"];
@@ -45,6 +55,7 @@ class friendlyPMC {
 
 	preAkiLoad(container: DependencyContainer) {
 		this.Logger = container.resolve("WinstonLogger");
+		this.mailSendService = container.resolve("MailSendService");
 
 		try {
 			this.config = Object.assign(this.config, require("../config.json"));
@@ -111,6 +122,22 @@ class friendlyPMC {
 		const folder = path.basename(path.dirname(__dirname));
 
 		imageRouter.addRoute("/files/trader/avatar/general", `${modLoader.getModPath(folder)}/avatar/general.jpg`);
+
+		// add a new router for handling items being given from the squad members
+		const staticRouterModService = container.resolve<StaticRouterModService>("StaticRouterModService");
+		const httpResponseUtil = container.resolve<HttpResponseUtil>("HttpResponseUtil");
+		const randomUtil = container.resolve<RandomUtil>("RandomUtil");
+
+		staticRouterModService.registerStaticRouter(
+			"SquadItemsGiver",
+			[
+				new RouteAction("/singleplayer/returnitems", (url: string, info: any, sessionID: string, output: string): any => {
+					this.mailSendService.sendUserMessageToPlayer(sessionID, <IUserDialogInfo>info.member, randomUtil.getArrayValue([]), info.items, 86400);
+					return httpResponseUtil.nullResponse();
+				}),
+			],
+			"custom-static-squad-items-giver"
+		);
 	}
 
 	postDBLoad(container: DependencyContainer) {

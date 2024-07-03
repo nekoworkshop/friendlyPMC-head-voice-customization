@@ -161,19 +161,26 @@ namespace friendlyPMC.Components
             };
         }
 
-        public AICoreActionResultStruct<BotLogicDecision> EngageEnemy()
+        public AICoreActionResultStruct<BotLogicDecision> EngageEnemy(bool pushOrdered = false)
         {
             Vector3 botPosition = botOwner_0.GetPlayer.Transform.position;
-            Vector3 bossPoition = HasBoss() ? GetBoss().Position : botPosition;
             Vector3 enemyPos = botOwner_0.Memory.GoalEnemy.CurrPosition;
             bool enemyVisible = botOwner_0.Memory.GoalEnemy.IsVisible;
 
             Utils.EnemyInfo.EnemyDistance distanceToEnemy = Utils.EnemyInfo.Distance(botOwner_0);
 
-            // we have the power, go to the enemy
-            if(botOwner_0.Memory.AttackImmediately) 
+            // we have the power or have been order to push, go to the enemy
+            if(botOwner_0.Memory.AttackImmediately || pushOrdered) 
             {
-                if(distanceToEnemy <= Utils.EnemyInfo.EnemyDistance.Close)
+                
+                if(
+                    // - go for it if enemy is already close
+                    distanceToEnemy <= Utils.EnemyInfo.EnemyDistance.Close ||
+                    // - go for it if enemy is just 1
+                    (pushOrdered && Utils.EnemyInfo.GetEnemiesAtLocation(botOwner_0, botOwner_0.Memory.GoalEnemy.CurrPosition) < 2) ||
+                    // - go for it if there is strength in numbers
+                    (pushOrdered && Utils.EnemyInfo.GetEnemiesAtLocation(botOwner_0, botOwner_0.Memory.GoalEnemy.CurrPosition) < 3 && botOwner_0.BotsGroup.MembersCount > 2)
+                )
                 {
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToEnemy, "rushEnemy");
                 }
@@ -220,10 +227,43 @@ namespace friendlyPMC.Components
                 }
 
                 // - fallback
-                if(distanceToEnemy <= Utils.EnemyInfo.EnemyDistance.Mid) {
-                    return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToEnemy, "rushEnemy");
-                } else {
-                    return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToEnemyZigZag, "rushEnemyZigZag");
+                // -- do not rush if there are more than 2 enemies in that place
+                if (Utils.EnemyInfo.GetEnemiesAtLocation(botOwner_0, botOwner_0.Memory.GoalEnemy.CurrPosition) > 2)
+                {
+                    
+                    // --- stay in cover
+                    if(botOwner_0.Memory.IsInCover)
+                        return new AICoreActionResultStruct<BotLogicDecision>(HoldFor(GClass760.Random(2f, 5f)), "wait4it");
+                    // --- move to some cover
+                    else
+                    {
+                        GetCoverPoint(botPosition, nearSearchRadius);
+
+                        if (customNavigationPoint_0 != null)
+                        {
+                            if (GetNavDistance(customNavigationPoint_0.Position) > sprintDistance)
+                            {
+                                return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "repositionFast");
+                            }
+
+                            return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMoving, "reposition");
+                        } else
+                        {
+                            return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.dogFight, "noWhereToGo");
+                        }
+                    }
+                }
+                // -- else go for it
+                else
+                {
+                    if (distanceToEnemy <= Utils.EnemyInfo.EnemyDistance.Mid)
+                    {
+                        return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToEnemy, "rushEnemy");
+                    }
+                    else
+                    {
+                        return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToEnemyZigZag, "rushEnemyZigZag");
+                    }
                 }
 
             // play the intimidation game 
@@ -294,7 +334,7 @@ namespace friendlyPMC.Components
                             return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMoving, "reposition");
                         }
 
-                        return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.dogFight, "DogFight");
+                        return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.dogFight, "noWhereToGo");
 
                         
                     }
@@ -550,7 +590,7 @@ namespace friendlyPMC.Components
 
             if(allyTactic) return DefendPosition();
             else if ((ordersAreHold || holdTactic) && !ordersAreAttack) return DefendPosition();
-            else if (ordersAreAttack || rushTactic) return EngageEnemy();
+            else if (ordersAreAttack || rushTactic) return EngageEnemy(ordersAreAttack);
 
             
 
