@@ -48,12 +48,12 @@ namespace friendlyPMC.Utils
                 return ProxyDistance.Close;
             }
 
-            if (distance < 65f)
+            if (distance < 55f)
             {
                 return ProxyDistance.Mid;
             }
 
-            if (distance < 120f)
+            if (distance < 110f)
             {
                 return ProxyDistance.Distant;
             }
@@ -76,12 +76,12 @@ namespace friendlyPMC.Utils
                 return EnemyDistance.Close;
             }
 
-            if (distance < 56f)
+            if (distance < 55f)
             {
                 return EnemyDistance.Mid;
             }
 
-            if (distance < 120f)
+            if (distance < 110f)
             {
                 return EnemyDistance.Distant;
             }
@@ -90,7 +90,7 @@ namespace friendlyPMC.Utils
 
         }
 
-        public static float GetEnemiesAtLocation(BotOwner bot, Vector3 position, float radius = 20f)
+        public static float GetEnemiesAtLocation(BotOwner bot, Vector3 position, float radius = 25f)
         {
             float nr = 0;
 

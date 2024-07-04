@@ -123,6 +123,8 @@ namespace friendlyPMC.Utils
 
                 if (!guiUpdate) return;
 
+                if (bt == null || bt.Data == null) return;
+
                 Vector3 aboveBotHeadPos = bt.Data.Position + (Vector3.up * 1.6f);
                 Vector3 screenPos = Camera.main.WorldToScreenPoint(aboveBotHeadPos);
 

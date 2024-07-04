@@ -313,19 +313,23 @@ namespace friendlyPMC.Patches
                             profile.Info.Settings.Role = WildSpawnType.assault;
                     }
 
-                    // make BirdEye not be silent!
+                    
                     if(botRole == WildSpawnType.followerBirdEye)
                     {
                         profile.Skills.BotSoundGoef.SetCurrent(3100f, true);
                         profile.Skills.AimMasterElite.Value = true;
                         profile.Skills.Sniper.SetCurrent(5100f, true);
-                        profile.Skills.RecoilControl.SetCurrent(4700f, true);
-                    }
-
-                    if(botRole == WildSpawnType.followerBigPipe)
+                        profile.Skills.RecoilControl.SetCurrent(4800f, true);
+                    } 
+                    else if(botRole == WildSpawnType.followerBigPipe)
                     {
-                        profile.Skills.RecoilControl.SetCurrent(4700f, true);
+                        profile.Skills.RecoilControl.SetCurrent(4800f, true);
                         profile.Skills.SMG.SetCurrent(5000f, true);
+                    }
+                    else if (botRole == WildSpawnType.bossKnight)
+                    {
+                        profile.Skills.RecoilControl.SetCurrent(4800f, true);
+                        profile.Skills.Assault.SetCurrent(5000f, true);
                     }
 
 

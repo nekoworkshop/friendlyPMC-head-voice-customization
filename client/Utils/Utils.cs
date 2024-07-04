@@ -45,17 +45,35 @@ namespace friendlyPMC.Utils
             return (pitAIBossPlayer)botOwner.BotFollower.BossToFollow;
         }
 
-        public static CustomNavigationPoint GetClosestCoverPoint(BotOwner botOwner, Vector3 centerPosition, float searchRadius, bool useFullCover = false)
+        public static CustomNavigationPoint GetClosestCoverPoint(BotOwner botOwner, Vector3 centerPosition, float searchRadius, float safeDistance = 5f)
         {
-            List<CustomNavigationPoint> customNavigationPoints = HasBoss(botOwner) && !useFullCover ? GetBoss(botOwner).GetAreaCovers() : BossPlayers.GetAICovers();
+            List<CustomNavigationPoint> customNavigationPoints = HasBoss(botOwner) ? GetBoss(botOwner).GetAreaCovers() : BossPlayers.GetAICovers();
 
             if (customNavigationPoints.Count > 0)
             {
                 CustomNavigationPoint point1 = null;
                 float distance = searchRadius;
+                float sqrDistance = 0f;
 
                 NavMeshPath navMeshPath = new NavMeshPath();
                 Vector3 botPosition = botOwner.Transform.position;
+
+                Func<CustomNavigationPoint,bool> PointSet = (CustomNavigationPoint point) =>
+                {
+                    navMeshPath.ClearCorners();
+                    bool resut = NavMesh.CalculatePath(botPosition, point.Position, -1, navMeshPath);
+                    if (resut && navMeshPath.status == NavMeshPathStatus.PathComplete)
+                    {
+
+                        float dist = navMeshPath.CalculatePathLength();
+                        if (dist > searchRadius)
+                        {
+                            return false;
+                        }
+                    }
+
+                    return true;
+                };
 
                 foreach (CustomNavigationPoint point in customNavigationPoints)
                 {
@@ -66,27 +84,31 @@ namespace friendlyPMC.Utils
                                 !botOwner.Memory.HaveEnemy ||
                                 (
                                     point.IsFreeById(botOwner.Memory.GoalEnemy.Owner.Id) &&
-                                    point.IsDangerPositionFarEnough(new Vector3[] { botOwner.Memory.GoalEnemy.CurrPosition }, 3f * 3f)
+                                    point.IsDangerPositionFarEnough(new Vector3[] { botOwner.Memory.GoalEnemy.CurrPosition }, safeDistance * safeDistance)
                                 )
                             )
                         )
                     {
+                        float sqrrange = (centerPosition - point.Position).sqrMagnitude;
+
+                        if(sqrrange <= sqrDistance)
+                        {
+                            if (PointSet(point))
+                            {
+                                point1 = point;
+                                sqrDistance = sqrrange;
+                                continue;
+                            }
+                        }
+
                         float range = Vector3.Distance(centerPosition, point.Position);
                         if (range < distance)
                         {
-                            navMeshPath.ClearCorners();
-                            bool resut = NavMesh.CalculatePath(botPosition, point.Position, -1, navMeshPath);
-                            if (resut && navMeshPath.status == NavMeshPathStatus.PathComplete)
+                            if (PointSet(point))
                             {
-
-                                float dist = navMeshPath.CalculatePathLength();
-                                if (dist > searchRadius)
-                                {
-                                    continue;
-                                }
+                                point1 = point;
+                                distance = range;
                             }
-                            point1 = point;
-                            distance = range;
                         }
                     }
                 }
@@ -187,9 +209,27 @@ namespace friendlyPMC.Utils
                 {
                     CustomNavigationPoint point1 = null;
                     float distance = !useFullCover && HasBoss(botOwner) ?  friendlyPMC.maximumRadius.Value : Mathf.Infinity;
+                    float sqrdistance = 0f;
 
                     NavMeshPath navMeshPath = new NavMeshPath();
                     Vector3 botPosition = botOwner.Transform.position;
+
+                    Func<CustomNavigationPoint, bool> PointSet = (CustomNavigationPoint point) =>
+                    {
+                        navMeshPath.ClearCorners();
+                        bool resut = NavMesh.CalculatePath(botPosition, point.Position, -1, navMeshPath);
+                        if (resut && navMeshPath.status == NavMeshPathStatus.PathComplete)
+                        {
+
+                            float dist = navMeshPath.CalculatePathLength();
+                            if (dist > distance)
+                            {
+                                return false;
+                            }
+                        }
+
+                        return true;
+                    };
 
                     foreach (CustomNavigationPoint point in customNavigationPoints)
                     {
@@ -200,24 +240,38 @@ namespace friendlyPMC.Utils
                                 point.IsDangerPositionFarEnough(new Vector3[] { botOwner.Memory.GoalEnemy.CurrPosition }, minDistance * minDistance)
                             )
                         {
-                            float range = Vector3.Distance(centerPosition, point.Position);
+
+                            Vector3 vrange = centerPosition - point.Position;
                             float enemyRange = Vector3.Distance(botOwner.Memory.GoalEnemy.CurrPosition, point.Position);
-                            if (range < distance && enemyRange <= maxDistance)
+
+                            if(enemyRange > maxDistance)
                             {
-                                navMeshPath.ClearCorners();
-                                bool resut = NavMesh.CalculatePath(botPosition, point.Position, -1, navMeshPath);
-                                if (resut && navMeshPath.status == NavMeshPathStatus.PathComplete)
+                                continue;
+                            }
+
+                            float sqrrange = vrange.sqrMagnitude;
+
+                            if(sqrrange <= sqrdistance )
+                            {
+                                if(PointSet(point))
+                                {
+                                    point.CanIShootToEnemy = true;
+                                    point1 = point;
+                                    sqrdistance = sqrrange;
+                                    continue;
+                                }
+                            }
+
+                            float range = vrange.magnitude;
+                            if (range < distance)
+                            {
+                                if (PointSet(point))
                                 {
 
-                                    float dist = navMeshPath.CalculatePathLength();
-                                    if (dist > distance)
-                                    {
-                                        continue;
-                                    }
+                                    point.CanIShootToEnemy = true;
+                                    point1 = point;
+                                    distance = range;
                                 }
-                                point.CanIShootToEnemy = true;
-                                point1 = point;
-                                distance = range;
                             }
                         }
                     }
