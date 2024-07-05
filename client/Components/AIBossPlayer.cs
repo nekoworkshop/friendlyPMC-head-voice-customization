@@ -121,7 +121,7 @@ namespace friendlyPMC.Components
                 };
                 bot.LeaveData.OnLeave += (BotOwner _bot) =>
                 {
-                    RemoveEnemy(bot);
+                    RemoveEnemy(_bot);
                 };
             }
 

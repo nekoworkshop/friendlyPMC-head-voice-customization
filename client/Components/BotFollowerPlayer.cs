@@ -15,6 +15,7 @@ using System.Reflection;
 using UnityEngine;
 using System.Security.Policy;
 using EFT.InventoryLogic;
+using static EFT.SpeedTree.TreeWind;
 
 
 namespace friendlyPMC.Components
@@ -32,6 +33,8 @@ namespace friendlyPMC.Components
         protected TransactionController _transactionController;
 
         protected LootFinder _lootFinder;
+
+        protected GClass529 settingModif;
 
         public LootingBrain LootingBrain
         {
@@ -67,6 +70,8 @@ namespace friendlyPMC.Components
             _botRole = botRole == WildSpawnType.assault ? _bot.Profile.Info.Settings.Role : botRole;
             
             _IsSquadMate = isSquad;
+
+            settingModif = new GClass529(1.2f,1.2f,1f,1f,1f,1f,0.7f,1f,1f);
 
             bool hadEnemy = _bot.Memory.HaveEnemy;
             // deactivate old layers
@@ -121,7 +126,7 @@ namespace friendlyPMC.Components
             _bot.Receiver.Dispose();
             
             // add special follower settings
-            SetlFollowerSettings(_bot);
+            SetFollowerSettings(_bot);
             // add a new receiver
             _bot.Receiver = GetFollowerReceiver(bot);
             _bot.Receiver.Init();
@@ -148,6 +153,7 @@ namespace friendlyPMC.Components
             _bot.BotTalk.SetSilence(0f); 
             // force bot to turn off light
             if(_bot.BotLight != null) _bot.BotLight.TurnOff(false, true);
+            //_bot.NightVision.H
             // make bot follower of player
             _player.AddFollower(_bot);
             // activate new following patrol mode
@@ -252,15 +258,21 @@ namespace friendlyPMC.Components
                 _bot.Memory.DeleteInfoAboutEnemy(_bot.Memory.GoalEnemy.Person);
             }
 
+            // apply some of settings modifier
+            _bot.Settings.Current._hearingDistCoef = settingModif.HearingDistCoef;
+            _bot.Settings.Current._precicingSpeedCoef = settingModif.PrecicingSpeedCoef;
+            _bot.Settings.Current._accuratySpeedCoef = settingModif.AccuratySpeedCoef;
+
             Logger.LogInfo($"Bot {_bot.Profile.Nickname} is now a follower of {_player.Player().Profile.Nickname}");
+            
         }
 
-        /** Exposed so that it can be patched by addons **/
+
         public virtual FollowerBrain GetFollowerBrain(BotOwner bot, pitAIBossPlayer boss)
         {
             return new FollowerBrain(bot, boss);
         }
-        /** Exposed so that it can be patched by addons **/
+
         public virtual AICoreAgentClass<BotLogicDecision> GetFollowerAIAgent(BotOwner bot)
         {
             string name = bot.name + " " + _botRole.ToString();
@@ -271,8 +283,8 @@ namespace friendlyPMC.Components
             }));
         }
 
-        /** Exposed so that it can be patched by addons **/
-        public virtual void SetlFollowerSettings(BotOwner bot)
+
+        public virtual void SetFollowerSettings(BotOwner bot)
         {
             _OldSettings = _bot.Settings;
             _OldGroupID = _bot.GroupId;
@@ -398,8 +410,10 @@ namespace friendlyPMC.Components
 
             settings.FileSettings.Hearing.CHANCE_TO_HEAR_SIMPLE_SOUND_0_1 = 0.05f;
             settings.FileSettings.Hearing.DISPERSION_COEF = 1f;
+            settings.FileSettings.Hearing.CLOSE_DIST = 6f;
             settings.FileSettings.Hearing.FAR_DIST = 20f;
 
+            
 
             bot.Settings = settings;
             bot.ENEMY_LOOK_AT_ME = Mathf.Cos(settings.FileSettings.Mind.ENEMY_LOOK_AT_ME_ANG * 0.017453292f);
@@ -412,9 +426,9 @@ namespace friendlyPMC.Components
             bot.GetPlayer.Profile.Info.GroupId = _player.realPlayer.GroupId;
 
             bot.Tactic.AggressionCoef = 1f;
+
         }
 
-        /** Exposed so that it can be patched by addons **/
         public FollowerReceiver GetFollowerReceiver(BotOwner bot)
         {
             return new FollowerReceiver(bot);

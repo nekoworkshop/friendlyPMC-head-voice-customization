@@ -78,14 +78,7 @@ namespace friendlyPMC.Components.BossFollower
             {
                 if (!botOwner_0.Memory.HaveEnemy || !botOwner_0.Memory.GoalEnemy.IsVisible)
                 {
-                    if (!botOwner_0.Memory.HaveEnemy)
-                    {
-                        GetClosestCoverPoint(bossPosition, friendlyPMC.fightOuterRadius.Value);
-                    }
-                    else
-                    {
-                        GetClosestAttackCoverPoint(bossPosition);
-                    }
+                    GetClosestCoverPoint(bossPosition, friendlyPMC.fightOuterRadius.Value);
 
                     if (customNavigationPoint_0 != null)
                     {
@@ -112,9 +105,6 @@ namespace friendlyPMC.Components.BossFollower
                 return followerFightLayer.MarksManFight();
             }
 
-            AICoreActionResultStruct<BotLogicDecision> baseDecision = base.GetDecision();
-
-            Vector3 enemyPos = botOwner_0.Memory.HaveEnemy ? botOwner_0.Memory.GoalEnemy.CurrPosition : botPosition;
             // player suggested to do a push
             if (ordersChanged && request != null && request.BotRequestType == BotRequestType.attackClose)
             {
@@ -125,11 +115,21 @@ namespace friendlyPMC.Components.BossFollower
                     try
                     {
                         botOwner_0.BotRequestController.CurRequest.Complete();
-                    } catch { }
+                    }
+                    catch { }
                 };
 
                 return followerFightLayer.EngageEnemy(true);
             }
+
+            if (Utils.EnemyInfo.Distance(botOwner_0) <= Utils.EnemyInfo.EnemyDistance.Close)
+            {
+                return followerFightLayer.CloseFight();
+            }
+
+            AICoreActionResultStruct<BotLogicDecision> baseDecision = base.GetDecision();
+
+            Vector3 enemyPos = botOwner_0.Memory.HaveEnemy ? botOwner_0.Memory.GoalEnemy.CurrPosition : botPosition;
 
             // do not let Knight run long distances to an enemy
             if (

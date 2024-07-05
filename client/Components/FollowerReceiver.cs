@@ -366,9 +366,15 @@ namespace friendlyPMC.Components
                     FollowerPatrolInstances.SetFarPatrol(botOwner_0);
 
                 }
-                // on need help get the closest bot to come near the boss
-                else if(info.phrase == EPhraseTrigger.NeedHelp || (info.phrase == EPhraseTrigger.Regroup && botOwner_0.Memory.HaveEnemy))
+                // on regroup all shall come near the boss
+                else if(info.phrase == EPhraseTrigger.Regroup)
                 {
+                    if(!botOwner_0.Memory.HaveEnemy)
+                    {
+                        botOwner_0.BotsGroup.RequestsController.TryAskFollowMeRequest(requester, botOwner_0);
+                        return;
+                    }
+
                     (botOwner_0.Brain.BaseBrain as FollowerBrain).BossOrdersChanged();
 
                     Player alivePlayerByProfileID = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(requester.ProfileId);
@@ -385,10 +391,40 @@ namespace friendlyPMC.Components
                         }
                     }
                 }
-                // on regroup all get closer to the boss
-                else if (info.phrase == EPhraseTrigger.Regroup)
+                // on need help come closer to the boss
+                else if (info.phrase == EPhraseTrigger.NeedHelp)
                 {
-                    botOwner_0.BotsGroup.RequestsController.TryAskFollowMeRequest(requester, botOwner_0);
+                    BotOwner closest = null;
+                    float dist = Mathf.Infinity;
+                    pitAIBossPlayer pitBoss = BossPlayers.Instance.GetBossPlayer(requester.ProfileId);
+                    Vector3 bossPos = boss.realPlayer.Transform.position;
+
+                    FollowerRegroup gclass = new FollowerRegroup(requester);
+
+                    pitBoss.Followers.ForEach(fl =>
+                    {
+                        if (gclass.CanRequest(botOwner_0))
+                        {
+                            Vector3 pos = fl.GetPlayer.Transform.position;
+                            float fldist = (bossPos - pos).sqrMagnitude;
+                            if (fldist < dist)
+                            {
+                                closest = fl;
+                                dist = fldist;
+                            }
+                        }
+
+                    });
+
+                    // - the closest bot shall go to the player
+                    if (closest != null && closest == botOwner_0)
+                    {
+                        if (botOwner_0.BotsGroup.RequestsController.TryAddRequest(gclass))
+                        {
+                            gclass.AddPossibleExecutors(botOwner_0);
+                            gclass.SetGroup(botOwner_0.BotsGroup.RequestsController);
+                        }
+                    }
                 }
                 // tell the bots to be quiet for a minute
                 else if(info.phrase == EPhraseTrigger.Silence)

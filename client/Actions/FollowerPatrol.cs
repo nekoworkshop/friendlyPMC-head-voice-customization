@@ -60,21 +60,29 @@ namespace friendlyPMC.Actions
             {
 
                 Vector3 leaderPosition = player_0.Position;
-                BotOwner birdEye = null;
-                var followers = BossPlayers.Instance.GetBossFollowers(player_0.ProfileId);
-                foreach (var fl in followers)
-                {
-                    if (fl.GetBot().IsRole(WildSpawnType.followerBirdEye))
-                    {
-                        birdEye = fl.GetBot();
-                        break;
-                    };
-                }
+                
 
-                // BigPipe will tail BirdEye instead of the player
-                if (isBigPipe && birdEye != null && !botOwner.Memory.HaveEnemy)
+                // BigPipe will tail BirdEye or Knight instead of the player
+                if (isBigPipe && !botOwner.Memory.HaveEnemy)
                 {
-                    leaderPosition = birdEye.GetPlayer.Transform.position;
+                    BotOwner birdEye = null;
+                    BotOwner knight = null;
+
+                    // - we don't know the order so we have to get both
+                    foreach (var fl in BossPlayers.Instance.GetBossFollowers(player_0.ProfileId))
+                    {
+                        if (fl.GetBot().IsRole(WildSpawnType.bossKnight))
+                            knight = fl.GetBot();
+
+                        if (fl.GetBot().IsRole(WildSpawnType.followerBirdEye))
+                            birdEye = fl.GetBot();
+                    }
+                    
+                    // priority is knight, birdeye and then the player
+                    if (knight != null)
+                        leaderPosition = knight.GetPlayer.Transform.position;
+                    else if(birdEye != null)
+                        leaderPosition = birdEye.GetPlayer.Transform.position;
                 }
 
                 this.float_3 = Time.time + GClass760.Random(1f, 2f);
@@ -165,35 +173,19 @@ namespace friendlyPMC.Actions
                 {
                     lastCoverPoint = null;
                     nocover = false;
-                    method_0();
+                    method_0(leaderPosition);
                     bool val = num > 14f;
                     botOwner.Mover.Sprint(val, true);
                 }
             }
         }
 
-        public void method_0()
+        public void method_0(Vector3 leaderPosition)
         {
             this.bool_0 = false;
             NavMeshHit navMeshHit;
 
-            Vector3 leaderPosition = player_0.Position;
-
-            BotOwner birdEye = null;
-            var followers = BossPlayers.Instance.GetBossFollowers(player_0.ProfileId);
-            foreach(var fl in followers)
-            {
-                if (fl.GetBot().IsRole(WildSpawnType.followerBirdEye))
-                {
-                    birdEye = fl.GetBot();
-                    break;
-                };
-            }
-
-            if (isBigPipe && birdEye != null)
-            {
-                leaderPosition = birdEye.GetPlayer.Transform.position;
-            }
+            
 
             if (this.method_1(leaderPosition) == NavMeshPathStatus.PathComplete)
             {

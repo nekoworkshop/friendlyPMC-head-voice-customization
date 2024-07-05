@@ -22,12 +22,14 @@ namespace friendlyPMC.Components
                 FollowerPatrol patrol = FollowerPatrolInstances.GetPatrol(bot);
                 patrol.SetReachDist(17f);
             }
+
+            bot.EnemyChooser = new FollowerEnemyChoose(bot);
         }
 
-        public override void SetlFollowerSettings(BotOwner bot)
+        public override void SetFollowerSettings(BotOwner bot)
         {
 
-            base.SetlFollowerSettings(bot);
+            base.SetFollowerSettings(bot);
             
             bot.Settings.FileSettings.Core.HearingSense = 1.0f;
 
@@ -113,6 +115,9 @@ namespace friendlyPMC.Components
             }
 
             bot.Tactic.AggressionChange(-1f);
+
+            settingModif.PrecicingSpeedCoef = 1.35f;
+            settingModif.AccuratySpeedCoef = 1.35f;
         }
 
         public override FollowerBrain GetFollowerBrain(BotOwner bot, pitAIBossPlayer boss)

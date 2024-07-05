@@ -26,6 +26,7 @@ namespace friendlyPMC.Components.FollowerBossFollower
             Vector3 botPosition = botOwner_0.GetPlayer.Transform.position;
             Vector3 bossPosition = HasBoss() ? GetBoss().Position : botPosition;
 
+
             AICoreActionResultStruct<BotLogicDecision> baseDecision =  base.GetDecision();
 
             if(
@@ -42,12 +43,12 @@ namespace friendlyPMC.Components.FollowerBossFollower
                 return baseDecision;
 
 
-            AICoreActionResultStruct < BotLogicDecision > supportDecision = supportLayer.GetDecision();
-
-            if(supportDecision.Action == BotLogicDecision.runToEnemyZigZag)
+            if (Utils.EnemyInfo.Distance(botOwner_0) <= Utils.EnemyInfo.EnemyDistance.Close)
             {
-                return baseDecision;
+                return followerFightLayer.CloseFight();
             }
+
+            AICoreActionResultStruct < BotLogicDecision > supportDecision = supportLayer.GetDecision();
 
             if(
                 supportDecision.Action == BotLogicDecision.suppressFire || 

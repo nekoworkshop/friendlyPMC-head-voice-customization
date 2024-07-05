@@ -51,9 +51,19 @@ namespace friendlyPMC.Patches
 
             var plBoss = BossPlayers.GetBoss(person.ProfileId);
             var isgroup = BossPlayers.IsBossGroup(__instance.Id);
-            // prevent boss player from being added as enemy to the group
+
+            
             if (isgroup && plBoss != null)
             {
+                // prevent enemies from being added on spawn
+                if (
+                    cause == EBotEnemyCause.initCauseEnemy || 
+                    cause == EBotEnemyCause.initial ||
+                    cause == EBotEnemyCause.AddEnemyToAllGroupsInBotZone || 
+                    cause == EBotEnemyCause.AddEnemyToAllGroups
+                ) return false;
+
+                // prevent boss player from being added as enemy to the group
                 BotsGroup bossGroup = plBoss.bossGroup;
                 if (bossGroup != null && __instance.Id == bossGroup.Id)
                 {

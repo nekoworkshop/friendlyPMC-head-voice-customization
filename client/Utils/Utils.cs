@@ -77,14 +77,26 @@ namespace friendlyPMC.Utils
 
                 foreach (CustomNavigationPoint point in customNavigationPoints)
                 {
+                    bool isDangerFarEnough = true;
+
+                    foreach (var item in botOwner.EnemiesController.EnemyInfos)
+                    {
+                        isDangerFarEnough = point.IsDangerPositionFarEnough(new Vector3[] { item.Value.CurrPosition }, safeDistance * safeDistance);
+                        if (!isDangerFarEnough)
+                        {
+                            break;
+                        }
+                    }
+
+                    if (isDangerFarEnough) continue;
+
                     if (
                             point.IsFreeById(botOwner.Id) &&
                             !point.IsSpotted &&
                             (
                                 !botOwner.Memory.HaveEnemy ||
                                 (
-                                    point.IsFreeById(botOwner.Memory.GoalEnemy.Owner.Id) &&
-                                    point.IsDangerPositionFarEnough(new Vector3[] { botOwner.Memory.GoalEnemy.CurrPosition }, safeDistance * safeDistance)
+                                    point.IsFreeById(botOwner.Memory.GoalEnemy.Owner.Id)
                                 )
                             )
                         )
@@ -233,11 +245,23 @@ namespace friendlyPMC.Utils
 
                     foreach (CustomNavigationPoint point in customNavigationPoints)
                     {
+                        bool isDangerFarEnough = true;
+
+                        foreach (var item in botOwner.EnemiesController.EnemyInfos)
+                        {
+                            isDangerFarEnough = point.IsDangerPositionFarEnough(new Vector3[] { item.Value.CurrPosition }, minDistance * minDistance);
+                            if(!isDangerFarEnough)
+                            {
+                                break;
+                            }
+                        }
+                        
+                        if (!isDangerFarEnough) continue;
+
                         if (
                                 point.IsFreeById(botOwner.Id) &&
                                 botOwner.Memory.HaveEnemy &&
-                                GClass301.CanShoot(point.Position, botOwner.Memory.GoalEnemy) &&
-                                point.IsDangerPositionFarEnough(new Vector3[] { botOwner.Memory.GoalEnemy.CurrPosition }, minDistance * minDistance)
+                                GClass301.CanShoot(point.Position, botOwner.Memory.GoalEnemy)
                             )
                         {
 

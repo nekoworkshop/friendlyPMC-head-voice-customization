@@ -118,12 +118,12 @@ namespace friendlyPMC.Utils
             }
 
 
-            botMap.ForEach(bt =>
+            if(botMap != null) botMap.ForEach(bt =>
             {
 
                 if (!guiUpdate) return;
 
-                if (bt == null || bt.Data == null) return;
+                if (bt == null || bt.Data == null || !bt.Data.HealthController.IsAlive) return;
 
                 Vector3 aboveBotHeadPos = bt.Data.Position + (Vector3.up * 1.6f);
                 Vector3 screenPos = Camera.main.WorldToScreenPoint(aboveBotHeadPos);

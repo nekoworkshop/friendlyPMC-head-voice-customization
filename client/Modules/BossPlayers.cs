@@ -94,12 +94,14 @@ namespace friendlyPMC.Modules
                                 {
 
                                     NavGraphVoxelSimple navGraphVoxelSimple = cover.VoxelesArray[i, j, k];
-                                    if (navGraphVoxelSimple != null && navGraphVoxelSimple.HaveNavMesh && navGraphVoxelSimple.Points != null)
+                                    if (navGraphVoxelSimple != null && navGraphVoxelSimple.Points != null)
                                     {
                                         foreach (GroupPoint groupPoint in navGraphVoxelSimple.Points)
                                         {
                                             if (groupPoint.CoverLevel == CoverLevel.Stay || groupPoint.CoverLevel == CoverLevel.Sit)
+                                            {
                                                 customNavigationPoints.Add(groupPoint.CreateCustomNavigationPoint(id));
+                                            }
                                         }
                                     }
                                 }
