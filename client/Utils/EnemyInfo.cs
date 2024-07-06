@@ -90,7 +90,7 @@ namespace friendlyPMC.Utils
 
         }
 
-        public static float GetEnemiesAtLocation(BotOwner bot, Vector3 position, float radius = 25f)
+        public static float GetEnemiesAtLocation(BotOwner bot, Vector3 position, float radius = 30f)
         {
             float nr = 0;
 

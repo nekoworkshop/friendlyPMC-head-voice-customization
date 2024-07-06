@@ -289,15 +289,37 @@ namespace friendlyPMC.Patches
                         }
                     }
                 }
-                
+
+
+                WildSpawnType botRole = profile.Info.Settings.Role;
+
+                profile.Info.Side = side;
+                profile.Info.TeamId = player.Player().Profile.Info.TeamId;
+
+                if (botRole == WildSpawnType.followerBirdEye)
+                {
+                    profile.Skills.BotSoundGoef.SetCurrent(3100f, true);
+                    profile.Skills.AimMasterElite.Value = true;
+                    profile.Skills.Sniper.SetCurrent(5100f, true);
+                    profile.Skills.RecoilControl.SetCurrent(4800f, true);
+                }
+                else if (botRole == WildSpawnType.followerBigPipe)
+                {
+                    profile.Skills.RecoilControl.SetCurrent(4800f, true);
+                    profile.Skills.SMG.SetCurrent(5000f, true);
+                }
+                else if (botRole == WildSpawnType.bossKnight)
+                {
+                    profile.Skills.RecoilControl.SetCurrent(4800f, true);
+                    profile.Skills.Assault.SetCurrent(5000f, true);
+                }
+
 
                 spanwers.Add(() => {
                     Stopwatch stopWatch = new Stopwatch();
                     stopWatch.Start();
 
-                    WildSpawnType botRole = profile.Info.Settings.Role;
-                    profile.Info.Side = side;
-
+                   
                     // switch role on spawning as original one glitches out
                     if (botRole == WildSpawnType.followerBigPipe || botRole == WildSpawnType.followerBirdEye)
                     {
@@ -311,25 +333,6 @@ namespace friendlyPMC.Patches
                         }
                         else
                             profile.Info.Settings.Role = WildSpawnType.assault;
-                    }
-
-                    
-                    if(botRole == WildSpawnType.followerBirdEye)
-                    {
-                        profile.Skills.BotSoundGoef.SetCurrent(3100f, true);
-                        profile.Skills.AimMasterElite.Value = true;
-                        profile.Skills.Sniper.SetCurrent(5100f, true);
-                        profile.Skills.RecoilControl.SetCurrent(4800f, true);
-                    } 
-                    else if(botRole == WildSpawnType.followerBigPipe)
-                    {
-                        profile.Skills.RecoilControl.SetCurrent(4800f, true);
-                        profile.Skills.SMG.SetCurrent(5000f, true);
-                    }
-                    else if (botRole == WildSpawnType.bossKnight)
-                    {
-                        profile.Skills.RecoilControl.SetCurrent(4800f, true);
-                        profile.Skills.Assault.SetCurrent(5000f, true);
                     }
 
 

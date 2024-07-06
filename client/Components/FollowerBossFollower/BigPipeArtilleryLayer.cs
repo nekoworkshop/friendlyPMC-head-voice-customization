@@ -1,4 +1,5 @@
-﻿using EFT;
+﻿using Aki.Common.Http;
+using EFT;
 using friendlyPMC.Components.BossFollower;
 using JetBrains.Annotations;
 using System;
@@ -26,20 +27,31 @@ namespace friendlyPMC.Components.FollowerBossFollower
             Vector3 botPosition = botOwner_0.GetPlayer.Transform.position;
             Vector3 bossPosition = HasBoss() ? GetBoss().Position : botPosition;
 
+            BotRequest request = botOwner_0.BotRequestController.CurRequest;
 
-            AICoreActionResultStruct<BotLogicDecision> baseDecision =  base.GetDecision();
+            // is in dogfight?
+            AICoreActionResultStruct<BotLogicDecision>? aicoreActionResultStruct = followerFightLayer.DogFight();
+
+            if (aicoreActionResultStruct != null)
+            {
+                return (AICoreActionResultStruct<BotLogicDecision>)aicoreActionResultStruct;
+            }
+            // needs healing?
+            aicoreActionResultStruct = followerFightLayer.NeedHeal();
+            if (aicoreActionResultStruct != null)
+            {
+                return (AICoreActionResultStruct<BotLogicDecision>)aicoreActionResultStruct;
+            }
+
+            AICoreActionResultStruct<BotLogicDecision> baseDecision =  base.KnightFight();
 
             if(
-                baseDecision.Action == BotLogicDecision.shootFromPlace ||
-                baseDecision.Reason == "usingStims" ||
-                baseDecision.Reason == "runToHeal" ||
-                baseDecision.Reason == "heal" ||
-                baseDecision.Reason == "healInCover"
-
-            ) 
-                return baseDecision;
-
-            if (botOwner_0.Memory.GoalEnemy.Owner.IsRole(WildSpawnType.marksman))
+                baseDecision.Reason == "regroupToBossFast" || 
+                baseDecision.Reason == "regroupToBoss" ||
+                (ordersChanged && request != null && request.BotRequestType == BotRequestType.attackClose) ||
+                botOwner_0.Memory.GoalEnemy.Owner.IsRole(WildSpawnType.marksman) ||
+                baseDecision.Action == BotLogicDecision.shootFromPlace
+            )
                 return baseDecision;
 
 
@@ -70,27 +82,6 @@ namespace friendlyPMC.Components.FollowerBossFollower
 
             return baseDecision;
         }
-        public override AICoreActionEndStruct ShallEndCurrentDecision(AICoreActionResultStruct<BotLogicDecision> curDecision)
-        {
-            if (!botOwner_0.Memory.HaveEnemy)
-            {
-                return gstruct7_0;
-            }
-
-            if (
-                curDecision.Reason == "getInCloseFast" ||
-                curDecision.Reason == "getInCloseSlow" ||
-                curDecision.Reason == "am" ||
-                curDecision.Reason == "repositionFast" ||
-                curDecision.Reason == "reposition"
-            )
-            {
-                return EndGetInClose();
-            }
-
-            return base.ShallEndCurrentDecision(curDecision);
-        }
-
         
     }
 }

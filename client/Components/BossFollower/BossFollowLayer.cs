@@ -41,7 +41,7 @@ namespace friendlyPMC.Components.BossFollower
 
         public override AICoreActionResultStruct<BotLogicDecision> GetDecision()
         {
-            BotRequest request = botOwner_0.BotRequestController.CurRequest != null ? botOwner_0.BotRequestController.CurRequest : null;
+            BotRequest request = botOwner_0.Memory.HaveEnemy ? null : botOwner_0.BotRequestController.CurRequest != null ? botOwner_0.BotRequestController.CurRequest : null;
 
             float regroupMinDistance = friendlyPMC.regroupMinDistance.Value;
             float nearSearchRadius = friendlyPMC.fightInnerRadius.Value;
@@ -84,6 +84,8 @@ namespace friendlyPMC.Components.BossFollower
                     requestRegroup = false;
                 }
             }
+
+            if(requestRegroup) Components.Logger.LogInfo("Regroup reached");
 
             if (!botOwner_0.Memory.HaveEnemy && request != null)
             {
@@ -153,9 +155,7 @@ namespace friendlyPMC.Components.BossFollower
 
                 if (requestRegroup && GetNavDistance(bossPosition) > regroupMinDistance)
                 {
-                    
-                    botOwner_0.BotRequestController.CurRequest.Complete();
-
+                    Components.Logger.LogInfo("Do a regroup");
                     GetClosestCoverPoint(bossPosition, nearSearchRadius);
 
                     if (customNavigationPoint_0 != null)
@@ -172,6 +172,9 @@ namespace friendlyPMC.Components.BossFollower
                     }
                     else
                     {
+
+                        botOwner_0.BotRequestController.CurRequest.Complete();
+
                         return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.followerPatrol, "regroupFallback");
                     }
                 }
@@ -179,7 +182,15 @@ namespace friendlyPMC.Components.BossFollower
             return base.GetDecision();
         }
 
-        
+
+        /*public override AICoreActionEndStruct EndFollowerPatrolItem()
+        {
+            if(requestRegroup || requestComeHere || requestGoThere)
+            return new AICoreActionEndStruct("request.Made", true);
+
+            return base.EndFollowerPatrolItem();
+        }*/
+
         protected float GetNavDistance(Vector3 point)
         {
             return Utils.Utils.GetNavDistance(botOwner_0.GetPlayer.Transform.position,point);

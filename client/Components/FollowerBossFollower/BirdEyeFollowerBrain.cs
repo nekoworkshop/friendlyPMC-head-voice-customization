@@ -21,7 +21,7 @@ namespace friendlyPMC.Components.FollowerBossFollower
         {
             // order matters for which layer get the initial priority
             // - follow
-            BossFollowLayer followLayer = new BossFollowLayer(_owner, 51);
+            BossFollowLayer followLayer = new BossFollowLayer(_owner, 50);
             method_0(1, followLayer, true);
             // avoid danger
             KnightAvoidDangerLayer layer = new KnightAvoidDangerLayer(_owner, 80);
@@ -30,7 +30,7 @@ namespace friendlyPMC.Components.FollowerBossFollower
             KnightWeaponMtnLayer layer2 = new KnightWeaponMtnLayer(_owner, 78);
             base.method_0(3, layer2, true);
             // assault building
-            KnightAssaultBuildingLayer layer3 = new KnightAssaultBuildingLayer(_owner, 70);
+            KnightAssaultBuildingLayer layer3 = new KnightAssaultBuildingLayer(_owner, 72);
             base.method_0(4, layer3, true);
             // enemy building
             //KnightEnemyBuildingLayer buildingLayer = new KnightEnemyBuildingLayer(_owner, 60);

@@ -143,7 +143,6 @@
   <ItemGroup>
     <Compile Include="Components\BossFollower\KnightAssaultBuildingLayer.cs" />
     <Compile Include="Components\BossFollower\KnightAvoidDangerLayer.cs" />
-    <Compile Include="Components\BossFollower\KnightEnemyBuildingLayer.cs" />
     <Compile Include="Components\BossFollower\KnightFightLayer.cs" />
     <Compile Include="Components\BossFollower\KnightWeaponMtnLayer.cs" />
     <Compile Include="Actions\FollowerAttackMove.cs" />
@@ -194,6 +193,7 @@
     <Compile Include="Patches\PlayerPatch.cs" />
     <Compile Include="Patches\QuickPanelPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utils\BotLogicDecisions.cs" />
     <Compile Include="Utils\EnemyInfo.cs" />
     <Compile Include="Utils\PingTeamates.cs" />
     <Compile Include="Utils\Utils.cs" />

@@ -17,12 +17,11 @@ namespace friendlyPMC.Actions
         public override bool CanRequest(BotOwner owner)
         {
 
-            if(owner.IsRole(WildSpawnType.followerBigPipe) && BotRequestType == BotRequestType.goToPoint)
-                return true;
 
-            if (
-                owner.IsRole(WildSpawnType.followerBirdEye) ||
-                owner.IsRole(WildSpawnType.followerBigPipe)
+            if (owner.Memory.HaveEnemy) return false;
+
+            /*if (
+                owner.IsRole(WildSpawnType.followerBirdEye)
             )
             {
                 if (Requester.IsAI && Requester.Profile.Info.Settings.Role == WildSpawnType.bossKnight)
@@ -37,7 +36,7 @@ namespace friendlyPMC.Actions
                     return true;
                 }
                 return false;
-            }
+            }*/
 
             return true;
         }

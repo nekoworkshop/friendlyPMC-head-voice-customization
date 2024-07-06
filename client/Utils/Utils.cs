@@ -8,6 +8,9 @@ using UnityEngine.AI;
 using UnityEngine;
 using friendlyPMC.Modules;
 using friendlyPMC.Components;
+using EFT.InventoryLogic;
+using HarmonyLib;
+using TMPro;
 
 namespace friendlyPMC.Utils
 {
@@ -19,6 +22,7 @@ namespace friendlyPMC.Utils
             WildSpawnType.followerBirdEye
         };
 
+        
         public static float GetNavDistance(Vector3 point1, Vector3 point2)
         {
             NavMeshPath navMeshPath = new NavMeshPath();
@@ -77,18 +81,13 @@ namespace friendlyPMC.Utils
 
                 foreach (CustomNavigationPoint point in customNavigationPoints)
                 {
-                    bool isDangerFarEnough = true;
-
+                    Vector3[] carePosition = new Vector3[] { };
                     foreach (var item in botOwner.EnemiesController.EnemyInfos)
                     {
-                        isDangerFarEnough = point.IsDangerPositionFarEnough(new Vector3[] { item.Value.CurrPosition }, safeDistance * safeDistance);
-                        if (!isDangerFarEnough)
-                        {
-                            break;
-                        }
+                        carePosition.AddItem(item.Value.CurrPosition);
                     }
 
-                    if (isDangerFarEnough) continue;
+                    if (!point.IsDangerPositionFarEnough(carePosition, safeDistance * safeDistance)) continue;
 
                     if (
                             point.IsFreeById(botOwner.Id) &&
@@ -131,7 +130,84 @@ namespace friendlyPMC.Utils
             return null;
         }
 
-        public static CustomNavigationPoint GetCoverPoint(BotOwner botOwner, Vector3 centerPosition, float searchRadius, bool useFullCover = false)
+        public static CustomNavigationPoint GetClosestCoverPointBetween(BotOwner botOwner, Vector3 pointA, Vector3 pointB, float safeDistance = 5f)
+        {
+            List<CustomNavigationPoint> customNavigationPoints = HasBoss(botOwner) ? GetBoss(botOwner).GetAreaCovers() : BossPlayers.GetAICovers();
+
+            if (customNavigationPoints.Count > 0)
+            {
+                CustomNavigationPoint point1 = null;
+                float searchRadius = Vector3.Distance(pointA, pointB);
+
+                float distance = searchRadius;
+                float sqrDistance = 0f;
+
+                NavMeshPath navMeshPath = new NavMeshPath();
+                Vector3 botPosition = botOwner.Transform.position;
+
+                Func<CustomNavigationPoint, bool> PointSet = (CustomNavigationPoint point) =>
+                {
+                    navMeshPath.ClearCorners();
+                    bool resut = NavMesh.CalculatePath(botPosition, point.Position, -1, navMeshPath);
+                    if (resut && navMeshPath.status == NavMeshPathStatus.PathComplete)
+                    {
+
+                        float dist = navMeshPath.CalculatePathLength();
+                        if (dist > searchRadius)
+                        {
+                            return false;
+                        }
+                    }
+
+                    return true;
+                };
+
+                foreach (CustomNavigationPoint point in customNavigationPoints)
+                {
+                    if (!IsPointBetween(point.Position, pointA, pointB)) continue;
+
+                    Vector3[] carePosition = new Vector3[] { };
+                    foreach (var item in botOwner.EnemiesController.EnemyInfos)
+                    {
+                        carePosition.AddItem(item.Value.CurrPosition);
+                    }
+
+                    if (!point.IsDangerPositionFarEnough(carePosition, safeDistance * safeDistance)) continue;
+
+                    if (
+                            point.IsFreeById(botOwner.Id) &&
+                            !point.IsSpotted &&
+                            (
+                                !botOwner.Memory.HaveEnemy ||
+                                (
+                                    point.IsFreeById(botOwner.Memory.GoalEnemy.Owner.Id)
+                                )
+                            )
+                        )
+                    {
+                        float sqrrange = (pointA - point.Position).sqrMagnitude;
+
+                        if (sqrrange <= sqrDistance && PointSet(point))
+                        {
+                            point1 = point;
+                            sqrDistance = sqrrange;
+                            continue;
+                        }
+
+                        float range = Vector3.Distance(pointA, point.Position);
+                        if (range <= distance && PointSet(point))
+                        {
+                            point1 = point;
+                            distance = range;
+                        }
+                    }
+                }
+
+            }
+
+            return null;
+        }
+        public static CustomNavigationPoint GetCoverPoint(BotOwner botOwner, Vector3 centerPosition, float searchRadius)
         {
 
             List<CustomNavigationPoint> customNavigationPoints = HasBoss(botOwner) ? GetBoss(botOwner).GetAreaCovers() : BossPlayers.GetAICovers();
@@ -204,6 +280,19 @@ namespace friendlyPMC.Utils
             return customNavigationPoint;
         }
 
+        public static bool IsPointBetween(Vector3 point, Vector3 start, Vector3 end)
+        {
+            if (point.x >= start.x && point.y >= start.y && point.z >= start.z)
+            {
+                if (point.x <= end.x && point.y <= end.y && point.z <= end.z)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         public static CustomNavigationPoint GetApproachableCoverPoint(BotOwner botOwner, Vector3 point, float minDistance = 5f)
         {
             Vector3 midpoint = Vector3.Lerp(botOwner.GetPlayer.Transform.position, point, 0.5f);
@@ -245,18 +334,15 @@ namespace friendlyPMC.Utils
 
                     foreach (CustomNavigationPoint point in customNavigationPoints)
                     {
-                        bool isDangerFarEnough = true;
+
+                        Vector3[] carePosition = new Vector3[] { };
 
                         foreach (var item in botOwner.EnemiesController.EnemyInfos)
                         {
-                            isDangerFarEnough = point.IsDangerPositionFarEnough(new Vector3[] { item.Value.CurrPosition }, minDistance * minDistance);
-                            if(!isDangerFarEnough)
-                            {
-                                break;
-                            }
+                            carePosition.AddItem(item.Value.CurrPosition);
                         }
                         
-                        if (!isDangerFarEnough) continue;
+                        if (!point.IsDangerPositionFarEnough(carePosition, minDistance * minDistance)) continue;
 
                         if (
                                 point.IsFreeById(botOwner.Id) &&

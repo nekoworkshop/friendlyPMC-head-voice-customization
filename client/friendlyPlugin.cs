@@ -23,7 +23,8 @@ namespace friendlyPMC
     {
         TakeLoot = 20,
         Regroup = 30,
-        OverThere = 40
+        OverThere = 40,
+        NeedHelp = 50
     }
 
     [BepInPlugin("xyz.pit.companion", "friendlyPMC", "3.3.5")]

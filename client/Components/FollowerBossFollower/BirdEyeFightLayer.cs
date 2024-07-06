@@ -80,7 +80,7 @@ namespace friendlyPMC.Components.FollowerBossFollower
                     coverTries++;
 
                     // enemy visbile but cannot shoot him
-                    GetClosestAttackCoverPoint(botPosition);
+                    GetClosestAttackCoverPoint(botPosition,false);
                     // no attack cover, just find a new cover 
                     if (customNavigationPoint_0 == null) GetClosestCoverPoint(botPosition, fightLongRange);
 
@@ -160,34 +160,32 @@ namespace friendlyPMC.Components.FollowerBossFollower
             {
                 if (Utils.Utils.GetNavDistance(botPosition, bossPosition) > friendlyPMC.regroupMinDistance.Value && (!botOwner_0.Memory.HaveEnemy || !botOwner_0.Memory.GoalEnemy.IsVisible))
                 {
-                    botOwner_0.BotRequestController.CurRequest.Complete();
 
-                    if (!botOwner_0.Memory.HaveEnemy)
+                    if (!botOwner_0.Memory.HaveEnemy || !botOwner_0.Memory.GoalEnemy.IsVisible)
                     {
-                        GetClosestCoverPoint(bossPosition, friendlyPMC.fightOuterRadius.Value);
-                    }
-                    else
-                    {
-                        GetClosestAttackCoverPoint(bossPosition);
-                    }
+                        GetClosestCoverPoint(bossPosition, friendlyPMC.fightInnerRadius.Value);
 
-                    coverTries = 0;
-
-                    if (customNavigationPoint_0 != null)
-                    {
-
-                        if (Utils.Utils.GetNavDistance(botPosition, customNavigationPoint_0.Position) > sprintDistance)
+                        if (customNavigationPoint_0 != null)
                         {
-                            return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "regroupToBossFast");
+
+                            if (Utils.Utils.GetNavDistance(botPosition, customNavigationPoint_0.Position) > sprintDistance)
+                            {
+                                return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "regroupToBossFast");
+                            }
+                            else
+                            {
+                                return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMoving, "regroupToBoss");
+                            }
                         }
                         else
                         {
-                            return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMoving, "regroupToBossSlow");
+                            return BotLogicDecisions.RegroupToBoss(botOwner_0);
                         }
                     }
                     else
                     {
-                        return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.followerPatrol, "regroupFallback");
+                        botOwner_0.BotTalk.TrySay(EPhraseTrigger.OnFight, true);
+                        request.Complete();
                     }
                 }
             }
@@ -245,17 +243,52 @@ namespace friendlyPMC.Components.FollowerBossFollower
         {
             List<string> getInClose = new List<string>
             {
-                "regroupToBossFast",
-                "regroupToBossSlow",
                 "getInCloseFast",
                 "getInCloseSlow",
                 "reposition",
                 "repositionFast"
             };
 
-            if (getInClose.Contains(curDecision.Reason))
+            List<string> regroup = new List<string>
+            {
+                "regroupToBossFast",
+                "regroupToBoss",
+            };
+
+            List<string> ordersIgnoreDecisions = new List<string>
+            {
+                "healInCover",
+                "DogFight",
+                "heal"
+            };
+
+            List<BotLogicDecision> ordersAllowActions = new List<BotLogicDecision>
+            {
+                BotLogicDecision.holdPosition,
+                BotLogicDecision.lay,
+            };
+
+            if (getInClose.Contains(curDecision.Reason) || (regroup.Contains(curDecision.Reason) && curDecision.Action == BotLogicDecision.goToPoint))
             {
                 return EndGetInClose();
+            }
+
+
+            // orders changed
+            if (ordersChanged && 
+                !ordersIgnoreDecisions.Contains(curDecision.Reason) &&
+                ordersAllowActions.Contains(curDecision.Action) &&
+                (
+                    !botOwner_0.Memory.HaveEnemy || 
+                    !botOwner_0.Memory.GoalEnemy.HaveSeen ||
+                    (   !botOwner_0.Memory.GoalEnemy.IsVisible && 
+                        Time.time - botOwner_0.Memory.GoalEnemy.PersonalLastSeenTime < 3f && 
+                        Utils.EnemyInfo.DistanceProxy(botOwner_0,botOwner_0.GetPlayer.Transform.position) > Utils.EnemyInfo.ProxyDistance.VeryClose
+                    )
+                )
+            )
+            {
+                return gstruct7_0;
             }
 
             return base.ShallEndCurrentDecision(curDecision);
@@ -391,7 +424,7 @@ namespace friendlyPMC.Components.FollowerBossFollower
             customNavigationPoint_0 = followerFightLayer.GetCoverPoint(centerPosition, searchRadius);
         }
 
-        protected virtual void GetClosestAttackCoverPoint(Vector3 centerPosition, bool useFullCover = false, float minDistance = 10f)
+        protected virtual void GetClosestAttackCoverPoint(Vector3 centerPosition, bool useFullCover = false, float minDistance = 15f)
         {
             CustomNavigationPoint cover = Utils.Utils.GetClosestAttackCoverPoint(botOwner_0, centerPosition, useFullCover, minDistance,170f);
             customNavigationPoint_0 = cover;

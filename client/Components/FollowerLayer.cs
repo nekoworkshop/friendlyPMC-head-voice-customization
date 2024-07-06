@@ -140,7 +140,7 @@ namespace friendlyPMC.Components
 
         }
 
-
+            
         public override AICoreActionEndStruct EndSimplePatrol()
         {
             string reason;
@@ -215,7 +215,8 @@ namespace friendlyPMC.Components
                 }
                 return new AICoreActionEndStruct("point.Reached", true);
             }
-            return new AICoreActionEndStruct(false);
+
+            return base.EndGoToPoint();
         }
 
         protected virtual List<CustomNavigationPoint> GetNearGovers()

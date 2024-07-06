@@ -16,10 +16,76 @@ namespace friendlyPMC.Components
     
     internal class FollowerReceiver : BotReceiver
     {
-        private readonly float maxGestusDistance = 20f;
+
+        private static Player interactivePlayer = null;
+
+        private static float interactiveTime = 0f;
+        
+        private static float closestTime = 0f;
+
+        private static BotOwner closestPlayer = null;
+
+        private static readonly float maxGestusDistance = 18f;
         public FollowerReceiver(BotOwner owner) : base(owner)
         {
             Receivers.AddReceiver(owner.ProfileId, this);
+        }
+
+
+        private static Player GetInteractivePlayer(Vector3 requestPosition, Vector3 requestDirection)
+        {
+
+            if(interactiveTime > Time.time) return interactivePlayer;
+
+            Ray ray = new Ray(requestPosition, requestDirection.normalized * maxGestusDistance);
+
+            RaycastHit hit;
+            Player player = GameWorld.FindInteractablePlayer(ray, out hit);
+
+            interactivePlayer = player;
+
+            interactiveTime = Time.time + 1f;
+
+            return interactivePlayer;
+        }
+
+        private static BotOwner GetClosetBot(BotOwner bot, IPlayer requester, out FollowerGoCheck request)
+        {
+
+            if (closestTime > Time.time)
+            {
+                request = new FollowerGoCheck(closestPlayer);
+                return closestPlayer;
+            }
+
+            BotOwner closest = null;
+            float dist = Mathf.Infinity;
+            pitAIBossPlayer boss = BossPlayers.Instance.GetBossPlayer(requester.ProfileId);
+            Vector3 bossPos = boss.realPlayer.Transform.position;
+
+            FollowerGoCheck gclass = new FollowerGoCheck(requester);
+
+            boss.Followers.ForEach(fl =>
+            {
+                if (gclass.CanRequest(bot))
+                {
+                    Vector3 pos = fl.GetPlayer.Transform.position;
+                    float fldist = (bossPos - pos).sqrMagnitude;
+                    if (fldist < dist)
+                    {
+                        closest = fl;
+                        dist = fldist;
+                    }
+                }
+
+            });
+
+            closestTime = Time.time + 0.5f;
+
+            closestPlayer = closest;
+            request = gclass;
+
+            return closestPlayer;
         }
 
         public virtual void Initiate()
@@ -69,7 +135,6 @@ namespace friendlyPMC.Components
             };
             List<EGesture> bossBusyNoGesture = new List<EGesture>
             {
-                EGesture.ComeToMe
             };
 
             bool isFollowerBoss = false;
@@ -106,7 +171,7 @@ namespace friendlyPMC.Components
                     
                 }
             }
-
+            // on gesture "stop" nearby bots will hold position
             if (gesture == EGesture.Stop)
             {
                 if (isBossCommunicating)
@@ -119,21 +184,30 @@ namespace friendlyPMC.Components
                 {
                     base.method_6(data);
                 }
-            } 
+            }
+            // on gesture "come here" only the bot that the player is looking at will come to the player
             else if(gesture == EGesture.ComeToMe)
             {
                 if (isBossCommunicating)
                 {
                     if (gestusDistance < maxGestusDistance)
                     {
-                        FollowerGoCheck gclass = new FollowerGoCheck(data.Player, BotRequestType.followMe);
-                        if (
-                            gclass.CanRequest(botOwner_0) &&
-                            botOwner_0.BotsGroup.RequestsController.TryAddRequest(gclass)
-                        )
+                        Components.Logger.LogInfo("Come To me was made");
+                        Player playerLook = GetInteractivePlayer(data.Player.Transform.position, data.Player.LookDirection);
+                        
+                        if(playerLook == null) Components.Logger.LogInfo("playerLook is null");
+
+                        if (playerLook != null && playerLook.ProfileId == botOwner_0.ProfileId)
                         {
-                            gclass.AddPossibleExecutors(botOwner_0);
-                            gclass.SetGroup(botOwner_0.BotsGroup.RequestsController);
+                            FollowerGoCheck gclass = new FollowerGoCheck(data.Player, BotRequestType.followMe);
+                            if (
+                                gclass.CanRequest(botOwner_0) &&
+                                botOwner_0.BotsGroup.RequestsController.TryAddRequest(gclass)
+                            )
+                            {
+                                gclass.AddPossibleExecutors(botOwner_0);
+                                gclass.SetGroup(botOwner_0.BotsGroup.RequestsController);
+                            }
                         }
                     }
                 }
@@ -142,6 +216,7 @@ namespace friendlyPMC.Components
                     base.method_6(data);
                 }
             }
+            // on gesture "go there", if bot has enemy, do a push, else the closest bot to the user will move forward 
             else if(gesture == EGesture.ThatDirection)
             {
                 if (isBossCommunicating)
@@ -169,29 +244,11 @@ namespace friendlyPMC.Components
                             // else move somewhere in front of the player
                             else
                             {
-                                BotOwner closest = null;
-                                float dist = Mathf.Infinity;
-                                pitAIBossPlayer boss = BossPlayers.Instance.GetBossPlayer(data.Player.ProfileId);
-                                Vector3 bossPos = boss.realPlayer.Transform.position;
+                                FollowerGoCheck gclass;
+                                BotOwner closest = GetClosetBot(botOwner_0,data.Player, out gclass);
 
-                                FollowerGoCheck gclass = new FollowerGoCheck(data.Player);
-
-                                boss.Followers.ForEach(fl =>
-                                {
-                                    if (gclass.CanRequest(botOwner_0))
-                                    {
-                                        Vector3 pos = fl.GetPlayer.Transform.position;
-                                        float fldist = (bossPos - pos).sqrMagnitude;
-                                        if (fldist < dist)
-                                        {
-                                            closest = fl;
-                                            dist = fldist;
-                                        }
-                                    }
-
-                                });
                                 // - the closest bot shall move
-                                if (closest != null && closest == botOwner_0 && botOwner_0.BotsGroup.RequestsController.TryAddRequest(gclass))
+                                if (closest != null && gclass != null && botOwner_0 && botOwner_0.BotsGroup.RequestsController.TryAddRequest(gclass))
                                 {
                                     gclass.AddPossibleExecutors(botOwner_0);
                                     gclass.SetGroup(botOwner_0.BotsGroup.RequestsController);
@@ -258,7 +315,6 @@ namespace friendlyPMC.Components
                 }
             }
 
-
             if (info.phrase == EPhraseTrigger.Attention)
             {
                 if (botOwner_0.BotRequestController.CurRequest != null)
@@ -277,6 +333,7 @@ namespace friendlyPMC.Components
 
                 return;
             }
+
 
             // AI Boss followers and AI followers of AI Bosses will not take several commands
             if (isBossCommunicating && isFollowerBoss)
@@ -367,15 +424,11 @@ namespace friendlyPMC.Components
 
                 }
                 // on regroup all shall come near the boss
-                else if(info.phrase == EPhraseTrigger.Regroup)
+                else if(info.phrase == EPhraseTrigger.Regroup || (isFollowerBoss && info.phrase == EPhraseTrigger.FollowMe && !botOwner_0.Memory.HaveEnemy))
                 {
-                    if(!botOwner_0.Memory.HaveEnemy)
-                    {
-                        botOwner_0.BotsGroup.RequestsController.TryAskFollowMeRequest(requester, botOwner_0);
-                        return;
-                    }
-
                     (botOwner_0.Brain.BaseBrain as FollowerBrain).BossOrdersChanged();
+
+                    Components.Logger.LogInfo("Boss Said to regroup");
 
                     Player alivePlayerByProfileID = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(requester.ProfileId);
 
@@ -391,7 +444,19 @@ namespace friendlyPMC.Components
                         }
                     }
                 }
-                // on need help come closer to the boss
+                else if(info.phrase == EPhraseTrigger.FollowMe)
+                {
+                    FollowerGoCheck gclass = new FollowerGoCheck(requester, BotRequestType.followMe);
+                    if (
+                        gclass.CanRequest(botOwner_0) &&
+                        botOwner_0.BotsGroup.RequestsController.TryAddRequest(gclass)
+                    )
+                    {
+                        gclass.AddPossibleExecutors(botOwner_0);
+                        gclass.SetGroup(botOwner_0.BotsGroup.RequestsController);
+                    }
+                }
+                // on need help closest bot shall come near boss
                 else if (info.phrase == EPhraseTrigger.NeedHelp)
                 {
                     BotOwner closest = null;
@@ -416,13 +481,27 @@ namespace friendlyPMC.Components
 
                     });
 
-                    // - the closest bot shall go to the player
-                    if (closest != null && closest == botOwner_0)
+                    
+                    if (closest != null && closest.ProfileId == botOwner_0.ProfileId)
                     {
-                        if (botOwner_0.BotsGroup.RequestsController.TryAddRequest(gclass))
+                        (botOwner_0.Brain.BaseBrain as FollowerBrain).BossOrdersChanged();
+                        
+                        if (!botOwner_0.Memory.HaveEnemy)
                         {
-                            gclass.AddPossibleExecutors(botOwner_0);
-                            gclass.SetGroup(botOwner_0.BotsGroup.RequestsController);
+                            botOwner_0.BotsGroup.RequestsController.TryAskFollowMeRequest(requester, botOwner_0);
+                            return;
+                        }
+
+
+                        Player alivePlayerByProfileID = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(requester.ProfileId);
+
+                        if (botOwner_0.BotRequestController.TryStopCurrent(alivePlayerByProfileID, true))
+                        {
+                            if (botOwner_0.BotsGroup.RequestsController.TryAddRequest(gclass))
+                            {
+                                gclass.AddPossibleExecutors(botOwner_0);
+                                gclass.SetGroup(botOwner_0.BotsGroup.RequestsController);
+                            }
                         }
                     }
                 }

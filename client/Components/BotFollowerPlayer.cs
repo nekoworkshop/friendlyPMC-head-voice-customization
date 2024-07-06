@@ -217,19 +217,20 @@ namespace friendlyPMC.Components
                         }
                     };
                     _player.bossGroup.AnyBodyShootImmediately = true;
-                    // - - any enemy the boss has, the followers will now have
+                    /*// - - any enemy the boss has, the followers will now have
                     try
                     {
                         var _initialBot = AccessTools.Field(typeof(BotsGroup), "_initialBot").GetValue(_player.bossGroup) as BotOwner;
                         _initialBot.Settings.FileSettings.Mind.USE_ADD_TO_ENEMY_VALIDATION = false;
                         _player.GetEnemies().ForEach(enemy =>
                         {
-                            _player.bossGroup.AddEnemy(enemy.GetPlayer, EBotEnemyCause.initCauseEnemy);
+                            if(enemy.BotState == EBotState.Active && !enemy.IsDead)
+                                _player.bossGroup.AddEnemy(enemy.GetPlayer, EBotEnemyCause.initCauseEnemy);
                         });
                     } catch(Exception ex)
                     {
                         Logger.LogInfo(ex.Message);
-                    }
+                    }*/
                 }
                 else if(_bot.BotsGroup.Id != _player.bossGroup.Id)
                 {

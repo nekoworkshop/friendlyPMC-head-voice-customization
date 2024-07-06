@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
+using static RootMotion.FinalIK.IKSolver;
 
 namespace friendlyPMC.Modules
 {
@@ -22,6 +24,25 @@ namespace friendlyPMC.Modules
         private List<string> _removedBosses;
 
         public bool IsDisposed = false;
+
+        private static readonly List<string> _excludedColliderNames = new List<string>
+        {
+            "metall_fence_2",
+            "metallstolb",
+            "stolb",
+            "fonar_stolb",
+            "fence_grid",
+            "metall_fence_new",
+            "ladder_platform",
+            "frame_L",
+            "frame_small_collider",
+            "bump2x_p3_set4x",
+            "bytovka_ladder",
+            "sign",
+            "sign17_lod",
+            "ograda1",
+            "ladder_metal"
+        };
 
         public BossPlayers()
         {
@@ -56,12 +77,12 @@ namespace friendlyPMC.Modules
 
             if (!playerBoss.IAmBoos)
             {
-                Logger.LogInfo($"Could not make player {player.Profile.Nickname} as BOSS");
+                Components.Logger.LogInfo($"Could not make player {player.Profile.Nickname} as BOSS");
                 return null;
             }
             else
             {
-                Logger.LogInfo($"Made player {player.Profile.Nickname} a BOSS");
+                Components.Logger.LogInfo($"Made player {player.Profile.Nickname} a BOSS");
             }
 
             string name = player.ProfileId;
@@ -100,7 +121,23 @@ namespace friendlyPMC.Modules
                                         {
                                             if (groupPoint.CoverLevel == CoverLevel.Stay || groupPoint.CoverLevel == CoverLevel.Sit)
                                             {
-                                                customNavigationPoints.Add(groupPoint.CreateCustomNavigationPoint(id));
+                                                Collider[] colliders = new Collider[10];
+                                                int numColliders = Physics.OverlapSphereNonAlloc(groupPoint.Position, 1.5f, colliders);
+
+                                                bool isgood = true;
+                                                for (int x = 0; i < numColliders; i++)
+                                                {
+                                                    Collider collider = colliders[x];
+
+                                                    if (_excludedColliderNames.Contains(collider.transform?.parent?.name))
+                                                    {
+                                                        isgood = false;
+                                                        break;
+                                                    }
+                                                }
+
+                                                if(isgood)
+                                                    customNavigationPoints.Add(groupPoint.CreateCustomNavigationPoint(id));
                                             }
                                         }
                                     }
@@ -257,9 +294,9 @@ namespace friendlyPMC.Modules
         public bool IsFollower(BotOwner bot, AIBossPlayer boss = null)
         {
 
-            if (boss != null && bot != null && bot.BotFollower.BossToFollow != null)
+            if (boss != null && bot != null && bot.BotFollower.HaveBoss)
             {
-                return bot.BotFollower.HaveBoss && bot.BotFollower.BossToFollow.Player().ProfileId == boss.Player().ProfileId;
+                return bot.BotFollower.BossToFollow.Player().ProfileId == boss.Player().ProfileId;
             }
             
             if (bot == null || !bot.BotFollower.HaveBoss) return false;

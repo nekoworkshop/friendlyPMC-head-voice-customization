@@ -28,9 +28,6 @@ namespace friendlyPMC.Components.FollowerBossFollower
             // assault building
             KnightAssaultBuildingLayer layer3 = new KnightAssaultBuildingLayer(_owner, 70);
             base.method_0(4, layer3, true);
-            //// enemy building
-            //KnightEnemyBuildingLayer buildingLayer = new KnightEnemyBuildingLayer(_owner, 60);
-            //base.method_0(5, buildingLayer, true);
             // artillerry support
             fightLayer = new BigPipeArtilleryLayer(_owner, 60);
             base.method_0(6, fightLayer, true);

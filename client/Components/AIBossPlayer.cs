@@ -244,7 +244,8 @@ namespace friendlyPMC.Components
             if (
                 arg1.Player != null && arg1.Player.IsAI && 
                 arg1.Player.AIData != null && 
-                arg1.Player.AIData.BotOwner != null && 
+                arg1.Player.AIData.BotOwner != null &&
+                _aiplayer != null &&
                 !BossPlayers.Instance.IsFollower(arg1.Player.AIData.BotOwner,_aiplayer)
                 )
             {

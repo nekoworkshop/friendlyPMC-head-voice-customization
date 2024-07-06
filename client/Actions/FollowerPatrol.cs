@@ -63,7 +63,7 @@ namespace friendlyPMC.Actions
                 
 
                 // BigPipe will tail BirdEye or Knight instead of the player
-                if (isBigPipe && !botOwner.Memory.HaveEnemy)
+                /*if (isBigPipe && !botOwner.Memory.HaveEnemy)
                 {
                     BotOwner birdEye = null;
                     BotOwner knight = null;
@@ -83,7 +83,7 @@ namespace friendlyPMC.Actions
                         leaderPosition = knight.GetPlayer.Transform.position;
                     else if(birdEye != null)
                         leaderPosition = birdEye.GetPlayer.Transform.position;
-                }
+                }*/
 
                 this.float_3 = Time.time + GClass760.Random(1f, 2f);
                 float num = Mathf.Abs((this.bool_0 ? this.vector3_0 : (leaderPosition - this.botOwner_0.Position)).magnitude);
