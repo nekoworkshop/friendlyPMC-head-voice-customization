@@ -307,7 +307,7 @@ namespace friendlyPMC.Components
                     {
                             return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "approachEnemyFast");
                     }
-
+                    botOwner_0.SearchData.SearchPoint = new BotSearchPoint(enemyPos, EBotSearchPoint.playerPosition);
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.search, "approachEnemy");
                 }
             // play the intimidation game 
@@ -360,7 +360,7 @@ namespace friendlyPMC.Components
                 else if(Time.time - lastEnemySeenTime < GClass760.Random(2f, 5f))
                 {
                     // -- find a cover point closer to the enemy's last known position
-                    GetClosestAttackCoverPoint(enemyPos, false, 5f, 120f);
+                    GetApproachablePoint();
                     if (customNavigationPoint_0 != null)
                     {
                         return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "getInCloseFast");
@@ -368,7 +368,7 @@ namespace friendlyPMC.Components
                     else
                     {
                         // -- no cover point found, approach the enemy
-                       botOwner_0.SearchData.SearchPoint = new BotSearchPoint(enemyPos, EBotSearchPoint.mapPosition);
+                       botOwner_0.SearchData.SearchPoint = new BotSearchPoint(enemyPos, EBotSearchPoint.playerPosition);
                        return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.search, "enemy.Search");
                     }
                 }
