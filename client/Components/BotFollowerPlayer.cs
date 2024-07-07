@@ -144,7 +144,8 @@ namespace friendlyPMC.Components
             {
                 Logger.LogInfo("Failed to add Looting Brain to follower: " +ex.Message);
             }
-
+            // change search mode
+            _bot.SearchData = new FollowerSearch(_bot);
             // add the new follower brain
             _bot.Brain.BaseBrain = GetFollowerBrain(_bot, _player);
             _bot.Brain.Agent = GetFollowerAIAgent(_bot);

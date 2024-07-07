@@ -87,8 +87,9 @@ namespace friendlyPMC.Components.BossFollower
 
             if(requestRegroup) Components.Logger.LogInfo("Regroup reached");
 
-            if (!botOwner_0.Memory.HaveEnemy && request != null)
+            if (request != null)
             {
+                Components.Logger.LogInfo("Request is: "+ request.BotRequestType.ToString());
                 if (requestGoThere)
                 {
 

@@ -90,31 +90,26 @@ namespace friendlyPMC.Utils
 
         }
 
-        public static float GetEnemiesAtLocation(BotOwner bot, Vector3 position, float radius = 30f)
+        public static float GetEnemiesAtLocation(BotOwner bot, Vector3 position, float radius = 25f)
         {
             float nr = 0;
 
-            RaycastHit[] hits = new RaycastHit[100];
+            Collider[] hits = new Collider[100];
 
-            int numHits = Physics.SphereCastNonAlloc(
-                new Ray(position, Vector3.zero),
+            int numHits = Physics.OverlapSphereNonAlloc(
+                position,
                 radius,
                 hits,
-                0f,
                 LayerMaskClass.PlayerMask
             );
 
             for (int i = 0; i < numHits; i++)
             {
-                RaycastHit hit = hits[i];
-                if (hit.collider != null)
-                {
-                    var enemy = bot.ShootData.method_4(hit.collider);
+                var enemy = bot.ShootData.method_4(hits[i]);
 
-                    if (enemy != null && enemy.IsAI && enemy.HealthController.IsAlive && bot.EnemiesController.IsEnemy(enemy))
-                    {
+                if (enemy != null && enemy.IsAI && enemy.HealthController.IsAlive && (bot.EnemiesController.IsEnemy(enemy) || bot.Settings.FileSettings.Mind.ENEMY_BOT_TYPES.Contains(enemy.GetPlayer.Profile.Info.Settings.Role)))
+                {
                         nr++;
-                    }
                 }
             }
 

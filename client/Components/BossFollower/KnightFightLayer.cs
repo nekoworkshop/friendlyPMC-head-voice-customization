@@ -170,11 +170,11 @@ namespace friendlyPMC.Components.BossFollower
                 Utils.Utils.GetNavDistance(botPosition, bossPosition) > friendlyPMC.regroupMinDistance.Value
             )
             {
+                Components.Logger.LogInfo("Player asked for help");
                 if (!botOwner_0.Memory.HaveEnemy || !botOwner_0.Memory.GoalEnemy.IsVisible)
                 {
                     followerFightLayer.GetCloserToBoss();
 
-                    
                 }
                 else
                 {
@@ -205,10 +205,10 @@ namespace friendlyPMC.Components.BossFollower
                 return followerFightLayer.EngageEnemy(true);
             }
 
-            if (Utils.EnemyInfo.Distance(botOwner_0) <= Utils.EnemyInfo.EnemyDistance.Close)
+            /*if (Utils.EnemyInfo.Distance(botOwner_0) <= Utils.EnemyInfo.EnemyDistance.Close)
             {
                 return followerFightLayer.CloseFight();
-            }
+            }*/
 
             AICoreActionResultStruct<BotLogicDecision> baseDecision = base.GetDecision();
 
@@ -231,7 +231,10 @@ namespace friendlyPMC.Components.BossFollower
                 }
             }
 
-            if (baseDecision.Reason == "assault2" || baseDecision.Reason == "assault1")
+            if (
+                (baseDecision.Reason == "assault2" || baseDecision.Reason == "assault1") &&
+                followerFightLayer.IsEnemyLowThreat()
+            )
             {
                 return KnightAssault();
             }
@@ -255,28 +258,9 @@ namespace friendlyPMC.Components.BossFollower
                 return gstruct7_0;
             }
 
-            List<string> regroup = new List<string>
-            {
-                "regroupToBossFast",
-                "regroupToBoss",
-            };
-
-            if (
-                curDecision.Reason == "getInCloseFast" || 
-                curDecision.Reason == "getInCloseSlow" || 
-                curDecision.Reason == "am" || 
-                curDecision.Reason == "repositionFast" || 
-                curDecision.Reason == "reposition" ||
-                (regroup.Contains(curDecision.Reason) && curDecision.Action == BotLogicDecision.goToPoint)
-            )
-            {
-                return EndGetInClose();
-            }
-
             List<string> ordersIgnoreDecisions = new List<string>
             {
                 "healInCover",
-                "DogFight",
                 "heal"
             };
 
@@ -284,6 +268,7 @@ namespace friendlyPMC.Components.BossFollower
             {
                 BotLogicDecision.holdPosition,
                 BotLogicDecision.lay,
+                BotLogicDecision.search
             };
 
             // orders changed
@@ -294,12 +279,12 @@ namespace friendlyPMC.Components.BossFollower
                     !botOwner_0.Memory.HaveEnemy ||
                     !botOwner_0.Memory.GoalEnemy.HaveSeen ||
                     (!botOwner_0.Memory.GoalEnemy.IsVisible &&
-                        Time.time - botOwner_0.Memory.GoalEnemy.PersonalLastSeenTime < 3f &&
                         Utils.EnemyInfo.DistanceProxy(botOwner_0, botOwner_0.GetPlayer.Transform.position) > Utils.EnemyInfo.ProxyDistance.VeryClose
                     )
                 )
             )
             {
+                Components.Logger.LogInfo("End current Decision");
                 return gstruct7_0;
             }
 
@@ -321,6 +306,11 @@ namespace friendlyPMC.Components.BossFollower
         public override AICoreActionEndStruct EndGoToPoint()
         {
             return followerFightLayer.EndGoToPoint();
+        }
+
+        public override AICoreActionEndStruct EndSearch()
+        {
+            return followerFightLayer.EndSearch();
         }
 
         public override AICoreActionEndStruct EndHoldPosition()

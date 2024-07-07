@@ -436,9 +436,11 @@ namespace friendlyPMC.Components
                     {
                         FollowerRegroup gclass = new FollowerRegroup(requester);
 
+                        Components.Logger.LogInfo("Try and add FollowerRegroup");
 
                         if (botOwner_0.BotsGroup.RequestsController.TryAddRequest(gclass))
                         {
+                            Components.Logger.LogInfo("Added FollowerRegroup");
                             gclass.AddPossibleExecutors(botOwner_0);
                             gclass.SetGroup(botOwner_0.BotsGroup.RequestsController);
                         }
