@@ -185,9 +185,9 @@ namespace friendlyPMC.Components
 
             Utils.EnemyInfo.EnemyDistance distanceToEnemy = Utils.EnemyInfo.Distance(botOwner_0);
             float enemiesAtLocation = Utils.EnemyInfo.GetEnemiesAtLocation(botOwner_0, botOwner_0.Memory.GoalEnemy.CurrPosition);
-
+            Components.Logger.LogInfo("Enemies at location " + enemiesAtLocation);
             // PUSH CASE
-            if(botOwner_0.Memory.AttackImmediately || pushOrdered) 
+            if (botOwner_0.Memory.AttackImmediately || pushOrdered) 
             {
                 if(
                     // - go for it if enemy is already close
@@ -360,7 +360,7 @@ namespace friendlyPMC.Components
                 else if(Time.time - lastEnemySeenTime < GClass760.Random(2f, 5f))
                 {
                     // -- find a cover point closer to the enemy's last known position
-                    GetClosestAttackCoverPoint(botOwner_0.Memory.GoalEnemy.CurrPosition, false, 5f, 120f);
+                    GetClosestAttackCoverPoint(enemyPos, false, 5f, 120f);
                     if (customNavigationPoint_0 != null)
                     {
                         return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "getInCloseFast");
@@ -368,7 +368,7 @@ namespace friendlyPMC.Components
                     else
                     {
                         // -- no cover point found, approach the enemy
-                       botOwner_0.SearchData.SearchPoint = new BotSearchPoint(botOwner_0.Memory.GoalEnemy.CurrPosition,EBotSearchPoint.mapPosition);
+                       botOwner_0.SearchData.SearchPoint = new BotSearchPoint(enemyPos, EBotSearchPoint.mapPosition);
                        return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.search, "enemy.Search");
                     }
                 }

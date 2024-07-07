@@ -9,6 +9,7 @@ using friendlyPMC.Components.BossFollower;
 using friendlyPMC.Components.FollowerBossFollower;
 using friendlyPMC.Actions;
 using LootingBots.Patch.Util;
+using System.Linq;
 
 namespace friendlyPMC.Components
 {
@@ -69,11 +70,11 @@ namespace friendlyPMC.Components
                     {
                         if (!_initialBot.Settings.FileSettings.Mind.DEFAULT_BEAR_BEHAVIOUR.HasFlag(EWarnBehaviour.Attack))
                         {
-                            bot.Settings.FileSettings.Mind.FRIENDLY_BOT_TYPES.AddItem(botType);
-                            bot.Settings.FileSettings.Mind.WARN_BOT_TYPES.AddItem(botType);
+                            bot.Settings.FileSettings.Mind.FRIENDLY_BOT_TYPES = bot.Settings.FileSettings.Mind.FRIENDLY_BOT_TYPES.AddItem(botType).ToArray();
+                            bot.Settings.FileSettings.Mind.WARN_BOT_TYPES = bot.Settings.FileSettings.Mind.WARN_BOT_TYPES.AddItem(botType).ToArray();
                         } else
                         {
-                            bot.Settings.FileSettings.Mind.ENEMY_BOT_TYPES.AddItem(botType);
+                            bot.Settings.FileSettings.Mind.ENEMY_BOT_TYPES = bot.Settings.FileSettings.Mind.ENEMY_BOT_TYPES.AddItem(botType).ToArray();
                         }
                         continue;
                     }
@@ -81,18 +82,18 @@ namespace friendlyPMC.Components
                     {
                         if (!_initialBot.Settings.FileSettings.Mind.DEFAULT_USEC_BEHAVIOUR.HasFlag(EWarnBehaviour.Attack))
                         {
-                            bot.Settings.FileSettings.Mind.FRIENDLY_BOT_TYPES.AddItem(botType);
-                            bot.Settings.FileSettings.Mind.WARN_BOT_TYPES.AddItem(botType);
+                            bot.Settings.FileSettings.Mind.FRIENDLY_BOT_TYPES = bot.Settings.FileSettings.Mind.FRIENDLY_BOT_TYPES.AddItem(botType).ToArray();
+                            bot.Settings.FileSettings.Mind.WARN_BOT_TYPES = bot.Settings.FileSettings.Mind.WARN_BOT_TYPES.AddItem(botType).ToArray();
                         }
                         else
                         {
-                            bot.Settings.FileSettings.Mind.ENEMY_BOT_TYPES.AddItem(botType);
+                            bot.Settings.FileSettings.Mind.ENEMY_BOT_TYPES = bot.Settings.FileSettings.Mind.ENEMY_BOT_TYPES.AddItem(botType).ToArray();
                         }
                         continue;
                     } 
                     else if(botType != WildSpawnType.shooterBTR)
                     {
-                        bot.Settings.FileSettings.Mind.ENEMY_BOT_TYPES.AddItem(botType);
+                        bot.Settings.FileSettings.Mind.ENEMY_BOT_TYPES = bot.Settings.FileSettings.Mind.ENEMY_BOT_TYPES.AddItem(botType).ToArray();
                     }
                 }
             } else
@@ -103,12 +104,12 @@ namespace friendlyPMC.Components
                     {
                         if (!_initialBot.Settings.FileSettings.Mind.DEFAULT_SAVAGE_BEHAVIOUR.HasFlag(EWarnBehaviour.Attack))
                         {
-                            bot.Settings.FileSettings.Mind.FRIENDLY_BOT_TYPES.AddItem(botType);
-                            bot.Settings.FileSettings.Mind.WARN_BOT_TYPES.AddItem(botType);
+                            bot.Settings.FileSettings.Mind.FRIENDLY_BOT_TYPES = bot.Settings.FileSettings.Mind.FRIENDLY_BOT_TYPES.AddItem(botType).ToArray();
+                            bot.Settings.FileSettings.Mind.WARN_BOT_TYPES = bot.Settings.FileSettings.Mind.WARN_BOT_TYPES.AddItem(botType).ToArray();
                         }
                         else if (botType != WildSpawnType.shooterBTR)
                         {
-                            bot.Settings.FileSettings.Mind.ENEMY_BOT_TYPES.AddItem(botType);
+                            bot.Settings.FileSettings.Mind.ENEMY_BOT_TYPES = bot.Settings.FileSettings.Mind.ENEMY_BOT_TYPES.AddItem(botType).ToArray();
                         }
                     }
                 }

@@ -94,7 +94,7 @@ namespace friendlyPMC.Utils
         {
             float nr = 0;
 
-            Collider[] hits = new Collider[100];
+            Collider[] hits = new Collider[50];
 
             int numHits = Physics.OverlapSphereNonAlloc(
                 position,
@@ -106,10 +106,21 @@ namespace friendlyPMC.Utils
             for (int i = 0; i < numHits; i++)
             {
                 var enemy = bot.ShootData.method_4(hits[i]);
-
-                if (enemy != null && enemy.IsAI && enemy.HealthController.IsAlive && (bot.EnemiesController.IsEnemy(enemy) || bot.Settings.FileSettings.Mind.ENEMY_BOT_TYPES.Contains(enemy.GetPlayer.Profile.Info.Settings.Role)))
+                
+                if (
+                    enemy != null && 
+                    enemy.HealthController.IsAlive && 
+                    (
+                        bot.EnemiesController.IsEnemy(enemy) || 
+                        bot.Settings.FileSettings.Mind.ENEMY_BOT_TYPES.Contains(enemy.GetPlayer.Profile.Info.Settings.Role)
+                    )
+                 )
                 {
-                        nr++;
+                    if (bot.GetPlayer.ProfileId == enemy.ProfileId) continue;
+                    if (enemy.IsAI && bot.BotsGroup.Contains(enemy.AIData.BotOwner)) continue;
+                    if(bot.BotsGroup.IsAlly(enemy)) continue;
+
+                        nr = nr + 1;
                 }
             }
 

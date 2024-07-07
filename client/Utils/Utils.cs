@@ -84,7 +84,7 @@ namespace friendlyPMC.Utils
                     Vector3[] carePosition = new Vector3[] { };
                     foreach (var item in botOwner.EnemiesController.EnemyInfos)
                     {
-                        carePosition.AddItem(item.Value.CurrPosition);
+                        carePosition = carePosition.AddItem(item.Value.CurrPosition).ToArray();
                     }
 
                     if (!point.IsDangerPositionFarEnough(carePosition, safeDistance * safeDistance)) continue;
@@ -169,7 +169,7 @@ namespace friendlyPMC.Utils
                     Vector3[] carePosition = new Vector3[] { };
                     foreach (var item in botOwner.EnemiesController.EnemyInfos)
                     {
-                        carePosition.AddItem(item.Value.CurrPosition);
+                        carePosition = carePosition.AddItem(item.Value.CurrPosition).ToArray();
                     }
 
                     if (!point.IsDangerPositionFarEnough(carePosition, safeDistance * safeDistance)) continue;
@@ -339,7 +339,7 @@ namespace friendlyPMC.Utils
 
                         foreach (var item in botOwner.EnemiesController.EnemyInfos)
                         {
-                            carePosition.AddItem(item.Value.CurrPosition);
+                            carePosition = carePosition.AddItem(item.Value.CurrPosition).ToArray();
                         }
                         
                         if (!point.IsDangerPositionFarEnough(carePosition, minDistance * minDistance)) continue;

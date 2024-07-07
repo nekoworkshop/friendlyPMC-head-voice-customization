@@ -71,7 +71,7 @@ namespace friendlyPMC.Components
             
             _IsSquadMate = isSquad;
 
-            settingModif = new GClass529(1.2f,1.2f,1f,1f,1f,1f,0.7f,1f,1f);
+            settingModif = new GClass529(1.2f,1.2f,1f,1f,1f,1f,0.4f,1f,1f);
 
             bool hadEnemy = _bot.Memory.HaveEnemy;
             // deactivate old layers
