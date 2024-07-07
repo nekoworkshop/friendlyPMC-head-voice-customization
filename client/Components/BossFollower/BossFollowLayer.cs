@@ -18,7 +18,9 @@ namespace friendlyPMC.Components.BossFollower
         protected float coverTimer = 0f;
 
         protected bool requestComeHere = false;
+        protected bool requestComeHereOngoing = false;
         protected bool requestGoThere = false;
+        protected bool requestGoThereOngoing = false;
         protected bool requestRegroup = false;
         public BossFollowLayer(BotOwner bot, int priority) : base(bot, priority)
         {
@@ -64,6 +66,7 @@ namespace friendlyPMC.Components.BossFollower
                 else
                 {
                     requestGoThere = false;
+                    requestGoThereOngoing = false;
                 }
 
                 if (request.BotRequestType == BotRequestType.followMe)
@@ -73,6 +76,7 @@ namespace friendlyPMC.Components.BossFollower
                 else
                 {
                     requestComeHere = false;
+                    requestComeHereOngoing = false;
                 }
 
                 if (request.BotRequestType == (BotRequestType)CustomBotRequestType.Regroup)
@@ -85,14 +89,11 @@ namespace friendlyPMC.Components.BossFollower
                 }
             }
 
-            if(requestRegroup) Components.Logger.LogInfo("Regroup reached");
-
             if (request != null)
             {
-                Components.Logger.LogInfo("Request is: "+ request.BotRequestType.ToString());
-                if (requestGoThere)
+                if (requestGoThere && !requestGoThereOngoing)
                 {
-
+                    requestGoThereOngoing = true;
                     botOwner_0.Gesture.TryGestus(EGesture.Good, false);
 
                     IPlayer requester = botOwner_0.BotRequestController.CurRequest.Requester;
@@ -114,13 +115,12 @@ namespace friendlyPMC.Components.BossFollower
                     botOwner_0.GoToSomePointData.UpdateToGo(shouldSprint02);
                     if (!shouldSprint02) botOwner_0.Sprint(false);
 
-                    botOwner_0.BotRequestController.CurRequest.Complete();
-
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.goToPoint, "req:moveThere");
                 }
 
-                if (requestComeHere)
+                if (requestComeHere && !requestComeHereOngoing)
                 {
+                    requestComeHereOngoing = true;
                     botOwner_0.Gesture.TryGestus(EGesture.Good, false);
 
                     IPlayer requester = botOwner_0.BotRequestController.CurRequest.Requester;
@@ -142,8 +142,6 @@ namespace friendlyPMC.Components.BossFollower
                     botOwner_0.GoToSomePointData.UpdateToGo(shouldSprint01);
                     if (!shouldSprint01) botOwner_0.Sprint(false);
 
-                    botOwner_0.BotRequestController.CurRequest.Complete();
-
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.goToPoint, "req:comeHere");
                 }
 
@@ -156,41 +154,36 @@ namespace friendlyPMC.Components.BossFollower
 
                 if (requestRegroup && GetNavDistance(bossPosition) > regroupMinDistance)
                 {
-                    Components.Logger.LogInfo("Do a regroup");
-                    GetClosestCoverPoint(bossPosition, nearSearchRadius);
-
-                    if (customNavigationPoint_0 != null)
-                    {
-
-                        if (GetNavDistance(customNavigationPoint_0.Position) > sprintDistance)
-                        {
-                            return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "regroupToPlayerFast");
-                        }
-                        else
-                        {
-                            return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMoving, "regroupToPlayerSlow");
-                        }
-                    }
-                    else
-                    {
-
-                        botOwner_0.BotRequestController.CurRequest.Complete();
-
-                        return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.followerPatrol, "regroupFallback");
-                    }
+                    botOwner_0.BotTalk.TrySay(EPhraseTrigger.Roger, false);
+                    request.Complete();
+                    return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.followerPatrol, "backToFLB");
                 }
             }
             return base.GetDecision();
         }
 
 
-        /*public override AICoreActionEndStruct EndFollowerPatrolItem()
+        public override AICoreActionEndStruct EndGoToPoint()
         {
-            if(requestRegroup || requestComeHere || requestGoThere)
-            return new AICoreActionEndStruct("request.Made", true);
+            AICoreActionEndStruct baseEnd = base.EndGoToPoint();
+            if (baseEnd.Value)
+            {
+                requestComeHereOngoing = false;
+                requestGoThereOngoing = false;
 
-            return base.EndFollowerPatrolItem();
-        }*/
+                BotRequest curRequest = botOwner_0.BotRequestController.CurRequest;
+                if (
+                    curRequest != null && 
+                    curRequest.BotRequestType == BotRequestType.followMe
+                )
+                {
+                    curRequest.Complete();
+                }
+
+            }
+
+            return baseEnd;
+        }
 
         protected float GetNavDistance(Vector3 point)
         {

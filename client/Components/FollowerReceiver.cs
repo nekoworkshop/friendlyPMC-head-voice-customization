@@ -32,27 +32,68 @@ namespace friendlyPMC.Components
         }
 
 
-        private static Player GetInteractivePlayer(Vector3 requestPosition, Vector3 requestDirection)
+        private static bool IsInteractivePlayer(BotOwner bot, Vector3 requestPosition, Vector3 requestDirection)
         {
 
-            if(interactiveTime > Time.time) return interactivePlayer;
+            if(interactiveTime > Time.time)
+            {
+                if (interactivePlayer == null) return false;
+                return interactivePlayer.ProfileId == bot.ProfileId;
+            }
 
-            Ray ray = new Ray(requestPosition, requestDirection.normalized * maxGestusDistance);
+            float sphereRadius = 20f / 2;
+            float sphereDistance = sphereRadius;
 
-            RaycastHit hit;
-            Player player = GameWorld.FindInteractablePlayer(ray, out hit);
+            RaycastHit[] hits = new RaycastHit[40];
 
-            interactivePlayer = player;
+            List<Player> players = new List<Player>();
 
-            interactiveTime = Time.time + 1f;
+            int numHits = Physics.SphereCastNonAlloc(
+                    new Ray(requestPosition, requestDirection),
+                    sphereRadius,
+                    hits,
+                    sphereDistance,
+                     LayerMaskClass.PlayerMask
+                );
 
-            return interactivePlayer;
+            for (int i = 0; i < numHits; i++)
+            {
+                RaycastHit hit = hits[i];
+                if (hit.collider != null)
+                {
+                    var player = bot.ShootData.method_4(hit.collider);
+
+                    if (player != null && player.IsAI && player.HealthController.IsAlive)
+                    {
+                        players.Add(player);
+                    }
+                }
+            }
+
+            float dist = Mathf.Infinity;
+            Player closet = null;
+            foreach (var pl in players)
+            {
+                float range = (requestPosition - pl.Transform.position).sqrMagnitude;
+                if (range < dist)
+                {
+                    dist = range;
+                    closet = pl;
+                }
+            }
+
+            interactivePlayer = closet;
+            interactiveTime = Time.time + 0.5f;
+
+            if (closet == null) return false;
+
+            return interactivePlayer.ProfileId == bot.ProfileId;
         }
 
         private static BotOwner GetClosetBot(BotOwner bot, IPlayer requester, out FollowerGoCheck request)
         {
 
-            if (closestTime > Time.time)
+            if (closestTime > Time.time && closestPlayer != null)
             {
                 request = new FollowerGoCheck(closestPlayer);
                 return closestPlayer;
@@ -190,24 +231,16 @@ namespace friendlyPMC.Components
             {
                 if (isBossCommunicating)
                 {
-                    if (gestusDistance < maxGestusDistance)
+                    if (gestusDistance < maxGestusDistance && IsInteractivePlayer(botOwner_0, data.Player.Transform.position, data.Player.LookDirection))
                     {
-                        Components.Logger.LogInfo("Come To me was made");
-                        Player playerLook = GetInteractivePlayer(data.Player.Transform.position, data.Player.LookDirection);
-                        
-                        if(playerLook == null) Components.Logger.LogInfo("playerLook is null");
-
-                        if (playerLook != null && playerLook.ProfileId == botOwner_0.ProfileId)
+                        FollowerGoCheck gclass = new FollowerGoCheck(data.Player, BotRequestType.followMe);
+                        if (
+                            gclass.CanRequest(botOwner_0) &&
+                            botOwner_0.BotsGroup.RequestsController.TryAddRequest(gclass)
+                        )
                         {
-                            FollowerGoCheck gclass = new FollowerGoCheck(data.Player, BotRequestType.followMe);
-                            if (
-                                gclass.CanRequest(botOwner_0) &&
-                                botOwner_0.BotsGroup.RequestsController.TryAddRequest(gclass)
-                            )
-                            {
-                                gclass.AddPossibleExecutors(botOwner_0);
-                                gclass.SetGroup(botOwner_0.BotsGroup.RequestsController);
-                            }
+                            gclass.AddPossibleExecutors(botOwner_0);
+                            gclass.SetGroup(botOwner_0.BotsGroup.RequestsController);
                         }
                     }
                 }

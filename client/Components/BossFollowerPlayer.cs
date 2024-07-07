@@ -23,8 +23,6 @@ namespace friendlyPMC.Components
                 FollowerPatrol patrol = FollowerPatrolInstances.GetPatrol(bot);
                 patrol.SetReachDist(17f);
             }
-
-            bot.EnemyChooser = new FollowerEnemyChoose(bot);
         }
 
         public override void SetFollowerSettings(BotOwner bot)

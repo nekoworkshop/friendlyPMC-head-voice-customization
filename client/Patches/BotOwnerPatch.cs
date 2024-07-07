@@ -24,12 +24,12 @@ namespace friendlyPMC.Patches
         {
 
             // if BOT is getting hit by a player BOSS of which it is a follower of, do not turn hostile
-            if (__instance !=null && __instance.BotFollower != null && __instance.BotFollower.HaveBoss && BossPlayers.Instance.IsFollower(__instance) && damageInfo.Player != null)
+            if (__instance != null && __instance.BotFollower != null && __instance.BotFollower.HaveBoss && BossPlayers.Instance.IsFollower(__instance) && damageInfo.Player != null)
             {
-                
+
                 AIBossPlayer player = BossPlayers.Instance.GetBossPlayer(damageInfo.Player.iPlayer.ProfileId);
 
-                if(player != null && BossPlayers.Instance.IsFollower(__instance, player))
+                if (player != null && BossPlayers.Instance.IsFollower(__instance, player))
                 {
                     // - yell "friendly fire"
                     __instance.BotTalk.TrySay(EPhraseTrigger.FriendlyFire);
@@ -65,7 +65,8 @@ namespace friendlyPMC.Patches
         }
     }
 
-    internal class BotOwnerManualUpdatePatch : ModulePatch {
+    internal class BotOwnerManualUpdatePatch : ModulePatch
+    {
 
         public static Dictionary<string, Action<BotOwner>> BotOwnerUpdate = new Dictionary<string, Action<BotOwner>>();
         protected override MethodBase GetTargetMethod()
@@ -75,10 +76,11 @@ namespace friendlyPMC.Patches
         [PatchPostfix]
         private static void PatchPostfix(BotOwner __instance)
         {
+            // patch on botOwner UpdateManual to allow us to execute custom code
             try
             {
                 if (
-                    __instance != null && 
+                    __instance != null &&
                     __instance.BotState == EBotState.Active &&
                     __instance.GetPlayer != null &&
                     __instance.GetPlayer.HealthController != null &&
@@ -90,12 +92,28 @@ namespace friendlyPMC.Patches
                     BotOwnerUpdate.TryGetValue(__instance.ProfileId, out OnUpdate);
                     if (OnUpdate != null) OnUpdate(__instance);
                 }
-            } catch (Exception e)
+            }
+            catch (Exception e)
             {
-                Components.Logger.LogInfo("Exception on BotOwner UpdateManual: " + e.Message);
+                Components.Logger.LogInfo("Exception on BotOwner UpdateManual PatchPostfix: " + e.Message);
             }
         }
-    }
 
-    
+        [PatchPrefix]
+        private static void PatchPrefix(BotOwner __instance)
+        {
+            // followers should not have goals
+            try
+            {
+                if (BossPlayers.Instance.IsFollower(__instance) && __instance.BotFollower.HaveBoss)
+                    AccessTools.Field(typeof(BotOwner), "_nextGetGoalTime").SetValue(__instance, Time.time);
+            }
+            catch (Exception e)
+            {
+                Components.Logger.LogInfo("Exception on BotOwner UpdateManual PatchPrefix: " + e.Message);
+            }
+
+
+        }
+    }
 }

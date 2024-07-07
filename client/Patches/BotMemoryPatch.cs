@@ -5,6 +5,7 @@ using friendlyPMC.Modules;
 using HarmonyLib;
 using JetBrains.Annotations;
 using System;
+using System.Diagnostics;
 using System.Reflection; 
 
 namespace friendlyPMC.Patches
@@ -32,7 +33,6 @@ namespace friendlyPMC.Patches
             pitAIBossPlayer playerBoss = null;
 
             if(isBossEnemy) playerBoss = BossPlayers.Instance.GetBossPlayer(enemy.ProfileId);
-
 
             // prevent same side from being added on creation just because they have a different role
             if (
@@ -75,6 +75,24 @@ namespace friendlyPMC.Patches
             }
 
             return true;
+        }
+    }
+
+    [HarmonyPatch(typeof(BotMemoryClass), "GoalEnemy", MethodType.Setter)]
+    public static class GoalEnemyTracePatch
+    {
+        public static void Postfix(BotMemoryClass __instance, EnemyInfo value)
+        {
+            // Log the stack trace
+            if (value != null)
+            {
+                var botOwner_0 = AccessTools.Field(typeof(BotMemoryClass), "botOwner_0").GetValue(__instance) as BotOwner;
+                if (BossPlayers.Instance.IsFollower(botOwner_0))
+                {
+                    Components.Logger.LogInfo("GoalEnemy is being set:" + value.Nickname);
+                    Components.Logger.LogInfo(new StackTrace().ToString());
+                }
+            }
         }
     }
 }

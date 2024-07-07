@@ -31,17 +31,15 @@ namespace friendlyPMC.Components.FollowerBossFollower
 
             // is in dogfight?
             AICoreActionResultStruct<BotLogicDecision>? aicoreActionResultStruct = followerFightLayer.DogFight();
+            if (aicoreActionResultStruct != null) return (AICoreActionResultStruct<BotLogicDecision>)aicoreActionResultStruct;
 
-            if (aicoreActionResultStruct != null)
-            {
-                return (AICoreActionResultStruct<BotLogicDecision>)aicoreActionResultStruct;
-            }
             // needs healing?
             aicoreActionResultStruct = followerFightLayer.NeedHeal();
-            if (aicoreActionResultStruct != null)
-            {
-                return (AICoreActionResultStruct<BotLogicDecision>)aicoreActionResultStruct;
-            }
+            if (aicoreActionResultStruct != null) return (AICoreActionResultStruct<BotLogicDecision>)aicoreActionResultStruct;
+
+            // player requests?
+            AICoreActionResultStruct<BotLogicDecision>? preFightDecision = KnightPreFight();
+            if (preFightDecision != null) return (AICoreActionResultStruct<BotLogicDecision>)preFightDecision;
 
             AICoreActionResultStruct<BotLogicDecision> baseDecision =  base.KnightFight();
 
@@ -55,10 +53,10 @@ namespace friendlyPMC.Components.FollowerBossFollower
                 return baseDecision;
 
 
-            if (Utils.EnemyInfo.Distance(botOwner_0) <= Utils.EnemyInfo.EnemyDistance.Close)
+            /*if (Utils.EnemyInfo.Distance(botOwner_0) <= Utils.EnemyInfo.EnemyDistance.Close)
             {
                 return followerFightLayer.CloseFight();
-            }
+            }*/
 
             AICoreActionResultStruct < BotLogicDecision > supportDecision = supportLayer.GetDecision();
 

@@ -185,7 +185,7 @@ namespace friendlyPMC.Components
 
             Utils.EnemyInfo.EnemyDistance distanceToEnemy = Utils.EnemyInfo.Distance(botOwner_0);
             float enemiesAtLocation = Utils.EnemyInfo.GetEnemiesAtLocation(botOwner_0, botOwner_0.Memory.GoalEnemy.CurrPosition);
-            Components.Logger.LogInfo("Enemies at location " + enemiesAtLocation);
+
             // PUSH CASE
             if (botOwner_0.Memory.AttackImmediately || pushOrdered) 
             {
@@ -573,7 +573,7 @@ namespace friendlyPMC.Components
                 return aicoreActionResultStruct.Value;
             }
 
-            if (method_2())
+            if (botOwner_0.DogFight.DogFightState == BotDogFightStatus.dogFight)
             {
                 if(!botOwner_0.Memory.GoalEnemy.IsVisible) botOwner_0.Steering.LookToDirection(enemyPosition - botPosition);
                 return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.dogFight, "cdg");
@@ -582,14 +582,33 @@ namespace friendlyPMC.Components
             // Check if the enemy is visible and can be shot
             if (botOwner_0.Memory.GoalEnemy.IsVisible && botOwner_0.Memory.GoalEnemy.CanShoot)
             {
-                float num = 100f * botOwner_0.HealthController.GetBodyPartHealth(EBodyPart.Common, false).Normalized;
 
                 Utils.EnemyInfo.EnemyDistance enemyDistance = Utils.EnemyInfo.Distance(botOwner_0);
+
+                float common = 100f * botOwner_0.HealthController.GetBodyPartHealth(EBodyPart.Common, false).Normalized;
+                float headnum = 100f * botOwner_0.HealthController.GetBodyPartHealth(EBodyPart.Head, false).Normalized;
+                float chestnum = 100f * botOwner_0.HealthController.GetBodyPartHealth(EBodyPart.Chest, false).Normalized;
+
+                float health;
+
+                if (common <= headnum && common <= chestnum)
+                {
+                    health = common;
+                }
+                else if (headnum <= common && headnum <= chestnum)
+                {
+                    health = headnum;
+                }
+                else
+                {
+                    health = chestnum;
+                }
+
                 //  - retreat as we are getting damaged
-                if ((num < 70f && enemyDistance < Utils.EnemyInfo.EnemyDistance.Mid) || num < 60f)
+                if ((health < 70f && enemyDistance < Utils.EnemyInfo.EnemyDistance.Mid) || health < 60f)
                 {
                     // -- find cover point behind
-                    GetClosestCoverPointBetween(botPosition, botPosition - (botOwner_0.LookDirection * coverSearchRadius), 12f);
+                    GetClosestCoverPointBetween(botPosition, botPosition - (botOwner_0.LookDirection * coverSearchRadius), 15f);
                     // -- found nothing, fallback to just finding some cover
                     if(customNavigationPoint_0 == null)
                     {
@@ -599,7 +618,7 @@ namespace friendlyPMC.Components
                     if(customNavigationPoint_0 != null)
                     {
                         // -- critical damage and enemy has enough distance, run for cover
-                        if(num < 50f && Utils.EnemyInfo.Distance(botOwner_0) > Utils.EnemyInfo.EnemyDistance.VeryClose)
+                        if(health < 50f && Utils.EnemyInfo.Distance(botOwner_0) > Utils.EnemyInfo.EnemyDistance.VeryClose)
                         {
                             return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "damageCritical");
                         }
@@ -631,7 +650,7 @@ namespace friendlyPMC.Components
                 float lastSeen = Time.time - botOwner_0.Memory.GoalEnemy.PersonalLastSeenTime;
                 if (!botOwner_0.Memory.GoalEnemy.IsVisible && lastSeen > 3f)
                 {
-                    // - close to the enmy, but safe enough to apply meds
+                    // - close to the enemy, but safe enough to apply meds
                     if(botOwner_0.Memory.IsInCover && Utils.EnemyInfo.DistanceProxy(botOwner_0,botPosition) > Utils.EnemyInfo.ProxyDistance.VeryClose)
                     {
                         heal_time = Time.time;

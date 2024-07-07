@@ -80,22 +80,17 @@ namespace friendlyPMC.Components.BossFollower
 
         public override AICoreActionResultStruct<BotLogicDecision> GetDecision()
         {
- 
-
             // is in dogfight?
             AICoreActionResultStruct<BotLogicDecision>? aicoreActionResultStruct = followerFightLayer.DogFight();
-
-            if (aicoreActionResultStruct != null)
-            {
-                return (AICoreActionResultStruct<BotLogicDecision>)aicoreActionResultStruct;
-            }
+            if (aicoreActionResultStruct != null) return (AICoreActionResultStruct<BotLogicDecision>)aicoreActionResultStruct;
 
             // needs healing?
             aicoreActionResultStruct = followerFightLayer.NeedHeal();
-            if (aicoreActionResultStruct != null)
-            {
-                return (AICoreActionResultStruct<BotLogicDecision>)aicoreActionResultStruct;
-            }
+            if (aicoreActionResultStruct != null) return (AICoreActionResultStruct<BotLogicDecision>)aicoreActionResultStruct;
+
+            // player requests?
+            AICoreActionResultStruct<BotLogicDecision>? preFightDecision = KnightPreFight();
+            if (preFightDecision != null) return (AICoreActionResultStruct<BotLogicDecision>)preFightDecision;
 
             try
             {
@@ -105,7 +100,6 @@ namespace friendlyPMC.Components.BossFollower
                 Components.Logger.LogInfo("Error: " + ex.Message);
                 return new AICoreActionResultStruct<BotLogicDecision>(HoldFor(GClass760.Random(1f, 2f)), "decision.Error");
             }
-
         }
 
         public AICoreActionResultStruct<BotLogicDecision> KnightAssault()
@@ -156,8 +150,9 @@ namespace friendlyPMC.Components.BossFollower
             }
         }
 
-        public AICoreActionResultStruct<BotLogicDecision> KnightFight()
+        public AICoreActionResultStruct<BotLogicDecision>? KnightPreFight()
         {
+
             BotRequest request = botOwner_0.BotRequestController.CurRequest;
 
             Vector3 botPosition = botOwner_0.GetPlayer.Transform.position;
@@ -204,6 +199,13 @@ namespace friendlyPMC.Components.BossFollower
                 };
                 return followerFightLayer.EngageEnemy(true);
             }
+
+            return null;
+        }
+        public AICoreActionResultStruct<BotLogicDecision> KnightFight()
+        {
+
+            Vector3 botPosition = botOwner_0.GetPlayer.Transform.position;
 
             /*if (Utils.EnemyInfo.Distance(botOwner_0) <= Utils.EnemyInfo.EnemyDistance.Close)
             {
@@ -284,7 +286,6 @@ namespace friendlyPMC.Components.BossFollower
                 )
             )
             {
-                Components.Logger.LogInfo("End current Decision");
                 return gstruct7_0;
             }
 
