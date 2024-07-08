@@ -177,20 +177,19 @@ namespace friendlyPMC.Components
 
         public AICoreActionResultStruct<BotLogicDecision> EngageEnemy(bool pushOrdered = false)
         {
-            Components.Logger.LogInfo("trace 1");
+
             Vector3 botPosition = botOwner_0.GetPlayer.Transform.position;
             Vector3 enemyPos = botOwner_0.Memory.GoalEnemy.CurrPosition;
             bool enemyVisible = botOwner_0.Memory.GoalEnemy.IsVisible;
             float lastEnemySeenTime = botOwner_0.Memory.GoalEnemy.PersonalLastSeenTime;
             bool inCover = botOwner_0.Memory.IsInCover;
-            Components.Logger.LogInfo("trace 2");
+
             Utils.EnemyInfo.EnemyDistance distanceToEnemy = Utils.EnemyInfo.Distance(botOwner_0);
             float enemiesAtLocation = Utils.EnemyInfo.GetEnemiesAtLocation(botOwner_0, enemyPos);
-            Components.Logger.LogInfo("trace 3");
+
             // PUSH CASE
             if (botOwner_0.Memory.AttackImmediately || pushOrdered) 
             {
-                Components.Logger.LogInfo("trace 4");
                 if (
                     // - go for it if enemy is already close
                     distanceToEnemy <= Utils.EnemyInfo.EnemyDistance.Close ||
@@ -200,7 +199,6 @@ namespace friendlyPMC.Components
                     (pushOrdered && enemiesAtLocation < 3)
                 )
                 {
-                    Components.Logger.LogInfo("trace 5");
                     // -- push if not visible
                     if (!enemyVisible)
                         return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToEnemy, "rushEnemy");
@@ -227,14 +225,12 @@ namespace friendlyPMC.Components
                 {   
                     if (distanceToEnemy <= Utils.EnemyInfo.EnemyDistance.Mid)
                     {
-                        Components.Logger.LogInfo("trace 6");
                         // -- in cover
                         if (inCover)
                         {
                             // --- try to shot enemy
                             if(enemiesAtLocation < 4 || ( botOwner_0.Memory.CurCustomCoverPoint !=null && botOwner_0.Memory.CurCustomCoverPoint.CanIShootToEnemy)) 
                             {
-                                Components.Logger.LogInfo("trace 7");
                                 if (botOwner_0.Memory.CurCustomCoverPoint != null && botOwner_0.Memory.CurCustomCoverPoint.CanIShootToEnemy)
                                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.shootFromCover, "shootFromCover");
                                 // --- else find better spot
@@ -249,24 +245,20 @@ namespace friendlyPMC.Components
                             // --- too many enemies, find better spot or hold out
                             else
                             {
-                                Components.Logger.LogInfo("trace 8");
                                 if (holdTimer < Time.time)
                                 {
                                     float timer = GClass760.Random(2f, 5f);
                                     holdTimer = Time.time + timer + GClass760.Random(2f, 3f);
-                                    Components.Logger.LogInfo("trace 9");
                                     return new AICoreActionResultStruct<BotLogicDecision>(HoldFor(timer), "wait4it");
                                 } 
                                 else
                                 {
-                                    Components.Logger.LogInfo("trace 10");
                                     GetApproachablePoint(); 
                                     
                                     if(customNavigationPoint_0 == null) GetClosestAttackCoverPoint(botPosition,false,10f);
                                     
                                     if(customNavigationPoint_0 == null) GetClosestCoverPointBetween(botPosition,enemyPos,20f);
 
-                                    Components.Logger.LogInfo("trace 11");
                                     if (customNavigationPoint_0 != null)
                                     {
                                         return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMoving, "relocate");
@@ -279,10 +271,9 @@ namespace friendlyPMC.Components
                         // -- not in cover
                         else
                         {
-                            Components.Logger.LogInfo("trace 12");
                             GetClosestCoverPointBetween(botPosition, enemyPos, 20f);
                             GetClosestCoverPoint(botPosition,coverSearchRadius);
-                            Components.Logger.LogInfo("trace 13");
+
                             if (customNavigationPoint_0 != null)
                             {
                                 return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "findCover");
@@ -292,7 +283,6 @@ namespace friendlyPMC.Components
                     // -- enemy is distant but visible
                     else
                     {
-                        Components.Logger.LogInfo("trace 14");
                         GetClosestAttackCoverPoint(enemyPos, false,10f);
                         if (customNavigationPoint_0 != null)
                         {
@@ -313,14 +303,14 @@ namespace friendlyPMC.Components
                 // - enemy not visible and push conditions not met
                 else
                 {
-                    Components.Logger.LogInfo("trace 15");
+
                     GetClosestCoverPointBetween(enemyPos, botPosition, 15f);
                     if (customNavigationPoint_0 != null)
                     {
                             return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "approachEnemyFast");
                     }
                     botOwner_0.SearchData.SearchPoint = new BotSearchPoint(enemyPos, EBotSearchPoint.playerPosition);
-                    Components.Logger.LogInfo("trace 16");
+
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.search, "approachEnemy");
                 }
             // play the intimidation game 
@@ -331,7 +321,6 @@ namespace friendlyPMC.Components
                     // -- if the bot is in cover
                     if (inCover)
                     {
-                        Components.Logger.LogInfo("trace 17");
                         // --- find an approachable point towards the enemy
                         GetApproachablePoint();
                         if (customNavigationPoint_0 != null)
@@ -354,7 +343,7 @@ namespace friendlyPMC.Components
                     {
                         // --- find a cover point closer to the enemy
                         GetClosestAttackCoverPoint(enemyPos, false, 5f, 120f);
-                        Components.Logger.LogInfo("trace 18");
+
                         if (customNavigationPoint_0 != null)
                         {
                             return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "getInCloseFast");
@@ -384,8 +373,7 @@ namespace friendlyPMC.Components
                     {
                         // -- no cover point found, approach the enemy
                        botOwner_0.SearchData.SearchPoint = new BotSearchPoint(enemyPos, EBotSearchPoint.playerPosition);
-                        Components.Logger.LogInfo("trace 20");
-                        return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.search, "enemy.Search");
+                       return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.search, "enemy.Search");
                     }
                 }
             }
@@ -412,9 +400,8 @@ namespace friendlyPMC.Components
                         if(customNavigationPoint_0 != null)
                             return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "getInCloseFast");
                     }
-                    Components.Logger.LogInfo("trace 21");
+
                     botOwner_0.SearchData.SearchPoint = new BotSearchPoint(enemyPos, EBotSearchPoint.mapPosition);
-                    Components.Logger.LogInfo("trace 22");
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.search, "enemy.Search");
                 }
 

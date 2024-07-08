@@ -41,9 +41,20 @@ namespace friendlyPMC.Components.FollowerBossFollower
             AICoreActionResultStruct<BotLogicDecision>? preFightDecision = KnightPreFight();
             if (preFightDecision != null) return (AICoreActionResultStruct<BotLogicDecision>)preFightDecision;
 
-            AICoreActionResultStruct<BotLogicDecision> baseDecision =  base.KnightFight();
+            AICoreActionResultStruct<BotLogicDecision> baseDecision;
 
-            if(
+            try
+            {
+                baseDecision = base.KnightFight();
+            }
+            catch (Exception ex)
+            {
+                Components.Logger.LogInfo("baseDecision Error: " + ex.Message);
+                Components.Logger.LogInfo("Trace: " + ex.StackTrace);
+                return new AICoreActionResultStruct<BotLogicDecision>(HoldFor(GClass760.Random(1f, 2f)), "baseDecision.Error");
+            }
+
+            if (
                 baseDecision.Reason == "regroupToBossFast" || 
                 baseDecision.Reason == "regroupToBoss" ||
                 (ordersChanged && request != null && request.BotRequestType == BotRequestType.attackClose) ||
@@ -58,9 +69,20 @@ namespace friendlyPMC.Components.FollowerBossFollower
                 return followerFightLayer.CloseFight();
             }*/
 
-            AICoreActionResultStruct < BotLogicDecision > supportDecision = supportLayer.GetDecision();
+            AICoreActionResultStruct<BotLogicDecision> supportDecision;
 
-            if(
+            try
+            {
+                supportDecision = supportLayer.GetDecision();
+            }
+            catch (Exception ex)
+            {
+                Components.Logger.LogInfo("supportDecision Error: " + ex.Message);
+                Components.Logger.LogInfo("Trace: " + ex.StackTrace);
+                return new AICoreActionResultStruct<BotLogicDecision>(HoldFor(GClass760.Random(1f, 2f)), "supportDecision.Error");
+            }
+
+            if (
                 supportDecision.Action == BotLogicDecision.suppressFire || 
                 supportDecision.Action == BotLogicDecision.shootToSmoke ||
                 supportDecision.Action == BotLogicDecision.suppressGrenade

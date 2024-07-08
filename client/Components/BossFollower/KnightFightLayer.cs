@@ -97,7 +97,7 @@ namespace friendlyPMC.Components.BossFollower
                 return KnightFight();
             } catch (Exception ex)
             {
-                Components.Logger.LogInfo("Error: " + ex.Message);
+                Components.Logger.LogInfo("KnightFight Error: " + ex.Message);
                 Components.Logger.LogInfo("Trace: " + ex.StackTrace);
                 return new AICoreActionResultStruct<BotLogicDecision>(HoldFor(GClass760.Random(1f, 2f)), "decision.Error");
             }
@@ -213,7 +213,14 @@ namespace friendlyPMC.Components.BossFollower
                 return followerFightLayer.CloseFight();
             }*/
 
-            AICoreActionResultStruct<BotLogicDecision> baseDecision = base.GetDecision();
+            AICoreActionResultStruct<BotLogicDecision> baseDecision;
+            try
+            {
+                baseDecision = base.GetDecision();
+            } catch
+            {
+                baseDecision = new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.standBy, "error");
+            }
 
             if(
                 baseDecision.Action == BotLogicDecision.suppressFire ||
@@ -277,17 +284,9 @@ namespace friendlyPMC.Components.BossFollower
                 "heal"
             };
 
-            List<BotLogicDecision> ordersAllowActions = new List<BotLogicDecision>
-            {
-                BotLogicDecision.holdPosition,
-                BotLogicDecision.lay,
-                BotLogicDecision.search
-            };
-
             // orders changed
             if (ordersChanged &&
                 !ordersIgnoreDecisions.Contains(curDecision.Reason) &&
-                ordersAllowActions.Contains(curDecision.Action) &&
                 (
                     !botOwner_0.Memory.HaveEnemy ||
                     !botOwner_0.Memory.GoalEnemy.HaveSeen ||
