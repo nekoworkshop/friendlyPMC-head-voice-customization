@@ -22,7 +22,7 @@ namespace friendlyPMC.Utils
             WildSpawnType.followerBirdEye
         };
 
-        
+        /** Get distance between 2 points via navigation path **/
         public static float GetNavDistance(Vector3 point1, Vector3 point2)
         {
             NavMeshPath navMeshPath = new NavMeshPath();
@@ -38,17 +38,19 @@ namespace friendlyPMC.Utils
                 return Vector3.Distance(point2, point1);
             }
         }
-
+        /** Shortcut to check if bot has boss **/
         private static bool HasBoss(BotOwner botOwner)
         {
             return botOwner.BotFollower.HaveBoss;
         }
-
+        /** Shortcut to get the boss the follower has **/
         private static pitAIBossPlayer GetBoss(BotOwner botOwner)
         {
             return (pitAIBossPlayer)botOwner.BotFollower.BossToFollow;
         }
-
+        /**
+         *  Get closest cover point for the bot to given to the position, within the search radius and at a min and max distance from danger 
+         */
         public static CustomNavigationPoint GetClosestCoverPoint(BotOwner botOwner, Vector3 centerPosition, float searchRadius, float safeDistance = 5f)
         {
             List<CustomNavigationPoint> customNavigationPoints = HasBoss(botOwner) ? GetBoss(botOwner).GetAreaCovers() : BossPlayers.GetAICovers();
@@ -133,7 +135,9 @@ namespace friendlyPMC.Utils
 
             return null;
         }
-
+        /**
+         *  Get closest cover point for the bot to pointA within the area between pointA and pointB, at a min safe distance from danger 
+         */
         public static CustomNavigationPoint GetClosestCoverPointBetween(BotOwner botOwner, Vector3 pointA, Vector3 pointB, float safeDistance = 5f)
         {
             List<CustomNavigationPoint> customNavigationPoints = HasBoss(botOwner) ? GetBoss(botOwner).GetAreaCovers() : BossPlayers.GetAICovers();
@@ -210,10 +214,16 @@ namespace friendlyPMC.Utils
                     }
                 }
 
+                return point1;
+
             }
 
             return null;
         }
+
+        /**
+         *  Get a random cover point for the bot around the given position, within the specified radius
+         */
         public static CustomNavigationPoint GetCoverPoint(BotOwner botOwner, Vector3 centerPosition, float searchRadius)
         {
 
@@ -267,7 +277,7 @@ namespace friendlyPMC.Utils
             return null;
 
         }
-
+        /** Utility to use CustomNavigationPoint when searching for a point. It is meant to replace FindPoint in LogicLayers of bots **/
         public static CustomNavigationPoint FindPoint(BotOwner botOwner, CustomNavigationPoint customNavigationPoint, float searchRadius = 50f)
         {
             if (customNavigationPoint != null && (!customNavigationPoint.IsFreeById(botOwner.Id) || customNavigationPoint.IsSpotted))
@@ -286,7 +296,7 @@ namespace friendlyPMC.Utils
 
             return customNavigationPoint;
         }
-
+        /** Check if position is between 2 points **/
         public static bool IsPointBetween(Vector3 point, Vector3 start, Vector3 end)
         {
             if (point.x >= start.x && point.y >= start.y && point.z >= start.z)
@@ -299,24 +309,24 @@ namespace friendlyPMC.Utils
 
             return false;
         }
-
+        /** Get cover point from which the bot can shoot that is closest to the middle of the distance between bot's position and specified position */
         public static CustomNavigationPoint GetApproachableCoverPoint(BotOwner botOwner, Vector3 point, float minDistance = 5f)
         {
             Vector3 midpoint = Vector3.Lerp(botOwner.GetPlayer.Transform.position, point, 0.5f);
 
-            return GetClosestAttackCoverPoint(botOwner, midpoint, false, minDistance);
+            return GetClosestAttackCoverPoint(botOwner, midpoint,minDistance);
         }
-
-        public static CustomNavigationPoint GetClosestAttackCoverPoint(BotOwner botOwner, Vector3 centerPosition, bool useFullCover = false, float minDistance = 5f, float maxDistance = 120f)
+        /** Get cover point from which the bot can shoot that is closest to the specified position, that is at min and max distance from danger and optionally that is not towards the direction of danger */
+        public static CustomNavigationPoint GetClosestAttackCoverPoint(BotOwner botOwner, Vector3 centerPosition, float minDistance = 5f, float maxDistance = 120f, Vector3? dangerPosition = null)
         {
-            List<CustomNavigationPoint> customNavigationPoints = HasBoss(botOwner) && !useFullCover ? GetBoss(botOwner).GetAreaCovers() : BossPlayers.GetAICovers();
+            List<CustomNavigationPoint> customNavigationPoints = HasBoss(botOwner) ? GetBoss(botOwner).GetAreaCovers() : BossPlayers.GetAICovers();
 
             if (customNavigationPoints.Count > 0)
             {
                 if (customNavigationPoints.Count > 0)
                 {
                     CustomNavigationPoint point1 = null;
-                    float distance = !useFullCover && HasBoss(botOwner) ?  friendlyPMC.maximumRadius.Value : Mathf.Infinity;
+                    float distance = HasBoss(botOwner) ?  friendlyPMC.maximumRadius.Value : Mathf.Infinity;
                     float sqrdistance = 0f;
 
                     NavMeshPath navMeshPath = new NavMeshPath();
@@ -373,6 +383,16 @@ namespace friendlyPMC.Utils
                                 continue;
                             }
 
+                            if(dangerPosition != null)
+                            {
+                                Vector3 directionToEnemy = ((Vector3)dangerPosition - botPosition).normalized;
+                                Vector3 directionToCover = (point.Position - botPosition).normalized;
+                                if (Vector3.Dot(directionToEnemy, directionToCover) > 0)
+                                {
+                                    continue; // Skip this cover point as it's in front of the bot relative to the enemy
+                                }
+                            }
+
                             float sqrrange = vrange.sqrMagnitude;
 
                             if(sqrrange <= sqrdistance )
@@ -406,7 +426,6 @@ namespace friendlyPMC.Utils
 
             return null;
         }
-    }
 
-    
+    }
 }
