@@ -97,36 +97,6 @@ namespace friendlyPMC.Patches
         }
     }
 
-    internal class BotGroupReportAboutEnemyy : ModulePatch
-    {
-        protected override MethodBase GetTargetMethod()
-        {
-            return AccessTools.Method(typeof(BotsGroup), "ReportAboutEnemy");
-
-        }
-        [PatchPrefix]
-        private static bool PatchPrefix(BotsGroup __instance, [NotNull] IPlayer enemy, EEnemyPartVisibleType isVisibleOnlyBySence)
-        {
-
-            if (enemy == null || (enemy.IsAI && enemy.AIData?.BotOwner?.GetPlayer == null))
-                return true;
-
-            // prevent boss player from being added as enemy to the group
-            if (BossPlayers.Instance.IsFollowerGroup(__instance.Id) && BossPlayers.Instance.IsBoss(enemy.ProfileId))
-            {
-                BotsGroup bossGroup = BossPlayers.Instance.GetBossPlayer(enemy.ProfileId).bossGroup;
-                if (bossGroup != null && __instance.Id == bossGroup.Id)
-                {
-                    return false;
-                }
-
-                return false;
-            }
-
-            return true;
-        }
-    }
-
     internal class BotGroupIsPlayerEnemy : ModulePatch
     {
         protected override MethodBase GetTargetMethod()

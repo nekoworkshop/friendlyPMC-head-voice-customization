@@ -98,6 +98,7 @@ namespace friendlyPMC.Components.BossFollower
             } catch (Exception ex)
             {
                 Components.Logger.LogInfo("Error: " + ex.Message);
+                Components.Logger.LogInfo("Trace: " + ex.StackTrace);
                 return new AICoreActionResultStruct<BotLogicDecision>(HoldFor(GClass760.Random(1f, 2f)), "decision.Error");
             }
         }
@@ -214,7 +215,17 @@ namespace friendlyPMC.Components.BossFollower
 
             AICoreActionResultStruct<BotLogicDecision> baseDecision = base.GetDecision();
 
-            Vector3 enemyPos = botOwner_0.Memory.HaveEnemy ? botOwner_0.Memory.GoalEnemy.CurrPosition : botPosition;
+            if(
+                baseDecision.Action == BotLogicDecision.suppressFire ||
+                baseDecision.Action == BotLogicDecision.shootFromPlace ||
+                baseDecision.Action == BotLogicDecision.lay ||
+                baseDecision.Action == BotLogicDecision.shootFromCover ||
+                baseDecision.Action == BotLogicDecision.healStimulators ||
+                baseDecision.Action == BotLogicDecision.heal
+            )
+            {
+                return baseDecision;
+            }
 
             if (HasBoss())
             {

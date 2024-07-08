@@ -76,23 +76,23 @@ namespace friendlyPMC.Patches
 
             return true;
         }
-    }
 
-    [HarmonyPatch(typeof(BotMemoryClass), "GoalEnemy", MethodType.Setter)]
-    public static class GoalEnemyTracePatch
-    {
-        public static void Postfix(BotMemoryClass __instance, EnemyInfo value)
+        [PatchPrefix]
+        public static void Postfix(BotMemoryClass __instance, [NotNull] IPlayer enemy, BotSettingsClass groupInfo, bool onActivation)
         {
-            // Log the stack trace
-            if (value != null)
+            // when a follower gets an enemy, ensure all other followers also get him
+            if(__instance.GoalEnemy != null)
             {
                 var botOwner_0 = AccessTools.Field(typeof(BotMemoryClass), "botOwner_0").GetValue(__instance) as BotOwner;
-                if (BossPlayers.Instance.IsFollower(botOwner_0))
+                if(BossPlayers.Instance.IsFollower(botOwner_0) && botOwner_0.BotFollower.HaveBoss)
                 {
-                    Components.Logger.LogInfo("GoalEnemy is being set:" + value.Nickname);
-                    Components.Logger.LogInfo(new StackTrace().ToString());
+                    botOwner_0.BotFollower.BossToFollow.Followers.ForEach(fl =>
+                    {
+                        if (!fl.Memory.HaveEnemy) fl.Memory.GoalEnemy = __instance.GoalEnemy;
+                    });
                 }
             }
         }
     }
+    
 }

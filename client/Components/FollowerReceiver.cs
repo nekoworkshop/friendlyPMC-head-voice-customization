@@ -90,25 +90,38 @@ namespace friendlyPMC.Components
             return interactivePlayer.ProfileId == bot.ProfileId;
         }
 
-        private static BotOwner GetClosetBot(BotOwner bot, IPlayer requester, out FollowerGoCheck request)
+        private static bool IsClosestBot(BotOwner bot, IPlayer requester, out FollowerGoCheck request)
         {
+            request = null;
 
-            if (closestTime > Time.time && closestPlayer != null)
+            if (closestTime > Time.time)
             {
-                request = new FollowerGoCheck(closestPlayer);
-                return closestPlayer;
+                if (closestPlayer == null) return false;
+
+                if (closestPlayer.ProfileId == bot.ProfileId)
+                {
+                    request = new FollowerGoCheck(closestPlayer);
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
             }
 
             BotOwner closest = null;
             float dist = Mathf.Infinity;
             pitAIBossPlayer boss = BossPlayers.Instance.GetBossPlayer(requester.ProfileId);
+            
+            if (boss == null) return false;
+
             Vector3 bossPos = boss.realPlayer.Transform.position;
 
             FollowerGoCheck gclass = new FollowerGoCheck(requester);
 
             boss.Followers.ForEach(fl =>
             {
-                if (gclass.CanRequest(bot))
+                if (fl != null && gclass.CanRequest(fl))
                 {
                     Vector3 pos = fl.GetPlayer.Transform.position;
                     float fldist = (bossPos - pos).sqrMagnitude;
@@ -124,9 +137,14 @@ namespace friendlyPMC.Components
             closestTime = Time.time + 0.5f;
 
             closestPlayer = closest;
-            request = gclass;
 
-            return closestPlayer;
+            if(closestPlayer.ProfileId == bot.ProfileId)
+            {
+                request = gclass;
+                return true;
+            }
+
+            return false;
         }
 
         public virtual void Initiate()
@@ -278,10 +296,8 @@ namespace friendlyPMC.Components
                             else
                             {
                                 FollowerGoCheck gclass;
-                                BotOwner closest = GetClosetBot(botOwner_0,data.Player, out gclass);
-
                                 // - the closest bot shall move
-                                if (closest != null && gclass != null && botOwner_0 && botOwner_0.BotsGroup.RequestsController.TryAddRequest(gclass))
+                                if (IsClosestBot(botOwner_0, data.Player, out gclass) && botOwner_0.BotsGroup.RequestsController.TryAddRequest(gclass))
                                 {
                                     gclass.AddPossibleExecutors(botOwner_0);
                                     gclass.SetGroup(botOwner_0.BotsGroup.RequestsController);

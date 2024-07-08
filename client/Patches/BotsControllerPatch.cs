@@ -319,21 +319,18 @@ namespace friendlyPMC.Patches
                     Stopwatch stopWatch = new Stopwatch();
                     stopWatch.Start();
 
-                   
+
                     // switch role on spawning as original one glitches out
-                    if (botRole == WildSpawnType.followerBigPipe || botRole == WildSpawnType.followerBirdEye)
+                    if (side == EPlayerSide.Bear)
                     {
-                        if (side == EPlayerSide.Bear)
-                        {
-                            profile.Info.Settings.Role = (WildSpawnType)AkiBotsPrePatcher.sptBearValue;
-                        }
-                        else if (side == EPlayerSide.Usec)
-                        {
-                            profile.Info.Settings.Role = (WildSpawnType)AkiBotsPrePatcher.sptUsecValue;
-                        }
-                        else
-                            profile.Info.Settings.Role = WildSpawnType.assault;
+                        profile.Info.Settings.Role = (WildSpawnType)AkiBotsPrePatcher.sptBearValue;
                     }
+                    else if (side == EPlayerSide.Usec)
+                    {
+                        profile.Info.Settings.Role = (WildSpawnType)AkiBotsPrePatcher.sptUsecValue;
+                    }
+                    else
+                        profile.Info.Settings.Role = WildSpawnType.assault;
 
 
                     botCreator.ActivateBot(profile, new GClass590(position, closestCorePoint.Id, false), zone, true, new Func<BotOwner, BotZone, BotsGroup>((BotOwner bt, BotZone zn) =>

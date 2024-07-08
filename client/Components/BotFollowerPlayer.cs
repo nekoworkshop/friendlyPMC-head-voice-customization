@@ -71,7 +71,7 @@ namespace friendlyPMC.Components
             
             _IsSquadMate = isSquad;
 
-            settingModif = new GClass529(1.2f,1.2f,1f,1f,1f,1f,0.7f,1f,1f);
+            settingModif = new GClass529(1.2f,1.2f,1f,1f,1f,1f,0.9f,1f,1f);
 
             bool hadEnemy = _bot.Memory.HaveEnemy;
             // deactivate old layers
@@ -407,13 +407,13 @@ namespace friendlyPMC.Components
             settings.FileSettings.Look.MAX_VISION_GRASS_METERS_OPT = 1.0f;
             settings.FileSettings.Look.MAX_VISION_GRASS_METERS_FLARE = 4.0f;
             settings.FileSettings.Look.MAX_VISION_GRASS_METERS_FLARE_OPT = 0.25f;
-            settings.FileSettings.Look.NO_GREEN_DIST = 3.0f;
-            settings.FileSettings.Look.NO_GRASS_DIST = 3.0f;
+            settings.FileSettings.Look.NO_GREEN_DIST = 4.0f;
+            settings.FileSettings.Look.NO_GRASS_DIST = 5.0f;
 
-            settings.FileSettings.Hearing.CHANCE_TO_HEAR_SIMPLE_SOUND_0_1 = 0.05f;
+            settings.FileSettings.Hearing.CHANCE_TO_HEAR_SIMPLE_SOUND_0_1 = 0.5f;
             settings.FileSettings.Hearing.DISPERSION_COEF = 1f;
             settings.FileSettings.Hearing.CLOSE_DIST = 6f;
-            settings.FileSettings.Hearing.FAR_DIST = 20f;
+            settings.FileSettings.Hearing.FAR_DIST = 35f;
 
             
 
