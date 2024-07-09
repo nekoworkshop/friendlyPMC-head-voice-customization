@@ -226,14 +226,14 @@ namespace friendlyPMC.Components
 
         public override CustomNavigationPoint FindPoint(CoverSearchData data, Func<CoverSearchData, CustomNavigationPoint> p, bool checkCurrent)
         {
-            customNavigationPoint_0 = Utils.Utils.FindPoint(botOwner_0, customNavigationPoint_0);
+            customNavigationPoint_0 = Utils.Covers.FindPoint(botOwner_0, customNavigationPoint_0);
             return customNavigationPoint_0;
         }
 
         protected virtual void GetCoverPoint(Vector3 centerPosition, float searchRadius)
         {
 
-            CustomNavigationPoint point1 = Utils.Utils.GetCoverPoint(botOwner_0, centerPosition, searchRadius);
+            CustomNavigationPoint point1 = Utils.Covers.GetCoverPoint(botOwner_0, centerPosition, searchRadius);
 
             customNavigationPoint_0 = point1;
             botOwner_0.Memory.SetCoverPoints(point1);

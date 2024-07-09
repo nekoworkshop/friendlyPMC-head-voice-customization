@@ -61,7 +61,6 @@ namespace friendlyPMC
         public static ConfigEntry<int> regroupMinDistance;
         public static ConfigEntry<int> maximumCover;
         public static ConfigEntry<int> maximumCoverDistance;
-        public static ConfigEntry<int> maximumRadius;
 
         public static ConfigEntry<int> scanDistance;
 
@@ -90,8 +89,6 @@ namespace friendlyPMC
             pingKey = Config.Bind(baseSettings, "2 Ping Squad", new KeyboardShortcut(KeyCode.F10), new ConfigDescription("Configurable key to trigger location of where your squad is"));
 
             regroupMinDistance = Config.Bind(miscSettings, "3 Regroup minimum distance", 7, new ConfigDescription("The minimum distance for the regroup call to have effect, in combat", new AcceptableValueRange<int>(5, 30)));
-
-            maximumRadius = Config.Bind(miscSettings, "1 Maximum distance to Boss", 100, new ConfigDescription("The maximum distance a follower can go out relative to the player. This is applied only at the begining of a raid", new AcceptableValueRange<int>(80, 300)));
 
             scanDistance = Config.Bind(miscSettings, "6 Maximum scan distance", 140, new ConfigDescription("Maximum distance to pick up any visible enemy that the player is signaling when issuing 'Contact' phrase", new AcceptableValueRange<int>(50, 300)));
 
@@ -162,6 +159,8 @@ namespace friendlyPMC
 
             new BotOwnerIsFolowerPatch().Enable();
             new BotOwnerManualUpdatePatch().Enable();
+
+            new EnemyInfoIsPointInVisibleSectorPatch().Enable();
 
             new PatrolDataFollowerPatch().Enable();
 

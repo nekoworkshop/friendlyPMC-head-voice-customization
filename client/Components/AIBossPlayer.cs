@@ -26,7 +26,7 @@ namespace friendlyPMC.Components
 
         private Coroutine coverCoroutine;
 
-        private float maximumDistance = 100f;
+        private float maximumDistance = 120f;
         public pitAIBossPlayer(Player player) : base(player)
         {
             realPlayer = player;
@@ -35,8 +35,6 @@ namespace friendlyPMC.Components
             coverPoints = new List<CustomNavigationPoint>();
             
             player.HealthController.DiedEvent += OnDead;
-
-            maximumDistance = friendlyPMC.maximumRadius.Value;
 
             SetAreaCovers();
             coverCoroutine = player.StartCoroutine(UpdateCoversCoroutine());

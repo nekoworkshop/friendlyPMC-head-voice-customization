@@ -63,7 +63,7 @@ namespace friendlyPMC.Actions
             if (float_0 < Time.time)
             {
                 float_0 = Time.time + 1f;
-                CustomNavigationPoint freeClosePoint = Utils.Utils.GetClosestCoverPoint(botOwner_0, botOwner_0.GetPlayer.Transform.position, 100f);
+                CustomNavigationPoint freeClosePoint = Utils.Covers.GetClosestCoverPoint(botOwner_0, botOwner_0.GetPlayer.Transform.position, 100f);
                 botOwner_0.GoToPoint(freeClosePoint);
             }
         }

@@ -56,7 +56,7 @@ namespace friendlyPMC.Components.BossFollower
 
             if (baseDecision.Action == BotLogicDecision.runToEnemy && Utils.Utils.GetNavDistance(botOwner_0.GetPlayer.Position, botOwner_0.Memory.GoalEnemy.CurrPosition) > 25f)
             {
-                customNavigationPoint_0 = Utils.Utils.GetApproachableCoverPoint(botOwner_0, botOwner_0.Memory.GoalEnemy.CurrPosition);
+                customNavigationPoint_0 = Utils.Covers.GetApproachableCoverPoint(botOwner_0, botOwner_0.Memory.GoalEnemy.CurrPosition);
                 if (customNavigationPoint_0 != null)
                 {
                     botOwner_0.Memory.SetCoverPoints(customNavigationPoint_0);

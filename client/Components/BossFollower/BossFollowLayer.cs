@@ -197,7 +197,7 @@ namespace friendlyPMC.Components.BossFollower
 
             this.coverTimer = 1f + Time.time;
 
-            CustomNavigationPoint point = Utils.Utils.GetClosestCoverPoint(botOwner_0, centerPosition, searchRadius);
+            CustomNavigationPoint point = Utils.Covers.GetClosestCoverPoint(botOwner_0, centerPosition, searchRadius);
 
             customNavigationPoint_0 = point;
             botOwner_0.Memory.SetCoverPoints(point);

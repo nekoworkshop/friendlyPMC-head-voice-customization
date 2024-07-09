@@ -1,16 +1,11 @@
-﻿using Aki.Common.Http;
+﻿
 using EFT;
-using EFT.InventoryLogic;
 using friendlyPMC.Modules;
 using friendlyPMC.Utils;
 using System;
 using System.Collections.Generic;
-using System.Linq.Expressions;
-using System.Threading.Tasks;
-using Systems.Effects;
 using UnityEngine;
 using UnityEngine.AI;
-using static RootMotion.FinalIK.IKSolver;
 
 namespace friendlyPMC.Components
 {
@@ -45,6 +40,11 @@ namespace friendlyPMC.Components
         private float coverTimer = 0f;
         private float holdTimer = 0f;
         private float suppressTime = 0f;
+
+        private float dangerTimer = 0f;
+        private float dangerIgnoreEquipTimer = 0f;
+        private bool dangerResult = false;
+        private bool dangerIgnoreEquipResult = false;
 
         private bool ordersAreHold = false;
         private bool ordersAreAttack = false;
@@ -83,6 +83,8 @@ namespace friendlyPMC.Components
             "getInCloseFast",
             "getInCloseSlow",
             "approachEnemy",
+            "repositionFast",
+            "reposition",
             "enemy.Search"
         };
 
@@ -164,12 +166,12 @@ namespace friendlyPMC.Components
 
         public bool HasBoss()
         {
-            return botOwner_0.BotFollower.HaveBoss;
+            return Utils.Utils.HasBoss(botOwner_0);
         }
 
         public pitAIBossPlayer GetBoss()
         {
-            return (pitAIBossPlayer)botOwner_0.BotFollower.BossToFollow;
+            return Utils.Utils.GetBoss(botOwner_0);
         }
 
         public bool ShallGoNearBoss()
@@ -206,7 +208,23 @@ namespace friendlyPMC.Components
 
         public bool IsEnemyLowThreat(bool ignoreEquip = false)
         {
-            return ((!ignoreEquip && botOwner_0.Memory.AttackImmediately) || ignoreEquip) && Utils.EnemyInfo.GetEnemiesAtLocation(botOwner_0, botOwner_0.Memory.GoalEnemy.CurrPosition) < (ignoreEquip ? 3 : 2);
+            if (!ignoreEquip && dangerTimer > Time.time) return dangerResult;
+            else if (ignoreEquip && dangerIgnoreEquipTimer > Time.time ) return dangerIgnoreEquipResult;
+
+            if(!ignoreEquip)
+            {
+                dangerTimer = Time.time + 1f;
+                dangerResult = botOwner_0.Memory.AttackImmediately && Utils.EnemyInfo.GetEnemiesAtLocation(botOwner_0, botOwner_0.Memory.GoalEnemy.ProfileId,botOwner_0.Memory.GoalEnemy.CurrPosition) < 2;
+
+                return dangerResult;
+            } 
+            else
+            {
+                dangerIgnoreEquipTimer = Time.time + 1f;
+                dangerIgnoreEquipResult = Utils.EnemyInfo.GetEnemiesAtLocation(botOwner_0, botOwner_0.Memory.GoalEnemy.ProfileId, botOwner_0.Memory.GoalEnemy.CurrPosition) < 3;
+
+                return dangerIgnoreEquipResult;
+            }
         }
 
         public AICoreActionResultStruct<BotLogicDecision> EngageEnemy(bool pushOrdered = false)
@@ -219,7 +237,7 @@ namespace friendlyPMC.Components
             bool inCover = botOwner_0.Memory.IsInCover;
 
             Utils.EnemyInfo.EnemyDistance distanceToEnemy = Utils.EnemyInfo.Distance(botOwner_0);
-            float enemiesAtLocation = Utils.EnemyInfo.GetEnemiesAtLocation(botOwner_0, enemyPos);
+            float enemiesAtLocation = Utils.EnemyInfo.GetEnemiesAtLocation(botOwner_0, botOwner_0.Memory.GoalEnemy.ProfileId, enemyPos);
 
             // PUSH CASE
             if (botOwner_0.Memory.AttackImmediately || pushOrdered) 
@@ -343,9 +361,8 @@ namespace friendlyPMC.Components
                     {
                             return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "approachEnemyFast");
                     }
-                    botOwner_0.SearchData.SearchPoint = new BotSearchPoint(enemyPos, EBotSearchPoint.playerPosition);
 
-                    return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.search, "enemy.Search");
+                    return EnemySearch();
                 }
             // play the intimidation game 
             } else {
@@ -406,8 +423,7 @@ namespace friendlyPMC.Components
                     else
                     {
                         // -- no cover point found, approach the enemy
-                       botOwner_0.SearchData.SearchPoint = new BotSearchPoint(enemyPos, EBotSearchPoint.playerPosition);
-                       return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.search, "enemy.Search");
+                        return EnemySearch();
                     }
                 }
             }
@@ -435,17 +451,15 @@ namespace friendlyPMC.Components
                             return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "getInCloseFast");
                     }
 
-                    botOwner_0.SearchData.SearchPoint = new BotSearchPoint(enemyPos, EBotSearchPoint.mapPosition);
-                    return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.search, "enemy.Search");
+                    return EnemySearch();
                 }
 
             }
         }
 
-        public AICoreActionResultStruct<BotLogicDecision> DefendPosition()
+        public AICoreActionResultStruct<BotLogicDecision> DefendPosition(Vector3 interestPosition)
         {
             Vector3 botPosition = botOwner_0.GetPlayer.Transform.position;
-            Vector3 bossPosition = HasBoss() ? GetBoss().Position : botPosition;
             Vector3 enemyPosition = botOwner_0.Memory.GoalEnemy.CurrPosition;
             bool enemyVisible = botOwner_0.Memory.GoalEnemy.IsVisible;
 
@@ -474,7 +488,7 @@ namespace friendlyPMC.Components
             // If the bot is not in cover, find the closest cover and move to it
             if(HasBoss())
             {
-                GetClosestCoverPointGroup( allyTactic ? botPosition :  bossPosition, coverSearchRadius);
+                GetClosestCoverPointGroup(interestPosition, coverSearchRadius);
                 if (customNavigationPoint_0 != null)
                 {
                     if(GetNavDistance(customNavigationPoint_0.Position) < sprintDistance)
@@ -567,9 +581,20 @@ namespace friendlyPMC.Components
                 }
             }
 
-            return DefendPosition();
+            return DefendPosition(HasBoss() ? GetBoss().Position : botPosition);
         }
         
+        public AICoreActionResultStruct<BotLogicDecision> EnemySearch(string reason = "enemy.Search")
+        {
+            Vector3 enemyPos = botOwner_0.Memory.GoalEnemy.CurrPosition;
+            botOwner_0.SearchData.SearchPoint = new BotSearchPoint(enemyPos, EBotSearchPoint.playerPosition);
+            var Timer = StaticManager.Instance.TimerManager.MakeTimer(TimeSpan.FromSeconds(0.1), false);
+            Timer.OnTimer += () =>
+            {
+                if (botOwner_0.BotState == EBotState.Active && !botOwner_0.IsDead && !botOwner_0.Memory.GoalEnemy.IsVisible) botOwner_0.Steering.LookToMovingDirection();
+            };
+            return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.search, reason);
+        }
         public AICoreActionResultStruct<BotLogicDecision> CloseFight()
         {
             Vector3 botPosition = botOwner_0.GetPlayer.Transform.position;
@@ -822,10 +847,12 @@ namespace friendlyPMC.Components
                 {
                     return BotLogicDecisions.RegroupToBoss(botOwner_0);
                 }
-            }   
+            }
 
-            if(allyTactic) return DefendPosition();
-            else if ((ordersAreHold || holdTactic) && !ordersAreAttack) return DefendPosition();
+            Vector3 interestPosition = HasBoss() ? GetBoss().Position : botOwner_0.GetPlayer.Transform.position;
+
+            if (allyTactic) return DefendPosition(interestPosition);
+            else if ((ordersAreHold || holdTactic) && !ordersAreAttack) return DefendPosition(interestPosition);
             else if (ordersAreAttack || rushTactic) return EngageEnemy(ordersAreAttack);
 
             
@@ -836,7 +863,7 @@ namespace friendlyPMC.Components
             }
             else
             {
-                return DefendPosition();
+                return DefendPosition(interestPosition);
             }
         }
 
@@ -1149,9 +1176,14 @@ namespace friendlyPMC.Components
                 return new AICoreActionEndStruct("enemy.None", true);
             }
 
-            if (botOwner_0.Memory.GoalEnemy.CanShoot)
+            if (botOwner_0.Memory.GoalEnemy.CanShoot || botOwner_0.Memory.GoalEnemy.IsVisible)
             {
                 return new AICoreActionEndStruct("enemy.canSh", true);
+            }
+
+            if(Utils.EnemyInfo.Distance(botOwner_0) <= Utils.EnemyInfo.EnemyDistance.VeryClose && !IsEnemyLowThreat())
+            {
+                return new AICoreActionEndStruct("enemy.tooMany", true);
             }
 
             if (botOwner_0.Mover.IsComeTo(0.5f, false))
@@ -1259,7 +1291,7 @@ namespace friendlyPMC.Components
 
         public override CustomNavigationPoint FindPoint(CoverSearchData data, Func<CoverSearchData, CustomNavigationPoint> p, bool checkCurrent)
         {
-            customNavigationPoint_0 = Utils.Utils.FindPoint(botOwner_0, customNavigationPoint_0, 100f);
+            customNavigationPoint_0 = Covers.FindPoint(botOwner_0, customNavigationPoint_0, 100f);
 
 
             return customNavigationPoint_0;
@@ -1272,7 +1304,7 @@ namespace friendlyPMC.Components
 
             this.coverTimer = 1f + Time.time;
 
-            CustomNavigationPoint point = Utils.Utils.GetClosestCoverPoint(botOwner_0, centerPosition, searchRadius, safeDistance);
+            CustomNavigationPoint point = Covers.GetClosestCoverPoint(botOwner_0, centerPosition, searchRadius, safeDistance);
 
             customNavigationPoint_0 = point;
             botOwner_0.Memory.SetCoverPoints(point);
@@ -1286,7 +1318,7 @@ namespace friendlyPMC.Components
 
             this.coverTimer = 1f + Time.time;
 
-            CustomNavigationPoint point = Utils.Utils.GetClosestCoverPointBetween(botOwner_0,pointA,pointB, safeDistance);
+            CustomNavigationPoint point = Covers.GetClosestCoverPointBetween(botOwner_0,pointA,pointB, safeDistance);
 
             customNavigationPoint_0 = point;
             botOwner_0.Memory.SetCoverPoints(point);
@@ -1301,7 +1333,7 @@ namespace friendlyPMC.Components
 
             this.coverTimer = 1f + Time.time;
 
-            CustomNavigationPoint point1 = Utils.Utils.GetCoverPoint(botOwner_0, centerPosition, searchRadius);
+            CustomNavigationPoint point1 = Covers.GetCoverPoint(botOwner_0, centerPosition, searchRadius);
 
             customNavigationPoint_0 = point1;
             botOwner_0.Memory.SetCoverPoints(point1);
@@ -1315,7 +1347,7 @@ namespace friendlyPMC.Components
 
             this.coverTimer = 1f + Time.time;
 
-            customNavigationPoint_1 = Utils.Utils.GetApproachableCoverPoint(botOwner_0, botOwner_0.Memory.GoalEnemy.CurrPosition);
+            customNavigationPoint_1 = Covers.GetApproachableCoverPoint(botOwner_0, botOwner_0.Memory.GoalEnemy.CurrPosition);
             botOwner_0.Memory.SetCoverPoints(customNavigationPoint_1);
             return customNavigationPoint_1;
         }
@@ -1326,12 +1358,12 @@ namespace friendlyPMC.Components
 
             this.coverTimer = 1f + Time.time;
 
-            customNavigationPoint_1 = Utils.Utils.GetClosestAttackCoverPoint(botOwner_0, centerPosition, minDistance, maxDistance);
+            customNavigationPoint_1 = Covers.GetClosestAttackCoverPoint(botOwner_0, centerPosition, minDistance, maxDistance);
             customNavigationPoint_0 = customNavigationPoint_1;
             botOwner_0.Memory.SetCoverPoints(customNavigationPoint_1);
             return customNavigationPoint_1;
         }
-        /** FInd closest cover point at the given position taking into cosideration the rest of the followers **/
+        /** Find closest cover point at the given position taking into cosideration the rest of the followers **/
         private void GetClosestCoverPointGroup(Vector3 centerPosition, float searchRadius)
         {
             if(!HasBoss() || GetBoss().Followers.Count < 2)

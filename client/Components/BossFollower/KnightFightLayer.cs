@@ -92,6 +92,11 @@ namespace friendlyPMC.Components.BossFollower
             AICoreActionResultStruct<BotLogicDecision>? preFightDecision = KnightPreFight();
             if (preFightDecision != null) return (AICoreActionResultStruct<BotLogicDecision>)preFightDecision;
 
+            if (Utils.EnemyInfo.Distance(botOwner_0) <= Utils.EnemyInfo.EnemyDistance.VeryClose && !followerFightLayer.IsEnemyLowThreat(true))
+            {
+                return followerFightLayer.DefendPosition(botOwner_0.GetPlayer.Transform.position);
+            }
+
             try
             {
                 return KnightFight();
@@ -286,7 +291,7 @@ namespace friendlyPMC.Components.BossFollower
 
         public override CustomNavigationPoint FindPoint(CoverSearchData data, Func<CoverSearchData, CustomNavigationPoint> p, bool checkCurrent)
         {
-            customNavigationPoint_0 = Utils.Utils.FindPoint(botOwner_0, customNavigationPoint_0);
+            customNavigationPoint_0 = Covers.FindPoint(botOwner_0, customNavigationPoint_0);
             return customNavigationPoint_0;
         }
 
