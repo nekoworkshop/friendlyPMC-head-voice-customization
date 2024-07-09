@@ -4,8 +4,6 @@ using HarmonyLib;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine.AI;
 using UnityEngine;
 
@@ -22,80 +20,30 @@ namespace friendlyPMC.Utils
 
             if (customNavigationPoints.Count > 0)
             {
-                CustomNavigationPoint point1 = null;
-                float distance = searchRadius;
-                float sqrDistance = 0f;
-
-                NavMeshPath navMeshPath = new NavMeshPath();
-                Vector3 botPosition = botOwner.Transform.position;
-
-                Func<CustomNavigationPoint, bool> PointSet = (CustomNavigationPoint point) =>
+                Vector3[] carePosition = new Vector3[] { };
+                foreach (var item in botOwner.EnemiesController.EnemyInfos)
                 {
-                    navMeshPath.ClearCorners();
-                    bool resut = NavMesh.CalculatePath(botPosition, point.Position, -1, navMeshPath);
-                    if (resut && navMeshPath.status == NavMeshPathStatus.PathComplete)
+                    try
                     {
-
-                        float dist = navMeshPath.CalculatePathLength();
-                        if (dist > searchRadius)
-                        {
-                            return false;
-                        }
+                        carePosition = carePosition.AddItem(item.Value.CurrPosition).ToArray();
                     }
-
-                    return true;
-                };
-
-                foreach (CustomNavigationPoint point in customNavigationPoints)
-                {
-                    Vector3[] carePosition = new Vector3[] { };
-                    foreach (var item in botOwner.EnemiesController.EnemyInfos)
-                    {
-                        try
-                        {
-                            carePosition = carePosition.AddItem(item.Value.CurrPosition).ToArray();
-                        }
-                        catch { }
-                    }
-
-                    if (!point.IsDangerPositionFarEnough(carePosition, safeDistance * safeDistance)) continue;
-
-                    if (
-                            point.IsFreeById(botOwner.Id) &&
-                            !point.IsSpotted &&
-                            (
-                                !botOwner.Memory.HaveEnemy ||
-                                (
-                                    point.IsFreeById(botOwner.Memory.GoalEnemy.Owner.Id)
-                                )
-                            )
-                        )
-                    {
-                        float sqrrange = (centerPosition - point.Position).sqrMagnitude;
-
-                        if (sqrrange <= sqrDistance)
-                        {
-                            if (PointSet(point))
-                            {
-                                point1 = point;
-                                sqrDistance = sqrrange;
-                                continue;
-                            }
-                        }
-
-                        float range = Vector3.Distance(centerPosition, point.Position);
-                        if (range < distance)
-                        {
-                            if (PointSet(point))
-                            {
-                                point1 = point;
-                                distance = range;
-                            }
-                        }
-                    }
+                    catch { }
                 }
 
-                return point1;
+                CustomNavigationPoint closestPoint = GetClosestPoint(botOwner, customNavigationPoints, centerPosition, searchRadius, point => {
+                    if (!point.IsDangerPositionFarEnough(carePosition, safeDistance * safeDistance)) return false;
+
+                    if (point.IsFreeById(botOwner.Id) &&
+                        !point.IsSpotted &&
+                        (!botOwner.Memory.HaveEnemy || point.IsFreeById(botOwner.Memory.GoalEnemy.Owner.Id)))
+                    {
+                        return true;
+                    }
+
+                    return false;
+                });
+
+                return closestPoint;
             }
 
             return null;
@@ -109,139 +57,68 @@ namespace friendlyPMC.Utils
 
             if (customNavigationPoints.Count > 0)
             {
-                CustomNavigationPoint point1 = null;
-                float searchRadius = Vector3.Distance(pointA, pointB);
+                float distance = Vector3.Distance(pointA, pointB);
 
-                float distance = searchRadius;
-                float sqrDistance = 0f;
-
-                NavMeshPath navMeshPath = new NavMeshPath();
-                Vector3 botPosition = botOwner.Transform.position;
-
-                Func<CustomNavigationPoint, bool> PointSet = (CustomNavigationPoint point) =>
+                Vector3[] carePosition = new Vector3[] { };
+                foreach (var item in botOwner.EnemiesController.EnemyInfos)
                 {
-                    navMeshPath.ClearCorners();
-                    bool resut = NavMesh.CalculatePath(botPosition, point.Position, -1, navMeshPath);
-                    if (resut && navMeshPath.status == NavMeshPathStatus.PathComplete)
+                    try
                     {
-
-                        float dist = navMeshPath.CalculatePathLength();
-                        if (dist > searchRadius)
-                        {
-                            return false;
-                        }
+                        carePosition = carePosition.AddItem(item.Value.CurrPosition).ToArray();
                     }
-
-                    return true;
-                };
-
-                foreach (CustomNavigationPoint point in customNavigationPoints)
-                {
-                    if (!IsPointBetween(point.Position, pointA, pointB)) continue;
-
-                    Vector3[] carePosition = new Vector3[] { };
-                    foreach (var item in botOwner.EnemiesController.EnemyInfos)
-                    {
-                        try
-                        {
-                            carePosition = carePosition.AddItem(item.Value.CurrPosition).ToArray();
-                        }
-                        catch { }
-                    }
-
-                    if (!point.IsDangerPositionFarEnough(carePosition, safeDistance * safeDistance)) continue;
-
-                    if (
-                            point.IsFreeById(botOwner.Id) &&
-                            !point.IsSpotted &&
-                            (
-                                !botOwner.Memory.HaveEnemy ||
-                                (
-                                    point.IsFreeById(botOwner.Memory.GoalEnemy.Owner.Id)
-                                )
-                            )
-                        )
-                    {
-                        float sqrrange = (pointA - point.Position).sqrMagnitude;
-
-                        if (sqrrange <= sqrDistance && PointSet(point))
-                        {
-                            point1 = point;
-                            sqrDistance = sqrrange;
-                            continue;
-                        }
-
-                        float range = Vector3.Distance(pointA, point.Position);
-                        if (range <= distance && PointSet(point))
-                        {
-                            point1 = point;
-                            distance = range;
-                        }
-                    }
+                    catch { }
                 }
 
-                return point1;
+                CustomNavigationPoint closestPoint = GetClosestPoint(botOwner, customNavigationPoints, pointA, distance, point =>
+                {
+                    if (IsPointBetween(point.Position, pointA, pointB) &&
+                        point.IsFreeById(botOwner.Id) &&
+                        !point.IsSpotted &&
+                        (!botOwner.Memory.HaveEnemy || point.IsFreeById(botOwner.Memory.GoalEnemy.Owner.Id)))
+                    {
 
+                        return point.IsDangerPositionFarEnough(carePosition, safeDistance * safeDistance);
+                    }
+
+                    
+                    return false;
+                });
+
+
+                return closestPoint;
             }
 
             return null;
         }
+
 
         /**
          *  Get a random cover point for the bot around the given position, within the specified radius
          */
         public static CustomNavigationPoint GetCoverPoint(BotOwner botOwner, Vector3 centerPosition, float searchRadius)
         {
-
             List<CustomNavigationPoint> customNavigationPoints = Utils.HasBoss(botOwner) ? Utils.GetBoss(botOwner).GetAreaCovers() : BossPlayers.GetAICovers();
 
             if (customNavigationPoints.Count > 0)
             {
-                CustomNavigationPoint point1 = null;
-                float distance = searchRadius;
-
-                List<CustomNavigationPoint> availablePoints = new List<CustomNavigationPoint>();
-
-                NavMeshPath navMeshPath = new NavMeshPath();
-                Vector3 botPosition = botOwner.Transform.position;
-
-                foreach (CustomNavigationPoint point in customNavigationPoints)
+                List<CustomNavigationPoint> availablePoints = FilterEligiblePoints(botOwner,customNavigationPoints, searchRadius, point =>
                 {
                     if (point.IsFreeById(botOwner.Id) && !point.IsSpotted)
                     {
-
-                        float range = Vector3.Distance(centerPosition, point.Position);
-                        if (range < distance)
-                        {
-                            navMeshPath.ClearCorners();
-                            bool resut = NavMesh.CalculatePath(botPosition, point.Position, -1, navMeshPath);
-                            if (resut && navMeshPath.status == NavMeshPathStatus.PathComplete)
-                            {
-
-                                float dist = navMeshPath.CalculatePathLength();
-                                if (dist > searchRadius)
-                                {
-                                    continue;
-                                }
-                            }
-                            distance = range;
-                            availablePoints.Add(point);
-
-                        }
+                        float sqrDistance = (centerPosition - point.Position).sqrMagnitude;
+                        return sqrDistance <= searchRadius * searchRadius;
                     }
-                }
-                // get a random point
+
+                    return false;
+                });
+
                 if (availablePoints.Count > 0)
                 {
-                    point1 = availablePoints.Random();
+                    return availablePoints.Random();
                 }
-
-
-                return point1;
             }
 
             return null;
-
         }
         /** Utility to use CustomNavigationPoint when searching for a point. It is meant to replace FindPoint in BaseLogicLayerSimpleClass of bots **/
         public static CustomNavigationPoint FindPoint(BotOwner botOwner, CustomNavigationPoint customNavigationPoint, float searchRadius = 50f)
@@ -261,19 +138,6 @@ namespace friendlyPMC.Utils
 
 
             return customNavigationPoint;
-        }
-        /** Check if position is between 2 points **/
-        public static bool IsPointBetween(Vector3 point, Vector3 start, Vector3 end)
-        {
-            if (point.x >= start.x && point.y >= start.y && point.z >= start.z)
-            {
-                if (point.x <= end.x && point.y <= end.y && point.z <= end.z)
-                {
-                    return true;
-                }
-            }
-
-            return false;
         }
         /** Get cover point from which the bot can shoot that is closest to the middle of the distance between bot's position and specified position */
         public static CustomNavigationPoint GetApproachableCoverPoint(BotOwner botOwner, Vector3 point, float minDistance = 5f)
@@ -308,22 +172,26 @@ namespace friendlyPMC.Utils
                     return true;
                 };
 
-                List<CustomNavigationPoint> eligiblePoints = new List<CustomNavigationPoint>();
-                Parallel.ForEach(customNavigationPoints, point =>
+                Vector3[] carePosition = new Vector3[] { };
+
+                foreach (var item in botOwner.EnemiesController.EnemyInfos)
                 {
-                    Vector3[] carePosition = new Vector3[] { };
-
-                    foreach (var item in botOwner.EnemiesController.EnemyInfos)
+                    try
                     {
-                        try
-                        {
-                            carePosition = carePosition.AddItem(item.Value.CurrPosition).ToArray();
-                        }
-                        catch
-                        {
-                        }
+                        carePosition = carePosition.AddItem(item.Value.CurrPosition).ToArray();
                     }
+                    catch
+                    {
+                    }
+                }
 
+                float closestSqrDistance = Mathf.Infinity;
+                CustomNavigationPoint closestPoint = null;
+
+                List<CustomNavigationPoint> eligiblePoints = new List<CustomNavigationPoint>();
+                foreach (CustomNavigationPoint point in eligiblePoints)
+                {
+                    
                     if (point.IsDangerPositionFarEnough(carePosition, minDistance * minDistance) &&
                         point.IsFreeById(botOwner.Id) &&
                         botOwner.Memory.HaveEnemy &&
@@ -334,38 +202,94 @@ namespace friendlyPMC.Utils
 
                         if (enemyRange <= maxDistance)
                         {
-                            if (dangerPosition == null || Vector3.Dot(((Vector3)dangerPosition - botPosition).normalized, (point.Position - botPosition).normalized) <= 0)
+                            if (
+                                (
+                                    dangerPosition == null ||
+                                    Vector3.Dot(((Vector3)dangerPosition - botPosition).normalized, (point.Position - botPosition).normalized) <= 0
+                                )
+                            )
                             {
-                                if (PointSet(point))
+                                float dist = (centerPosition - point.Position).sqrMagnitude;
+                                if(dist <= closestSqrDistance && PointSet(point))
                                 {
+                                    closestSqrDistance = dist;
                                     point.CanIShootToEnemy = true;
-                                    eligiblePoints.Add(point);
+                                    closestPoint = point;
                                 }
                             }
                         }
                     }
-                });
+                };
 
-                if (eligiblePoints.Count > 0)
-                {
-                    CustomNavigationPoint closestPoint = null;
-                    float closestSqrDistance = Mathf.Infinity;
-
-                    foreach (CustomNavigationPoint point in eligiblePoints)
-                    {
-                        float sqrDistance = (centerPosition - point.Position).sqrMagnitude;
-                        if (sqrDistance < closestSqrDistance)
-                        {
-                            closestPoint = point;
-                            closestSqrDistance = sqrDistance;
-                        }
-                    }
-
-                    return closestPoint;
-                }
+                return closestPoint;
             }
 
             return null;
         }
+
+        private static bool IsNavigablePoint(BotOwner botOwner, CustomNavigationPoint point, float maxDistance)
+        {
+            NavMeshPath navMeshPath = new NavMeshPath();
+            Vector3 botPosition = botOwner.Transform.position;
+
+            navMeshPath.ClearCorners();
+            bool result = NavMesh.CalculatePath(botPosition, point.Position, -1, navMeshPath);
+            if (result && navMeshPath.status == NavMeshPathStatus.PathComplete)
+            {
+                float dist = navMeshPath.CalculatePathLength();
+                if (dist <= maxDistance)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+        private static bool IsPointBetween(Vector3 point, Vector3 start, Vector3 end)
+        {
+            if (point.x >= start.x && point.y >= start.y && point.z >= start.z)
+            {
+                if (point.x <= end.x && point.y <= end.y && point.z <= end.z)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+        private static List<CustomNavigationPoint> FilterEligiblePoints(BotOwner botOwner, List<CustomNavigationPoint> customNavigationPoints, float maxDistance, Func<CustomNavigationPoint, bool> eligibilityCheck)
+        {
+            List<CustomNavigationPoint> eligiblePoints = new List<CustomNavigationPoint>();
+
+            foreach (CustomNavigationPoint point in customNavigationPoints)
+            {
+                if (eligibilityCheck(point) && IsNavigablePoint(botOwner, point, maxDistance))
+                {
+                    eligiblePoints.Add(point);
+                }
+            }
+            return eligiblePoints;
+        }
+        private static CustomNavigationPoint GetClosestPoint(BotOwner botOwner,List<CustomNavigationPoint> eligiblePoints, Vector3 centerPosition, float maxDistance, Func<CustomNavigationPoint, bool> eligibilityCheck)
+        {
+            CustomNavigationPoint closestPoint = null;
+            float closestSqrDistance = Mathf.Infinity;
+
+            foreach (CustomNavigationPoint point in eligiblePoints)
+            {
+                if (eligibilityCheck(point) && IsNavigablePoint(botOwner, point, maxDistance))
+                {
+                    float sqrDistance = (centerPosition - point.Position).sqrMagnitude;
+                    if (sqrDistance < closestSqrDistance)
+                    {
+                        closestPoint = point;
+                        closestSqrDistance = sqrDistance;
+                    }
+                }
+            }
+
+            return closestPoint;
+        }
+
     }
 }

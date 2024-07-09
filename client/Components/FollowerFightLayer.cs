@@ -203,9 +203,6 @@ namespace friendlyPMC.Components
             };
         }
 
-
-
-
         public bool IsEnemyLowThreat(bool ignoreEquip = false)
         {
             if (!ignoreEquip && dangerTimer > Time.time) return dangerResult;
@@ -227,7 +224,7 @@ namespace friendlyPMC.Components
             }
         }
 
-        public AICoreActionResultStruct<BotLogicDecision> EngageEnemy(bool pushOrdered = false)
+        public AICoreActionResultStruct<BotLogicDecision> EngageEnemy(bool pushOrdered = false, bool isaiboss = false)
         {
 
             Vector3 botPosition = botOwner_0.GetPlayer.Transform.position;
@@ -240,7 +237,7 @@ namespace friendlyPMC.Components
             float enemiesAtLocation = Utils.EnemyInfo.GetEnemiesAtLocation(botOwner_0, botOwner_0.Memory.GoalEnemy.ProfileId, enemyPos);
 
             // PUSH CASE
-            if (botOwner_0.Memory.AttackImmediately || pushOrdered) 
+            if (botOwner_0.Memory.AttackImmediately || (isaiboss && enemiesAtLocation < 2) || pushOrdered) 
             {
                 if (
                     // - go for it if enemy is already close
@@ -248,7 +245,7 @@ namespace friendlyPMC.Components
                     // - go for it if enemy is just 1
                     (enemiesAtLocation < 2) ||
                     // - go for it if there is strength in numbers
-                    (pushOrdered && enemiesAtLocation < 3)
+                    (pushOrdered && enemiesAtLocation < 4)
                 )
                 {
                     // -- push if not visible
@@ -1171,6 +1168,11 @@ namespace friendlyPMC.Components
 
         public override AICoreActionEndStruct EndSearch()
         {
+            if(ordersChanged)
+            {
+                return new AICoreActionEndStruct("search.End", true);
+            }
+
             if (!botOwner_0.Memory.HaveEnemy)
             {
                 return new AICoreActionEndStruct("enemy.None", true);
@@ -1181,10 +1183,10 @@ namespace friendlyPMC.Components
                 return new AICoreActionEndStruct("enemy.canSh", true);
             }
 
-            if(Utils.EnemyInfo.Distance(botOwner_0) <= Utils.EnemyInfo.EnemyDistance.VeryClose && !IsEnemyLowThreat())
+            /*if(Utils.EnemyInfo.Distance(botOwner_0) <= Utils.EnemyInfo.EnemyDistance.VeryClose && !IsEnemyLowThreat())
             {
                 return new AICoreActionEndStruct("enemy.tooMany", true);
-            }
+            }*/
 
             if (botOwner_0.Mover.IsComeTo(0.5f, false))
             {
@@ -1238,9 +1240,7 @@ namespace friendlyPMC.Components
                         (
                             !botOwner_0.Memory.HaveEnemy ||
                             !botOwner_0.Memory.GoalEnemy.HaveSeen ||
-                            (!botOwner_0.Memory.GoalEnemy.IsVisible &&
-                                Utils.EnemyInfo.DistanceProxy(botOwner_0, botOwner_0.GetPlayer.Transform.position) > Utils.EnemyInfo.ProxyDistance.VeryClose
-                            )
+                            (!botOwner_0.Memory.GoalEnemy.IsVisible && Time.time - botOwner_0.Memory.LastEnemyTimeSeen > 3f)
                         )
                     )
                 )
@@ -1272,9 +1272,7 @@ namespace friendlyPMC.Components
                 (
                     !botOwner_0.Memory.HaveEnemy ||
                     !botOwner_0.Memory.GoalEnemy.HaveSeen ||
-                    (!botOwner_0.Memory.GoalEnemy.IsVisible &&
-                        Utils.EnemyInfo.DistanceProxy(botOwner_0, botOwner_0.GetPlayer.Transform.position) > Utils.EnemyInfo.ProxyDistance.VeryClose
-                    )
+                    (!botOwner_0.Memory.GoalEnemy.IsVisible && Time.time - botOwner_0.Memory.LastEnemyTimeSeen > 3f)
                 )
             )
             {
@@ -1291,8 +1289,11 @@ namespace friendlyPMC.Components
 
         public override CustomNavigationPoint FindPoint(CoverSearchData data, Func<CoverSearchData, CustomNavigationPoint> p, bool checkCurrent)
         {
-            customNavigationPoint_0 = Covers.FindPoint(botOwner_0, customNavigationPoint_0, 100f);
+            if (this.coverTimer > Time.time) return customNavigationPoint_0;
 
+            this.coverTimer = 1f + Time.time;
+
+            customNavigationPoint_0 = Covers.FindPoint(botOwner_0, customNavigationPoint_0, 100f);
 
             return customNavigationPoint_0;
         }

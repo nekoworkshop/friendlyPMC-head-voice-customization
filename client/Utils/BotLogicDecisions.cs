@@ -1,9 +1,4 @@
 ﻿using EFT;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace friendlyPMC.Utils
@@ -18,9 +13,11 @@ namespace friendlyPMC.Utils
 
             IPlayer requester = request != null ? bot.BotRequestController.CurRequest.Requester : null;
 
-            if(requester == null) return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.followerPatrol, "requester.None");
+            if(requester == null) {
+                return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.followerPatrol, "backToBoss");
+            }
 
-            Vector3 requestPos = requester.Position;
+            Vector3 requestPos = requester.Transform.position;
 
             float randomX = GClass760.Random(-5f, 5f);
             float randomZ = GClass760.Random(-5f, 5f);
@@ -37,7 +34,7 @@ namespace friendlyPMC.Utils
             bot.GoToSomePointData.UpdateToGo(shouldSprint01);
             if (!shouldSprint01) bot.Sprint(false);
 
-            bot.BotRequestController.CurRequest.Complete();
+            request.Complete();
 
             return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.goToPoint, shouldSprint01 ? "regroupToBossFast" : "regroupToBoss");
         }

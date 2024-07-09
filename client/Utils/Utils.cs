@@ -19,9 +19,9 @@ namespace friendlyPMC.Utils
         };
 
         /** Get distance between 2 points via navigation path **/
-        public static float GetNavDistance(Vector3 point1, Vector3 point2)
+        public static float GetNavDistance(Vector3 point1, Vector3 point2, NavMeshPath existingMesh = null)
         {
-            NavMeshPath navMeshPath = new NavMeshPath();
+            NavMeshPath navMeshPath = existingMesh != null ? existingMesh :  new NavMeshPath();
             navMeshPath.ClearCorners();
             bool resut = NavMesh.CalculatePath(point1, point2, -1, navMeshPath);
 

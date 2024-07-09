@@ -1,4 +1,5 @@
 ﻿using Aki.Reflection.Patching;
+using Comfort.Common;
 using EFT;
 using friendlyPMC.Components;
 using friendlyPMC.Modules;
@@ -6,7 +7,8 @@ using HarmonyLib;
 using JetBrains.Annotations;
 using System;
 using System.Diagnostics;
-using System.Reflection; 
+using System.Reflection;
+using System.Threading.Tasks;
 
 namespace friendlyPMC.Patches
 {
@@ -31,7 +33,6 @@ namespace friendlyPMC.Patches
             bool isBossEnemy = BossPlayers.Instance.IsBoss(enemy.ProfileId);
 
             pitAIBossPlayer playerBoss = null;
-
             if(isBossEnemy) playerBoss = BossPlayers.Instance.GetBossPlayer(enemy.ProfileId);
 
             // prevent same side from being added on creation just because they have a different role
@@ -66,33 +67,37 @@ namespace friendlyPMC.Patches
             {
                 return false;
             }
-            //if a bot makes player an enemy, make the group aware of that
-            else if (!isfollower && playerBoss != null)
-            {   try
-                {
-                    playerBoss.bossGroup?.AddEnemy(botOwner_0, EBotEnemyCause.checkAddTODO);
-                } catch {}
-            }
 
             return true;
         }
+    }
 
-        [PatchPrefix]
-        public static void Postfix(BotMemoryClass __instance, [NotNull] IPlayer enemy, BotSettingsClass groupInfo, bool onActivation)
+    [HarmonyPatch(typeof(BotMemoryClass), "GoalEnemy", MethodType.Setter)]
+    public static class GoalEnemyTracePatch
+    {
+        public static void Postfix(BotMemoryClass __instance, EnemyInfo value)
         {
-            // when a follower gets an enemy, ensure all other followers also get him
-            if(__instance.GoalEnemy != null)
+            // if a follower makes someone an enemy, the rest of the group should know
+            if (value != null)
             {
                 var botOwner_0 = AccessTools.Field(typeof(BotMemoryClass), "botOwner_0").GetValue(__instance) as BotOwner;
-                if(BossPlayers.Instance.IsFollower(botOwner_0) && botOwner_0.BotFollower.HaveBoss)
+                // add enemy to group
+                botOwner_0.BotsGroup.AddEnemy(value.Person, EBotEnemyCause.checkAddTODO);
+                // ensure all other members know about the enemy
+                if (BossPlayers.Instance.IsFollower(botOwner_0) && botOwner_0.BotFollower.HaveBoss)
                 {
-                    botOwner_0.BotFollower.BossToFollow.Followers.ForEach(fl =>
+                    BotSettingsClass botsett = new BotSettingsClass(Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(value.ProfileId), botOwner_0.BotsGroup, EBotEnemyCause.checkAddTODO);
+
+                    botOwner_0.BotFollower.BossToFollow.Followers.ForEach(item =>
                     {
-                        if (!fl.Memory.HaveEnemy) fl.Memory.GoalEnemy = __instance.GoalEnemy;
+                        if (item.ProfileId != botOwner_0.ProfileId && !item.Memory.HaveEnemy)
+                        {
+                            item.Memory.AddEnemy(value.Person, botsett, false);
+                        }
                     });
                 }
             }
         }
     }
-    
+
 }

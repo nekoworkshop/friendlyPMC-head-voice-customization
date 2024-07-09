@@ -1,8 +1,7 @@
-﻿using EFT;
-using System;
+﻿using Comfort.Common;
+using EFT;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
@@ -10,6 +9,22 @@ namespace friendlyPMC.Utils
 {
     internal class EnemyInfo
     {
+        private struct CachedEnemyInfo
+        {
+            public float EnemyCount;
+            public Vector3 CachedPosition;
+
+            public CachedEnemyInfo(float enemyCount, Vector3 cachedPosition)
+            {
+                EnemyCount = enemyCount;
+                CachedPosition = cachedPosition;
+            }
+        }
+
+        private static Dictionary<(Vector3, string), CachedEnemyInfo> enemyLocationCache = new Dictionary<(Vector3, string), CachedEnemyInfo>();
+        private static object enemyLocationCacheLock = new object();
+
+        private static List<string> enemies = new List<string>();
 
         public enum EnemyDistance
         {
@@ -71,7 +86,7 @@ namespace friendlyPMC.Utils
 
             if(distance < 12f) return EnemyDistance.VeryClose;
 
-            if (distance < 30f)
+            if (distance < 35f)
             {
                 return EnemyDistance.Close;
             }
@@ -90,11 +105,43 @@ namespace friendlyPMC.Utils
 
         }
 
-        public static float GetEnemiesAtLocation(BotOwner bot, Vector3 position, float radius = 25f)
+        public static float GetEnemiesAtLocation(BotOwner bot, string enemyId, Vector3 position, float radius = 25f)
         {
-            float nr = 0;
+            if(!enemies.Contains(enemyId))
+            {
+                Player enemy = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(enemyId);
+                enemy.OnIPlayerDeadOrUnspawn += (IPlayer pl) =>
+                {
+                    Task.Run(() =>
+                    {
+                        ClearEnemyLocations(enemyId);
+                        enemies.Remove(enemyId);
+                    });
+                };
+            }
 
-            Collider[] hits = new Collider[50];
+
+            Vector3 cacheKey = new Vector3(Mathf.Round(position.x), Mathf.Round(position.y), Mathf.Round(position.z));
+            (Vector3, string) cacheKeyWithId = (cacheKey, enemyId);
+
+            lock (enemyLocationCacheLock)
+            {
+                if (enemyLocationCache.TryGetValue(cacheKeyWithId, out CachedEnemyInfo cachedInfo))
+                {
+                    if (cachedInfo.CachedPosition == position)
+                    {
+                        return cachedInfo.EnemyCount;
+                    }
+                    else
+                    {
+                        enemyLocationCache.Remove(cacheKeyWithId);
+                    }
+                }
+            }
+
+            int nr = 0;
+
+            Collider[] hits = new Collider[20];
 
             int numHits = Physics.OverlapSphereNonAlloc(
                 position,
@@ -103,28 +150,56 @@ namespace friendlyPMC.Utils
                 LayerMaskClass.PlayerMask
             );
 
+            if (numHits == 0)
+            {
+                lock (enemyLocationCacheLock)
+                {
+                    enemyLocationCache[cacheKeyWithId] = new CachedEnemyInfo(0f, position);
+                }
+                return 0;
+            }
+
             for (int i = 0; i < numHits; i++)
             {
                 var enemy = bot.ShootData.method_4(hits[i]);
-                
-                if (
-                    enemy != null && 
-                    enemy.HealthController.IsAlive && 
-                    (
-                        bot.EnemiesController.IsEnemy(enemy) || 
-                        bot.Settings.FileSettings.Mind.ENEMY_BOT_TYPES.Contains(enemy.GetPlayer.Profile.Info.Settings.Role)
-                    )
-                 )
-                {
-                    if (bot.GetPlayer.ProfileId == enemy.ProfileId) continue;
-                    if (enemy.IsAI && bot.BotsGroup.Contains(enemy.AIData.BotOwner)) continue;
-                    if(bot.BotsGroup.IsAlly(enemy)) continue;
 
-                        nr = nr + 1;
+                if (enemy != null &&
+                    enemy.HealthController.IsAlive &&
+                    (bot.EnemiesController.IsEnemy(enemy) ||
+                     bot.Settings.FileSettings.Mind.ENEMY_BOT_TYPES.Contains(enemy.GetPlayer.Profile.Info.Settings.Role)) &&
+                    bot.GetPlayer.ProfileId != enemy.ProfileId &&
+                    !(enemy.IsAI && bot.BotsGroup.Contains(enemy.AIData.BotOwner)) &&
+                    !bot.BotsGroup.IsAlly(enemy))
+                {
+                    nr++;
                 }
             }
 
-            return nr;
+            float result = nr;
+
+            lock (enemyLocationCacheLock)
+            {
+                enemyLocationCache[cacheKeyWithId] = new CachedEnemyInfo(result, position);
+            }
+
+            return result;
+        }
+
+        public static void ClearEnemyLocations(string enemyId)
+        {
+            lock (enemyLocationCacheLock)
+            {
+                var keysToRemove = enemyLocationCache.Keys.Where(key => key.Item2 == enemyId).ToList();
+                foreach (var key in keysToRemove)
+                {
+                    enemyLocationCache.Remove(key);
+                }
+            }
+        }
+
+        public static void ClearEnemiesLocations()
+        {
+            enemyLocationCache.Clear();
         }
     }
 }

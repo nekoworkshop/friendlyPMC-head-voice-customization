@@ -55,12 +55,13 @@ namespace friendlyPMC
 
         public static ConfigEntry<int> enemyRemember;
 
-        public static ConfigEntry<int> fightOuterRadius;
-        public static ConfigEntry <int> fightInnerRadius;
+        public static readonly float fightOuterRadius = 50f;
+        public static readonly float fightInnerRadius = 30f;
 
-        public static ConfigEntry<int> regroupMinDistance;
-        public static ConfigEntry<int> maximumCover;
-        public static ConfigEntry<int> maximumCoverDistance;
+        public static readonly float regroupMinDistance = 7f;
+
+        public static readonly float maximumCover = 10f;
+        public static readonly float maximumCoverDistance = 35f;
 
         public static ConfigEntry<int> scanDistance;
 
@@ -88,17 +89,9 @@ namespace friendlyPMC
 
             pingKey = Config.Bind(baseSettings, "2 Ping Squad", new KeyboardShortcut(KeyCode.F10), new ConfigDescription("Configurable key to trigger location of where your squad is"));
 
-            regroupMinDistance = Config.Bind(miscSettings, "3 Regroup minimum distance", 7, new ConfigDescription("The minimum distance for the regroup call to have effect, in combat", new AcceptableValueRange<int>(5, 30)));
+            scanDistance = Config.Bind(miscSettings, "1 Maximum scan distance", 140, new ConfigDescription("Maximum distance to pick up any visible enemy that the player is signaling when issuing 'Contact' phrase", new AcceptableValueRange<int>(50, 300)));
 
-            scanDistance = Config.Bind(miscSettings, "6 Maximum scan distance", 140, new ConfigDescription("Maximum distance to pick up any visible enemy that the player is signaling when issuing 'Contact' phrase", new AcceptableValueRange<int>(50, 300)));
-
-            enemyRemember = Config.Bind(miscSettings, "6,1  -  Time to forget about enemy (in sec.)", 20, new ConfigDescription("Maximum time a follower will remember an enemy. This is applied only at the begining of a raid", new AcceptableValueRange<int>(5, 60)));
-
-            maximumCover = Config.Bind(miscSettings, "2.1  -  Combat cover stay (in sec.)", 10, new ConfigDescription("Maximum time a follower will stay in cover when in 'defend' mode before trying to get closer to the player", new AcceptableValueRange<int>(2, 20)));
-            maximumCoverDistance = Config.Bind(miscSettings, "2 Combat cover distance", 30, new ConfigDescription("Maximum distance allowed between the follower and the player while the follower is in cover, when in 'defend' mode", new AcceptableValueRange<int>(10, 50)));
-
-            fightOuterRadius = Config.Bind(miscSettings, "4 Combat outer radius", 50, new ConfigDescription("The upper limit to search for cover during combat relative the current goal (player or enemy)", new AcceptableValueRange<int>(30, 100)));
-            fightInnerRadius = Config.Bind(miscSettings, "5 Combat inner radius", 30, new ConfigDescription("The lower limit to search for cover during combat relative the current goal (player or enemy)", new AcceptableValueRange<int>(15, 50)));
+            enemyRemember = Config.Bind(miscSettings, "2 Time to forget about enemy (in sec.)", 20, new ConfigDescription("Maximum time a follower will remember an enemy. This is applied only at the begining of a raid", new AcceptableValueRange<int>(5, 60)));
 
             knightSpawn = Config.Bind(testSettings, "1 Spawn with The Goons", false, new ConfigDescription("Experimental: Spawn with the goons squad. This works in combination with your own squad. Take note that a boss and his followers do not accept the same commands as your squad"));
 
@@ -154,13 +147,14 @@ namespace friendlyPMC
             new BotGroupAddEnemy().Enable();
 
             new BotMemoryAddEnemyPatch().Enable();
-
             new BotGroupUsecEnemyPatch().Enable();
+            var harmony = new Harmony("xyz.pit.companion");
+            harmony.PatchAll(typeof(GoalEnemyTracePatch).Assembly);
 
             new BotOwnerIsFolowerPatch().Enable();
             new BotOwnerManualUpdatePatch().Enable();
 
-            new EnemyInfoIsPointInVisibleSectorPatch().Enable();
+            //new EnemyInfoIsPointInVisibleSectorPatch().Enable();
 
             new PatrolDataFollowerPatch().Enable();
 
@@ -190,6 +184,7 @@ namespace friendlyPMC
             new QuickPanelPatch().Enable();
             new GestureMenuPatch().Enable();
             new EPhraseTriggerPatch().Enable();
+
         }
 
         void Update()

@@ -163,6 +163,8 @@ namespace friendlyPMC.Utils
 
                         float hp = 0;
                         float hpmax = 0;
+
+                        string blackout = "";
                         
                         foreach (EBodyPart part in Enum.GetValues(typeof(EBodyPart)))
                         {
@@ -181,6 +183,11 @@ namespace friendlyPMC.Utils
                                         ValueStruct value = bt.Data.HealthController.GetBodyPartHealth(part, true);
                                         hp += value.Current;
                                         hpmax += value.Maximum;
+                                        if(value.Current == 0)
+                                        {
+                                            if (blackout.Length > 0) blackout +=", ";
+                                            blackout += part.ToString().Localized();
+                                        }
                                         break;
 
                                     default:
@@ -196,6 +203,12 @@ namespace friendlyPMC.Utils
                             if (hp < hpmax)
                                 stringBuilder.Append($"HP: {hp}/{hpmax}");
                             else stringBuilder.Append($"HP: {hpmax}");
+
+                            if(blackout.Length > 0)
+                            {
+                                stringBuilder.Append(Environment.NewLine);
+                                stringBuilder.Append("0%: " + blackout);
+                            }
                         }
 
                         if (bt.Data.Brain.BaseBrain is FollowerBrain)

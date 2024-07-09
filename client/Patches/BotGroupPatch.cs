@@ -51,7 +51,6 @@ namespace friendlyPMC.Patches
 
             var plBoss = BossPlayers.GetBoss(person.ProfileId);
             var isgroup = BossPlayers.IsBossGroup(__instance.Id);
-
             
             if (isgroup && plBoss != null)
             {
@@ -69,8 +68,8 @@ namespace friendlyPMC.Patches
                 {
                     return false;
                 }
+            }
             // whoever makes the player an enemy is our enemy
-            } 
             else if (!isgroup && plBoss != null)
             {
                 try
@@ -87,9 +86,10 @@ namespace friendlyPMC.Patches
                             }
                         }
                     }
-                } catch (Exception ex)
+                }
+                catch (Exception ex)
                 {
-                    Components.Logger.LogInfo("Failed to make a group an enemy: "+ ex.Message);
+                    Components.Logger.LogInfo("Failed to make a group an enemy: " + ex.Message);
                 }
             }
 

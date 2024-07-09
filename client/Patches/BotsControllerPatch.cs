@@ -13,13 +13,10 @@ using System.Reflection;
 using System.Threading;
 using UnityEngine;
 
-using Aki.Common.Http;
 
 using BotCacheClass = GClass591;
 using IProfileData = GClass592;
-using EFT.Bots;
-using System.Data;
-using EFT.UI;
+
 using friendlyPMC.Utils;
 
 
@@ -290,7 +287,6 @@ namespace friendlyPMC.Patches
                     }
                 }
 
-
                 WildSpawnType botRole = profile.Info.Settings.Role;
 
                 profile.Info.Side = side;
@@ -319,19 +315,21 @@ namespace friendlyPMC.Patches
                     Stopwatch stopWatch = new Stopwatch();
                     stopWatch.Start();
 
-
                     // switch role on spawning as original one glitches out
-                    if (side == EPlayerSide.Bear)
+                    if (botRole == WildSpawnType.followerBirdEye)
                     {
-                        profile.Info.Settings.Role = (WildSpawnType)AkiBotsPrePatcher.sptBearValue;
-                    }
-                    else if (side == EPlayerSide.Usec)
-                    {
-                        profile.Info.Settings.Role = (WildSpawnType)AkiBotsPrePatcher.sptUsecValue;
-                    }
-                    else
-                        profile.Info.Settings.Role = WildSpawnType.assault;
+                        if (side == EPlayerSide.Bear)
+                        {
+                            profile.Info.Settings.Role = (WildSpawnType)AkiBotsPrePatcher.sptBearValue;
+                        }
+                        else if (side == EPlayerSide.Usec)
+                        {
+                            profile.Info.Settings.Role = (WildSpawnType)AkiBotsPrePatcher.sptUsecValue;
+                        }
+                        else
+                            profile.Info.Settings.Role = WildSpawnType.assault;
 
+                    }
 
                     botCreator.ActivateBot(profile, new GClass590(position, closestCorePoint.Id, false), zone, true, new Func<BotOwner, BotZone, BotsGroup>((BotOwner bt, BotZone zn) =>
                     {
@@ -339,17 +337,19 @@ namespace friendlyPMC.Patches
 
                     }), new Action<BotOwner>((BotOwner owner) =>
                     {
-
                         Action<BotOwner> OnBotState = new Action<BotOwner>((BotOwner me) =>
                         {
                             BotOwnerManualUpdatePatch.BotOwnerUpdate.Remove(me.ProfileId); // clear watcher
-                            // prevent attack of player on spawn
-                            me.Memory.DeleteInfoAboutEnemy(player.Player());
-
-                            me.GetPlayer.ActiveHealthController.RestoreFullHealth(); // ensure bot has full health
-
+                            
                             try
                             {
+                                // prevent attack of player on spawn
+                                me.Memory.DeleteInfoAboutEnemy(player.Player());
+
+                                me.GetPlayer.ActiveHealthController.RestoreFullHealth(); // ensure bot has full health
+
+                                me.Memory.IsPeace = true;
+
                                 // force player side on the bot
                                 if (me.Side != side)
                                 {
@@ -359,6 +359,24 @@ namespace friendlyPMC.Patches
                                 if(!me.IsRole(botRole))
                                 {
                                     me.GetPlayer.Profile.Info.Settings.Role = botRole;
+                                }
+
+                                // restore original boss logic
+                                /*if(me.Boss != null && me.Boss.BossLogic != null)
+                                    me.Boss.BossLogic.Dispose();*/
+
+                                // our Pipe needs the same boss logic as knight due to their shared fighting logic
+                                if (me.IsRole(WildSpawnType.followerBigPipe))
+                                {
+                                    if (me.Boss != null)
+                                    {
+                                        if (me.Boss.BossLogic != null)
+                                            me.Boss.BossLogic.Dispose();
+
+                                        me.Boss.BossLogic = new GClass371(me, me.Boss);
+                                        me.Boss.NeedProtection = false;
+                                    }
+
                                 }
 
                                 BossPlayers.Instance.AddFollower(me, player, false, botRole); // make bot a follower
@@ -378,7 +396,8 @@ namespace friendlyPMC.Patches
                             }
                             catch (Exception ex)
                             {
-                                Components.Logger.LogInfo("Failed to make Boss ally a follower: " + ex.Message);
+                                Components.Logger.LogInfo("Failed to add "+me.Profile.Nickname + " as ally: " + ex.Message);
+                                Components.Logger.LogInfo("Trace : " + ex.StackTrace);
                             }
                         });
 
@@ -392,13 +411,13 @@ namespace friendlyPMC.Patches
 
                         botSpawnerClass.method_10(owner, bot, new Action<BotOwner>((BotOwner follower) =>
                         {
-                            Components.Logger.LogInfo("Boss Ally " + follower.Profile.Nickname + " ready");
+                            Components.Logger.LogInfo("Ally " + follower.Profile.Nickname + " spawned");
 
                             var Timer = StaticManager.Instance.TimerManager.MakeTimer(TimeSpan.FromSeconds(2), false);
 
                             Timer.OnTimer += () =>
                             {
-                                follower.BotTalk.TrySay(EPhraseTrigger.Ready, true);
+                                follower.BotTalk.TrySay(EPhraseTrigger.Ready, false);
                             };
 
                         }), true, stopWatch);
@@ -530,18 +549,24 @@ namespace friendlyPMC.Patches
 
                 Action<BotOwner> OnBotState = new Action<BotOwner>((BotOwner me) =>
                 {
-
-                    BotOwnerManualUpdatePatch.BotOwnerUpdate.Remove(me.ProfileId); // clear watcher
-
-                    me.Memory.DeleteInfoAboutEnemy(player.Player()); // prevent attack of player on spawn
-
-                    BossPlayers.Instance.AddFollower(me, player,true); // make bot a follower
-                    
-                    me.GetPlayer.ActiveHealthController.RestoreFullHealth(); // ensure bot has full health
-
-                    if (side == EPlayerSide.Savage)
+                    try
                     {
-                        (me.Brain.BaseBrain as FollowerBrain).SetBossTactic("ally");
+                        BotOwnerManualUpdatePatch.BotOwnerUpdate.Remove(me.ProfileId); // clear watcher
+
+                        me.Memory.DeleteInfoAboutEnemy(player.Player()); // prevent attack of player on spawn
+
+                        BossPlayers.Instance.AddFollower(me, player, true); // make bot a follower
+
+                        me.GetPlayer.ActiveHealthController.RestoreFullHealth(); // ensure bot has full health
+
+                        if (side == EPlayerSide.Savage)
+                        {
+                            (me.Brain.BaseBrain as FollowerBrain).SetBossTactic("ally");
+                        }
+                    } catch (Exception ex)
+                    {
+                        Components.Logger.LogInfo("Failed to add " + me.Profile.Nickname + " as follower : " + ex.Message);
+                        Components.Logger.LogInfo("Trace: " + ex.StackTrace);
                     }
                 });
 
@@ -557,7 +582,7 @@ namespace friendlyPMC.Patches
                 botSpawnerClass.method_10(owner, bot, new Action<BotOwner>((BotOwner follower)=>
                 {
 
-                    Components.Logger.LogInfo("Follower " + follower.Profile.Nickname + " ready");
+                    Components.Logger.LogInfo("Follower " + follower.Profile.Nickname + " spawned");
 
                     spawnedFollowers++;
                     if (spawnedFollowers >= memberCount)
@@ -569,7 +594,7 @@ namespace friendlyPMC.Patches
 
                     Timer.OnTimer += () =>
                     {
-                        follower.BotTalk.TrySay(EPhraseTrigger.Ready, true);
+                        follower.BotTalk.TrySay(EPhraseTrigger.Ready, false);
                     };
 
                 }) , false, stopWatch );
@@ -768,6 +793,8 @@ namespace friendlyPMC.Patches
             BotOwnerManualUpdatePatch.BotOwnerUpdate.Clear();
 
             PingTeamates.Disable();
+
+            Utils.EnemyInfo.ClearEnemiesLocations();
 
             Components.Logger.LogInfo("Raid Ended");
 

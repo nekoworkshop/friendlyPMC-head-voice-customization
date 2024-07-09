@@ -1,14 +1,11 @@
 ﻿using Comfort.Common;
 using EFT;
 using friendlyPMC.Modules;
-using HarmonyLib;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Reflection;
 using System.Threading.Tasks;
 using UnityEngine;
-using static UnityEngine.UI.GridLayoutGroup;
 
 namespace friendlyPMC.Components
 {
@@ -24,16 +21,22 @@ namespace friendlyPMC.Components
 
         private List<CustomNavigationPoint> coverPoints;
 
+        private Dictionary<Vector3, List<CustomNavigationPoint>> coverZones;
+
         private Coroutine coverCoroutine;
 
-        private float maximumDistance = 120f;
+        private float maximumDistance = 150f;
         public pitAIBossPlayer(Player player) : base(player)
         {
             realPlayer = player;
 
             aBossLogic = new AIBossPlayerLogic(player, this);
+
             coverPoints = new List<CustomNavigationPoint>();
-            
+
+            coverZones = new Dictionary<Vector3, List<CustomNavigationPoint>>();
+
+
             player.HealthController.DiedEvent += OnDead;
 
             SetAreaCovers();
@@ -69,26 +72,42 @@ namespace friendlyPMC.Components
             Task.Run(() =>
             {
 
-                List<CustomNavigationPoint> covers = new List<CustomNavigationPoint>();
+                Vector3 playerPosition = realPlayer.Transform.position;
+                Vector3 squareCenter = new Vector3(
+                    Mathf.Floor(playerPosition.x / 30f) * 30f,
+                    Mathf.Floor(playerPosition.y / 30f) * 30f,
+                    Mathf.Floor(playerPosition.z / 30f) * 30f
+                );
+
+                List<CustomNavigationPoint> covers = null;
+
+                if (coverZones.TryGetValue(squareCenter, out covers))
+                {
+                    coverPoints = covers;
+                    return;
+                }
+
+                covers = new List<CustomNavigationPoint>();
                 float radius = maximumDistance;
                 float lastDist = 0f;
-                Vector3 centerPos = realPlayer.Transform.position;
 
-                BossPlayers.GetAICovers().ForEach(point =>
+                foreach (CustomNavigationPoint point in BossPlayers.GetAICovers())
                 {
-                    float sqrDist = (centerPos - point.Position).sqrMagnitude;
+                    float sqrDist = (squareCenter - point.Position).sqrMagnitude;
 
                     if (sqrDist <= lastDist)
                     {
                         covers.Add(point);
 
                     }
-                    else if (Vector3.Distance(centerPos, point.Position) <= radius)
+                    else if (Vector3.Distance(squareCenter, point.Position) <= radius)
                     {
                         lastDist = sqrDist;
                         covers.Add(point);
                     }
-                });
+                }
+                
+                coverZones[squareCenter] = covers;
 
                 coverPoints = covers;
             });
@@ -99,9 +118,10 @@ namespace friendlyPMC.Components
             while (true)
             {
                 SetAreaCovers();
-                yield return new WaitForSeconds(2f);
+                yield return new WaitForSeconds(1f);
             }
         }
+
         public List<CustomNavigationPoint> GetAreaCovers()
         {
             return coverPoints;

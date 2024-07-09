@@ -76,6 +76,7 @@ namespace friendlyPMC.Components.BossFollower
             {
                 ordersChanged = false;
             };
+            followerFightLayer.OrdersChanged();
         }
 
         public override AICoreActionResultStruct<BotLogicDecision> GetDecision()
@@ -250,7 +251,7 @@ namespace friendlyPMC.Components.BossFollower
 
                 )
                 {
-                    GetClosestCoverPoint(GetBoss().Position, friendlyPMC.fightOuterRadius.Value);
+                    //GetClosestCoverPoint(GetBoss().Position, friendlyPMC.fightOuterRadius.Value);
                     if (customNavigationPoint_0 != null)
                     {
                         return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, baseDecision.Reason);
@@ -268,14 +269,14 @@ namespace friendlyPMC.Components.BossFollower
 
             if (baseDecision.Reason == "IsDamaged" || baseDecision.Reason == "EnoughtHave")
             {
-                GetCoverPoint(botPosition, fightLongRange);
+                //GetCoverPoint(botPosition, fightLongRange);
                 if (customNavigationPoint_0 != null)
                 {
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, baseDecision.Reason);
                 }
             }
 
-            return followerFightLayer.EngageEnemy();
+            return followerFightLayer.EngageEnemy(false,true);
         }
 
         public override AICoreActionEndStruct ShallEndCurrentDecision(AICoreActionResultStruct<BotLogicDecision> curDecision)
@@ -287,13 +288,11 @@ namespace friendlyPMC.Components.BossFollower
             return base.ShallEndCurrentDecision(curDecision);
         }
 
-        
-
-        public override CustomNavigationPoint FindPoint(CoverSearchData data, Func<CoverSearchData, CustomNavigationPoint> p, bool checkCurrent)
+        /*public override CustomNavigationPoint FindPoint(CoverSearchData data, Func<CoverSearchData, CustomNavigationPoint> p, bool checkCurrent)
         {
             customNavigationPoint_0 = Covers.FindPoint(botOwner_0, customNavigationPoint_0);
             return customNavigationPoint_0;
-        }
+        }*/
 
         public AICoreActionEndStruct EndGetInClose()
         {

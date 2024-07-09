@@ -27,7 +27,7 @@ namespace friendlyPMC.Patches
 
             bool allowDefault = true;
 
-            foreach (var item in FollowerPatrolInstances.GetPatrols())
+            if(botOwner_0 != null) foreach(var item in FollowerPatrolInstances.GetPatrols())
             {
                 if(item.botOwner.ProfileId == botOwner_0.ProfileId)
                 {

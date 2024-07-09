@@ -22,10 +22,10 @@ namespace friendlyPMC.Patches
             BotOwner Owner = __instance.Owner;
             Vector3 v = position - Owner.Position;
 
-            // followers have way better vision angle in order to counter the disabling of their CalcGoal action
+            // followers have better vision angle in order to counter the disabling of their CalcGoal action
             if (BossPlayers.Instance.IsFollower(Owner))
             {
-                float cos = Mathf.Cos(220f * Mathf.Deg2Rad);
+                float cos = -0.939693f;
 
                 __result = GClass759.IsAngLessNormalized(Owner.LookDirection, GClass759.NormalizeFastSelf(v), cos);
 

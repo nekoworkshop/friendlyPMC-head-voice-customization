@@ -61,6 +61,7 @@ namespace friendlyPMC.Components
             }
         }
 
+       
         protected WildSpawnType _botRole;
 
         public BotFollowerPlayer(BotOwner bot, pitAIBossPlayer player, bool isSquad = false, WildSpawnType botRole = WildSpawnType.assault)
@@ -176,6 +177,8 @@ namespace friendlyPMC.Components
             } catch(Exception e)
             {
                 Logger.LogInfo("Failed to activate new follower patrol mode: " + e.Message);
+                Logger.LogInfo("StackTrace : " + e.StackTrace);
+
                 _bot.BotFollower.PatrolDataFollower.InitPlayer(player.realPlayer);
                 if (!_bot.BotFollower.PatrolDataFollower.IsInited)
                 {
@@ -254,11 +257,6 @@ namespace friendlyPMC.Components
                 Logger.LogInfo("Could not add ammo to follower: " + ex.Message);
             }
 
-            // reset enemy state
-            if (_bot.Memory.HaveEnemy)
-            {
-                _bot.Memory.DeleteInfoAboutEnemy(_bot.Memory.GoalEnemy.Person);
-            }
 
             // apply some of settings modifier
             _bot.Settings.Current._hearingDistCoef = settingModif.HearingDistCoef;
@@ -266,9 +264,34 @@ namespace friendlyPMC.Components
             _bot.Settings.Current._accuratySpeedCoef = settingModif.AccuratySpeedCoef;
 
             Logger.LogInfo($"Bot {_bot.Profile.Nickname} is now a follower of {_player.Player().Profile.Nickname}");
-            
-        }
 
+            // reset enemy state
+            StaticManager.Instance.TimerManager.MakeTimer(TimeSpan.FromSeconds(0.1), false).OnTimer += () =>
+            {
+                if (_bot.Memory.HaveEnemy)
+                {
+                    _bot.Memory.DeleteInfoAboutEnemy(_bot.Memory.GoalEnemy.Person);
+                }
+            };
+
+            _bot.GetPlayer.BeingHitAction += BeingHitAction;
+
+        }
+        /** 
+         * This is needed since we are disabling CalcGoal for followers 
+         * Make the bot look towards the direction he is getting shot it (to see the enemy)
+         * **/
+        public void BeingHitAction(DamageInfo damageInfo, EBodyPart bodyType, float damageReducedByArmor)
+        {
+            if(!_bot.Memory.HaveEnemy && damageInfo.Player != null)
+            {
+                Vector3? pos = damageInfo.Player.iPlayer?.Position;
+                if(pos != null)
+                {
+                    _bot.Steering.LookToDirection((Vector3)pos - _bot.GetPlayer.Transform.position,90f);
+                }
+            }
+        }
 
         public virtual FollowerBrain GetFollowerBrain(BotOwner bot, pitAIBossPlayer boss)
         {
@@ -371,6 +394,7 @@ namespace friendlyPMC.Components
             settings.FileSettings.Patrol.FRIEND_SEARCH_SEC = 60;
             settings.FileSettings.Patrol.FOLLOWER_START_MOVE_DELAY = 0.5f;
             settings.FileSettings.Patrol.CAN_FRIENDLY_TILT = true;
+            settings.FileSettings.Patrol.VISION_DIST_COEF_PEACE = 1f;
 
             settings.FileSettings.Look.MINIMUM_VISIBLE_DIST = 15f;
 
@@ -495,6 +519,8 @@ namespace friendlyPMC.Components
 
                 _bot.GetPlayer.Physical.Stamina.ForceMode = false;
                 _bot.GetPlayer.Physical.HandsStamina.ForceMode = false;
+
+                _bot.GetPlayer.BeingHitAction -= BeingHitAction;
 
             } catch(Exception ex)
             {

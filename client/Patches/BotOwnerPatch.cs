@@ -105,8 +105,12 @@ namespace friendlyPMC.Patches
             // followers should not have goals
             try
             {
-                if (BossPlayers.Instance.IsFollower(__instance) && __instance.BotFollower.HaveBoss)
-                    AccessTools.Field(typeof(BotOwner), "_nextGetGoalTime").SetValue(__instance, Time.time);
+                float _nextGetGoalTime = (float)AccessTools.Field(typeof(BotOwner), "_nextGetGoalTime").GetValue(__instance);
+                if (_nextGetGoalTime < Time.time)
+                {
+                    if (BossPlayers.Instance.IsFollower(__instance) && __instance.BotFollower.HaveBoss)
+                        AccessTools.Field(typeof(BotOwner), "_nextGetGoalTime").SetValue(__instance, Time.time + 120f);
+                }
             }
             catch (Exception e)
             {

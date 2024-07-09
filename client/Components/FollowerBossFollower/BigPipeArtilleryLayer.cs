@@ -93,7 +93,7 @@ namespace friendlyPMC.Components.FollowerBossFollower
 
             if (supportDecision.Reason == "IsInSmoke")
             {
-                GetClosestCoverPoint(bossPosition, fightRange);
+                //GetClosestCoverPoint(bossPosition, fightRange);
                 if (customNavigationPoint_0 != null)
                 {
                     return supportDecision;
