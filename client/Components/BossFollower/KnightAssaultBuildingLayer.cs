@@ -34,7 +34,7 @@ namespace friendlyPMC.Components.BossFollower
 
         public override bool ShallUseNow()
         {
-            if (HasBoss() && botOwner_0.Memory.HaveEnemy && Vector3.Distance(GetBoss().Position, botOwner_0.Memory.GoalEnemy.CurrPosition) >= friendlyPMC.maximumCoverDistance.Value)
+            if (HasBoss() && botOwner_0.Memory.HaveEnemy && Vector3.Distance(GetBoss().Position, botOwner_0.Memory.GoalEnemy.CurrPosition) >= friendlyPMC.maximumCoverDistance)
             {
                 return false;
             }

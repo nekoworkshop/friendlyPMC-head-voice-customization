@@ -7,6 +7,7 @@ namespace friendlyPMC.Actions
     internal class FollowerGoToPoint : GClass159
     {
         private bool _shouldSprint = true;
+        
         public FollowerGoToPoint(BotOwner bot) : base(bot)
         {
 

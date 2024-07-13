@@ -45,8 +45,7 @@ namespace friendlyPMC.Components.BossFollower
         {
             BotRequest request = botOwner_0.Memory.HaveEnemy ? null : botOwner_0.BotRequestController.CurRequest != null ? botOwner_0.BotRequestController.CurRequest : null;
 
-            float regroupMinDistance = friendlyPMC.regroupMinDistance.Value;
-            float nearSearchRadius = friendlyPMC.fightInnerRadius.Value;
+            float regroupMinDistance = friendlyPMC.regroupMinDistance;;
 
             float sprintDistance = 10f;
             Vector3 bossPosition = GetBossPosition();
@@ -147,8 +146,6 @@ namespace friendlyPMC.Components.BossFollower
 
                 if (request.BotRequestType == BotRequestType.wait)
                 {
-                    botOwner_0.Gesture.TryGestus(EGesture.Good, false);
-
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.holdPosition, "req:holdPos");
                 }
 
@@ -163,7 +160,7 @@ namespace friendlyPMC.Components.BossFollower
         }
 
 
-        public override AICoreActionEndStruct EndGoToPoint()
+/*        public override AICoreActionEndStruct EndGoToPoint()
         {
             AICoreActionEndStruct baseEnd = base.EndGoToPoint();
             if (baseEnd.Value)
@@ -183,7 +180,7 @@ namespace friendlyPMC.Components.BossFollower
             }
 
             return baseEnd;
-        }
+        }*/
 
         protected float GetNavDistance(Vector3 point)
         {

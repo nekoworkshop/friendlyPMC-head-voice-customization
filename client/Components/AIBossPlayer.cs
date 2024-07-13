@@ -33,9 +33,7 @@ namespace friendlyPMC.Components
             aBossLogic = new AIBossPlayerLogic(player, this);
 
             coverPoints = new List<CustomNavigationPoint>();
-
             coverZones = new Dictionary<Vector3, List<CustomNavigationPoint>>();
-
 
             player.HealthController.DiedEvent += OnDead;
 
@@ -67,49 +65,57 @@ namespace friendlyPMC.Components
             return aBossLogic;
         }
 
-        private void SetAreaCovers()
+        private Task SetAreaCovers()
         {
-            Task.Run(() =>
+            return Task.Run(() =>
             {
-
-                Vector3 playerPosition = realPlayer.Transform.position;
-                Vector3 squareCenter = new Vector3(
-                    Mathf.Floor(playerPosition.x / 30f) * 30f,
-                    Mathf.Floor(playerPosition.y / 30f) * 30f,
-                    Mathf.Floor(playerPosition.z / 30f) * 30f
-                );
-
-                List<CustomNavigationPoint> covers = null;
-
-                if (coverZones.TryGetValue(squareCenter, out covers))
+                try
                 {
-                    coverPoints = covers;
-                    return;
+                    Vector3 playerPosition = realPlayer.Transform.position;
+                    Vector3 squareCenter = new Vector3(
+                        Mathf.Floor(playerPosition.x / 25f) * 25f,
+                        Mathf.Floor(playerPosition.y / 25f) * 25f,
+                        Mathf.Floor(playerPosition.z / 25f) * 25f
+                    );
+
+                    if (coverZones.ContainsKey(squareCenter))
+                    {
+                        coverPoints = coverZones[squareCenter];
+                    }
+                   
+                    List<CustomNavigationPoint> groupPoints = BossPlayers.GetAICovers();
+
+                    if (groupPoints.Count > 0)
+                    {
+                        List<CustomNavigationPoint> points = new List<CustomNavigationPoint>();
+                        float lastsqr = float.MaxValue;
+
+                        int maxValue = 150;
+
+                        groupPoints.Sort((a, b) => Vector3.Distance(a.Position, squareCenter).CompareTo(Vector3.Distance(b.Position, squareCenter)));
+
+                        foreach (CustomNavigationPoint groupPoint in groupPoints)
+                        {
+                            float sqrdist = (squareCenter - groupPoint.Position).sqrMagnitude;
+                            if (Vector3.Distance(groupPoint.Position, squareCenter) <= maximumDistance)
+                            {
+                                points.Add(groupPoint);
+                                lastsqr = sqrdist;
+                                maxValue--;
+                            }
+                            if (maxValue <= 0) break;
+                        }
+
+                        coverZones[squareCenter] = points;
+
+                        coverPoints = points;
+                    }
+                } catch (Exception ex)
+                {
+                    Components.Logger.LogInfo("Covers Coroutine failing : " + ex.Message);
+                    Components.Logger.LogInfo("Trace : " + ex.StackTrace);
                 }
 
-                covers = new List<CustomNavigationPoint>();
-                float radius = maximumDistance;
-                float lastDist = 0f;
-
-                foreach (CustomNavigationPoint point in BossPlayers.GetAICovers())
-                {
-                    float sqrDist = (squareCenter - point.Position).sqrMagnitude;
-
-                    if (sqrDist <= lastDist)
-                    {
-                        covers.Add(point);
-
-                    }
-                    else if (Vector3.Distance(squareCenter, point.Position) <= radius)
-                    {
-                        lastDist = sqrDist;
-                        covers.Add(point);
-                    }
-                }
-                
-                coverZones[squareCenter] = covers;
-
-                coverPoints = covers;
             });
         }
 
@@ -117,7 +123,8 @@ namespace friendlyPMC.Components
         {
             while (true)
             {
-                SetAreaCovers();
+                Task ts = SetAreaCovers();
+                yield return new WaitUntil(()=>ts.IsCompleted);
                 yield return new WaitForSeconds(1f);
             }
         }
@@ -265,7 +272,7 @@ namespace friendlyPMC.Components
                 arg1.Player.AIData.BotOwner != null &&
                 _aiplayer != null &&
                 !BossPlayers.Instance.IsFollower(arg1.Player.AIData.BotOwner,_aiplayer)
-                )
+            )
             {
                 _lastTimeHit = Time.time;
                 try
@@ -273,9 +280,9 @@ namespace friendlyPMC.Components
                     if (_aiplayer.bossGroup != null)
                     {
                         _aiplayer.bossGroup.CheckAndAddEnemy(arg1.Player.iPlayer);
-                        _aiplayer.AddEnemy(arg1.Player.AIData.BotOwner);
                     }
 
+                    _aiplayer.AddEnemy(arg1.Player.AIData.BotOwner);
                 }
                 catch (Exception e)
                 {

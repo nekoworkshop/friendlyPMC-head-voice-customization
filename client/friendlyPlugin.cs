@@ -27,6 +27,11 @@ namespace friendlyPMC
         NeedHelp = 50
     }
 
+    public enum CustomBotDecisions
+    {
+        SniperSearch = 100
+    }
+
     [BepInPlugin("xyz.pit.companion", "friendlyPMC", "3.3.5")]
     [BepInDependency("com.spt-aki.core", "3.8.0")]
     [BepInDependency("xyz.drakia.bigbrain")]
@@ -148,13 +153,14 @@ namespace friendlyPMC
 
             new BotMemoryAddEnemyPatch().Enable();
             new BotGroupUsecEnemyPatch().Enable();
+
             var harmony = new Harmony("xyz.pit.companion");
             harmony.PatchAll(typeof(GoalEnemyTracePatch).Assembly);
 
             new BotOwnerIsFolowerPatch().Enable();
             new BotOwnerManualUpdatePatch().Enable();
 
-            //new EnemyInfoIsPointInVisibleSectorPatch().Enable();
+            new EnemyInfoIsPointInVisibleSectorPatch().Enable();
 
             new PatrolDataFollowerPatch().Enable();
 

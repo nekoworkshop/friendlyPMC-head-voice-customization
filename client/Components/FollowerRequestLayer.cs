@@ -1,6 +1,7 @@
 ﻿using Aki.Common.Http;
 using EFT;
 using friendlyPMC.Modules;
+using friendlyPMC.Utils;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -264,52 +265,12 @@ namespace friendlyPMC.Components
 
         private void GetCoverPoint(Vector3 centerPosition, float searchRadius)
         {
-
             if (this.coverTimer > Time.time) return;
 
-            this.coverTimer = 2f + Time.time;
+            this.coverTimer = 1f + Time.time;
 
-
-
-            List<CustomNavigationPoint> customNavigationPoints = HasBoss() ? GetBoss().GetAreaCovers() : BossPlayers.GetAICovers();
-
-            if (customNavigationPoints.Count > 0)
-            {
-                CustomNavigationPoint point1 = null;
-                float distance = searchRadius;
-
-                List<CustomNavigationPoint> availablePoints = new List<CustomNavigationPoint>();
-
-                foreach (CustomNavigationPoint point in customNavigationPoints)
-                {
-                    if (point.IsFreeById(botOwner_0.Id) && !point.IsSpotted)
-                    {
-                        float range = (centerPosition - point.Position).magnitude;
-                        if (range < distance)
-                        {
-                            distance = range;
-                            availablePoints.Add(point);
-
-                        }
-                    }
-                }
-                // get a random point
-                if (availablePoints.Count > 0)
-                {
-                    point1 = availablePoints.Random();
-                }
-
-
-                if (point1 != null)
-                {
-                    customNavigationPoint_0 = point1;
-                    botOwner_0.Memory.SetCoverPoints(point1);
-                }
-                else
-                {
-                    customNavigationPoint_0 = null;
-                }
-            }
+            customNavigationPoint_0 = Covers.GetCoverPoint(botOwner_0, centerPosition, searchRadius);
+            botOwner_0.Memory.SetCoverPoints(customNavigationPoint_0);
         }
     }
 }

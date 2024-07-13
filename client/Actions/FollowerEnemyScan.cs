@@ -74,22 +74,22 @@ namespace friendlyPMC.Actions
 
             if ( closet != null)
             {
-
-                if(bot.Memory.HaveEnemy)
-                {
-                    bot.BotsGroup.AddEnemy(closet, EBotEnemyCause.checkAddTODO);
-                    return;
-                }
+                Components.Logger.LogInfo("Player has seen " + closet.Profile.Nickname);
+                
+                if (bot.Memory.HaveEnemy && bot.Memory.GoalEnemy.ProfileId == closet.Profile.ProfileId) return;
 
                 bot.BotsGroup.AddEnemy(closet.AIData.Player, EBotEnemyCause.checkAddTODO);
                 bot.Memory.AddEnemy(closet, new BotSettingsClass(closet, bot.BotsGroup, EBotEnemyCause.checkAddTODO), false);
+                Components.Logger.LogInfo("Making " + closet.Profile.Nickname + " enemy to others");
                 EnemyInfo info;
                 bot.EnemiesController.EnemyInfos.TryGetValue(closet, out info);
-                if (info != null)
+                if (info != null && (!bot.Memory.HaveEnemy || !bot.Memory.GoalEnemy.HaveSeen ||  Time.time - bot.Memory.GoalEnemy.PersonalLastSeenTime > 4f))
                 {
                     info.PriorityIndex = 0;
-                    bot.Memory.GoalEnemy = info;
                     info.SetVisible(true);
+                    bot.Memory.GoalEnemy = info;
+
+                    Components.Logger.LogInfo("Made " + closet.Profile.Nickname + " an enemy");
                 }
             }
         }

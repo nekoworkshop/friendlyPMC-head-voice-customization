@@ -129,9 +129,9 @@ namespace friendlyPMC.Components
                 }
                 if (method_11(20f))
                 {
-                    GetCoverPoint(botOwner_0.GetPlayer.Transform.position, 30f);
+                    GetCoverPoint(botOwner_0.GetPlayer.Transform.position, 50f);
                     if (this.customNavigationPoint_0 != null)
-                    return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "goforheal");
+                        return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "goforheal");
                 }
                 heal_time = Time.time;
                 return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.heal, "heal now");
@@ -173,11 +173,6 @@ namespace friendlyPMC.Components
             return gstruct7_1;
         }
 
-        public override AICoreActionEndStruct EndRunToCover()
-        {
-            if (!botOwner_0.Memory.HaveEnemy) return new AICoreActionEndStruct("enemy.None", true);
-            return base.EndRunToCover();
-        }
         public override AICoreActionEndStruct EndSuppressFire()
         { 
             return new AICoreActionEndStruct("enemy.None", true);
@@ -202,33 +197,12 @@ namespace friendlyPMC.Components
 
             return base.EndAttackMoving();
         }
-        public override AICoreActionEndStruct EndGoToPoint()
-        {
-            if (botOwner_0.Memory.HaveEnemy) return new AICoreActionEndStruct("enemy.Has", true);
 
-            BotRequest curRequest = this.botOwner_0.BotRequestController.CurRequest;
-            if (botOwner_0.GoToSomePointData.IsCome() || botOwner_0.Mover.IsComeTo(0.5f, false))
-            {
-                if (curRequest != null && curRequest.BotRequestType == BotRequestType.goToPoint)
-                {
-                    curRequest.Complete();
-                }
-                return new AICoreActionEndStruct("point.Reached", true);
-            }
-
-            return base.EndGoToPoint();
-        }
-
-        protected virtual List<CustomNavigationPoint> GetNearGovers()
-        {
-            return HasBoss() ? GetBoss().GetAreaCovers() : BossPlayers.GetAICovers();
-        }
-
-        public override CustomNavigationPoint FindPoint(CoverSearchData data, Func<CoverSearchData, CustomNavigationPoint> p, bool checkCurrent)
+        /*public override CustomNavigationPoint FindPoint(CoverSearchData data, Func<CoverSearchData, CustomNavigationPoint> p, bool checkCurrent)
         {
             customNavigationPoint_0 = Utils.Covers.FindPoint(botOwner_0, customNavigationPoint_0);
             return customNavigationPoint_0;
-        }
+        }*/
 
         protected virtual void GetCoverPoint(Vector3 centerPosition, float searchRadius)
         {

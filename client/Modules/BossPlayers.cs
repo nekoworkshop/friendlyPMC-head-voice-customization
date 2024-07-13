@@ -19,7 +19,7 @@ namespace friendlyPMC.Modules
         private List<BotFollowerPlayer> _followers { get; set; }
         private List<int> _botsGroup { get; set; }
 
-        private List<CustomNavigationPoint> navigationPoints;
+        private List<CustomNavigationPoint> _groupPoints;
 
         private List<string> _removedBosses;
 
@@ -54,6 +54,8 @@ namespace friendlyPMC.Modules
             _followers = new List<BotFollowerPlayer> { };
             _removedBosses = new List<string> { };
             _botsGroup = new List<int> { };
+
+            _groupPoints = new List<CustomNavigationPoint>();
         }
 
         public static void Dispose()
@@ -94,64 +96,61 @@ namespace friendlyPMC.Modules
 
             _bosses[name] = playerBoss;
 
-            // get info about ALL available covers
-            if (navigationPoints == null)
+            if (_groupPoints.Count > 0) return playerBoss;
+
+
+
+            AICoversData[] aICoversData = UnityEngine.Object.FindObjectsOfType<AICoversData>();
+
+            if (aICoversData != null)
             {
-                AICoversData[] aICoversData = UnityEngine.Object.FindObjectsOfType<AICoversData>();
 
-                List<CustomNavigationPoint> customNavigationPoints = new List<CustomNavigationPoint>();
-
-                if (aICoversData != null)
+                foreach (AICoversData cover in aICoversData)
                 {
-
-                    foreach (AICoversData cover in aICoversData)
+                    int id = player.Id;
+                    for (int i = 0; i < cover.MaxX; i++)
                     {
-                        int id = player.Id;
-                        for (int i = 0; i < cover.MaxX; i++)
+                        for (int j = 0; j < cover.MaxY; j++)
                         {
-                            for (int j = 0; j < cover.MaxY; j++)
+                            for (int k = 0; k < cover.MaxZ; k++)
                             {
-                                for (int k = 0; k < cover.MaxZ; k++)
+
+                                NavGraphVoxelSimple navGraphVoxelSimple = cover.VoxelesArray[i, j, k];
+                                if (navGraphVoxelSimple != null && navGraphVoxelSimple.Points != null)
                                 {
-
-                                    NavGraphVoxelSimple navGraphVoxelSimple = cover.VoxelesArray[i, j, k];
-                                    if (navGraphVoxelSimple != null && navGraphVoxelSimple.Points != null)
+                                    foreach (GroupPoint groupPoint in navGraphVoxelSimple.Points)
                                     {
-                                        foreach (GroupPoint groupPoint in navGraphVoxelSimple.Points)
+                                        if (groupPoint.CoverLevel == CoverLevel.Stay || groupPoint.CoverLevel == CoverLevel.Sit)
                                         {
-                                            if (groupPoint.CoverLevel == CoverLevel.Stay || groupPoint.CoverLevel == CoverLevel.Sit)
+                                            Collider[] colliders = new Collider[10];
+                                            int numColliders = Physics.OverlapSphereNonAlloc(groupPoint.Position, 1.5f, colliders);
+
+                                            bool isgood = true;
+                                            for (int x = 0; i < numColliders; i++)
                                             {
-                                                Collider[] colliders = new Collider[10];
-                                                int numColliders = Physics.OverlapSphereNonAlloc(groupPoint.Position, 1.5f, colliders);
+                                                Collider collider = colliders[x];
 
-                                                bool isgood = true;
-                                                for (int x = 0; i < numColliders; i++)
+                                                if (_excludedColliderNames.Contains(collider.transform?.parent?.name))
                                                 {
-                                                    Collider collider = colliders[x];
-
-                                                    if (_excludedColliderNames.Contains(collider.transform?.parent?.name))
-                                                    {
-                                                        isgood = false;
-                                                        break;
-                                                    }
+                                                    isgood = false;
+                                                    break;
                                                 }
-
-                                                if(isgood)
-                                                    customNavigationPoints.Add(groupPoint.CreateCustomNavigationPoint(id));
                                             }
+
+                                            if (isgood)
+                                                _groupPoints.Add(groupPoint.CreateCustomNavigationPoint(id));
                                         }
                                     }
                                 }
                             }
                         }
                     }
-
                 }
 
-                navigationPoints = customNavigationPoints;
             }
 
             return playerBoss;
+        
         }
 
         public bool RemoveBossPlayer(string name)
@@ -293,19 +292,18 @@ namespace friendlyPMC.Modules
 
         public bool IsFollower(BotOwner bot, AIBossPlayer boss = null)
         {
+            if (bot == null || bot.BotFollower == null || !bot.BotFollower.HaveBoss) return false;
 
             if (boss != null && bot != null && bot.BotFollower.HaveBoss)
             {
                 return bot.BotFollower.BossToFollow.Player().ProfileId == boss.Player().ProfileId;
             }
-            
-            if (bot == null || !bot.BotFollower.HaveBoss) return false;
 
             BotFollowerPlayer _follower = null;
 
             foreach (var item in _followers)
             {
-                if (item!= null && item.IsBot(bot))
+                if (item != null && item.IsBot(bot))
                 {
                     _follower = item;
                     break;
@@ -391,7 +389,7 @@ namespace friendlyPMC.Modules
 
         public List<CustomNavigationPoint> GetCovers()
         {
-            return navigationPoints;
+            return _groupPoints;
         }
 
 

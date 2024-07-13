@@ -44,21 +44,21 @@ namespace friendlyPMC.Patches
         [PatchPrefix]
         private static bool PatchPrefix(BotsGroup __instance, IPlayer person, EBotEnemyCause cause)
         {
-            if(person == null || (person.IsAI && person.AIData?.BotOwner?.GetPlayer == null))
+            if (person == null || (person.IsAI && person.AIData?.BotOwner?.GetPlayer == null))
             {
                 return true;
             }
 
             var plBoss = BossPlayers.GetBoss(person.ProfileId);
             var isgroup = BossPlayers.IsBossGroup(__instance.Id);
-            
+
             if (isgroup && plBoss != null)
             {
                 // prevent enemies from being added on spawn
                 if (
-                    cause == EBotEnemyCause.initCauseEnemy || 
+                    cause == EBotEnemyCause.initCauseEnemy ||
                     cause == EBotEnemyCause.initial ||
-                    cause == EBotEnemyCause.AddEnemyToAllGroupsInBotZone || 
+                    cause == EBotEnemyCause.AddEnemyToAllGroupsInBotZone ||
                     cause == EBotEnemyCause.AddEnemyToAllGroups
                 ) return false;
 
@@ -69,8 +69,21 @@ namespace friendlyPMC.Patches
                     return false;
                 }
             }
+
+            return true;
+        }
+        [PatchPostfix]
+        private static void PatchPostfix(BotsGroup __instance, IPlayer person, EBotEnemyCause cause)
+        {
+            if (person == null || (person.IsAI && person.AIData?.BotOwner?.GetPlayer == null))
+            {
+                return;
+            }
+
+            var plBoss = BossPlayers.GetBoss(person.ProfileId);
+
             // whoever makes the player an enemy is our enemy
-            else if (!isgroup && plBoss != null)
+            if (plBoss != null && plBoss.bossGroup != null && plBoss.bossGroup.Id != __instance.Id)
             {
                 try
                 {
@@ -92,11 +105,8 @@ namespace friendlyPMC.Patches
                     Components.Logger.LogInfo("Failed to make a group an enemy: " + ex.Message);
                 }
             }
-
-            return true;
         }
     }
-
     internal class BotGroupIsPlayerEnemy : ModulePatch
     {
         protected override MethodBase GetTargetMethod()

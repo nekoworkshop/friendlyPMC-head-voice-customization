@@ -25,11 +25,12 @@ namespace friendlyPMC.Patches
             // followers have better vision angle in order to counter the disabling of their CalcGoal action
             if (BossPlayers.Instance.IsFollower(Owner))
             {
-                float cos = -0.939693f;
+                return true;
+                /* float cos = -0.939693f;
 
                 __result = GClass759.IsAngLessNormalized(Owner.LookDirection, GClass759.NormalizeFastSelf(v), cos);
 
-                return false;
+                return false; */
             }
 
             return true;

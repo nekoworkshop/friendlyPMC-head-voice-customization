@@ -35,10 +35,9 @@ namespace friendlyPMC.Actions
 
         private float reachDist = 10f;
 
+        private bool sprinting = false;
 
         public readonly BotOwner botOwner;
-
-        private bool isBigPipe;
 
         public FollowerPatrol(pitAIBossPlayer player, BotOwner owner) : base(owner)
         {
@@ -49,8 +48,6 @@ namespace friendlyPMC.Actions
             IsInited = true;
 
             botOwner = owner;
-
-            isBigPipe = owner.IsRole(WildSpawnType.followerBigPipe);
         }
 
         public void Update()
@@ -61,30 +58,6 @@ namespace friendlyPMC.Actions
 
                 Vector3 leaderPosition = player_0.Position;
                 
-
-                // BigPipe will tail BirdEye or Knight instead of the player
-                /*if (isBigPipe && !botOwner.Memory.HaveEnemy)
-                {
-                    BotOwner birdEye = null;
-                    BotOwner knight = null;
-
-                    // - we don't know the order so we have to get both
-                    foreach (var fl in BossPlayers.Instance.GetBossFollowers(player_0.ProfileId))
-                    {
-                        if (fl.GetBot().IsRole(WildSpawnType.bossKnight))
-                            knight = fl.GetBot();
-
-                        if (fl.GetBot().IsRole(WildSpawnType.followerBirdEye))
-                            birdEye = fl.GetBot();
-                    }
-                    
-                    // priority is knight, birdeye and then the player
-                    if (knight != null)
-                        leaderPosition = knight.GetPlayer.Transform.position;
-                    else if(birdEye != null)
-                        leaderPosition = birdEye.GetPlayer.Transform.position;
-                }*/
-
                 this.float_3 = Time.time + GClass760.Random(1f, 2f);
                 float num = Mathf.Abs((this.bool_0 ? this.vector3_0 : (leaderPosition - this.botOwner_0.Position)).magnitude);
                 bool flag2;
@@ -92,7 +65,11 @@ namespace friendlyPMC.Actions
                 this.bool_1 = flag2;
                 if (flag2)
                 {
-                    this.botOwner_0.Mover.Sprint(false, true);
+                    if (sprinting)
+                    {
+                        botOwner_0.Mover.Sprint(false, false);
+                        sprinting = false;
+                    }
                     
                     if (this.bool_0)
                     {
@@ -106,9 +83,9 @@ namespace friendlyPMC.Actions
 
                         CustomNavigationPoint nearPoint = null;
 
-                        if (lastCoverPoint == null && !nocover)
+                        /*if (lastCoverPoint == null && !nocover)
                         {
-                            List<CustomNavigationPoint> coverPoints = BossPlayers.Instance.GetCovers();
+                            List<CustomNavigationPoint> coverPoints = boss_0.GetAreaCovers();
 
                             float maxDist = reachDist;
                             float radius = maxDist;
@@ -124,10 +101,14 @@ namespace friendlyPMC.Actions
                                 }
                             });
 
-                            nearPoint = availCover.GetRandomItem();
+                            CustomNavigationPoint cover = availCover.Count > 0 ?  availCover.GetRandomItem() : null;
+                            if (cover != null)
+                            {
+                                nearPoint = cover;
+                            }
                         }
                         else
-                            nearPoint = lastCoverPoint;
+                            nearPoint = lastCoverPoint;*/
 
                         if (nearPoint != null)
                         {
@@ -161,7 +142,7 @@ namespace friendlyPMC.Actions
                             bool_0 = true;
                             return;
                         }
-                        if (botOwner.GoToPoint(navMeshHit.position, true, -1f, false, true, true, false) != NavMeshPathStatus.PathComplete)
+                        if (botOwner.GoToPoint(navMeshHit.position, false, -1f, false, true, true, false) != NavMeshPathStatus.PathComplete)
                         {
                             botOwner.StopMove();
                             bool_0 = true;
@@ -175,7 +156,12 @@ namespace friendlyPMC.Actions
                     nocover = false;
                     method_0(leaderPosition);
                     bool val = num > 14f;
-                    botOwner.Mover.Sprint(val, true);
+                    
+                    if(val && !sprinting)
+                        botOwner.Mover.Sprint(true, false);
+                    else if (!val && !sprinting) botOwner.Mover.Sprint(false, false);
+
+                    sprinting = val;
                 }
             }
         }

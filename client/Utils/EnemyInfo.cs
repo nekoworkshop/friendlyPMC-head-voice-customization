@@ -86,7 +86,7 @@ namespace friendlyPMC.Utils
 
             if(distance < 12f) return EnemyDistance.VeryClose;
 
-            if (distance < 35f)
+            if (distance < 31f)
             {
                 return EnemyDistance.Close;
             }

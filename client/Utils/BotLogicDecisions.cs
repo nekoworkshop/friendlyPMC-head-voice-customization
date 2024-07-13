@@ -14,7 +14,7 @@ namespace friendlyPMC.Utils
             IPlayer requester = request != null ? bot.BotRequestController.CurRequest.Requester : null;
 
             if(requester == null) {
-                return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.followerPatrol, "backToBoss");
+                return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.followerPatrol, "requester.None");
             }
 
             Vector3 requestPos = requester.Transform.position;

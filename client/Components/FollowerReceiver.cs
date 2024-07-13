@@ -169,14 +169,14 @@ namespace friendlyPMC.Components
         public bool IsBossRequester(IPlayer requester)
         {
 
-            bool isBossCommunicating = requester != null && BossPlayers.Instance.IsFollower(botOwner_0) && botOwner_0.BotFollower.BossToFollow.IsMe(requester);
+            bool isBossCommunicating = requester != null && botOwner_0.BotFollower.BossToFollow.IsMe(requester);
 
             return isBossCommunicating;
         }
 
         public bool IsAllyRequester(IPlayer requester)
         {
-            return IsBossRequester(requester) || BossPlayers.Instance.IsFollower(botOwner_0) && requester != null && botOwner_0.BotsGroup.IsAlly(requester);
+            return IsBossRequester(requester) || (requester != null && botOwner_0.BotsGroup.IsAlly(requester));
         }
 
         public virtual void GestusShown(GClass454 data)
@@ -187,7 +187,7 @@ namespace friendlyPMC.Components
 
             float gestusDistance = (botOwner_0.GetPlayer.Transform.position - data.Player.Transform.position).magnitude;
 
-            bool shouldDefault = !BossPlayers.Instance.IsFollower(botOwner_0) && !BossPlayers.Instance.IsBoss(data.Player.ProfileId);
+            bool shouldDefault = !BossPlayers.Instance.IsBoss(data.Player.ProfileId);
 
             List<EGesture> bossNoGesture = new List<EGesture>
             {
@@ -327,7 +327,7 @@ namespace friendlyPMC.Components
             
             bool isAllyRequesting = IsAllyRequester(requester);
 
-            bool shouldDefault = !BossPlayers.Instance.IsFollower(botOwner_0) && !BossPlayers.Instance.IsBoss(requester.ProfileId);
+            bool shouldDefault = !BossPlayers.Instance.IsBoss(requester.ProfileId);
 
             bool isClose = (botOwner_0.GetPlayer.Transform.position - requester.Transform.position).magnitude < 14f;
             bool notBusy = !botOwner_0.Memory.HaveEnemy;

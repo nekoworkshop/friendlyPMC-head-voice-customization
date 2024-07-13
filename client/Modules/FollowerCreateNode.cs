@@ -34,6 +34,9 @@ namespace friendlyPMC.Modules
             if (type == BotLogicDecision.goToPoint)
                 return new FollowerGoToPoint(bot);
 
+            if(type == (BotLogicDecision)CustomBotDecisions.SniperSearch)
+                return new FollowerSniperSearch(bot);
+
             return GClass460.CreateNode(type, bot);
         }
 
@@ -58,6 +61,9 @@ namespace friendlyPMC.Modules
             smethod_0(dictionary, BotLogicDecision.shootFromStationary, bot);
             smethod_0(dictionary, BotLogicDecision.dogFight, bot);
             smethod_0(dictionary, BotLogicDecision.search, bot);
+
+            smethod_0(dictionary, (BotLogicDecision)CustomBotDecisions.SniperSearch, bot);
+            
             smethod_0(dictionary, BotLogicDecision.shootFromCover, bot);
             smethod_0(dictionary, BotLogicDecision.runAwayGrenade, bot);
             smethod_0(dictionary, BotLogicDecision.runAwayBTR, bot);
