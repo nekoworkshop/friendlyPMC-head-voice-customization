@@ -2,6 +2,7 @@
 using EFT;
 using friendlyPMC.Actions;
 using friendlyPMC.Modules;
+using friendlyPMC.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -45,7 +46,7 @@ namespace friendlyPMC.Components.BossFollower
         {
             BotRequest request = botOwner_0.Memory.HaveEnemy ? null : botOwner_0.BotRequestController.CurRequest != null ? botOwner_0.BotRequestController.CurRequest : null;
 
-            float regroupMinDistance = friendlyPMC.regroupMinDistance;;
+            float regroupMinDistance = friendlyPMC.regroupMinDistance;
 
             float sprintDistance = 10f;
             Vector3 bossPosition = GetBossPosition();
@@ -151,9 +152,7 @@ namespace friendlyPMC.Components.BossFollower
 
                 if (requestRegroup && GetNavDistance(bossPosition) > regroupMinDistance)
                 {
-                    botOwner_0.BotTalk.TrySay(EPhraseTrigger.Roger, false);
-                    request.Complete();
-                    return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.followerPatrol, "backToFLB");
+                    return BotLogicDecisions.RegroupToBoss(botOwner_0);
                 }
             }
             return base.GetDecision();

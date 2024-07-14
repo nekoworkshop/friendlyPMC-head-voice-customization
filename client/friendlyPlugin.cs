@@ -29,7 +29,8 @@ namespace friendlyPMC
 
     public enum CustomBotDecisions
     {
-        SniperSearch = 100
+        SniperSearch = 100,
+        CoverToCover = 101
     }
 
     [BepInPlugin("xyz.pit.companion", "friendlyPMC", "3.3.5")]

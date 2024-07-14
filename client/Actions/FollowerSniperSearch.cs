@@ -9,11 +9,8 @@ using UnityEngine.AI;
 
 namespace friendlyPMC.Actions
 {
-    internal class FollowerSniperSearch : GClass160
+    internal class FollowerSniperSearch : GClass159
     {
-
-        private CustomNavigationPoint Spot = null;
-
         private Vector3? spotPosition;
 
         private bool sprint = false;
@@ -23,9 +20,11 @@ namespace friendlyPMC.Actions
         private float float_6 = 0f;
 
         private float _nextPosibleCheckTime = 0f;
+        
         private Vector3? _lastTarget;
 
         private bool covering = false;
+        private Vector3? _lastCover;
         public FollowerSniperSearch(BotOwner bot) : base(bot)
         {
 
@@ -47,9 +46,8 @@ namespace friendlyPMC.Actions
                 {
                     botOwner_0.SetPose(0.01f);
                     botOwner_0.StopMove();
-                    botOwner_0.Steering.LookToPoint(this.botOwner_0.Memory.GoalEnemy.GetCenterPart());
-                    float_6 = Time.time + GClass760.Random(2f, 4f);
-                    spotPosition = null;
+                    botOwner_0.Steering.LookToPoint(botOwner_0.Memory.GoalEnemy.GetCenterPart());
+                    float_6 = Time.time + GClass760.Random(1f, 3f);
                     return;
                 }
 
@@ -68,13 +66,12 @@ namespace friendlyPMC.Actions
                 return;
             }
 
-            if (_lastTarget.HasValue && Spot == null && float_5 < Time.time)
+            if (_lastTarget.HasValue && float_5 < Time.time)
             {
                 float_5 = Time.time + GClass760.Random(2f, 4f);
 
-                Components.Logger.LogInfo("sniperSearch: look for a spot");
                 // find a cover from where we can shoot the enemy
-                Spot = Utils.Covers.GetClosestAttackCoverPoint(botOwner_0, _lastTarget.Value, 20f, 100f, null, true);
+                CustomNavigationPoint Spot = Utils.Covers.GetClosestAttackCoverPoint(botOwner_0, _lastTarget.Value, 20f, 100f, null, true);
 
                 if (Spot != null)
                 {
@@ -93,41 +90,22 @@ namespace friendlyPMC.Actions
                 
                 if (!spotPosition.HasValue)
                 {
-                    Components.Logger.LogInfo("sniperSearch: no sniping spot found");
-                    
-                    // no sniping position found, cover boss if available
-                    if(botOwner_0.BotFollower.HaveBoss)
-                    {
-                        CustomNavigationPoint cover = Utils.Covers.GetClosestCoverPoint(botOwner_0,botOwner_0.BotFollower.BossToFollow.Position,60f,10f);
-                        if(cover != null)
-                        {
-                            spotPosition = cover.Position;
-                            covering = true;
-                        }
-                        else
-                        {
-                            return;
-                        }
-                    // else wait for the next refresh
-                    } 
-                    else 
+                    if (!TryBossCover())
                     {
                         SetSearchPosition();
                         return;
                     }
+                    else if (!spotPosition.HasValue) return;
                 }
-
-                Components.Logger.LogInfo("sniperSearch: have spot");
-
-                botOwner_0.LookData.SetLookPointByHearing(null);
 
                 botOwner_0.GoToSomePointData.SetPoint((Vector3)spotPosition);
                 bool sprint = Utils.Utils.GetNavDistance(botOwner_0.GetPlayer.Transform.position, (Vector3)spotPosition) > 20f;
                 botOwner_0.GoToSomePointData.UpdateToGo(sprint);
-                if (!covering)
+
+                if (covering)
                     botOwner_0.Steering.LookToMovingDirection();
                 else
-                    botOwner_0.LookData.SetLookPointByHearing(null);
+                    botOwner_0.Steering.LookToDirection(spotPosition.Value - botOwner_0.GetPlayer.Transform.position,90f);
 
             } else
             {
@@ -157,7 +135,6 @@ namespace friendlyPMC.Actions
             {
                 _lastTarget = targetSpot;
                 spotPosition = null;
-                Spot = null;
                 covering = false;
                 botOwner_0.Mover.Sprint(false, true);
             }
@@ -175,7 +152,38 @@ namespace friendlyPMC.Actions
         {
             botOwner_0.SetPose(0.01f);
             botOwner_0.StopMove();
-            botOwner_0.Steering.LookToPoint(this.botOwner_0.Memory.GoalEnemy.GetCenterPart());
+            botOwner_0.Steering.LookToPoint(botOwner_0.Memory.GoalEnemy.GetCenterPart());
+        }
+
+        private bool TryBossCover()
+        {
+            if (botOwner_0.BotFollower.HaveBoss)
+            {
+                Vector3 bossPos = botOwner_0.BotFollower.BossToFollow.Position;
+                Vector3 targetSpot = new Vector3(
+                    Mathf.Floor(bossPos.x / 20f) * 20f,
+                    Mathf.Floor(bossPos.y / 20f) * 20f,
+                    Mathf.Floor(bossPos.z / 20f) * 20f
+                );
+
+                if(targetSpot != _lastCover)
+                {
+                    _lastCover = targetSpot;
+                    spotPosition = null;
+                }
+
+                CustomNavigationPoint cover = Utils.Covers.GetClosestCoverPoint(botOwner_0, bossPos, 40f, 10f);
+
+                if (cover != null)
+                {
+                    spotPosition = cover.Position;
+                    
+                }
+                covering = true;
+                return true;
+            }
+
+            return false;
         }
     }
 }

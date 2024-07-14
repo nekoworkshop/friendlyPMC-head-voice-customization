@@ -84,7 +84,7 @@ namespace friendlyPMC.Utils
 
             float distance = Utils.GetNavDistance(botPosition, enemyPosition);
 
-            if(distance < 12f) return EnemyDistance.VeryClose;
+            if(distance < 15f) return EnemyDistance.VeryClose;
 
             if (distance < 31f)
             {

@@ -83,7 +83,7 @@ namespace friendlyPMC.Actions
 
                         CustomNavigationPoint nearPoint = null;
 
-                        /*if (lastCoverPoint == null && !nocover)
+                        if (lastCoverPoint == null && !nocover)
                         {
                             List<CustomNavigationPoint> coverPoints = boss_0.GetAreaCovers();
 
@@ -108,7 +108,7 @@ namespace friendlyPMC.Actions
                             }
                         }
                         else
-                            nearPoint = lastCoverPoint;*/
+                            nearPoint = lastCoverPoint;
 
                         if (nearPoint != null)
                         {

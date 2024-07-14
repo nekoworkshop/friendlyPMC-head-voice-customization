@@ -477,21 +477,21 @@ namespace friendlyPMC.Components
                 {
                     (botOwner_0.Brain.BaseBrain as FollowerBrain).BossOrdersChanged();
 
-                    Components.Logger.LogInfo("Boss Said to regroup");
-
                     Player alivePlayerByProfileID = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(requester.ProfileId);
 
                     if (botOwner_0.BotRequestController.TryStopCurrent(alivePlayerByProfileID, true))
                     {
                         FollowerRegroup gclass = new FollowerRegroup(requester);
 
-                        Components.Logger.LogInfo("Try and add FollowerRegroup");
-
                         if (botOwner_0.BotsGroup.RequestsController.TryAddRequest(gclass))
                         {
-                            Components.Logger.LogInfo("Added FollowerRegroup");
                             gclass.AddPossibleExecutors(botOwner_0);
                             gclass.SetGroup(botOwner_0.BotsGroup.RequestsController);
+                            if (isClose && (!notBusy || !botOwner_0.Memory.GoalEnemy.IsVisible))
+                            {
+                                botOwner_0.BotTalk.TrySay(EPhraseTrigger.Roger, false);
+                                botOwner_0.Gesture.TryGestus(EGesture.Good, false);
+                            }
                         }
                     }
                 }
