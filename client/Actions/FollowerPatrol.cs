@@ -142,7 +142,7 @@ namespace friendlyPMC.Actions
                             bool_0 = true;
                             return;
                         }
-                        if (botOwner.GoToPoint(navMeshHit.position, false, -1f, false, true, true, false) != NavMeshPathStatus.PathComplete)
+                        if (botOwner.GoToPoint(navMeshHit.position, true, -1f, false, true, true, false) != NavMeshPathStatus.PathComplete)
                         {
                             botOwner.StopMove();
                             bool_0 = true;

@@ -265,16 +265,24 @@ namespace friendlyPMC.Utils
 
             // Create a sphere around the target position with the specified radius range
             float randomRadius = GClass760.Random(minRadius, maxRadius);
+            
+            NavMeshPath mesh = new NavMeshPath();
 
             // Try to find a valid position within the sphere
             for (int i = 0; i < 100; i++) // Adjust the number of attempts as needed
             {
                 Vector3 randomPosition = targetPosition + UnityEngine.Random.insideUnitSphere * randomRadius;
 
+                NavMeshHit navMeshHit;
+
+                if (!NavMesh.SamplePosition(randomPosition, out navMeshHit, 10f, -1)) continue;
+
+                if (!IsNavigablePoint(botOwner, navMeshHit.position, 200f, mesh)) continue;
+
                 // Check if the bot can shoot from the random position to the target
-                if (GClass301.CanShootToTarget(shootTarget, (Vector3)randomPosition, botOwner.LookSensor.Mask, false))
+                if (GClass301.CanShootToTarget(shootTarget, navMeshHit.position, botOwner.LookSensor.Mask, false))
                 {
-                    return randomPosition;
+                    return navMeshHit.position;
                 }
             }
 
