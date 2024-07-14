@@ -20,14 +20,15 @@ namespace friendlyPMC.Actions
 
         private float float_4 = 0f;
         private float float_5 = 0f;
+        private float float_6 = 0f;
 
         private float _nextPosibleCheckTime = 0f;
         private Vector3? _lastTarget;
 
-        private NavMeshPath navMeshPath;
+        private bool covering = false;
         public FollowerSniperSearch(BotOwner bot) : base(bot)
         {
-            navMeshPath = new NavMeshPath();
+
         }
 
         public override void Update()
@@ -38,10 +39,27 @@ namespace friendlyPMC.Actions
 
             RefreshSearchPoint();
 
+            if (float_6 > Time.time) return;
+
             if(spotPosition.HasValue)
             {
+                if(botOwner_0.GoToSomePointData.IsCome())
+                {
+                    botOwner_0.SetPose(0.01f);
+                    botOwner_0.StopMove();
+                    botOwner_0.Steering.LookToPoint(this.botOwner_0.Memory.GoalEnemy.GetCenterPart());
+                    float_6 = Time.time + GClass760.Random(2f, 4f);
+                    spotPosition = null;
+                    return;
+                }
+
                 botOwner_0.GoToSomePointData.UpdateToGo(sprint);
-                botOwner_0.Steering.LookToMovingDirection();
+
+                if (!covering)
+                    botOwner_0.Steering.LookToMovingDirection();
+                else
+                    botOwner_0.LookData.SetLookPointByHearing(null);
+
                 if (float_4 < Time.time)
                 {
                     float_4 = Time.time + 2f;
@@ -61,6 +79,7 @@ namespace friendlyPMC.Actions
                 if (Spot != null)
                 {
                     spotPosition = Spot.Position;
+                    covering = false;
                 }
                 // else find a position from where we can see the enemy
                 else
@@ -68,35 +87,59 @@ namespace friendlyPMC.Actions
                     ShootPointClass shootTarget = new ShootPointClass(_lastTarget.Value, 1f);
 
                     spotPosition = Utils.Covers.FindShootPosition(botOwner_0, shootTarget, 15f, 100f);
+                    covering = false;
                 }
 
+                
                 if (!spotPosition.HasValue)
                 {
                     Components.Logger.LogInfo("sniperSearch: no sniping spot found");
-                    this.botOwner_0.SetPose(0.01f);
-                    this.botOwner_0.StopMove();
+                    
+                    // no sniping position found, cover boss if available
+                    if(botOwner_0.BotFollower.HaveBoss)
+                    {
+                        CustomNavigationPoint cover = Utils.Covers.GetClosestCoverPoint(botOwner_0,botOwner_0.BotFollower.BossToFollow.Position,60f,10f);
+                        if(cover != null)
+                        {
+                            spotPosition = cover.Position;
+                            covering = true;
+                        }
+                        else
+                        {
+                            return;
+                        }
+                    // else wait for the next refresh
+                    } 
+                    else 
+                    {
+                        SetSearchPosition();
+                        return;
+                    }
                 }
-                else
-                {
-                    Components.Logger.LogInfo("sniperSearch: have spot");
 
+                Components.Logger.LogInfo("sniperSearch: have spot");
+
+                botOwner_0.LookData.SetLookPointByHearing(null);
+
+                botOwner_0.GoToSomePointData.SetPoint((Vector3)spotPosition);
+                bool sprint = Utils.Utils.GetNavDistance(botOwner_0.GetPlayer.Transform.position, (Vector3)spotPosition) > 20f;
+                botOwner_0.GoToSomePointData.UpdateToGo(sprint);
+                if (!covering)
+                    botOwner_0.Steering.LookToMovingDirection();
+                else
                     botOwner_0.LookData.SetLookPointByHearing(null);
 
-                    botOwner_0.GoToSomePointData.SetPoint((Vector3)spotPosition);
-                    bool sprint = Utils.Utils.GetNavDistance(botOwner_0.GetPlayer.Transform.position, (Vector3)spotPosition) > 20f;
-                    botOwner_0.GoToSomePointData.UpdateToGo(sprint);
-                    botOwner_0.Steering.LookToMovingDirection();
-                }
             } else
             {
 
-                if(!_lastTarget.HasValue) RearchSearchPoint();
+                if(!_lastTarget.HasValue) ReachSearchPoint();
+                else SetSearchPosition();
             }
         }
 
         private void RefreshSearchPoint()
         {
-            if (this._nextPosibleCheckTime > Time.time)
+            if (this._nextPosibleCheckTime > Time.time || !botOwner_0.Memory.HaveEnemy)
             {
                 return;
             }
@@ -115,17 +158,24 @@ namespace friendlyPMC.Actions
                 _lastTarget = targetSpot;
                 spotPosition = null;
                 Spot = null;
+                covering = false;
                 botOwner_0.Mover.Sprint(false, true);
             }
         }
 
-        private void RearchSearchPoint()
+        private void ReachSearchPoint()
+        {
+            SetSearchPosition();
+            _nextPosibleCheckTime = Time.time + 1f;
+            spotPosition = null;
+            covering = false;
+        }
+
+        private void SetSearchPosition()
         {
             botOwner_0.SetPose(0.01f);
             botOwner_0.StopMove();
             botOwner_0.Steering.LookToPoint(this.botOwner_0.Memory.GoalEnemy.GetCenterPart());
-            _nextPosibleCheckTime = Time.time + 1f;
-            spotPosition = null;
         }
     }
 }

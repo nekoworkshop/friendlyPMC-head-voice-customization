@@ -125,11 +125,6 @@ namespace friendlyPMC.Components.FollowerBossFollower
                     }
 
                     // - fallback
-                    StaticManager.Instance.TimerManager.MakeTimer(TimeSpan.FromSeconds(1f), false).OnTimer += () =>
-                    {
-                        if (botOwner_0.BotState == EBotState.Active && !botOwner_0.IsDead && botOwner_0.Memory.HaveEnemy && !botOwner_0.Memory.GoalEnemy.IsVisible)
-                            botOwner_0.Steering.LookToDirection(enemyPosition - botPosition);
-                    };
                     return new AICoreActionResultStruct<BotLogicDecision>((BotLogicDecision)CustomBotDecisions.SniperSearch, "sniper.Search");
                 }
             }
@@ -381,7 +376,7 @@ namespace friendlyPMC.Components.FollowerBossFollower
                 return new AICoreActionEndStruct("enemy.ShotMe", true);
             }
 
-            if(Utils.EnemyInfo.Distance(botOwner_0) <= Utils.EnemyInfo.EnemyDistance.Close)
+            if(Utils.EnemyInfo.Distance(botOwner_0) <= Utils.EnemyInfo.EnemyDistance.VeryClose)
             {
                 return new AICoreActionEndStruct("enemy.Close", true);
             }
