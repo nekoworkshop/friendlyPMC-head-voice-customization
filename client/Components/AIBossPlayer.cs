@@ -279,7 +279,7 @@ namespace friendlyPMC.Components
                 {
                     if (_aiplayer.bossGroup != null)
                     {
-                        _aiplayer.bossGroup.CheckAndAddEnemy(arg1.Player.iPlayer);
+                        _aiplayer.bossGroup.CheckAndAddEnemy(arg1.Player.AIData.BotOwner);
                     }
 
                     _aiplayer.AddEnemy(arg1.Player.AIData.BotOwner);
