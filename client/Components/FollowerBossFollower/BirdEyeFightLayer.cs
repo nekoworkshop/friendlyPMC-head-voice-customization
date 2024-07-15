@@ -142,7 +142,6 @@ namespace friendlyPMC.Components.FollowerBossFollower
             BotRequest request = botOwner_0.BotRequestController.CurRequest;
 
             Vector3 botPosition = botOwner_0.GetPlayer.Transform.position;
-            Vector3 bossPosition = HasBoss() ? GetBoss().Position : botPosition;
 
             EnemyInfo goalEnemy = botOwner_0.Memory.GoalEnemy;
 
@@ -166,7 +165,6 @@ namespace friendlyPMC.Components.FollowerBossFollower
                 request.BotRequestType == (BotRequestType)CustomBotRequestType.Regroup
             )
             {
-                Logger.LogInfo("Player asked for help");
                 if (!botOwner_0.Memory.HaveEnemy || !botOwner_0.Memory.GoalEnemy.IsVisible)
                 {
                     return followerFightLayer.GetCloserToBoss();

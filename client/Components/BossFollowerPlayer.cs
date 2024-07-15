@@ -22,19 +22,23 @@ namespace friendlyPMC.Components
             {
                 FollowerPatrol patrol = FollowerPatrolInstances.GetPatrol(bot);
                 patrol.SetReachDist(17f);
+
+                
             }
         }
 
         public override void SetFollowerSettings(BotOwner bot)
         {
+            settingModif.AccuratySpeedCoef = 1.5f;
 
             base.SetFollowerSettings(bot);
             
             bot.Settings.FileSettings.Core.HearingSense = 1.0f;
 
+
             if (bot.IsRole(WildSpawnType.followerBirdEye))
             {
-                bot.Settings.FileSettings.Core.GainSightCoef = 0.4f;
+                bot.Settings.FileSettings.Core.GainSightCoef = 0.5f;
                 bot.Settings.FileSettings.Cover.SOUND_TO_GET_SPOTTED = 10f;
                 bot.Settings.FileSettings.Cover.SPOTTED_COVERS_RADIUS = 12f;
                 bot.Settings.FileSettings.Shoot.LOW_DIST_TO_CHANGE_WEAPON = 30f;

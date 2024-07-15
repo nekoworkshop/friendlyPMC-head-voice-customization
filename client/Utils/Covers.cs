@@ -143,9 +143,7 @@ namespace friendlyPMC.Utils
             Vector3 botPosition = botOwner.Transform.position;
             Vector3 enemyPos = botOwner.Memory.GoalEnemy.CurrPosition;
 
-            ShootPointClass shootTarget;
-            if (botOwner.Memory.GoalEnemy.HaveSeen) shootTarget = botOwner.CurrentEnemyTargetPosition(true);
-            else shootTarget = new ShootPointClass(enemyPos, 1f);
+            ShootPointClass shootTarget = new ShootPointClass(enemyPos, 1f);
 
             CustomNavigationPoint pt = ClosestPoint(botOwner, centerPosition, (CustomNavigationPoint point) =>
             {
@@ -168,7 +166,7 @@ namespace friendlyPMC.Utils
                     return false;
                 }
 
-                if (!GClass301.CanShootToTarget(shootTarget, point.Position, botOwner.LookSensor.Mask, false)) return false;
+                if (!GClass301.CanShootToTarget(shootTarget, point.Position, LayerMaskClass.HighPolyWithTerrainMask, false)) return false;
 
                 
                 return true;

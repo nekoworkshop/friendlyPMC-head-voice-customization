@@ -52,11 +52,11 @@ namespace friendlyPMC.Actions
 
         public void Update()
         {
-
+            botOwner_0.LookData.SetLookPointByHearing(null);
             if (this.float_3 < Time.time)
             {
 
-                Vector3 leaderPosition = player_0.Position;
+                Vector3 leaderPosition = player_0.Transform.position;
                 
                 this.float_3 = Time.time + GClass760.Random(1f, 2f);
                 float num = Mathf.Abs((this.bool_0 ? this.vector3_0 : (leaderPosition - this.botOwner_0.Position)).magnitude);
@@ -74,6 +74,7 @@ namespace friendlyPMC.Actions
                     if (this.bool_0)
                     {
                         this.botOwner_0.StopMove();
+                        Components.Logger.LogInfo("StopMove");
                         return;
                     }
 
@@ -117,15 +118,10 @@ namespace friendlyPMC.Actions
                             botOwner_0.Steering.LookToMovingDirection();
 
                             var status = botOwner.Mover.GoToPoint(nearPoint, true, true);
-                            if (status != NavMeshPathStatus.PathComplete)
+                            if (status == NavMeshPathStatus.PathComplete)
                             {
-                                botOwner.StopMove();
-                                botOwner.SetPose(0.5f);
-                                bool_0 = true;
                                 return;
                             }
-
-                            return;
                         }
 
                         nocover = true;
@@ -159,7 +155,7 @@ namespace friendlyPMC.Actions
                     
                     if(val && !sprinting)
                         botOwner.Mover.Sprint(true, false);
-                    else if (!val && !sprinting) botOwner.Mover.Sprint(false, false);
+                    else if (!val && sprinting) botOwner.Mover.Sprint(false, false);
 
                     sprinting = val;
                 }
@@ -291,7 +287,7 @@ namespace friendlyPMC.Actions
             var patrol = GetPatrol(bot);
             if (patrol != null)
             {
-                patrol.SetReachDist(25f);
+                patrol.SetReachDist(20f);
             }
 
             if (!bot.Memory.HaveEnemy)

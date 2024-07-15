@@ -36,25 +36,28 @@ namespace friendlyPMC.Actions
 
             if (!botOwner_0.Memory.HaveEnemy) return;
 
+
             RefreshSearchPoint();
 
             if (float_6 > Time.time) return;
 
-            if(spotPosition.HasValue)
+
+            if (spotPosition.HasValue)
             {
                 if(botOwner_0.GoToSomePointData.IsCome())
                 {
                     botOwner_0.SetPose(0.01f);
                     botOwner_0.StopMove();
                     botOwner_0.Steering.LookToPoint(botOwner_0.Memory.GoalEnemy.GetCenterPart());
-                    float_6 = Time.time + GClass760.Random(1f, 3f);
+                    float_6 = Time.time + GClass760.Random(2f, 3f);
+                    ReachSearchPoint();
                     return;
                 }
 
                 botOwner_0.GoToSomePointData.UpdateToGo(sprint);
 
                 if (!covering)
-                    botOwner_0.Steering.LookToMovingDirection();
+                    botOwner_0.Steering.LookToDirection(botOwner_0.Memory.GoalEnemy.CurrPosition - botOwner_0.GetPlayer.Transform.position, 90f);
                 else
                     botOwner_0.LookData.SetLookPointByHearing(null);
 
@@ -71,7 +74,7 @@ namespace friendlyPMC.Actions
                 float_5 = Time.time + GClass760.Random(2f, 4f);
 
                 // find a cover from where we can shoot the enemy
-                CustomNavigationPoint Spot = Utils.Covers.GetClosestAttackCoverPoint(botOwner_0, _lastTarget.Value, 20f, 100f, null, true);
+                CustomNavigationPoint Spot = Utils.Covers.GetClosestAttackCoverPoint(botOwner_0, _lastTarget.Value, 5f, 100f, null);
 
                 if (Spot != null)
                 {
@@ -83,19 +86,21 @@ namespace friendlyPMC.Actions
                 {
                     ShootPointClass shootTarget = new ShootPointClass(_lastTarget.Value, 1f);
 
-                    spotPosition = Utils.Covers.FindShootPosition(botOwner_0, shootTarget, 15f, 100f);
+                    spotPosition = Utils.Covers.FindShootPosition(botOwner_0, shootTarget, 5f, 100f);
                     covering = false;
                 }
 
-                
+                // else find a position from where we can cover boss
                 if (!spotPosition.HasValue)
                 {
-                    if (!TryBossCover())
-                    {
-                        SetSearchPosition();
-                        return;
-                    }
-                    else if (!spotPosition.HasValue) return;
+                    TryBossCover();
+
+                }
+                // nothing found - stay in place
+                if (!spotPosition.HasValue)
+                {
+                    SetSearchPosition();
+                    return;
                 }
 
                 botOwner_0.GoToSomePointData.SetPoint((Vector3)spotPosition);
@@ -105,7 +110,7 @@ namespace friendlyPMC.Actions
                 if (covering)
                     botOwner_0.Steering.LookToMovingDirection();
                 else
-                    botOwner_0.Steering.LookToDirection(spotPosition.Value - botOwner_0.GetPlayer.Transform.position,90f);
+                    botOwner_0.Steering.LookToDirection(botOwner_0.Memory.GoalEnemy.CurrPosition - botOwner_0.GetPlayer.Transform.position,90f);
 
             } else
             {
@@ -122,7 +127,7 @@ namespace friendlyPMC.Actions
                 return;
             }
             
-            this._nextPosibleCheckTime = Time.time + 7f;
+            this._nextPosibleCheckTime = Time.time + 5f;
             Vector3 enemyPosition = botOwner_0.Memory.GoalEnemy.CurrPosition;
 
             Vector3 targetSpot = new Vector3(
@@ -143,7 +148,7 @@ namespace friendlyPMC.Actions
         private void ReachSearchPoint()
         {
             SetSearchPosition();
-            _nextPosibleCheckTime = Time.time + 1f;
+            _nextPosibleCheckTime = Time.time + 2f;
             spotPosition = null;
             covering = false;
         }
@@ -170,15 +175,17 @@ namespace friendlyPMC.Actions
                 {
                     _lastCover = targetSpot;
                     spotPosition = null;
-                }
+                    CustomNavigationPoint cover = Utils.Covers.GetClosestCoverPoint(botOwner_0, targetSpot, 50f, 5f);
 
-                CustomNavigationPoint cover = Utils.Covers.GetClosestCoverPoint(botOwner_0, bossPos, 40f, 10f);
+                    if (cover != null)
+                    {
+                        spotPosition = cover.Position;
 
-                if (cover != null)
-                {
-                    spotPosition = cover.Position;
-                    
+                    }
                 }
+                
+                _lastTarget = null;
+
                 covering = true;
                 return true;
             }

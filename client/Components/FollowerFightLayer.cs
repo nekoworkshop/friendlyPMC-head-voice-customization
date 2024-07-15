@@ -690,7 +690,7 @@ namespace friendlyPMC.Components
             StaticManager.Instance.TimerManager.MakeTimer(TimeSpan.FromSeconds(0.1), false).OnTimer += () =>
             {
                 if (botOwner_0.BotState == EBotState.Active && !botOwner_0.IsDead && botOwner_0.Memory.HaveEnemy && !botOwner_0.Memory.GoalEnemy.IsVisible) 
-                    botOwner_0.Steering.LookToDirection(botOwner_0.GetPlayer.Transform.position - botOwner_0.Memory.GoalEnemy.CurrPosition);
+                    botOwner_0.Steering.LookToDirection(botOwner_0.Memory.GoalEnemy.CurrPosition - botOwner_0.GetPlayer.Transform.position,90f);
             };
             return new AICoreActionResultStruct<BotLogicDecision>(HoldFor(timer), reason);
         }

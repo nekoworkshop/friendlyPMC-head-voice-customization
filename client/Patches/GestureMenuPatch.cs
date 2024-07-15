@@ -42,6 +42,17 @@ namespace friendlyPMC.Patches
                     gestureBaseItem.OnPointerClicked.Subscribe(new Action<GestureBaseItem.GStruct400>(@class.method_0));
                     list_1.Add(gestureBaseItem);
                 }
+
+                else if(item.gameObject.name == "TEAM STATUS")
+                {
+                    Components.Logger.LogInfo("add to team status panel");
+                    GesturesMenu.Class2921 @class = new GesturesMenu.Class2921();
+                    @class.gesturesMenu_0 = __instance;
+                    @class.isSituational = false;
+                    GestureBaseItem gestureBaseItem = item.CreateNewPhrase((EPhraseTrigger)CustomPhrases.TeamStatus, @class.isSituational);
+                    gestureBaseItem.OnPointerClicked.Subscribe(new Action<GestureBaseItem.GStruct400>(@class.method_0));
+                    list_1.Add(gestureBaseItem);
+                }
             });
         }
     }
@@ -61,9 +72,9 @@ namespace friendlyPMC.Patches
                 {
                     __result = "Contact";
                     return false;
-                } else if (trigger == EPhraseTrigger.PhraseNone)
+                } else if (trigger == (EPhraseTrigger)CustomPhrases.TeamStatus)
                 {
-                    __result = "Check In";
+                    __result = "Status Report";
                     return false;
                 }
             }

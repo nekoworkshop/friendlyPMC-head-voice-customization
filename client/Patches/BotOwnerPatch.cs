@@ -74,7 +74,7 @@ namespace friendlyPMC.Patches
         {
             return AccessTools.Method(typeof(BotOwner), "UpdateManual");
         }
-        [PatchPrefix]
+       /* [PatchPrefix]
         private static bool PatchPrefix(BotOwner __instance)
         {
             // followers should not have goals
@@ -115,7 +115,7 @@ namespace friendlyPMC.Patches
             }
 
             return true;
-        }
+        }*/
 
         [PatchPostfix]
         private static void PatchPostfix(BotOwner __instance)
