@@ -8,7 +8,6 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
-using UnityEngine.Profiling;
 
 namespace friendlyPMC.Utils
 {
@@ -254,9 +253,9 @@ namespace friendlyPMC.Utils
             Color marker = Color.red;
             if(bt.Data.Memory.HaveEnemy && !bt.EnemyPos.HasValue)
             {
-                if(bt.Data.Memory.GoalEnemy.IsVisible ||bt.Data.Memory.GoalEnemy.HaveSeen)
+                if(bt.Data.Memory.GoalEnemy.IsVisible || bt.Data.Memory.GoalEnemy.HaveSeen)
                 {
-                    bt.EnemyPos = bt.Data.Memory.GoalEnemy.PersonalLastPos;
+                    bt.EnemyPos = bt.Data.Memory.GoalEnemy.CurrPosition;
                     marker = bt.Data.Memory.GoalEnemy.IsVisible ? Color.red : Color.yellow;
 
                 } 
@@ -326,13 +325,13 @@ namespace friendlyPMC.Utils
             Vector3 screenPos = Camera.main.WorldToScreenPoint(enemyPosition + Vector3.up * 1f);
             if (screenPos.z > 0)
             {
-                float animationOffset = Mathf.Sin(Time.time * 3f) * 3f;
+                float animationOffset = Mathf.Sin(Time.time * 2f) * 10f;
                 Vector3 markerPos = new Vector3(screenPos.x, Screen.height - screenPos.y + animationOffset, 0f);
 
                 Matrix4x4 matrixBackup = GUI.matrix;
                 GUIUtility.RotateAroundPivot(-180, markerPos);
 
-                GUI.DrawTexture(new Rect(markerPos.x, markerPos.y, 20f, 20f), CreateTriangleTexture(cl));
+                GUI.DrawTexture(new Rect(markerPos.x, markerPos.y, 25f, 25f), CreateTriangleTexture(cl));
 
                 GUI.matrix = matrixBackup;
             }

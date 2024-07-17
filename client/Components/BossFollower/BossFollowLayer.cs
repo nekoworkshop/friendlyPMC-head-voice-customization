@@ -1,15 +1,8 @@
-﻿using Aki.Common.Http;
-using EFT;
-using friendlyPMC.Actions;
+﻿using EFT;
+
 using friendlyPMC.Modules;
 using friendlyPMC.Utils;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.AI;
 
 namespace friendlyPMC.Components.BossFollower
 {
@@ -99,10 +92,10 @@ namespace friendlyPMC.Components.BossFollower
                     IPlayer requester = botOwner_0.BotRequestController.CurRequest.Requester;
 
                     Vector3 dir = requester.LookDirection;
-                    float forwardDistance = GClass760.Random(3f, 5f);
+                    float forwardDistance = GClass761.Random(3f, 5f);
 
                     Vector3 forwardPosition = requester.Position + dir.normalized * forwardDistance;
-                    float lateralOffset = GClass760.RandomSing() * GClass760.Random(0.5f, 1.5f);
+                    float lateralOffset = GClass761.RandomSing() * GClass761.Random(0.5f, 1.5f);
                     Vector3 lateralDirection = Vector3.Cross(Vector3.up, dir).normalized;
 
                     Vector3 finalPosition = forwardPosition + lateralDirection * lateralOffset;
@@ -128,7 +121,7 @@ namespace friendlyPMC.Components.BossFollower
                     Vector3 requestPos = requester.Position;
                     Vector3 dir = requester.LookDirection;
 
-                    float offset = GClass760.RandomSing() * GClass760.Random(1f, 2f);
+                    float offset = GClass761.RandomSing() * GClass761.Random(1f, 2f);
                     Vector3 direction = Vector3.Cross(Vector3.up, dir).normalized;
 
                     Vector3 finPos = requestPos + direction * offset;

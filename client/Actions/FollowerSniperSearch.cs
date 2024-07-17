@@ -25,6 +25,10 @@ namespace friendlyPMC.Actions
 
         private bool covering = false;
         private Vector3? _lastCover;
+
+        protected float _minDist = 10f;
+
+        protected float _maxDist = 100f;
         public FollowerSniperSearch(BotOwner bot) : base(bot)
         {
 
@@ -49,7 +53,7 @@ namespace friendlyPMC.Actions
                     botOwner_0.SetPose(0.01f);
                     botOwner_0.StopMove();
                     botOwner_0.Steering.LookToPoint(botOwner_0.Memory.GoalEnemy.GetCenterPart());
-                    float_6 = Time.time + GClass760.Random(2f, 3f);
+                    float_6 = Time.time + GClass761.Random(2f, 3f);
                     ReachSearchPoint();
                     return;
                 }
@@ -71,10 +75,10 @@ namespace friendlyPMC.Actions
 
             if (_lastTarget.HasValue && float_5 < Time.time)
             {
-                float_5 = Time.time + GClass760.Random(2f, 4f);
+                float_5 = Time.time + GClass761.Random(2f, 4f);
 
                 // find a cover from where we can shoot the enemy
-                CustomNavigationPoint Spot = Utils.Covers.GetClosestAttackCoverPoint(botOwner_0, _lastTarget.Value, 5f, 100f, null);
+                CustomNavigationPoint Spot = Utils.Covers.GetClosestAttackCoverPoint(botOwner_0, _lastTarget.Value, _minDist, _maxDist, botOwner_0.Memory.GoalEnemy.CurrPosition);
 
                 if (Spot != null)
                 {
@@ -86,7 +90,7 @@ namespace friendlyPMC.Actions
                 {
                     ShootPointClass shootTarget = new ShootPointClass(_lastTarget.Value, 1f);
 
-                    spotPosition = Utils.Covers.FindShootPosition(botOwner_0, shootTarget, 5f, 100f);
+                    spotPosition = Utils.Covers.FindShootPosition(botOwner_0, shootTarget, _minDist, _maxDist);
                     covering = false;
                 }
 

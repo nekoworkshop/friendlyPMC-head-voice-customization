@@ -1,6 +1,6 @@
-import { TraderServiceType } from "@spt-aki/models/enums/TraderServiceType";
-import { ITraderConfig } from "@spt-aki/models/spt/config/ITraderConfig";
-import { IDatabaseTables } from "@spt-aki/models/spt/server/IDatabaseTables";
+import { TraderServiceType } from "@spt/models/enums/TraderServiceType";
+import { ITraderConfig } from "@spt/models/spt/config/ITraderConfig";
+import { IDatabaseTables } from "@spt/models/spt/server/IDatabaseTables";
 
 export function SetFreemanTrader(Tables: IDatabaseTables, Traders: ITraderConfig) {
 	const traders = Tables.traders;

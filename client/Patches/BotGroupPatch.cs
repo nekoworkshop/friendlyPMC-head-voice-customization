@@ -1,15 +1,11 @@
-﻿using Aki.Reflection.Patching;
+﻿using SPT.Reflection.Patching;
 using EFT;
 using friendlyPMC.Components;
 using friendlyPMC.Modules;
 using HarmonyLib; 
-using JetBrains.Annotations;
-using Sirenix.Serialization.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using UnityEngine;
-using static UnityEngine.EventSystems.EventTrigger;
 
 namespace friendlyPMC.Patches
 {

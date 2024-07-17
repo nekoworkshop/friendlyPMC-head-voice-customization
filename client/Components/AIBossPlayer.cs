@@ -47,7 +47,7 @@ namespace friendlyPMC.Components
             {
                 Followers.ForEach(follower =>
                 {
-                    if (follower != null && GClass760.Random(1, 100) > friendlyPMC.returnChanceDeath.Value)
+                    if (follower != null && GClass761.Random(1, 100) > friendlyPMC.returnChanceDeath.Value)
                     {
 
                         var flw = BossPlayers.Instance.GetFollower(follower);
@@ -81,6 +81,8 @@ namespace friendlyPMC.Components
                     if (coverZones.ContainsKey(squareCenter))
                     {
                         coverPoints = coverZones[squareCenter];
+
+                        return;
                     }
                    
                     List<CustomNavigationPoint> groupPoints = BossPlayers.GetAICovers();
@@ -253,7 +255,7 @@ namespace friendlyPMC.Components
             bot.BotFollower.BossFindAction();
         }
     }
-    internal class AIBossPlayerLogic : GClass363
+    internal class AIBossPlayerLogic : GClass362
     {
         private Player _player;
         private pitAIBossPlayer _aiplayer;

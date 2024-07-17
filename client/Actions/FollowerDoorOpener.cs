@@ -3,17 +3,17 @@ using UnityEngine;
 
 namespace friendlyPMC.Actions
 {
-    internal class GClass168_0 : BaseNodeClass
+    internal class GClass168_0 : BaseNodeAbstractClass
     {
 
         private bool bool_0;
         private float float_0;
 
-        public GClass168_0(BotOwner bot, GClass509 doorClass) : base(bot) {
+        public GClass168_0(BotOwner bot, GClass508 doorClass) : base(bot) {
             GClass509_0 = doorClass;
         }
 
-        private GClass509 GClass509_0;
+        private GClass508 GClass509_0;
 
         public override void Update()
         {
@@ -51,15 +51,15 @@ namespace friendlyPMC.Actions
             this.bool_0 = false;
         }
     }
-    internal class FollowerDoorOpener : BaseNodeClass
+    internal class FollowerDoorOpener : BaseNodeAbstractClass
     {
-        public FollowerDoorOpener(BotOwner bot, GClass509 doorClass) : base(bot) {
+        public FollowerDoorOpener(BotOwner bot, GClass508 doorClass) : base(bot) {
 
             GClass509_0 = doorClass;
             gclass168_0 = new GClass168_0(bot,doorClass);
         }
         
-        private GClass509 GClass509_0;
+        private GClass508 GClass509_0;
 
         public override void Update()
         {

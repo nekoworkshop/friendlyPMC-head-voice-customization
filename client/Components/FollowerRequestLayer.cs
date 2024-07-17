@@ -1,5 +1,4 @@
-﻿using Aki.Common.Http;
-using EFT;
+﻿using EFT;
 using friendlyPMC.Modules;
 using friendlyPMC.Utils;
 using System;
@@ -124,7 +123,7 @@ namespace friendlyPMC.Components
                     Vector3 requestPos = requester.Position;
                     Vector3 dir01 = requester.LookDirection;
 
-                    float offset = GClass760.RandomSing() * GClass760.Random(1f, 2f);
+                    float offset = GClass761.RandomSing() * GClass761.Random(1f, 2f);
                     Vector3 direction = Vector3.Cross(Vector3.up, dir01).normalized;
 
                     Vector3 finPos = requestPos + direction * offset;
@@ -180,10 +179,10 @@ namespace friendlyPMC.Components
                 case BotRequestType.goToPoint:
 
                     Vector3 dir02 = requester.LookDirection;
-                    float forwardDistance = GClass760.Random(3f, 5f);
+                    float forwardDistance = GClass761.Random(3f, 5f);
 
                     Vector3 forwardPosition = requester.Position + dir02.normalized * forwardDistance;
-                    float lateralOffset = GClass760.RandomSing() * GClass760.Random(0.5f, 1.5f);
+                    float lateralOffset = GClass761.RandomSing() * GClass761.Random(0.5f, 1.5f);
                     Vector3 lateralDirection = Vector3.Cross(Vector3.up, dir02).normalized;
 
                     Vector3 finalPosition = forwardPosition + lateralDirection * lateralOffset;
@@ -220,14 +219,14 @@ namespace friendlyPMC.Components
                 if (curRequest != null && curRequest.BotRequestType == BotRequestType.doorOpen)
                     curRequest.Complete();
 
-                return this.gstruct7_0;
+                return aICoreActionEndStruct;
             }
 
             if (curRequest != null && curRequest.BotRequestType == BotRequestType.doorOpen && !botOwner_0.DoorOpener.Interacting)
             {
-                return this.gstruct7_1;
+                return aICoreActionEndStruct_1;
             }
-            return this.gstruct7_0;
+            return aICoreActionEndStruct;
         }
         public override AICoreActionEndStruct EndSuppressFire()
         {
@@ -239,11 +238,11 @@ namespace friendlyPMC.Components
                     suppressTime = 0;
                     curRequest.Complete();
 
-                    return this.gstruct7_0;
+                    return aICoreActionEndStruct;
                 }
-                return this.gstruct7_1;
+                return aICoreActionEndStruct_1;
             }
-            return this.gstruct7_0;
+            return aICoreActionEndStruct;
         }
 
         public override CustomNavigationPoint FindPoint(CoverSearchData data, Func<CoverSearchData, CustomNavigationPoint> p, bool checkCurrent)

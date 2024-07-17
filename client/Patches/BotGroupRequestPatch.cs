@@ -1,15 +1,13 @@
-﻿using Aki.Common.Http;
-using Aki.Reflection.Patching;
-using Comfort.Common;
+﻿using SPT.Reflection.Patching;
+
 using EFT;
-using EFT.Interactive;
-using friendlyPMC.Actions;
+
 using friendlyPMC.Components;
 using friendlyPMC.Modules;
 using HarmonyLib;
 using System;
 using System.Reflection;
-using UnityEngine;
+
 
 namespace friendlyPMC.Patches
 {
@@ -27,17 +25,31 @@ namespace friendlyPMC.Patches
 
             pitAIBossPlayer playerBoss = BossPlayers.Instance.GetBossPlayer(player.ProfileId);
 
-
-
             if (playerBoss != null && posibleExecuter != null)
             {
-                // if BOT is already a follower, allow "follow me" request to take place
-                if (BossPlayers.Instance.IsFollower(posibleExecuter, playerBoss))
-                {
-                    return true;
+                bool isAFollower = BossPlayers.Instance.IsFollower(posibleExecuter);
 
+                if (isAFollower)
+                {
+                    // if BOT is already a follower, allow "follow me" request to take place if it is the boss who is requesting it
+                    if (posibleExecuter.BotFollower.HaveBoss)
+                    {
+                        if (posibleExecuter.BotFollower.BossToFollow.IsMe(playerBoss.Player()))
+                        {
+                            return true;
+                        // - this is a follower of someone else
+                        } 
+                        else
+                        {
+                            posibleExecuter.BotTalk.TrySay(EPhraseTrigger.Negative);
+                            posibleExecuter.Gesture.TryGestus(EGesture.Bad, true);
+                            __result = false;
+                            return false;
+                        }
+                    }
                 }
-                else if (player.Side == posibleExecuter.Side)
+                
+                if (player.Side == posibleExecuter.Side)
                 {
                     int followLimit = friendlyPMC.extraPickups.Value;
                     if(friendlyPMC.squadSpawn.Value)
@@ -47,9 +59,8 @@ namespace friendlyPMC.Patches
                     // add BOT as follower to the player BOSS if limit was not reached
                     if (BossPlayers.Instance.GetBossFollowers(player.ProfileId).Count < followLimit)
                     {
-
                         BossPlayers.Instance.AddFollower(posibleExecuter, playerBoss);
-                        // bot signals "OK"
+                        // - bot signals "OK"
                         posibleExecuter.BotTalk.TrySay(EPhraseTrigger.Roger);
                         posibleExecuter.Gesture.TryGestus(EGesture.Good, true);
 

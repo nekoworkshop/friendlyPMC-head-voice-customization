@@ -1,15 +1,6 @@
 ﻿using EFT;
-using friendlyPMC.Components;
-using friendlyPMC.Modules;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine.AI;
 using UnityEngine;
-using Newtonsoft.Json.Linq;
-using Aki.Common.Http;
 using friendlyPMC.Utils;
 
 namespace friendlyPMC.Components.BossFollower
@@ -117,7 +108,7 @@ namespace friendlyPMC.Components.BossFollower
             {
                 Components.Logger.LogInfo("KnightFight Error: " + ex.Message);
                 Components.Logger.LogInfo("Trace: " + ex.StackTrace);
-                return new AICoreActionResultStruct<BotLogicDecision>(HoldFor(GClass760.Random(1f, 2f)), "decision.Error");
+                return new AICoreActionResultStruct<BotLogicDecision>(HoldFor(GClass761.Random(1f, 2f)), "decision.Error");
             }
         }
 
@@ -309,7 +300,7 @@ namespace friendlyPMC.Components.BossFollower
         }
         public override CustomNavigationPoint FindPoint(CoverSearchData data, Func<CoverSearchData, CustomNavigationPoint> p, bool checkCurrent)
         {
-            customNavigationPoint_0 = Covers.FindPoint(botOwner_0, customNavigationPoint_0);
+            customNavigationPoint_0 = followerFightLayer.FindPoint(data, p, checkCurrent);
             return customNavigationPoint_0;
         }
 

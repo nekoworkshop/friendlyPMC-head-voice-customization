@@ -1,14 +1,14 @@
-﻿using Aki.PrePatch;
+﻿
 using EFT;
 
 using HarmonyLib;
-using LootingBots.Patch.Components;
+
 using System;
 
 using friendlyPMC.Components.BossFollower;
 using friendlyPMC.Components.FollowerBossFollower;
 using friendlyPMC.Actions;
-using LootingBots.Patch.Util;
+
 using System.Linq;
 
 namespace friendlyPMC.Components
@@ -55,8 +55,8 @@ namespace friendlyPMC.Components
 
             EPlayerSide side = _player.Player().Side;
 
-            WildSpawnType sptBear = (WildSpawnType)AkiBotsPrePatcher.sptBearValue;
-            WildSpawnType sptUsec = (WildSpawnType)AkiBotsPrePatcher.sptUsecValue;
+            WildSpawnType sptBear = WildSpawnType.pmcBEAR;
+            WildSpawnType sptUsec = WildSpawnType.pmcUSEC;
 
             var _initialBot = AccessTools.Field(typeof(BotsGroup), "_initialBot").GetValue(_player.bossGroup) as BotOwner;
 

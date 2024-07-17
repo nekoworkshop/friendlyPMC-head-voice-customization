@@ -91,7 +91,7 @@ namespace friendlyPMC.Components
             get => _isTakingHeavyDamage;
         }
 
-        private GClass553.GInterface13 _damageTimer;
+        private GClass552.IBotTimer _damageTimer;
 
 
         private AICoreActionResultStruct<BotLogicDecision>? previousDecision = null;
@@ -374,8 +374,8 @@ namespace friendlyPMC.Components
                             {
                                 if (holdTimer < Time.time)
                                 {
-                                    float timer = GClass760.Random(2f, 5f);
-                                    holdTimer = Time.time + timer + GClass760.Random(2f, 3f);
+                                    float timer = GClass761.Random(2f, 5f);
+                                    holdTimer = Time.time + timer + GClass761.Random(2f, 3f);
                                     return new AICoreActionResultStruct<BotLogicDecision>(HoldFor(timer), "wait4it");
                                 } 
                                 else
@@ -420,8 +420,8 @@ namespace friendlyPMC.Components
                             // No cover point found, hold position temporarily
                             if (holdTimer < Time.time)
                             {
-                                float timer = GClass760.Random(2f, 5f);
-                                holdTimer = Time.time + timer + GClass760.Random(2f, 3f);
+                                float timer = GClass761.Random(2f, 5f);
+                                holdTimer = Time.time + timer + GClass761.Random(2f, 3f);
                                 return new AICoreActionResultStruct<BotLogicDecision>(HoldFor(timer), "wait4it");
                             }
                         }
@@ -458,8 +458,8 @@ namespace friendlyPMC.Components
                         // --- no approachable point found, hold position temporarily
                             if (holdTimer < Time.time)
                             {
-                                float timer = GClass760.Random(2f, 5f);
-                                holdTimer = Time.time + timer + GClass760.Random(2f, 3f);
+                                float timer = GClass761.Random(2f, 5f);
+                                holdTimer = Time.time + timer + GClass761.Random(2f, 3f);
                                 return new AICoreActionResultStruct<BotLogicDecision>(HoldFor(timer), "wait4it");
                             }
                         }
@@ -479,8 +479,8 @@ namespace friendlyPMC.Components
                             // --- no cover point found, hold position temporarily
                             if (holdTimer < Time.time)
                             {
-                                float timer = GClass760.Random(2f, 5f);
-                                holdTimer = Time.time + timer + GClass760.Random(2f, 3f);
+                                float timer = GClass761.Random(2f, 5f);
+                                holdTimer = Time.time + timer + GClass761.Random(2f, 3f);
                                 return new AICoreActionResultStruct<BotLogicDecision>(HoldFor(timer), "wait4it");
                             } else
                                 return EnemySearch();
@@ -488,7 +488,7 @@ namespace friendlyPMC.Components
                     }
                 }
                 // - if the enemy is not visible
-                else if(Time.time - lastEnemySeenTime < GClass760.Random(2f, 5f))
+                else if(Time.time - lastEnemySeenTime < GClass761.Random(2f, 5f))
                 {
                     // -- find a cover point closer to the enemy's last known position
                     GetApproachablePoint();
@@ -507,8 +507,8 @@ namespace friendlyPMC.Components
             // --  fallback If no conditions are met
             if (holdTimer < Time.time)
             {
-                float timer = GClass760.Random(2f, 5f);
-                holdTimer = Time.time + timer + GClass760.Random(2f, 3f);
+                float timer = GClass761.Random(2f, 5f);
+                holdTimer = Time.time + timer + GClass761.Random(2f, 3f);
                 return new AICoreActionResultStruct<BotLogicDecision>(HoldFor(timer), "waitAbit");
             }
             else
@@ -555,10 +555,10 @@ namespace friendlyPMC.Components
                 // Else check if the bot needs to get close to the boss
                 if(HasBoss() && ShallGoNearBoss())
                 {
-                    return GetCloserToBoss();
+                    return new AICoreActionResultStruct<BotLogicDecision>((BotLogicDecision)CustomBotDecisions.CoverToCover, "coverBoss");
                 }
                 // Otherwise, hold position
-                return HoldPositionFor(GClass760.Random(2f,4f), "holdPositionInCover");
+                return HoldPositionFor(GClass761.Random(2f,4f), "holdPositionInCover");
             }
 
             // If the bot is not in cover, find the closest cover and move to it
@@ -605,7 +605,7 @@ namespace friendlyPMC.Components
                 if(canShoot)
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.shootFromCover, "sfc");
 
-                return new AICoreActionResultStruct<BotLogicDecision>(HoldFor(GClass760.Random(2f, 5f)), "wait4it");
+                return new AICoreActionResultStruct<BotLogicDecision>(HoldFor(GClass761.Random(2f, 5f)), "wait4it");
             }
 
             // If the enemy is a sniper and visible, try to find a cover point from which you can shoot
@@ -629,7 +629,7 @@ namespace friendlyPMC.Components
             }
 
             // If the sniper was recently seen, try to find a cover point from which you can approach
-            if (haveSeen && Time.time - lastSeenTime < GClass760.Random(5f, 7f))
+            if (haveSeen && Time.time - lastSeenTime < 5f)
             {
                 GetApproachablePoint();
 
@@ -662,27 +662,7 @@ namespace friendlyPMC.Components
         
         public AICoreActionResultStruct<BotLogicDecision> EnemySearch(string reason = null)
         {
-            string stepTrace = "1";
-            try
-            {
-                stepTrace += "; 2";
-                Vector3 enemyPos = botOwner_0.Memory.GoalEnemy.CurrPosition;
-                stepTrace += "; 3";
-                botOwner_0.SearchData.SearchPoint = new BotSearchPoint(enemyPos, EBotSearchPoint.playerPosition);
-                stepTrace += "; 4";
-                StaticManager.Instance.TimerManager.MakeTimer(TimeSpan.FromSeconds(0.1), false).OnTimer += () =>
-                {
-                    if (botOwner_0.BotState == EBotState.Active && !botOwner_0.IsDead && !botOwner_0.Memory.GoalEnemy.IsVisible) botOwner_0.Steering.LookToMovingDirection();
-                };
-                stepTrace += "; 5";
-                return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.search, reason != null ? reason : "enemy.Search");
-            } catch (Exception ex)
-            {
-                Logger.LogInfo("Search Error: " + ex.Message);
-                Logger.LogInfo("Trace: " + ex.StackTrace);
-                Logger.LogInfo("Steps: " + stepTrace);
-                return new AICoreActionResultStruct<BotLogicDecision>(HoldFor(1f), "search.Error");
-            }
+            return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.search, reason != null ? reason : "enemy.Search");
         }
 
         public AICoreActionResultStruct<BotLogicDecision> HoldPositionFor(float timer, string reason = "wait4it")
@@ -693,21 +673,6 @@ namespace friendlyPMC.Components
                     botOwner_0.Steering.LookToDirection(botOwner_0.Memory.GoalEnemy.CurrPosition - botOwner_0.GetPlayer.Transform.position,90f);
             };
             return new AICoreActionResultStruct<BotLogicDecision>(HoldFor(timer), reason);
-        }
-
-        public AICoreActionResultStruct<BotLogicDecision> CloseFight()
-        {
-            Vector3 botPosition = botOwner_0.GetPlayer.Transform.position;
-            Vector3 enemyPos = botOwner_0.Memory.GoalEnemy.CurrPosition;
-            bool enemyVisible = botOwner_0.Memory.GoalEnemy.IsVisible;
-            float lastEnemySeenTime = botOwner_0.Memory.GoalEnemy.PersonalLastSeenTime;
-            bool inCover = botOwner_0.Memory.IsInCover;
-
-            
-
-            // fallback
-            if(!botOwner_0.Memory.GoalEnemy.IsVisible) botOwner_0.Steering.LookToDirection(enemyPos - botPosition);
-            return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.dogFight, "cdg");
         }
 
         public AICoreActionResultStruct<BotLogicDecision> GetCloserToBoss()
@@ -722,7 +687,7 @@ namespace friendlyPMC.Components
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "moveCloserToBossFast");
 
             }
-            return new AICoreActionResultStruct<BotLogicDecision>((BotLogicDecision)CustomBotDecisions.CoverToCover, "coverBoss");
+            return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.followerPatrol, "moveCloserFallback");
         }
         public AICoreActionResultStruct<BotLogicDecision>?  DogFight()
         {
@@ -915,7 +880,6 @@ namespace friendlyPMC.Components
             return null;
         }
 
-
         public AICoreActionResultStruct<BotLogicDecision> DecideTactic()
         {
 
@@ -955,8 +919,6 @@ namespace friendlyPMC.Components
             if (allyTactic) return DefendPosition(interestPosition);
             else if ((ordersAreHold || holdTactic) && !ordersAreAttack) return DefendPosition(interestPosition);
             else if (ordersAreAttack || rushTactic) return EngageEnemy(ordersAreAttack);
-
-            
 
             if (botOwner_0.Memory.AttackImmediately && Utils.EnemyInfo.Distance(botOwner_0) < Utils.EnemyInfo.EnemyDistance.Far)
             {
@@ -1158,7 +1120,7 @@ namespace friendlyPMC.Components
             {
                 this.botOwner_0.Memory.Spotted(false, null, null);
                 this.botOwner_0.Memory.BotCurrentCoverInfo.SetCover(this.customNavigationPoint_0, true);
-                GClass363 gclass = gclass363_0;
+                GClass362 gclass = gclass363_0;
                 if (gclass != null)
                 {
                     gclass.StartMoveToAttackPoint(botOwner_0.Id);
@@ -1190,7 +1152,7 @@ namespace friendlyPMC.Components
 
             GetCoverPoint(botOwner_0.GetPlayer.Transform.position, nearSearchRadius);
 
-            return this.gstruct7_1;
+            return aICoreActionEndStruct_1;
         }
 
         public override AICoreActionEndStruct EndSuppressFire()
@@ -1203,11 +1165,11 @@ namespace friendlyPMC.Components
                     suppressTime = 0;
                     curRequest.Complete();
 
-                    return this.gstruct7_0;
+                    return aICoreActionEndStruct;
                 }
-                return this.gstruct7_1;
+                return aICoreActionEndStruct_1;
             }
-            return this.gstruct7_0;
+            return aICoreActionEndStruct;
         }
 
         public override AICoreActionEndStruct EndRunToEnemy()
@@ -1282,7 +1244,7 @@ namespace friendlyPMC.Components
                 return new AICoreActionEndStruct("EndHealTimer", true);
             }
 
-            return gstruct7_1;
+            return aICoreActionEndStruct_1;
         }
 
         public override AICoreActionEndStruct EndTakeItem()
@@ -1347,7 +1309,7 @@ namespace friendlyPMC.Components
                 return new AICoreActionEndStruct("enemy.Close", true);
             }
 
-            return gstruct7_0;
+            return aICoreActionEndStruct;
         }
 
         public AICoreActionEndStruct EndCoverToCover()
@@ -1362,13 +1324,13 @@ namespace friendlyPMC.Components
                 return new AICoreActionEndStruct("enemy.canSh", true);
             }
 
-            return gstruct7_0;
+            return aICoreActionEndStruct;
         }
         public override AICoreActionEndStruct ShallEndCurrentDecision(AICoreActionResultStruct<BotLogicDecision> curDecision)
         {
             if (!botOwner_0.Memory.HaveEnemy)
             {
-                return gstruct7_0;
+                return aICoreActionEndStruct;
             }
 
             // orders changed
@@ -1390,7 +1352,7 @@ namespace friendlyPMC.Components
                 )
             )
             {
-                return gstruct7_0;
+                return aICoreActionEndStruct;
             }
 
             if (closeInDecisions.Contains(curDecision.Reason))
@@ -1406,7 +1368,7 @@ namespace friendlyPMC.Components
         {
             if (!botOwner_0.Memory.HaveEnemy)
             {
-                return gstruct7_0;
+                return aICoreActionEndStruct;
             }
 
             List<BotLogicDecision> breakOffContactDecision = new List<BotLogicDecision>
@@ -1433,7 +1395,7 @@ namespace friendlyPMC.Components
                 )
             )
             {
-                return gstruct7_0;
+                return aICoreActionEndStruct;
             }
 
             if (closeInDecisions.Contains(curDecision.Reason))

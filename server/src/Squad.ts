@@ -1,45 +1,46 @@
 import { DependencyContainer, inject } from "tsyringe";
-import { DatabaseServer } from "@spt-aki/servers/DatabaseServer";
+import { DatabaseServer } from "@spt/servers/DatabaseServer";
 
-import { BotDifficultyHelper } from "@spt-aki/helpers/BotDifficultyHelper";
-import { BotController } from "@spt-aki/controllers/BotController";
+import { BotDifficultyHelper } from "@spt/helpers/BotDifficultyHelper";
+import { BotController } from "@spt/controllers/BotController";
 
-import { IBotConfig } from "@spt-aki/models/spt/config/IBotConfig";
-import { IPmcConfig } from "@spt-aki/models/spt/config/IPmcConfig";
+import { IBotConfig } from "@spt/models/spt/config/IBotConfig";
+import { IPmcConfig } from "@spt/models/spt/config/IPmcConfig";
 
-import { ILogger } from "@spt-aki/models/spt/utils/ILogger";
+import { ILogger } from "@spt/models/spt/utils/ILogger";
 
-import { Difficulty } from "@spt-aki/models/eft/common/tables/IBotType";
+import { Difficulty } from "@spt/models/eft/common/tables/IBotType";
 
-import { LogTextColor } from "@spt-aki/models/spt/logging/LogTextColor";
+import { LogTextColor } from "@spt/models/spt/logging/LogTextColor";
 
-import { ILocations } from "@spt-aki/models/spt/server/ILocations";
+import { ILocations } from "@spt/models/spt/server/ILocations";
 
 import { openZonesMap } from "./AOZExports";
 
-import { ITraderConfig } from "@spt-aki/models/spt/config/ITraderConfig";
-import { TraderHelper } from "@spt-aki/helpers/TraderHelper";
-import { Traders } from "@spt-aki/models/enums/Traders";
+import { ITraderConfig } from "@spt/models/spt/config/ITraderConfig";
+import { TraderHelper } from "@spt/helpers/TraderHelper";
+import { Traders } from "@spt/models/enums/Traders";
 import { SetFreemanTrader } from "./Trader";
 
-import { ImageRouter } from "@spt-aki/routers/ImageRouter";
-import type { PostAkiModLoader } from "@spt-aki/loaders/PostAkiModLoader";
+import { ImageRouter } from "@spt/routers/ImageRouter";
+import type { PostSptModLoader } from "@spt/loaders/PostSptModLoader";
 
-import { MailSendService } from "@spt-aki/services/MailSendService";
+import { MailSendService } from "@spt/services/MailSendService";
 
-import type { StaticRouterModService } from "@spt-aki/services/mod/staticRouter/StaticRouterModService";
+import type { StaticRouterModService } from "@spt/services/mod/staticRouter/StaticRouterModService";
 
 import path from "path";
-import { RouteAction } from "@spt-aki/di/Router";
-import { HttpResponseUtil } from "@spt-aki/utils/HttpResponseUtil";
-import { IUserDialogInfo } from "@spt-aki/models/eft/profile/IAkiProfile";
+import { RouteAction } from "@spt/di/Router";
+import { HttpResponseUtil } from "@spt/utils/HttpResponseUtil";
+import { IUserDialogInfo } from "@spt/models/eft/profile/ISptProfile";
 
-import { RandomUtil } from "@spt-aki/utils/RandomUtil";
+import { RandomUtil } from "@spt/utils/RandomUtil";
 
 class friendlyPMC {
 	config = {
 		sameSideHostile: false,
 		armbands: true,
+		englishBear: true,
 	};
 
 	Logger: ILogger;
@@ -53,7 +54,7 @@ class friendlyPMC {
 
 	originalGetValidTraderIdByEnumValue: TraderHelper["getValidTraderIdByEnumValue"];
 
-	preAkiLoad(container: DependencyContainer) {
+	preSptLoad(container: DependencyContainer) {
 		this.Logger = container.resolve("WinstonLogger");
 		this.mailSendService = container.resolve("MailSendService");
 
@@ -117,7 +118,7 @@ class friendlyPMC {
 		);
 
 		const imageRouter: ImageRouter = container.resolve("ImageRouter");
-		const modLoader: PostAkiModLoader = container.resolve("PostAkiModLoader");
+		const modLoader: PostSptModLoader = container.resolve("PostSptModLoader");
 
 		const folder = path.basename(path.dirname(__dirname));
 
@@ -142,9 +143,9 @@ class friendlyPMC {
 
 	postDBLoad(container: DependencyContainer) {
 		const configServer: any = container.resolve("ConfigServer");
-		const Bots: IBotConfig = configServer.getConfig("aki-bot");
-		const PMCBOT: IPmcConfig = configServer.getConfig("aki-pmc");
-		const Traders: ITraderConfig = configServer.getConfig("aki-trader");
+		const Bots: IBotConfig = configServer.getConfig("spt-bot");
+		const PMCBOT: IPmcConfig = configServer.getConfig("spt-pmc");
+		const Traders: ITraderConfig = configServer.getConfig("spt-trader");
 
 		const databaseServer = container.resolve<DatabaseServer>("DatabaseServer");
 		const tables = databaseServer.getTables();
@@ -197,6 +198,13 @@ class friendlyPMC {
 						break;
 				}
 			}
+		}
+
+		if (this.config.englishBear) {
+			tables.bots.types["bear"].appearance.voice = {
+				Bear_1_Eng: 1,
+				Bear_2_Eng: 1,
+			};
 		}
 
 		// open all zones to the bots

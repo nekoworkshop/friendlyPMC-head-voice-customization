@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace friendlyPMC.Modules
 {
-    // replication of GClass460
+    // replication of GClass459
     internal class FollowerCreateNode
     {
 
@@ -17,7 +17,7 @@ namespace friendlyPMC.Modules
 
             if (type == BotLogicDecision.doorOpen)
             {
-                return new FollowerDoorOpener(bot, bot.BotRequestController.CurRequest as GClass509);
+                return new FollowerDoorOpener(bot, bot.BotRequestController.CurRequest as GClass508);
             }
 
             if (type == BotLogicDecision.botTakeItem)
@@ -40,7 +40,10 @@ namespace friendlyPMC.Modules
             if(type == (BotLogicDecision)CustomBotDecisions.CoverToCover)
                 return new FollowerCoverToCover(bot);
 
-            return GClass460.CreateNode(type, bot);
+            if(type == BotLogicDecision.search)
+                return new FollowerSearch(bot);
+
+            return GClass459.CreateNode(type, bot);
         }
 
         public static Dictionary<BotLogicDecision, GClass134> ActionsList(BotOwner bot)

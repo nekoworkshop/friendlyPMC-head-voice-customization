@@ -34,7 +34,7 @@ namespace friendlyPMC.Components
 
         protected LootFinder _lootFinder;
 
-        protected GClass529 settingModif;
+        protected GClass528 settingModif;
 
         public LootingBrain LootingBrain
         {
@@ -72,7 +72,7 @@ namespace friendlyPMC.Components
             
             _IsSquadMate = isSquad;
 
-            settingModif = new GClass529(1.2f,1.2f,1f,1f,1f,1f,0.9f,1f,1f);
+            settingModif = new GClass528(1.2f,1.2f,1f,1f,1f,1f,0.9f,1f,1f);
 
             // change enenmy chooser to custom
             if (bot.EnemyChooser != null)
@@ -87,7 +87,7 @@ namespace friendlyPMC.Components
             // force current layer to trigger end decision
             try
             {
-                AccessTools.Field(typeof(BaseLogicLayerClass), "bool_1").SetValue(_bot.Brain.BaseBrain.CurLayerInfo, true);
+                AccessTools.Field(typeof(BaseLogicLayerAbstractClass), "bool_1").SetValue(_bot.Brain.BaseBrain.CurLayerInfo, true);
             } catch { }
 
             var baseBrain = _bot.Brain.BaseBrain;
@@ -152,8 +152,6 @@ namespace friendlyPMC.Components
             {
                 Logger.LogInfo("Failed to add Looting Brain to follower: " +ex.Message);
             }
-            // change search mode
-            _bot.SearchData = new FollowerSearch(_bot);
             // add the new follower brain
             _bot.Brain.BaseBrain = GetFollowerBrain(_bot, _player);
             _bot.Brain.Agent = GetFollowerAIAgent(_bot);
@@ -321,7 +319,7 @@ namespace friendlyPMC.Components
             _OldSettings = _bot.Settings;
             _OldGroupID = _bot.GroupId;
             // increase bot's power
-            BotDifficultySettingsClass settings = Singleton<GClass534>.Instance.GetSettings(BotDifficulty.hard, _botRole);
+            BotDifficultySettingsClass settings = Singleton<GClass533>.Instance.GetSettings(BotDifficulty.hard, _botRole);
             // - hardcode some settings to make the bot more efficient
             settings.FileSettings.Move.REACH_DIST = 1.5f;
             settings.FileSettings.Move.REACH_DIST_COVER = 2f;

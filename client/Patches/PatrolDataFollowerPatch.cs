@@ -1,14 +1,10 @@
-﻿using Aki.Reflection.Patching;
+﻿using SPT.Reflection.Patching;
 using EFT;
 using friendlyPMC.Actions;
-using friendlyPMC.Modules;
+
 using HarmonyLib;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace friendlyPMC.Patches
 {

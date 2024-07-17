@@ -11,7 +11,7 @@ using friendlyPMC.Components;
 
 namespace friendlyPMC.Actions
 {
-    internal class FollowerPatrol : GClass362
+    internal class FollowerPatrol : GClass361
     {
 
         private readonly Player player_0;
@@ -58,7 +58,7 @@ namespace friendlyPMC.Actions
 
                 Vector3 leaderPosition = player_0.Transform.position;
                 
-                this.float_3 = Time.time + GClass760.Random(1f, 2f);
+                this.float_3 = Time.time + GClass761.Random(1f, 2f);
                 float num = Mathf.Abs((this.bool_0 ? this.vector3_0 : (leaderPosition - this.botOwner_0.Position)).magnitude);
                 bool flag2;
                 bool flag = (flag2 = (num < reachDist)) != this.bool_1;
@@ -91,14 +91,14 @@ namespace friendlyPMC.Actions
                             float maxDist = reachDist;
                             float radius = maxDist;
 
+                            NavMeshPath navMeshPath = new NavMeshPath();
                             List<CustomNavigationPoint> availCover = new List<CustomNavigationPoint>();
                             coverPoints.ForEach((point) =>
                             {
                                 float dist = (leaderPosition - point.Position).magnitude;
-                                if (dist < radius && point.IsFreeById(botOwner.Id))
+                                if (point.IsFreeById(botOwner.Id) && Utils.Utils.GetNavDistance(leaderPosition, point.Position, navMeshPath) <= maxDist)
                                 {
                                     availCover.Add(point);
-                                    radius = dist;
                                 }
                             });
 
@@ -127,8 +127,8 @@ namespace friendlyPMC.Actions
                         nocover = true;
                         float minR = Mathf.Min(1f, reachDist * 0.19f);
                         float maxR = Mathf.Min(5f, reachDist * 0.65f);
-                        float num2 = (float)GClass760.RandomSing() * GClass760.Random(minR, maxR);
-                        float num3 = (float)GClass760.RandomSing() * GClass760.Random(minR, maxR);
+                        float num2 = (float)GClass761.RandomSing() * GClass761.Random(minR, maxR);
+                        float num3 = (float)GClass761.RandomSing() * GClass761.Random(minR, maxR);
                         float x = num2 + leaderPosition.x;
                         float z = num3 + leaderPosition.z;
                         NavMeshHit navMeshHit;

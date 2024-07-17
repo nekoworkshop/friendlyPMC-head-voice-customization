@@ -23,7 +23,7 @@ namespace friendlyPMC.Actions
 
             if (goalEnemy != null)
             {
-                botOwner_0.Steering.LookToPoint(botOwner_0.Memory.GoalEnemy.CurrPosition);
+                botOwner_0.Steering.LookToPoint(botOwner_0.Memory.GoalEnemy.GetCenterPart());
             }
         }
     }

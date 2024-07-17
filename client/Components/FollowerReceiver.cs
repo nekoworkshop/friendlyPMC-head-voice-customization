@@ -1,12 +1,11 @@
-﻿using Aki.Common.Http;
-using Comfort.Common;
+﻿using Comfort.Common;
 using EFT;
 using EFT.Interactive;
 using friendlyPMC.Actions;
 using friendlyPMC.Requests;
 using friendlyPMC.Modules;
 using System;
-using System.Threading.Tasks;
+
 using UnityEngine;
 using System.Collections.Generic;
 using HarmonyLib;
@@ -179,7 +178,7 @@ namespace friendlyPMC.Components
             return IsBossRequester(requester) || (requester != null && botOwner_0.BotsGroup.IsAlly(requester));
         }
 
-        public virtual void GestusShown(GClass454 data)
+        public virtual void GestusShown(GClass453 data)
         {
 
             EGesture gesture = data.Gesture;
@@ -376,7 +375,7 @@ namespace friendlyPMC.Components
                     botOwner_0.Memory.DeleteInfoAboutEnemy(botOwner_0.Memory.GoalEnemy.Person);
                 }
                 // force current layer to trigger end decision
-                AccessTools.Field(typeof(BaseLogicLayerClass), "bool_1").SetValue(botOwner_0.Brain.BaseBrain.CurLayerInfo,true);
+                AccessTools.Field(typeof(BaseLogicLayerAbstractClass), "bool_1").SetValue(botOwner_0.Brain.BaseBrain.CurLayerInfo,true);
                 // try to get bot unstuck in item taker logic
                 InteractableObjects.RemoveTaker(botOwner_0);
 
@@ -487,7 +486,7 @@ namespace friendlyPMC.Components
                         {
                             gclass.AddPossibleExecutors(botOwner_0);
                             gclass.SetGroup(botOwner_0.BotsGroup.RequestsController);
-                            if (isClose && (!notBusy || !botOwner_0.Memory.GoalEnemy.IsVisible))
+                            if (isClose && (notBusy || !botOwner_0.Memory.GoalEnemy.IsVisible))
                             {
                                 botOwner_0.BotTalk.TrySay(EPhraseTrigger.Roger, false);
                                 botOwner_0.Gesture.TryGestus(EGesture.Good, false);

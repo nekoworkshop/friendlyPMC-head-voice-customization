@@ -156,7 +156,7 @@ namespace friendlyPMC.Components
             {
                 return new AICoreActionEndStruct("has boss", true);
             }
-            return gstruct7_1;
+            return aICoreActionEndStruct_1;
         }
 
         public override AICoreActionEndStruct EndHeal()
@@ -170,7 +170,7 @@ namespace friendlyPMC.Components
                 return new AICoreActionEndStruct("EndHealTimer", true);
             }
 
-            return gstruct7_1;
+            return aICoreActionEndStruct_1;
         }
 
         public override AICoreActionEndStruct EndSuppressFire()

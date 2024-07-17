@@ -18,7 +18,7 @@ using LootingBots.Patch.Util;
 
 namespace friendlyPMC.Actions
 {
-    internal class FollowerTakeLoot : BaseNodeClass
+    internal class FollowerTakeLoot : BaseNodeAbstractClass
     {
         private BotFollowerPlayer _follower;
 

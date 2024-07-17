@@ -13,7 +13,10 @@ namespace friendlyPMC.Actions
 
         public override void Look()
         {
-            if (botOwner_0.Memory.HaveEnemy && !botOwner_0.Memory.IsInCover && botOwner_0.Memory.GoalEnemy.CurrPosition != null) botOwner_0.Steering.LookToPoint(botOwner_0.Memory.GoalEnemy.CurrPosition);
+            if (botOwner_0.Memory.HaveEnemy && !botOwner_0.Memory.IsInCover && botOwner_0.Memory.GoalEnemy.CurrPosition != null)
+            {
+                botOwner_0.Steering.LookToDirection(botOwner_0.Memory.GoalEnemy.CurrPosition - botOwner_0.GetPlayer.Transform.position);
+            }
         }
     }
 }

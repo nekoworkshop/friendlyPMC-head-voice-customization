@@ -3,15 +3,13 @@ using BepInEx.Configuration;
 using Comfort.Common;
 using EFT;
 using EFT.UI;
-using EFT.UI.Gestures;
+
 using friendlyPMC.Modules;
 using friendlyPMC.Patches;
 using friendlyPMC.Utils;
 using HarmonyLib;
-using System;
+
 using System.Collections.Generic;
-using System.Reflection;
-using System.Security.Cryptography;
 using UnityEngine;
 
 using Logger = friendlyPMC.Components.Logger;
@@ -30,7 +28,8 @@ namespace friendlyPMC
     public enum CustomBotDecisions
     {
         SniperSearch = 100,
-        CoverToCover = 101
+        CoverToCover = 101,
+        EnemySearch = 102
     }
 
     public enum CustomPhrases
@@ -38,8 +37,7 @@ namespace friendlyPMC
         TeamStatus = 200
     }
 
-    [BepInPlugin("xyz.pit.companion", "friendlyPMC", "3.3.5")]
-    [BepInDependency("com.spt-aki.core", "3.8.0")]
+    [BepInPlugin("xyz.pit.companion", "friendlyPMC", "3.4.0")]
     [BepInDependency("xyz.drakia.bigbrain")]
     [BepInDependency("xyz.drakia.waypoints")]
     [BepInDependency("com.Arys.UnityToolkit")]
@@ -160,9 +158,6 @@ namespace friendlyPMC
             new BotMemoryAddEnemyPatch().Enable();
             new BotGroupUsecEnemyPatch().Enable();
 
-            var harmony = new Harmony("xyz.pit.companion");
-            harmony.PatchAll(typeof(GoalEnemyTracePatch).Assembly);
-
             new BotOwnerIsFolowerPatch().Enable();
             new BotOwnerManualUpdatePatch().Enable();
 
@@ -196,6 +191,10 @@ namespace friendlyPMC
             new QuickPanelPatch().Enable();
             new GestureMenuPatch().Enable();
             new EPhraseTriggerPatch().Enable();
+
+            var harmony = new Harmony("xyz.pit.companion");
+            harmony.PatchAll(typeof(GoalEnemyTracePatch).Assembly);
+            harmony.PatchAll(typeof(LocalGameCtorPatch).Assembly);
 
         }
 

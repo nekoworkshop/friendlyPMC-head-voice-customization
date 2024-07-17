@@ -19,8 +19,8 @@ namespace friendlyPMC.Utils
 
             Vector3 requestPos = requester.Transform.position;
 
-            float randomX = GClass760.Random(-5f, 5f);
-            float randomZ = GClass760.Random(-5f, 5f);
+            float randomX = GClass761.Random(-5f, 5f);
+            float randomZ = GClass761.Random(-5f, 5f);
             Vector3 offset = new Vector3(randomX, 0f, randomZ);
 
             Vector3 finPos = requestPos + offset;

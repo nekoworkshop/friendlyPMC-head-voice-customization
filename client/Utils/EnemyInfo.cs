@@ -105,6 +105,16 @@ namespace friendlyPMC.Utils
 
         }
 
+        public static float NavDistance(BotOwner bot)
+        {
+            if (!bot.Memory.HaveEnemy) return Mathf.Infinity;
+
+            Vector3 botPosition = bot.GetPlayer.Transform.position;
+            Vector3 enemyPosition = bot.Memory.GoalEnemy.CurrPosition;
+
+            return Utils.GetNavDistance(botPosition, enemyPosition);
+        }
+
         public static float GetEnemiesAtLocation(BotOwner bot, string enemyId, Vector3 position, float radius = 25f)
         {
             if(!enemies.Contains(enemyId))

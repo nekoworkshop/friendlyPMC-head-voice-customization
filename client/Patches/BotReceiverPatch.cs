@@ -1,4 +1,4 @@
-﻿using Aki.Reflection.Patching;
+﻿using SPT.Reflection.Patching;
 using EFT;
 using friendlyPMC.Components;
 using friendlyPMC.Modules;
@@ -82,7 +82,7 @@ namespace friendlyPMC.Patches
                     if (requester != null && (botOwner.GetPlayer.Transform.position - requester.Transform.position).magnitude < 10f)
                     {
 
-                        if (!BossPlayers.Instance.IsFollower(botOwner) && !botOwner.BotFollower.HaveBoss && BossPlayers.Instance.IsBoss(requester.ProfileId))
+                        if (!BossPlayers.Instance.IsFollower(botOwner) && BossPlayers.Instance.IsBoss(requester.ProfileId))
                         {
                             // this will switch the BotReceiver to our own, so the rest can be altered there
                             botOwner.BotsGroup.RequestsController.TryAskFollowMeRequest(requester, botOwner);

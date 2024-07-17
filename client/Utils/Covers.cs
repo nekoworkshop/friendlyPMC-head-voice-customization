@@ -6,7 +6,6 @@ using System.Linq;
 using UnityEngine.AI;
 using UnityEngine;
 using friendlyPMC.Components;
-using static RootMotion.FinalIK.IKSolver;
 
 namespace friendlyPMC.Utils
 {
@@ -205,7 +204,7 @@ namespace friendlyPMC.Utils
             {
                 if (
                     !point.IsFreeById(botOwner.Id) ||
-                    !GClass328.IsDangerPositionFarEnough(point.Position, carePosition, safeDistance * safeDistance) ||
+                    !GClass326.IsDangerPositionFarEnough(point.Position, carePosition, safeDistance * safeDistance) ||
                     Vector3.Distance(point.Position, botOwner.GetPlayer.Transform.position) <= 1f ||
                     !eligibleCheck(point)
                 )
@@ -257,25 +256,24 @@ namespace friendlyPMC.Utils
             return false;
         }
 
-        public static Vector3? FindShootPosition(BotOwner botOwner, ShootPointClass shootTarget, float minRadius, float maxRadius)
+        public static Vector3? FindShootPosition(BotOwner botOwner, ShootPointClass shootTarget, float minDistance, float maxRadius)
         {
             Vector3 targetPosition = shootTarget.Point;
-
-            // Create a sphere around the target position with the specified radius range
-            float randomRadius = GClass760.Random(minRadius, maxRadius);
             
             NavMeshPath mesh = new NavMeshPath();
 
             // Try to find a valid position within the sphere
-            for (int i = 0; i < 100; i++) // Adjust the number of attempts as needed
+            for (int i = 0; i < 50; i++) // Adjust the number of attempts as needed
             {
-                Vector3 randomPosition = targetPosition + UnityEngine.Random.insideUnitSphere * randomRadius;
+                Vector3 randomPosition = targetPosition + UnityEngine.Random.insideUnitSphere * maxRadius;
 
                 NavMeshHit navMeshHit;
 
                 if (!NavMesh.SamplePosition(randomPosition, out navMeshHit, 10f, -1)) continue;
 
-                if (!IsNavigablePoint(botOwner, navMeshHit.position, 200f, mesh)) continue;
+                if (!IsNavigablePoint(botOwner, navMeshHit.position, 150f, mesh)) continue;
+
+                if (EnemyInfo.NavDistance(botOwner) < minDistance) continue;
 
                 // Check if the bot can shoot from the random position to the target
                 if (GClass301.CanShootToTarget(shootTarget, navMeshHit.position, botOwner.LookSensor.Mask, false))

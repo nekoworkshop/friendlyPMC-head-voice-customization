@@ -2,7 +2,7 @@
 using EFT.Interactive;
 using EFT.InventoryLogic;
 
-using Aki.Common.Http;
+using SPT.Common.Http;
 
 using HarmonyLib;
 using Comfort.Common;
