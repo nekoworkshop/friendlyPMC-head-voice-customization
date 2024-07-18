@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.AI;
 
 namespace friendlyPMC.Utils
 {
@@ -105,14 +106,14 @@ namespace friendlyPMC.Utils
 
         }
 
-        public static float NavDistance(BotOwner bot)
+        public static float NavDistance(BotOwner bot, NavMeshPath navMesh = null)
         {
             if (!bot.Memory.HaveEnemy) return Mathf.Infinity;
 
             Vector3 botPosition = bot.GetPlayer.Transform.position;
             Vector3 enemyPosition = bot.Memory.GoalEnemy.CurrPosition;
 
-            return Utils.GetNavDistance(botPosition, enemyPosition);
+            return Utils.GetNavDistance(botPosition, enemyPosition, navMesh);
         }
 
         public static float GetEnemiesAtLocation(BotOwner bot, string enemyId, Vector3 position, float radius = 25f)

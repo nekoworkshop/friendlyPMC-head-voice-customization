@@ -80,8 +80,6 @@ namespace friendlyPMC
         public static ConfigEntry<bool> bigPipeSpawn;
         public static ConfigEntry<bool> birdEyeSpawn;
         public static ConfigEntry<bool> justKnightSpawn;
-
-        public static ConfigEntry<KeyboardShortcut> pingKey;
         private void Awake()
         {
 
@@ -95,8 +93,6 @@ namespace friendlyPMC
             squadDelay = Config.Bind(baseSettings, "1.3  -  Squad spawn Delay", 0, new ConfigDescription("When Squad Spawn is active, how much to delay the spawn of the squad ( in sec.). This is useful in case you have Swag+Donuts. Set delay above 10 seconds.", new AcceptableValueRange<int>(0, 30)));
 
             returnChanceDeath = Config.Bind(baseSettings, "1.5  -  Squadmate return chance after death", 50, new ConfigDescription("Chance your followers will return the items you gave them should you die. This applies only to members you spawned with.", new AcceptableValueRange<int>(1, 100)));
-
-            pingKey = Config.Bind(baseSettings, "2 Ping Squad", new KeyboardShortcut(KeyCode.F10), new ConfigDescription("Configurable key to trigger location of where your squad is"));
 
             scanDistance = Config.Bind(miscSettings, "1 Maximum scan distance", 140, new ConfigDescription("Maximum distance to pick up any visible enemy that the player is signaling when issuing 'Contact' phrase", new AcceptableValueRange<int>(50, 300)));
 
@@ -195,34 +191,6 @@ namespace friendlyPMC
             var harmony = new Harmony("xyz.pit.companion");
             harmony.PatchAll(typeof(GoalEnemyTracePatch).Assembly);
             harmony.PatchAll(typeof(LocalGameCtorPatch).Assembly);
-
-        }
-
-        void Update()
-        {
-            GameWorld gameWorld = Singleton<GameWorld>.Instance;
-            if (gameWorld == null) return;
-
-            if (GamePlayerOwner.MyPlayer == null || GamePlayerOwner.MyPlayer.HealthController == null || !GamePlayerOwner.MyPlayer.HealthController.IsAlive)
-            {
-                return;
-            }
-
-            if (pingKey.Value.IsPressed())
-            {
-
-                string id = GamePlayerOwner.MyPlayer.ProfileId;
-
-                if (BossPlayers.Instance != null && PingTeamates.Instance != null)
-                {
-                    var boss = BossPlayers.Instance.GetBossPlayer(id);
-                    if (boss != null)
-                    {
-                        PingTeamates.Instance.Ping(boss);
-                    }
-                }
-
-            }
 
         }
 

@@ -9,7 +9,7 @@ import { IPmcConfig } from "@spt/models/spt/config/IPmcConfig";
 
 import { ILogger } from "@spt/models/spt/utils/ILogger";
 
-import { Difficulty } from "@spt/models/eft/common/tables/IBotType";
+import { Difficulty, IBotType } from "@spt/models/eft/common/tables/IBotType";
 
 import { LogTextColor } from "@spt/models/spt/logging/LogTextColor";
 
@@ -35,6 +35,9 @@ import { HttpResponseUtil } from "@spt/utils/HttpResponseUtil";
 import { IUserDialogInfo } from "@spt/models/eft/profile/ISptProfile";
 
 import { RandomUtil } from "@spt/utils/RandomUtil";
+import { BotGenerator } from "@spt/generators/BotGenerator";
+import { IBotBase } from "@spt/models/eft/common/tables/IBotBase";
+import { BotGenerationDetails } from "@spt/models/spt/bots/BotGenerationDetails";
 
 class friendlyPMC {
 	config = {
@@ -54,9 +57,13 @@ class friendlyPMC {
 
 	originalGetValidTraderIdByEnumValue: TraderHelper["getValidTraderIdByEnumValue"];
 
+	originalGenerateBot: BotGenerator["generateBot"];
+
 	preSptLoad(container: DependencyContainer) {
 		this.Logger = container.resolve("WinstonLogger");
 		this.mailSendService = container.resolve("MailSendService");
+
+		const botGenerator = container.resolve<BotGenerator>("BotGenerator");
 
 		try {
 			this.config = Object.assign(this.config, require("../config.json"));
@@ -117,6 +124,19 @@ class friendlyPMC {
 			{ frequency: "Always" }
 		);
 
+		this.generateBot = this.generateBot.bind(this);
+		container.afterResolution(
+			"BotGenerator",
+			(_t, result: BotGenerator) => {
+				if (!this.originalGenerateBot) {
+					this.originalGenerateBot = result["generateBot"].bind(result);
+
+					result["generateBot"] = this.generateBot;
+				}
+			},
+			{ frequency: "Always" }
+		);
+
 		const imageRouter: ImageRouter = container.resolve("ImageRouter");
 		const modLoader: PostSptModLoader = container.resolve("PostSptModLoader");
 
@@ -143,6 +163,7 @@ class friendlyPMC {
 
 	postDBLoad(container: DependencyContainer) {
 		const configServer: any = container.resolve("ConfigServer");
+
 		const Bots: IBotConfig = configServer.getConfig("spt-bot");
 		const PMCBOT: IPmcConfig = configServer.getConfig("spt-pmc");
 		const Traders: ITraderConfig = configServer.getConfig("spt-trader");
@@ -334,6 +355,21 @@ class friendlyPMC {
 		const result = this.originalGetValidTraderIdByEnumValue(traderEnumValue);
 
 		return result;
+	}
+
+	generateBot(sessionId: string, bot: IBotBase, botJsonTemplate: IBotType, botGenerationDetails: BotGenerationDetails) {
+		const role = botGenerationDetails.role.toLowerCase();
+		if (role == "followerbirdeye" || role == "followerbigpipe" || role == "bossknight") {
+			botJsonTemplate.generation.items.healing.weights = {
+				"0": 0,
+				"1": 2,
+				"2": 6,
+			};
+
+			this.Logger.info("FriendlyPMC:  Patching bot generation for " + role);
+		}
+
+		return this.originalGenerateBot(sessionId, bot, botJsonTemplate, botGenerationDetails);
 	}
 }
 

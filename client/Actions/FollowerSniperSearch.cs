@@ -75,7 +75,7 @@ namespace friendlyPMC.Actions
 
             if (_lastTarget.HasValue && float_5 < Time.time)
             {
-                float_5 = Time.time + GClass761.Random(2f, 4f);
+                float_5 = Time.time + GClass761.Random(3f, 4f);
 
                 // find a cover from where we can shoot the enemy
                 CustomNavigationPoint Spot = Utils.Covers.GetClosestAttackCoverPoint(botOwner_0, _lastTarget.Value, _minDist, _maxDist, botOwner_0.Memory.GoalEnemy.CurrPosition);

@@ -361,11 +361,10 @@ namespace friendlyPMC.Components.FollowerBossFollower
         public void OrdersChanged()
         {
             ordersChanged = true;
-            var Timer = StaticManager.Instance.TimerManager.MakeTimer(TimeSpan.FromSeconds(1), false);
-            Timer.OnTimer += () =>
+            Utils.Utils.SetTimeout(() =>
             {
                 ordersChanged = false;
-            };
+            },1000f);
 
             followerFightLayer.OrdersChanged();
         }

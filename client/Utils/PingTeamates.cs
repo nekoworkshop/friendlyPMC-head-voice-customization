@@ -46,11 +46,17 @@ namespace friendlyPMC.Utils
 
         public static PingTeamates Instance = null;
 
+        private static RadioSound radioSound;
+
+        private bool locationPing = false;
+
         public void Ping(pitAIBossPlayer player)
         {
             if (lasttime > Time.time) return;
 
             lasttime = Time.time + 5f;
+
+            locationPing = false;
 
             GameWorld world = Singleton<GameWorld>.Instance;
 
@@ -73,6 +79,8 @@ namespace friendlyPMC.Utils
                     }
                 }
             }
+
+            if (radioSound != null) radioSound.PlayRadioSound();
 
         }
 
@@ -251,12 +259,40 @@ namespace friendlyPMC.Utils
             if (bt == null || bt.Data == null || !bt.Data.HealthController.IsAlive) return;
 
             Color marker = Color.red;
-            if(bt.Data.Memory.HaveEnemy && !bt.EnemyPos.HasValue)
+            
+            Vector3? targetPosition = null;
+
+            if (bt.Data.Memory.HaveEnemy)
             {
-                if(bt.Data.Memory.GoalEnemy.IsVisible || bt.Data.Memory.GoalEnemy.HaveSeen)
+                
+                if (bt.Data.Memory.GoalEnemy.IsVisible || bt.Data.Memory.GoalEnemy.HaveSeen)
                 {
-                    bt.EnemyPos = bt.Data.Memory.GoalEnemy.CurrPosition;
+
+                    Vector3 enemyPosition = bt.Data.Memory.GoalEnemy.CurrPosition;
+
+                    Vector3 targetSpot = new Vector3(
+                        Mathf.Floor(enemyPosition.x / 20f) * 20f,
+                        Mathf.Floor(enemyPosition.y / 20f) * 20f,
+                        Mathf.Floor(enemyPosition.z / 20f) * 20f
+                    );
+
+                    targetPosition = new Vector3(
+                        targetSpot.x,
+                        enemyPosition.y,
+                        targetSpot.z
+                    );
+
+                    bt.EnemyPos = targetSpot;
                     marker = bt.Data.Memory.GoalEnemy.IsVisible ? Color.red : Color.yellow;
+
+                    foreach (var item in botMap)  
+                    {
+                        if(item != bt && item.EnemyPos.HasValue && item.EnemyPos == targetSpot)
+                        {
+                            bt.EnemyPos = null;
+                            break;
+                        }
+                    }
 
                 } 
                 else
@@ -265,12 +301,18 @@ namespace friendlyPMC.Utils
                 }
             }
 
-            if(bt.EnemyPos.HasValue)
+            if(targetPosition.HasValue)
             {
-                Vector3 screenPos = Camera.main.WorldToScreenPoint(bt.EnemyPos.Value + Vector3.up * 2f);
+                Vector3 screenPos = Camera.main.WorldToScreenPoint(targetPosition.Value + Vector3.up * 2f);
                 if (screenPos.z > 0)
                 {
-                    DrawEnemyMarker(bt.EnemyPos.Value,marker);
+                    DrawEnemyMarker(targetPosition.Value, marker);
+                    if(!locationPing)
+                    {
+                        locationPing = true;
+                        float stereoPan = CalculateStereoPane(targetPosition.Value);
+                        radioSound.PlayLocationSound(stereoPan);
+                    }
                 }
             }
         }
@@ -325,7 +367,7 @@ namespace friendlyPMC.Utils
             Vector3 screenPos = Camera.main.WorldToScreenPoint(enemyPosition + Vector3.up * 1f);
             if (screenPos.z > 0)
             {
-                float animationOffset = Mathf.Sin(Time.time * 2f) * 10f;
+                float animationOffset = Mathf.Sin(Time.time * 5f) * 5f;
                 Vector3 markerPos = new Vector3(screenPos.x, Screen.height - screenPos.y + animationOffset, 0f);
 
                 Matrix4x4 matrixBackup = GUI.matrix;
@@ -346,13 +388,26 @@ namespace friendlyPMC.Utils
                 if (gameWorld.gameObject.GetComponent<PingTeamates>() == null)
                 {
                     Instance = gameWorld.gameObject.AddComponent<PingTeamates>();
+
+                    GameObject soundObject = new GameObject("RadioSoundPingTeamates");
+                    radioSound = soundObject.AddComponent<RadioSound>();
+                    radioSound.Enable();
                 }
             }
+        }
+        private float CalculateStereoPane(Vector3 markerPosition)
+        {
+            Vector3 cameraRight = Camera.main.transform.right;
+            Vector3 directionToMarker = (markerPosition - Camera.main.transform.position).normalized;
+
+            float dotProduct = Vector3.Dot(cameraRight, directionToMarker);
+            return -dotProduct;
         }
 
         public static void Disable()
         {
             Instance.Dispose();
+            radioSound = null;
         }
 
     }

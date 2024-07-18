@@ -6,6 +6,7 @@ using HarmonyLib;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using static UnityEngine.EventSystems.EventTrigger;
 
 namespace friendlyPMC.Patches
 {
@@ -118,6 +119,22 @@ namespace friendlyPMC.Patches
             {
                 BotsGroup bossGroup = BossPlayers.Instance.GetBossPlayer(player.ProfileId).bossGroup;
                 if (bossGroup != null && __instance.Id == bossGroup.Id)
+                {
+                    __result = false;
+                    return false;
+                }
+            }
+
+            var _initialBotMindSettings = AccessTools.Field(typeof(BotsGroup), "_initialBotMindSettings").GetValue(__instance) as BotGlobalsMindSettings;
+
+            // prevent same side from being added just because they have a different role
+            if (_initialBotMindSettings != null && player.Side == __instance.Side)
+            {
+                if (
+                    (player.Side == EPlayerSide.Bear && !_initialBotMindSettings.DEFAULT_BEAR_BEHAVIOUR.HasFlag(EWarnBehaviour.Attack)) ||
+                    (player.Side == EPlayerSide.Usec && !_initialBotMindSettings.DEFAULT_USEC_BEHAVIOUR.HasFlag(EWarnBehaviour.Attack)) ||
+                    (player.Side == EPlayerSide.Savage && !_initialBotMindSettings.DEFAULT_SAVAGE_BEHAVIOUR.HasFlag(EWarnBehaviour.Attack))
+                )
                 {
                     __result = false;
                     return false;

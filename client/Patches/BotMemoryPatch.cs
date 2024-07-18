@@ -124,10 +124,10 @@ namespace friendlyPMC.Patches
                                 }
                             });
 
-                            StaticManager.Instance.TimerManager.MakeTimer(TimeSpan.FromSeconds(0.1), false).OnTimer += () =>
+                            Task.Delay(100).ContinueWith( t =>
                             {
                                 enemies.Remove(value.ProfileId);
-                            };
+                            });
                         }
                     });
                 } catch

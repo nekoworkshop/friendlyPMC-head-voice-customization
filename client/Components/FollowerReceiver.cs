@@ -370,14 +370,16 @@ namespace friendlyPMC.Components
                     botOwner_0.BotRequestController.CurRequest.Complete();
                 }
                 
-                if(botOwner_0.Memory.HaveEnemy)
-                {
-                    botOwner_0.Memory.DeleteInfoAboutEnemy(botOwner_0.Memory.GoalEnemy.Person);
-                }
                 // force current layer to trigger end decision
                 AccessTools.Field(typeof(BaseLogicLayerAbstractClass), "bool_1").SetValue(botOwner_0.Brain.BaseBrain.CurLayerInfo,true);
                 // try to get bot unstuck in item taker logic
                 InteractableObjects.RemoveTaker(botOwner_0);
+                // clear current enemy
+                if (botOwner_0.Memory.HaveEnemy)
+                {
+                    botOwner_0.Memory.DeleteInfoAboutEnemy(botOwner_0.Memory.GoalEnemy.Person);
+                    botOwner_0.Memory.GoalEnemy = null;
+                }
 
                 return;
             }

@@ -1,20 +1,23 @@
-3.5:
+3.4:
+- x - update for spt 3.9
 - x - improve the fighting logic, fix bugs
-- - ensure BirdEye stops going close in attempt to get a kills
+- x - ensure BirdEye stops going close in attempt to get a kills
 - - ensure followers still obey commands
 
 - x - modify how followers detect enemies
-- - see if we can get rid of the sideeffect for this by having bot have a 360 vision
 
 - x - cover points picked different
 - x - improve performance
 
+
+- x - change the Goons equipment to always include meds (src\generators\BotLootGenerator.ts, src\generators\PMCLootGenerator.ts and bot jsons)
+- x - on team pinging, if any followers has enemy in their visuals, place a marker where they are seeing the enemy
+- - play a sound when the marker is placed
+
+3.5:
+- add new command "hold fire" to stop followers from enganging enemies unless enemy is too close or they shoot at us
+- goons send messages at the end of the raid
 - change how items are returned so that random followers report returning the items
-- change the Goons equipment to always include meds (src\generators\BotLootGenerator.ts, src\generators\PMCLootGenerator.ts and bot jsons)
 
 3.6:
-- add new command "hold fire" to stop followers from enganging enemies unless enemy is too close or they shoot at us
-- on team pinging, if any followers has enemy in their visuals, place a marker where they are seeing the enemy
-
-3.7:
 - 

@@ -10,13 +10,13 @@ namespace friendlyPMC.Requests
         {
             botOwner_0 = bot;
 
-            Task.Delay(3000).ContinueWith(t =>
+            Utils.Utils.SetTimeout(()=>
             {
-                if(botOwner_0.BotRequestController.CurRequest !=null && botOwner_0.BotRequestController.CurRequest.BotRequestType == request)
+                if(botOwner_0 != null && !botOwner_0.IsDead && botOwner_0.BotState == EBotState.Active && botOwner_0.BotRequestController.CurRequest !=null && botOwner_0.BotRequestController.CurRequest.BotRequestType == request)
                 {
                     botOwner_0.BotRequestController.CurRequest.Complete();
                 }
-            });
+            },3000f);
         }
 
         public override EBotRequestMode RequestMode

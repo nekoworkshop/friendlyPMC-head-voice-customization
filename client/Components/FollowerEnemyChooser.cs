@@ -63,14 +63,21 @@ namespace friendlyPMC.Components
                 float distance = enemyInfo.Distance;
                 float elevationDifference = Mathf.Abs(botPosition.y - enemyInfo.CurrPosition.y);
                 float navDistance = Utils.Utils.GetNavDistance(botPosition, enemyInfo.CurrPosition);
-                if (
+                /*if (
                     !enemyInfo.IsVisible && 
                     (distance < 30f || (elevationDifference >= 12f && elevationDifference < 25f && distance < 51f)) && 
                     navDistance > 49f
                 )
                 {
                     continue;
-                }
+                }*/
+                // ignore enemies that the bot cannot see, they can't see him, and are at a relative distance
+                if (
+                    enemyInfo.Owner && 
+                    !enemyInfo.IsVisible && !botOwner_0.LookSensor.CheckLookSimple(enemyInfo.Owner.GetPlayer,botOwner_0.GetPlayer) &&
+                    navDistance > 30f
+                ) continue;
+
 
                 if (enemyInfo.IgnoreUntilAggression)
                 {

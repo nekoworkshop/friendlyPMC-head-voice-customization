@@ -426,9 +426,7 @@ namespace friendlyPMC.Patches
 
                                     BossPlayers.Instance.AddFollower(me, player, false, botRole); // make bot a follower
 
-                                    var Timer = StaticManager.Instance.TimerManager.MakeTimer(TimeSpan.FromSeconds(1), false);
-
-                                    Timer.OnTimer += () =>
+                                    Utils.Utils.SetTimeout(() =>
                                     {
                                         if (spanwers.Count > 0)
                                         {
@@ -439,7 +437,7 @@ namespace friendlyPMC.Patches
                                         {
                                             token.Cancel();
                                         }
-                                    };
+                                    }, 1000f);
                                 }
                                 catch (Exception ex)
                                 {
@@ -460,12 +458,10 @@ namespace friendlyPMC.Patches
                             {
                                 Components.Logger.LogInfo("Ally " + follower.Profile.Nickname + " spawned");
 
-                                var Timer = StaticManager.Instance.TimerManager.MakeTimer(TimeSpan.FromSeconds(2), false);
-
-                                Timer.OnTimer += () =>
+                                Utils.Utils.SetTimeout(() =>
                                 {
                                     follower.BotTalk.TrySay(EPhraseTrigger.Ready, false);
-                                };
+                                },2000);
 
                             }), true, stopWatch);
 
@@ -640,17 +636,16 @@ namespace friendlyPMC.Patches
                             Components.Logger.LogInfo("Follower " + follower.Profile.Nickname + " spawned");
 
                             spawnedFollowers++;
+                            
                             if (spawnedFollowers >= memberCount)
                             {
                                 token.Cancel();
                             }
 
-                            var Timer = StaticManager.Instance.TimerManager.MakeTimer(TimeSpan.FromSeconds(2), false);
-
-                            Timer.OnTimer += () =>
+                            Utils.Utils.SetTimeout(() =>
                             {
                                 follower.BotTalk.TrySay(EPhraseTrigger.Ready, false);
-                            };
+                            },2000);
 
                         }), false, stopWatch);
 
@@ -697,8 +692,7 @@ namespace friendlyPMC.Patches
 
             if (friendlyPMC.alternativeSpawn.Value == true)
             {
-                var Timer = StaticManager.Instance.TimerManager.MakeTimer(TimeSpan.FromSeconds(friendlyPMC.squadDelay.Value), false);
-                Timer.OnTimer += () =>
+                Utils.Utils.SetBotTimer(() =>
                 {
                     try
                     {
@@ -706,13 +700,12 @@ namespace friendlyPMC.Patches
                         Instance.SpawnGroupBots(playerBoss).Forget();
                     }
                     catch (Exception e) { Components.Logger.LogInfo("Failed Alternative Spawn Process #1: " + e.Message); }
-                };
+                }, friendlyPMC.squadDelay.Value);
 
 
                 if (friendlyPMC.knightSpawn.Value)
                 {
-                    var Timer2 = StaticManager.Instance.TimerManager.MakeTimer(TimeSpan.FromSeconds(friendlyPMC.squadDelay.Value + 1), false);
-                    Timer2.OnTimer += () =>
+                    Utils.Utils.SetBotTimer(() =>
                     {
                         try
                         {
@@ -720,7 +713,7 @@ namespace friendlyPMC.Patches
                             Instance.SpawnBossFollower(playerBoss).Forget();
                         }
                         catch (Exception e) { Components.Logger.LogInfo("Failed Alternative Spawn Process #2: " + e.Message); }
-                    };
+                    },(friendlyPMC.squadDelay.Value + 1));
                     
                 }
             }
@@ -754,15 +747,15 @@ namespace friendlyPMC.Patches
                             BotsControllerPatch.Instance.SpawnGroupBots(playerBoss).Forget();
                         } else
                         {
-                            var Timer = StaticManager.Instance.TimerManager.MakeTimer(TimeSpan.FromSeconds(friendlyPMC.squadDelay.Value), false);
-                            Timer.OnTimer += () =>
+                            Utils.Utils.SetBotTimer(() =>
                             {
                                 try
                                 {
                                     BotsControllerPatch.Instance.SpawnGroupBots(playerBoss).Forget();
                                 }
-                                catch(Exception e) { Components.Logger.LogInfo("Failed Delayed Squad Spawn Process " + e.Message); }
-                            };
+                                catch (Exception e) { Components.Logger.LogInfo("Failed Delayed Squad Spawn Process " + e.Message); }
+
+                            }, friendlyPMC.squadDelay.Value);
                         }
                     }
                 });
@@ -774,16 +767,15 @@ namespace friendlyPMC.Patches
 
                 BotsControllerPatch.spawnedPlayers.ForEach(playerBoss =>
                 {
-                    var Timer = StaticManager.Instance.TimerManager.MakeTimer(TimeSpan.FromSeconds(friendlyPMC.squadDelay.Value + 1), false);
-                    Timer.OnTimer += () =>
+                    Utils.Utils.SetBotTimer(() =>
                     {
                         try
                         {
-
                             BotsControllerPatch.Instance.SpawnBossFollower(playerBoss).Forget();
                         }
                         catch (Exception e) { Components.Logger.LogInfo("Failed Delayed Boss Ally Process " + e.Message); }
-                    };
+
+                    }, (friendlyPMC.squadDelay.Value + 1));
                 });
             }
         }

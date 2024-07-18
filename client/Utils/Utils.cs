@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine.AI;
 using UnityEngine;
 using friendlyPMC.Components;
+using System;
+using System.Timers;
 
 namespace friendlyPMC.Utils
 {
@@ -39,6 +41,57 @@ namespace friendlyPMC.Utils
         public static pitAIBossPlayer GetBoss(BotOwner botOwner)
         {
             return (pitAIBossPlayer)botOwner.BotFollower.BossToFollow;
+        }
+
+        public static GClass552.IBotTimer SetTimeout(Action func, float timer, bool isLopped = false)
+        {
+            Timer time = new Timer(timer);
+
+            GClass552.Class261 @class = new GClass552.Class261();
+
+            var duration = TimeSpan.FromSeconds(timer / 1000);
+            
+            float num = (float)duration.TotalSeconds;
+
+            @class.gclass552_0 = null;
+            @class.timer = new GClass552.Class260();
+            @class.timer.Init(() => { }, () =>
+            {
+                Components.Logger.LogInfo("SetTimeout Called");
+                try
+                {
+                    func();
+                }
+                catch (Exception ex)
+                {
+                    Components.Logger.LogInfo($"Exception in SetTimeout: {ex.Message}");
+                    Components.Logger.LogInfo($"StackTrace in SetTimeout: {ex.StackTrace}");
+                }
+            });
+
+            @class.timer.Start(Time.time + num, num, isLopped);
+            return @class.timer;
+        }
+
+        public static GClass552.IBotTimer SetBotTimer(Action func,float seconds)
+        {
+            var Timer = StaticManager.Instance.TimerManager.MakeTimer(TimeSpan.FromSeconds(seconds), false);
+
+            Timer.OnTimer += () =>
+            {
+                Components.Logger.LogInfo("SetBotTimer Called");
+                try
+                {
+                    func();
+                }
+                catch (Exception ex)
+                {
+                    Components.Logger.LogInfo($"Exception in SetBotTimer: {ex.Message}");
+                    Components.Logger.LogInfo($"StackTrace in SetBotTimer: {ex.StackTrace}");
+                }
+            };
+
+            return Timer;
         }
     }
 }

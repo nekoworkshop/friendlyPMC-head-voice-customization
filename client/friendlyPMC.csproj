@@ -117,6 +117,10 @@
     <Reference Include="UnityEngine.AssetBundleModule">
       <HintPath>..\..\..\XboxGames\AKI-Streets-3.9\EscapeFromTarkov_Data\Managed\UnityEngine.AssetBundleModule.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine.AudioModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\XboxGames\AKI-Streets-3.9\EscapeFromTarkov_Data\Managed\UnityEngine.AudioModule.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>..\..\..\XboxGames\AKI-Streets-3.9\EscapeFromTarkov_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
     </Reference>
@@ -135,6 +139,14 @@
     </Reference>
     <Reference Include="UnityEngine.UI">
       <HintPath>..\..\..\XboxGames\AKI-Streets-3.9\EscapeFromTarkov_Data\Managed\UnityEngine.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UnityWebRequestAudioModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\XboxGames\AKI-Streets-3.9\EscapeFromTarkov_Data\Managed\UnityEngine.UnityWebRequestAudioModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UnityWebRequestModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\XboxGames\AKI-Streets-3.9\EscapeFromTarkov_Data\Managed\UnityEngine.UnityWebRequestModule.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -158,6 +170,7 @@
     <Compile Include="Components\FollowerBossFollower\BirdEyeFollowLayer.cs" />
     <Compile Include="Components\FollowerEnemyChooser.cs" />
     <Compile Include="Modules\FollowerCreateNode.cs" />
+    <Compile Include="Modules\RadioSound.cs" />
     <Compile Include="Patches\BotMemoryPatch.cs" />
     <Compile Include="Patches\EnemyInfoPatch.cs" />
     <Compile Include="Patches\GestureMenuPatch.cs" />

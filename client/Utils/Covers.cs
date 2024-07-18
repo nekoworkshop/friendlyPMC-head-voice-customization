@@ -6,6 +6,8 @@ using System.Linq;
 using UnityEngine.AI;
 using UnityEngine;
 using friendlyPMC.Components;
+using static RootMotion.FinalIK.IKSolver;
+using TMPro;
 
 namespace friendlyPMC.Utils
 {
@@ -263,7 +265,7 @@ namespace friendlyPMC.Utils
             NavMeshPath mesh = new NavMeshPath();
 
             // Try to find a valid position within the sphere
-            for (int i = 0; i < 50; i++) // Adjust the number of attempts as needed
+            for (int i = 0; i < 70; i++) // Adjust the number of attempts as needed
             {
                 Vector3 randomPosition = targetPosition + UnityEngine.Random.insideUnitSphere * maxRadius;
 
@@ -271,9 +273,9 @@ namespace friendlyPMC.Utils
 
                 if (!NavMesh.SamplePosition(randomPosition, out navMeshHit, 10f, -1)) continue;
 
-                if (!IsNavigablePoint(botOwner, navMeshHit.position, 150f, mesh)) continue;
+                if (!GClass326.IsDangerPositionFarEnough(navMeshHit.position, new Vector3[] { targetPosition }, minDistance * minDistance)) continue;
 
-                if (EnemyInfo.NavDistance(botOwner) < minDistance) continue;
+                if (!IsNavigablePoint(botOwner, navMeshHit.position, 150f, mesh)) continue;
 
                 // Check if the bot can shoot from the random position to the target
                 if (GClass301.CanShootToTarget(shootTarget, navMeshHit.position, botOwner.LookSensor.Mask, false))

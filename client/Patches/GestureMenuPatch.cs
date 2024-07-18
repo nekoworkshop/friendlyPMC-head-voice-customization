@@ -22,6 +22,7 @@ namespace friendlyPMC.Patches
         {
             var list_0 = (List<GesturesAudioItem>)AccessTools.Field(typeof(GesturesMenu), "list_0").GetValue(__instance);
             var list_1 = (List<GestureBaseItem>)AccessTools.Field(typeof(GesturesMenu), "list_1").GetValue(__instance);
+            var hashSet_1 = (HashSet<EPhraseTrigger>)AccessTools.Field(typeof(GesturesMenu), "hashSet_1").GetValue(__instance);
 
             list_0.ForEach(item =>
             {
@@ -37,13 +38,14 @@ namespace friendlyPMC.Patches
 
                 else if(item.gameObject.name == "TEAM STATUS")
                 {
-                    Components.Logger.LogInfo("add to team status panel");
                     GesturesMenu.Class2965 @class = new GesturesMenu.Class2965();
                     @class.gesturesMenu_0 = __instance;
                     @class.isSituational = false;
                     GestureBaseItem gestureBaseItem = item.CreateNewPhrase((EPhraseTrigger)CustomPhrases.TeamStatus, @class.isSituational);
                     gestureBaseItem.OnPointerClicked.Subscribe(new Action<GestureBaseItem.GStruct399>(@class.method_0));
                     list_1.Add(gestureBaseItem);
+
+                    hashSet_1.Add((EPhraseTrigger)CustomPhrases.TeamStatus);
                 }
             });
         }

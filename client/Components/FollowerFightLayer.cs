@@ -1,16 +1,11 @@
 ﻿
 using EFT;
-using EFT.HealthSystem;
-using friendlyPMC.Modules;
 using friendlyPMC.Utils;
 using System;
 using System.Collections.Generic;
-using System.Reflection;
-using System.Security.Cryptography;
+using System.Timers;
 using UnityEngine;
 using UnityEngine.AI;
-using static RootMotion.FinalIK.IKSolver;
-using static UnityEngine.EventSystems.EventTrigger;
 
 namespace friendlyPMC.Components
 {
@@ -145,6 +140,7 @@ namespace friendlyPMC.Components
         public override void Dispose()
         {
             botOwner_0.GetPlayer.BeingHitAction -= BeingHitAction;
+            _damageTimer = null;
             base.Dispose();
         }
 
@@ -160,21 +156,22 @@ namespace friendlyPMC.Components
                 {
                     float hp = bodyPart.Health.Current * 100 / bodyPart.Health.Maximum;
 
-                    if(
-                        (hp <= 65 && part == EBodyPart.Head ) ||
+                    if (
+                        (hp <= 65 && part == EBodyPart.Head) ||
                         (hp <= 55 && part == EBodyPart.Chest) ||
                         (hp > 0 && hp <= 35 && part == EBodyPart.Stomach)
-                    ) 
+                    )
                     {
                         _isTakingHeavyDamage = true;
                         if (_damageTimer != null) _damageTimer.Stop();
 
-                        _damageTimer = StaticManager.Instance.TimerManager.MakeTimer(TimeSpan.FromSeconds(0.1), false);
-                        _damageTimer.OnTimer += () =>
+                        Utils.Utils.SetTimeout(() =>
                         {
                             _isTakingHeavyDamage = false;
                             _damageTimer = null;
-                        };
+
+                        }, 100);
+                        
                     }
 
                 }
@@ -274,11 +271,11 @@ namespace friendlyPMC.Components
         public void OrdersChanged()
         {
             ordersChanged = true;
-            var Timer = StaticManager.Instance.TimerManager.MakeTimer(TimeSpan.FromSeconds(1), false);
-            Timer.OnTimer += () =>
+
+            Utils.Utils.SetTimeout(() =>
             {
                 ordersChanged = false;
-            };
+            },1000f);
         }
 
         public bool IsEnemyLowThreat(bool ignoreEquip = false)
@@ -667,11 +664,11 @@ namespace friendlyPMC.Components
 
         public AICoreActionResultStruct<BotLogicDecision> HoldPositionFor(float timer, string reason = "wait4it")
         {
-            StaticManager.Instance.TimerManager.MakeTimer(TimeSpan.FromSeconds(0.1), false).OnTimer += () =>
+            Utils.Utils.SetTimeout(() =>
             {
                 if (botOwner_0.BotState == EBotState.Active && !botOwner_0.IsDead && botOwner_0.Memory.HaveEnemy && !botOwner_0.Memory.GoalEnemy.IsVisible) 
                     botOwner_0.Steering.LookToDirection(botOwner_0.Memory.GoalEnemy.CurrPosition - botOwner_0.GetPlayer.Transform.position,90f);
-            };
+            },100f);
             return new AICoreActionResultStruct<BotLogicDecision>(HoldFor(timer), reason);
         }
 
@@ -1209,27 +1206,7 @@ namespace friendlyPMC.Components
 
         public override AICoreActionEndStruct EndSearch()
         {
-            if(ordersChanged)
-            {
-                return new AICoreActionEndStruct("search.End", true);
-            }
-
-            if (!botOwner_0.Memory.HaveEnemy)
-            {
-                return new AICoreActionEndStruct("enemy.None", true);
-            }
-
-            if (botOwner_0.Memory.GoalEnemy.CanShoot || botOwner_0.Memory.GoalEnemy.IsVisible)
-            {
-                return new AICoreActionEndStruct("enemy.canSh", true);
-            }
-
-            if(Utils.EnemyInfo.Distance(botOwner_0) <= Utils.EnemyInfo.EnemyDistance.VeryClose && !IsEnemyLowThreat())
-            {
-                return new AICoreActionEndStruct("enemy.tooMany", true);
-            }
-
-            return base.EndSearch();
+            return EndSniperSearch();
         }
 
         public override AICoreActionEndStruct EndHeal()
@@ -1287,7 +1264,7 @@ namespace friendlyPMC.Components
         public AICoreActionEndStruct EndSniperSearch()
         {
             if (ordersChanged)
-                return new AICoreActionEndStruct("enemy.Close", true);
+                return new AICoreActionEndStruct("search.End", true);
 
             if (!botOwner_0.Memory.HaveEnemy)
             {
@@ -1360,6 +1337,8 @@ namespace friendlyPMC.Components
                 return EndGetInClose();
             }
 
+            if(curDecision.Reason == "runToHeal" || curDecision.Reason == "goforheal") return base.EndRunToCover();
+
             return base.ShallEndCurrentDecision(curDecision);
         }
 
@@ -1402,6 +1381,8 @@ namespace friendlyPMC.Components
             {
                 return EndGetInClose();
             }
+
+            if(curDecision.Reason == "runToHeal" || curDecision.Reason == "goforheal") return base.EndRunToCover();
 
             return null;
         }

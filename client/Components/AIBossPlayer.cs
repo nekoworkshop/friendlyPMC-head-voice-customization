@@ -1,6 +1,7 @@
 ﻿using Comfort.Common;
 using EFT;
 using friendlyPMC.Modules;
+using friendlyPMC.Utils;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -37,6 +38,8 @@ namespace friendlyPMC.Components
 
             player.HealthController.DiedEvent += OnDead;
 
+            Singleton<BotEventHandler>.Instance.OnPhraseSay += PhraseSaid;
+
             SetAreaCovers();
             coverCoroutine = player.StartCoroutine(UpdateCoversCoroutine());
         }
@@ -60,6 +63,13 @@ namespace friendlyPMC.Components
             BossPlayers.Instance.RemoveBossPlayer(realPlayer.ProfileId);
         }
 
+        public void PhraseSaid(BotEventHandler.GClass599 info)
+        {
+            if(info.phrase == (EPhraseTrigger)CustomPhrases.TeamStatus && info.PlayerRequester != null && info.PlayerRequester.ProfileId == realPlayer.ProfileId)
+            {
+                PingTeamates.Instance.Ping(this);
+            }
+        }
         public new AIBossPlayerLogic GetBossLogic()
         {
             return aBossLogic;
@@ -209,6 +219,8 @@ namespace friendlyPMC.Components
         public void DisposeBoss()
         {
             realPlayer.HealthController.DiedEvent -= OnDead;
+
+            Singleton<BotEventHandler>.Instance.OnPhraseSay -= PhraseSaid;
 
             if (bossGroup != null)
             {

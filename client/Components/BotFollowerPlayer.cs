@@ -16,6 +16,7 @@ using UnityEngine;
 using System.Security.Policy;
 using EFT.InventoryLogic;
 using static EFT.SpeedTree.TreeWind;
+using System.Threading.Tasks;
 
 
 namespace friendlyPMC.Components
@@ -268,18 +269,18 @@ namespace friendlyPMC.Components
             _bot.Settings.Current._precicingSpeedCoef = settingModif.PrecicingSpeedCoef;
             _bot.Settings.Current._accuratySpeedCoef = settingModif.AccuratySpeedCoef;
 
-            Logger.LogInfo($"Bot {_bot.Profile.Nickname} is now a follower of {_player.Player().Profile.Nickname}");
-
             // reset enemy state
-            StaticManager.Instance.TimerManager.MakeTimer(TimeSpan.FromSeconds(0.1), false).OnTimer += () =>
+            Utils.Utils.SetTimeout(() =>
             {
-                if (_bot.Memory.HaveEnemy)
+                if (_bot != null && !_bot.IsDead && _bot.BotState == EBotState.Active && _bot.Memory.HaveEnemy)
                 {
                     _bot.Memory.DeleteInfoAboutEnemy(_bot.Memory.GoalEnemy.Person);
                 }
-            };
+            }, 0.1f);
 
-            _bot.GetPlayer.BeingHitAction += BeingHitAction;
+            //_bot.GetPlayer.BeingHitAction += BeingHitAction;
+
+            Logger.LogInfo($"Bot {_bot.Profile.Nickname} is now a follower of {_player.Player().Profile.Nickname}");
 
         }
         /** 
