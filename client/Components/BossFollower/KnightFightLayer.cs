@@ -2,6 +2,7 @@
 using System;
 using UnityEngine;
 using EFT.InventoryLogic;
+using System.Reflection.Emit;
 
 namespace friendlyPMC.Components.BossFollower
 {
@@ -71,6 +72,17 @@ namespace friendlyPMC.Components.BossFollower
             }
 
             return true;
+        }
+
+        public new void OnLayerChanged(AICoreLayerClass<BotLogicDecision> layer)
+        {
+            this.int_16 = 0;
+            if (layer == this)
+            {
+                this.float_43 = Time.time;
+                return;
+            }
+            this.float_43 = -1000f;
         }
         protected bool HasBoss()
         {
@@ -311,11 +323,11 @@ namespace friendlyPMC.Components.BossFollower
                 {
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.shootFromPlace, "sfps1");
                 }
-
-                if (followerFightLayer.IsEnemyLowThreat() && Utils.EnemyInfo.Distance(botOwner_0) < Utils.EnemyInfo.EnemyDistance.Distant)
+                // temporary disabled
+                /*if (followerFightLayer.IsEnemyLowThreat() && Utils.EnemyInfo.Distance(botOwner_0) < Utils.EnemyInfo.EnemyDistance.Distant)
                 {
                     return KnightAssault();
-                }
+                }*/
             }
 
             return null;

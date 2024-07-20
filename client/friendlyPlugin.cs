@@ -157,8 +157,6 @@ namespace friendlyPMC
             new BotOwnerIsFolowerPatch().Enable();
             new BotOwnerManualUpdatePatch().Enable();
 
-            //new EnemyInfoIsPointInVisibleSectorPatch().Enable();
-
             new PatrolDataFollowerPatch().Enable();
 
             new FollowRequestPatch().Enable();
@@ -191,6 +189,8 @@ namespace friendlyPMC
             var harmony = new Harmony("xyz.pit.companion");
             harmony.PatchAll(typeof(GoalEnemyTracePatch).Assembly);
             harmony.PatchAll(typeof(LocalGameCtorPatch).Assembly);
+
+            SAINPatch.PatchSAINIfInstalled();
 
         }
 

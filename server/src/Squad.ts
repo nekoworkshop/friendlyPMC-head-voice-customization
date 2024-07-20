@@ -253,14 +253,14 @@ class friendlyPMC {
 		pmcType = pmcType.toLowerCase();
 
 		// force the friendly mind here as some mods may overwrite things
-		if (pmcType == "bear" || pmcType == "usec" || pmcType == "sptbear" || pmcType == "sptusec") {
+		if (pmcType == "bear" || pmcType == "usec" || pmcType == "sptbear" || pmcType == "sptusec" || pmcType == "pmcbear" || pmcType == "pmcusec") {
 			Object.assign(diff.Mind, {
-				DEFAULT_ENEMY_BEAR: pmcType == "usec" || pmcType == "sptusec" || is_hostile,
+				DEFAULT_ENEMY_BEAR: pmcType == "usec" || pmcType == "sptusec" || pmcType == "pmcusec" || is_hostile,
 				DEFAULT_ENEMY_SAVAGE: true,
-				DEFAULT_ENEMY_USEC: pmcType == "bear" || pmcType == "sptbear" || is_hostile,
-				DEFAULT_BEAR_BEHAVIOUR: !is_hostile && (pmcType == "bear" || pmcType == "sptbear") ? "Ignore" : "Attack",
+				DEFAULT_ENEMY_USEC: pmcType == "bear" || pmcType == "sptbear" || pmcType == "pmcbear" || is_hostile,
+				DEFAULT_BEAR_BEHAVIOUR: !is_hostile && (pmcType == "bear" || pmcType == "sptbear" || pmcType == "pmcbear") ? "Ignore" : "Attack",
 				DEFAULT_SAVAGE_BEHAVIOUR: "Attack",
-				DEFAULT_USEC_BEHAVIOUR: !is_hostile && (pmcType == "usec" || pmcType == "sptusec") ? "Ignore" : "Attack",
+				DEFAULT_USEC_BEHAVIOUR: !is_hostile && (pmcType == "usec" || pmcType == "sptusec" || pmcType == "pmcusec") ? "Ignore" : "Attack",
 				CAN_RECIVE_PLAYER_REQUESTS: !is_hostile,
 				CAN_RECEIVE_PLAYER_REQUESTS: !is_hostile,
 				CAN_RECEIVE_PLAYER_REQUESTS_USEC: !is_hostile,
@@ -292,12 +292,14 @@ class friendlyPMC {
 			if (!is_hostile) {
 				// do these do anything?
 
-				if (pmcType == "bear") {
+				if (pmcType == "bear" || pmcType == "sptbear" || pmcType == "pmcbear") {
 					clearWrongEnemy(diff.Mind, "sptBear");
 					clearWrongEnemy(diff.Mind, "bear");
-				} else if (pmcType == "usec") {
+					clearWrongEnemy(diff.Mind, "pmcBEAR");
+				} else if (pmcType == "usec" || pmcType == "sptusec" || pmcType == "pmcusec") {
 					clearWrongEnemy(diff.Mind, "sptUsec");
 					clearWrongEnemy(diff.Mind, "usec");
+					clearWrongEnemy(diff.Mind, "pmcUSEC");
 				}
 			}
 			// ensure these settings are set last as they are not dependent of "is_hostile" flag

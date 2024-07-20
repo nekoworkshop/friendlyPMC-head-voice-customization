@@ -684,7 +684,7 @@ namespace friendlyPMC.Components
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "moveCloserToBossFast");
 
             }
-            return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.followerPatrol, "moveCloserFallback");
+            return BotLogicDecisions.RegroupToBoss(botOwner_0);
         }
         public AICoreActionResultStruct<BotLogicDecision>?  DogFight()
         {

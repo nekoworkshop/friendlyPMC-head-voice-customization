@@ -78,8 +78,8 @@ namespace friendlyPMC.Actions
                 
                 if (bot.Memory.HaveEnemy && bot.Memory.GoalEnemy.ProfileId == closet.Profile.ProfileId) return;
 
-                bot.BotsGroup.AddEnemy(closet.AIData.Player, EBotEnemyCause.checkAddTODO);
-                bot.Memory.AddEnemy(closet, new BotSettingsClass(closet, bot.BotsGroup, EBotEnemyCause.checkAddTODO), false);
+                bot.BotsGroup.AddEnemy(closet.AIData.Player, EBotEnemyCause.addPlayerToBoss);
+                bot.Memory.AddEnemy(closet, new BotSettingsClass(closet, bot.BotsGroup, EBotEnemyCause.addPlayerToBoss), false);
                 Components.Logger.LogInfo("Making " + closet.Profile.Nickname + " enemy to others");
                 EnemyInfo info;
                 bot.EnemiesController.EnemyInfos.TryGetValue(closet, out info);

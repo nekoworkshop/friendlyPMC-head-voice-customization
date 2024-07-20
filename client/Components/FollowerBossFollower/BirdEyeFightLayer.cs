@@ -122,7 +122,7 @@ namespace friendlyPMC.Components.FollowerBossFollower
                 {
                     coverTimer = Time.time + GClass761.Random(3f, 5f);
                     botOwner_0.GoToSomePointData.SetPoint(customNavigationPoint_0.Position);
-                    return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.goToPoint, "repositionFast");
+                    return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.goToPoint, "reposition");
                 }
                 // -- fallback #1, just wait
                 if (holdTimer < Time.time)
@@ -165,8 +165,10 @@ namespace friendlyPMC.Components.FollowerBossFollower
                 request.BotRequestType == (BotRequestType)CustomBotRequestType.Regroup
             )
             {
+                Components.Logger.LogInfo("Boss asked said regroup");
                 if (!botOwner_0.Memory.HaveEnemy || !botOwner_0.Memory.GoalEnemy.IsVisible)
                 {
+                    Components.Logger.LogInfo("Boss asked to get closer");
                     return followerFightLayer.GetCloserToBoss();
                 }
                 else
@@ -225,6 +227,7 @@ namespace friendlyPMC.Components.FollowerBossFollower
                     !botOwner_0.Memory.GoalEnemy.IsVisible &&
                         (
                             decision.Reason == "repositionFast" ||
+                            decision.Reason == "reposition" ||
                             enemyClose
                         )
                     &&
@@ -242,6 +245,7 @@ namespace friendlyPMC.Components.FollowerBossFollower
                     !botOwner_0.Memory.GoalEnemy.IsVisible &&
                         (
                             decision.Reason == "repositionFast" ||
+                            decision.Reason == "reposition" ||
                             decision.Reason == "relocateFast" ||
                             decision.Reason == "sniper.Search"
                         )
@@ -345,8 +349,14 @@ namespace friendlyPMC.Components.FollowerBossFollower
             }
             return followerFightLayer.EndGoToPoint();
         }
-
         
+        public AICoreActionEndStruct EndSniperSearch()
+        {
+            if (ordersChanged) return new AICoreActionEndStruct("search.End", true);
+
+            return followerFightLayer.EndSniperSearch();
+        }
+
 
         protected bool HasBoss()
         {

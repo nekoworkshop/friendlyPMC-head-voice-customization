@@ -76,11 +76,11 @@ namespace friendlyPMC.Components
             settingModif = new GClass528(1.2f,1.2f,1f,1f,1f,1f,0.9f,1f,1f);
 
             // change enenmy chooser to custom
-            if (bot.EnemyChooser != null)
+            /*if (bot.EnemyChooser != null)
                 bot.EnemyChooser.Dispose();
 
             bot.EnemyChooser = new FollowerEnemyChooser(bot);
-            bot.EnemyChooser.Activate();
+            bot.EnemyChooser.Activate();*/
 
             bool hadEnemy = _bot.Memory.HaveEnemy;
             // deactivate old layers

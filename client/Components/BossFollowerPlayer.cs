@@ -30,6 +30,7 @@ namespace friendlyPMC.Components
         public override void SetFollowerSettings(BotOwner bot)
         {
             settingModif.AccuratySpeedCoef = 1.5f;
+            settingModif.ScatteringCoef = 1.5f;
 
             base.SetFollowerSettings(bot);
             

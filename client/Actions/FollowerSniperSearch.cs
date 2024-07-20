@@ -1,5 +1,9 @@
-﻿using EFT;
+﻿using Cysharp.Threading.Tasks;
+using EFT;
+using friendlyPMC.Components;
+using HarmonyLib;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -17,48 +21,58 @@ namespace friendlyPMC.Actions
 
         private float float_4 = 0f;
         private float float_5 = 0f;
-        private float float_6 = 0f;
-
-        private float _nextPosibleCheckTime = 0f;
         
         private Vector3? _lastTarget;
+        private Vector3? _lastPosition;
+        private Vector3? _lastCover;
+        private Vector3? _lastSpot;
+
+        private float _nextShootPositionUpdateTime = 0f;
 
         private bool covering = false;
-        private Vector3? _lastCover;
+
+        private bool _hasCome = false;
 
         protected float _minDist = 10f;
 
         protected float _maxDist = 100f;
+
+        private Queue<Action> _actionsQueue = new Queue<Action>();
         public FollowerSniperSearch(BotOwner bot) : base(bot)
         {
 
         }
 
         public override void Update()
-        {            
+        {
             botOwner_0.DoorOpener.Update();
 
             if (!botOwner_0.Memory.HaveEnemy) return;
 
-
-            RefreshSearchPoint();
-
-            if (float_6 > Time.time) return;
-
+            while (_actionsQueue.Count > 0)
+            {
+                Action action = _actionsQueue.Dequeue();
+                action();
+            }
 
             if (spotPosition.HasValue)
             {
-                if(botOwner_0.GoToSomePointData.IsCome())
+                if (botOwner_0.GoToSomePointData.IsCome())
                 {
-                    botOwner_0.SetPose(0.01f);
-                    botOwner_0.StopMove();
-                    botOwner_0.Steering.LookToPoint(botOwner_0.Memory.GoalEnemy.GetCenterPart());
-                    float_6 = Time.time + GClass761.Random(2f, 3f);
+                    if (!_hasCome)
+                    {
+                        botOwner_0.SetPose(0.5f);
+                        botOwner_0.StopMove();
+                        botOwner_0.Steering.LookToPoint(botOwner_0.Memory.GoalEnemy.GetCenterPart());
+                        _hasCome = true;
+                    }
                     ReachSearchPoint();
                     return;
                 }
 
                 botOwner_0.GoToSomePointData.UpdateToGo(sprint);
+
+                _hasCome = false;
 
                 if (!covering)
                     botOwner_0.Steering.LookToDirection(botOwner_0.Memory.GoalEnemy.CurrPosition - botOwner_0.GetPlayer.Transform.position, 90f);
@@ -77,27 +91,27 @@ namespace friendlyPMC.Actions
             {
                 float_5 = Time.time + GClass761.Random(3f, 4f);
 
-                // find a cover from where we can shoot the enemy
-                CustomNavigationPoint Spot = Utils.Covers.GetClosestAttackCoverPoint(botOwner_0, _lastTarget.Value, _minDist, _maxDist, botOwner_0.Memory.GoalEnemy.CurrPosition);
+                UpdateShootPosition();
 
-                if (Spot != null)
+
+                if (!_lastTarget.HasValue) return;
+
+                if (_lastSpot.HasValue)
                 {
-                    spotPosition = Spot.Position;
+                    spotPosition = _lastSpot;
                     covering = false;
                 }
                 // else find a position from where we can see the enemy
-                else
+                else if (_lastPosition.HasValue)
                 {
-                    ShootPointClass shootTarget = new ShootPointClass(_lastTarget.Value, 1f);
-
-                    spotPosition = Utils.Covers.FindShootPosition(botOwner_0, shootTarget, _minDist, _maxDist);
+                    spotPosition = _lastPosition.Value;
                     covering = false;
                 }
-
                 // else find a position from where we can cover boss
-                if (!spotPosition.HasValue)
+                else if (_lastCover.HasValue)
                 {
-                    TryBossCover();
+                    spotPosition = _lastCover.Value;
+                    covering = true;
 
                 }
                 // nothing found - stay in place
@@ -114,24 +128,22 @@ namespace friendlyPMC.Actions
                 if (covering)
                     botOwner_0.Steering.LookToMovingDirection();
                 else
-                    botOwner_0.Steering.LookToDirection(botOwner_0.Memory.GoalEnemy.CurrPosition - botOwner_0.GetPlayer.Transform.position,90f);
+                    botOwner_0.Steering.LookToDirection(botOwner_0.Memory.GoalEnemy.CurrPosition - botOwner_0.GetPlayer.Transform.position, 90f);
 
-            } else
+            }
+            else
             {
-
-                if(!_lastTarget.HasValue) ReachSearchPoint();
+                _hasCome = false;
+                if (!_lastTarget.HasValue)
+                {
+                    UpdateShootPosition();
+                }
                 else SetSearchPosition();
             }
         }
 
         private void RefreshSearchPoint()
         {
-            if (this._nextPosibleCheckTime > Time.time || !botOwner_0.Memory.HaveEnemy)
-            {
-                return;
-            }
-            
-            this._nextPosibleCheckTime = Time.time + 5f;
             Vector3 enemyPosition = botOwner_0.Memory.GoalEnemy.CurrPosition;
 
             Vector3 targetSpot = new Vector3(
@@ -144,57 +156,122 @@ namespace friendlyPMC.Actions
             {
                 _lastTarget = targetSpot;
                 spotPosition = null;
-                covering = false;
-                botOwner_0.Mover.Sprint(false, true);
+                covering = false;;
             }
         }
 
         private void ReachSearchPoint()
         {
             SetSearchPosition();
-            _nextPosibleCheckTime = Time.time + 2f;
             spotPosition = null;
             covering = false;
         }
 
         private void SetSearchPosition()
         {
-            botOwner_0.SetPose(0.01f);
+            botOwner_0.SetPose(0.5f);
             botOwner_0.StopMove();
-            botOwner_0.Steering.LookToPoint(botOwner_0.Memory.GoalEnemy.GetCenterPart());
+            if(botOwner_0.Memory.HaveEnemy)
+                botOwner_0.Steering.LookToPoint(botOwner_0.Memory.GoalEnemy.GetCenterPart());
         }
 
-        private bool TryBossCover()
+        private void UpdateShootPosition()
         {
-            if (botOwner_0.BotFollower.HaveBoss)
+            if (_nextShootPositionUpdateTime > Time.time) return;
+
+            _nextShootPositionUpdateTime = Time.time + 1.5f;
+
+            Vector3[] carePosition = new Vector3[] { };
+
+            foreach (var item in botOwner_0.EnemiesController.EnemyInfos)
             {
-                Vector3 bossPos = botOwner_0.BotFollower.BossToFollow.Position;
-                Vector3 targetSpot = new Vector3(
-                    Mathf.Floor(bossPos.x / 20f) * 20f,
-                    Mathf.Floor(bossPos.y / 20f) * 20f,
-                    Mathf.Floor(bossPos.z / 20f) * 20f
-                );
-
-                if(targetSpot != _lastCover)
+                try
                 {
-                    _lastCover = targetSpot;
-                    spotPosition = null;
-                    CustomNavigationPoint cover = Utils.Covers.GetClosestCoverPoint(botOwner_0, targetSpot, 50f, 5f);
-
-                    if (cover != null)
-                    {
-                        spotPosition = cover.Position;
-
-                    }
+                    carePosition = carePosition.AddItem(item.Value.CurrPosition).ToArray();
                 }
-                
-                _lastTarget = null;
-
-                covering = true;
-                return true;
+                catch
+                {
+                }
             }
 
-            return false;
+            List<CustomNavigationPoint> areaCovers = botOwner_0.BotFollower.HaveBoss ? (botOwner_0.BotFollower.BossToFollow as pitAIBossPlayer).GetAreaCovers() : new List<CustomNavigationPoint>();
+
+            if (!botOwner_0.Memory.HaveEnemy)
+            {
+                _lastTarget = null;
+                return;
+            }
+
+            RefreshSearchPoint();
+
+
+            if (_lastTarget.HasValue)
+            {
+                Vector3 enemySpot = botOwner_0.Memory.GoalEnemy.CurrPosition;
+
+                CustomNavigationPoint Spot = Utils.Covers.GetClosestAttackCoverPoint(
+                    botOwner_0.Id,
+                    botOwner_0.GetPlayer.Transform.position,
+                    enemySpot,
+                    areaCovers,
+                    _minDist, 
+                    _maxDist,
+                    carePosition,
+                    false
+                );
+
+                if (Spot != null) _lastSpot = Spot.Position;
+                else _lastSpot = null;
+
+
+                if (!_lastSpot.HasValue)
+                {
+                    _actionsQueue.Enqueue(() => {
+
+                        ShootPointClass shootTarget = new ShootPointClass(enemySpot, 1f);
+                        _lastPosition = Utils.Covers.FindShootPosition(
+                            botOwner_0.GetPlayer.Transform.position,
+                            shootTarget,
+                            botOwner_0.LookSensor.Mask,
+                            _minDist,
+                            _maxDist
+                        );
+
+                        if (!_lastPosition.HasValue && botOwner_0.BotFollower.HaveBoss)
+                        {
+                            Vector3 bossPos = botOwner_0.BotFollower.BossToFollow.Position;
+
+                            _actionsQueue.Enqueue(() =>
+                            {
+                                CustomNavigationPoint cover = Utils.Covers.GetClosestCoverPoint(
+                                    botOwner_0.Id,
+                                    botOwner_0.GetPlayer.Transform.position,
+                                    bossPos,
+                                    areaCovers,
+                                    30f,
+                                    5f,
+                                    carePosition
+                                );
+
+                                if (cover != null)
+                                {
+                                    _lastCover = cover.Position;
+
+                                }
+                                else
+                                {
+                                    _lastCover = null;
+                                }
+                            });
+                        }
+
+                    });
+                }
+            }
+            else
+            {
+                _lastPosition = null;
+            }
         }
     }
 }

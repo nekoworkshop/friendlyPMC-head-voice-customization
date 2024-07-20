@@ -172,8 +172,8 @@
     <Compile Include="Modules\FollowerCreateNode.cs" />
     <Compile Include="Modules\RadioSound.cs" />
     <Compile Include="Patches\BotMemoryPatch.cs" />
-    <Compile Include="Patches\EnemyInfoPatch.cs" />
     <Compile Include="Patches\GestureMenuPatch.cs" />
+    <Compile Include="Patches\SAINPatch.cs" />
     <Compile Include="Requests\FollowerGoCheck.cs" />
     <Compile Include="Requests\FollowerHold.cs" />
     <Compile Include="Actions\FollowerPatrol.cs" />

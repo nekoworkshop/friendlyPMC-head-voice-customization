@@ -271,9 +271,9 @@ namespace friendlyPMC.Utils
                     Vector3 enemyPosition = bt.Data.Memory.GoalEnemy.CurrPosition;
 
                     Vector3 targetSpot = new Vector3(
-                        Mathf.Floor(enemyPosition.x / 20f) * 20f,
-                        Mathf.Floor(enemyPosition.y / 20f) * 20f,
-                        Mathf.Floor(enemyPosition.z / 20f) * 20f
+                        Mathf.Floor(enemyPosition.x / 10f) * 10f,
+                        Mathf.Floor(enemyPosition.y / 10f) * 10f,
+                        Mathf.Floor(enemyPosition.z / 10f) * 10f
                     );
 
                     targetPosition = new Vector3(
@@ -287,7 +287,7 @@ namespace friendlyPMC.Utils
 
                     foreach (var item in botMap)  
                     {
-                        if(item != bt && item.EnemyPos.HasValue && item.EnemyPos == targetSpot)
+                        if(item != bt && item.EnemyPos.HasValue && item.EnemyPos == targetSpot && marker != Color.red)
                         {
                             bt.EnemyPos = null;
                             break;
@@ -307,12 +307,13 @@ namespace friendlyPMC.Utils
                 if (screenPos.z > 0)
                 {
                     DrawEnemyMarker(targetPosition.Value, marker);
-                    if(!locationPing)
-                    {
-                        locationPing = true;
-                        float stereoPan = CalculateStereoPane(targetPosition.Value);
-                        radioSound.PlayLocationSound(stereoPan);
-                    }
+                }
+
+                if (!locationPing)
+                {
+                    locationPing = true;
+                    float stereoPan = CalculateStereoPane(targetPosition.Value);
+                    radioSound.PlayLocationSound(stereoPan);
                 }
             }
         }

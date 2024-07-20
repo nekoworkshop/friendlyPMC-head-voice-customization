@@ -11,6 +11,8 @@ using System.Collections.Generic;
 
 using System.Reflection;
 using System.Threading.Tasks;
+using UnityEngine;
+using System.Diagnostics;
 
 namespace friendlyPMC.Patches
 {
@@ -90,19 +92,28 @@ namespace friendlyPMC.Patches
 
                     if (enemyInfo_0 == value) return;
 
+                    /*if(BossPlayers.Instance.IsFollower(value.Owner) && value.Owner.Side == botOwner_0.Side)
+                    {
+                        Components.Logger.LogInfo("Adding enemy to same side because : " + value.GroupInfo.Cause.ToString());
+                        StackTrace stackTrace = new StackTrace();
+                        string stackTraceString = stackTrace.ToString();
+                        Components.Logger.LogInfo("Enemy SameSide Trace: " + stackTraceString);
+                    }*/
+                    
+                    if (value.GroupInfo.Cause == EBotEnemyCause.addBotNoGroup || value.GroupInfo.Cause == EBotEnemyCause.checkAddTODO) return;
+
                     Task.Run(() =>
                     {
                         // ensure all other members know about the enemy
                         if (BossPlayers.Instance.IsFollower(botOwner_0) && botOwner_0.BotFollower.HaveBoss)
                         {
-
                             if (enemies.Contains(value.ProfileId)) return;
 
                             enemies.Add(value.ProfileId);
                             // add enemy to group
-                            botOwner_0.BotsGroup.AddEnemy(value.Person, EBotEnemyCause.checkAddTODO);
+                            botOwner_0.BotsGroup.AddEnemy(value.Person, EBotEnemyCause.addCauseGroup);
 
-                            BotSettingsClass botsett = new BotSettingsClass(Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(value.ProfileId), botOwner_0.BotsGroup, EBotEnemyCause.checkAddTODO);
+                            BotSettingsClass botsett = new BotSettingsClass(Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(value.ProfileId), botOwner_0.BotsGroup, EBotEnemyCause.addCauseGroup);
 
                             botOwner_0.BotFollower.BossToFollow.Followers.ForEach(item =>
                             {
@@ -124,13 +135,14 @@ namespace friendlyPMC.Patches
                                 }
                             });
 
-                            Task.Delay(100).ContinueWith( t =>
+                            Task.Delay(100).ContinueWith(t =>
                             {
                                 enemies.Remove(value.ProfileId);
                             });
                         }
                     });
-                } catch
+                }
+                catch
                 {
 
                 }

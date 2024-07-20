@@ -83,9 +83,9 @@ namespace friendlyPMC.Components
                 {
                     Vector3 playerPosition = realPlayer.Transform.position;
                     Vector3 squareCenter = new Vector3(
-                        Mathf.Floor(playerPosition.x / 25f) * 25f,
-                        Mathf.Floor(playerPosition.y / 25f) * 25f,
-                        Mathf.Floor(playerPosition.z / 25f) * 25f
+                        Mathf.Floor(playerPosition.x / 30f) * 30f,
+                        Mathf.Floor(playerPosition.y / 20f) * 20f,
+                        Mathf.Floor(playerPosition.z / 30f) * 30f
                     );
 
                     if (coverZones.ContainsKey(squareCenter))
@@ -102,8 +102,8 @@ namespace friendlyPMC.Components
                         List<CustomNavigationPoint> points = new List<CustomNavigationPoint>();
                         float lastsqr = float.MaxValue;
 
-                        int maxValue = 150;
-
+                        int maxValue = 100;
+                        // sort all available points from the closest to the farthest
                         groupPoints.Sort((a, b) => Vector3.Distance(a.Position, squareCenter).CompareTo(Vector3.Distance(b.Position, squareCenter)));
 
                         foreach (CustomNavigationPoint groupPoint in groupPoints)
@@ -124,8 +124,8 @@ namespace friendlyPMC.Components
                     }
                 } catch (Exception ex)
                 {
-                    Components.Logger.LogInfo("Covers Coroutine failing : " + ex.Message);
-                    Components.Logger.LogInfo("Trace : " + ex.StackTrace);
+                    Logger.LogInfo("Covers Coroutine failing : " + ex.Message);
+                    Logger.LogInfo("Trace : " + ex.StackTrace);
                 }
 
             });
@@ -137,7 +137,7 @@ namespace friendlyPMC.Components
             {
                 Task ts = SetAreaCovers();
                 yield return new WaitUntil(()=>ts.IsCompleted);
-                yield return new WaitForSeconds(1f);
+                yield return new WaitForSeconds(2f);
             }
         }
 
@@ -182,7 +182,7 @@ namespace friendlyPMC.Components
             // make the closest enemy of boss, the enemy
             if(enemy != null)
             {
-                BotSettingsClass botSettingsClass = new BotSettingsClass(Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(enemy.ProfileId), bossGroup, EBotEnemyCause.checkAddTODO);
+                BotSettingsClass botSettingsClass = new BotSettingsClass(Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(enemy.ProfileId), bossGroup, EBotEnemyCause.pmcBossKill);
 
                 follower.Memory.AddEnemy(enemy, botSettingsClass, false);
                 EnemyInfo info;

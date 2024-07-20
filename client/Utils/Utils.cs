@@ -42,7 +42,7 @@ namespace friendlyPMC.Utils
         {
             return (pitAIBossPlayer)botOwner.BotFollower.BossToFollow;
         }
-
+        /** Recreation of javascript SetTimeout **/
         public static GClass552.IBotTimer SetTimeout(Action func, float timer, bool isLopped = false)
         {
             Timer time = new Timer(timer);
@@ -57,7 +57,6 @@ namespace friendlyPMC.Utils
             @class.timer = new GClass552.Class260();
             @class.timer.Init(() => { }, () =>
             {
-                Components.Logger.LogInfo("SetTimeout Called");
                 try
                 {
                     func();
@@ -72,14 +71,13 @@ namespace friendlyPMC.Utils
             @class.timer.Start(Time.time + num, num, isLopped);
             return @class.timer;
         }
-
+        /** Shortcut to EFT method of doign MakeTimer in relation to bot activity **/
         public static GClass552.IBotTimer SetBotTimer(Action func,float seconds)
         {
             var Timer = StaticManager.Instance.TimerManager.MakeTimer(TimeSpan.FromSeconds(seconds), false);
 
             Timer.OnTimer += () =>
             {
-                Components.Logger.LogInfo("SetBotTimer Called");
                 try
                 {
                     func();

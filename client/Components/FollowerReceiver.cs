@@ -478,6 +478,8 @@ namespace friendlyPMC.Components
                 {
                     (botOwner_0.Brain.BaseBrain as FollowerBrain).BossOrdersChanged();
 
+                    Components.Logger.LogInfo("Boss said Regroup");
+
                     Player alivePlayerByProfileID = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(requester.ProfileId);
 
                     if (botOwner_0.BotRequestController.TryStopCurrent(alivePlayerByProfileID, true))
@@ -486,6 +488,7 @@ namespace friendlyPMC.Components
 
                         if (botOwner_0.BotsGroup.RequestsController.TryAddRequest(gclass))
                         {
+                            Components.Logger.LogInfo("Proceed to regroup");
                             gclass.AddPossibleExecutors(botOwner_0);
                             gclass.SetGroup(botOwner_0.BotsGroup.RequestsController);
                             if (isClose && (notBusy || !botOwner_0.Memory.GoalEnemy.IsVisible))
@@ -776,6 +779,11 @@ namespace friendlyPMC.Components
                             InteractableObjects.SetTaker(botOwner_0);
                         }
                     }
+                }
+                else if(info.phrase == (EPhraseTrigger)CustomPhrases.TeamStatus)
+                {
+                    if(notBusy) base.method_0(info); // go for default which will just do a hello gesture
+                    return;
                 }
                 // on dismiss remove the bot from being a follower
                 else if (info.phrase == EPhraseTrigger.OnYourOwn)
