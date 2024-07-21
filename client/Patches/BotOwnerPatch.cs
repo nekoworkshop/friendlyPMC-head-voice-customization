@@ -7,6 +7,7 @@ using HarmonyLib;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using UnityEngine;
 
 
 namespace friendlyPMC.Patches
@@ -74,7 +75,53 @@ namespace friendlyPMC.Patches
         {
             return AccessTools.Method(typeof(BotOwner), "UpdateManual");
         }
-   
+
+        /*[PatchPrefix]
+        private static bool PatchPrefix(BotOwner __instance)
+        {
+            // followers should not have goals
+            try
+            {
+                float _nextGetGoalTime = (float)AccessTools.Field(typeof(BotOwner), "_nextGetGoalTime").GetValue(__instance);
+                if (_nextGetGoalTime < Time.time)
+                {
+                   
+                    if (BossPlayers.Instance.IsFollower(__instance) && __instance.BotFollower.HaveBoss)
+                    {
+                        if (__instance.Memory.DangerData.HaveCloseDanger || __instance.Memory.HaveEnemy) return true;
+
+                        if(!__instance.Memory.HaveEnemy) {
+                            // check if any enemy is close enough for bot to hear and get next to it
+                            EnemyInfo potentialEnemy = __instance.EnemyChooser.FindDangerEnemy();
+
+                            potentialEnemy.GroupInfo.IsHaveSeen = false;
+
+                            if (
+                                potentialEnemy != null &&
+                                (
+                                    potentialEnemy.HaveSeen ||
+                                    Utils.Utils.GetNavDistance(__instance.GetPlayer.Transform.position, potentialEnemy.Person.Position) < 35f
+                                )
+                            )
+                            {
+                                __instance.Memory.GoalEnemy = potentialEnemy;
+                            }
+                        }
+
+                        AccessTools.Field(typeof(BotOwner), "_nextGetGoalTime").SetValue(__instance, Time.time + 2.5f);
+
+                        return false;
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Components.Logger.LogInfo("Exception on BotOwner UpdateManual PatchPrefix: " + e.Message);
+            }
+
+            return true;
+        }*/
+
         [PatchPostfix]
         private static void PatchPostfix(BotOwner __instance)
         {
@@ -93,6 +140,7 @@ namespace friendlyPMC.Patches
                     Action<BotOwner> OnUpdate;
                     BotOwnerUpdate.TryGetValue(__instance.ProfileId, out OnUpdate);
                     if (OnUpdate != null) OnUpdate(__instance);
+
                 }
             }
             catch (Exception e)

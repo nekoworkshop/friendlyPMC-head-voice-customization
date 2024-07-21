@@ -37,6 +37,14 @@ namespace friendlyPMC
         TeamStatus = 200
     }
 
+    public class FollowerUtils
+    {
+        public static bool IsFollower(BotOwner Bot)
+        {
+            return BossPlayers.Instance.IsFollower(Bot);
+        }
+    }
+
     [BepInPlugin("xyz.pit.companion", "friendlyPMC", "3.4.0")]
     [BepInDependency("xyz.drakia.bigbrain")]
     [BepInDependency("xyz.drakia.waypoints")]
@@ -80,6 +88,7 @@ namespace friendlyPMC
         public static ConfigEntry<bool> bigPipeSpawn;
         public static ConfigEntry<bool> birdEyeSpawn;
         public static ConfigEntry<bool> justKnightSpawn;
+
         private void Awake()
         {
 

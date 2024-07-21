@@ -13,7 +13,7 @@ namespace friendlyPMC.Modules
 {
     internal class BossPlayers
     {
-        public static BossPlayers Instance;
+        public static BossPlayers Instance { get; private set; }
 
         private Dictionary<string, pitAIBossPlayer> _bosses { get; set; }
         private List<BotFollowerPlayer> _followers { get; set; }

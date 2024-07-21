@@ -418,7 +418,7 @@ namespace friendlyPMC.Utils
         private float CalculateStereoPane(Vector3 markerPosition)
         {
             Vector3 cameraRight = Camera.main.transform.right;
-            Vector3 directionToMarker = (markerPosition - Camera.main.transform.position).normalized;
+            Vector3 directionToMarker = (Camera.main.transform.position - markerPosition).normalized;
 
             float dotProduct = Vector3.Dot(cameraRight, directionToMarker);
             return -dotProduct;

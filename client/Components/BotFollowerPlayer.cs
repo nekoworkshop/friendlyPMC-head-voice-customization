@@ -268,6 +268,7 @@ namespace friendlyPMC.Components
             _bot.Settings.Current._hearingDistCoef = settingModif.HearingDistCoef;
             _bot.Settings.Current._precicingSpeedCoef = settingModif.PrecicingSpeedCoef;
             _bot.Settings.Current._accuratySpeedCoef = settingModif.AccuratySpeedCoef;
+            _bot.Settings.Current._scatteringCoef = settingModif.ScatteringCoef;
 
             // reset enemy state
             Utils.Utils.SetTimeout(() =>
@@ -440,7 +441,7 @@ namespace friendlyPMC.Components
             settings.FileSettings.Look.NO_GREEN_DIST = 4.0f;
             settings.FileSettings.Look.NO_GRASS_DIST = 5.0f;
 
-            settings.FileSettings.Hearing.CHANCE_TO_HEAR_SIMPLE_SOUND_0_1 = 0.5f;
+            settings.FileSettings.Hearing.CHANCE_TO_HEAR_SIMPLE_SOUND_0_1 = 0.2f;
             settings.FileSettings.Hearing.DISPERSION_COEF = 1f;
             settings.FileSettings.Hearing.CLOSE_DIST = 6f;
             settings.FileSettings.Hearing.FAR_DIST = 35f;

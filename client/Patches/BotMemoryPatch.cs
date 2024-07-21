@@ -91,14 +91,16 @@ namespace friendlyPMC.Patches
                     var enemyInfo_0 = AccessTools.Field(typeof(BotMemoryClass), "enemyInfo_0").GetValue(__instance) as EnemyInfo;
 
                     if (enemyInfo_0 == value) return;
-
-                    /*if(BossPlayers.Instance.IsFollower(value.Owner) && value.Owner.Side == botOwner_0.Side)
+                    
+                    // - prevent follower from adding an enemy they never encountered but "sense" it
+                    if(BossPlayers.Instance.IsFollower(botOwner_0))
                     {
-                        Components.Logger.LogInfo("Adding enemy to same side because : " + value.GroupInfo.Cause.ToString());
+                        Components.Logger.LogInfo("Adding enemy because : " + value.GroupInfo.Cause.ToString());
+                        Components.Logger.LogInfo("Has seen enemy : " + (value.GroupInfo.IsHaveSeen ? "YES" : "NO"));
                         StackTrace stackTrace = new StackTrace();
                         string stackTraceString = stackTrace.ToString();
                         Components.Logger.LogInfo("Enemy SameSide Trace: " + stackTraceString);
-                    }*/
+                    }
                     
                     if (value.GroupInfo.Cause == EBotEnemyCause.addBotNoGroup || value.GroupInfo.Cause == EBotEnemyCause.checkAddTODO) return;
 
