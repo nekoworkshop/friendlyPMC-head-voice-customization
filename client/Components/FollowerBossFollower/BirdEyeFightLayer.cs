@@ -263,7 +263,7 @@ namespace friendlyPMC.Components.FollowerBossFollower
 
         public override AICoreActionEndStruct ShallEndCurrentDecision(AICoreActionResultStruct<BotLogicDecision> curDecision)
         {
-            AICoreActionEndStruct? common = followerFightLayer.ShallEndCurrentDecisionAllies(curDecision);
+            AICoreActionEndStruct? common = followerFightLayer.ShallEndCurrentDecisionAllies(curDecision,ordersChanged);
 
             if (common != null) return (AICoreActionEndStruct)common;
 

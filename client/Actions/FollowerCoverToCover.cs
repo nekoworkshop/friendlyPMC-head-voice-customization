@@ -31,7 +31,7 @@ namespace friendlyPMC.Actions
 
             if (botOwner_0.BotFollower.HaveBoss) _coverPerson = botOwner_0.BotFollower.BossToFollow.Player();
 
-            RefreshCoverPoint();
+            
 
             if (botOwner_0.GoToSomePointData.IsCome() || !coverChange)
             {
@@ -39,6 +39,7 @@ namespace friendlyPMC.Actions
                 botOwner_0.StopMove();
                 botOwner_0.Steering.LookToPoint(this.botOwner_0.Memory.GoalEnemy.GetCenterPart());
                 coverChange = false;
+                RefreshCoverPoint();
                 return;
             }
 
@@ -53,7 +54,8 @@ namespace friendlyPMC.Actions
                     sprint = Utils.Utils.GetNavDistance(botOwner_0.GetPlayer.Transform.position, coverPosition.Value) > 20f;
                 }
                 return;
-            }
+            } else
+                RefreshCoverPoint();
 
         }
 
@@ -69,7 +71,7 @@ namespace friendlyPMC.Actions
             Vector3 bossPos = _coverPerson.Transform.position;
             Vector3 targetSpot = new Vector3(
                 Mathf.Floor(bossPos.x / 20f) * 20f,
-                Mathf.Floor(bossPos.y / 20f) * 20f,
+                Mathf.Floor(bossPos.y / 3f) * 3f,
                 Mathf.Floor(bossPos.z / 20f) * 20f
             );
 

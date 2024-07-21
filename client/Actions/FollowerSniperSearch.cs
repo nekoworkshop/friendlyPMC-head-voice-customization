@@ -148,7 +148,7 @@ namespace friendlyPMC.Actions
 
             Vector3 targetSpot = new Vector3(
                 Mathf.Floor(enemyPosition.x / 20f) * 20f,
-                Mathf.Floor(enemyPosition.y / 20f) * 20f,
+                Mathf.Floor(enemyPosition.y / 2f) * 2f,
                 Mathf.Floor(enemyPosition.z / 20f) * 20f
             );
 

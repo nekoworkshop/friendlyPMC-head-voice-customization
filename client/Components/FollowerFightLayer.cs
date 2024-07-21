@@ -1343,7 +1343,7 @@ namespace friendlyPMC.Components
         }
 
 
-        public AICoreActionEndStruct? ShallEndCurrentDecisionAllies(AICoreActionResultStruct<BotLogicDecision> curDecision)
+        public AICoreActionEndStruct? ShallEndCurrentDecisionAllies(AICoreActionResultStruct<BotLogicDecision> curDecision, bool ordersChanged)
         {
             if (!botOwner_0.Memory.HaveEnemy)
             {
@@ -1369,8 +1369,7 @@ namespace friendlyPMC.Components
                 !ordersIgnoreDecisions.Contains(curDecision.Action) &&
                 (
                     !botOwner_0.Memory.HaveEnemy ||
-                    !botOwner_0.Memory.GoalEnemy.HaveSeen ||
-                    (!botOwner_0.Memory.GoalEnemy.IsVisible && Time.time - botOwner_0.Memory.LastEnemyTimeSeen > 1.5f)
+                    !botOwner_0.Memory.GoalEnemy.IsVisible
                 )
             )
             {

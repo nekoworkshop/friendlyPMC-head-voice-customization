@@ -168,7 +168,7 @@ namespace friendlyPMC.Components
         public bool IsBossRequester(IPlayer requester)
         {
 
-            bool isBossCommunicating = requester != null && botOwner_0.BotFollower.BossToFollow.IsMe(requester);
+            bool isBossCommunicating = !botOwner_0.BotFollower.HaveBoss ? false : requester != null && botOwner_0.BotFollower.BossToFollow.IsMe(requester);
 
             return isBossCommunicating;
         }

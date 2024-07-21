@@ -200,11 +200,13 @@ namespace friendlyPMC.Patches
         {
             LocalGame game = LocalGameCtorPatch.Instance;
 
-            var botSpawnerClass = Controller.BotSpawner;
+            BotSpawner botSpawnerClass = Controller.BotSpawner;
 
-            var botGame = AccessTools.Field(typeof(BotSpawner), "_game").GetValue(botSpawnerClass) as IBotGame;
+            IBotGame botGame = AccessTools.Field(typeof(BotSpawner), "_game").GetValue(botSpawnerClass) as IBotGame;
 
-            var dictionary_2 = AccessTools.Field(typeof(LocalGame), "dictionary_2").GetValue(game) as Dictionary<string, Player>;
+            Dictionary<string, Player> dictionary_2 = null;
+
+            dictionary_2 = AccessTools.Field(typeof(LocalGame), "dictionary_2").GetValue(game) as Dictionary<string, Player>;
 
             // recreation of ActivateBot from GClass814
             GClass814.Class509 @class = new GClass814.Class509();
@@ -214,7 +216,6 @@ namespace friendlyPMC.Patches
             @class.callback = callback;
 
             @class.groupAction = groupAction;
-
 
 
             GClass590 bornInfo = new GClass590(position, pointId, false);
@@ -237,6 +238,7 @@ namespace friendlyPMC.Patches
 
             @class.method_0(botOwner);
         }
+
         public async UniTask SpawnBossFollower(pitAIBossPlayer player, WildSpawnType boss = WildSpawnType.bossKnight, CancelToken cancelToken = null)
         {
             
@@ -375,100 +377,120 @@ namespace friendlyPMC.Patches
 
                     }
 
-                    ActivateBot(botCreator, profile, position, closestCorePoint.Id, zone,
-                        new Func<BotOwner, BotZone, BotsGroup>((BotOwner bt, BotZone zn) =>
+                    Action<BotOwner> OnActivate = new Action<BotOwner>((BotOwner owner) =>
+                    {
+                        Action<BotOwner> OnBotState = new Action<BotOwner>((BotOwner me) =>
                         {
-                            return GetPlayerGroup(player, bt, zn);
-                        }),
-                        new Action<BotOwner>((BotOwner owner) =>
-                        {
-                            Action<BotOwner> OnBotState = new Action<BotOwner>((BotOwner me) =>
-                            {
-                                BotOwnerManualUpdatePatch.BotOwnerUpdate.Remove(me.ProfileId); // clear watcher
+                            BotOwnerManualUpdatePatch.BotOwnerUpdate.Remove(me.ProfileId); // clear watcher
 
-                                try
+                            try
+                            {
+                                // prevent attack of player on spawn
+                                me.Memory.DeleteInfoAboutEnemy(player.Player());
+
+                                me.GetPlayer.ActiveHealthController.RestoreFullHealth(); // ensure bot has full health
+
+                                me.Memory.IsPeace = true;
+
+                                // force player side on the bot
+                                if (me.Side != side)
                                 {
-                                    // prevent attack of player on spawn
-                                    me.Memory.DeleteInfoAboutEnemy(player.Player());
-
-                                    me.GetPlayer.ActiveHealthController.RestoreFullHealth(); // ensure bot has full health
-
-                                    me.Memory.IsPeace = true;
-
-                                    // force player side on the bot
-                                    if (me.Side != side)
-                                    {
-                                        me.GetPlayer.Profile.Info.Side = side;
-                                    }
-
-                                    if (!me.IsRole(botRole))
-                                    {
-                                        me.GetPlayer.Profile.Info.Settings.Role = botRole;
-                                    }
-
-                                    // restore original boss logic
-                                    /*if(me.Boss != null && me.Boss.BossLogic != null)
-                                        me.Boss.BossLogic.Dispose();*/
-
-                                    // our Pipe needs the same boss logic as knight due to their shared fighting logic
-                                    if (me.IsRole(WildSpawnType.followerBigPipe))
-                                    {
-                                        if (me.Boss != null)
-                                        {
-                                            if (me.Boss.BossLogic != null)
-                                                me.Boss.BossLogic.Dispose();
-
-                                            me.Boss.BossLogic = new GClass371(me, me.Boss);
-                                            me.Boss.NeedProtection = false;
-                                        }
-
-                                    }
-
-                                    BossPlayers.Instance.AddFollower(me, player, false, botRole); // make bot a follower
-
-                                    Utils.Utils.SetTimeout(() =>
-                                    {
-                                        if (spanwers.Count > 0)
-                                        {
-                                            spanwers[spanwers.Count - 1].Invoke();
-                                            spanwers.RemoveAt(spanwers.Count - 1);
-                                        }
-                                        else
-                                        {
-                                            token.Cancel();
-                                        }
-                                    }, 1000f);
+                                    me.GetPlayer.Profile.Info.Side = side;
                                 }
-                                catch (Exception ex)
+
+                                if (!me.IsRole(botRole))
                                 {
-                                    Components.Logger.LogInfo("Failed to add " + me.Profile.Nickname + " as ally: " + ex.Message);
-                                    Components.Logger.LogInfo("Trace : " + ex.StackTrace);
+                                    me.GetPlayer.Profile.Info.Settings.Role = botRole;
                                 }
-                            });
 
-                            BotOwnerManualUpdatePatch.BotOwnerUpdate.Add(owner.ProfileId, OnBotState);
+                                // restore original boss logic
+                                /*if(me.Boss != null && me.Boss.BossLogic != null)
+                                    me.Boss.BossLogic.Dispose();*/
 
-                            // force player side on the bot
-                            if (owner.Side != side)
-                            {
-                                owner.GetPlayer.Profile.Info.Side = side;
-                            }
+                                // our Pipe needs the same boss logic as knight due to their shared fighting logic
+                                if (me.IsRole(WildSpawnType.followerBigPipe))
+                                {
+                                    if (me.Boss != null)
+                                    {
+                                        if (me.Boss.BossLogic != null)
+                                            me.Boss.BossLogic.Dispose();
 
-                            botSpawnerClass.method_10(owner, bot, new Action<BotOwner>((BotOwner follower) =>
-                            {
-                                Components.Logger.LogInfo("Ally " + follower.Profile.Nickname + " spawned");
+                                        me.Boss.BossLogic = new GClass371(me, me.Boss);
+                                        me.Boss.NeedProtection = false;
+                                    }
+
+                                }
+
+                                BossPlayers.Instance.AddFollower(me, player, false, botRole); // make bot a follower
 
                                 Utils.Utils.SetTimeout(() =>
                                 {
-                                    follower.BotTalk.TrySay(EPhraseTrigger.Ready, false);
-                                },2000);
+                                    if (spanwers.Count > 0)
+                                    {
+                                        spanwers[spanwers.Count - 1].Invoke();
+                                        spanwers.RemoveAt(spanwers.Count - 1);
+                                    }
+                                    else
+                                    {
+                                        token.Cancel();
+                                    }
+                                }, 1000f);
+                            }
+                            catch (Exception ex)
+                            {
+                                Components.Logger.LogInfo("Failed to add " + me.Profile.Nickname + " as ally: " + ex.Message);
+                                Components.Logger.LogInfo("Trace : " + ex.StackTrace);
+                            }
+                        });
 
-                            }), true, stopWatch);
+                        BotOwnerManualUpdatePatch.BotOwnerUpdate.Add(owner.ProfileId, OnBotState);
 
-                        })
-                    ).Forget();
+                        // force player side on the bot
+                        if (owner.Side != side)
+                        {
+                            owner.GetPlayer.Profile.Info.Side = side;
+                        }
 
-                });   
+                        botSpawnerClass.method_10(owner, bot, new Action<BotOwner>((BotOwner follower) =>
+                        {
+                            Components.Logger.LogInfo("Ally " + follower.Profile.Nickname + " spawned");
+
+                            Utils.Utils.SetTimeout(() =>
+                            {
+                                follower.BotTalk.TrySay(EPhraseTrigger.Ready, false);
+                            }, 2000);
+
+                        }), true, stopWatch);
+
+                    });
+
+                    Func<BotOwner, BotZone, BotsGroup> GroupAction = new Func<BotOwner, BotZone, BotsGroup>((BotOwner bt, BotZone zn) =>
+                    {
+                        return GetPlayerGroup(player, bt, zn);
+                    });
+
+                    Type fikaType = Type.GetType("Fika.Core.Coop.GameMode.CoopGame, Fika.Core");
+
+                    if (fikaType != null)
+                    {
+                        botCreator.ActivateBot(
+                            profile,
+                            new GClass590(position, closestCorePoint.Id, false),
+                            zone, true,
+                            GroupAction,
+                            OnActivate,
+                            token.GetCancelToken()
+                        );
+                    }
+                    else
+                    {
+                        ActivateBot(botCreator, profile, position, closestCorePoint.Id, zone,
+                            GroupAction,
+                            OnActivate
+                        ).Forget();
+                    }
+
+            });   
             });
 
             spanwers.Reverse();

@@ -24,7 +24,10 @@ namespace friendlyPMC.Utils
         public GUIContent GuiContent;
         public Rect GuiRect;
 
+        public Rect MarkRect;
+
         public Vector3? EnemyPos = null;
+        public Vector3? EnemyZone = null;
     }
 
     internal class PingTeamates : MonoBehaviour, IDisposable
@@ -37,6 +40,7 @@ namespace friendlyPMC.Utils
         private float nextUpdateTime;
 
         private GUIStyle guiStyle;
+        private GUIStyle makerGuiStyle;
 
         private float screenScale = 1.0f;
 
@@ -124,6 +128,11 @@ namespace friendlyPMC.Utils
             if (guiStyle == null)
             {
                 CreateGuiStyle();
+            }
+
+            if (makerGuiStyle == null)
+            {
+                CreateMarkerGuiStyle();
             }
 
 
@@ -246,8 +255,6 @@ namespace friendlyPMC.Utils
                         bt.GuiRect.size = guiSize;
 
                         GUI.Box(bt.GuiRect, bt.GuiContent.text, guiStyle);
-
-                        
                     }
                 }
         } 
@@ -259,63 +266,61 @@ namespace friendlyPMC.Utils
             if (bt == null || bt.Data == null || !bt.Data.HealthController.IsAlive) return;
 
             Color marker = Color.red;
-            
-            Vector3? targetPosition = null;
 
-            if (bt.Data.Memory.HaveEnemy)
+            if (bt.Data.Memory.HaveEnemy && (bt.Data.Memory.GoalEnemy.IsVisible || bt.Data.Memory.GoalEnemy.HaveSeen))
             {
-                
-                if (bt.Data.Memory.GoalEnemy.IsVisible || bt.Data.Memory.GoalEnemy.HaveSeen)
+                Vector3 enemyPosition = bt.Data.Memory.GoalEnemy.CurrPosition;
+
+                Vector3 targetSpot = new Vector3(
+                    Mathf.Floor(enemyPosition.x / 25f) * 25f,
+                    Mathf.Floor(enemyPosition.y / 25f) * 25f,
+                    Mathf.Floor(enemyPosition.z / 25f) * 25f
+                );
+
+                if (targetSpot != bt.EnemyZone)
                 {
+                    bt.EnemyZone = targetSpot;
+                    bt.EnemyPos = enemyPosition + (Vector3.up * 1.6f);
+                }
 
-                    Vector3 enemyPosition = bt.Data.Memory.GoalEnemy.CurrPosition;
+                marker = bt.Data.Memory.GoalEnemy.IsVisible ? Color.red : Color.yellow;
 
-                    Vector3 targetSpot = new Vector3(
-                        Mathf.Floor(enemyPosition.x / 10f) * 10f,
-                        Mathf.Floor(enemyPosition.y / 10f) * 10f,
-                        Mathf.Floor(enemyPosition.z / 10f) * 10f
-                    );
-
-                    targetPosition = new Vector3(
-                        targetSpot.x,
-                        enemyPosition.y,
-                        targetSpot.z
-                    );
-
-                    bt.EnemyPos = targetSpot;
-                    marker = bt.Data.Memory.GoalEnemy.IsVisible ? Color.red : Color.yellow;
-
-                    foreach (var item in botMap)  
+                foreach (var item in botMap)
+                {
+                    if (item != bt && item.EnemyZone.HasValue && item.EnemyZone == targetSpot && marker != Color.red)
                     {
-                        if(item != bt && item.EnemyPos.HasValue && item.EnemyPos == targetSpot && marker != Color.red)
-                        {
-                            bt.EnemyPos = null;
-                            break;
-                        }
+                        bt.EnemyPos = null;
+                        break;
+                    }
+                }
+
+                if (bt.EnemyPos.HasValue)
+                {
+                    if (bt.MarkRect == null)
+                    {
+                        bt.MarkRect = new Rect();
                     }
 
-                } 
-                else
-                {
-                    bt.EnemyPos = null;
+
+                    Vector3 screenPos = Camera.main.WorldToScreenPoint(bt.EnemyPos.Value);
+                    if (screenPos.z > 0)
+                    {
+                        DrawEnemyMarker(bt, screenPos, marker);
+                    }
+
+                    if (!locationPing)
+                    {
+                        locationPing = true;
+                        float stereoPan = CalculateStereoPane(enemyPosition);
+                        radioSound.PlayLocationSound(stereoPan);
+                    }
                 }
             }
-
-            if(targetPosition.HasValue)
+            else
             {
-                Vector3 screenPos = Camera.main.WorldToScreenPoint(targetPosition.Value + Vector3.up * 2f);
-                if (screenPos.z > 0)
-                {
-                    DrawEnemyMarker(targetPosition.Value, marker);
-                }
-
-                if (!locationPing)
-                {
-                    locationPing = true;
-                    float stereoPan = CalculateStereoPane(targetPosition.Value);
-                    radioSound.PlayLocationSound(stereoPan);
-                }
+                bt.EnemyPos = null;
             }
+
         }
 
         private void CreateGuiStyle()
@@ -334,6 +339,20 @@ namespace friendlyPMC.Utils
            
         }
 
+        private void CreateMarkerGuiStyle()
+        {
+            makerGuiStyle = new GUIStyle(GUI.skin.box);
+            makerGuiStyle.alignment = TextAnchor.MiddleCenter;
+            makerGuiStyle.margin = new RectOffset(0, 0, 0, 0);
+            makerGuiStyle.fontStyle = FontStyle.Bold;
+            makerGuiStyle.fontSize = 20;
+            makerGuiStyle.richText = true;
+            makerGuiStyle.border = new RectOffset(0, 0, 0, 0);
+            makerGuiStyle.normal.background = MakeTexture(new Color(0, 0, 0, 0));
+
+            makerGuiStyle.normal.textColor = Color.white;
+        }
+
         private Texture2D MakeTexture(Color color)
         {
             Texture2D texture = new Texture2D(1, 1);
@@ -344,12 +363,15 @@ namespace friendlyPMC.Utils
 
         private Texture2D CreateTriangleTexture(Color color)
         {
-            Texture2D texture = new Texture2D(30, 30);
-            for (int y = 0; y < 30; y++)
+            int width = 30;
+            int height = 30;
+            Texture2D texture = new Texture2D(width, height);
+
+            for (int y = 0; y < height; y++)
             {
-                for (int x = 0; x < 30; x++)
+                for (int x = 0; x < width; x++)
                 {
-                    if (y <= 14 && x >= y && x <= 29 - y) // Condition for upside-down triangle
+                    if (y <= height / 2 && x >= (height / 2 - y) && x <= (height / 2 + y))
                     {
                         texture.SetPixel(x, y, color);
                     }
@@ -359,25 +381,22 @@ namespace friendlyPMC.Utils
                     }
                 }
             }
+
             texture.Apply();
             return texture;
         }
 
-        private void DrawEnemyMarker(Vector3 enemyPosition, Color cl)
+        private void DrawEnemyMarker(BotData bt, Vector3 markerPos, Color cl)
         {
-            Vector3 screenPos = Camera.main.WorldToScreenPoint(enemyPosition + Vector3.up * 1f);
-            if (screenPos.z > 0)
-            {
-                float animationOffset = Mathf.Sin(Time.time * 5f) * 5f;
-                Vector3 markerPos = new Vector3(screenPos.x, Screen.height - screenPos.y + animationOffset, 0f);
+            float animationOffset = Mathf.Sin(Time.time * 5f) * 5f;
+            
+            float size = 25f;
 
-                Matrix4x4 matrixBackup = GUI.matrix;
-                GUIUtility.RotateAroundPivot(-180, markerPos);
+            bt.MarkRect.x = (markerPos.x * screenScale) - (size / 2);
+            bt.MarkRect.y = Screen.height - ((markerPos.y * screenScale) + size) + animationOffset;
+            bt.MarkRect.size = new Vector2(size, size);
 
-                GUI.DrawTexture(new Rect(markerPos.x, markerPos.y, 25f, 25f), CreateTriangleTexture(cl));
-
-                GUI.matrix = matrixBackup;
-            }
+            GUI.Box(bt.MarkRect, CreateTriangleTexture(cl), makerGuiStyle);
         }
 
         public static void Enable()
