@@ -96,10 +96,9 @@ namespace friendlyPMC.Patches
                     if(BossPlayers.Instance.IsFollower(botOwner_0))
                     {
                         Components.Logger.LogInfo("Adding enemy because : " + value.GroupInfo.Cause.ToString());
-                        Components.Logger.LogInfo("Has seen enemy : " + (value.GroupInfo.IsHaveSeen ? "YES" : "NO"));
                         StackTrace stackTrace = new StackTrace();
                         string stackTraceString = stackTrace.ToString();
-                        Components.Logger.LogInfo("Enemy SameSide Trace: " + stackTraceString);
+                        Components.Logger.LogInfo("Enemy Trace: " + stackTraceString);
                     }
                     
                     if (value.GroupInfo.Cause == EBotEnemyCause.addBotNoGroup || value.GroupInfo.Cause == EBotEnemyCause.checkAddTODO) return;

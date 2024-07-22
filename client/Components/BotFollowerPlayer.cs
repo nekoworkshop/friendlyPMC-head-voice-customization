@@ -79,7 +79,7 @@ namespace friendlyPMC.Components
             /*if (bot.EnemyChooser != null)
                 bot.EnemyChooser.Dispose();
 
-            bot.EnemyChooser = new FollowerEnemyChooser(bot);
+            bot.EnemyChooser = new GClass404(bot);
             bot.EnemyChooser.Activate();*/
 
             bool hadEnemy = _bot.Memory.HaveEnemy;

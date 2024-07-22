@@ -76,7 +76,7 @@ namespace friendlyPMC.Patches
             return AccessTools.Method(typeof(BotOwner), "UpdateManual");
         }
 
-        /*[PatchPrefix]
+        [PatchPrefix]
         private static bool PatchPrefix(BotOwner __instance)
         {
             // followers should not have goals
@@ -94,12 +94,9 @@ namespace friendlyPMC.Patches
                             // check if any enemy is close enough for bot to hear and get next to it
                             EnemyInfo potentialEnemy = __instance.EnemyChooser.FindDangerEnemy();
 
-                            potentialEnemy.GroupInfo.IsHaveSeen = false;
-
                             if (
                                 potentialEnemy != null &&
                                 (
-                                    potentialEnemy.HaveSeen ||
                                     Utils.Utils.GetNavDistance(__instance.GetPlayer.Transform.position, potentialEnemy.Person.Position) < 35f
                                 )
                             )
@@ -120,7 +117,7 @@ namespace friendlyPMC.Patches
             }
 
             return true;
-        }*/
+        }
 
         [PatchPostfix]
         private static void PatchPostfix(BotOwner __instance)
