@@ -375,6 +375,11 @@ namespace friendlyPMC.Modules
             return _bosses[name];
         }
 
+        public Dictionary<string, pitAIBossPlayer> GetBossPlayers()
+        {
+            return _bosses;
+        }
+
         public List<BotFollowerPlayer> GetBossFollowers(string name)
         {
             List<BotFollowerPlayer> botFollowers = new List<BotFollowerPlayer>();

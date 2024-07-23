@@ -1,15 +1,12 @@
-﻿using Cysharp.Threading.Tasks;
-using EFT;
+﻿using EFT;
 using friendlyPMC.Components;
 using HarmonyLib;
+
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 using UnityEngine;
-using UnityEngine.AI;
 
 namespace friendlyPMC.Actions
 {
@@ -21,31 +18,69 @@ namespace friendlyPMC.Actions
 
         private float float_4 = 0f;
         private float float_5 = 0f;
-        
-        private Vector3? _lastTarget;
-        private Vector3? _lastPosition;
-        private Vector3? _lastCover;
-        private Vector3? _lastSpot;
 
-        private float _nextShootPositionUpdateTime = 0f;
+        protected Vector3? _lastTarget;
+        protected Vector3? _lastPosition;
+        protected Vector3? _lastCover;
+        protected Vector3? _lastSpot;
 
-        private bool covering = false;
+        protected float _nextShootPositionUpdateTime = 0f;
 
-        private bool _hasCome = false;
+        protected bool covering = false;
 
-        protected float _minDist = 10f;
+        protected bool _hasCome = false;
 
-        protected float _maxDist = 100f;
+        protected float minDist = 10f;
 
-        private Queue<Action> _actionsQueue = new Queue<Action>();
+        protected float maxDist = 100f;
+
+        protected Queue<Action> _actionsQueue = new Queue<Action>();
+
+        protected bool _init = false;
+
+        protected BotLogicDecision Action = (BotLogicDecision)CustomBotDecisions.SniperSearch;
         public FollowerSniperSearch(BotOwner bot) : base(bot)
         {
+            
+        }
 
+        protected virtual void Init()
+        {
+            (botOwner_0.Brain.Agent as FollowerAIAgent<BotLogicDecision>).OnUpdate += OnAgentUpdate;
+            (botOwner_0.Brain.Agent as FollowerAIAgent<BotLogicDecision>).OnDispose += OnAgentDispose;
+        }
+        protected void OnAgentUpdate(AICoreActionResultStruct<BotLogicDecision> decision)
+        {
+            if (
+                decision.Action != Action
+            )
+            {
+                _actionsQueue.Clear();
+            }
+        }
+
+        protected void OnAgentDispose(object sender, EventArgs e)
+        {
+            _actionsQueue?.Clear();
+            (botOwner_0.Brain.Agent as FollowerAIAgent<BotLogicDecision>).OnUpdate -= OnAgentUpdate;
+            (botOwner_0.Brain.Agent as FollowerAIAgent<BotLogicDecision>).OnDispose -= OnAgentDispose;
         }
 
         public override void Update()
         {
             botOwner_0.DoorOpener.Update();
+
+            try
+            {
+                if (!_init)
+                {
+                    Init();
+                    _init = true;
+                }
+            } catch (Exception ex)
+            {
+                Components.Logger.LogInfo("Failed to init Search" + ex.Message);
+            }
 
             if (!botOwner_0.Memory.HaveEnemy) return;
 
@@ -75,7 +110,7 @@ namespace friendlyPMC.Actions
                 _hasCome = false;
 
                 if (!covering)
-                    botOwner_0.Steering.LookToDirection(botOwner_0.Memory.GoalEnemy.CurrPosition - botOwner_0.GetPlayer.Transform.position, 90f);
+                    botOwner_0.Steering.LookToPoint(botOwner_0.Memory.GoalEnemy.GetCenterPart());
                 else
                     botOwner_0.LookData.SetLookPointByHearing(null);
 
@@ -122,13 +157,13 @@ namespace friendlyPMC.Actions
                 }
 
                 botOwner_0.GoToSomePointData.SetPoint((Vector3)spotPosition);
-                bool sprint = Utils.Utils.GetNavDistance(botOwner_0.GetPlayer.Transform.position, (Vector3)spotPosition) > 20f;
+                sprint = Utils.Utils.GetNavDistance(botOwner_0.GetPlayer.Transform.position, (Vector3)spotPosition) > 20f;
                 botOwner_0.GoToSomePointData.UpdateToGo(sprint);
 
                 if (covering)
                     botOwner_0.Steering.LookToMovingDirection();
                 else
-                    botOwner_0.Steering.LookToDirection(botOwner_0.Memory.GoalEnemy.CurrPosition - botOwner_0.GetPlayer.Transform.position, 90f);
+                    botOwner_0.Steering.LookToPoint(botOwner_0.Memory.GoalEnemy.GetCenterPart());
 
             }
             else
@@ -142,7 +177,7 @@ namespace friendlyPMC.Actions
             }
         }
 
-        private void RefreshSearchPoint()
+        protected void RefreshSearchPoint()
         {
             Vector3 enemyPosition = botOwner_0.Memory.GoalEnemy.CurrPosition;
 
@@ -175,7 +210,7 @@ namespace friendlyPMC.Actions
                 botOwner_0.Steering.LookToPoint(botOwner_0.Memory.GoalEnemy.GetCenterPart());
         }
 
-        private void UpdateShootPosition()
+        protected virtual void UpdateShootPosition()
         {
             if (_nextShootPositionUpdateTime > Time.time) return;
 
@@ -214,8 +249,8 @@ namespace friendlyPMC.Actions
                     botOwner_0.GetPlayer.Transform.position,
                     enemySpot,
                     areaCovers,
-                    _minDist, 
-                    _maxDist,
+                    minDist, 
+                    maxDist,
                     carePosition,
                     false
                 );
@@ -233,8 +268,8 @@ namespace friendlyPMC.Actions
                             botOwner_0.GetPlayer.Transform.position,
                             shootTarget,
                             botOwner_0.LookSensor.Mask,
-                            _minDist,
-                            _maxDist
+                            minDist,
+                            maxDist
                         );
 
                         if (!_lastPosition.HasValue && botOwner_0.BotFollower.HaveBoss)

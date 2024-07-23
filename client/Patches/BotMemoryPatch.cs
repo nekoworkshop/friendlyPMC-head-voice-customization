@@ -90,18 +90,22 @@ namespace friendlyPMC.Patches
                     var botOwner_0 = AccessTools.Field(typeof(BotMemoryClass), "botOwner_0").GetValue(__instance) as BotOwner;
                     var enemyInfo_0 = AccessTools.Field(typeof(BotMemoryClass), "enemyInfo_0").GetValue(__instance) as EnemyInfo;
 
-                    if (enemyInfo_0 == value) return;
-                    
-                    // - prevent follower from adding an enemy they never encountered but "sense" it
-                    if(BossPlayers.Instance.IsFollower(botOwner_0))
+                    //if (enemyInfo_0 == value) return;
+
+                    // - prevent follower from adding an enemy they never encountered but "sensed" it
+                    if (BossPlayers.Instance.IsFollower(botOwner_0))
                     {
                         Components.Logger.LogInfo("Adding enemy because : " + value.GroupInfo.Cause.ToString());
                         StackTrace stackTrace = new StackTrace();
                         string stackTraceString = stackTrace.ToString();
                         Components.Logger.LogInfo("Enemy Trace: " + stackTraceString);
                     }
-                    
-                    if (value.GroupInfo.Cause == EBotEnemyCause.addBotNoGroup || value.GroupInfo.Cause == EBotEnemyCause.checkAddTODO) return;
+
+                    if (
+                        value.GroupInfo.Cause == EBotEnemyCause.addBotNoGroup || 
+                        value.GroupInfo.Cause == EBotEnemyCause.checkAddTODO ||
+                        value.GroupInfo.Cause == EBotEnemyCause.addPlayerToBoss
+                        ) return;
 
                     Task.Run(() =>
                     {

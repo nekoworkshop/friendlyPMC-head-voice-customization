@@ -199,7 +199,7 @@ namespace friendlyPMC
             harmony.PatchAll(typeof(GoalEnemyTracePatch).Assembly);
             harmony.PatchAll(typeof(LocalGameCtorPatch).Assembly);
 
-            SAINPatch.PatchSAINIfInstalled();
+            //SAINPatch.PatchSAINIfInstalled();
 
         }
 

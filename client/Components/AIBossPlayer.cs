@@ -293,7 +293,7 @@ namespace friendlyPMC.Components
                 {
                     if (_aiplayer.bossGroup != null)
                     {
-                        _aiplayer.bossGroup.CheckAndAddEnemy(arg1.Player.AIData.BotOwner);
+                        _aiplayer.bossGroup.AddEnemy(arg1.Player.AIData.BotOwner, EBotEnemyCause.addPlayerToBoss);
                     }
 
                     _aiplayer.AddEnemy(arg1.Player.AIData.BotOwner);

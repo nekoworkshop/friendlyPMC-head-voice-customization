@@ -265,9 +265,7 @@ namespace friendlyPMC.Utils
 
             if (bt == null || bt.Data == null || !bt.Data.HealthController.IsAlive) return;
 
-            Color marker = Color.red;
-
-            if (bt.Data.Memory.HaveEnemy && (bt.Data.Memory.GoalEnemy.IsVisible || bt.Data.Memory.GoalEnemy.HaveSeen))
+            if (bt.Data.Memory.HaveEnemy)
             {
                 Vector3 enemyPosition = bt.Data.Memory.GoalEnemy.CurrPosition;
 
@@ -283,11 +281,11 @@ namespace friendlyPMC.Utils
                     bt.EnemyPos = enemyPosition + (Vector3.up * 1.6f);
                 }
 
-                marker = bt.Data.Memory.GoalEnemy.IsVisible ? Color.red : Color.yellow;
+                Color marker = bt.Data.Memory.GoalEnemy.IsVisible ? Color.red : Color.yellow;
 
                 foreach (var item in botMap)
                 {
-                    if (item != bt && item.EnemyZone.HasValue && item.EnemyZone == targetSpot && marker != Color.red)
+                    if (item != bt && item.EnemyPos.HasValue && item.EnemyZone.HasValue && item.EnemyZone == targetSpot && marker != Color.red)
                     {
                         bt.EnemyPos = null;
                         break;

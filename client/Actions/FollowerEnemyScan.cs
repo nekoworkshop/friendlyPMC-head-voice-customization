@@ -1,4 +1,5 @@
-﻿using EFT;
+﻿using ChartAndGraph;
+using EFT;
 using LootingBots.Patch.Util;
 using RootMotion.FinalIK;
 using System;
@@ -78,18 +79,35 @@ namespace friendlyPMC.Actions
                 
                 if (bot.Memory.HaveEnemy && bot.Memory.GoalEnemy.ProfileId == closet.Profile.ProfileId) return;
 
-                bot.BotsGroup.AddEnemy(closet.AIData.Player, EBotEnemyCause.addPlayerToBoss);
-                bot.Memory.AddEnemy(closet, new BotSettingsClass(closet, bot.BotsGroup, EBotEnemyCause.checkAddTODO), false);
+                bot.BotsGroup.AddEnemy(closet, EBotEnemyCause.addPlayerToBoss);
+
+                if (bot.Memory.HaveEnemy) return;
+
+                BotSettingsClass groupInfo = new BotSettingsClass(closet, bot.BotsGroup, EBotEnemyCause.addPlayerToBoss);
+
+                bot.Memory.AddEnemy(closet, groupInfo, false);
+                
                 Components.Logger.LogInfo("Making " + closet.Profile.Nickname + " enemy to others");
+
                 EnemyInfo info;
+
                 bot.EnemiesController.EnemyInfos.TryGetValue(closet, out info);
-                if (info != null && (!bot.Memory.HaveEnemy || !bot.Memory.GoalEnemy.HaveSeen ||  Time.time - bot.Memory.GoalEnemy.PersonalLastSeenTime > 4f))
+                
+                if(info == null)
+                {
+                    info = bot.EnemiesController.AddNew(bot.BotsGroup, closet, groupInfo);
+                }
+
+                if (info != null)
                 {
                     info.PriorityIndex = 0;
-                    info.SetVisible(true);
-                    bot.Memory.GoalEnemy = info;
+                    if (!bot.Memory.HaveEnemy)
+                    {
+                        info.SetVisible(true);
+                        bot.Memory.GoalEnemy = info;
 
-                    Components.Logger.LogInfo("Made " + closet.Profile.Nickname + " an enemy");
+                        Components.Logger.LogInfo("Made " + closet.Profile.Nickname + " an active enemy to " + bot.Profile.Nickname);
+                    }
                 }
             }
         }

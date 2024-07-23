@@ -49,23 +49,24 @@ namespace friendlyPMC.Patches
 
                 Components.Logger.LogInfo("Enable SAIN PATCH");
 
-                if (classType != null)
+                /*if (classType != null)
                 {
                     // disable this for followers
-                    harmony.Patch(AccessTools.Method(classType, "Update"), new HarmonyMethod(typeof(SAINPatch).GetMethod(nameof(PatchAssignActiveEnemy), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance)));
-                }
+                    harmony.Patch(AccessTools.Method(classType, "assignActiveEnemy"), new HarmonyMethod(typeof(SAINPatch).GetMethod(nameof(PatchAssignActiveEnemy), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance)));
+                }*/
 
                 if(squadType != null)
                 {
                     // disable this for followers
                     harmony.Patch(AccessTools.Method(squadType, "clearPlayerPlace"), new HarmonyMethod(typeof(SAINPatch).GetMethod(nameof(PatchClearPlayerPlace), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance)));
 
+                    // this should not run for the boss player group
                     harmony.Patch(AccessTools.Method(squadType, "calcGoalForBot"), new HarmonyMethod(typeof(SAINPatch).GetMethod(nameof(PatchCalcGoalForBot), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance)));
                 }
 
-                if(targetType != null)
+                /*if(targetType != null)
                     // disable this for followers
-                    harmony.Patch(AccessTools.Method(targetType, "updateGoalTarget"), new HarmonyMethod(typeof(SAINPatch).GetMethod(nameof(PatchUpdateGoalTarget), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance)));
+                    harmony.Patch(AccessTools.Method(targetType, "updateGoalTarget"), new HarmonyMethod(typeof(SAINPatch).GetMethod(nameof(PatchUpdateGoalTarget), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance)));*/
 
                 if (hearingType != null)
                     harmony.Patch(AccessTools.Method(hearingType, "CheckCalcGoal"), new HarmonyMethod(typeof(SAINPatch).GetMethod(nameof(PatchCheckCalcGoal), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance)));
@@ -154,7 +155,6 @@ namespace friendlyPMC.Patches
 
                             if (botOwner != null && BossPlayers.Instance.IsFollower(botOwner))
                             {
-                                // this should not run for the boss player group
                                 allow = false;
                                 break;
                             }
@@ -170,7 +170,7 @@ namespace friendlyPMC.Patches
 
         private static bool PatchCalcGoalForBot(object __instance, BotOwner botOwner)
         {
-            return BossPlayers.Instance.IsFollower(botOwner);
+            return !BossPlayers.Instance.IsFollower(botOwner);
         }
 
         private static bool PatchUpdateGoalTarget(object __instance)

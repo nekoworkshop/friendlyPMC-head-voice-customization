@@ -18,6 +18,8 @@ namespace friendlyPMC.Utils
             }
 
             Vector3 requestPos = requester.Transform.position;
+            
+            request.Complete();
 
             float randomX = GClass761.Random(-5f, 5f);
             float randomZ = GClass761.Random(-5f, 5f);
@@ -33,8 +35,6 @@ namespace friendlyPMC.Utils
             bool shouldSprint01 = Vector3.Distance(point, bot.GetPlayer.Transform.position) >= sprintDistance;
             bot.GoToSomePointData.UpdateToGo(shouldSprint01);
             if (!shouldSprint01) bot.Sprint(false);
-
-            request.Complete();
 
             return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.goToPoint, shouldSprint01 ? "regroupToBossFast" : "regroupToBoss");
         }

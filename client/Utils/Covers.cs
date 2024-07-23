@@ -109,8 +109,6 @@ namespace friendlyPMC.Utils
 
             }, safeDistance);
 
-            // if (pt == null) Components.Logger.LogInfo("GetClosestCoverPointBetween gave NULL Cover");
-
             return pt;
         }
         /**
@@ -359,23 +357,8 @@ namespace friendlyPMC.Utils
 
             return closest;
         }
-        /** Helper function to filter items in an array **/
-        private static async UniTask<List<T>> CoversFilterAsync<T>(List<T> list, Func<T,bool> action)
-        {
-            List<T> result = new List<T>();
 
-            foreach (var item in list)
-            {
-                if (action(item)) result.Add(item);
-            }
-
-            await UniTask.Yield(PlayerLoopTiming.Update);
-
-            return result;
-        }
-
-
-        private static bool IsPointBetween(Vector3 point, Vector3 start, Vector3 end)
+        public static bool IsPointBetween(Vector3 point, Vector3 start, Vector3 end)
         {
             if (point.x >= start.x && point.y >= start.y && point.z >= start.z)
             {
@@ -435,7 +418,7 @@ namespace friendlyPMC.Utils
             return null;
         }
         /** (V2) Find a position from where the bot can shoot at the given target **/
-        public static Vector3? FindShootPosition(Vector3 botPosition, ShootPointClass shootTarget, LayerMask Mask, float minDistance, float maxRadius)
+        public static Vector3? FindShootPosition(Vector3 botPosition, ShootPointClass shootTarget, LayerMask Mask, float minDistance, float maxRadius, Func<Vector3, bool> eligibleCheck = null)
         {
             Vector3 targetPosition = shootTarget.Point;
 
@@ -457,6 +440,8 @@ namespace friendlyPMC.Utils
                 if (!GClass326.IsDangerPositionFarEnough(navMeshHit.position, new Vector3[] { targetPosition }, minDistance * minDistance)) continue;
 
                 if (!IsNavigablePoint(botPosition, navMeshHit.position, 150f, mesh)) continue;
+
+                if (eligibleCheck != null && !eligibleCheck(navMeshHit.position)) continue;
 
                 if (GClass301.CanShootToTarget(shootTarget, navMeshHit.position, Mask, false))
                 {

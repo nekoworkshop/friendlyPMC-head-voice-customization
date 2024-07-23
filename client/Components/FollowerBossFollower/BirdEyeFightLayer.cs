@@ -267,14 +267,6 @@ namespace friendlyPMC.Components.FollowerBossFollower
 
             if (common != null) return (AICoreActionEndStruct)common;
 
-            if(curDecision.Action == (BotLogicDecision)CustomBotDecisions.SniperSearch)
-            {
-                return followerFightLayer.EndSniperSearch();
-            } else if (curDecision.Action == (BotLogicDecision)CustomBotDecisions.CoverToCover)
-            {
-                return followerFightLayer.EndCoverToCover();
-            }
-
             return base.ShallEndCurrentDecision(curDecision);
         }
 

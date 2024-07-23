@@ -276,10 +276,11 @@ namespace friendlyPMC.Components
                 if (_bot != null && !_bot.IsDead && _bot.BotState == EBotState.Active && _bot.Memory.HaveEnemy)
                 {
                     _bot.Memory.DeleteInfoAboutEnemy(_bot.Memory.GoalEnemy.Person);
+                    _bot.Memory.GoalEnemy = null;
                 }
-            }, 0.1f);
+            }, 100f);
 
-            //_bot.GetPlayer.BeingHitAction += BeingHitAction;
+            _bot.GetPlayer.BeingHitAction += BeingHitAction;
 
             Logger.LogInfo($"Bot {_bot.Profile.Nickname} is now a follower of {_player.Player().Profile.Nickname}");
 
@@ -293,9 +294,9 @@ namespace friendlyPMC.Components
             if(!_bot.Memory.HaveEnemy && damageInfo.Player != null)
             {
                 Vector3? pos = damageInfo.Player.iPlayer?.Position;
-                if(pos != null)
+                if (pos.HasValue)
                 {
-                    _bot.Steering.LookToDirection((Vector3)pos - _bot.GetPlayer.Transform.position,90f);
+                    _bot.Steering.LookToPoint((Vector3)pos,90f);
                 }
             }
         }
@@ -309,7 +310,7 @@ namespace friendlyPMC.Components
         {
             string name = bot.name + " " + _botRole.ToString();
 
-            return new AICoreAgentClass<BotLogicDecision>(bot.BotsController.AICoreController, bot.Brain.BaseBrain, FollowerCreateNode.ActionsList(bot), bot.gameObject, name, new Func<BotLogicDecision, GClass134>((BotLogicDecision decision) =>
+            return new FollowerAIAgent<BotLogicDecision>(bot.BotsController.AICoreController, bot.Brain.BaseBrain, FollowerCreateNode.ActionsList(bot), bot.gameObject, name, new Func<BotLogicDecision, GClass134>((BotLogicDecision decision) =>
             {
                 return FollowerCreateNode.CreateNode(decision, bot);
             }));

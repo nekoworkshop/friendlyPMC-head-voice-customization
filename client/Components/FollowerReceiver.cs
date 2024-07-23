@@ -486,16 +486,22 @@ namespace friendlyPMC.Components
                     {
                         FollowerRegroup gclass = new FollowerRegroup(requester);
 
-                        if (botOwner_0.BotsGroup.RequestsController.TryAddRequest(gclass))
+                        gclass.AddPossibleExecutors(botOwner_0);
+
+                        if (botOwner_0.AIData.AskRequests.TryAdd(gclass, botOwner_0.BotsGroup.RequestsController))
                         {
                             Components.Logger.LogInfo("Proceed to regroup");
-                            gclass.AddPossibleExecutors(botOwner_0);
-                            gclass.SetGroup(botOwner_0.BotsGroup.RequestsController);
+
                             if (isClose && (notBusy || !botOwner_0.Memory.GoalEnemy.IsVisible))
                             {
                                 botOwner_0.BotTalk.TrySay(EPhraseTrigger.Roger, false);
                                 botOwner_0.Gesture.TryGestus(EGesture.Good, false);
                             }
+
+                        }
+                        else if (isClose && (notBusy || !botOwner_0.Memory.GoalEnemy.IsVisible))
+                        {
+                            botOwner_0.BotRequestController.TrySayNegative(requester, gclass.BotRequestType);
                         }
                     }
                 }
@@ -504,11 +510,13 @@ namespace friendlyPMC.Components
                     FollowerGoCheck gclass = new FollowerGoCheck(requester, BotRequestType.followMe);
                     if (
                         gclass.CanRequest(botOwner_0) &&
-                        botOwner_0.BotsGroup.RequestsController.TryAddRequest(gclass)
+                        botOwner_0.AIData.AskRequests.TryAdd(gclass, botOwner_0.BotsGroup.RequestsController)
                     )
                     {
                         gclass.AddPossibleExecutors(botOwner_0);
-                        gclass.SetGroup(botOwner_0.BotsGroup.RequestsController);
+                    } else
+                    {
+                        botOwner_0.BotRequestController.TrySayNegative(requester, gclass.BotRequestType);
                     }
                 }
                 // on need help closest bot shall come near boss
@@ -550,13 +558,12 @@ namespace friendlyPMC.Components
 
                         Player alivePlayerByProfileID = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(requester.ProfileId);
 
-                        if (botOwner_0.BotRequestController.TryStopCurrent(alivePlayerByProfileID, true))
+                        if (
+                            botOwner_0.BotRequestController.TryStopCurrent(alivePlayerByProfileID, true) &&
+                            botOwner_0.AIData.AskRequests.TryAdd(gclass, botOwner_0.BotsGroup.RequestsController)
+                        )
                         {
-                            if (botOwner_0.BotsGroup.RequestsController.TryAddRequest(gclass))
-                            {
-                                gclass.AddPossibleExecutors(botOwner_0);
-                                gclass.SetGroup(botOwner_0.BotsGroup.RequestsController);
-                            }
+                            gclass.AddPossibleExecutors(botOwner_0);
                         }
                     }
                 }

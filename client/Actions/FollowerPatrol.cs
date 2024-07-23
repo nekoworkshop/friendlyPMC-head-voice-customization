@@ -74,7 +74,6 @@ namespace friendlyPMC.Actions
                     if (this.bool_0)
                     {
                         this.botOwner_0.StopMove();
-                        Components.Logger.LogInfo("StopMove");
                         return;
                     }
 

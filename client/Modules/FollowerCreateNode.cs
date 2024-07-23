@@ -40,7 +40,7 @@ namespace friendlyPMC.Modules
             if(type == (BotLogicDecision)CustomBotDecisions.CoverToCover)
                 return new FollowerCoverToCover(bot);
 
-            if(type == BotLogicDecision.search)
+            if (type == (BotLogicDecision)CustomBotDecisions.EnemySearch)
                 return new FollowerSearch(bot);
 
             return GClass459.CreateNode(type, bot);
@@ -70,6 +70,7 @@ namespace friendlyPMC.Modules
 
             smethod_0(dictionary, (BotLogicDecision)CustomBotDecisions.SniperSearch, bot);
             smethod_0(dictionary, (BotLogicDecision)CustomBotDecisions.CoverToCover, bot);
+            smethod_0(dictionary, (BotLogicDecision)CustomBotDecisions.EnemySearch, bot);
 
             smethod_0(dictionary, BotLogicDecision.shootFromCover, bot);
             smethod_0(dictionary, BotLogicDecision.runAwayGrenade, bot);

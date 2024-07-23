@@ -608,12 +608,10 @@ namespace friendlyPMC.Patches
                     botCreator, profile, position, closestCorePoint.Id, zone,
                     new Func<BotOwner, BotZone, BotsGroup>((BotOwner bt, BotZone zn) =>
                     {
-                        Components.Logger.LogInfo("Followers group get");
                         return GetPlayerGroup(player, bt, zn);
 
                     }), new Action<BotOwner>((BotOwner owner) =>
                     {
-                        Components.Logger.LogInfo("Folowers callback");
 
                         bool shallBeGroup = bot.SpawnParams?.ShallBeGroup != null;
 

@@ -246,8 +246,9 @@ namespace friendlyPMC.Components.BossFollower
                 {
                     if (botOwner_0.Memory.GoalEnemy != null && botOwner_0.Memory.GoalEnemy.CanShoot && botOwner_0.Memory.GoalEnemy.IsVisible)
                     {
-                        return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.shootFromPlace, "enemyNear");
+                        return followerFightLayer.DogFight();
                     }
+
                     GetClosestAttackCoverPoint(botOwner_0.Memory.GoalEnemy.CurrPosition,10f);
                     if(customNavigationPoint_0 != null)
                         return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMoving, "enemyNear");
@@ -275,8 +276,9 @@ namespace friendlyPMC.Components.BossFollower
                 {
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.heal, "HealInCover");
                 }
+
                 IL_19D:
-                return method_22("runToEnemy");
+                return KnightAssault();
             }
 
             int num = (botOwner_0.BotsGroup.MembersCount > 1) ? 1 : 2;
@@ -321,13 +323,13 @@ namespace friendlyPMC.Components.BossFollower
                 
                 if (method_12() && botOwner_0.Memory.GoalEnemy.CanShoot && botOwner_0.Memory.GoalEnemy.IsVisible)
                 {
-                    return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.shootFromPlace, "sfps1");
+                    return followerFightLayer.DogFight();
                 }
-                // temporary disabled
-                /*if (followerFightLayer.IsEnemyLowThreat() && Utils.EnemyInfo.Distance(botOwner_0) < Utils.EnemyInfo.EnemyDistance.Distant)
+
+                if (followerFightLayer.IsEnemyLowThreat() && Utils.EnemyInfo.Distance(botOwner_0) < Utils.EnemyInfo.EnemyDistance.Mid)
                 {
                     return KnightAssault();
-                }*/
+                }
             }
 
             return null;

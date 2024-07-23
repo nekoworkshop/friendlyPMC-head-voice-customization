@@ -163,6 +163,7 @@
     <Compile Include="Components\BossFollowerPlayer.cs" />
     <Compile Include="Components\BossFollower\BossFollowLayer.cs" />
     <Compile Include="Components\BossFollower\KnightFollowerBrain.cs" />
+    <Compile Include="Components\FollowerAIAgent.cs" />
     <Compile Include="Components\FollowerBossFollower\BigPipeArtilleryLayer.cs" />
     <Compile Include="Components\FollowerBossFollower\BigPipeFollowerBrain.cs" />
     <Compile Include="Components\FollowerBossFollower\BirdEyeFightLayer.cs" />
@@ -171,6 +172,7 @@
     <Compile Include="Components\FollowerEnemyChooser.cs" />
     <Compile Include="Modules\FollowerCreateNode.cs" />
     <Compile Include="Modules\RadioSound.cs" />
+    <Compile Include="Patches\BotHearingSensorPatch.cs" />
     <Compile Include="Patches\BotMemoryPatch.cs" />
     <Compile Include="Patches\GestureMenuPatch.cs" />
     <Compile Include="Patches\SAINPatch.cs" />

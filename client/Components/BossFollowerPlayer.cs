@@ -30,7 +30,7 @@ namespace friendlyPMC.Components
         public override void SetFollowerSettings(BotOwner bot)
         {
             settingModif.AccuratySpeedCoef = 1.5f;
-            settingModif.ScatteringCoef = 1.5f;
+            settingModif.ScatteringCoef = 0.5f;
 
             base.SetFollowerSettings(bot);
             
@@ -74,7 +74,6 @@ namespace friendlyPMC.Components
                         if (!_initialBot.Settings.FileSettings.Mind.DEFAULT_BEAR_BEHAVIOUR.HasFlag(EWarnBehaviour.Attack))
                         {
                             bot.Settings.FileSettings.Mind.FRIENDLY_BOT_TYPES = bot.Settings.FileSettings.Mind.FRIENDLY_BOT_TYPES.AddItem(botType).ToArray();
-                            bot.Settings.FileSettings.Mind.WARN_BOT_TYPES = bot.Settings.FileSettings.Mind.WARN_BOT_TYPES.AddItem(botType).ToArray();
                         } else
                         {
                             bot.Settings.FileSettings.Mind.ENEMY_BOT_TYPES = bot.Settings.FileSettings.Mind.ENEMY_BOT_TYPES.AddItem(botType).ToArray();
@@ -86,7 +85,6 @@ namespace friendlyPMC.Components
                         if (!_initialBot.Settings.FileSettings.Mind.DEFAULT_USEC_BEHAVIOUR.HasFlag(EWarnBehaviour.Attack))
                         {
                             bot.Settings.FileSettings.Mind.FRIENDLY_BOT_TYPES = bot.Settings.FileSettings.Mind.FRIENDLY_BOT_TYPES.AddItem(botType).ToArray();
-                            bot.Settings.FileSettings.Mind.WARN_BOT_TYPES = bot.Settings.FileSettings.Mind.WARN_BOT_TYPES.AddItem(botType).ToArray();
                         }
                         else
                         {
