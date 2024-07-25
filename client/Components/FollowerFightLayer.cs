@@ -888,8 +888,6 @@ namespace friendlyPMC.Components
 
             Vector3 interestPosition = HasBoss() ? GetBoss().Position : botOwner_0.GetPlayer.Transform.position;
 
-            if (ordersAreAttack) Components.Logger.LogInfo("orders are to attack");
-
             if (allyTactic) return DefendPosition(interestPosition);
             else if ((ordersAreHold || holdTactic) && !ordersAreAttack) return DefendPosition(interestPosition);
             else if (ordersAreAttack || rushTactic) return EngageEnemy(ordersAreAttack);
