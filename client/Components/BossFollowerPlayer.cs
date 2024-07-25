@@ -29,12 +29,14 @@ namespace friendlyPMC.Components
 
         public override void SetFollowerSettings(BotOwner bot)
         {
-            settingModif.AccuratySpeedCoef = 1.5f;
-            settingModif.ScatteringCoef = 0.5f;
+
+            settingModif.PrecicingSpeedCoef = 1.35f;
+            settingModif.AccuratySpeedCoef = 1.35f;
+            settingModif.ScatteringCoef = 1.7f;
 
             base.SetFollowerSettings(bot);
             
-            bot.Settings.FileSettings.Core.HearingSense = 1.0f;
+            //bot.Settings.FileSettings.Core.HearingSense = 1.0f;
 
 
             if (bot.IsRole(WildSpawnType.followerBirdEye))
@@ -117,9 +119,6 @@ namespace friendlyPMC.Components
             }
 
             bot.Tactic.AggressionChange(-1f);
-
-            settingModif.PrecicingSpeedCoef = 1.35f;
-            settingModif.AccuratySpeedCoef = 1.35f;
         }
 
         public override FollowerBrain GetFollowerBrain(BotOwner bot, pitAIBossPlayer boss)

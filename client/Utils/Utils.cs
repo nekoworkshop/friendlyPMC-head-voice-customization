@@ -5,6 +5,8 @@ using UnityEngine;
 using friendlyPMC.Components;
 using System;
 using System.Timers;
+using System.Threading.Tasks;
+using System.Threading;
 
 namespace friendlyPMC.Utils
 {
@@ -43,19 +45,17 @@ namespace friendlyPMC.Utils
             return (pitAIBossPlayer)botOwner.BotFollower.BossToFollow;
         }
         /** Recreation of javascript SetTimeout **/
-        public static GClass552.IBotTimer SetTimeout(Action func, float timer, bool isLopped = false)
+        public static GClass552.Class260 SetTimeout(Action func, int timer, bool isLopped = false)
         {
-            Timer time = new Timer(timer);
+            float num = timer / 1000;
 
             GClass552.Class261 @class = new GClass552.Class261();
-
-            var duration = TimeSpan.FromSeconds(timer / 1000);
-            
-            float num = (float)duration.TotalSeconds;
-
-            @class.gclass552_0 = null;
+            @class.gclass552_0 = StaticManager.Instance.TimerManager;
             @class.timer = new GClass552.Class260();
-            @class.timer.Init(() => { }, () =>
+            @class.timer.Init(new Action(@class.method_0), new Action(@class.method_1));
+            @class.timer.Start(Time.time + num, num, isLopped);
+
+            @class.timer.OnTimer += () =>
             {
                 try
                 {
@@ -66,9 +66,9 @@ namespace friendlyPMC.Utils
                     Components.Logger.LogInfo($"Exception in SetTimeout: {ex.Message}");
                     Components.Logger.LogInfo($"StackTrace in SetTimeout: {ex.StackTrace}");
                 }
-            });
+            };
 
-            @class.timer.Start(Time.time + num, num, isLopped);
+
             return @class.timer;
         }
         /** Shortcut to EFT method of doign MakeTimer in relation to bot activity **/

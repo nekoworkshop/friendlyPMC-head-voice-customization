@@ -278,12 +278,13 @@ namespace friendlyPMC.Components
                         
                         if (botOwner_0.BotRequestController.TryStopCurrent(alivePlayerByProfileID, false))
                         {
+
                             (botOwner_0.Brain.BaseBrain as FollowerBrain).BossOrdersChanged();
+
                             // if has enemy, on "That direction" rush the enemy
                             if (botOwner_0.Memory.HaveEnemy)
                             {
                                 FollowerRushEnemy gclass = new FollowerRushEnemy(botOwner_0, alivePlayerByProfileID,BotRequestType.attackClose);
-
                                 if (botOwner_0.BotsGroup.RequestsController.TryAddRequest(gclass))
                                 {
                                     gclass.AddPossibleExecutors(botOwner_0);
@@ -478,7 +479,6 @@ namespace friendlyPMC.Components
                 {
                     (botOwner_0.Brain.BaseBrain as FollowerBrain).BossOrdersChanged();
 
-                    Components.Logger.LogInfo("Boss said Regroup");
 
                     Player alivePlayerByProfileID = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(requester.ProfileId);
 
@@ -486,18 +486,15 @@ namespace friendlyPMC.Components
                     {
                         FollowerRegroup gclass = new FollowerRegroup(requester);
 
-                        gclass.AddPossibleExecutors(botOwner_0);
-
-                        if (botOwner_0.AIData.AskRequests.TryAdd(gclass, botOwner_0.BotsGroup.RequestsController))
+                        if (botOwner_0.BotsGroup.RequestsController.TryAddRequest(gclass))
                         {
-                            Components.Logger.LogInfo("Proceed to regroup");
-
+                            gclass.AddPossibleExecutors(botOwner_0);
+                            gclass.SetGroup(botOwner_0.BotsGroup.RequestsController);
                             if (isClose && (notBusy || !botOwner_0.Memory.GoalEnemy.IsVisible))
                             {
                                 botOwner_0.BotTalk.TrySay(EPhraseTrigger.Roger, false);
                                 botOwner_0.Gesture.TryGestus(EGesture.Good, false);
                             }
-
                         }
                         else if (isClose && (notBusy || !botOwner_0.Memory.GoalEnemy.IsVisible))
                         {
@@ -510,10 +507,11 @@ namespace friendlyPMC.Components
                     FollowerGoCheck gclass = new FollowerGoCheck(requester, BotRequestType.followMe);
                     if (
                         gclass.CanRequest(botOwner_0) &&
-                        botOwner_0.AIData.AskRequests.TryAdd(gclass, botOwner_0.BotsGroup.RequestsController)
+                        botOwner_0.BotsGroup.RequestsController.TryAddRequest(gclass)
                     )
                     {
                         gclass.AddPossibleExecutors(botOwner_0);
+                        gclass.SetGroup(botOwner_0.BotsGroup.RequestsController);
                     } else
                     {
                         botOwner_0.BotRequestController.TrySayNegative(requester, gclass.BotRequestType);
@@ -559,11 +557,14 @@ namespace friendlyPMC.Components
                         Player alivePlayerByProfileID = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(requester.ProfileId);
 
                         if (
-                            botOwner_0.BotRequestController.TryStopCurrent(alivePlayerByProfileID, true) &&
-                            botOwner_0.AIData.AskRequests.TryAdd(gclass, botOwner_0.BotsGroup.RequestsController)
+                            botOwner_0.BotRequestController.TryStopCurrent(alivePlayerByProfileID, true)
                         )
                         {
-                            gclass.AddPossibleExecutors(botOwner_0);
+                            if (botOwner_0.BotsGroup.RequestsController.TryAddRequest(gclass))
+                            {
+                                gclass.AddPossibleExecutors(botOwner_0);
+                                gclass.SetGroup(botOwner_0.BotsGroup.RequestsController);
+                            }
                         }
                     }
                 }
@@ -598,7 +599,6 @@ namespace friendlyPMC.Components
                         // if has enemy, on "go forward" move in closer to the enemy
                         if (botOwner_0.Memory.HaveEnemy)
                         {
-
                             FollowerRushEnemy gclass = new FollowerRushEnemy(botOwner_0, alivePlayerByProfileID, BotRequestType.goToPoint);
                             if (botOwner_0.BotsGroup.RequestsController.TryAddRequest(gclass))
                             {
@@ -662,6 +662,7 @@ namespace friendlyPMC.Components
                     (botOwner_0.Brain.BaseBrain as FollowerBrain).BossOrdersChanged();
 
                     FollowerEnemyScan.ScanDirection(botOwner_0, info.PlayerRequester, boss.realPlayer);
+                    return;
                 }
                 // open door request
                 else if (info.phrase == EPhraseTrigger.OpenDoor && !botOwner_0.Memory.HaveEnemy)
@@ -698,7 +699,7 @@ namespace friendlyPMC.Components
                     if(!notBusy)
                     {
                         botOwner_0.Gesture.TryGestus(EGesture.Bad, false);
-                        botOwner_0.BotTalk.TrySay(EPhraseTrigger.Negative, false);
+                        botOwner_0.BotTalk.TrySay(EPhraseTrigger.DontKnow, false);
                         return;
                     }
 
@@ -789,7 +790,10 @@ namespace friendlyPMC.Components
                 }
                 else if(info.phrase == (EPhraseTrigger)CustomPhrases.TeamStatus)
                 {
-                    if(notBusy) base.method_0(info); // go for default which will just do a hello gesture
+                    if(notBusy)
+                    {
+                        botOwner_0.Gesture.TryGestus(EGesture.Hello, false);
+                    }
                     return;
                 }
                 // on dismiss remove the bot from being a follower

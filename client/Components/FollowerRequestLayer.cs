@@ -114,6 +114,8 @@ namespace friendlyPMC.Components
                 return new AICoreActionResultStruct<BotLogicDecision>(HoldOrCover(botOwner_0), "req:Error");
             }
 
+            Components.Logger.LogInfo("BotRequestType: " + request.BotRequestType);
+
             switch (request.BotRequestType)
             {
                 // on follow me request from the boss, just come closer to the boss or get out of hold position
@@ -127,19 +129,18 @@ namespace friendlyPMC.Components
                     Vector3 direction = Vector3.Cross(Vector3.up, dir01).normalized;
 
                     Vector3 finPos = requestPos + direction * offset;
-                    finPos.y = requester.PlayerBody.PlayerBones.Head.position.y;
 
                     Vector3 point = new Vector3(finPos.x, requestPos.y, finPos.z);
                     
                     botOwner_0.GoToSomePointData.SetPoint(point);
 
-                    botOwner_0.Steering.LookToPoint(new Vector3(requestPos.x, requester.PlayerBody.PlayerBones.Head.position.y, requestPos.z));
+                    botOwner_0.Steering.LookToMovingDirection();
                     
                     bool shouldSprint01 = Vector3.Distance(point, botOwner_0.GetPlayer.Transform.position) >= sprintDistance;
                     botOwner_0.GoToSomePointData.UpdateToGo(shouldSprint01);
                     if (!shouldSprint01) botOwner_0.Sprint(false);
 
-                    botOwner_0.BotRequestController.CurRequest.Complete();
+                    request.Complete();
 
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.goToPoint, "req:comeHere");
 
@@ -186,17 +187,16 @@ namespace friendlyPMC.Components
                     Vector3 lateralDirection = Vector3.Cross(Vector3.up, dir02).normalized;
 
                     Vector3 finalPosition = forwardPosition + lateralDirection * lateralOffset;
-                    finalPosition.y = requester.PlayerBody.PlayerBones.Head.position.y;
 
                     botOwner_0.BotTalk.TrySay(EPhraseTrigger.Going, false);
 
                     botOwner_0.GoToSomePointData.SetPoint(finalPosition);
-                    botOwner_0.Steering.LookToPoint(finalPosition);
+                    botOwner_0.Steering.LookToMovingDirection();
                     bool shouldSprint02 = Vector3.Distance(finalPosition, botOwner_0.GetPlayer.Transform.position) >= sprintDistance;
                     botOwner_0.GoToSomePointData.UpdateToGo(shouldSprint02);
                     if (!shouldSprint02) botOwner_0.Sprint(false);
 
-                    botOwner_0.BotRequestController.CurRequest.Complete();
+                    request.Complete();
 
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.goToPoint, "req:goCheck");
 

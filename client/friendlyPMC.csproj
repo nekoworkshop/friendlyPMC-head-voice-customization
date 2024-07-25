@@ -172,7 +172,6 @@
     <Compile Include="Components\FollowerEnemyChooser.cs" />
     <Compile Include="Modules\FollowerCreateNode.cs" />
     <Compile Include="Modules\RadioSound.cs" />
-    <Compile Include="Patches\BotHearingSensorPatch.cs" />
     <Compile Include="Patches\BotMemoryPatch.cs" />
     <Compile Include="Patches\GestureMenuPatch.cs" />
     <Compile Include="Patches\SAINPatch.cs" />

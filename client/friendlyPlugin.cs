@@ -6,7 +6,6 @@ using EFT.UI;
 
 using friendlyPMC.Modules;
 using friendlyPMC.Patches;
-using friendlyPMC.Utils;
 using HarmonyLib;
 
 using System.Collections.Generic;
@@ -193,13 +192,13 @@ namespace friendlyPMC
 
             new QuickPanelPatch().Enable();
             new GestureMenuPatch().Enable();
+            new GestureMenuAvailablePhrasesPatch().Enable();
             new EPhraseTriggerPatch().Enable();
 
             var harmony = new Harmony("xyz.pit.companion");
-            harmony.PatchAll(typeof(GoalEnemyTracePatch).Assembly);
             harmony.PatchAll(typeof(LocalGameCtorPatch).Assembly);
 
-            //SAINPatch.PatchSAINIfInstalled();
+            SAINPatch.PatchSAINIfInstalled();
 
         }
 

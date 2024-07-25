@@ -79,15 +79,30 @@ namespace friendlyPMC.Actions
                 
                 if (bot.Memory.HaveEnemy && bot.Memory.GoalEnemy.ProfileId == closet.Profile.ProfileId) return;
 
-                bot.BotsGroup.AddEnemy(closet, EBotEnemyCause.addPlayerToBoss);
-
-                if (bot.Memory.HaveEnemy) return;
-
-                BotSettingsClass groupInfo = new BotSettingsClass(closet, bot.BotsGroup, EBotEnemyCause.addPlayerToBoss);
-
-                bot.Memory.AddEnemy(closet, groupInfo, false);
+                BotSettingsClass groupInfo;
+                bot.BotsGroup.Enemies.TryGetValue(closet, out groupInfo);
                 
-                Components.Logger.LogInfo("Making " + closet.Profile.Nickname + " enemy to others");
+                if (groupInfo == null)
+                {
+                    bot.BotsGroup.AddEnemy(closet, EBotEnemyCause.addPlayerToBoss);
+                    bot.BotsGroup.Enemies.TryGetValue(closet, out groupInfo);
+                    Components.Logger.LogInfo("Making " + closet.Profile.Nickname + " enemy to others");
+                }
+
+
+                if (
+                    bot.Memory.HaveEnemy && 
+                    (   bot.Memory.GoalEnemy.IsVisible || 
+                        (bot.Memory.GoalEnemy.HaveSeen && bot.Memory.GoalEnemy.PersonalLastSeenTime < 3f)
+                    )
+                ) return;
+
+                if (groupInfo == null)
+                {
+                    groupInfo = new BotSettingsClass(closet, bot.BotsGroup, EBotEnemyCause.addPlayerToBoss);
+
+                    bot.Memory.AddEnemy(closet, groupInfo, false);
+                }
 
                 EnemyInfo info;
 
@@ -101,13 +116,10 @@ namespace friendlyPMC.Actions
                 if (info != null)
                 {
                     info.PriorityIndex = 0;
-                    if (!bot.Memory.HaveEnemy)
-                    {
-                        info.SetVisible(true);
-                        bot.Memory.GoalEnemy = info;
+                    info.SetVisible(true);
+                    bot.Memory.GoalEnemy = info;
 
-                        Components.Logger.LogInfo("Made " + closet.Profile.Nickname + " an active enemy to " + bot.Profile.Nickname);
-                    }
+                    Components.Logger.LogInfo("Made " + closet.Profile.Nickname + " an active enemy to " + bot.Profile.Nickname);
                 }
             }
         }

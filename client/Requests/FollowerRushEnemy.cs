@@ -16,7 +16,7 @@ namespace friendlyPMC.Requests
                 {
                     botOwner_0.BotRequestController.CurRequest.Complete();
                 }
-            },3000f);
+            },3000);
         }
 
         public override EBotRequestMode RequestMode

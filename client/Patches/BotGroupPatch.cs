@@ -66,7 +66,7 @@ namespace friendlyPMC.Patches
             }
 
             // prevent same side from being added just because they have a different role
-            if (cause == EBotEnemyCause.addBotNoGroup)
+            if (cause == EBotEnemyCause.addBotNoGroup || cause == EBotEnemyCause.AddNewMember || cause == EBotEnemyCause.warn)
             {
                 if (__instance.Side == person.Side)
                 {
@@ -108,7 +108,7 @@ namespace friendlyPMC.Patches
                         {
                             foreach (var item in _members)
                             {
-                                bossGroup.AddEnemy(item, EBotEnemyCause.checkAddTODO);
+                                bossGroup.AddEnemy(item, EBotEnemyCause.addPlayerToBoss);
                             }
                         }
                     }

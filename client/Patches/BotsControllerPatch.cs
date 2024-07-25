@@ -434,7 +434,7 @@ namespace friendlyPMC.Patches
                                     {
                                         token.Cancel();
                                     }
-                                }, 1000f);
+                                }, 1000);
                             }
                             catch (Exception ex)
                             {

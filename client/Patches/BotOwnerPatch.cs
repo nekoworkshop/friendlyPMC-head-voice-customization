@@ -76,55 +76,6 @@ namespace friendlyPMC.Patches
         {
             return AccessTools.Method(typeof(BotOwner), "UpdateManual");
         }
-
-        /** Prefix patch UpdateManual so that followers will not have goals and have enemies auto assigned **/
-        /*[PatchPrefix]
-        private static bool PatchPrefix(BotOwner __instance)
-        {
-            // followers should not have goals
-            try
-            {
-                float _nextGetGoalTime = (float)AccessTools.Field(typeof(BotOwner), "_nextGetGoalTime").GetValue(__instance);
-
-                if (_nextGetGoalTime <= Time.time)
-                {
-
-                    if (BossPlayers.Instance.IsFollower(__instance))
-                    {
-
-                        if (__instance.Memory.DangerData.HaveCloseDanger)
-                        {
-                            __instance.Memory.GoalTarget.Clear();
-                            __instance.Memory.GoalEnemy = null;
-
-                        }
-                        else if (!__instance.Memory.HaveEnemy)
-                        {
-                            // check if any enemy is close enough for bot to hear and get next to it
-                            EnemyInfo potentialEnemy = __instance.EnemyChooser.FindDangerEnemy();
-
-                            if (
-                                potentialEnemy != null &&
-                                (
-                                    Utils.Utils.GetNavDistance(__instance.GetPlayer.Transform.position, potentialEnemy.Person.Transform.position) < 35f
-                                )
-                            )
-                            {
-                                __instance.Memory.GoalEnemy = potentialEnemy; // needs testing
-                            }
-                        }
-
-                        AccessTools.Field(typeof(BotOwner), "_nextGetGoalTime").SetValue(__instance, GClass531.Core.UPDATE_GOAL_TIMER_SEC + Time.time);
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                Components.Logger.LogInfo("Exception on BotOwner UpdateManual PatchPrefix: " + e.Message);
-            }
-
-            return true;
-        }*/
         /** Patch on botOwner UpdateManual to allow us to execute custom code **/
         [PatchPostfix]
         private static void PatchPostfix(BotOwner __instance)
@@ -149,53 +100,6 @@ namespace friendlyPMC.Patches
             catch (Exception e)
             {
                 Components.Logger.LogInfo("Exception on BotOwner UpdateManual PatchPostfix: " + e.Message);
-            }
-        }
-    }
-   
-    internal class BotOwnerActivatePatch : ModulePatch
-    {
-        protected override MethodBase GetTargetMethod()
-        {
-            return AccessTools.Method(typeof(BotOwner), "method_10");
-
-        }
-        /** Fix having followers be enemy of same side just because their roles where under ENEMY_BOT_TYPES **/
-        [PatchPostfix]
-        private static void PatchPostfix(BotOwner __instance)
-        {
-            if (BossPlayers.Instance.IsFollower(__instance)) return;
-
-            Dictionary<string, pitAIBossPlayer> playerBosses = BossPlayers.Instance.GetBossPlayers();
-
-            foreach (pitAIBossPlayer boss in playerBosses.Values)
-            {
-                var followers = BossPlayers.GetFollowersByBoss(boss.Player().ProfileId);
-
-                if (followers.Count > 0)
-                {
-                    EPlayerSide bossSide = boss.Player().Side;
-                    if (bossSide == __instance.Side)
-                    {
-                        var sett = __instance.Settings.FileSettings;
-                        if (
-                            (bossSide == EPlayerSide.Bear && !sett.Mind.DEFAULT_BEAR_BEHAVIOUR.HasFlag(EWarnBehaviour.Attack)) ||
-                            (bossSide == EPlayerSide.Usec && !sett.Mind.DEFAULT_USEC_BEHAVIOUR.HasFlag(EWarnBehaviour.Attack)) ||
-                            (bossSide == EPlayerSide.Savage && !sett.Mind.DEFAULT_SAVAGE_BEHAVIOUR.HasFlag(EWarnBehaviour.Attack))
-                        )
-                        {
-                            foreach (var follower in followers)
-                            {
-                                var botPlayer = follower.GetBot().GetPlayer;
-
-                                if (__instance.EnemiesController.IsEnemy(botPlayer))
-                                {
-                                    __instance.EnemiesController.Remove(botPlayer);
-                                }
-                            }
-                        }
-                    }
-                }
             }
         }
     }

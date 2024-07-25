@@ -278,9 +278,14 @@ namespace friendlyPMC.Components
                     _bot.Memory.DeleteInfoAboutEnemy(_bot.Memory.GoalEnemy.Person);
                     _bot.Memory.GoalEnemy = null;
                 }
-            }, 100f);
+                // TURN OFF THE FLASHLIGHT!
+                if (_bot.BotLight != null && _bot.BotLight.IsEnable)
+                {
+                    _bot.BotLight.TurnOff(false, true);
+                }
+            }, 300);
 
-            _bot.GetPlayer.BeingHitAction += BeingHitAction;
+            //_bot.GetPlayer.BeingHitAction += BeingHitAction;
 
             Logger.LogInfo($"Bot {_bot.Profile.Nickname} is now a follower of {_player.Player().Profile.Nickname}");
 

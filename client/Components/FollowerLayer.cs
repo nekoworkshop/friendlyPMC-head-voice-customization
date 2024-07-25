@@ -198,6 +198,16 @@ namespace friendlyPMC.Components
             return base.EndAttackMoving();
         }
 
+        public override AICoreActionEndStruct ShallEndCurrentDecision(AICoreActionResultStruct<BotLogicDecision> curDecision)
+        {
+            if(curDecision.Action == BotLogicDecision.runToCover && curDecision.Reason == "runToCover")
+            {
+                return new AICoreActionEndStruct("enemy.None", true);
+            }
+
+            return base.ShallEndCurrentDecision(curDecision);
+        }
+
         /*public override CustomNavigationPoint FindPoint(CoverSearchData data, Func<CoverSearchData, CustomNavigationPoint> p, bool checkCurrent)
         {
             customNavigationPoint_0 = Utils.Covers.FindPoint(botOwner_0, customNavigationPoint_0);

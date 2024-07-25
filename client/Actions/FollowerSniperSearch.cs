@@ -56,6 +56,8 @@ namespace friendlyPMC.Actions
             )
             {
                 _actionsQueue.Clear();
+                spotPosition = null;
+                _lastTarget = null;
             }
         }
 
@@ -68,112 +70,120 @@ namespace friendlyPMC.Actions
 
         public override void Update()
         {
-            botOwner_0.DoorOpener.Update();
-
             try
             {
-                if (!_init)
+                botOwner_0.DoorOpener.Update();
+
+                try
                 {
-                    Init();
-                    _init = true;
+                    if (!_init)
+                    {
+                        Init();
+                        _init = true;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Components.Logger.LogInfo("Failed to init Search: " + ex.Message);
+                }
+
+                if (!botOwner_0.Memory.HaveEnemy) return;
+
+                while (_actionsQueue.Count > 0)
+                {
+                    Action action = _actionsQueue.Dequeue();
+                    action();
+                }
+
+                if (spotPosition.HasValue)
+                {
+                    if (botOwner_0.GoToSomePointData.IsCome())
+                    {
+                        if (!_hasCome)
+                        {
+                            botOwner_0.SetPose(0.5f);
+                            botOwner_0.StopMove();
+                            botOwner_0.Steering.LookToPoint(botOwner_0.Memory.GoalEnemy.GetCenterPart());
+                            _hasCome = true;
+                        }
+                        ReachSearchPoint();
+                        return;
+                    }
+
+                    botOwner_0.GoToSomePointData.UpdateToGo(sprint);
+
+                    _hasCome = false;
+
+                    if (!covering)
+                        botOwner_0.Steering.LookToPoint(botOwner_0.Memory.GoalEnemy.GetCenterPart());
+                    else
+                        botOwner_0.LookData.SetLookPointByHearing(null);
+
+                    if (float_4 < Time.time)
+                    {
+                        float_4 = Time.time + 2f;
+                        sprint = Utils.Utils.GetNavDistance(botOwner_0.GetPlayer.Transform.position, spotPosition.Value) > 20f;
+                    }
+                    return;
+                }
+
+                if (_lastTarget.HasValue && float_5 < Time.time)
+                {
+                    float_5 = Time.time + GClass761.Random(3f, 4f);
+
+                    UpdateShootPosition();
+
+
+                    if (!_lastTarget.HasValue) return;
+
+                    if (_lastSpot.HasValue)
+                    {
+                        spotPosition = _lastSpot;
+                        covering = false;
+                    }
+                    // else find a position from where we can see the enemy
+                    else if (_lastPosition.HasValue)
+                    {
+                        spotPosition = _lastPosition.Value;
+                        covering = false;
+                    }
+                    // else find a position from where we can cover boss
+                    else if (_lastCover.HasValue)
+                    {
+                        spotPosition = _lastCover.Value;
+                        covering = true;
+
+                    }
+                    // nothing found - stay in place
+                    if (!spotPosition.HasValue)
+                    {
+                        SetSearchPosition();
+                        return;
+                    }
+
+                    botOwner_0.GoToSomePointData.SetPoint((Vector3)spotPosition);
+                    sprint = Utils.Utils.GetNavDistance(botOwner_0.GetPlayer.Transform.position, (Vector3)spotPosition) > 20f;
+                    botOwner_0.GoToSomePointData.UpdateToGo(sprint);
+
+                    if (covering)
+                        botOwner_0.Steering.LookToMovingDirection();
+                    else
+                        botOwner_0.Steering.LookToPoint(botOwner_0.Memory.GoalEnemy.GetCenterPart());
+
+                }
+                else
+                {
+                    _hasCome = false;
+                    if (!_lastTarget.HasValue)
+                    {
+                        UpdateShootPosition();
+                    }
+                    else SetSearchPosition();
                 }
             } catch (Exception ex)
             {
-                Components.Logger.LogInfo("Failed to init Search" + ex.Message);
-            }
-
-            if (!botOwner_0.Memory.HaveEnemy) return;
-
-            while (_actionsQueue.Count > 0)
-            {
-                Action action = _actionsQueue.Dequeue();
-                action();
-            }
-
-            if (spotPosition.HasValue)
-            {
-                if (botOwner_0.GoToSomePointData.IsCome())
-                {
-                    if (!_hasCome)
-                    {
-                        botOwner_0.SetPose(0.5f);
-                        botOwner_0.StopMove();
-                        botOwner_0.Steering.LookToPoint(botOwner_0.Memory.GoalEnemy.GetCenterPart());
-                        _hasCome = true;
-                    }
-                    ReachSearchPoint();
-                    return;
-                }
-
-                botOwner_0.GoToSomePointData.UpdateToGo(sprint);
-
-                _hasCome = false;
-
-                if (!covering)
-                    botOwner_0.Steering.LookToPoint(botOwner_0.Memory.GoalEnemy.GetCenterPart());
-                else
-                    botOwner_0.LookData.SetLookPointByHearing(null);
-
-                if (float_4 < Time.time)
-                {
-                    float_4 = Time.time + 2f;
-                    sprint = Utils.Utils.GetNavDistance(botOwner_0.GetPlayer.Transform.position, spotPosition.Value) > 20f;
-                }
-                return;
-            }
-
-            if (_lastTarget.HasValue && float_5 < Time.time)
-            {
-                float_5 = Time.time + GClass761.Random(3f, 4f);
-
-                UpdateShootPosition();
-
-
-                if (!_lastTarget.HasValue) return;
-
-                if (_lastSpot.HasValue)
-                {
-                    spotPosition = _lastSpot;
-                    covering = false;
-                }
-                // else find a position from where we can see the enemy
-                else if (_lastPosition.HasValue)
-                {
-                    spotPosition = _lastPosition.Value;
-                    covering = false;
-                }
-                // else find a position from where we can cover boss
-                else if (_lastCover.HasValue)
-                {
-                    spotPosition = _lastCover.Value;
-                    covering = true;
-
-                }
-                // nothing found - stay in place
-                if (!spotPosition.HasValue)
-                {
-                    SetSearchPosition();
-                    return;
-                }
-
-                botOwner_0.GoToSomePointData.SetPoint((Vector3)spotPosition);
-                sprint = Utils.Utils.GetNavDistance(botOwner_0.GetPlayer.Transform.position, (Vector3)spotPosition) > 20f;
-                botOwner_0.GoToSomePointData.UpdateToGo(sprint);
-
-                if (covering)
-                    botOwner_0.Steering.LookToMovingDirection();
-                else
-                    botOwner_0.Steering.LookToPoint(botOwner_0.Memory.GoalEnemy.GetCenterPart());
-
-            }
-            else
-            {
-                _hasCome = false;
-                if (!_lastTarget.HasValue)
-                {
-                    UpdateShootPosition();
-                }
-                else SetSearchPosition();
+                Components.Logger.LogInfo("SniperSearch Error: " + ex.Message);
+                Components.Logger.LogInfo("Trace: " + ex.StackTrace);
             }
         }
 

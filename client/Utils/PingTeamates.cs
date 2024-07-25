@@ -43,6 +43,7 @@ namespace friendlyPMC.Utils
         private GUIStyle makerGuiStyle;
 
         private float screenScale = 1.0f;
+        private float fovFactor = 1f;
 
         Player myPlayer;
 
@@ -137,6 +138,8 @@ namespace friendlyPMC.Utils
 
 
             if(botMap != null) {
+                float currentFOV = Camera.main.fieldOfView;
+                fovFactor = Camera.main.fieldOfView / currentFOV;
                 botMap.ForEach(DrawBotGUI);
                 botMap.ForEach(DrawEnemyMarkerGUI);
             }
@@ -301,6 +304,7 @@ namespace friendlyPMC.Utils
 
 
                     Vector3 screenPos = Camera.main.WorldToScreenPoint(bt.EnemyPos.Value);
+
                     if (screenPos.z > 0)
                     {
                         DrawEnemyMarker(bt, screenPos, marker);
@@ -388,10 +392,10 @@ namespace friendlyPMC.Utils
         {
             float animationOffset = Mathf.Sin(Time.time * 5f) * 5f;
             
-            float size = 25f;
+            float size = 30f;
 
-            bt.MarkRect.x = (markerPos.x * screenScale) - (size / 2);
-            bt.MarkRect.y = Screen.height - ((markerPos.y * screenScale) + size) + animationOffset;
+            bt.MarkRect.x = (markerPos.x * screenScale / fovFactor) - (size / 2);
+            bt.MarkRect.y = Screen.height - ((markerPos.y * screenScale / fovFactor) + size) + animationOffset;
             bt.MarkRect.size = new Vector2(size, size);
 
             GUI.Box(bt.MarkRect, CreateTriangleTexture(cl), makerGuiStyle);

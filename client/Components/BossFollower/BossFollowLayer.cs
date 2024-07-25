@@ -2,6 +2,7 @@
 
 using friendlyPMC.Modules;
 using friendlyPMC.Utils;
+using System;
 using UnityEngine;
 
 namespace friendlyPMC.Components.BossFollower
@@ -23,7 +24,12 @@ namespace friendlyPMC.Components.BossFollower
         public override bool ShallUseNow()
         {
 
-            if (!HasBoss() || botOwner_0.Memory.HaveEnemy) return false;
+            if (!HasBoss() || botOwner_0.Memory.HaveEnemy)
+            {
+                requestGoThereOngoing = false;
+                requestComeHereOngoing = false;
+                return false;
+            }
 
             botOwner_0.PriorityAxeTarget.FindTarget();
 
@@ -84,34 +90,33 @@ namespace friendlyPMC.Components.BossFollower
 
             if (request != null)
             {
-                if (requestGoThere && !requestGoThereOngoing)
+                if (requestGoThere)
                 {
-                    requestGoThereOngoing = true;
                     botOwner_0.Gesture.TryGestus(EGesture.Good, false);
-
                     IPlayer requester = botOwner_0.BotRequestController.CurRequest.Requester;
 
                     Vector3 dir = requester.LookDirection;
                     float forwardDistance = GClass761.Random(3f, 5f);
 
-                    Vector3 forwardPosition = requester.Position + dir.normalized * forwardDistance;
+                    Vector3 forwardPosition = requester.Transform.position + dir.normalized * forwardDistance;
                     float lateralOffset = GClass761.RandomSing() * GClass761.Random(0.5f, 1.5f);
                     Vector3 lateralDirection = Vector3.Cross(Vector3.up, dir).normalized;
-
                     Vector3 finalPosition = forwardPosition + lateralDirection * lateralOffset;
-                    finalPosition.y = requester.PlayerBody.PlayerBones.Head.position.y;
+                    finalPosition.y = requester.Transform.position.y;
 
                     botOwner_0.GoToSomePointData.SetPoint(finalPosition);
-                    botOwner_0.Steering.LookToPoint(finalPosition);
+                    botOwner_0.Steering.LookToMovingDirection();
 
                     bool shouldSprint02 = Vector3.Distance(finalPosition, botOwner_0.GetPlayer.Transform.position) >= sprintDistance;
                     botOwner_0.GoToSomePointData.UpdateToGo(shouldSprint02);
                     if (!shouldSprint02) botOwner_0.Sprint(false);
 
+                    request.Complete();
+
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.goToPoint, "req:moveThere");
                 }
 
-                if (requestComeHere && !requestComeHereOngoing)
+                if (requestComeHere)
                 {
                     requestComeHereOngoing = true;
                     botOwner_0.Gesture.TryGestus(EGesture.Good, false);
@@ -135,6 +140,8 @@ namespace friendlyPMC.Components.BossFollower
                     botOwner_0.GoToSomePointData.UpdateToGo(shouldSprint01);
                     if (!shouldSprint01) botOwner_0.Sprint(false);
 
+                    request.Complete();
+
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.goToPoint, "req:comeHere");
                 }
 
@@ -152,7 +159,7 @@ namespace friendlyPMC.Components.BossFollower
         }
 
 
-/*        public override AICoreActionEndStruct EndGoToPoint()
+        /*public override AICoreActionEndStruct EndGoToPoint()
         {
             AICoreActionEndStruct baseEnd = base.EndGoToPoint();
             if (baseEnd.Value)

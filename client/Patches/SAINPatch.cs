@@ -18,11 +18,7 @@ namespace friendlyPMC.Patches
             return AppDomain.CurrentDomain.GetAssemblies().Any(a => a.GetName().Name == "SAIN");
         }
 
-        private static Type classType = null;
-
         private static Type squadType = null;
-
-        private static Type targetType = null;
 
         private static Type hearingType = null;
 
@@ -30,16 +26,11 @@ namespace friendlyPMC.Patches
         {
             if (IsSAINInstalled())
             {
-                if(classType == null)
-                    classType = Type.GetType("SAIN.SAINComponent.Classes.EnemyClasses.EnemyChooserClass, SAIN");
 
                 if(squadType == null)
                 {
                     squadType = Type.GetType("SAIN.BotController.Classes.Squad, SAIN");
                 }
-
-                if(targetType == null)
-                    targetType = Type.GetType("SAIN.SAINComponent.Classes.CurrentTargetClass, SAIN"); 
 
                 if(hearingType == null)
                     hearingType = Type.GetType("SAIN.SAINComponent.Classes.SAINHearingSensorClass, SAIN");
@@ -49,13 +40,7 @@ namespace friendlyPMC.Patches
 
                 Components.Logger.LogInfo("Enable SAIN PATCH");
 
-                /*if (classType != null)
-                {
-                    // disable this for followers
-                    harmony.Patch(AccessTools.Method(classType, "assignActiveEnemy"), new HarmonyMethod(typeof(SAINPatch).GetMethod(nameof(PatchAssignActiveEnemy), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance)));
-                }*/
-
-                if(squadType != null)
+                if (squadType != null)
                 {
                     // disable this for followers
                     harmony.Patch(AccessTools.Method(squadType, "clearPlayerPlace"), new HarmonyMethod(typeof(SAINPatch).GetMethod(nameof(PatchClearPlayerPlace), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance)));
@@ -64,29 +49,9 @@ namespace friendlyPMC.Patches
                     harmony.Patch(AccessTools.Method(squadType, "calcGoalForBot"), new HarmonyMethod(typeof(SAINPatch).GetMethod(nameof(PatchCalcGoalForBot), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance)));
                 }
 
-                /*if(targetType != null)
-                    // disable this for followers
-                    harmony.Patch(AccessTools.Method(targetType, "updateGoalTarget"), new HarmonyMethod(typeof(SAINPatch).GetMethod(nameof(PatchUpdateGoalTarget), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance)));*/
-
                 if (hearingType != null)
                     harmony.Patch(AccessTools.Method(hearingType, "CheckCalcGoal"), new HarmonyMethod(typeof(SAINPatch).GetMethod(nameof(PatchCheckCalcGoal), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance)));
             }
-        }
-
-        private static bool PatchAssignActiveEnemy(object __instance)
-        {
-            try
-            {
-                PropertyInfo botOwnerProperty = classType.GetProperty("BotOwner");
-                BotOwner botObject = botOwnerProperty.GetValue(__instance) as BotOwner;
-
-                if (BossPlayers.Instance.IsFollower(botObject)) return false;
-            }
-            catch (Exception ex)
-            {
-                Components.Logger.LogInfo("Failed to run SAIN EnemyChooserClass Update Patch :" + ex.Message);
-            }
-            return true;
         }
 
         private static bool PatchClearPlayerPlace(object __instance, IPlayer player)
@@ -104,11 +69,12 @@ namespace friendlyPMC.Patches
 
             if (Members == null)
             {
-                Components.Logger.LogInfo("Members is NULL");
                 return true;
             }
             
             bool allow = true;
+
+            if (BossPlayers.Instance == null) return allow;
 
             try
             {
@@ -170,25 +136,9 @@ namespace friendlyPMC.Patches
 
         private static bool PatchCalcGoalForBot(object __instance, BotOwner botOwner)
         {
-            return !BossPlayers.Instance.IsFollower(botOwner);
+            return BossPlayers.Instance == null || botOwner == null || !BossPlayers.Instance.IsFollower(botOwner);
         }
 
-        private static bool PatchUpdateGoalTarget(object __instance)
-        {
-            try
-            {
-                PropertyInfo botOwnerProperty = targetType.GetProperty("BotOwner");
-                BotOwner botObject = botOwnerProperty.GetValue(__instance) as BotOwner;
-
-                if (BossPlayers.Instance.IsFollower(botObject)) return false;
-            }
-            catch (Exception ex)
-            {
-                Components.Logger.LogInfo("Failed to run updateGoalTarget Patch :" + ex.Message);
-            }
-            return true;
-        }
-    
         private static bool PatchCheckCalcGoal(object __instance)
         {
             PropertyInfo botOwnerProperty = hearingType.GetProperty("BotOwner");

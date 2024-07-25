@@ -17,12 +17,6 @@ namespace friendlyPMC.Patches
         {
             return AccessTools.Method(typeof(GesturesMenu), "InitPhraseGroups");
         }
-        [PatchPrefix]
-        private static void PatchPrefix(GesturesMenu __instance)
-        {
-            var hashSet_1 = (HashSet<EPhraseTrigger>)AccessTools.Field(typeof(GesturesMenu), "hashSet_1").GetValue(__instance);
-            hashSet_1.Add((EPhraseTrigger)CustomPhrases.TeamStatus);
-        }
         [PatchPostfix]
         private static void PatchPostfix(GesturesMenu __instance)
         {
@@ -51,6 +45,20 @@ namespace friendlyPMC.Patches
                     list_1.Add(gestureBaseItem);
                 }
             });
+        }
+    }
+
+    internal class GestureMenuAvailablePhrasesPatch : ModulePatch
+    {
+        protected override MethodBase GetTargetMethod()
+        {
+            return AccessTools.Method(typeof(GesturesMenu), "Init");
+        }
+        [PatchPostfix]
+        private static void PatchPostfix(GesturesMenu __instance)
+        {
+            var hashSet_1 = (HashSet<EPhraseTrigger>)AccessTools.Field(typeof(GesturesMenu), "hashSet_1").GetValue(__instance);
+            hashSet_1.Add((EPhraseTrigger)CustomPhrases.TeamStatus);
         }
     }
 

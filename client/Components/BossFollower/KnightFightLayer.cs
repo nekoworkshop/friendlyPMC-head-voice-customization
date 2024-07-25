@@ -100,9 +100,7 @@ namespace friendlyPMC.Components.BossFollower
             Utils.Utils.SetTimeout(() =>
             {
                 ordersChanged = false;
-            },1000f);
-
-            followerFightLayer.OrdersChanged();
+            },1000);
         }
 
         public override AICoreActionResultStruct<BotLogicDecision> GetDecision()
@@ -119,9 +117,10 @@ namespace friendlyPMC.Components.BossFollower
             AICoreActionResultStruct<BotLogicDecision>? preFightDecision = KnightPreFight();
             if (preFightDecision != null) return (AICoreActionResultStruct<BotLogicDecision>)preFightDecision;
 
-            if (Utils.EnemyInfo.Distance(botOwner_0) <= Utils.EnemyInfo.EnemyDistance.VeryClose && !followerFightLayer.IsEnemyLowThreat(true))
+            // do not go after distant enemies
+            if (Utils.EnemyInfo.Distance(botOwner_0) >= Utils.EnemyInfo.EnemyDistance.Distant)
             {
-                return followerFightLayer.DefendPosition(botOwner_0.GetPlayer.Transform.position);
+                return new AICoreActionResultStruct<BotLogicDecision>((BotLogicDecision)CustomBotDecisions.CoverToCover, "coverBoss");
             }
 
             try
@@ -156,6 +155,7 @@ namespace friendlyPMC.Components.BossFollower
                     if (customNavigationPoint_0 != null)
                     {
                         // Move towards the cover point while suppressing the enemy
+                        botOwner_0.Steering.LookToPoint(botOwner_0.Memory.GoalEnemy.GetCenterPart());
                         return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMovingWithSuppress, "assaultApproach");
                     }
                     else
@@ -173,6 +173,7 @@ namespace friendlyPMC.Components.BossFollower
                 if (customNavigationPoint_0 != null)
                 {
                     // Move towards the cover point while suppressing
+                    botOwner_0.Steering.LookToPoint(botOwner_0.Memory.GoalEnemy.GetCenterPart());
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMovingWithSuppress, "assaultApproach");
                 }
                 else
@@ -188,6 +189,13 @@ namespace friendlyPMC.Components.BossFollower
 
             BotRequest request = botOwner_0.BotRequestController.CurRequest;
 
+            if (request != null && !ordersChanged)
+            {
+                Components.Logger.LogInfo(request.BotRequestType + " is not an order");
+                request.Complete();
+                return null;
+            }
+
             Vector3 botPosition = botOwner_0.GetPlayer.Transform.position;
             Vector3 bossPosition = request != null ? botOwner_0.BotRequestController.CurRequest.Requester.Position : botPosition;
 
@@ -198,16 +206,15 @@ namespace friendlyPMC.Components.BossFollower
                 Utils.Utils.GetNavDistance(botPosition, bossPosition) > friendlyPMC.regroupMinDistance
             )
             {
-                Components.Logger.LogInfo("Player asked for help");
+
                 if (!botOwner_0.Memory.HaveEnemy || !botOwner_0.Memory.GoalEnemy.IsVisible)
                 {
-                    Components.Logger.LogInfo("move closer to Player");
                     followerFightLayer.GetCloserToBoss();
 
                 }
                 else
                 {
-                    botOwner_0.BotTalk.TrySay(EPhraseTrigger.OnFight, true);
+                    botOwner_0.BotTalk.TrySay(EPhraseTrigger.DontKnow, true);
                     request.Complete();
                 }
             }
@@ -221,15 +228,6 @@ namespace friendlyPMC.Components.BossFollower
             // player suggested to do a push
             if (ordersChanged && request != null && request.BotRequestType == BotRequestType.attackClose)
             {
-
-                Utils.Utils.SetTimeout(() =>
-                {
-                    if(botOwner_0 != null && !botOwner_0.IsDead && botOwner_0.BotState == EBotState.Active && botOwner_0.BotRequestController.CurRequest != null)
-                    {
-                        botOwner_0.BotRequestController.CurRequest.Complete();
-                    }
-                },2000f);
-
                 return followerFightLayer.EngageEnemy(true);
             }
 
