@@ -160,7 +160,7 @@ namespace friendlyPMC.Components
             // let the bot talk
             _bot.BotTalk.SetSilence(0f); 
             // force bot to turn off light
-            if(_bot.BotLight != null) _bot.BotLight.TurnOff(false, true);
+            if(_bot.BotLight != null && _bot.BotLight.IsEnable) _bot.BotLight.TurnOff(false, true);
             //_bot.NightVision.H
             // make bot follower of player
             _player.AddFollower(_bot);
