@@ -41,7 +41,7 @@ namespace friendlyPMC.Components
 
             if (bot.IsRole(WildSpawnType.followerBirdEye))
             {
-                bot.Settings.FileSettings.Core.GainSightCoef = 0.5f;
+                bot.Settings.FileSettings.Core.GainSightCoef = 0.1f;
                 bot.Settings.FileSettings.Cover.SOUND_TO_GET_SPOTTED = 10f;
                 bot.Settings.FileSettings.Cover.SPOTTED_COVERS_RADIUS = 12f;
                 bot.Settings.FileSettings.Shoot.LOW_DIST_TO_CHANGE_WEAPON = 30f;

@@ -71,6 +71,8 @@ namespace friendlyPMC
 
         public static ConfigEntry<int> enemyRemember;
 
+        public static ConfigEntry<float> heatlhMultiplier;
+
         public static readonly float fightOuterRadius = 50f;
         public static readonly float fightInnerRadius = 30f;
 
@@ -105,6 +107,8 @@ namespace friendlyPMC
             scanDistance = Config.Bind(miscSettings, "1 Maximum scan distance", 140, new ConfigDescription("Maximum distance to pick up any visible enemy that the player is signaling when issuing 'Contact' phrase", new AcceptableValueRange<int>(50, 300)));
 
             enemyRemember = Config.Bind(miscSettings, "2 Time to forget about enemy (in sec.)", 20, new ConfigDescription("Maximum time a follower will remember an enemy. This is applied only at the begining of a raid", new AcceptableValueRange<int>(5, 60)));
+
+            heatlhMultiplier = Config.Bind(miscSettings, "3 Squad Health Multiplier", 1f, new ConfigDescription("Health multiplier for the followers you spawn with. This is applied per each body part. Does not apply to boss followers.", new AcceptableValueRange<float>(1, 5)));
 
             knightSpawn = Config.Bind(testSettings, "1 Spawn with The Goons", false, new ConfigDescription("Experimental: Spawn with the goons squad. This works in combination with your own squad. Take note that a boss and his followers do not accept the same commands as your squad"));
 

@@ -974,7 +974,8 @@ namespace friendlyPMC.Components
                 return GetCloserToBoss();
             }
 
-            if (!botOwner_0.Memory.HaveEnemy)
+            
+            if (!botOwner_0.Memory.HaveEnemy && !allyTactic)
             {
                 if(bossUnderAttack)
                 {
@@ -1007,11 +1008,20 @@ namespace friendlyPMC.Components
                 suppressTime = Time.time + 2f;
                 return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.suppressFire, "suppressFire");
             }
+
             // throw grenate request
             if(request != null && request.BotRequestType == BotRequestType.throwGrenade)
                 return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.throwGrenadeFromPlace, "throwGrenadeRequest");
 
             if (botOwner_0.Memory.GoalEnemy.Owner.IsRole(WildSpawnType.marksman)) return MarksManFight();
+
+            // ally tactic will make the bot always fight in hold mode
+            if (allyTactic)
+            {
+                ordersAreAttack = false;
+                ordersAreHold = false;
+                return DefendPosition(bossPosition);
+            }
 
             if (request != null && request.BotRequestType == BotRequestType.goToPoint)
             {

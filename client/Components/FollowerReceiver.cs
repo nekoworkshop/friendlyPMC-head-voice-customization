@@ -195,6 +195,10 @@ namespace friendlyPMC.Components
             {
             };
 
+            List<EGesture> allyNoGesture = new List<EGesture> { 
+                EGesture.ThatDirection
+            };
+
             bool isFollowerBoss = false;
             foreach (WildSpawnType role in Utils.Utils.BossFollowersRoles)
             {
@@ -205,10 +209,21 @@ namespace friendlyPMC.Components
                 }
             }
 
-            // AI Boss followers will not take several gestures
-            if (isBossCommunicating && isFollowerBoss)
+            // AI Boss followers and scavs will not take several gestures
+            if (isBossCommunicating)
             {
-                if (gestusDistance < maxGestusDistance)
+
+                if (gestusDistance > maxGestusDistance)
+                {
+                    return;
+                }
+
+                if(botOwner_0.Side == EPlayerSide.Savage && allyNoGesture.Contains(gesture))
+                {
+                    botOwner_0.Gesture.TryGestus(EGesture.Bad, false);
+                    return;
+                } 
+                else if (isFollowerBoss)
                 {
                     if (bossNoGesture.Contains(gesture))
                     {
@@ -216,17 +231,15 @@ namespace friendlyPMC.Components
                         if (!botOwner_0.Memory.HaveEnemy) 
                         { 
                             botOwner_0.Gesture.TryGestus(EGesture.Bad, false);
-                            botOwner_0.BotTalk.TrySay(EPhraseTrigger.Negative, false);
                         }
                         return;
                     }
 
                     if(botOwner_0.Memory.HaveEnemy && bossBusyNoGesture.Contains(gesture))
                     {
+                        botOwner_0.BotTalk.TrySay(EPhraseTrigger.DontKnow,true);
                         return;
-                    }
-
-                    
+                    }  
                 }
             }
             // on gesture "stop" nearby bots will hold position
@@ -354,6 +367,17 @@ namespace friendlyPMC.Components
                 EPhraseTrigger.LootBody
             };
 
+            List<EPhraseTrigger> allyNoPhrase = new List<EPhraseTrigger>{
+                EPhraseTrigger.Silence,
+                EPhraseTrigger.Fire,
+                EPhraseTrigger.GetBack,
+                EPhraseTrigger.GoForward,
+                EPhraseTrigger.CoverMe,
+                EPhraseTrigger.Stop,
+                EPhraseTrigger.Gogogo,
+                EPhraseTrigger.OpenDoor
+            };
+
             bool isFollowerBoss = false;
             foreach (WildSpawnType role in Utils.Utils.BossFollowersRoles)
             {
@@ -411,6 +435,13 @@ namespace friendlyPMC.Components
                 }
             }
 
+            // scavs tend not to listen to anything
+            if(botOwner_0.Side == EPlayerSide.Savage && allyNoPhrase.Contains(info.phrase))
+            {
+                botOwner_0.Gesture.TryGestus(EGesture.Bad, false);
+                botOwner_0.BotTalk.TrySay(EPhraseTrigger.Negative, true);
+                return;
+            }
 
             if(isAllyRequesting)
             {
@@ -696,7 +727,7 @@ namespace friendlyPMC.Components
                 // loot item
                 else if (info.phrase == EPhraseTrigger.LootGeneric || info.phrase == EPhraseTrigger.LootWeapon)
                 {
-                    if(!notBusy)
+                    if(!notBusy && botOwner_0.Memory.GoalEnemy.HaveSeen && Time.time - botOwner_0.Memory.GoalEnemy.PersonalLastSeenTime < 3f)
                     {
                         botOwner_0.Gesture.TryGestus(EGesture.Bad, false);
                         botOwner_0.BotTalk.TrySay(EPhraseTrigger.DontKnow, false);
