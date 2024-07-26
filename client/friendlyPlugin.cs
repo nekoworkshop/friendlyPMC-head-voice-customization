@@ -164,6 +164,7 @@ namespace friendlyPMC
 
             new BotOwnerIsFolowerPatch().Enable();
             new BotOwnerManualUpdatePatch().Enable();
+            new BotOwnerActivatePatch().Enable();
 
             new PatrolDataFollowerPatch().Enable();
 

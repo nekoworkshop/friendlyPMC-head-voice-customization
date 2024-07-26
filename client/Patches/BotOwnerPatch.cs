@@ -103,4 +103,48 @@ namespace friendlyPMC.Patches
             }
         }
     }
+
+    internal class BotOwnerActivatePatch : ModulePatch
+    {
+        protected override MethodBase GetTargetMethod()
+        {
+            return AccessTools.Method(typeof(BotOwner), "method_10");
+
+        }
+        /** Fix having followers be enemy of same side just because their roles where under ENEMY_BOT_TYPES **/
+        [PatchPostfix]
+        private static void PatchPostfix(BotOwner __instance)
+        {
+            if (BossPlayers.Instance.IsFollower(__instance)) return;
+
+            Dictionary<string, pitAIBossPlayer> playerBosses = BossPlayers.Instance.GetBossPlayers();
+
+            foreach (pitAIBossPlayer boss in playerBosses.Values)
+            {
+                var followers = BossPlayers.GetFollowersByBoss(boss.Player().ProfileId);
+
+                if (followers.Count > 0)
+                {
+                    EPlayerSide bossSide = boss.Player().Side;
+                    if (bossSide == __instance.Side)
+                    {
+                        var sett = __instance.Settings.FileSettings;
+                        if (
+                            (bossSide == EPlayerSide.Bear && !sett.Mind.DEFAULT_BEAR_BEHAVIOUR.HasFlag(EWarnBehaviour.Attack)) ||
+                            (bossSide == EPlayerSide.Usec && !sett.Mind.DEFAULT_USEC_BEHAVIOUR.HasFlag(EWarnBehaviour.Attack)) ||
+                            (bossSide == EPlayerSide.Savage && !sett.Mind.DEFAULT_SAVAGE_BEHAVIOUR.HasFlag(EWarnBehaviour.Attack))
+                        )
+                        {
+                            foreach (var follower in followers)
+                            {
+                                var botPlayer = follower.GetBot().GetPlayer;
+
+                                __instance.BotsGroup.RemoveEnemy(botPlayer);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
