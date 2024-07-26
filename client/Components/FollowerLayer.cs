@@ -156,7 +156,7 @@ namespace friendlyPMC.Components
             {
                 return new AICoreActionEndStruct("has boss", true);
             }
-            return gstruct7_1;
+            return aICoreActionEndStruct_1;
         }
 
         public override AICoreActionEndStruct EndHeal()
@@ -170,7 +170,7 @@ namespace friendlyPMC.Components
                 return new AICoreActionEndStruct("EndHealTimer", true);
             }
 
-            return gstruct7_1;
+            return aICoreActionEndStruct_1;
         }
 
         public override AICoreActionEndStruct EndSuppressFire()
@@ -196,6 +196,16 @@ namespace friendlyPMC.Components
             }
 
             return base.EndAttackMoving();
+        }
+
+        public override AICoreActionEndStruct ShallEndCurrentDecision(AICoreActionResultStruct<BotLogicDecision> curDecision)
+        {
+            if(curDecision.Action == BotLogicDecision.runToCover && curDecision.Reason == "runToHeal")
+            {
+                return new AICoreActionEndStruct("enemy.None", true);
+            }
+
+            return base.ShallEndCurrentDecision(curDecision);
         }
 
         /*public override CustomNavigationPoint FindPoint(CoverSearchData data, Func<CoverSearchData, CustomNavigationPoint> p, bool checkCurrent)

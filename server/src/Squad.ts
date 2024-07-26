@@ -1,45 +1,49 @@
 import { DependencyContainer, inject } from "tsyringe";
-import { DatabaseServer } from "@spt-aki/servers/DatabaseServer";
+import { DatabaseServer } from "@spt/servers/DatabaseServer";
 
-import { BotDifficultyHelper } from "@spt-aki/helpers/BotDifficultyHelper";
-import { BotController } from "@spt-aki/controllers/BotController";
+import { BotDifficultyHelper } from "@spt/helpers/BotDifficultyHelper";
+import { BotController } from "@spt/controllers/BotController";
 
-import { IBotConfig } from "@spt-aki/models/spt/config/IBotConfig";
-import { IPmcConfig } from "@spt-aki/models/spt/config/IPmcConfig";
+import { IBotConfig } from "@spt/models/spt/config/IBotConfig";
+import { IPmcConfig } from "@spt/models/spt/config/IPmcConfig";
 
-import { ILogger } from "@spt-aki/models/spt/utils/ILogger";
+import { ILogger } from "@spt/models/spt/utils/ILogger";
 
-import { Difficulty } from "@spt-aki/models/eft/common/tables/IBotType";
+import { Difficulty, IBotType } from "@spt/models/eft/common/tables/IBotType";
 
-import { LogTextColor } from "@spt-aki/models/spt/logging/LogTextColor";
+import { LogTextColor } from "@spt/models/spt/logging/LogTextColor";
 
-import { ILocations } from "@spt-aki/models/spt/server/ILocations";
+import { ILocations } from "@spt/models/spt/server/ILocations";
 
 import { openZonesMap } from "./AOZExports";
 
-import { ITraderConfig } from "@spt-aki/models/spt/config/ITraderConfig";
-import { TraderHelper } from "@spt-aki/helpers/TraderHelper";
-import { Traders } from "@spt-aki/models/enums/Traders";
+import { ITraderConfig } from "@spt/models/spt/config/ITraderConfig";
+import { TraderHelper } from "@spt/helpers/TraderHelper";
+import { Traders } from "@spt/models/enums/Traders";
 import { SetFreemanTrader } from "./Trader";
 
-import { ImageRouter } from "@spt-aki/routers/ImageRouter";
-import type { PostAkiModLoader } from "@spt-aki/loaders/PostAkiModLoader";
+import { ImageRouter } from "@spt/routers/ImageRouter";
+import type { PostSptModLoader } from "@spt/loaders/PostSptModLoader";
 
-import { MailSendService } from "@spt-aki/services/MailSendService";
+import { MailSendService } from "@spt/services/MailSendService";
 
-import type { StaticRouterModService } from "@spt-aki/services/mod/staticRouter/StaticRouterModService";
+import type { StaticRouterModService } from "@spt/services/mod/staticRouter/StaticRouterModService";
 
 import path from "path";
-import { RouteAction } from "@spt-aki/di/Router";
-import { HttpResponseUtil } from "@spt-aki/utils/HttpResponseUtil";
-import { IUserDialogInfo } from "@spt-aki/models/eft/profile/IAkiProfile";
+import { RouteAction } from "@spt/di/Router";
+import { HttpResponseUtil } from "@spt/utils/HttpResponseUtil";
+import { IUserDialogInfo } from "@spt/models/eft/profile/ISptProfile";
 
-import { RandomUtil } from "@spt-aki/utils/RandomUtil";
+import { RandomUtil } from "@spt/utils/RandomUtil";
+import { BotGenerator } from "@spt/generators/BotGenerator";
+import { IBotBase } from "@spt/models/eft/common/tables/IBotBase";
+import { BotGenerationDetails } from "@spt/models/spt/bots/BotGenerationDetails";
 
 class friendlyPMC {
 	config = {
 		sameSideHostile: false,
 		armbands: true,
+		englishBear: true,
 	};
 
 	Logger: ILogger;
@@ -53,9 +57,13 @@ class friendlyPMC {
 
 	originalGetValidTraderIdByEnumValue: TraderHelper["getValidTraderIdByEnumValue"];
 
-	preAkiLoad(container: DependencyContainer) {
+	originalGenerateBot: BotGenerator["generateBot"];
+
+	preSptLoad(container: DependencyContainer) {
 		this.Logger = container.resolve("WinstonLogger");
 		this.mailSendService = container.resolve("MailSendService");
+
+		const botGenerator = container.resolve<BotGenerator>("BotGenerator");
 
 		try {
 			this.config = Object.assign(this.config, require("../config.json"));
@@ -116,8 +124,21 @@ class friendlyPMC {
 			{ frequency: "Always" }
 		);
 
+		this.generateBot = this.generateBot.bind(this);
+		container.afterResolution(
+			"BotGenerator",
+			(_t, result: BotGenerator) => {
+				if (!this.originalGenerateBot) {
+					this.originalGenerateBot = result["generateBot"].bind(result);
+
+					result["generateBot"] = this.generateBot;
+				}
+			},
+			{ frequency: "Always" }
+		);
+
 		const imageRouter: ImageRouter = container.resolve("ImageRouter");
-		const modLoader: PostAkiModLoader = container.resolve("PostAkiModLoader");
+		const modLoader: PostSptModLoader = container.resolve("PostSptModLoader");
 
 		const folder = path.basename(path.dirname(__dirname));
 
@@ -142,9 +163,10 @@ class friendlyPMC {
 
 	postDBLoad(container: DependencyContainer) {
 		const configServer: any = container.resolve("ConfigServer");
-		const Bots: IBotConfig = configServer.getConfig("aki-bot");
-		const PMCBOT: IPmcConfig = configServer.getConfig("aki-pmc");
-		const Traders: ITraderConfig = configServer.getConfig("aki-trader");
+
+		const Bots: IBotConfig = configServer.getConfig("spt-bot");
+		const PMCBOT: IPmcConfig = configServer.getConfig("spt-pmc");
+		const Traders: ITraderConfig = configServer.getConfig("spt-trader");
 
 		const databaseServer = container.resolve<DatabaseServer>("DatabaseServer");
 		const tables = databaseServer.getTables();
@@ -199,6 +221,13 @@ class friendlyPMC {
 			}
 		}
 
+		if (this.config.englishBear) {
+			tables.bots.types["bear"].appearance.voice = {
+				Bear_1_Eng: 1,
+				Bear_2_Eng: 1,
+			};
+		}
+
 		// open all zones to the bots
 		const locations: ILocations = tables.locations;
 		for (const altLocation in openZonesMap) {
@@ -224,14 +253,14 @@ class friendlyPMC {
 		pmcType = pmcType.toLowerCase();
 
 		// force the friendly mind here as some mods may overwrite things
-		if (pmcType == "bear" || pmcType == "usec" || pmcType == "sptbear" || pmcType == "sptusec") {
+		if (pmcType == "bear" || pmcType == "usec" || pmcType == "sptbear" || pmcType == "sptusec" || pmcType == "pmcbear" || pmcType == "pmcusec") {
 			Object.assign(diff.Mind, {
-				DEFAULT_ENEMY_BEAR: pmcType == "usec" || pmcType == "sptusec" || is_hostile,
+				DEFAULT_ENEMY_BEAR: pmcType == "usec" || pmcType == "sptusec" || pmcType == "pmcusec" || is_hostile,
 				DEFAULT_ENEMY_SAVAGE: true,
-				DEFAULT_ENEMY_USEC: pmcType == "bear" || pmcType == "sptbear" || is_hostile,
-				DEFAULT_BEAR_BEHAVIOUR: !is_hostile && (pmcType == "bear" || pmcType == "sptbear") ? "Ignore" : "Attack",
+				DEFAULT_ENEMY_USEC: pmcType == "bear" || pmcType == "sptbear" || pmcType == "pmcbear" || is_hostile,
+				DEFAULT_BEAR_BEHAVIOUR: !is_hostile && (pmcType == "bear" || pmcType == "sptbear" || pmcType == "pmcbear") ? "Ignore" : "Attack",
 				DEFAULT_SAVAGE_BEHAVIOUR: "Attack",
-				DEFAULT_USEC_BEHAVIOUR: !is_hostile && (pmcType == "usec" || pmcType == "sptusec") ? "Ignore" : "Attack",
+				DEFAULT_USEC_BEHAVIOUR: !is_hostile && (pmcType == "usec" || pmcType == "sptusec" || pmcType == "pmcusec") ? "Ignore" : "Attack",
 				CAN_RECIVE_PLAYER_REQUESTS: !is_hostile,
 				CAN_RECEIVE_PLAYER_REQUESTS: !is_hostile,
 				CAN_RECEIVE_PLAYER_REQUESTS_USEC: !is_hostile,
@@ -263,12 +292,14 @@ class friendlyPMC {
 			if (!is_hostile) {
 				// do these do anything?
 
-				if (pmcType == "bear") {
+				if (pmcType == "bear" || pmcType == "sptbear" || pmcType == "pmcbear") {
 					clearWrongEnemy(diff.Mind, "sptBear");
 					clearWrongEnemy(diff.Mind, "bear");
-				} else if (pmcType == "usec") {
+					clearWrongEnemy(diff.Mind, "pmcBEAR");
+				} else if (pmcType == "usec" || pmcType == "sptusec" || pmcType == "pmcusec") {
 					clearWrongEnemy(diff.Mind, "sptUsec");
 					clearWrongEnemy(diff.Mind, "usec");
+					clearWrongEnemy(diff.Mind, "pmcUSEC");
 				}
 			}
 			// ensure these settings are set last as they are not dependent of "is_hostile" flag
@@ -326,6 +357,21 @@ class friendlyPMC {
 		const result = this.originalGetValidTraderIdByEnumValue(traderEnumValue);
 
 		return result;
+	}
+
+	generateBot(sessionId: string, bot: IBotBase, botJsonTemplate: IBotType, botGenerationDetails: BotGenerationDetails) {
+		const role = botGenerationDetails.role.toLowerCase();
+		if (role == "followerbirdeye" || role == "followerbigpipe" || role == "bossknight") {
+			botJsonTemplate.generation.items.healing.weights = {
+				"0": 0,
+				"1": 2,
+				"2": 6,
+			};
+
+			this.Logger.info("FriendlyPMC:  Patching bot generation for " + role);
+		}
+
+		return this.originalGenerateBot(sessionId, bot, botJsonTemplate, botGenerationDetails);
 	}
 }
 

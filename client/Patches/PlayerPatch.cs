@@ -1,12 +1,12 @@
-﻿using Aki.Reflection.Patching;
-using Comfort.Common;
+﻿using SPT.Reflection.Patching;
+
 using EFT;
-using friendlyPMC.Components;
+
 using friendlyPMC.Modules;
 using HarmonyLib;
 using System;
 using System.Reflection;
-using UnityEngine;
+
 namespace friendlyPMC.Patches
 {
     internal class AIDataDisposePatch : ModulePatch

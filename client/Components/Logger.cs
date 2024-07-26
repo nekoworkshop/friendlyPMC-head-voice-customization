@@ -1,4 +1,5 @@
 ﻿using BepInEx.Logging;
+using UnityEngine;
 
 namespace friendlyPMC.Components
 {
@@ -12,7 +13,7 @@ namespace friendlyPMC.Components
 
         public static void LogInfo(string message)
         {
-            Instance.LogInfo(message);
+            Instance.LogInfo($"[{Time.time}]" + message);
         }
     }
 }

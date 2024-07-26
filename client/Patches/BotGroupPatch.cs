@@ -1,15 +1,14 @@
-﻿using Aki.Reflection.Patching;
+﻿using SPT.Reflection.Patching;
 using EFT;
 using friendlyPMC.Components;
 using friendlyPMC.Modules;
 using HarmonyLib; 
-using JetBrains.Annotations;
-using Sirenix.Serialization.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using UnityEngine;
 using static UnityEngine.EventSystems.EventTrigger;
+using UnityEngine;
+using friendlyPMC.Utils;
 
 namespace friendlyPMC.Patches
 {
@@ -42,7 +41,7 @@ namespace friendlyPMC.Patches
 
         }
         [PatchPrefix]
-        private static bool PatchPrefix(BotsGroup __instance, IPlayer person, EBotEnemyCause cause)
+        private static bool PatchPrefix(BotsGroup __instance, ref bool __result, IPlayer person, EBotEnemyCause cause)
         {
             if (person == null || (person.IsAI && person.AIData?.BotOwner?.GetPlayer == null))
             {
@@ -51,22 +50,36 @@ namespace friendlyPMC.Patches
 
             var plBoss = BossPlayers.GetBoss(person.ProfileId);
             var isgroup = BossPlayers.IsBossGroup(__instance.Id);
-
+            
+            
+            
             if (isgroup && plBoss != null)
             {
-                // prevent enemies from being added on spawn
-                if (
-                    cause == EBotEnemyCause.initCauseEnemy ||
-                    cause == EBotEnemyCause.initial ||
-                    cause == EBotEnemyCause.AddEnemyToAllGroupsInBotZone ||
-                    cause == EBotEnemyCause.AddEnemyToAllGroups
-                ) return false;
-
-                // prevent boss player from being added as enemy to the group
                 BotsGroup bossGroup = plBoss.bossGroup;
-                if (bossGroup != null && __instance.Id == bossGroup.Id)
+                // prevent boss players from being added as enemy to the group
+
+                if ((bossGroup != null && __instance.Id == bossGroup.Id) || __instance.Side == plBoss.realPlayer.Side)
                 {
+                    __result = false;
                     return false;
+                }
+            }
+
+            // prevent same side from being added just because they have a different role
+            if (cause == EBotEnemyCause.addBotNoGroup || cause == EBotEnemyCause.AddNewMember || cause == EBotEnemyCause.warn)
+            {
+                if (__instance.Side == person.Side)
+                {
+                    var _initialBotMindSettings = AccessTools.Field(typeof(BotsGroup), "_initialBotMindSettings").GetValue(__instance) as BotGlobalsMindSettings;
+                    if (
+                        (person.Side == EPlayerSide.Bear && !_initialBotMindSettings.DEFAULT_BEAR_BEHAVIOUR.HasFlag(EWarnBehaviour.Attack)) ||
+                        (person.Side == EPlayerSide.Usec && !_initialBotMindSettings.DEFAULT_USEC_BEHAVIOUR.HasFlag(EWarnBehaviour.Attack)) ||
+                        (person.Side == EPlayerSide.Savage && !_initialBotMindSettings.DEFAULT_SAVAGE_BEHAVIOUR.HasFlag(EWarnBehaviour.Attack))
+                    )
+                    {
+                        __result = false;
+                        return false;
+                    }
                 }
             }
 
@@ -95,7 +108,7 @@ namespace friendlyPMC.Patches
                         {
                             foreach (var item in _members)
                             {
-                                bossGroup.AddEnemy(item, EBotEnemyCause.checkAddTODO);
+                                bossGroup.AddEnemy(item, EBotEnemyCause.addPlayerToBoss);
                             }
                         }
                     }
@@ -122,6 +135,22 @@ namespace friendlyPMC.Patches
             {
                 BotsGroup bossGroup = BossPlayers.Instance.GetBossPlayer(player.ProfileId).bossGroup;
                 if (bossGroup != null && __instance.Id == bossGroup.Id)
+                {
+                    __result = false;
+                    return false;
+                }
+            }
+
+            var _initialBotMindSettings = AccessTools.Field(typeof(BotsGroup), "_initialBotMindSettings").GetValue(__instance) as BotGlobalsMindSettings;
+
+            // prevent same side from being added just because they have a different role
+            if (_initialBotMindSettings != null && player.Side == __instance.Side)
+            {
+                if (
+                    (player.Side == EPlayerSide.Bear && !_initialBotMindSettings.DEFAULT_BEAR_BEHAVIOUR.HasFlag(EWarnBehaviour.Attack)) ||
+                    (player.Side == EPlayerSide.Usec && !_initialBotMindSettings.DEFAULT_USEC_BEHAVIOUR.HasFlag(EWarnBehaviour.Attack)) ||
+                    (player.Side == EPlayerSide.Savage && !_initialBotMindSettings.DEFAULT_SAVAGE_BEHAVIOUR.HasFlag(EWarnBehaviour.Attack))
+                )
                 {
                     __result = false;
                     return false;

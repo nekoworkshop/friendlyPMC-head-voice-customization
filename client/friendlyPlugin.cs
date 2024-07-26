@@ -3,15 +3,12 @@ using BepInEx.Configuration;
 using Comfort.Common;
 using EFT;
 using EFT.UI;
-using EFT.UI.Gestures;
+
 using friendlyPMC.Modules;
 using friendlyPMC.Patches;
-using friendlyPMC.Utils;
 using HarmonyLib;
-using System;
+
 using System.Collections.Generic;
-using System.Reflection;
-using System.Security.Cryptography;
 using UnityEngine;
 
 using Logger = friendlyPMC.Components.Logger;
@@ -30,7 +27,8 @@ namespace friendlyPMC
     public enum CustomBotDecisions
     {
         SniperSearch = 100,
-        CoverToCover = 101
+        CoverToCover = 101,
+        EnemySearch = 102
     }
 
     public enum CustomPhrases
@@ -38,8 +36,15 @@ namespace friendlyPMC
         TeamStatus = 200
     }
 
-    [BepInPlugin("xyz.pit.companion", "friendlyPMC", "3.3.5")]
-    [BepInDependency("com.spt-aki.core", "3.8.0")]
+    public class FollowerUtils
+    {
+        public static bool IsFollower(BotOwner Bot)
+        {
+            return BossPlayers.Instance.IsFollower(Bot);
+        }
+    }
+
+    [BepInPlugin("xyz.pit.companion", "friendlyPMC", "3.4.0")]
     [BepInDependency("xyz.drakia.bigbrain")]
     [BepInDependency("xyz.drakia.waypoints")]
     [BepInDependency("com.Arys.UnityToolkit")]
@@ -83,7 +88,6 @@ namespace friendlyPMC
         public static ConfigEntry<bool> birdEyeSpawn;
         public static ConfigEntry<bool> justKnightSpawn;
 
-        public static ConfigEntry<KeyboardShortcut> pingKey;
         private void Awake()
         {
 
@@ -97,8 +101,6 @@ namespace friendlyPMC
             squadDelay = Config.Bind(baseSettings, "1.3  -  Squad spawn Delay", 0, new ConfigDescription("When Squad Spawn is active, how much to delay the spawn of the squad ( in sec.). This is useful in case you have Swag+Donuts. Set delay above 10 seconds.", new AcceptableValueRange<int>(0, 30)));
 
             returnChanceDeath = Config.Bind(baseSettings, "1.5  -  Squadmate return chance after death", 50, new ConfigDescription("Chance your followers will return the items you gave them should you die. This applies only to members you spawned with.", new AcceptableValueRange<int>(1, 100)));
-
-            pingKey = Config.Bind(baseSettings, "2 Ping Squad", new KeyboardShortcut(KeyCode.F10), new ConfigDescription("Configurable key to trigger location of where your squad is"));
 
             scanDistance = Config.Bind(miscSettings, "1 Maximum scan distance", 140, new ConfigDescription("Maximum distance to pick up any visible enemy that the player is signaling when issuing 'Contact' phrase", new AcceptableValueRange<int>(50, 300)));
 
@@ -160,13 +162,9 @@ namespace friendlyPMC
             new BotMemoryAddEnemyPatch().Enable();
             new BotGroupUsecEnemyPatch().Enable();
 
-            var harmony = new Harmony("xyz.pit.companion");
-            harmony.PatchAll(typeof(GoalEnemyTracePatch).Assembly);
-
             new BotOwnerIsFolowerPatch().Enable();
             new BotOwnerManualUpdatePatch().Enable();
-
-            //new EnemyInfoIsPointInVisibleSectorPatch().Enable();
+            new BotOwnerActivatePatch().Enable();
 
             new PatrolDataFollowerPatch().Enable();
 
@@ -195,35 +193,13 @@ namespace friendlyPMC
 
             new QuickPanelPatch().Enable();
             new GestureMenuPatch().Enable();
+            new GestureMenuAvailablePhrasesPatch().Enable();
             new EPhraseTriggerPatch().Enable();
 
-        }
+            var harmony = new Harmony("xyz.pit.companion");
+            harmony.PatchAll(typeof(LocalGameCtorPatch).Assembly);
 
-        void Update()
-        {
-            GameWorld gameWorld = Singleton<GameWorld>.Instance;
-            if (gameWorld == null) return;
-
-            if (GamePlayerOwner.MyPlayer == null || GamePlayerOwner.MyPlayer.HealthController == null || !GamePlayerOwner.MyPlayer.HealthController.IsAlive)
-            {
-                return;
-            }
-
-            if (pingKey.Value.IsPressed())
-            {
-
-                string id = GamePlayerOwner.MyPlayer.ProfileId;
-
-                if (BossPlayers.Instance != null && PingTeamates.Instance != null)
-                {
-                    var boss = BossPlayers.Instance.GetBossPlayer(id);
-                    if (boss != null)
-                    {
-                        PingTeamates.Instance.Ping(boss);
-                    }
-                }
-
-            }
+            SAINPatch.PatchSAINIfInstalled();
 
         }
 

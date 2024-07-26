@@ -1,5 +1,4 @@
-﻿using Aki.PrePatch;
-using Aki.Reflection.Patching;
+﻿using SPT.Reflection.Patching;
 using Cysharp.Threading.Tasks;
 using EFT;
 using friendlyPMC.Actions;
@@ -14,10 +13,13 @@ using System.Threading;
 using UnityEngine;
 
 
-using BotCacheClass = GClass591;
 using IProfileData = GClass592;
 
 using friendlyPMC.Utils;
+using Comfort.Common;
+using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
+using System.Security.Policy;
 
 
 
@@ -41,6 +43,7 @@ namespace friendlyPMC.Patches
             cancelSource.Cancel();
         }
     }
+
     internal class BotsControllerPatch : ModulePatch
     {
         public static BotsControllerPatch Instance;
@@ -76,11 +79,10 @@ namespace friendlyPMC.Patches
             var allPlayers = AccessTools.Field(typeof(BotSpawner), "_allPlayers").GetValue(botSpawnerClass) as List<Player>;
 
             var allBotZones = AccessTools.Field(typeof(BotSpawner), "_allBotZones").GetValue(botSpawnerClass) as BotZone[];
-            var _freeForAll = (bool)AccessTools.Field(typeof(BotSpawner), "_freeForAll").GetValue(botSpawnerClass);
+            bool _freeForAll = true;
 
-
-            WildSpawnType sptBear = (WildSpawnType)AkiBotsPrePatcher.sptBearValue;
-            WildSpawnType sptUsec = (WildSpawnType)AkiBotsPrePatcher.sptUsecValue;
+            WildSpawnType sptBear = WildSpawnType.pmcBEAR;
+            WildSpawnType sptUsec = WildSpawnType.pmcUSEC;
 
             WildSpawnType roleh;
             bool sameSideHostile;
@@ -97,7 +99,7 @@ namespace friendlyPMC.Patches
             {
                 roleh = WildSpawnType.assault;
             }
-            
+
             GetSameSideHostile(roleh, player.Player().Side, out sameSideHostile);
 
             EPlayerSide side = player.realPlayer.Side;
@@ -185,7 +187,7 @@ namespace friendlyPMC.Patches
         {
             isHostile = false;
 
-            BotSettingsComponents botSettingsComponents = GClass532.smethod_1(BotDifficulty.normal, role, false);
+            BotSettingsComponents botSettingsComponents = GClass531.smethod_1(BotDifficulty.normal, role, false);
             if(botSettingsComponents != null)
             {
                 if (side == EPlayerSide.Bear) isHostile = botSettingsComponents.Mind.DEFAULT_BEAR_BEHAVIOUR.HasFlag(EWarnBehaviour.Attack);
@@ -193,6 +195,50 @@ namespace friendlyPMC.Patches
                 else isHostile = botSettingsComponents.Mind.DEFAULT_SAVAGE_BEHAVIOUR.HasFlag(EWarnBehaviour.Attack);
             }
         }
+
+        public async UniTask ActivateBot(GClass814 botCreator, Profile profile, Vector3 position, int pointId,  BotZone zone, Func<BotOwner, BotZone, BotsGroup>groupAction, Action<BotOwner> callback)
+        {
+            LocalGame game = LocalGameCtorPatch.Instance;
+
+            BotSpawner botSpawnerClass = Controller.BotSpawner;
+
+            IBotGame botGame = AccessTools.Field(typeof(BotSpawner), "_game").GetValue(botSpawnerClass) as IBotGame;
+
+            Dictionary<string, Player> dictionary_2 = null;
+
+            dictionary_2 = AccessTools.Field(typeof(LocalGame), "dictionary_2").GetValue(game) as Dictionary<string, Player>;
+
+            // recreation of ActivateBot from GClass814
+            GClass814.Class509 @class = new GClass814.Class509();
+            @class.gclass814_0 = botCreator;
+            @class.zone = zone;
+
+            @class.callback = callback;
+
+            @class.groupAction = groupAction;
+
+
+            GClass590 bornInfo = new GClass590(position, pointId, false);
+            // this is part of method_17 from LocalGame
+            int playerId = game.method_12();
+            profile.SetSpawnedInSession(profile.Info.Side == EPlayerSide.Savage);
+
+            LocalPlayer localPlayer = await LocalPlayer.Create(playerId, bornInfo.position, Quaternion.identity, "Player", "", EPointOfView.ThirdPerson, profile, true, game.UpdateQueue, Player.EUpdateMode.Auto, Player.EUpdateMode.Auto, BackendConfigAbstractClass.Config.CharacterController.BotPlayerMode, new Func<float>(LocalGame.Class1394.class1394_0.method_4), new Func<float>(LocalGame.Class1394.class1394_0.method_5), new GClass1800(), GClass1457.Default, null, null, false);
+            localPlayer.Location = game.Location_0.Id;
+
+            dictionary_2.Add(localPlayer.ProfileId, localPlayer);
+
+            // method_2 of GClass814
+            AICorePoint corePoint = Controller.CoversData.AICorePointsHolder.GetCorePoint(bornInfo.CorePointId);
+            BotOwner botOwner = BotOwner.Create(localPlayer, null, botGame.GameDateTime, Controller, true, corePoint);
+            botCreator.method_4(botOwner.GetPlayer);
+            botCreator.method_5(botOwner, false);
+            botOwner.GetComponentsInChildren<Collider>();
+            botOwner.GetPlayer.CharacterController.isEnabled = false;
+
+            @class.method_0(botOwner);
+        }
+
         public async UniTask SpawnBossFollower(pitAIBossPlayer player, WildSpawnType boss = WildSpawnType.bossKnight, CancelToken cancelToken = null)
         {
             
@@ -201,8 +247,7 @@ namespace friendlyPMC.Patches
             CancelToken token = cancelToken != null ? cancelToken :  new CancelToken();
 
             var botSpawnerClass = Controller.BotSpawner;
-            var botCreator = AccessTools.Field(typeof(BotSpawner), "_botCreator").GetValue(botSpawnerClass) as IBotCreator;
-
+            var botCreator = AccessTools.Field(typeof(BotSpawner), "_botCreator").GetValue(botSpawnerClass) as GClass814;
 
             Vector3 position = player.Position;
             EPlayerSide side = player.Player().Side;
@@ -214,7 +259,7 @@ namespace friendlyPMC.Patches
             @params.ShallBeGroup = new ShallBeGroupParams(true, false, 4);
 
             IProfileData botData = new IProfileData(side, boss, BotDifficulty.hard, 0f, @params);
-            List<IProfileData> bossFollowers = new List<IProfileData> { };
+            List<IProfileData> bossFollowers = new List<IProfileData> { };;
 
             if (boss == WildSpawnType.bossKnight)
             {
@@ -223,14 +268,14 @@ namespace friendlyPMC.Patches
                 if (friendlyPMC.birdEyeSpawn.Value) bossFollowers.Add(new IProfileData(side, WildSpawnType.followerBirdEye, BotDifficulty.impossible, 0f, @params));
             }
 
-            BotCacheClass bot = await BotCacheClass.Create(botData, botCreator, 1, botSpawnerClass);
+            BotCreationDataClass bot = await BotCreationDataClass.Create(botData, botCreator, 1, botSpawnerClass);
 
 
             if (bossFollowers.Count > 0)
             {
                 foreach (var item in bossFollowers)
                 {
-                    BotCacheClass flw = await BotCacheClass.Create(item, botCreator, 1, botSpawnerClass);
+                    BotCreationDataClass flw = await BotCreationDataClass.Create(item, botCreator, 1, botSpawnerClass);
                     bot.AddProfiles(flw.Profiles);
                 }
 
@@ -243,6 +288,7 @@ namespace friendlyPMC.Patches
 
             var closestCorePoint = GetClosestCorePoint(Controller, position);
             bot.AddPosition(position, closestCorePoint.Id);
+
 
             List<Action> spanwers = new List<Action>();
 
@@ -320,27 +366,23 @@ namespace friendlyPMC.Patches
                     {
                         if (side == EPlayerSide.Bear)
                         {
-                            profile.Info.Settings.Role = (WildSpawnType)AkiBotsPrePatcher.sptBearValue;
+                            profile.Info.Settings.Role = WildSpawnType.pmcBEAR;
                         }
                         else if (side == EPlayerSide.Usec)
                         {
-                            profile.Info.Settings.Role = (WildSpawnType)AkiBotsPrePatcher.sptUsecValue;
+                            profile.Info.Settings.Role = WildSpawnType.pmcUSEC;
                         }
                         else
                             profile.Info.Settings.Role = WildSpawnType.assault;
 
                     }
 
-                    botCreator.ActivateBot(profile, new GClass590(position, closestCorePoint.Id, false), zone, true, new Func<BotOwner, BotZone, BotsGroup>((BotOwner bt, BotZone zn) =>
-                    {
-                        return GetPlayerGroup(player, bt, zn);
-
-                    }), new Action<BotOwner>((BotOwner owner) =>
+                    Action<BotOwner> OnActivate = new Action<BotOwner>((BotOwner owner) =>
                     {
                         Action<BotOwner> OnBotState = new Action<BotOwner>((BotOwner me) =>
                         {
                             BotOwnerManualUpdatePatch.BotOwnerUpdate.Remove(me.ProfileId); // clear watcher
-                            
+
                             try
                             {
                                 // prevent attack of player on spawn
@@ -355,8 +397,8 @@ namespace friendlyPMC.Patches
                                 {
                                     me.GetPlayer.Profile.Info.Side = side;
                                 }
-                                
-                                if(!me.IsRole(botRole))
+
+                                if (!me.IsRole(botRole))
                                 {
                                     me.GetPlayer.Profile.Info.Settings.Role = botRole;
                                 }
@@ -381,22 +423,22 @@ namespace friendlyPMC.Patches
 
                                 BossPlayers.Instance.AddFollower(me, player, false, botRole); // make bot a follower
 
-                                var Timer = StaticManager.Instance.TimerManager.MakeTimer(TimeSpan.FromSeconds(1), false);
-
-                                Timer.OnTimer += () =>
+                                Utils.Utils.SetTimeout(() =>
                                 {
-                                    if (spanwers.Count > 0) {
+                                    if (spanwers.Count > 0)
+                                    {
                                         spanwers[spanwers.Count - 1].Invoke();
                                         spanwers.RemoveAt(spanwers.Count - 1);
-                                    } else
+                                    }
+                                    else
                                     {
                                         token.Cancel();
                                     }
-                                };
+                                }, 1000);
                             }
                             catch (Exception ex)
                             {
-                                Components.Logger.LogInfo("Failed to add "+me.Profile.Nickname + " as ally: " + ex.Message);
+                                Components.Logger.LogInfo("Failed to add " + me.Profile.Nickname + " as ally: " + ex.Message);
                                 Components.Logger.LogInfo("Trace : " + ex.StackTrace);
                             }
                         });
@@ -413,17 +455,42 @@ namespace friendlyPMC.Patches
                         {
                             Components.Logger.LogInfo("Ally " + follower.Profile.Nickname + " spawned");
 
-                            var Timer = StaticManager.Instance.TimerManager.MakeTimer(TimeSpan.FromSeconds(2), false);
-
-                            Timer.OnTimer += () =>
+                            Utils.Utils.SetTimeout(() =>
                             {
                                 follower.BotTalk.TrySay(EPhraseTrigger.Ready, false);
-                            };
+                            }, 2000);
 
                         }), true, stopWatch);
 
-                    }), token.GetCancelToken());
-                });   
+                    });
+
+                    Func<BotOwner, BotZone, BotsGroup> GroupAction = new Func<BotOwner, BotZone, BotsGroup>((BotOwner bt, BotZone zn) =>
+                    {
+                        return GetPlayerGroup(player, bt, zn);
+                    });
+
+                    Type fikaType = Type.GetType("Fika.Core.Coop.GameMode.CoopGame, Fika.Core");
+
+                    if (fikaType != null)
+                    {
+                        botCreator.ActivateBot(
+                            profile,
+                            new GClass590(position, closestCorePoint.Id, false),
+                            zone, true,
+                            GroupAction,
+                            OnActivate,
+                            token.GetCancelToken()
+                        );
+                    }
+                    else
+                    {
+                        ActivateBot(botCreator, profile, position, closestCorePoint.Id, zone,
+                            GroupAction,
+                            OnActivate
+                        ).Forget();
+                    }
+
+            });   
             });
 
             spanwers.Reverse();
@@ -439,7 +506,7 @@ namespace friendlyPMC.Patches
             CancelToken token = new CancelToken();
 
             var botSpawnerClass = Controller.BotSpawner;
-            var botCreator = AccessTools.Field(typeof(BotSpawner), "_botCreator").GetValue(botSpawnerClass) as IBotCreator;
+            var botCreator = AccessTools.Field(typeof(BotSpawner), "_botCreator").GetValue(botSpawnerClass) as GClass814;
            
 
             Vector3 position = player.Position;
@@ -448,8 +515,8 @@ namespace friendlyPMC.Patches
 
             BotZone zone = botSpawnerClass.GetClosestZone(position, out dist);
 
-            WildSpawnType sptBear = (WildSpawnType)AkiBotsPrePatcher.sptBearValue;
-            WildSpawnType sptUsec = (WildSpawnType)AkiBotsPrePatcher.sptUsecValue;
+            WildSpawnType sptBear = WildSpawnType.pmcBEAR;
+            WildSpawnType sptUsec = WildSpawnType.pmcUSEC;
 
             WildSpawnType type;
             if (side == EPlayerSide.Bear)
@@ -472,7 +539,7 @@ namespace friendlyPMC.Patches
 
             IProfileData botData = new IProfileData(side, type, BotDifficulty.hard, 0f, @params);
 
-            BotCacheClass bot = await BotCacheClass.Create(botData, botCreator, memberCount, botSpawnerClass);
+            BotCreationDataClass bot = await BotCreationDataClass.Create(botData, botCreator, memberCount, botSpawnerClass);
 
             // copy player equipment
             if (friendlyPMC.copyEquip.Value && side != EPlayerSide.Savage) bot.Profiles.ForEach(profile =>
@@ -483,9 +550,17 @@ namespace friendlyPMC.Patches
                 }
             });
 
-            
-            
-            bot.Profiles.ForEach(profile => {
+            List<Action> spanwers = new List<Action>();
+
+            Components.Logger.LogInfo("Spawn Followers");
+
+            var closestCorePoint = GetClosestCorePoint(Controller, position);
+            bot.AddPosition(position, closestCorePoint.Id);
+
+            float spawnedFollowers = 0;
+
+            bot.Profiles.ForEach(async profile =>
+            {
                 // followers should use the same groupID as the player
                 profile.Info.GroupId = player.realPlayer.GroupId;
                 // spawned followers will have a different health than the rest
@@ -525,81 +600,78 @@ namespace friendlyPMC.Patches
                         }
                     }
                 }
-            });
 
-            var closestCorePoint = GetClosestCorePoint(Controller, position);
-            bot.AddPosition(position, closestCorePoint.Id);
-
-            Stopwatch stopWatch = new Stopwatch();
-
-
-            Components.Logger.LogInfo("Spawn Followers");
-
-            float spawnedFollowers = 0;
-
-            botCreator.ActivateBot(bot, zone, true, new Func<BotOwner, BotZone, BotsGroup>((BotOwner bt, BotZone zn) =>
-            {
-                return GetPlayerGroup(player, bt, zn);
-
-            }), new Action<BotOwner>((BotOwner owner) =>
-            {
-                bool shallBeGroup = bot.SpawnParams?.ShallBeGroup != null;
-
+                Stopwatch stopWatch = new Stopwatch();
                 stopWatch.Start();
 
-                Action<BotOwner> OnBotState = new Action<BotOwner>((BotOwner me) =>
-                {
-                    try
+                await ActivateBot(
+                    botCreator, profile, position, closestCorePoint.Id, zone,
+                    new Func<BotOwner, BotZone, BotsGroup>((BotOwner bt, BotZone zn) =>
                     {
-                        BotOwnerManualUpdatePatch.BotOwnerUpdate.Remove(me.ProfileId); // clear watcher
+                        return GetPlayerGroup(player, bt, zn);
 
-                        me.Memory.DeleteInfoAboutEnemy(player.Player()); // prevent attack of player on spawn
+                    }), new Action<BotOwner>((BotOwner owner) =>
+                    {
 
-                        BossPlayers.Instance.AddFollower(me, player, true); // make bot a follower
+                        bool shallBeGroup = bot.SpawnParams?.ShallBeGroup != null;
 
-                        me.GetPlayer.ActiveHealthController.RestoreFullHealth(); // ensure bot has full health
+                        stopWatch.Start();
 
-                        if (side == EPlayerSide.Savage)
+                        Action<BotOwner> OnBotState = new Action<BotOwner>((BotOwner me) =>
                         {
-                            (me.Brain.BaseBrain as FollowerBrain).SetBossTactic("ally");
+                            try
+                            {
+                                BotOwnerManualUpdatePatch.BotOwnerUpdate.Remove(me.ProfileId); // clear watcher
+
+                                me.Memory.DeleteInfoAboutEnemy(player.Player()); // prevent attack of player on spawn
+
+                                BossPlayers.Instance.AddFollower(me, player, true); // make bot a follower
+
+                                me.GetPlayer.ActiveHealthController.RestoreFullHealth(); // ensure bot has full health
+
+                                if (side == EPlayerSide.Savage)
+                                {
+                                    (me.Brain.BaseBrain as FollowerBrain).SetBossTactic("ally");
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                Components.Logger.LogInfo("Failed to add " + me.Profile.Nickname + " as follower : " + ex.Message);
+                                Components.Logger.LogInfo("Trace: " + ex.StackTrace);
+                            }
+                        });
+
+                        BotOwnerManualUpdatePatch.BotOwnerUpdate.Add(owner.ProfileId, OnBotState);
+
+                        // force player side on the bot
+                        if (owner.Side != side)
+                        {
+                            owner.GetPlayer.Profile.Info.Side = side;
                         }
-                    } catch (Exception ex)
-                    {
-                        Components.Logger.LogInfo("Failed to add " + me.Profile.Nickname + " as follower : " + ex.Message);
-                        Components.Logger.LogInfo("Trace: " + ex.StackTrace);
-                    }
-                });
-
-                BotOwnerManualUpdatePatch.BotOwnerUpdate.Add(owner.ProfileId, OnBotState);
-
-                // force player side on the bot
-                if(owner.Side != side)
-                {
-                    owner.GetPlayer.Profile.Info.Side = side;
-                }
 
 
-                botSpawnerClass.method_10(owner, bot, new Action<BotOwner>((BotOwner follower)=>
-                {
+                        botSpawnerClass.method_10(owner, bot, new Action<BotOwner>((BotOwner follower) =>
+                        {
 
-                    Components.Logger.LogInfo("Follower " + follower.Profile.Nickname + " spawned");
+                            Components.Logger.LogInfo("Follower " + follower.Profile.Nickname + " spawned");
 
-                    spawnedFollowers++;
-                    if (spawnedFollowers >= memberCount)
-                    {
-                        token.Cancel();
-                    }
+                            spawnedFollowers++;
+                            
+                            if (spawnedFollowers >= memberCount)
+                            {
+                                token.Cancel();
+                            }
 
-                    var Timer = StaticManager.Instance.TimerManager.MakeTimer(TimeSpan.FromSeconds(2), false);
+                            Utils.Utils.SetTimeout(() =>
+                            {
+                                follower.BotTalk.TrySay(EPhraseTrigger.Ready, false);
+                            },2000);
 
-                    Timer.OnTimer += () =>
-                    {
-                        follower.BotTalk.TrySay(EPhraseTrigger.Ready, false);
-                    };
+                        }), false, stopWatch);
 
-                }) , false, stopWatch );
-
-            }), token.GetCancelToken());
+                    })
+                );
+            });
 
         }
 
@@ -640,8 +712,7 @@ namespace friendlyPMC.Patches
 
             if (friendlyPMC.alternativeSpawn.Value == true)
             {
-                var Timer = StaticManager.Instance.TimerManager.MakeTimer(TimeSpan.FromSeconds(friendlyPMC.squadDelay.Value), false);
-                Timer.OnTimer += () =>
+                Utils.Utils.SetBotTimer(() =>
                 {
                     try
                     {
@@ -649,13 +720,12 @@ namespace friendlyPMC.Patches
                         Instance.SpawnGroupBots(playerBoss).Forget();
                     }
                     catch (Exception e) { Components.Logger.LogInfo("Failed Alternative Spawn Process #1: " + e.Message); }
-                };
+                }, friendlyPMC.squadDelay.Value);
 
 
                 if (friendlyPMC.knightSpawn.Value)
                 {
-                    var Timer2 = StaticManager.Instance.TimerManager.MakeTimer(TimeSpan.FromSeconds(friendlyPMC.squadDelay.Value + 1), false);
-                    Timer2.OnTimer += () =>
+                    Utils.Utils.SetBotTimer(() =>
                     {
                         try
                         {
@@ -663,7 +733,7 @@ namespace friendlyPMC.Patches
                             Instance.SpawnBossFollower(playerBoss).Forget();
                         }
                         catch (Exception e) { Components.Logger.LogInfo("Failed Alternative Spawn Process #2: " + e.Message); }
-                    };
+                    },(friendlyPMC.squadDelay.Value + 1));
                     
                 }
             }
@@ -697,15 +767,15 @@ namespace friendlyPMC.Patches
                             BotsControllerPatch.Instance.SpawnGroupBots(playerBoss).Forget();
                         } else
                         {
-                            var Timer = StaticManager.Instance.TimerManager.MakeTimer(TimeSpan.FromSeconds(friendlyPMC.squadDelay.Value), false);
-                            Timer.OnTimer += () =>
+                            Utils.Utils.SetBotTimer(() =>
                             {
                                 try
                                 {
                                     BotsControllerPatch.Instance.SpawnGroupBots(playerBoss).Forget();
                                 }
-                                catch(Exception e) { Components.Logger.LogInfo("Failed Delayed Squad Spawn Process " + e.Message); }
-                            };
+                                catch (Exception e) { Components.Logger.LogInfo("Failed Delayed Squad Spawn Process " + e.Message); }
+
+                            }, friendlyPMC.squadDelay.Value);
                         }
                     }
                 });
@@ -717,16 +787,15 @@ namespace friendlyPMC.Patches
 
                 BotsControllerPatch.spawnedPlayers.ForEach(playerBoss =>
                 {
-                    var Timer = StaticManager.Instance.TimerManager.MakeTimer(TimeSpan.FromSeconds(friendlyPMC.squadDelay.Value + 1), false);
-                    Timer.OnTimer += () =>
+                    Utils.Utils.SetBotTimer(() =>
                     {
                         try
                         {
-
                             BotsControllerPatch.Instance.SpawnBossFollower(playerBoss).Forget();
                         }
                         catch (Exception e) { Components.Logger.LogInfo("Failed Delayed Boss Ally Process " + e.Message); }
-                    };
+
+                    }, (friendlyPMC.squadDelay.Value + 1));
                 });
             }
         }
@@ -760,11 +829,11 @@ namespace friendlyPMC.Patches
     {
         protected override MethodBase GetTargetMethod()
         {
-            return AccessTools.Method(typeof(GClass579), "Run");
+            return AccessTools.Method(typeof(BossSpawnWaveManagerClass), "Run");
 
         }
         [PatchPostfix]
-        private static void PatchPostfix(GClass579 __instance, EBotsSpawnMode spawnMode = EBotsSpawnMode.Anyway)
+        private static void PatchPostfix(BossSpawnWaveManagerClass __instance, EBotsSpawnMode spawnMode = EBotsSpawnMode.Anyway)
         {
             WavesSpawnScenarioRunPatch.SpawnFollowers();
         }
@@ -796,9 +865,22 @@ namespace friendlyPMC.Patches
 
             Utils.EnemyInfo.ClearEnemiesLocations();
 
+            if (LocalGameCtorPatch.Instance != null) LocalGameCtorPatch.Instance = null;
+
             Components.Logger.LogInfo("Raid Ended");
 
             return true;
+        }
+    }
+
+
+    [HarmonyPatch(typeof(LocalGame),MethodType.Constructor)]
+    internal class LocalGameCtorPatch
+    {
+        public static LocalGame Instance;
+        public static void Postfix(LocalGame __instance)
+        {
+            Instance = __instance;
         }
     }
 

@@ -1,14 +1,14 @@
-﻿using Aki.PrePatch;
+﻿
 using EFT;
 
 using HarmonyLib;
-using LootingBots.Patch.Components;
+
 using System;
 
 using friendlyPMC.Components.BossFollower;
 using friendlyPMC.Components.FollowerBossFollower;
 using friendlyPMC.Actions;
-using LootingBots.Patch.Util;
+
 using System.Linq;
 
 namespace friendlyPMC.Components
@@ -29,11 +29,14 @@ namespace friendlyPMC.Components
 
         public override void SetFollowerSettings(BotOwner bot)
         {
-            settingModif.AccuratySpeedCoef = 1.5f;
+
+            settingModif.PrecicingSpeedCoef = 1.35f;
+            settingModif.AccuratySpeedCoef = 1.35f;
+            settingModif.ScatteringCoef = 1.7f;
 
             base.SetFollowerSettings(bot);
             
-            bot.Settings.FileSettings.Core.HearingSense = 1.0f;
+            //bot.Settings.FileSettings.Core.HearingSense = 1.0f;
 
 
             if (bot.IsRole(WildSpawnType.followerBirdEye))
@@ -55,8 +58,8 @@ namespace friendlyPMC.Components
 
             EPlayerSide side = _player.Player().Side;
 
-            WildSpawnType sptBear = (WildSpawnType)AkiBotsPrePatcher.sptBearValue;
-            WildSpawnType sptUsec = (WildSpawnType)AkiBotsPrePatcher.sptUsecValue;
+            WildSpawnType sptBear = WildSpawnType.pmcBEAR;
+            WildSpawnType sptUsec = WildSpawnType.pmcUSEC;
 
             var _initialBot = AccessTools.Field(typeof(BotsGroup), "_initialBot").GetValue(_player.bossGroup) as BotOwner;
 
@@ -73,7 +76,6 @@ namespace friendlyPMC.Components
                         if (!_initialBot.Settings.FileSettings.Mind.DEFAULT_BEAR_BEHAVIOUR.HasFlag(EWarnBehaviour.Attack))
                         {
                             bot.Settings.FileSettings.Mind.FRIENDLY_BOT_TYPES = bot.Settings.FileSettings.Mind.FRIENDLY_BOT_TYPES.AddItem(botType).ToArray();
-                            bot.Settings.FileSettings.Mind.WARN_BOT_TYPES = bot.Settings.FileSettings.Mind.WARN_BOT_TYPES.AddItem(botType).ToArray();
                         } else
                         {
                             bot.Settings.FileSettings.Mind.ENEMY_BOT_TYPES = bot.Settings.FileSettings.Mind.ENEMY_BOT_TYPES.AddItem(botType).ToArray();
@@ -85,7 +87,6 @@ namespace friendlyPMC.Components
                         if (!_initialBot.Settings.FileSettings.Mind.DEFAULT_USEC_BEHAVIOUR.HasFlag(EWarnBehaviour.Attack))
                         {
                             bot.Settings.FileSettings.Mind.FRIENDLY_BOT_TYPES = bot.Settings.FileSettings.Mind.FRIENDLY_BOT_TYPES.AddItem(botType).ToArray();
-                            bot.Settings.FileSettings.Mind.WARN_BOT_TYPES = bot.Settings.FileSettings.Mind.WARN_BOT_TYPES.AddItem(botType).ToArray();
                         }
                         else
                         {
@@ -118,9 +119,6 @@ namespace friendlyPMC.Components
             }
 
             bot.Tactic.AggressionChange(-1f);
-
-            settingModif.PrecicingSpeedCoef = 1.35f;
-            settingModif.AccuratySpeedCoef = 1.35f;
         }
 
         public override FollowerBrain GetFollowerBrain(BotOwner bot, pitAIBossPlayer boss)

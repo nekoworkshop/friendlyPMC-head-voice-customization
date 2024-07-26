@@ -4,7 +4,7 @@ using UnityEngine.AI;
 
 namespace friendlyPMC.Actions
 {
-    internal class FollowerGoToPoint : GClass159
+    internal class FollowerGoToPoint : GClass173
     {
         private bool _shouldSprint = true;
         

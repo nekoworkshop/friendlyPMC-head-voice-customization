@@ -1,10 +1,10 @@
 {
 	"name": "friendlyPMC",
-	"version": "3.3.0",
+	"version": "3.4.0",
 	"main": "src/Squad.js",
 	"license": "See License file",
 	"author": "Pit Alex",
-	"akiVersion": "3.8.*",
+	"sptVersion": "3.9.*",
 	"scripts": {
 		"setup:environment": "npm i",
 		"build:unzipped": "copyfiles -e \"./node_modules/**/*.*\" -e \"./dist/**/*.*\" -e \"./package-lock.json\" -e \"./tsconfig.json\" -e \"./src/Squad.js\" -e \"./src/PlayGround.ts\" -e \"./types/**/*\" \"./**/*.*\" ./friendlyPMC",

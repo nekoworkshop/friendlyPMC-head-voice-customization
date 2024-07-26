@@ -1,5 +1,4 @@
-﻿using Aki.Common.Http;
-using EFT;
+﻿using EFT;
 using friendlyPMC.Modules;
 using friendlyPMC.Utils;
 using System;
@@ -115,6 +114,8 @@ namespace friendlyPMC.Components
                 return new AICoreActionResultStruct<BotLogicDecision>(HoldOrCover(botOwner_0), "req:Error");
             }
 
+            Components.Logger.LogInfo("BotRequestType: " + request.BotRequestType);
+
             switch (request.BotRequestType)
             {
                 // on follow me request from the boss, just come closer to the boss or get out of hold position
@@ -124,23 +125,22 @@ namespace friendlyPMC.Components
                     Vector3 requestPos = requester.Position;
                     Vector3 dir01 = requester.LookDirection;
 
-                    float offset = GClass760.RandomSing() * GClass760.Random(1f, 2f);
+                    float offset = GClass761.RandomSing() * GClass761.Random(1f, 2f);
                     Vector3 direction = Vector3.Cross(Vector3.up, dir01).normalized;
 
                     Vector3 finPos = requestPos + direction * offset;
-                    finPos.y = requester.PlayerBody.PlayerBones.Head.position.y;
 
                     Vector3 point = new Vector3(finPos.x, requestPos.y, finPos.z);
                     
                     botOwner_0.GoToSomePointData.SetPoint(point);
 
-                    botOwner_0.Steering.LookToPoint(new Vector3(requestPos.x, requester.PlayerBody.PlayerBones.Head.position.y, requestPos.z));
+                    botOwner_0.Steering.LookToMovingDirection();
                     
                     bool shouldSprint01 = Vector3.Distance(point, botOwner_0.GetPlayer.Transform.position) >= sprintDistance;
                     botOwner_0.GoToSomePointData.UpdateToGo(shouldSprint01);
                     if (!shouldSprint01) botOwner_0.Sprint(false);
 
-                    botOwner_0.BotRequestController.CurRequest.Complete();
+                    request.Complete();
 
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.goToPoint, "req:comeHere");
 
@@ -180,24 +180,23 @@ namespace friendlyPMC.Components
                 case BotRequestType.goToPoint:
 
                     Vector3 dir02 = requester.LookDirection;
-                    float forwardDistance = GClass760.Random(3f, 5f);
+                    float forwardDistance = GClass761.Random(3f, 5f);
 
                     Vector3 forwardPosition = requester.Position + dir02.normalized * forwardDistance;
-                    float lateralOffset = GClass760.RandomSing() * GClass760.Random(0.5f, 1.5f);
+                    float lateralOffset = GClass761.RandomSing() * GClass761.Random(0.5f, 1.5f);
                     Vector3 lateralDirection = Vector3.Cross(Vector3.up, dir02).normalized;
 
                     Vector3 finalPosition = forwardPosition + lateralDirection * lateralOffset;
-                    finalPosition.y = requester.PlayerBody.PlayerBones.Head.position.y;
 
                     botOwner_0.BotTalk.TrySay(EPhraseTrigger.Going, false);
 
                     botOwner_0.GoToSomePointData.SetPoint(finalPosition);
-                    botOwner_0.Steering.LookToPoint(finalPosition);
+                    botOwner_0.Steering.LookToMovingDirection();
                     bool shouldSprint02 = Vector3.Distance(finalPosition, botOwner_0.GetPlayer.Transform.position) >= sprintDistance;
                     botOwner_0.GoToSomePointData.UpdateToGo(shouldSprint02);
                     if (!shouldSprint02) botOwner_0.Sprint(false);
 
-                    botOwner_0.BotRequestController.CurRequest.Complete();
+                    request.Complete();
 
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.goToPoint, "req:goCheck");
 
@@ -220,14 +219,14 @@ namespace friendlyPMC.Components
                 if (curRequest != null && curRequest.BotRequestType == BotRequestType.doorOpen)
                     curRequest.Complete();
 
-                return this.gstruct7_0;
+                return aICoreActionEndStruct;
             }
 
             if (curRequest != null && curRequest.BotRequestType == BotRequestType.doorOpen && !botOwner_0.DoorOpener.Interacting)
             {
-                return this.gstruct7_1;
+                return aICoreActionEndStruct_1;
             }
-            return this.gstruct7_0;
+            return aICoreActionEndStruct;
         }
         public override AICoreActionEndStruct EndSuppressFire()
         {
@@ -239,11 +238,11 @@ namespace friendlyPMC.Components
                     suppressTime = 0;
                     curRequest.Complete();
 
-                    return this.gstruct7_0;
+                    return aICoreActionEndStruct;
                 }
-                return this.gstruct7_1;
+                return aICoreActionEndStruct_1;
             }
-            return this.gstruct7_0;
+            return aICoreActionEndStruct;
         }
 
         public override CustomNavigationPoint FindPoint(CoverSearchData data, Func<CoverSearchData, CustomNavigationPoint> p, bool checkCurrent)

@@ -1,16 +1,8 @@
 ﻿using EFT;
-using friendlyPMC.Components;
-using friendlyPMC.Modules;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine.AI;
 using UnityEngine;
-using Newtonsoft.Json.Linq;
-using Aki.Common.Http;
-using friendlyPMC.Utils;
+using EFT.InventoryLogic;
+using System.Reflection.Emit;
 
 namespace friendlyPMC.Components.BossFollower
 {
@@ -29,6 +21,17 @@ namespace friendlyPMC.Components.BossFollower
         protected FollowerFightLayer followerFightLayer;
 
         protected bool bool_14;
+
+        protected bool bool_8;
+
+        protected bool bool_10;
+
+        protected float float_43 = 0f;
+        protected float float_52 = 0f;
+        protected float float_29 = 0f;
+        protected float float_32 = 0f;
+
+        protected int int_16 = 0;
 
         public KnightFightLayer(BotOwner bot, int priority) : base(bot, priority)
         {
@@ -62,13 +65,24 @@ namespace friendlyPMC.Components.BossFollower
                 return false;
             }
 
-            if (!this.bool_14)
+            if (!bool_14)
             {
-                this.bool_14 = true;
-                this.botOwner_0.Brain.BaseBrain.OnLayerChangedTo += this.OnLayerChanged;
+                bool_14 = true;
+                botOwner_0.Brain.BaseBrain.OnLayerChangedTo += OnLayerChanged;
             }
 
             return true;
+        }
+
+        public new void OnLayerChanged(AICoreLayerClass<BotLogicDecision> layer)
+        {
+            this.int_16 = 0;
+            if (layer == this)
+            {
+                this.float_43 = Time.time;
+                return;
+            }
+            this.float_43 = -1000f;
         }
         protected bool HasBoss()
         {
@@ -83,12 +97,10 @@ namespace friendlyPMC.Components.BossFollower
         public void OrdersChanged()
         {
             ordersChanged = true;
-            var Timer = StaticManager.Instance.TimerManager.MakeTimer(TimeSpan.FromSeconds(1), false);
-            Timer.OnTimer += () =>
+            Utils.Utils.SetTimeout(() =>
             {
                 ordersChanged = false;
-            };
-            followerFightLayer.OrdersChanged();
+            },1000);
         }
 
         public override AICoreActionResultStruct<BotLogicDecision> GetDecision()
@@ -105,9 +117,10 @@ namespace friendlyPMC.Components.BossFollower
             AICoreActionResultStruct<BotLogicDecision>? preFightDecision = KnightPreFight();
             if (preFightDecision != null) return (AICoreActionResultStruct<BotLogicDecision>)preFightDecision;
 
-            if (Utils.EnemyInfo.Distance(botOwner_0) <= Utils.EnemyInfo.EnemyDistance.VeryClose && !followerFightLayer.IsEnemyLowThreat(true))
+            // do not go after distant enemies
+            if (Utils.EnemyInfo.Distance(botOwner_0) >= Utils.EnemyInfo.EnemyDistance.Distant)
             {
-                return followerFightLayer.DefendPosition(botOwner_0.GetPlayer.Transform.position);
+                return new AICoreActionResultStruct<BotLogicDecision>((BotLogicDecision)CustomBotDecisions.CoverToCover, "coverBoss");
             }
 
             try
@@ -117,7 +130,7 @@ namespace friendlyPMC.Components.BossFollower
             {
                 Components.Logger.LogInfo("KnightFight Error: " + ex.Message);
                 Components.Logger.LogInfo("Trace: " + ex.StackTrace);
-                return new AICoreActionResultStruct<BotLogicDecision>(HoldFor(GClass760.Random(1f, 2f)), "decision.Error");
+                return new AICoreActionResultStruct<BotLogicDecision>(HoldFor(GClass761.Random(1f, 2f)), "decision.Error");
             }
         }
 
@@ -142,6 +155,7 @@ namespace friendlyPMC.Components.BossFollower
                     if (customNavigationPoint_0 != null)
                     {
                         // Move towards the cover point while suppressing the enemy
+                        botOwner_0.Steering.LookToPoint(botOwner_0.Memory.GoalEnemy.GetCenterPart());
                         return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMovingWithSuppress, "assaultApproach");
                     }
                     else
@@ -159,6 +173,7 @@ namespace friendlyPMC.Components.BossFollower
                 if (customNavigationPoint_0 != null)
                 {
                     // Move towards the cover point while suppressing
+                    botOwner_0.Steering.LookToPoint(botOwner_0.Memory.GoalEnemy.GetCenterPart());
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMovingWithSuppress, "assaultApproach");
                 }
                 else
@@ -174,6 +189,13 @@ namespace friendlyPMC.Components.BossFollower
 
             BotRequest request = botOwner_0.BotRequestController.CurRequest;
 
+            if (request != null && !ordersChanged)
+            {
+                Components.Logger.LogInfo(request.BotRequestType + " is not an order");
+                request.Complete();
+                return null;
+            }
+
             Vector3 botPosition = botOwner_0.GetPlayer.Transform.position;
             Vector3 bossPosition = request != null ? botOwner_0.BotRequestController.CurRequest.Requester.Position : botPosition;
 
@@ -184,16 +206,15 @@ namespace friendlyPMC.Components.BossFollower
                 Utils.Utils.GetNavDistance(botPosition, bossPosition) > friendlyPMC.regroupMinDistance
             )
             {
-                Components.Logger.LogInfo("Player asked for help");
+
                 if (!botOwner_0.Memory.HaveEnemy || !botOwner_0.Memory.GoalEnemy.IsVisible)
                 {
-                    Components.Logger.LogInfo("move closer to Player");
                     followerFightLayer.GetCloserToBoss();
 
                 }
                 else
                 {
-                    botOwner_0.BotTalk.TrySay(EPhraseTrigger.OnFight, true);
+                    botOwner_0.BotTalk.TrySay(EPhraseTrigger.DontKnow, true);
                     request.Complete();
                 }
             }
@@ -207,96 +228,131 @@ namespace friendlyPMC.Components.BossFollower
             // player suggested to do a push
             if (ordersChanged && request != null && request.BotRequestType == BotRequestType.attackClose)
             {
-                var Timer = StaticManager.Instance.TimerManager.MakeTimer(TimeSpan.FromSeconds(2), false);
-
-                Timer.OnTimer += () =>
-                {
-                    try
-                    {
-                        botOwner_0.BotRequestController.CurRequest.Complete();
-                    }
-                    catch { }
-                };
                 return followerFightLayer.EngageEnemy(true);
             }
 
             return null;
         }
-        public AICoreActionResultStruct<BotLogicDecision> KnightFight()
+        
+        /** Adaptation of original GetDecision from GClass65 */
+        public AICoreActionResultStruct<BotLogicDecision>? KnightBaseDecision()
         {
-
-            Vector3 botPosition = botOwner_0.GetPlayer.Transform.position;
-
-            /*if (Utils.EnemyInfo.Distance(botOwner_0) <= Utils.EnemyInfo.EnemyDistance.Close)
+            if (method_23() && botOwner_0.Brain.LastDecision != null)
             {
-                return followerFightLayer.CloseFight();
-            }*/
-
-            AICoreActionResultStruct<BotLogicDecision> baseDecision;
-            try
-            {
-                baseDecision = base.GetDecision();
-            } catch (Exception ex)
-            {
-                Components.Logger.LogInfo("baseDecision Error: " + ex.Message);
-                Components.Logger.LogInfo("Trace: " + ex.StackTrace);
-                baseDecision = new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.standBy, "error");
-            }
-
-            if(
-                baseDecision.Action == BotLogicDecision.suppressFire ||
-                baseDecision.Action == BotLogicDecision.shootFromPlace ||
-                baseDecision.Action == BotLogicDecision.lay ||
-                baseDecision.Action == BotLogicDecision.shootFromCover ||
-                baseDecision.Action == BotLogicDecision.healStimulators ||
-                baseDecision.Action == BotLogicDecision.heal
-            )
-            {
-                return baseDecision;
-            }
-
-            if (HasBoss())
-            {
-                if (
-                    (baseDecision.Action == BotLogicDecision.runToCover && baseDecision.Reason == "loseTarget") ||
-                    (baseDecision.Action == BotLogicDecision.runToCover && baseDecision.Reason == "EnoughtHave") ||
-                    (baseDecision.Action == BotLogicDecision.runToCover && baseDecision.Reason == "run3")
-
-                )
+                BotLogicDecision? lastDecision = botOwner_0.Brain.LastDecision;
+                if (!(lastDecision.GetValueOrDefault() == BotLogicDecision.attackMoving & lastDecision != null))
                 {
-                    //GetClosestCoverPoint(GetBoss().Position, friendlyPMC.fightOuterRadius.Value);
-                    if (customNavigationPoint_0 != null)
+                    if (botOwner_0.Memory.GoalEnemy != null && botOwner_0.Memory.GoalEnemy.CanShoot && botOwner_0.Memory.GoalEnemy.IsVisible)
                     {
-                        return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, baseDecision.Reason);
+                        return followerFightLayer.DogFight();
                     }
+
+                    GetClosestAttackCoverPoint(botOwner_0.Memory.GoalEnemy.CurrPosition,10f);
+                    if(customNavigationPoint_0 != null)
+                        return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMoving, "enemyNear");
                 }
             }
 
-            if (
-                (baseDecision.Reason == "assault2" || baseDecision.Reason == "assault1") &&
-                followerFightLayer.IsEnemyLowThreat()
-            )
+            bool_8 = false;
+            bool_10 = false;
+            EnemyInfo goalEnemy = botOwner_0.Memory.GoalEnemy;
+            if (float_43 + 10f < Time.time && botOwner_0.Memory.GoalEnemy != null && !botOwner_0.Memory.GoalEnemy.CanShoot)
             {
+                if (goalEnemy != null)
+                {
+                    if (goalEnemy.IsVisible)
+                    {
+                        goto IL_19D;
+                    }
+                    BotLogicDecision? lastDecision = botOwner_0.Brain.LastDecision;
+                    if (lastDecision.GetValueOrDefault() == BotLogicDecision.heal & lastDecision != null)
+                    {
+                        goto IL_19D;
+                    }
+                }
+                if (botOwner_0.Medecine.FirstAid.Have2Do && botOwner_0.Memory.IsInCover && botOwner_0.Memory.LastEnemyTimeSeen + 6f < Time.time)
+                {
+                    return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.heal, "HealInCover");
+                }
+
+                IL_19D:
                 return KnightAssault();
             }
 
-            if (baseDecision.Reason == "IsDamaged" || baseDecision.Reason == "EnoughtHave")
+            int num = (botOwner_0.BotsGroup.MembersCount > 1) ? 1 : 2;
+            if (int_16 >= num)
             {
-                //GetCoverPoint(botPosition, fightLongRange);
-                if (customNavigationPoint_0 != null)
+                int_16 = 0;
+                return followerFightLayer.HoldPositionFor(7f,"bad covers");
+            }
+            float_52 = Time.time;
+
+
+            if (method_13())
+            {
+                if (method_16(true))
                 {
-                    return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, baseDecision.Reason);
+                    GetClosestCoverPoint(botOwner_0.GetPlayer.Transform.position, fightRange);
+                    return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "loseTarget");
+                }
+
+                if (botOwner_0.WeaponManager.Grenades.HaveGrenadeOfType(ThrowWeapType.smoke_grenade))
+                {
+                    AIGreanageThrowData aigreanageThrowData = new AIGreanageThrowData();
+                    aigreanageThrowData.Direction = botOwner_0.LookDirection;
+                    aigreanageThrowData.Ang = 30f;
+                    aigreanageThrowData.Force = 6f;
+                    aigreanageThrowData.GrenadeType = new ThrowWeapType?(ThrowWeapType.smoke_grenade);
+                    botOwner_0.WeaponManager.Grenades.SetThrowData(aigreanageThrowData);
+                    botOwner_0.WeaponManager.Grenades.DoThrow();
+                    float_29 = Time.time;
+                    float_32 = Time.time;
+                    return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.suppressFire, "suppress1");
                 }
             }
+
+            if (method_21())
+            {
+                if (botOwner_0.Memory.IsInCover)
+                {
+                    botOwner_0.Memory.Spotted(false, null, new float?(32f));
+                    int_16++;
+                }
+                
+                if (method_12() && botOwner_0.Memory.GoalEnemy.CanShoot && botOwner_0.Memory.GoalEnemy.IsVisible)
+                {
+                    return followerFightLayer.DogFight();
+                }
+
+                if (followerFightLayer.IsEnemyLowThreat() && Utils.EnemyInfo.Distance(botOwner_0) < Utils.EnemyInfo.EnemyDistance.Mid)
+                {
+                    return KnightAssault();
+                }
+            }
+
+            return null;
+        }
+
+
+        public AICoreActionResultStruct<BotLogicDecision> KnightFight()
+        {
+            AICoreActionResultStruct<BotLogicDecision>? baseDecision = KnightBaseDecision();
+
+            if (baseDecision.HasValue) return baseDecision.Value;
 
             return followerFightLayer.EngageEnemy(false,true);
         }
 
         public override AICoreActionEndStruct ShallEndCurrentDecision(AICoreActionResultStruct<BotLogicDecision> curDecision)
         {
-            AICoreActionEndStruct? common = followerFightLayer.ShallEndCurrentDecisionAllies(curDecision);
+            AICoreActionEndStruct? common = followerFightLayer.ShallEndCurrentDecisionAllies(curDecision, ordersChanged);
 
             if (common != null) return (AICoreActionEndStruct)common;
+
+            if(curDecision.Reason == "assaultRush" && Utils.EnemyInfo.Distance(botOwner_0) <= Utils.EnemyInfo.EnemyDistance.VeryClose)
+            {
+                return new AICoreActionEndStruct("assault.closeEnough", true);
+            }
 
             return base.ShallEndCurrentDecision(curDecision);
         }
@@ -309,7 +365,7 @@ namespace friendlyPMC.Components.BossFollower
         }
         public override CustomNavigationPoint FindPoint(CoverSearchData data, Func<CoverSearchData, CustomNavigationPoint> p, bool checkCurrent)
         {
-            customNavigationPoint_0 = Covers.FindPoint(botOwner_0, customNavigationPoint_0);
+            customNavigationPoint_0 = followerFightLayer.FindPoint(data, p, checkCurrent);
             return customNavigationPoint_0;
         }
 

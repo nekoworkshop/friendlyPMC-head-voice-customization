@@ -7,6 +7,10 @@ using UnityEngine.AI;
 using UnityEngine;
 using friendlyPMC.Components;
 using static RootMotion.FinalIK.IKSolver;
+using TMPro;
+using Cysharp.Threading.Tasks;
+using System.Threading.Tasks;
+using System.Threading;
 
 namespace friendlyPMC.Utils
 {
@@ -41,12 +45,57 @@ namespace friendlyPMC.Utils
 
             }, safeDistance);
 
-            // if (pt == null) Components.Logger.LogInfo("GetClosestCoverPoint gave NULL Cover");
+            return pt;
+        }
+        /**
+         *  (V2) Get closest cover point for the bot to given to the position, within the search radius and at a min distance from danger 
+         */
+        public static CustomNavigationPoint GetClosestCoverPoint(
+            int botOwnerId,
+            Vector3 botPosition,
+            Vector3 centerPosition,
+            List<CustomNavigationPoint> areaPoints,
+            float searchRadius, 
+            float safeDistance = 5f,
+            Vector3[] dangerPositions = null,
+            Func<CustomNavigationPoint, bool>extraChecks = null
+        )
+        {
+            NavMeshPath navMeshPath = new NavMeshPath();
+
+            CustomNavigationPoint pt = ClosestPoint(botOwnerId, botPosition, centerPosition, areaPoints, 
+            (CustomNavigationPoint point) =>
+            {
+                // cover too far
+                if (Vector3.Distance(point.Position, centerPosition) > searchRadius) return false;
+
+                navMeshPath.ClearCorners();
+                bool result = NavMesh.CalculatePath(centerPosition, point.Position, -1, navMeshPath);
+
+                if (result && navMeshPath.status == NavMeshPathStatus.PathComplete)
+                {
+                    float dist = navMeshPath.CalculatePathLength();
+                    // cover far to reach
+                    if (dist > searchRadius)
+                    {
+                        return false;
+                    }
+                }
+                // no nav mesh to it
+                else
+                {
+                    return false;
+                }
+                // did not pass extra checks
+                if (extraChecks != null && !extraChecks(point)) return false;
+
+                return true;
+
+            }, safeDistance, dangerPositions);
 
             return pt;
-
-
         }
+
         /**
          *  Get closest cover point for the bot to pointA within the area between pointA and pointB, at a min safe distance from danger 
          */
@@ -59,8 +108,6 @@ namespace friendlyPMC.Utils
                 return true;
 
             }, safeDistance);
-
-            // if (pt == null) Components.Logger.LogInfo("GetClosestCoverPointBetween gave NULL Cover");
 
             return pt;
         }
@@ -120,7 +167,7 @@ namespace friendlyPMC.Utils
                 NavMeshPath navMeshPath = new NavMeshPath();
                 customNavigationPoint = GetCoverPoint(botOwner, botOwner.GetPlayer.Transform.position, searchRadius, (CustomNavigationPoint point) =>
                 {
-                    return IsNavigablePoint(botOwner, point.Position, searchRadius, navMeshPath);
+                    return IsNavigablePoint(botOwner.GetPlayer.Transform.position, point.Position, searchRadius, navMeshPath);
                 });
             }
 
@@ -135,7 +182,7 @@ namespace friendlyPMC.Utils
             return GetClosestAttackCoverPoint(botOwner, midpoint, minDistance);
         }
         /** Get cover point from which the bot can shoot that is closest to the specified position, that is at min and max distance from danger and optionally that is not towards the direction of danger */
-        public static CustomNavigationPoint GetClosestAttackCoverPoint(BotOwner botOwner, Vector3 centerPosition, float minDistance = 5f, float maxDistance = 200f, Vector3? dangerPosition = null, bool debug = false)
+        public static CustomNavigationPoint GetClosestAttackCoverPoint(BotOwner botOwner, Vector3 centerPosition, float minDistance = 5f, float maxDistance = 200f, Vector3? dangerPosition = null)
         {
             if (!botOwner.Memory.HaveEnemy) return null;
 
@@ -161,7 +208,7 @@ namespace friendlyPMC.Utils
                     return false;
                 }
 
-                if (!IsNavigablePoint(botOwner, point.Position, 100f, navMeshPath))
+                if (!IsNavigablePoint(botOwner.GetPlayer.Transform.position, point.Position, 100f, navMeshPath))
                 {
                     return false;
                 }
@@ -175,7 +222,56 @@ namespace friendlyPMC.Utils
 
             return pt;
         }
+        /** (V2) Get cover point from which the bot can shoot that is closest to the specified position, that is at min and max distance from danger and optionally that is not towards the direction of danger */
+        public static CustomNavigationPoint GetClosestAttackCoverPoint(
+            int botOwnerId,
+            Vector3 botPosition,
+            Vector3 enemyPosition,
 
+            List<CustomNavigationPoint> areaPoints,
+
+            float minDistance = 5f, 
+            float maxDistance = 200f,
+            Vector3[] dangerPositions = null,
+            bool behindEnemy = true
+        )
+        {
+
+
+            ShootPointClass shootTarget = new ShootPointClass(enemyPosition, 1f);
+
+            CustomNavigationPoint pt = ClosestPoint(botOwnerId, botPosition, enemyPosition, areaPoints, 
+            (CustomNavigationPoint point) =>
+            {
+                float enemyRange = Vector3.Distance(enemyPosition, point.Position);
+                if (enemyRange > maxDistance)
+                {
+                    return false;
+                }
+
+                if (
+                    behindEnemy &&
+                    Vector3.Dot((enemyPosition - botPosition).normalized, (point.Position - botPosition).normalized) > 0
+                )
+                {
+                    return false;
+                }
+
+                if (!IsNavigablePoint(botPosition, point.Position, 100f))
+                {
+                    return false;
+                }
+
+                if (!GClass301.CanShootToTarget(shootTarget, point.Position, LayerMaskClass.HighPolyWithTerrainMask, false)) return false;
+
+                
+                return true;
+
+            }, minDistance,dangerPositions);
+
+            return pt;
+        }
+        /** Get the point among the relative ones to the boss player that is the closest to centerPosition that meets the eligibility check **/
         public static CustomNavigationPoint ClosestPoint(BotOwner botOwner, Vector3 centerPosition, Func<CustomNavigationPoint, bool> eligibleCheck,  float safeDistance = 5f)
         {
             
@@ -205,7 +301,7 @@ namespace friendlyPMC.Utils
             {
                 if (
                     !point.IsFreeById(botOwner.Id) ||
-                    !GClass328.IsDangerPositionFarEnough(point.Position, carePosition, safeDistance * safeDistance) ||
+                    !GClass326.IsDangerPositionFarEnough(point.Position, carePosition, safeDistance * safeDistance) ||
                     Vector3.Distance(point.Position, botOwner.GetPlayer.Transform.position) <= 1f ||
                     !eligibleCheck(point)
                 )
@@ -224,9 +320,45 @@ namespace friendlyPMC.Utils
 
             return closest;
         }
+        /** (V2) Get the point among the given ones that is the closest to centerPosition that meets the eligibility check **/
+        public static CustomNavigationPoint ClosestPoint(
+            int botOwnerId,
+            Vector3 botPosition, 
+            Vector3 centerPosition,
+            List<CustomNavigationPoint> areaPoints,
+            Func<CustomNavigationPoint, bool> eligibleCheck, 
+            float safeDistance = 5f, 
+            Vector3[] dangerPositions = null
+        )
+        {
+            CustomNavigationPoint closest = null;
 
+            float lastsqr = Mathf.Infinity;
+                
+            foreach (CustomNavigationPoint point in areaPoints)
+            {
+                if (
+                        !point.IsFreeById(botOwnerId) ||
+                        !GClass326.IsDangerPositionFarEnough(point.Position, dangerPositions, safeDistance * safeDistance) ||
+                        Vector3.Distance(point.Position, botPosition) <= 1f ||
+                        !eligibleCheck(point)
+                    )
+                {
+                    continue;
+                }
 
-        private static bool IsPointBetween(Vector3 point, Vector3 start, Vector3 end)
+                float dist = (centerPosition - point.Position).sqrMagnitude;
+                if (dist <= lastsqr)
+                {
+                    closest = point;
+                    lastsqr = dist;
+                }
+            }
+
+            return closest;
+        }
+
+        public static bool IsPointBetween(Vector3 point, Vector3 start, Vector3 end)
         {
             if (point.x >= start.x && point.y >= start.y && point.z >= start.z)
             {
@@ -238,10 +370,9 @@ namespace friendlyPMC.Utils
 
             return false;
         }
-        private static bool IsNavigablePoint(BotOwner botOwner, Vector3 point, float maxDistance, NavMeshPath existingMesh = null)
+        private static bool IsNavigablePoint(Vector3 botPosition, Vector3 point, float maxDistance, NavMeshPath existingMesh = null)
         {
             NavMeshPath navMeshPath = existingMesh != null ? existingMesh : new NavMeshPath();
-            Vector3 botPosition = botOwner.Transform.position;
 
             navMeshPath.ClearCorners();
             bool result = NavMesh.CalculatePath(botPosition, point, -1, navMeshPath);
@@ -256,26 +387,25 @@ namespace friendlyPMC.Utils
 
             return false;
         }
-
-        public static Vector3? FindShootPosition(BotOwner botOwner, ShootPointClass shootTarget, float minRadius, float maxRadius)
+        /** Find a position from where the bot can shoot at the given target **/
+        public static Vector3? FindShootPosition(BotOwner botOwner, ShootPointClass shootTarget, float minDistance, float maxRadius)
         {
             Vector3 targetPosition = shootTarget.Point;
-
-            // Create a sphere around the target position with the specified radius range
-            float randomRadius = GClass760.Random(minRadius, maxRadius);
             
             NavMeshPath mesh = new NavMeshPath();
 
             // Try to find a valid position within the sphere
-            for (int i = 0; i < 100; i++) // Adjust the number of attempts as needed
+            for (int i = 0; i < 70; i++) // Adjust the number of attempts as needed
             {
-                Vector3 randomPosition = targetPosition + UnityEngine.Random.insideUnitSphere * randomRadius;
+                Vector3 randomPosition = targetPosition + UnityEngine.Random.insideUnitSphere * maxRadius;
 
                 NavMeshHit navMeshHit;
 
                 if (!NavMesh.SamplePosition(randomPosition, out navMeshHit, 10f, -1)) continue;
 
-                if (!IsNavigablePoint(botOwner, navMeshHit.position, 200f, mesh)) continue;
+                if (!GClass326.IsDangerPositionFarEnough(navMeshHit.position, new Vector3[] { targetPosition }, minDistance * minDistance)) continue;
+
+                if (!IsNavigablePoint(botOwner.GetPlayer.Transform.position, navMeshHit.position, 150f, mesh)) continue;
 
                 // Check if the bot can shoot from the random position to the target
                 if (GClass301.CanShootToTarget(shootTarget, navMeshHit.position, botOwner.LookSensor.Mask, false))
@@ -285,6 +415,40 @@ namespace friendlyPMC.Utils
             }
 
             // If no valid position is found, return Vector3.zero
+            return null;
+        }
+        /** (V2) Find a position from where the bot can shoot at the given target **/
+        public static Vector3? FindShootPosition(Vector3 botPosition, ShootPointClass shootTarget, LayerMask Mask, float minDistance, float maxRadius, Func<Vector3, bool> eligibleCheck = null)
+        {
+            Vector3 targetPosition = shootTarget.Point;
+
+            NavMeshPath mesh = new NavMeshPath();
+
+            // Try to find a valid position within the sphere
+            List<Vector3> positions = new List<Vector3>();
+
+            for (int i = 0; i < 100; i++) // Adjust the number of attempts as needed
+            {
+                Vector3 randomPosition = targetPosition + UnityEngine.Random.insideUnitSphere * maxRadius;
+                if (randomPosition == Vector3.zero) continue;
+                if (positions.Contains(randomPosition)) continue;
+
+                NavMeshHit navMeshHit;
+
+                if (!NavMesh.SamplePosition(randomPosition, out navMeshHit, 10f, -1)) continue;
+
+                if (!GClass326.IsDangerPositionFarEnough(navMeshHit.position, new Vector3[] { targetPosition }, minDistance * minDistance)) continue;
+
+                if (!IsNavigablePoint(botPosition, navMeshHit.position, 150f, mesh)) continue;
+
+                if (eligibleCheck != null && !eligibleCheck(navMeshHit.position)) continue;
+
+                if (GClass301.CanShootToTarget(shootTarget, navMeshHit.position, Mask, false))
+                {
+                    return navMeshHit.position;
+                }
+            }
+
             return null;
         }
 

@@ -16,6 +16,7 @@ using UnityEngine;
 using System.Security.Policy;
 using EFT.InventoryLogic;
 using static EFT.SpeedTree.TreeWind;
+using System.Threading.Tasks;
 
 
 namespace friendlyPMC.Components
@@ -34,7 +35,7 @@ namespace friendlyPMC.Components
 
         protected LootFinder _lootFinder;
 
-        protected GClass529 settingModif;
+        protected GClass528 settingModif;
 
         public LootingBrain LootingBrain
         {
@@ -72,14 +73,14 @@ namespace friendlyPMC.Components
             
             _IsSquadMate = isSquad;
 
-            settingModif = new GClass529(1.2f,1.2f,1f,1f,1f,1f,0.9f,1f,1f);
+            settingModif = new GClass528(1.2f,1.2f,1f,1f,1f,1f,0.9f,1f,1f);
 
             // change enenmy chooser to custom
-            if (bot.EnemyChooser != null)
+            /*if (bot.EnemyChooser != null)
                 bot.EnemyChooser.Dispose();
 
-            bot.EnemyChooser = new FollowerEnemyChooser(bot);
-            bot.EnemyChooser.Activate();
+            bot.EnemyChooser = new GClass404(bot);
+            bot.EnemyChooser.Activate();*/
 
             bool hadEnemy = _bot.Memory.HaveEnemy;
             // deactivate old layers
@@ -87,7 +88,7 @@ namespace friendlyPMC.Components
             // force current layer to trigger end decision
             try
             {
-                AccessTools.Field(typeof(BaseLogicLayerClass), "bool_1").SetValue(_bot.Brain.BaseBrain.CurLayerInfo, true);
+                AccessTools.Field(typeof(BaseLogicLayerAbstractClass), "bool_1").SetValue(_bot.Brain.BaseBrain.CurLayerInfo, true);
             } catch { }
 
             var baseBrain = _bot.Brain.BaseBrain;
@@ -152,8 +153,6 @@ namespace friendlyPMC.Components
             {
                 Logger.LogInfo("Failed to add Looting Brain to follower: " +ex.Message);
             }
-            // change search mode
-            _bot.SearchData = new FollowerSearch(_bot);
             // add the new follower brain
             _bot.Brain.BaseBrain = GetFollowerBrain(_bot, _player);
             _bot.Brain.Agent = GetFollowerAIAgent(_bot);
@@ -161,7 +160,7 @@ namespace friendlyPMC.Components
             // let the bot talk
             _bot.BotTalk.SetSilence(0f); 
             // force bot to turn off light
-            if(_bot.BotLight != null) _bot.BotLight.TurnOff(false, true);
+            if(_bot.BotLight != null && _bot.BotLight.IsEnable) _bot.BotLight.TurnOff(false, true);
             //_bot.NightVision.H
             // make bot follower of player
             _player.AddFollower(_bot);
@@ -269,19 +268,26 @@ namespace friendlyPMC.Components
             _bot.Settings.Current._hearingDistCoef = settingModif.HearingDistCoef;
             _bot.Settings.Current._precicingSpeedCoef = settingModif.PrecicingSpeedCoef;
             _bot.Settings.Current._accuratySpeedCoef = settingModif.AccuratySpeedCoef;
-
-            Logger.LogInfo($"Bot {_bot.Profile.Nickname} is now a follower of {_player.Player().Profile.Nickname}");
+            _bot.Settings.Current._scatteringCoef = settingModif.ScatteringCoef;
 
             // reset enemy state
-            StaticManager.Instance.TimerManager.MakeTimer(TimeSpan.FromSeconds(0.1), false).OnTimer += () =>
+            Utils.Utils.SetTimeout(() =>
             {
-                if (_bot.Memory.HaveEnemy)
+                if (_bot != null && !_bot.IsDead && _bot.BotState == EBotState.Active && _bot.Memory.HaveEnemy)
                 {
                     _bot.Memory.DeleteInfoAboutEnemy(_bot.Memory.GoalEnemy.Person);
+                    _bot.Memory.GoalEnemy = null;
                 }
-            };
+                // TURN OFF THE FLASHLIGHT!
+                if (_bot.BotLight != null && _bot.BotLight.IsEnable)
+                {
+                    _bot.BotLight.TurnOff(false, true);
+                }
+            }, 300);
 
-            _bot.GetPlayer.BeingHitAction += BeingHitAction;
+            //_bot.GetPlayer.BeingHitAction += BeingHitAction;
+
+            Logger.LogInfo($"Bot {_bot.Profile.Nickname} is now a follower of {_player.Player().Profile.Nickname}");
 
         }
         /** 
@@ -293,9 +299,9 @@ namespace friendlyPMC.Components
             if(!_bot.Memory.HaveEnemy && damageInfo.Player != null)
             {
                 Vector3? pos = damageInfo.Player.iPlayer?.Position;
-                if(pos != null)
+                if (pos.HasValue)
                 {
-                    _bot.Steering.LookToDirection((Vector3)pos - _bot.GetPlayer.Transform.position,90f);
+                    _bot.Steering.LookToPoint((Vector3)pos,90f);
                 }
             }
         }
@@ -309,7 +315,7 @@ namespace friendlyPMC.Components
         {
             string name = bot.name + " " + _botRole.ToString();
 
-            return new AICoreAgentClass<BotLogicDecision>(bot.BotsController.AICoreController, bot.Brain.BaseBrain, FollowerCreateNode.ActionsList(bot), bot.gameObject, name, new Func<BotLogicDecision, GClass134>((BotLogicDecision decision) =>
+            return new FollowerAIAgent<BotLogicDecision>(bot.BotsController.AICoreController, bot.Brain.BaseBrain, FollowerCreateNode.ActionsList(bot), bot.gameObject, name, new Func<BotLogicDecision, GClass134>((BotLogicDecision decision) =>
             {
                 return FollowerCreateNode.CreateNode(decision, bot);
             }));
@@ -321,7 +327,7 @@ namespace friendlyPMC.Components
             _OldSettings = _bot.Settings;
             _OldGroupID = _bot.GroupId;
             // increase bot's power
-            BotDifficultySettingsClass settings = Singleton<GClass534>.Instance.GetSettings(BotDifficulty.hard, _botRole);
+            BotDifficultySettingsClass settings = Singleton<GClass533>.Instance.GetSettings(BotDifficulty.hard, _botRole);
             // - hardcode some settings to make the bot more efficient
             settings.FileSettings.Move.REACH_DIST = 1.5f;
             settings.FileSettings.Move.REACH_DIST_COVER = 2f;
@@ -441,7 +447,7 @@ namespace friendlyPMC.Components
             settings.FileSettings.Look.NO_GREEN_DIST = 4.0f;
             settings.FileSettings.Look.NO_GRASS_DIST = 5.0f;
 
-            settings.FileSettings.Hearing.CHANCE_TO_HEAR_SIMPLE_SOUND_0_1 = 0.5f;
+            settings.FileSettings.Hearing.CHANCE_TO_HEAR_SIMPLE_SOUND_0_1 = 0.2f;
             settings.FileSettings.Hearing.DISPERSION_COEF = 1f;
             settings.FileSettings.Hearing.CLOSE_DIST = 6f;
             settings.FileSettings.Hearing.FAR_DIST = 35f;

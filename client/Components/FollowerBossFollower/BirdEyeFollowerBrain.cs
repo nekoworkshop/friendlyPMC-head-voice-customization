@@ -29,18 +29,12 @@ namespace friendlyPMC.Components.FollowerBossFollower
             // weapon maintenance during combat
             KnightWeaponMtnLayer layer2 = new KnightWeaponMtnLayer(_owner, 78);
             base.method_0(3, layer2, true);
-            // assault building
-            //KnightAssaultBuildingLayer layer3 = new KnightAssaultBuildingLayer(_owner, 72);
-            //base.method_0(4, layer3, true);
-            // enemy building
-            //KnightEnemyBuildingLayer buildingLayer = new KnightEnemyBuildingLayer(_owner, 60);
-            //base.method_0(5, buildingLayer, true);
             // sniper fight
             fightLayer = new BirdEyeFightLayer(_owner, 55);
-            method_0(6, fightLayer, true);
+            method_0(4, fightLayer, true);
             // - item taker
             FollowerLootLayer layer7 = new FollowerLootLayer(_owner, 40);
-            method_0(7, layer7, true);
+            method_0(5, layer7, true);
         }
 
         public override string ShortName()

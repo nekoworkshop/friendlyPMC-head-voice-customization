@@ -13,7 +13,7 @@ namespace friendlyPMC.Modules
 {
     internal class BossPlayers
     {
-        public static BossPlayers Instance;
+        public static BossPlayers Instance { get; private set; }
 
         private Dictionary<string, pitAIBossPlayer> _bosses { get; set; }
         private List<BotFollowerPlayer> _followers { get; set; }
@@ -107,13 +107,16 @@ namespace friendlyPMC.Modules
 
                 foreach (AICoversData cover in aICoversData)
                 {
-                    int id = player.Id;
+                    int id = 0;
                     for (int i = 0; i < cover.MaxX; i++)
                     {
+                        id += i;
                         for (int j = 0; j < cover.MaxY; j++)
                         {
+                            id += j;
                             for (int k = 0; k < cover.MaxZ; k++)
                             {
+                                id += k;
 
                                 NavGraphVoxelSimple navGraphVoxelSimple = cover.VoxelesArray[i, j, k];
                                 if (navGraphVoxelSimple != null && navGraphVoxelSimple.Points != null)
@@ -138,7 +141,16 @@ namespace friendlyPMC.Modules
                                             }
 
                                             if (isgood)
-                                                _groupPoints.Add(groupPoint.CreateCustomNavigationPoint(id));
+                                            {
+                                                try
+                                                {
+                                                    _groupPoints.Add(groupPoint.CreateCustomNavigationPoint(id));
+                                                    id += 1;
+                                                } catch
+                                                {
+
+                                                }
+                                            }
                                         }
                                     }
                                 }
@@ -294,11 +306,6 @@ namespace friendlyPMC.Modules
         {
             if (bot == null || bot.BotFollower == null || !bot.BotFollower.HaveBoss) return false;
 
-            if (boss != null && bot != null && bot.BotFollower.HaveBoss)
-            {
-                return bot.BotFollower.BossToFollow.Player().ProfileId == boss.Player().ProfileId;
-            }
-
             BotFollowerPlayer _follower = null;
 
             foreach (var item in _followers)
@@ -308,6 +315,11 @@ namespace friendlyPMC.Modules
                     _follower = item;
                     break;
                 }
+            }
+
+            if (_follower != null && boss != null && bot != null && bot.BotFollower.HaveBoss)
+            {
+                return bot.BotFollower.BossToFollow.Player().ProfileId == boss.Player().ProfileId;
             }
 
             return _follower != null;
@@ -361,6 +373,11 @@ namespace friendlyPMC.Modules
                 return null;
             }
             return _bosses[name];
+        }
+
+        public Dictionary<string, pitAIBossPlayer> GetBossPlayers()
+        {
+            return _bosses;
         }
 
         public List<BotFollowerPlayer> GetBossFollowers(string name)

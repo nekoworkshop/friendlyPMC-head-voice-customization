@@ -1,5 +1,4 @@
-﻿using Aki.Common.Http;
-using EFT;
+﻿using EFT;
 using friendlyPMC.Components.BossFollower;
 using JetBrains.Annotations;
 using System;
@@ -51,7 +50,7 @@ namespace friendlyPMC.Components.FollowerBossFollower
             {
                 Components.Logger.LogInfo("baseDecision Error: " + ex.Message);
                 Components.Logger.LogInfo("Trace: " + ex.StackTrace);
-                return new AICoreActionResultStruct<BotLogicDecision>(HoldFor(GClass760.Random(1f, 2f)), "baseDecision.Error");
+                return new AICoreActionResultStruct<BotLogicDecision>(HoldFor(GClass761.Random(1f, 2f)), "baseDecision.Error");
             }
 
             if (
@@ -79,7 +78,7 @@ namespace friendlyPMC.Components.FollowerBossFollower
             {
                 Components.Logger.LogInfo("supportDecision Error: " + ex.Message);
                 Components.Logger.LogInfo("Trace: " + ex.StackTrace);
-                return new AICoreActionResultStruct<BotLogicDecision>(HoldFor(GClass760.Random(1f, 2f)), "supportDecision.Error");
+                return new AICoreActionResultStruct<BotLogicDecision>(HoldFor(GClass761.Random(1f, 2f)), "supportDecision.Error");
             }
 
             if (

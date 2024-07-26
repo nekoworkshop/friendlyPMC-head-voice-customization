@@ -1,6 +1,7 @@
 ﻿using Comfort.Common;
 using EFT;
 using friendlyPMC.Modules;
+using friendlyPMC.Utils;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -37,6 +38,8 @@ namespace friendlyPMC.Components
 
             player.HealthController.DiedEvent += OnDead;
 
+            Singleton<BotEventHandler>.Instance.OnPhraseSay += PhraseSaid;
+
             SetAreaCovers();
             coverCoroutine = player.StartCoroutine(UpdateCoversCoroutine());
         }
@@ -47,7 +50,7 @@ namespace friendlyPMC.Components
             {
                 Followers.ForEach(follower =>
                 {
-                    if (follower != null && GClass760.Random(1, 100) > friendlyPMC.returnChanceDeath.Value)
+                    if (follower != null && GClass761.Random(1, 100) > friendlyPMC.returnChanceDeath.Value)
                     {
 
                         var flw = BossPlayers.Instance.GetFollower(follower);
@@ -60,6 +63,13 @@ namespace friendlyPMC.Components
             BossPlayers.Instance.RemoveBossPlayer(realPlayer.ProfileId);
         }
 
+        public void PhraseSaid(BotEventHandler.GClass599 info)
+        {
+            if(info.phrase == (EPhraseTrigger)CustomPhrases.TeamStatus && info.PlayerRequester != null && info.PlayerRequester.ProfileId == realPlayer.ProfileId)
+            {
+                PingTeamates.Instance.Ping(this);
+            }
+        }
         public new AIBossPlayerLogic GetBossLogic()
         {
             return aBossLogic;
@@ -73,14 +83,16 @@ namespace friendlyPMC.Components
                 {
                     Vector3 playerPosition = realPlayer.Transform.position;
                     Vector3 squareCenter = new Vector3(
-                        Mathf.Floor(playerPosition.x / 25f) * 25f,
-                        Mathf.Floor(playerPosition.y / 25f) * 25f,
-                        Mathf.Floor(playerPosition.z / 25f) * 25f
+                        Mathf.Floor(playerPosition.x / 30f) * 30f,
+                        Mathf.Floor(playerPosition.y / 20f) * 20f,
+                        Mathf.Floor(playerPosition.z / 30f) * 30f
                     );
 
                     if (coverZones.ContainsKey(squareCenter))
                     {
                         coverPoints = coverZones[squareCenter];
+
+                        return;
                     }
                    
                     List<CustomNavigationPoint> groupPoints = BossPlayers.GetAICovers();
@@ -90,8 +102,8 @@ namespace friendlyPMC.Components
                         List<CustomNavigationPoint> points = new List<CustomNavigationPoint>();
                         float lastsqr = float.MaxValue;
 
-                        int maxValue = 150;
-
+                        int maxValue = 100;
+                        // sort all available points from the closest to the farthest
                         groupPoints.Sort((a, b) => Vector3.Distance(a.Position, squareCenter).CompareTo(Vector3.Distance(b.Position, squareCenter)));
 
                         foreach (CustomNavigationPoint groupPoint in groupPoints)
@@ -112,8 +124,8 @@ namespace friendlyPMC.Components
                     }
                 } catch (Exception ex)
                 {
-                    Components.Logger.LogInfo("Covers Coroutine failing : " + ex.Message);
-                    Components.Logger.LogInfo("Trace : " + ex.StackTrace);
+                    Logger.LogInfo("Covers Coroutine failing : " + ex.Message);
+                    Logger.LogInfo("Trace : " + ex.StackTrace);
                 }
 
             });
@@ -125,7 +137,7 @@ namespace friendlyPMC.Components
             {
                 Task ts = SetAreaCovers();
                 yield return new WaitUntil(()=>ts.IsCompleted);
-                yield return new WaitForSeconds(1f);
+                yield return new WaitForSeconds(2f);
             }
         }
 
@@ -170,7 +182,7 @@ namespace friendlyPMC.Components
             // make the closest enemy of boss, the enemy
             if(enemy != null)
             {
-                BotSettingsClass botSettingsClass = new BotSettingsClass(Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(enemy.ProfileId), bossGroup, EBotEnemyCause.checkAddTODO);
+                BotSettingsClass botSettingsClass = new BotSettingsClass(Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(enemy.ProfileId), bossGroup, EBotEnemyCause.pmcBossKill);
 
                 follower.Memory.AddEnemy(enemy, botSettingsClass, false);
                 EnemyInfo info;
@@ -207,6 +219,8 @@ namespace friendlyPMC.Components
         public void DisposeBoss()
         {
             realPlayer.HealthController.DiedEvent -= OnDead;
+
+            Singleton<BotEventHandler>.Instance.OnPhraseSay -= PhraseSaid;
 
             if (bossGroup != null)
             {
@@ -253,7 +267,7 @@ namespace friendlyPMC.Components
             bot.BotFollower.BossFindAction();
         }
     }
-    internal class AIBossPlayerLogic : GClass363
+    internal class AIBossPlayerLogic : GClass362
     {
         private Player _player;
         private pitAIBossPlayer _aiplayer;
@@ -279,7 +293,7 @@ namespace friendlyPMC.Components
                 {
                     if (_aiplayer.bossGroup != null)
                     {
-                        _aiplayer.bossGroup.CheckAndAddEnemy(arg1.Player.AIData.BotOwner);
+                        _aiplayer.bossGroup.AddEnemy(arg1.Player.AIData.BotOwner, EBotEnemyCause.addPlayerToBoss);
                     }
 
                     _aiplayer.AddEnemy(arg1.Player.AIData.BotOwner);

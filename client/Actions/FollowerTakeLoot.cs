@@ -12,13 +12,11 @@ using System.Collections;
 using System.Reflection;
 using EFT.InventoryLogic;
 using System.Collections.Generic;
-using HarmonyLib;
-using LootingBots.Patch.Components;
-using LootingBots.Patch.Util;
+using System.Threading.Tasks;
 
 namespace friendlyPMC.Actions
 {
-    internal class FollowerTakeLoot : BaseNodeClass
+    internal class FollowerTakeLoot : BaseNodeAbstractClass
     {
         private BotFollowerPlayer _follower;
 
@@ -119,9 +117,7 @@ namespace friendlyPMC.Actions
                     takingLoot = true;
                     lootTimer = Time.time + 15f;
 
-                    var Timer = StaticManager.Instance.TimerManager.MakeTimer(TimeSpan.FromSeconds(10), false);
-                    Timer.OnTimer += () =>
-                    {
+                    Task.Delay(TimeSpan.FromSeconds(10)).ContinueWith( t =>{
                         if (botOwner_0.IsDead || botOwner_0.BotState != EBotState.Active || _follower.LootingBrain == null || _follower.LootingBrain.IsBotLooting) return;
                         try
                         {
@@ -131,8 +127,7 @@ namespace friendlyPMC.Actions
                             takingLoot = false;
                         }
                         catch { }
-                    };
-
+                    });
 
                     EnableTransactions();
                     _follower.LootingBrain.StartCoroutine(_follower.LootingBrain.LootCorpse());

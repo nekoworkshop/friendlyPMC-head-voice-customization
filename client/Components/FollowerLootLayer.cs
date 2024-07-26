@@ -34,14 +34,14 @@ namespace friendlyPMC.Components
             if (!InteractableObjects.IsTaker(botOwner_0))
                 return new AICoreActionEndStruct("item.None", true);
             
-            return gstruct7_0;
+            return aICoreActionEndStruct;
         }
         public override AICoreActionEndStruct EndFollowerPatrolItem()
         {
             if (!InteractableObjects.IsTaker(botOwner_0))
                 return new AICoreActionEndStruct("item.None", true);
 
-            return gstruct7_0;
+            return aICoreActionEndStruct;
         }
 
         public override AICoreActionEndStruct ShallEndCurrentDecision(AICoreActionResultStruct<BotLogicDecision> curDecision)

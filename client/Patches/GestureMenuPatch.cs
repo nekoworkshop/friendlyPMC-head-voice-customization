@@ -1,19 +1,11 @@
-﻿using Aki.Reflection.Patching;
-using Comfort.Common;
-using EFT;
-using EFT.UI;
+﻿using SPT.Reflection.Patching;
 using EFT.UI.Gestures;
-using friendlyPMC.Modules;
-using friendlyPMC.Utils;
 using HarmonyLib;
-using Newtonsoft.Json.Linq;
+
 using System;
 using System.Collections.Generic;
-using System.Linq;
+
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine.EventSystems;
 
 
 namespace friendlyPMC.Patches
@@ -35,25 +27,38 @@ namespace friendlyPMC.Patches
             {
                 if(item.gameObject.name == "ENEMY")
                 {
-                    GesturesMenu.Class2921 @class = new GesturesMenu.Class2921();
+                    GesturesMenu.Class2965 @class = new GesturesMenu.Class2965();
                     @class.gesturesMenu_0 = __instance;
                     @class.isSituational = false;
                     GestureBaseItem gestureBaseItem = item.CreateNewPhrase(EPhraseTrigger.OnRepeatedContact, @class.isSituational);
-                    gestureBaseItem.OnPointerClicked.Subscribe(new Action<GestureBaseItem.GStruct400>(@class.method_0));
+                    gestureBaseItem.OnPointerClicked.Subscribe(new Action<GestureBaseItem.GStruct399>(@class.method_0));
                     list_1.Add(gestureBaseItem);
                 }
 
                 else if(item.gameObject.name == "TEAM STATUS")
                 {
-                    Components.Logger.LogInfo("add to team status panel");
-                    GesturesMenu.Class2921 @class = new GesturesMenu.Class2921();
+                    GesturesMenu.Class2965 @class = new GesturesMenu.Class2965();
                     @class.gesturesMenu_0 = __instance;
                     @class.isSituational = false;
                     GestureBaseItem gestureBaseItem = item.CreateNewPhrase((EPhraseTrigger)CustomPhrases.TeamStatus, @class.isSituational);
-                    gestureBaseItem.OnPointerClicked.Subscribe(new Action<GestureBaseItem.GStruct400>(@class.method_0));
+                    gestureBaseItem.OnPointerClicked.Subscribe(new Action<GestureBaseItem.GStruct399>(@class.method_0));
                     list_1.Add(gestureBaseItem);
                 }
             });
+        }
+    }
+
+    internal class GestureMenuAvailablePhrasesPatch : ModulePatch
+    {
+        protected override MethodBase GetTargetMethod()
+        {
+            return AccessTools.Method(typeof(GesturesMenu), "Init");
+        }
+        [PatchPostfix]
+        private static void PatchPostfix(GesturesMenu __instance)
+        {
+            var hashSet_1 = (HashSet<EPhraseTrigger>)AccessTools.Field(typeof(GesturesMenu), "hashSet_1").GetValue(__instance);
+            hashSet_1.Add((EPhraseTrigger)CustomPhrases.TeamStatus);
         }
     }
 

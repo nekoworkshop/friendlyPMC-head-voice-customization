@@ -49,7 +49,6 @@ namespace friendlyPMC.Components.FollowerBossFollower
         {
 
             Vector3 botPosition = botOwner_0.GetPlayer.Transform.position;
-            Vector3 enemyPosition = botOwner_0.Memory.GoalEnemy.CurrPosition;
             bool enemyVisible = botOwner_0.Memory.GoalEnemy.IsVisible;
 
             if (enemyVisible)
@@ -68,14 +67,14 @@ namespace friendlyPMC.Components.FollowerBossFollower
                         {
                             return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMoving, "relocate");
                         }
-                        coverTimer = Time.time + GClass760.Random(3f, 5f);
+                        coverTimer = Time.time + GClass761.Random(3f, 5f);
                         return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "relocateFast");
                     }
                     // - found nothing, fallback
                     if (holdTimer < Time.time)
                     {
-                        float timer = GClass760.Random(2f, 5f);
-                        holdTimer = Time.time + timer + GClass760.Random(2f, 3f);
+                        float timer = GClass761.Random(2f, 5f);
+                        holdTimer = Time.time + timer + GClass761.Random(2f, 3f);
                         return followerFightLayer.HoldPositionFor(timer);
                     }
 
@@ -95,7 +94,7 @@ namespace friendlyPMC.Components.FollowerBossFollower
                         GetClosestAttackCoverPoint(botPosition, 20f);
                         if (customNavigationPoint_0 != null && coverTimer < Time.time)
                         {
-                            coverTimer = Time.time + GClass760.Random(3f, 5f);
+                            coverTimer = Time.time + GClass761.Random(3f, 5f);
                             return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMoving, "relocate");
                         }
                     }
@@ -103,8 +102,8 @@ namespace friendlyPMC.Components.FollowerBossFollower
                     // -- fallback #1, just wait
                     if (holdTimer < Time.time)
                     {
-                        float timer = GClass760.Random(2f, 5f);
-                        holdTimer = Time.time + timer + GClass760.Random(3f, 5f);
+                        float timer = GClass761.Random(2f, 5f);
+                        holdTimer = Time.time + timer + GClass761.Random(3f, 5f);
                         return followerFightLayer.HoldPositionFor(timer);
                     }
 
@@ -120,15 +119,15 @@ namespace friendlyPMC.Components.FollowerBossFollower
 
                 if (customNavigationPoint_0 != null && coverTimer < Time.time)
                 {
-                    coverTimer = Time.time + GClass760.Random(3f, 5f);
+                    coverTimer = Time.time + GClass761.Random(3f, 5f);
                     botOwner_0.GoToSomePointData.SetPoint(customNavigationPoint_0.Position);
-                    return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.goToPoint, "repositionFast");
+                    return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.goToPoint, "reposition");
                 }
                 // -- fallback #1, just wait
                 if (holdTimer < Time.time)
                 {
-                    float timer = GClass760.Random(2f, 5f);
-                    holdTimer = Time.time + timer + GClass760.Random(3f, 5f);
+                    float timer = GClass761.Random(2f, 5f);
+                    holdTimer = Time.time + timer + GClass761.Random(3f, 5f);
                     return followerFightLayer.HoldPositionFor(timer);
                 }
 
@@ -139,137 +138,143 @@ namespace friendlyPMC.Components.FollowerBossFollower
 
         public override AICoreActionResultStruct<BotLogicDecision> GetDecision()
         {
-            BotRequest request = botOwner_0.BotRequestController.CurRequest;
-
-            Vector3 botPosition = botOwner_0.GetPlayer.Transform.position;
-
-            EnemyInfo goalEnemy = botOwner_0.Memory.GoalEnemy;
-
-            // is in dogfight?
-            AICoreActionResultStruct<BotLogicDecision>? aicoreActionResultStruct = followerFightLayer.DogFight();
-            if (aicoreActionResultStruct.HasValue)
+            try
             {
+                BotRequest request = botOwner_0.BotRequestController.CurRequest;
 
-                return (AICoreActionResultStruct<BotLogicDecision>)aicoreActionResultStruct;
-            }
-            // needs healing?
-            aicoreActionResultStruct = followerFightLayer.NeedHeal();
-            if (aicoreActionResultStruct != null)
-            {
-                return (AICoreActionResultStruct<BotLogicDecision>)aicoreActionResultStruct;
-            }
+                Vector3 botPosition = botOwner_0.GetPlayer.Transform.position;
+                Vector3 bossPosition = request != null ? botOwner_0.BotRequestController.CurRequest.Requester.Position : botPosition;
 
-            // player needs help or has call for a regroup
-            if (
-                ordersChanged && request != null &&
-                request.BotRequestType == (BotRequestType)CustomBotRequestType.Regroup
-            )
-            {
-                if (!botOwner_0.Memory.HaveEnemy || !botOwner_0.Memory.GoalEnemy.IsVisible)
+                EnemyInfo goalEnemy = botOwner_0.Memory.GoalEnemy;
+
+                // is in dogfight?
+                AICoreActionResultStruct<BotLogicDecision>? aicoreActionResultStruct = followerFightLayer.DogFight();
+                if (aicoreActionResultStruct.HasValue)
                 {
-                    return followerFightLayer.GetCloserToBoss();
+
+                    return (AICoreActionResultStruct<BotLogicDecision>)aicoreActionResultStruct;
+                }
+                // needs healing?
+                aicoreActionResultStruct = followerFightLayer.NeedHeal();
+                if (aicoreActionResultStruct != null)
+                {
+                    return (AICoreActionResultStruct<BotLogicDecision>)aicoreActionResultStruct;
+                }
+
+                // player needs help or has call for a regroup
+                if (
+                    ordersChanged && request != null &&
+                    request.BotRequestType == (BotRequestType)CustomBotRequestType.Regroup &&
+                    Utils.Utils.GetNavDistance(botPosition, bossPosition) > friendlyPMC.regroupMinDistance
+                )
+                {
+
+                    if (!botOwner_0.Memory.HaveEnemy || !botOwner_0.Memory.GoalEnemy.IsVisible)
+                    {
+                        followerFightLayer.GetCloserToBoss();
+
+                    }
+                    else
+                    {
+                        botOwner_0.BotTalk.TrySay(EPhraseTrigger.DontKnow, true);
+                        request.Complete();
+                    }
+                }
+
+                // do not pursue a marksman
+                if (botOwner_0.Memory.GoalEnemy.Owner.IsRole(WildSpawnType.marksman))
+                {
+                    return followerFightLayer.MarksManFight();
+                }
+
+                AICoreActionResultStruct<BotLogicDecision> decision;
+
+                // default to hold tactic if enemy is too close
+                bool enemyClose = false;
+                bool enemyVeryClose = false;
+                if (Utils.EnemyInfo.Distance(botOwner_0) <= Utils.EnemyInfo.EnemyDistance.VeryClose)
+                {
+                    decision = new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.dogFight, "getReady");
+                    enemyVeryClose = true;
+                }
+                else if (Utils.EnemyInfo.Distance(botOwner_0) <= Utils.EnemyInfo.EnemyDistance.Close)
+                {
+                    decision = followerFightLayer.DefendPosition(HasBoss() ? GetBoss().Position : botPosition);
+                    enemyClose = true;
                 }
                 else
                 {
-                    botOwner_0.BotTalk.TrySay(EPhraseTrigger.OnFight, true);
-                    request.Complete();
+
+                    decision = SniperFight();
                 }
-            }
-
-            // do not pursue a marksman
-            if (botOwner_0.Memory.GoalEnemy.Owner.IsRole(WildSpawnType.marksman))
-            {
-                return followerFightLayer.MarksManFight();
-            }
-
-            AICoreActionResultStruct<BotLogicDecision> decision;
-
-            // default to hold tactic if enemy is too close
-            bool enemyClose = false;
-            bool enemyVeryClose = false;
-            if (Utils.EnemyInfo.Distance(botOwner_0) <= Utils.EnemyInfo.EnemyDistance.VeryClose)
-            {
-                decision = new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.dogFight, "getReady");
-                enemyVeryClose = true;
-            }
-            else if (Utils.EnemyInfo.Distance(botOwner_0) <= Utils.EnemyInfo.EnemyDistance.Close)
-            {
-                decision = followerFightLayer.DefendPosition(HasBoss() ? GetBoss().Position : botPosition);
-                enemyClose = true;
-            }
-            else
-            {
-
-                decision = SniperFight();
-            }
-            // enemy very close, switch to close combat ASAP
-            if (goalEnemy != null && enemyVeryClose)
-            {
-                if (
-                    botOwner_0.WeaponManager.Selector.LastEquipmentSlot != EquipmentSlot.SecondPrimaryWeapon &&
-                    botOwner_0.WeaponManager.Selector.CanChangeToSecondWeapons &&
-                    (
-                        !botOwner_0.Memory.GoalEnemy.HaveSeen ||
-                        Time.time - botOwner_0.Memory.GoalEnemy.PersonalLastSeenTime > 2f
+                // enemy very close, switch to close combat ASAP
+                if (goalEnemy != null && enemyVeryClose)
+                {
+                    if (
+                        botOwner_0.WeaponManager.Selector.LastEquipmentSlot != EquipmentSlot.SecondPrimaryWeapon &&
+                        botOwner_0.WeaponManager.Selector.CanChangeToSecondWeapons &&
+                        (
+                            !botOwner_0.Memory.GoalEnemy.HaveSeen ||
+                            Time.time - botOwner_0.Memory.GoalEnemy.PersonalLastSeenTime > 2f
+                        )
                     )
-                )
-                {
-                    botOwner_0.WeaponManager.Selector.TryChangeWeapon(true);
+                    {
+                        botOwner_0.WeaponManager.Selector.TryChangeWeapon(true);
+                    }
                 }
-            }
-            else if(goalEnemy != null && customNavigationPoint_0 != null)
+                else if (goalEnemy != null && customNavigationPoint_0 != null)
+                {
+                    // switch to secondary weapon if we are getting closer to the enemy
+                    var proxydist = Utils.EnemyInfo.DistanceProxy(botOwner_0, customNavigationPoint_0.Position);
+                    if (
+                        !botOwner_0.Memory.GoalEnemy.IsVisible &&
+                            (
+                                decision.Reason == "repositionFast" ||
+                                decision.Reason == "reposition" ||
+                                enemyClose
+                            )
+                        &&
+                        botOwner_0.WeaponManager.Selector.LastEquipmentSlot != EquipmentSlot.SecondPrimaryWeapon &&
+                        botOwner_0.WeaponManager.Selector.CanChangeToSecondWeapons &&
+                        proxydist < Utils.EnemyInfo.ProxyDistance.Mid && proxydist > Utils.EnemyInfo.ProxyDistance.VeryClose
+                    )
+                    {
+                        botOwner_0.WeaponManager.Selector.TryChangeWeapon(true);
+
+                    }
+                    // switch back to sniper if we are moving to a sniper shot
+                    else if (
+                        Utils.EnemyInfo.DistanceProxy(botOwner_0, customNavigationPoint_0.Position) >= Utils.EnemyInfo.ProxyDistance.Mid &&
+                        !botOwner_0.Memory.GoalEnemy.IsVisible &&
+                            (
+                                decision.Reason == "repositionFast" ||
+                                decision.Reason == "reposition" ||
+                                decision.Reason == "relocateFast" ||
+                                decision.Reason == "sniper.Search"
+                            )
+                        &&
+                        botOwner_0.WeaponManager.Selector.LastEquipmentSlot != EquipmentSlot.FirstPrimaryWeapon
+                    )
+                    {
+                        botOwner_0.WeaponManager.Selector.TryChangeToMain();
+                    }
+                }
+
+
+                return decision;
+            } catch( Exception ex )
             {
-                // switch to secondary weapon if we are getting closer to the enemy
-                var proxydist = Utils.EnemyInfo.DistanceProxy(botOwner_0, customNavigationPoint_0.Position);
-                if (
-                    !botOwner_0.Memory.GoalEnemy.IsVisible &&
-                        (
-                            decision.Reason == "repositionFast" ||
-                            enemyClose
-                        )
-                    &&
-                    botOwner_0.WeaponManager.Selector.LastEquipmentSlot != EquipmentSlot.SecondPrimaryWeapon &&
-                    botOwner_0.WeaponManager.Selector.CanChangeToSecondWeapons &&
-                    proxydist < Utils.EnemyInfo.ProxyDistance.Mid && proxydist > Utils.EnemyInfo.ProxyDistance.VeryClose
-                )
-                {
-                    botOwner_0.WeaponManager.Selector.TryChangeWeapon(true);
-
-                } 
-                // switch back to sniper if we are moving to a sniper shot
-                else if(
-                    Utils.EnemyInfo.DistanceProxy(botOwner_0, customNavigationPoint_0.Position) >= Utils.EnemyInfo.ProxyDistance.Mid &&
-                    !botOwner_0.Memory.GoalEnemy.IsVisible &&
-                        (
-                            decision.Reason == "repositionFast" ||
-                            decision.Reason == "relocateFast" ||
-                            decision.Reason == "sniper.Search"
-                        )
-                    &&
-                    botOwner_0.WeaponManager.Selector.LastEquipmentSlot != EquipmentSlot.FirstPrimaryWeapon
-                )
-                {
-                    botOwner_0.WeaponManager.Selector.TryChangeToMain();
-                }
+                Components.Logger.LogInfo("BirdEye Decision Error: " + ex.Message);
+                Components.Logger.LogInfo("Trace: " + ex.StackTrace);
+                return new AICoreActionResultStruct<BotLogicDecision>(HoldFor(GClass761.Random(1f, 2f)), "decision.Error");
             }
-
-
-            return decision;
         }
 
         public override AICoreActionEndStruct ShallEndCurrentDecision(AICoreActionResultStruct<BotLogicDecision> curDecision)
         {
-            AICoreActionEndStruct? common = followerFightLayer.ShallEndCurrentDecisionAllies(curDecision);
+            AICoreActionEndStruct? common = followerFightLayer.ShallEndCurrentDecisionAllies(curDecision,ordersChanged);
 
             if (common != null) return (AICoreActionEndStruct)common;
-
-            if(curDecision.Action == (BotLogicDecision)CustomBotDecisions.SniperSearch)
-            {
-                return followerFightLayer.EndSniperSearch();
-            } else if (curDecision.Action == (BotLogicDecision)CustomBotDecisions.CoverToCover)
-            {
-                return followerFightLayer.EndCoverToCover();
-            }
 
             return base.ShallEndCurrentDecision(curDecision);
         }
@@ -345,8 +350,14 @@ namespace friendlyPMC.Components.FollowerBossFollower
             }
             return followerFightLayer.EndGoToPoint();
         }
-
         
+        public AICoreActionEndStruct EndSniperSearch()
+        {
+            if (ordersChanged) return new AICoreActionEndStruct("search.End", true);
+
+            return followerFightLayer.EndSniperSearch();
+        }
+
 
         protected bool HasBoss()
         {
@@ -361,11 +372,10 @@ namespace friendlyPMC.Components.FollowerBossFollower
         public void OrdersChanged()
         {
             ordersChanged = true;
-            var Timer = StaticManager.Instance.TimerManager.MakeTimer(TimeSpan.FromSeconds(1), false);
-            Timer.OnTimer += () =>
+            Utils.Utils.SetTimeout(() =>
             {
                 ordersChanged = false;
-            };
+            },1000);
 
             followerFightLayer.OrdersChanged();
         }
