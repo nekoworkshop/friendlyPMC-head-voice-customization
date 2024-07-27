@@ -153,8 +153,14 @@ class friendlyPMC {
 			"SquadItemsGiver",
 			[
 				new RouteAction("/singleplayer/returnitems", (url: string, info: any, sessionID: string, output: string): any => {
-					this.mailSendService.sendUserMessageToPlayer(sessionID, <IUserDialogInfo>info.member, randomUtil.getArrayValue([]), info.items, 86400);
-					return httpResponseUtil.nullResponse();
+					//prettier-ignore
+					this.mailSendService.sendUserMessageToPlayer(sessionID, <IUserDialogInfo>info.member, randomUtil.getArrayValue([
+                        "Here is your stuff, where is my money?", 
+                        "Got your things right here. Where's my cut?", 
+                        "Here is everything you gave me. So... we are splitting this, right?",
+                        "You know carrying all of this is pretty challenging. Don't blame me if next time some of it falls off.\nOf course you can always... insure, if you know what I mean.",
+                    ]), info.items, 86400);
+					return httpResponseUtil.emptyResponse();
 				}),
 			],
 			"custom-static-squad-items-giver"

@@ -1,24 +1,23 @@
-3.4:
-- x - update for spt 3.9
-- x - improve the fighting logic, fix bugs
-- x - ensure BirdEye stops going close in attempt to get a kills
-- x - ensure followers still obey commands
-
-- x - modify how followers detect enemies
-
-- x - cover points picked different
-- x - improve performance
-
-
-- x - change the Goons equipment to always include meds (src\generators\BotLootGenerator.ts, src\generators\PMCLootGenerator.ts and bot jsons)
-- x - on team pinging, if any followers has enemy in their visuals, place a marker where they are seeing the enemy
-- x - play a sound when the marker is placed
-
 3.5:
-- fix glitchy behavior of boss followers
-- add new command "hold fire" to stop followers from enganging enemies unless enemy is too close or they shoot at us
+- x - fix glitchy behavior of boss followers
+- x - improve scav runs with followers
+
+- > - change how items are returned so that random followers report returning the items
+
+- see if FIKA compatibility can be improved
+
 - goons send messages at the end of the raid
-- change how items are returned so that random followers report returning the items
+- add new command "hold fire" to stop followers from enganging enemies unless enemy is too close or they shoot at us
+
 
 3.6:
-- 
+
+- add load selection for squad members 
+- - rifle preset 
+- - sniper preset
+- - shotgun preset
+- - user preset 
+
+3.7?:
+- add ability to give followers money
+- make given loot randomly "falloff" in case user is not giving any money to the followers

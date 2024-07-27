@@ -19,6 +19,7 @@ using LootingBots.Patch.Components;
 
 using friendlyPMC.Components;
 
+
 namespace friendlyPMC.Modules
 {
     internal class InteractableObjects
@@ -34,6 +35,7 @@ namespace friendlyPMC.Modules
         private bool IsDisposed = false;
 
         private Dictionary<string, Dictionary<string,Item>> _lootedItems;
+        private Dictionary<string, Dictionary<string, object>> _followersWithLoot;
 
         public InteractableObjects() { 
             if(Instance == null)
@@ -41,6 +43,7 @@ namespace friendlyPMC.Modules
                 Instance = this;
 
                 _lootedItems = new Dictionary<string, Dictionary<string,Item>>();
+                _followersWithLoot = new Dictionary<string, Dictionary<string, object>>();
             }
 
         }
@@ -54,6 +57,10 @@ namespace friendlyPMC.Modules
             {
                 foreach (var item in stack.Value)
                 {
+                    // - do not return med items (assume they where given to the bot for healing)
+                    bool flag = item.Value is MedsClass;
+                    if (flag) continue;
+
                     items.Add(item.Value);
                 }
             }
@@ -65,11 +72,13 @@ namespace friendlyPMC.Modules
 
             var _defaultJsonConverters = Traverse.Create(converterClass).Field<JsonConverter[]>("Converters").Value;
 
-            if(flatItems.Length > 0) 
-                RequestHandler.PutJson("/singleplayer/traderServices/itemDelivery", new
+            var info = Instance._followersWithLoot.Values.Random();
+
+            if (flatItems.Length > 0) 
+                RequestHandler.PutJson("/singleplayer/returnitems", new
                 {
                     items = flatItems,
-                    traderId = "friendlypmc-return-loot"
+                    member = info
                 }.ToJson(_defaultJsonConverters));
         }
 
@@ -230,16 +239,30 @@ namespace friendlyPMC.Modules
                 bot.BotRequestController.CurRequest.Complete();
         }
 
-        public static void StoreItem(string bot, Item item)
+        public static void StoreItem(BotOwner bot, Item item)
         {
-            if(!Instance._lootedItems.ContainsKey(bot)) {
-                Instance._lootedItems.Add(bot, new Dictionary<string, Item>());
+            if(!Instance._lootedItems.ContainsKey(bot.ProfileId)) {
+                Instance._lootedItems.Add(bot.ProfileId, new Dictionary<string, Item>());
+                Instance._followersWithLoot.Add(bot.ProfileId, new Dictionary<string, object> {
+                    { "_id" , bot.ProfileId  },
+                    { "aid" , bot.Profile.AccountId },
+                    { 
+                        "Info" , new Dictionary<string, object>{
+                            { "Level", bot.Profile.Info.Level },
+                            { "MemberCategory", bot.Profile.Info.MemberCategory },
+                            { "Nickname",  bot.Profile.Info.Nickname },
+                            { "Side",  bot.Profile.Info.Side },
+                        } 
+                    },
+                });
             }
 
-            var list = Instance._lootedItems[bot];
+            var list = Instance._lootedItems[bot.ProfileId];
 
-            if(!list.ContainsKey(item.Id))
+            if (!list.ContainsKey(item.Id))
+            {
                 list.Add(item.Id, item.CloneItem());
+            }
         }
 
         public static void RemoveStoredItem(string bot, string itemId)
@@ -269,6 +292,7 @@ namespace friendlyPMC.Modules
             if(Instance._lootedItems.ContainsKey(bot))
             {
                 Instance._lootedItems.Remove(bot);
+                Instance._followersWithLoot.Remove(bot);
             }
         }
 

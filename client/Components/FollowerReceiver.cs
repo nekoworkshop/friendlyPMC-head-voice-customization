@@ -770,10 +770,15 @@ namespace friendlyPMC.Components
                                 {
                                     gclass.AddPossibleExecutors(botOwner_0);
                                     gclass.SetGroup(botOwner_0.BotsGroup.RequestsController);
+
+                                    botOwner_0.BotTalk.TrySay(EPhraseTrigger.Roger, false);
+                                    botOwner_0.Gesture.TryGestus(EGesture.Good, false);
                                 }
                             }
                         }
                     }
+
+                    return;
                 }
                 else if(info.phrase == EPhraseTrigger.CheckHim || info.phrase == EPhraseTrigger.LootBody)
                 {
@@ -816,8 +821,13 @@ namespace friendlyPMC.Components
                         if (closest != null && closest.ProfileId == botOwner_0.ProfileId)
                         {
                             InteractableObjects.SetTaker(botOwner_0);
+
+                            botOwner_0.BotTalk.TrySay(EPhraseTrigger.Roger, false);
+                            botOwner_0.Gesture.TryGestus(EGesture.Good, false);
                         }
                     }
+
+                    return; 
                 }
                 else if(info.phrase == (EPhraseTrigger)CustomPhrases.TeamStatus)
                 {

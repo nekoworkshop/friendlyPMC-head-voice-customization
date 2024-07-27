@@ -114,8 +114,6 @@ namespace friendlyPMC.Components
                 return new AICoreActionResultStruct<BotLogicDecision>(HoldOrCover(botOwner_0), "req:Error");
             }
 
-            Components.Logger.LogInfo("BotRequestType: " + request.BotRequestType);
-
             switch (request.BotRequestType)
             {
                 // on follow me request from the boss, just come closer to the boss or get out of hold position

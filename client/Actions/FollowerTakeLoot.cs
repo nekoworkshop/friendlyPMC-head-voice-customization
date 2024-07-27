@@ -157,7 +157,7 @@ namespace friendlyPMC.Actions
                 result = await _follower.TransactionController.TryPickupItem(item);
                 if (result && _follower.IsSquadMate)
                 {
-                    InteractableObjects.StoreItem(botOwner_0.ProfileId, item);
+                    InteractableObjects.StoreItem(botOwner_0, item);
                 }
                 // mark loot as being ignored as if bot tries to get it the second item, it will end up getting stucked
                 if(!result)
