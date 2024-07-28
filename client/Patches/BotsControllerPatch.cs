@@ -20,6 +20,8 @@ using Comfort.Common;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using System.Security.Policy;
+using static RootMotion.FinalIK.IKSolver;
+using UnityEngine.Profiling;
 
 
 
@@ -239,6 +241,17 @@ namespace friendlyPMC.Patches
             @class.method_0(botOwner);
         }
 
+        public async UniTask ActivateFikaBot(GClass814 botCreator, Profile profile, GClass590 position, BotZone zone,bool shallBeGroup, Func<BotOwner, BotZone, BotsGroup> GroupAction, Action<BotOwner> OnActivate,CancellationToken token)
+        {
+            await botCreator.ActivateBot(
+                            profile,
+                            position,
+                            zone, true,
+                            GroupAction,
+                            OnActivate,
+                            token
+                        );
+        }
         public async UniTask SpawnBossFollower(pitAIBossPlayer player, WildSpawnType boss = WildSpawnType.bossKnight, CancelToken cancelToken = null)
         {
             
@@ -473,14 +486,15 @@ namespace friendlyPMC.Patches
 
                     if (fikaType != null)
                     {
-                        botCreator.ActivateBot(
+                        ActivateFikaBot(
+                            botCreator,
                             profile,
                             new GClass590(position, closestCorePoint.Id, false),
                             zone, true,
                             GroupAction,
                             OnActivate,
                             token.GetCancelToken()
-                        );
+                        ).Forget();
                     }
                     else
                     {
@@ -559,6 +573,13 @@ namespace friendlyPMC.Patches
 
             float spawnedFollowers = 0;
 
+            Type fikaType = Type.GetType("Fika.Core.Coop.GameMode.CoopGame, Fika.Core");
+
+            Func<BotOwner, BotZone, BotsGroup> GroupAction = new Func<BotOwner, BotZone, BotsGroup>((BotOwner bt, BotZone zn) =>
+            {
+                return GetPlayerGroup(player, bt, zn);
+            });
+
             bot.Profiles.ForEach(async profile =>
             {
                 // followers should use the same groupID as the player
@@ -608,69 +629,78 @@ namespace friendlyPMC.Patches
                 Stopwatch stopWatch = new Stopwatch();
                 stopWatch.Start();
 
-                await ActivateBot(
-                    botCreator, profile, position, closestCorePoint.Id, zone,
-                    new Func<BotOwner, BotZone, BotsGroup>((BotOwner bt, BotZone zn) =>
+
+                Action<BotOwner> OnActivate = new Action<BotOwner>((BotOwner owner) =>
+                {
+
+                    bool shallBeGroup = bot.SpawnParams?.ShallBeGroup != null;
+
+                    stopWatch.Start();
+
+                    Action<BotOwner> OnBotState = new Action<BotOwner>((BotOwner me) =>
                     {
-                        return GetPlayerGroup(player, bt, zn);
+                        try
+                        {
 
-                    }), new Action<BotOwner>((BotOwner owner) =>
+                            BotOwnerManualUpdatePatch.BotOwnerUpdate.Remove(me.ProfileId); // clear watcher
+
+                            me.Memory.DeleteInfoAboutEnemy(player.Player()); // prevent attack of player on spawn
+
+                            BossPlayers.Instance.AddFollower(me, player, true); // make bot a follower
+
+                            me.GetPlayer.ActiveHealthController.RestoreFullHealth(); // ensure bot has full health
+                        }
+                        catch (Exception ex)
+                        {
+                            Components.Logger.LogInfo("Failed to add " + me.Profile.Nickname + " as follower : " + ex.Message);
+                            Components.Logger.LogInfo("Trace: " + ex.StackTrace);
+                        }
+                    });
+
+                    BotOwnerManualUpdatePatch.BotOwnerUpdate.Add(owner.ProfileId, OnBotState);
+
+                    // force player side on the bot
+                    if (owner.Side != side)
+                    {
+                        owner.GetPlayer.Profile.Info.Side = side;
+                    }
+
+                    botSpawnerClass.method_10(owner, bot, new Action<BotOwner>((BotOwner follower) =>
                     {
 
-                        bool shallBeGroup = bot.SpawnParams?.ShallBeGroup != null;
+                        Components.Logger.LogInfo("Follower " + follower.Profile.Nickname + " spawned");
 
-                        stopWatch.Start();
+                        spawnedFollowers++;
 
-                        Action<BotOwner> OnBotState = new Action<BotOwner>((BotOwner me) =>
+                        if (spawnedFollowers >= memberCount)
                         {
-                            try
-                            {
-                                BotOwnerManualUpdatePatch.BotOwnerUpdate.Remove(me.ProfileId); // clear watcher
-
-                                me.Memory.DeleteInfoAboutEnemy(player.Player()); // prevent attack of player on spawn
-
-                                BossPlayers.Instance.AddFollower(me, player, true); // make bot a follower
-
-                                me.GetPlayer.ActiveHealthController.RestoreFullHealth(); // ensure bot has full health
-
-                            }
-                            catch (Exception ex)
-                            {
-                                Components.Logger.LogInfo("Failed to add " + me.Profile.Nickname + " as follower : " + ex.Message);
-                                Components.Logger.LogInfo("Trace: " + ex.StackTrace);
-                            }
-                        });
-
-                        BotOwnerManualUpdatePatch.BotOwnerUpdate.Add(owner.ProfileId, OnBotState);
-
-                        // force player side on the bot
-                        if (owner.Side != side)
-                        {
-                            owner.GetPlayer.Profile.Info.Side = side;
+                            token.Cancel();
                         }
 
-
-                        botSpawnerClass.method_10(owner, bot, new Action<BotOwner>((BotOwner follower) =>
+                        Utils.Utils.SetTimeout(() =>
                         {
+                            follower.BotTalk.TrySay(EPhraseTrigger.Ready, false);
+                        }, 2000);
 
-                            Components.Logger.LogInfo("Follower " + follower.Profile.Nickname + " spawned");
+                    }), false, stopWatch);
 
-                            spawnedFollowers++;
-                            
-                            if (spawnedFollowers >= memberCount)
-                            {
-                                token.Cancel();
-                            }
+                });
+                if (fikaType == null)
+                    await ActivateBot(
+                        botCreator, profile, position, closestCorePoint.Id, zone,
+                        GroupAction, OnActivate
+                    );
+                else
+                    await ActivateFikaBot(
+                        botCreator,
+                        profile,
+                        new GClass590(position, closestCorePoint.Id, false),
+                        zone, true,
+                        GroupAction,
+                        OnActivate,
+                        token.GetCancelToken()
+                    );
 
-                            Utils.Utils.SetTimeout(() =>
-                            {
-                                follower.BotTalk.TrySay(EPhraseTrigger.Ready, false);
-                            },2000);
-
-                        }), false, stopWatch);
-
-                    })
-                );
             });
 
         }
@@ -849,8 +879,9 @@ namespace friendlyPMC.Patches
         [PatchPrefix]
         private static bool PatchPrefix(BotsController __instance)
         {
-            BossPlayers.Dispose();
             InteractableObjects.Dispose();
+
+            BossPlayers.Dispose();
             Receivers.Dispose();
             FollowerPatrolInstances.Dispose();
 

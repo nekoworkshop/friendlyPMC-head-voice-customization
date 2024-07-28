@@ -285,25 +285,9 @@ namespace friendlyPMC.Components
                 }
             }, 300);
 
-            //_bot.GetPlayer.BeingHitAction += BeingHitAction;
-
             Logger.LogInfo($"Bot {_bot.Profile.Nickname} is now a follower of {_player.Player().Profile.Nickname}");
-
-        }
-        /** 
-         * This is needed since we are disabling CalcGoal for followers 
-         * Make the bot look towards the direction he is getting shot it (to see the enemy)
-         * **/
-        public void BeingHitAction(DamageInfo damageInfo, EBodyPart bodyType, float damageReducedByArmor)
-        {
-            if(!_bot.Memory.HaveEnemy && damageInfo.Player != null)
-            {
-                Vector3? pos = damageInfo.Player.iPlayer?.Position;
-                if (pos.HasValue)
-                {
-                    _bot.Steering.LookToPoint((Vector3)pos,90f);
-                }
-            }
+            string stackTrace = Environment.StackTrace;
+            Logger.LogInfo("Stack trace: " + stackTrace);
         }
 
         public virtual FollowerBrain GetFollowerBrain(BotOwner bot, pitAIBossPlayer boss)
@@ -532,8 +516,6 @@ namespace friendlyPMC.Components
 
                 _bot.GetPlayer.Physical.Stamina.ForceMode = false;
                 _bot.GetPlayer.Physical.HandsStamina.ForceMode = false;
-
-                _bot.GetPlayer.BeingHitAction -= BeingHitAction;
 
             } catch(Exception ex)
             {

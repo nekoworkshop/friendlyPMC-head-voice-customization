@@ -18,6 +18,7 @@ using Newtonsoft.Json;
 using LootingBots.Patch.Components;
 
 using friendlyPMC.Components;
+using EFT.UI;
 
 
 namespace friendlyPMC.Modules
@@ -52,16 +53,22 @@ namespace friendlyPMC.Modules
         {
 
             List<Item> items = new List<Item>();
-            // loop through all looted items inside _lootedItems and add them to the list
-            foreach(var stack in _lootedItems)
-            {
-                foreach (var item in stack.Value)
-                {
-                    // - do not return med items (assume they where given to the bot for healing)
-                    bool flag = item.Value is MedsClass;
-                    if (flag) continue;
 
-                    items.Add(item.Value);
+            List<string> keys = _lootedItems.Keys.ToList();
+            // loop through all looted items inside _lootedItems and add them to the list
+            foreach (var key in keys)
+            {
+                if(_lootedItems.TryGetValue(key, out Dictionary<string, Item> stack))
+                {
+                    List<string> stackKeys = stack.Keys.ToList();
+                    foreach (var stackKey in stackKeys)
+                    {
+                        if (stack.TryGetValue(stackKey, out Item item))
+                        {
+                            if(item != null && item is MedsClass == false)
+                                items.Add(item);
+                        }
+                    }
                 }
             }
 
@@ -74,7 +81,7 @@ namespace friendlyPMC.Modules
 
             var info = Instance._followersWithLoot.Values.Random();
 
-            if (flatItems.Length > 0) 
+            if (flatItems != null && flatItems.Any()) 
                 RequestHandler.PutJson("/singleplayer/returnitems", new
                 {
                     items = flatItems,
