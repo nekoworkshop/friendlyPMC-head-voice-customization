@@ -263,15 +263,21 @@ namespace friendlyPMC.Modules
             }
 
             if (!isAIBoss)
+            {
                 _follower = new BotFollowerPlayer(bot, player, bot.Side != EPlayerSide.Savage && squadMate);
                 // scavs have a special tactic
                 if (bot.Side == EPlayerSide.Savage)
                 {
-                    (bot.Brain.BaseBrain as FollowerBrain).SetBossTactic("ally"); 
+                    (bot.Brain.BaseBrain as FollowerBrain).SetBossTactic("ally");
                 }
-            else {
+            }
+            else
+            {
                 _follower = new BossFollowerPlayer(bot, player, role);
             }
+
+            
+            _follower.Init();
 
             _followers.Add(_follower);
 

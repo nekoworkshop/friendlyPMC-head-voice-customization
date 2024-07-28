@@ -44,7 +44,7 @@ namespace friendlyPMC
         }
     }
 
-    [BepInPlugin("xyz.pit.companion", "friendlyPMC", "3.4.0")]
+    [BepInPlugin("xyz.pit.companion", "friendlyPMC", "3.4.1")]
     [BepInDependency("xyz.drakia.bigbrain")]
     [BepInDependency("xyz.drakia.waypoints")]
     [BepInDependency("com.Arys.UnityToolkit")]
@@ -63,11 +63,8 @@ namespace friendlyPMC
 
         public static ConfigEntry<bool> squadSpawn;
         public static ConfigEntry<int> squadSize;
-        public static ConfigEntry <int> squadDelay;
         public static ConfigEntry<bool> copyEquip;
         public static ConfigEntry<int> extraPickups;
-
-        public static ConfigEntry<bool> alternativeSpawn;
 
         public static ConfigEntry<int> enemyRemember;
 
@@ -99,8 +96,6 @@ namespace friendlyPMC
             copyEquip = Config.Bind(baseSettings, "1.6  -  Clone equipment", true, new ConfigDescription("When Squad Spawn is active, spawned followers will have the same equipment as the player"));
             extraPickups = Config.Bind(baseSettings, "2 Maximum followers", 3, new ConfigDescription("Maximum number of followers the player can have. Cannot be less than Squad Size if Squad Spawn is active", new AcceptableValueRange<int>(1, 30)));
 
-            alternativeSpawn = Config.Bind(baseSettings, "1.2  -  Alternative Spawn", false, new ConfigDescription("Try alternative Spawning method to help with Swag+Donuts"));
-            squadDelay = Config.Bind(baseSettings, "1.3  -  Squad spawn Delay", 0, new ConfigDescription("When Squad Spawn is active, how much to delay the spawn of the squad ( in sec.). This is useful in case you have Swag+Donuts. Set delay above 10 seconds.", new AcceptableValueRange<int>(0, 30)));
 
             returnChanceDeath = Config.Bind(baseSettings, "1.5  -  Squadmate return chance after death", 50, new ConfigDescription("Chance your followers will return the items you gave them should you die. This applies only to members you spawned with.", new AcceptableValueRange<int>(1, 100)));
 
@@ -204,6 +199,8 @@ namespace friendlyPMC
             harmony.PatchAll(typeof(LocalGameCtorPatch).Assembly);
 
             SAINPatch.PatchSAINIfInstalled();
+
+            
 
         }
 

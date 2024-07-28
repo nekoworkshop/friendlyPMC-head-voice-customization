@@ -142,9 +142,11 @@ namespace friendlyPMC.Patches
         private static bool PatchCheckCalcGoal(object __instance)
         {
             PropertyInfo botOwnerProperty = hearingType.GetProperty("BotOwner");
+            if (botOwnerProperty == null) return true;
             BotOwner botObject = botOwnerProperty.GetValue(__instance) as BotOwner;
+            if(botObject == null) return true;
 
-            if (BossPlayers.Instance.IsFollower(botObject))
+            if (BossPlayers.Instance != null && BossPlayers.Instance.IsFollower(botObject))
             {
                 EnemyInfo potentialEnemy = botObject.EnemyChooser.FindDangerEnemy();
 

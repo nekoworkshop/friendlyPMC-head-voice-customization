@@ -6,18 +6,13 @@ using HarmonyLib;
 
 using LootingBots.Patch.Components;
 using LootingBots.Patch.Util;
-using LootingBots;
 
 using System;
 using System.Collections.Generic;
 using System.Reflection;
 
 using UnityEngine;
-using System.Security.Policy;
 using EFT.InventoryLogic;
-using static EFT.SpeedTree.TreeWind;
-using System.Threading.Tasks;
-
 
 namespace friendlyPMC.Components
 {
@@ -74,14 +69,10 @@ namespace friendlyPMC.Components
             _IsSquadMate = isSquad;
 
             settingModif = new GClass528(1.2f,1.2f,1f,1f,1f,1f,0.9f,1f,1f);
+        }
 
-            // change enenmy chooser to custom
-            /*if (bot.EnemyChooser != null)
-                bot.EnemyChooser.Dispose();
-
-            bot.EnemyChooser = new GClass404(bot);
-            bot.EnemyChooser.Activate();*/
-
+        public virtual void Init()
+        {
             bool hadEnemy = _bot.Memory.HaveEnemy;
             // deactivate old layers
 
@@ -89,7 +80,8 @@ namespace friendlyPMC.Components
             try
             {
                 AccessTools.Field(typeof(BaseLogicLayerAbstractClass), "bool_1").SetValue(_bot.Brain.BaseBrain.CurLayerInfo, true);
-            } catch { }
+            }
+            catch { }
 
             var baseBrain = _bot.Brain.BaseBrain;
             // guess work because we cannot access the private property dictionary_0 where the layers are, but no brain has 20 layers, usually it's 10
@@ -97,7 +89,7 @@ namespace friendlyPMC.Components
             {
                 try
                 {
-                    if(baseBrain != null) baseBrain.method_3(i);
+                    if (baseBrain != null) baseBrain.method_3(i);
                 }
                 catch (Exception)
                 {
@@ -130,43 +122,53 @@ namespace friendlyPMC.Components
                 baseBrain.CurLayerInfo.IsActive = false;
             }
             _bot.Brain.Agent.Dispose();
-            if(baseBrain != null) baseBrain.Dispose();
+            if (baseBrain != null) baseBrain.Dispose();
             _bot.BotsController.AICoreController.Stop();
             _bot.Receiver.Dispose();
-            
+
             // add special follower settings
             SetFollowerSettings(_bot);
             // add a new receiver
-            _bot.Receiver = GetFollowerReceiver(bot);
+            _bot.Receiver = GetFollowerReceiver(_bot);
             _bot.Receiver.Init();
             try
-            {          
-                // initialize LootingBots brain
-                _lootingBrain = _bot.GetPlayer.gameObject.GetComponent<LootingBrain>();
-                _lootFinder = _bot.GetPlayer.gameObject.GetComponent<LootFinder>();
-
-                _transactionController = AccessTools.Field(typeof(InventoryController), "_transactionController").GetValue(_lootingBrain.InventoryController) as TransactionController;
-
-                _lootingBrain.UpdateGridStats();
-
-            } catch(Exception ex)
             {
-                Logger.LogInfo("Failed to add Looting Brain to follower: " +ex.Message);
+
+                // initialize LootingBots brain
+                _lootingBrain = _bot.GetPlayer.GetComponentInParent<LootingBrain>();
+                if (_lootingBrain = null)
+                {
+                    _transactionController = AccessTools.Field(typeof(InventoryController), "_transactionController").GetValue(_lootingBrain.InventoryController) as TransactionController;
+                   
+                    _lootingBrain.UpdateGridStats();
+
+                    _lootFinder = _bot.GetPlayer.GetComponentInParent<LootFinder>();
+                } else
+                {
+                    Logger.LogInfo("Can't find LootBrain - looting will be disabled");
+                }
+
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogInfo("Failed to add Looting Brain to a follower: " + ex.Message + " at step " + step);
+                Logger.LogInfo("StackTrace: " + ex.StackTrace);
             }
             // add the new follower brain
             _bot.Brain.BaseBrain = GetFollowerBrain(_bot, _player);
             _bot.Brain.Agent = GetFollowerAIAgent(_bot);
             _bot.BotsController.AICoreController.Activate();
             // let the bot talk
-            _bot.BotTalk.SetSilence(0f); 
+            _bot.BotTalk.SetSilence(0f);
             // force bot to turn off light
-            if(_bot.BotLight != null && _bot.BotLight.IsEnable) _bot.BotLight.TurnOff(false, true);
+            if (_bot.BotLight != null && _bot.BotLight.IsEnable) _bot.BotLight.TurnOff(false, true);
             //_bot.NightVision.H
             // make bot follower of player
             _player.AddFollower(_bot);
             // activate new following patrol mode
             try
-            { 
+            {
 
                 var followerAIBase = AccessTools.Field(typeof(PatrolDataFollower), "followerAIBase").GetValue(_bot.BotFollower.PatrolDataFollower) as GClass480;
 
@@ -175,17 +177,18 @@ namespace friendlyPMC.Components
                     followerAIBase.Dispose();
                 }
 
-                FollowerPatrolInstances.AddPatrol(new FollowerPatrol(player, bot));
+                FollowerPatrolInstances.AddPatrol(new FollowerPatrol(_player, _bot));
 
                 _bot.BotFollower.PatrolDataFollower.IsInited = true;
                 _bot.BotFollower.PatrolDataFollower.ManualUpdate();
 
-            } catch(Exception e)
+            }
+            catch (Exception e)
             {
                 Logger.LogInfo("Failed to activate new follower patrol mode: " + e.Message);
                 Logger.LogInfo("StackTrace : " + e.StackTrace);
 
-                _bot.BotFollower.PatrolDataFollower.InitPlayer(player.realPlayer);
+                _bot.BotFollower.PatrolDataFollower.InitPlayer(_player.realPlayer);
                 if (!_bot.BotFollower.PatrolDataFollower.IsInited)
                 {
                     _bot.BotFollower.PatrolDataFollower.IsInited = true;
@@ -193,7 +196,7 @@ namespace friendlyPMC.Components
                 _bot.BotFollower.PatrolDataFollower.ManualUpdate();
             }
 
-             // make all followers have the same group
+            // make all followers have the same group
             if (_bot.BotsGroup != null)
             {
                 // - if there is no group yet, take the bot's group
@@ -220,43 +223,33 @@ namespace friendlyPMC.Components
                     _player.bossGroup.Lock();
                     _player.bossGroup.OnEnemyAdd += (IPlayer pl, EBotEnemyCause cause) =>
                     {
-                        if (pl != null && player.Player().ProfileId == pl.ProfileId)
+                        if (pl != null && _player.Player().ProfileId == pl.ProfileId)
                         {
-                            player.bossGroup.RemoveEnemy(player.Player());
-                            player.bossGroup.AddAlly(player.realPlayer);
+                            _player.bossGroup.RemoveEnemy(_player.Player());
+                            _player.bossGroup.AddAlly(_player.realPlayer);
                         }
                     };
                     _player.bossGroup.AnyBodyShootImmediately = true;
-                    /*// - - any enemy the boss has, the followers will now have
-                    try
-                    {
-                        var _initialBot = AccessTools.Field(typeof(BotsGroup), "_initialBot").GetValue(_player.bossGroup) as BotOwner;
-                        _initialBot.Settings.FileSettings.Mind.USE_ADD_TO_ENEMY_VALIDATION = false;
-                        _player.GetEnemies().ForEach(enemy =>
-                        {
-                            if(enemy.BotState == EBotState.Active && !enemy.IsDead)
-                                _player.bossGroup.AddEnemy(enemy.GetPlayer, EBotEnemyCause.initCauseEnemy);
-                        });
-                    } catch(Exception ex)
-                    {
-                        Logger.LogInfo(ex.Message);
-                    }*/
                 }
-                else if(_bot.BotsGroup.Id != _player.bossGroup.Id)
+                else if (_bot.BotsGroup.Id != _player.bossGroup.Id)
                 {
                     _bot.BotsGroup.RemoveAlly(_bot);
                     _player.bossGroup.AddMember(_bot, false);
                 }
-            } else if(_player.bossGroup != null)
+            }
+            else if (_player.bossGroup != null)
             {
                 _player.bossGroup.AddMember(_bot, false);
             }
 
             try
             {
-                Weapon primWeapon = bot.AIData.Player.HandsController.Item as Weapon;
+                if (_transactionController != null)
+                {
+                    Weapon primWeapon = _bot.AIData.Player.HandsController.Item as Weapon;
 
-                _transactionController.AddExtraAmmo(primWeapon);
+                    _transactionController.AddExtraAmmo(primWeapon);
+                }
             }
             catch (Exception ex)
             {
@@ -286,8 +279,14 @@ namespace friendlyPMC.Components
             }, 300);
 
             Logger.LogInfo($"Bot {_bot.Profile.Nickname} is now a follower of {_player.Player().Profile.Nickname}");
-            string stackTrace = Environment.StackTrace;
-            Logger.LogInfo("Stack trace: " + stackTrace);
+        }
+
+        private InventoryControllerClass GetInventoryController(BotOwner bot)
+        {
+            Type playerType = typeof(Player);
+
+            FieldInfo inventoryControllerField = playerType.GetField("_inventoryController", BindingFlags.NonPublic | BindingFlags.Instance);
+            return (InventoryControllerClass)inventoryControllerField.GetValue(bot.GetPlayer);
         }
 
         public virtual FollowerBrain GetFollowerBrain(BotOwner bot, pitAIBossPlayer boss)

@@ -131,7 +131,8 @@ namespace friendlyPMC.Actions
 
                     EnableTransactions();
                     _follower.LootingBrain.StartCoroutine(_follower.LootingBrain.LootCorpse());
-                    if (_follower.IsSquadMate) _follower.LootingBrain.StartCoroutine(MonitorLootingCoroutine());
+                    if (_follower.IsSquadMate) 
+                        _follower.LootingBrain.StartCoroutine(MonitorLootingCoroutine(() => OnLootingComplete()));
                 }
                 // pick up the given item
                 else if (_follower.LootingBrain.ActiveItem != null && _follower.LootingBrain.ActiveItem.Item != null)
@@ -184,7 +185,7 @@ namespace friendlyPMC.Actions
             bool_1 = false;
         }
 
-        private IEnumerator MonitorLootingCoroutine()
+        private IEnumerator MonitorLootingCoroutine(Action callBack = null)
         {
             while (botOwner_0 != null && botOwner_0.BotState == EBotState.Active && botOwner_0.HealthController.IsAlive && _follower != null && _follower.LootingBrain.IsBotLooting)
             {
@@ -192,8 +193,9 @@ namespace friendlyPMC.Actions
             }
 
             // Perform the task after looting is complete
-            OnLootingComplete();
+            if (callBack != null) callBack();
         }
+
         /** Check if the bot still has the items given by the player in his inventory **/
         private void OnLootingComplete()
         {

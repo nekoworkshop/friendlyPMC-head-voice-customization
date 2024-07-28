@@ -38,6 +38,9 @@ import { RandomUtil } from "@spt/utils/RandomUtil";
 import { BotGenerator } from "@spt/generators/BotGenerator";
 import { IBotBase } from "@spt/models/eft/common/tables/IBotBase";
 import { BotGenerationDetails } from "@spt/models/spt/bots/BotGenerationDetails";
+import { HashUtil } from "@spt/utils/HashUtil";
+import { ISendMessageDetails } from "@spt/models/spt/dialog/ISendMessageDetails";
+import { MessageType } from "@spt/models/enums/MessageType";
 
 class friendlyPMC {
 	config = {
@@ -153,13 +156,53 @@ class friendlyPMC {
 			"SquadItemsGiver",
 			[
 				new RouteAction("/singleplayer/returnitems", (url: string, info: any, sessionID: string, output: string): any => {
-					//prettier-ignore
-					this.mailSendService.sendUserMessageToPlayer(sessionID, <IUserDialogInfo>info.member, randomUtil.getArrayValue([
-                        "Here is your stuff, where is my money?", 
-                        "Got your things right here. Where's my cut?", 
-                        "Here is everything you gave me. So... we are splitting this, right?",
-                        "You know carrying all of this is pretty challenging. Don't blame me if next time some of it falls off.\nOf course you can always... insure, if you know what I mean.",
-                    ]), info.items, 86400);
+					const member = <IUserDialogInfo>info.member;
+
+					const details: ISendMessageDetails = {
+						recipientId: sessionID,
+						sender: MessageType.USER_MESSAGE,
+						senderDetails: member,
+						//@prettier-ignore
+						messageText: randomUtil.getArrayValue(["Here is your stuff. Uhm, anything in there for me? ", "Got your things right here. Where's my cut?", "Here is everything you gave me. So... we are splitting this, right?", "Here, this is everything you gave me.\nYou know carrying all of this is pretty challenging. Don't blame me if next time some of it falls off.\nOf course you can always... insure, if you know what I mean.", "Here you go my friend, all the stuff you gave me. Yeah... friends always look out for each other, right?", "I got your stuff right here. Anything in there you can spare?"]),
+					};
+
+					// Add items to message - recreation of sendMessageToPlayer in order to insert the NPC as a user
+					if (info.items?.length > 0) {
+						details.items = info.items;
+						details.itemsMaxStorageLifetimeSeconds = 86400;
+
+						// Get dialog, create if doesn't exist
+						const senderDialog = this.mailSendService["getDialog"](details);
+
+						senderDialog.Users = senderDialog.Users || [];
+						senderDialog.Users.push(member); // insertion is here
+
+						// Flag dialog as containing a new message to player
+						senderDialog.new++;
+
+						// Craft message
+						const message = this.mailSendService["createDialogMessage"](senderDialog._id, details);
+
+						// Create items array
+						// Generate item stash if we have rewards.
+						const itemsToSendToPlayer = this.mailSendService["processItemsBeforeAddingToMail"](senderDialog.type, details);
+
+						// If there's items to send to player, flag dialog as containing attachments
+						if ((itemsToSendToPlayer.data?.length ?? 0) > 0) {
+							senderDialog.attachmentsNew += 1;
+						}
+
+						// Store reward items inside message and set appropriate flags inside message
+						this.mailSendService["addRewardItemsToMessage"](message, itemsToSendToPlayer, details.itemsMaxStorageLifetimeSeconds);
+
+						// Add message to dialog
+						senderDialog.messages.push(message);
+
+						// Send message off to player so they get it in client
+						const notificationMessage = this.mailSendService["notifierHelper"].createNewMessageNotification(message);
+						this.mailSendService["notificationSendHelper"].sendMessage(details.recipientId, notificationMessage);
+					}
+
 					return httpResponseUtil.emptyResponse();
 				}),
 			],

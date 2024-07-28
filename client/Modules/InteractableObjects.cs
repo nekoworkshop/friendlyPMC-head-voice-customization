@@ -65,8 +65,8 @@ namespace friendlyPMC.Modules
                     {
                         if (stack.TryGetValue(stackKey, out Item item))
                         {
-                            if(item != null && item is MedsClass == false)
-                                items.Add(item);
+                            //if(item != null && item is MedsClass == false)
+                            items.Add(item);
                         }
                     }
                 }
@@ -81,12 +81,20 @@ namespace friendlyPMC.Modules
 
             var info = Instance._followersWithLoot.Values.Random();
 
-            if (flatItems != null && flatItems.Any()) 
+            if (flatItems != null && flatItems.Any())
+            {
+                /*RequestHandler.PutJson("/singleplayer/traderServices/itemDelivery", new
+                {
+                    items = flatItems,
+                    traderId = "friendlypmc-return-loot"
+                }.ToJson(_defaultJsonConverters));*/
+
                 RequestHandler.PutJson("/singleplayer/returnitems", new
                 {
                     items = flatItems,
                     member = info
                 }.ToJson(_defaultJsonConverters));
+            }
         }
 
         public void Destroy()

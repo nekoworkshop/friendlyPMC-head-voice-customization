@@ -416,10 +416,6 @@ namespace friendlyPMC.Patches
                                     me.GetPlayer.Profile.Info.Settings.Role = botRole;
                                 }
 
-                                // restore original boss logic
-                                /*if(me.Boss != null && me.Boss.BossLogic != null)
-                                    me.Boss.BossLogic.Dispose();*/
-
                                 // our Pipe needs the same boss logic as knight due to their shared fighting logic
                                 if (me.IsRole(WildSpawnType.followerBigPipe))
                                 {
@@ -639,16 +635,13 @@ namespace friendlyPMC.Patches
 
                     Action<BotOwner> OnBotState = new Action<BotOwner>((BotOwner me) =>
                     {
+                        BotOwnerManualUpdatePatch.BotOwnerUpdate.Remove(me.ProfileId); // clear watcher
                         try
                         {
-
-                            BotOwnerManualUpdatePatch.BotOwnerUpdate.Remove(me.ProfileId); // clear watcher
-
                             me.Memory.DeleteInfoAboutEnemy(player.Player()); // prevent attack of player on spawn
-
-                            BossPlayers.Instance.AddFollower(me, player, true); // make bot a follower
-
                             me.GetPlayer.ActiveHealthController.RestoreFullHealth(); // ensure bot has full health
+                            BossPlayers.Instance.AddFollower(me, player, true);
+
                         }
                         catch (Exception ex)
                         {
@@ -685,6 +678,7 @@ namespace friendlyPMC.Patches
                     }), false, stopWatch);
 
                 });
+
                 if (fikaType == null)
                     await ActivateBot(
                         botCreator, profile, position, closestCorePoint.Id, zone,
@@ -740,34 +734,6 @@ namespace friendlyPMC.Patches
                 
             }
 
-            if (friendlyPMC.alternativeSpawn.Value == true)
-            {
-                Utils.Utils.SetBotTimer(() =>
-                {
-                    try
-                    {
-                        Components.Logger.LogInfo("Start Squad Spawn");
-                        Instance.SpawnGroupBots(playerBoss).Forget();
-                    }
-                    catch (Exception e) { Components.Logger.LogInfo("Failed Alternative Spawn Process #1: " + e.Message); }
-                }, friendlyPMC.squadDelay.Value);
-
-
-                if (friendlyPMC.knightSpawn.Value)
-                {
-                    Utils.Utils.SetBotTimer(() =>
-                    {
-                        try
-                        {
-                            Components.Logger.LogInfo("Start Boss Ally Spawn");
-                            Instance.SpawnBossFollower(playerBoss).Forget();
-                        }
-                        catch (Exception e) { Components.Logger.LogInfo("Failed Alternative Spawn Process #2: " + e.Message); }
-                    },(friendlyPMC.squadDelay.Value + 1));
-                    
-                }
-            }
-
         }
     }
 
@@ -777,8 +743,6 @@ namespace friendlyPMC.Patches
 
         public static void SpawnFollowers()
         {
-            
-            if (friendlyPMC.alternativeSpawn.Value == true) return;
 
             if (spawnRan) return;
 
@@ -792,21 +756,7 @@ namespace friendlyPMC.Patches
 
                     if (BotsControllerPatch.Controller != null)
                     {
-                        if (friendlyPMC.squadDelay.Value <= 0)
-                        {
-                            BotsControllerPatch.Instance.SpawnGroupBots(playerBoss).Forget();
-                        } else
-                        {
-                            Utils.Utils.SetBotTimer(() =>
-                            {
-                                try
-                                {
-                                    BotsControllerPatch.Instance.SpawnGroupBots(playerBoss).Forget();
-                                }
-                                catch (Exception e) { Components.Logger.LogInfo("Failed Delayed Squad Spawn Process " + e.Message); }
-
-                            }, friendlyPMC.squadDelay.Value);
-                        }
+                        BotsControllerPatch.Instance.SpawnGroupBots(playerBoss).Forget();
                     }
                 });
             }
@@ -825,7 +775,7 @@ namespace friendlyPMC.Patches
                         }
                         catch (Exception e) { Components.Logger.LogInfo("Failed Delayed Boss Ally Process " + e.Message); }
 
-                    }, (friendlyPMC.squadDelay.Value + 1));
+                    }, 1);
                 });
             }
         }
