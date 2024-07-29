@@ -136,7 +136,7 @@ namespace friendlyPMC.Components
 
                 // initialize LootingBots brain
                 _lootingBrain = _bot.GetPlayer.GetComponentInParent<LootingBrain>();
-                if (_lootingBrain = null)
+                if (_lootingBrain != null)
                 {
                     _transactionController = AccessTools.Field(typeof(InventoryController), "_transactionController").GetValue(_lootingBrain.InventoryController) as TransactionController;
                    
@@ -152,7 +152,7 @@ namespace friendlyPMC.Components
             }
             catch (Exception ex)
             {
-                Logger.LogInfo("Failed to add Looting Brain to a follower: " + ex.Message + " at step " + step);
+                Logger.LogInfo("Failed to add Looting Brain to a follower: " + ex.Message);
                 Logger.LogInfo("StackTrace: " + ex.StackTrace);
             }
             // add the new follower brain
