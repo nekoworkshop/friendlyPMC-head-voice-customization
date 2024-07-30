@@ -16,14 +16,15 @@ namespace friendlyPMC.Components
     internal class BossFollowerPlayer : BotFollowerPlayer
     {
 
-        public BossFollowerPlayer(BotOwner bot, pitAIBossPlayer player, WildSpawnType bossRole) : base(bot, player, false, bossRole) {
+        public BossFollowerPlayer(BotOwner bot, pitAIBossPlayer player, WildSpawnType bossRole) : base(bot, player, false, bossRole) {}
 
-            if (bossRole == WildSpawnType.followerBirdEye)
+        public override void Init()
+        {
+            base.Init();
+            if (_botRole == WildSpawnType.followerBirdEye)
             {
-                FollowerPatrol patrol = FollowerPatrolInstances.GetPatrol(bot);
+                FollowerPatrol patrol = FollowerPatrolInstances.GetPatrol(_bot);
                 patrol.SetReachDist(17f);
-
-                
             }
         }
 

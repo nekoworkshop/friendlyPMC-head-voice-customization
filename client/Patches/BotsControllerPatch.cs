@@ -24,6 +24,7 @@ using static RootMotion.FinalIK.IKSolver;
 using UnityEngine.Profiling;
 using EFT.InventoryLogic;
 using System.ComponentModel;
+using BepInEx.Configuration;
 
 
 
@@ -599,46 +600,47 @@ namespace friendlyPMC.Patches
                 // change bot equipment based on preferences
                 try
                 {
+                    int pid = 0;
                     bot.Profiles.ForEach(profile =>
                     {
                         if (profile != null)
-                        {   // - copy player equipment
-                            if (friendlyPMC.copyEquip.Value)
-                                profile.Inventory.Equipment = player.Player().Profile.Inventory.Equipment.CloneItem(null);
-                            // - else take from existing presets
-                            else if (presets.Count > 0 && friendlyPMC.useEquipPresets.Value)
+                        {   if (friendlyPMC.squadSetup.Value)
                             {
-                                foreach(var preset in presets)
+                                if(friendlyPMC.squadMembers.ContainsKey(pid))
                                 {
-                                    if (friendlyPMC.equipmentValues[preset.Name].Value > 0)
+                                    string eq = friendlyPMC.squadMembers[pid][1].Value;
+                                    if(eq != null && eq != "Random") 
                                     {
-                                        var equipment = preset.Equipment;
-
-                                        if (!bundleJobs.Contains(preset.Name))
+                                        if (eq == "Player Equipment")
                                         {
-                                            foreach (var item in equipment.GetAllItems())
+                                            profile.Inventory.Equipment = player.Player().Profile.Inventory.Equipment.CloneItem(null);
+                                        }
+                                        else
+                                        {
+                                            foreach (var preset in presets)
                                             {
-                                                bundleTokens.Add(item.GetAllBundleTokens());
-                                            };
-                                            bundleJobs.Add(preset.Name);
-                                        }
+                                                if(eq == preset.Name)
+                                                {
+                                                    var equipment = preset.Equipment;
 
-                                        if (!usedPresets.ContainsKey(preset.Name))
-                                        {
-                                            usedPresets.Add(preset.Name, 1);
-                                            profileEquipment.Add(profile.Id, equipment);
-                                            break;
-                                        }
-                                        else if (usedPresets[preset.Name] < friendlyPMC.equipmentValues[preset.Name].Value)
-                                        {
-                                            usedPresets[preset.Name] += 1;
-                                            profileEquipment.Add(profile.Id, equipment);
-                                            break;
+                                                    if (!bundleJobs.Contains(preset.Name))
+                                                    {
+                                                        foreach (var item in equipment.GetAllItems())
+                                                        {
+                                                            bundleTokens.Add(item.GetAllBundleTokens());
+                                                        };
+                                                        bundleJobs.Add(preset.Name);
+                                                    }
+
+                                                    profileEquipment.Add(profile.Id, equipment);
+                                                }
+                                            }
                                         }
                                     }
                                 }
                             }
                             // - else leave it random
+                            pid++;
                         }
                     });
                 } catch(Exception ex)

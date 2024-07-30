@@ -52,10 +52,7 @@ namespace friendlyPMC.Patches
                 if (player.Side == posibleExecuter.Side)
                 {
                     int followLimit = friendlyPMC.extraPickups.Value;
-                    if(friendlyPMC.squadSpawn.Value)
-                    {
-                        followLimit = Math.Max(followLimit, friendlyPMC.squadSize.Value);
-                    }
+
                     // add BOT as follower to the player BOSS if limit was not reached
                     if (BossPlayers.Instance.GetBossFollowers(player.ProfileId).Count < followLimit)
                     {

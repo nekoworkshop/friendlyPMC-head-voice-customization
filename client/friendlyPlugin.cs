@@ -20,6 +20,8 @@ using System;
 using EFT.Builds;
 using static UnityEngine.EventSystems.EventTrigger;
 using static GClass1750;
+using System.Security.Policy;
+using BepInEx.Bootstrap;
 
 namespace friendlyPMC
 {
@@ -64,7 +66,7 @@ namespace friendlyPMC
         internal static friendlyPMC Instance { get; private set; }
 
         public static Dictionary<GameObject, HashSet<Material>> objectsMaterials = new Dictionary<GameObject, HashSet<Material>>();
-        
+
         const string baseSettings = "Base Settings";
         const string equipSettings = "Squad Equipment";
         const string miscSettings = "Miscellaneous";
@@ -72,8 +74,13 @@ namespace friendlyPMC
 
         public static ConfigEntry<bool> squadSpawn;
         public static ConfigEntry<int> squadSize;
-        public static ConfigEntry<bool> copyEquip;
         public static ConfigEntry<int> extraPickups;
+
+        public static ConfigEntry<bool> squadSetup;
+
+        public static Dictionary<int, List<ConfigEntry<string>>> squadMembers = new Dictionary<int, List<ConfigEntry<string>>>();
+
+        public static ConfigEntry<bool> copyEquip;
 
         public static ConfigEntry<int> enemyRemember;
 
@@ -98,12 +105,19 @@ namespace friendlyPMC
 
         private Dictionary<string, ConfigDefinition> equipmentEntries = new Dictionary<string, ConfigDefinition>();
 
+        private string[] equipPresets = new string[] {
+            "Random",
+            "Player Equipment"
+        };
+
         public static Dictionary<string, ConfigEntry<int>> equipmentValues = new Dictionary<string, ConfigEntry<int>>();
         public static ConfigEntry<bool> useEquipPresets;
 
         public static TarkovApplication application;
 
         private static Coroutine equipmentWatcher;
+
+        private static ConfigurationManager.ConfigurationManager configurationManager;
 
         private void Awake()
         {
@@ -194,6 +208,13 @@ namespace friendlyPMC
 
             });
 
+            configurationManager = Chainloader.PluginInfos
+            .Values
+            .FirstOrDefault(x => x.Instance.GetType().Name == "ConfigurationManager")
+            ?.Instance as ConfigurationManager.ConfigurationManager;
+
+
+
             StartEquipmentBuildWatch();
 
             ConfigSet();
@@ -261,11 +282,26 @@ namespace friendlyPMC
 
             returnChanceDeath = Config.Bind(baseSettings, "1.3  -  Squadmate return chance after death", 50, new ConfigDescription("Chance your followers will return the items you gave them should you die. This applies only to members you spawned with.", new AcceptableValueRange<int>(1, 100)));
 
-            extraPickups = Config.Bind(baseSettings, "2 Maximum followers", 3, new ConfigDescription("Maximum number of followers the player can have. Cannot be less than Squad Size if Squad Spawn is active", new AcceptableValueRange<int>(1, 30)));
+            squadSetup = Config.Bind(baseSettings, "1.4  -  Use Squad setup", false, new ConfigDescription("Use specific setup for your squad"));
 
-            copyEquip = Config.Bind(equipSettings, "1 Clone equipment", false, new ConfigDescription("When Squad Spawn is active, spawned followers will have the same equipment as the player"));
+            Config.SettingChanged += (sender, args) =>
+            {
+                if (
+                    args.ChangedSetting.Definition == squadSize.Definition ||
+                    args.ChangedSetting.Definition == squadSetup.Definition
+                )
+                {
+                    Components.Logger.LogInfo(args.ChangedSetting.Definition.Key);
 
-            useEquipPresets = Config.Bind(equipSettings, "2 Use Custom Presets", false, new ConfigDescription("When Squad Spawn is active, spawned followers will use custom build presets, if available"));
+                    ConfigSquadMembersSet();
+                    Config.Save();
+                    configurationManager.BuildSettingList();
+                }
+            };
+
+            ConfigSquadMembersSet();
+
+            extraPickups = Config.Bind(baseSettings, "2 Maximum followers", 1, new ConfigDescription("Maximum followers the player can have. This is in addition to the squad.", new AcceptableValueRange<int>(1, 30)));
 
             scanDistance = Config.Bind(miscSettings, "1 Maximum scan distance", 140, new ConfigDescription("Maximum distance to pick up any visible enemy that the player is signaling when issuing 'Contact' phrase", new AcceptableValueRange<int>(50, 300)));
 
@@ -282,45 +318,133 @@ namespace friendlyPMC
             birdEyeSpawn = Config.Bind(testSettings, "1.3  -  Spawn with BirdEye", true, new ConfigDescription("Experimental: Only when Spawn with The Goons is active"));
         }
 
+        private void ConfigSquadMembersSet()
+        {
+            if (squadSetup.Value)
+            {
+
+                for (int i = 0; i < squadSize.Value; i++)
+                {
+
+                    if (!squadMembers.ContainsKey(i))
+                    {
+                        List<ConfigEntry<string>> configEntries = new List<ConfigEntry<string>>
+                        {
+                            Config.Bind(
+                                baseSettings,
+                                "1.4.1  -    -  Squad Member #" + (i + 1) + " Tactic",
+                                "Default",
+                                new ConfigDescription("Set Squad member fight tactic. Default is a combination of Pusher and Holder. Pusher tries to push the enemy often. Holder will stay in place around the boss. Marksman will try to get a position from where he can shoot preferably from behind the player, at a distance and will not push even if ordered.",
+                                    new AcceptableValueList<string>(new string[] {
+                                        "Default",
+                                        "Marksman",
+                                        "Pusher",
+                                        "Holder"
+                                    })
+                                )
+                            ),
+                            EquipmentOptions("1.4.1  -    -  Squad Member #" + (i + 1) + " Equipment","Random")
+                        };
+
+                        squadMembers.Add(i, configEntries);
+                    }
+                }
+
+                if (squadSize.Value < squadMembers.Count)
+                {
+                    int i = squadMembers.Count - squadSize.Value;
+
+                    while (i > squadSize.Value)
+                    {
+                        var entries = squadMembers[i];
+                        entries.ForEach(e =>
+                        {
+                            if (Config.TryGetEntry<string>(e.Definition, out var entry))
+                            {
+                                Config.Remove(e.Definition);
+                            }
+                        });
+                        squadMembers.Remove(i - 1);
+                        i--;
+                    }
+                }
+            } else
+            {
+                foreach (var item in squadMembers)
+                {
+                    var entries = item.Value;
+                    entries.ForEach(e =>
+                    {
+                        if (Config.TryGetEntry<string>(e.Definition, out var entry))
+                        {
+                            Config.Remove(e.Definition);
+                        }
+                    });
+                }
+
+                squadMembers.Clear();
+            }
+        }
+
+        private ConfigEntry<string> EquipmentOptions(string name, string value)
+        {
+            return Config.Bind(
+                baseSettings,
+                name,
+                value,
+                new ConfigDescription("Set Squad member equipment. You can choose between random, which is default SPT, user's current equipment or user created presets (recommended if using a tactic different than default.", new AcceptableValueList<string>(equipPresets))
+             );
+        }
+
         private void BuildEquipmentPresets()
         {
             var presets = Utils.Equipment.CustomPresets;
 
-            var presetEntries = new Dictionary<string, ConfigDefinition>();
+            var updatedPresets = new string[] {
+                "Random",
+                "Player Equipment"
+            };
 
             foreach (var item in presets)
             {
-                int val = 1;
-
-                if (!equipmentValues.ContainsKey(item.Name))
-                {
-                
-                    var entry = Config.Bind(equipSettings, $"2.1  -  {item.Name} preset", val, new ConfigDescription("How many followers will use this preset", new AcceptableValueRange<int>(0, 30)));
-
-                    if (!equipmentValues.ContainsKey(item.Name))
-                    {
-                        equipmentValues.Add(item.Name, entry);
-                    }
-
-                    equipmentEntries.Add(item.Name, entry.Definition);
-                }
-
-                presetEntries.Add(item.Name, equipmentValues[item.Name].Definition);
+                updatedPresets = updatedPresets.AddItem(item.Name).ToArray();
             }
             
-            List<string> toRemove = new List<string>();
+            bool wasUpdated = false;
 
-            foreach (var ent in equipmentEntries)
+            foreach (var item in updatedPresets)
             {
-                if(!presetEntries.ContainsKey(ent.Key))
+                if(!equipPresets.Contains(item))
                 {
-                    toRemove.Add(ent.Key);
+                    wasUpdated = true;
+                    break;
                 }
             }
 
-            foreach (var key in toRemove)
+            if (wasUpdated)
             {
-                equipmentEntries.Remove(key);
+
+                equipPresets = updatedPresets;
+
+                foreach (var member in squadMembers)
+                {
+                    var entry = member.Value[1];
+     
+                    if(Config.TryGetEntry<string>(entry.Definition, out var e))
+                    {
+                        string name = entry.Definition.Key;
+                        string value = entry.Value;
+
+                        if(!equipPresets.Contains(value))
+                        {
+                            value = "Random";
+                        }
+
+                        member.Value[1] = EquipmentOptions(name, value);
+
+                        Config.Remove(entry.Definition);
+                    }
+                }
             }
         }
     }

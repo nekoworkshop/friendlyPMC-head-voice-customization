@@ -173,6 +173,10 @@
     <Compile Include="Components\FollowerBossFollower\BirdEyeFollowerBrain.cs" />
     <Compile Include="Components\FollowerBossFollower\BirdEyeFollowLayer.cs" />
     <Compile Include="Components\FollowerEnemyChooser.cs" />
+    <Compile Include="Components\Tactics\FollowerCommonLayer.cs" />
+    <Compile Include="Components\Tactics\FollowerHolderLayer.cs" />
+    <Compile Include="Components\Tactics\FollowerPusherLayer.cs" />
+    <Compile Include="Components\Tactics\FollowerSniperLayer.cs" />
     <Compile Include="Modules\FollowerCreateNode.cs" />
     <Compile Include="Modules\RadioSound.cs" />
     <Compile Include="Patches\BotMemoryPatch.cs" />
