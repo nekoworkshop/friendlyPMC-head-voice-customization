@@ -22,6 +22,8 @@ using Newtonsoft.Json.Linq;
 using System.Security.Policy;
 using static RootMotion.FinalIK.IKSolver;
 using UnityEngine.Profiling;
+using EFT.InventoryLogic;
+using System.ComponentModel;
 
 
 
@@ -276,9 +278,37 @@ namespace friendlyPMC.Patches
 
             if (boss == WildSpawnType.bossKnight)
             {
+
+                Utils.Utils.FlagSet("withKnight", true);
+
+                if (friendlyPMC.bigPipeSpawn.Value)
+                {
+                    bossFollowers.Add(new IProfileData(side, WildSpawnType.followerBigPipe, BotDifficulty.hard, 0f, @params));
+                    Utils.Utils.FlagSet("withBigPipe", true);
+                }
+
+                if (friendlyPMC.birdEyeSpawn.Value)
+                {
+                    bossFollowers.Add(new IProfileData(side, WildSpawnType.followerBirdEye, BotDifficulty.impossible, 0f, @params));
+                    Utils.Utils.FlagSet("withBirdEye", true);
+                }
                 
-                if(friendlyPMC.bigPipeSpawn.Value) bossFollowers.Add(new IProfileData(side,WildSpawnType.followerBigPipe,BotDifficulty.hard,0f,@params));
-                if (friendlyPMC.birdEyeSpawn.Value) bossFollowers.Add(new IProfileData(side, WildSpawnType.followerBirdEye, BotDifficulty.impossible, 0f, @params));
+                if(friendlyPMC.birdEyeSpawn.Value && friendlyPMC.birdEyeSpawn.Value)
+                {
+                    Utils.Utils.FlagSet("withGoons", true);
+                }
+
+            } else
+            {
+                if(boss == WildSpawnType.followerBigPipe)
+                {
+                    Utils.Utils.FlagSet("withBigPipe", true);
+                }
+
+                if (boss == WildSpawnType.followerBirdEye)
+                {
+                    Utils.Utils.FlagSet("withBirdEye", true);
+                }
             }
 
             BotCreationDataClass bot = await BotCreationDataClass.Create(botData, botCreator, 1, botSpawnerClass);
@@ -349,6 +379,7 @@ namespace friendlyPMC.Patches
                 WildSpawnType botRole = profile.Info.Settings.Role;
 
                 profile.Info.Side = side;
+                profile.Info.GroupId = player.realPlayer.GroupId;
                 profile.Info.TeamId = player.Player().Profile.Info.TeamId;
 
                 if (botRole == WildSpawnType.followerBirdEye)
@@ -551,16 +582,100 @@ namespace friendlyPMC.Patches
 
             BotCreationDataClass bot = await BotCreationDataClass.Create(botData, botCreator, memberCount, botSpawnerClass);
 
-            // copy player equipment
-            if (friendlyPMC.copyEquip.Value && side != EPlayerSide.Savage) bot.Profiles.ForEach(profile =>
+            List<DependencyGraph<IEasyBundle>.GClass3415> bundleTokens = new List<DependencyGraph<IEasyBundle>.GClass3415>();
+            Dictionary<string,EquipmentClass> profileEquipment = new Dictionary<string,EquipmentClass>();
+            
+            if (side != EPlayerSide.Savage)
             {
-                if (profile != null)
-                {
-                    profile.Inventory.Equipment = player.Player().Profile.Inventory.Equipment.CloneItem(null);
-                }
-            });
 
-            List<Action> spanwers = new List<Action>();
+                List<GClass3205> presets = new List<GClass3205>();
+                Utils.Equipment.CustomPresets.ForEach(preset =>
+                {
+                    presets.Add(preset);
+                });
+
+                Dictionary<string,int> usedPresets = new Dictionary<string,int>();
+                List<string> bundleJobs = new List<string>();
+                // change bot equipment based on preferences
+                try
+                {
+                    bot.Profiles.ForEach(profile =>
+                    {
+                        if (profile != null)
+                        {   // - copy player equipment
+                            if (friendlyPMC.copyEquip.Value)
+                                profile.Inventory.Equipment = player.Player().Profile.Inventory.Equipment.CloneItem(null);
+                            // - else take from existing presets
+                            else if (presets.Count > 0 && friendlyPMC.useEquipPresets.Value)
+                            {
+                                foreach(var preset in presets)
+                                {
+                                    if (friendlyPMC.equipmentValues[preset.Name].Value > 0)
+                                    {
+                                        var equipment = preset.Equipment;
+
+                                        if (!bundleJobs.Contains(preset.Name))
+                                        {
+                                            foreach (var item in equipment.GetAllItems())
+                                            {
+                                                bundleTokens.Add(item.GetAllBundleTokens());
+                                            };
+                                            bundleJobs.Add(preset.Name);
+                                        }
+
+                                        if (!usedPresets.ContainsKey(preset.Name))
+                                        {
+                                            usedPresets.Add(preset.Name, 1);
+                                            profileEquipment.Add(profile.Id, equipment);
+                                            break;
+                                        }
+                                        else if (usedPresets[preset.Name] < friendlyPMC.equipmentValues[preset.Name].Value)
+                                        {
+                                            usedPresets[preset.Name] += 1;
+                                            profileEquipment.Add(profile.Id, equipment);
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                            // - else leave it random
+                        }
+                    });
+                } catch(Exception ex)
+                {
+                    Components.Logger.LogInfo("Failed to set squad equipment " +  ex.Message);
+                }
+            }
+            
+            // if we have build presets we must ensure we load all their assets
+            if(bundleTokens.Count > 0)
+            {
+                Components.Logger.LogInfo("Fetching presets assets");
+                try
+                {
+                    List<UniTask> bundleTasks = new List<UniTask>();
+                    foreach (var bundleToken in bundleTokens)
+                    {
+                        bundleTasks.Add(GClass1458.WaitForAllBundlesJob(bundleToken, new Action(GClass1947.Class1694.class1694_0.method_0), default(CancellationToken), null).AsUniTask());
+                    }
+                    await UniTask.WhenAll(bundleTasks);
+
+                    bot.Profiles.ForEach(profile =>
+                    {
+                        if (profile != null)
+                        {
+                            if(profileEquipment.ContainsKey(profile.Id))
+                            {
+                                profile.Inventory.Equipment = profileEquipment[profile.Id];
+                            }
+                        }
+                    });
+
+                } catch (Exception ex)
+                {
+                    Components.Logger.LogInfo("Failed to use custom presets, will fall back to random loadout :" + ex.Message);
+                }
+            }
 
             Components.Logger.LogInfo("Spawn Followers");
 
@@ -580,6 +695,7 @@ namespace friendlyPMC.Patches
             {
                 // followers should use the same groupID as the player
                 profile.Info.GroupId = player.realPlayer.GroupId;
+                profile.Info.TeamId = player.Player().Profile.Info.TeamId;
                 // spawned followers will have a different health than the rest
                 foreach (EBodyPart part in Enum.GetValues(typeof(EBodyPart)))
                 {
@@ -624,7 +740,6 @@ namespace friendlyPMC.Patches
 
                 Stopwatch stopWatch = new Stopwatch();
                 stopWatch.Start();
-
 
                 Action<BotOwner> OnActivate = new Action<BotOwner>((BotOwner owner) =>
                 {
@@ -719,6 +834,8 @@ namespace friendlyPMC.Patches
                 Components.Logger.LogInfo("Raid Started");
 
                 Controller = __instance;
+
+                friendlyPMC.StopEquipmentBuildWatch();
             }
 
            
@@ -747,7 +864,9 @@ namespace friendlyPMC.Patches
             if (spawnRan) return;
 
             spawnRan = true;
-            
+
+            List<UniTask> squadSpawners = new List<UniTask>();
+
             if (friendlyPMC.squadSpawn.Value)
             {
                 Components.Logger.LogInfo("Start Squad Spawn");
@@ -756,7 +875,15 @@ namespace friendlyPMC.Patches
 
                     if (BotsControllerPatch.Controller != null)
                     {
-                        BotsControllerPatch.Instance.SpawnGroupBots(playerBoss).Forget();
+                        UniTask squadSpanner = BotsControllerPatch.Instance.SpawnGroupBots(playerBoss);
+                        if (!friendlyPMC.knightSpawn.Value)
+                        {
+                            squadSpanner.Forget();
+                        }
+                        else
+                        {
+                            squadSpawners.Add(squadSpanner);
+                        }
                     }
                 });
             }
@@ -765,18 +892,18 @@ namespace friendlyPMC.Patches
             {
                 Components.Logger.LogInfo("Start Boss Ally Spawn");
 
-                BotsControllerPatch.spawnedPlayers.ForEach(playerBoss =>
+                UniTask.WhenAll(squadSpawners).ContinueWith(() =>
                 {
-                    Utils.Utils.SetBotTimer(() =>
+                    BotsControllerPatch.spawnedPlayers.ForEach(playerBoss =>
                     {
                         try
                         {
                             BotsControllerPatch.Instance.SpawnBossFollower(playerBoss).Forget();
                         }
                         catch (Exception e) { Components.Logger.LogInfo("Failed Delayed Boss Ally Process " + e.Message); }
+                    });
 
-                    }, 1);
-                });
+                }).Forget();
             }
         }
 
@@ -845,8 +972,11 @@ namespace friendlyPMC.Patches
             PingTeamates.Disable();
 
             Utils.EnemyInfo.ClearEnemiesLocations();
+            Utils.Utils.FlagsClear();
 
             if (LocalGameCtorPatch.Instance != null) LocalGameCtorPatch.Instance = null;
+
+            friendlyPMC.StartEquipmentBuildWatch();
 
             Components.Logger.LogInfo("Raid Ended");
 

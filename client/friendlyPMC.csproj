@@ -34,6 +34,9 @@
     <Reference Include="0Harmony">
       <HintPath>..\..\core\0Harmony.dll</HintPath>
     </Reference>
+    <Reference Include="ConfigurationManager">
+      <HintPath>..\..\..\XboxGames\AKI-Streets-3.9\BepInEx\plugins\spt\ConfigurationManager.dll</HintPath>
+    </Reference>
     <Reference Include="spt-custom">
       <HintPath>..\..\..\XboxGames\AKI-Streets-3.9\BepInEx\plugins\spt\spt-custom.dll</HintPath>
     </Reference>
@@ -209,6 +212,7 @@
     <Compile Include="Utils\BotLogicDecisions.cs" />
     <Compile Include="Utils\Covers.cs" />
     <Compile Include="Utils\EnemyInfo.cs" />
+    <Compile Include="Utils\Equipment.cs" />
     <Compile Include="Utils\PingTeamates.cs" />
     <Compile Include="Utils\Utils.cs" />
     <Compile Include="Utils\WorldScreen.cs" />

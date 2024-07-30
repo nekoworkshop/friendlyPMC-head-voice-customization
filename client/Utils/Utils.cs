@@ -12,6 +12,9 @@ namespace friendlyPMC.Utils
 {
     internal class Utils
     {
+        
+        private static Dictionary<string,bool> flags = new Dictionary<string,bool>();
+
         public static List<WildSpawnType> BossFollowersRoles = new List<WildSpawnType> { 
             WildSpawnType.bossKnight, 
             WildSpawnType.followerBigPipe,
@@ -90,6 +93,23 @@ namespace friendlyPMC.Utils
             };
 
             return Timer;
+        }
+
+
+        public static void FlagSet(string flag, bool value)
+        {
+            flags[flag] = value;
+        }
+
+        public static bool FlagGet(string flag)
+        {
+            flags.TryGetValue(flag, out var value);
+            return value || false;
+        }
+
+        public static void FlagsClear()
+        {
+            flags.Clear();
         }
     }
 }
