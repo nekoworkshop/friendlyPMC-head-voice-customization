@@ -12,7 +12,6 @@ namespace friendlyPMC.Components.FollowerBossFollower
         protected GClass51 supportLayer;
         public BigPipeArtilleryLayer([NotNull] BotOwner owner, int priority) : base(owner, priority)
         {
-            followerFightLayer = new FollowerFightLayer(owner,priority);
             supportLayer = new GClass51(owner,priority);
         }
 
@@ -21,19 +20,28 @@ namespace friendlyPMC.Components.FollowerBossFollower
             return "PipeFight";
         }
 
+        public override void OnActivate()
+        {
+            supportLayer?.OnActivate();
+            base.OnActivate();
+        }
+
+        public override void Dispose()
+        {
+            supportLayer?.Dispose();
+            base.Dispose();
+        }
+
         public override AICoreActionResultStruct<BotLogicDecision> GetDecision()
         {
-            Vector3 botPosition = botOwner_0.GetPlayer.Transform.position;
-            Vector3 bossPosition = HasBoss() ? GetBoss().Position : botPosition;
-
             BotRequest request = botOwner_0.BotRequestController.CurRequest;
 
             // is in dogfight?
-            AICoreActionResultStruct<BotLogicDecision>? aicoreActionResultStruct = followerFightLayer.DogFight();
+            AICoreActionResultStruct<BotLogicDecision>? aicoreActionResultStruct = commonLayer.DogFight(out customNavigationPoint_0);
             if (aicoreActionResultStruct != null) return (AICoreActionResultStruct<BotLogicDecision>)aicoreActionResultStruct;
 
             // needs healing?
-            aicoreActionResultStruct = followerFightLayer.NeedHeal();
+            aicoreActionResultStruct = commonLayer.NeedHeal(out customNavigationPoint_0);
             if (aicoreActionResultStruct != null) return (AICoreActionResultStruct<BotLogicDecision>)aicoreActionResultStruct;
 
             // player requests?
@@ -56,7 +64,7 @@ namespace friendlyPMC.Components.FollowerBossFollower
             if (
                 baseDecision.Reason == "regroupToBossFast" || 
                 baseDecision.Reason == "regroupToBoss" ||
-                (ordersChanged && request != null && request.BotRequestType == BotRequestType.attackClose) ||
+                (commonLayer.OrderHasChangedRecently && request != null && request.BotRequestType == BotRequestType.attackClose) ||
                 botOwner_0.Memory.GoalEnemy.Owner.IsRole(WildSpawnType.marksman) ||
                 baseDecision.Action == BotLogicDecision.shootFromPlace
             )

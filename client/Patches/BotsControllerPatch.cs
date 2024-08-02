@@ -585,6 +585,8 @@ namespace friendlyPMC.Patches
 
             List<DependencyGraph<IEasyBundle>.GClass3415> bundleTokens = new List<DependencyGraph<IEasyBundle>.GClass3415>();
             Dictionary<string,EquipmentClass> profileEquipment = new Dictionary<string,EquipmentClass>();
+
+            Dictionary<string,string> profileTactic = new Dictionary<string,string>();
             
             if (side != EPlayerSide.Savage)
             {
@@ -636,6 +638,27 @@ namespace friendlyPMC.Patches
                                                 }
                                             }
                                         }
+                                    }
+
+                                    string tactic = friendlyPMC.squadMembers[pid][0].Value;
+                                    if(tactic != null && tactic != "Default")
+                                    {
+                                        switch (tactic)
+                                        {
+                                            case "Pusher":
+                                                tactic = "push";
+                                                break;
+                                            case "Holder":
+                                                tactic = "defend";
+                                                break;
+                                            case "Marksman":
+                                                tactic = "marksman";
+                                                // some cheating here, making our marskman good
+                                                profile.Skills.Sniper.SetCurrent(5100f, true);
+                                                profile.Skills.RecoilControl.SetCurrent(4800f, true);
+                                                break;
+                                        }
+                                        profileTactic.Add(profile.ProfileId, tactic);
                                     }
                                 }
                             }
@@ -757,7 +780,22 @@ namespace friendlyPMC.Patches
                         {
                             me.Memory.DeleteInfoAboutEnemy(player.Player()); // prevent attack of player on spawn
                             me.GetPlayer.ActiveHealthController.RestoreFullHealth(); // ensure bot has full health
-                            BossPlayers.Instance.AddFollower(me, player, true);
+
+                            string tactic = null;
+                            profileTactic.TryGetValue(profile.ProfileId, out tactic);
+
+                            if (tactic == null) tactic = "balance";
+
+                            WildSpawnType botType = type;
+
+                            if(profile.Info?.Settings?.Role != null)
+                            {
+                                botType = profile.Info.Settings.Role;
+                            }
+
+                            Components.Logger.LogInfo("Tactic is " + tactic);
+
+                            BossPlayers.Instance.AddFollower(me, player, true, botType, tactic);
 
                         }
                         catch (Exception ex)
@@ -836,8 +874,6 @@ namespace friendlyPMC.Patches
                 Components.Logger.LogInfo("Raid Started");
 
                 Controller = __instance;
-
-                friendlyPMC.StopEquipmentBuildWatch();
             }
 
            
@@ -977,8 +1013,6 @@ namespace friendlyPMC.Patches
             Utils.Utils.FlagsClear();
 
             if (LocalGameCtorPatch.Instance != null) LocalGameCtorPatch.Instance = null;
-
-            friendlyPMC.StartEquipmentBuildWatch();
 
             Components.Logger.LogInfo("Raid Ended");
 

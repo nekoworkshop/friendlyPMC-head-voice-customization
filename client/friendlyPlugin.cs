@@ -22,6 +22,9 @@ using static UnityEngine.EventSystems.EventTrigger;
 using static GClass1750;
 using System.Security.Policy;
 using BepInEx.Bootstrap;
+using System.Net.Sockets;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 
 namespace friendlyPMC
 {
@@ -54,6 +57,15 @@ namespace friendlyPMC
         }
     }
 
+    [HarmonyPatch(typeof(ConfigurationManager.ConfigurationManager), "DisplayingWindow", MethodType.Setter)]
+    public static class ConfigurationManagerPatch
+    {
+        public static void Prefix(ConfigurationManager.ConfigurationManager __instance, bool value)
+        {
+            friendlyPMC.Instance.GetEquipmentBuilds();
+        }
+    }
+
     [BepInPlugin("xyz.pit.companion", "friendlyPMC", "3.4.1")]
     [BepInDependency("xyz.drakia.bigbrain")]
     [BepInDependency("xyz.drakia.waypoints")]
@@ -68,7 +80,6 @@ namespace friendlyPMC
         public static Dictionary<GameObject, HashSet<Material>> objectsMaterials = new Dictionary<GameObject, HashSet<Material>>();
 
         const string baseSettings = "Base Settings";
-        const string equipSettings = "Squad Equipment";
         const string miscSettings = "Miscellaneous";
         const string testSettings = "Testing";
 
@@ -80,19 +91,13 @@ namespace friendlyPMC
 
         public static Dictionary<int, List<ConfigEntry<string>>> squadMembers = new Dictionary<int, List<ConfigEntry<string>>>();
 
+        private bool squadSet = false;
+
         public static ConfigEntry<bool> copyEquip;
 
         public static ConfigEntry<int> enemyRemember;
 
         public static ConfigEntry<float> heatlhMultiplier;
-
-        public static readonly float fightOuterRadius = 50f;
-        public static readonly float fightInnerRadius = 30f;
-
-        public static readonly float regroupMinDistance = 7f;
-
-        public static readonly float maximumCover = 10f;
-        public static readonly float maximumCoverDistance = 35f;
 
         public static ConfigEntry<int> scanDistance;
 
@@ -102,23 +107,18 @@ namespace friendlyPMC
         public static ConfigEntry<bool> bigPipeSpawn;
         public static ConfigEntry<bool> birdEyeSpawn;
         public static ConfigEntry<bool> justKnightSpawn;
-
-        private Dictionary<string, ConfigDefinition> equipmentEntries = new Dictionary<string, ConfigDefinition>();
-
         private string[] equipPresets = new string[] {
             "Random",
             "Player Equipment"
         };
 
-        public static Dictionary<string, ConfigEntry<int>> equipmentValues = new Dictionary<string, ConfigEntry<int>>();
-        public static ConfigEntry<bool> useEquipPresets;
-
         public static TarkovApplication application;
-
-        private static Coroutine equipmentWatcher;
 
         private static ConfigurationManager.ConfigurationManager configurationManager;
 
+        private static Dictionary<ConfigDefinition, string> savedConfigValues;
+
+        private List<CancellationTokenSource> refreshTokens = new List<CancellationTokenSource>();
         private void Awake()
         {
 
@@ -213,93 +213,73 @@ namespace friendlyPMC
             .FirstOrDefault(x => x.Instance.GetType().Name == "ConfigurationManager")
             ?.Instance as ConfigurationManager.ConfigurationManager;
 
-
-
-            StartEquipmentBuildWatch();
-
             ConfigSet();
+
+            harmony.PatchAll(typeof(ConfigurationManagerPatch).Assembly);
+
         }
 
-        public static void StartEquipmentBuildWatch()
+        public void GetEquipmentBuilds()
         {
-            equipmentWatcher = Instance.StartCoroutine(Instance.GetEquipmentBuilds());
-        }
-
-        public static void StopEquipmentBuildWatch()
-        {
-            Instance.StopCoroutine(equipmentWatcher);
-        }
-
-        private IEnumerator GetEquipmentBuilds()
-        {
-            while (true)
+            if (application == null)
             {
-                if (application == null)
+                try
                 {
-                    try
-                    {
-                        application = SPT.Reflection.Utils.ClientAppUtils.GetMainApp();
-                    }
-                    catch
-                    {
-
-                    }
+                    application = SPT.Reflection.Utils.ClientAppUtils.GetMainApp();
                 }
-
-                if (application != null)
+                catch
                 {
-                    var buildStorage = application.GetClientBackEndSession()?.EquipmentBuildsStorage;
 
-                    if (buildStorage != null)
+                }
+            }
+
+            if (application != null)
+            {
+                var buildStorage = application.GetClientBackEndSession()?.EquipmentBuildsStorage;
+
+                if (buildStorage != null)
+                {
+                    var equipBuilds = buildStorage.EquipmentBuilds;
+                    if (equipBuilds != null)
                     {
-                        var equipBuilds = buildStorage.EquipmentBuilds;
-                        if (equipBuilds != null)
+                        Utils.Equipment.CustomPresets.Clear();
+
+                        equipBuilds.Values.Where((GClass3205 build) =>
                         {
-                            Utils.Equipment.CustomPresets.Clear();
+                            return build.BuildType == EEquipmentBuildType.Custom;
+                        }).ExecuteForEach((GClass3205 build) =>
+                        {
+                            Utils.Equipment.CustomPresets.Add(build);
+                        });
 
-                            equipBuilds.Values.Where((GClass3205 build) =>
-                            {
-                                return build.BuildType == EEquipmentBuildType.Custom;
-                            }).ExecuteForEach((GClass3205 build) =>
-                            {
-                                Utils.Equipment.CustomPresets.Add(build);
-                            });
-                        }
+                        BuildEquipmentPresets();
                     }
-
-                    BuildEquipmentPresets();
                 }
-
-                yield return new WaitForSeconds(5f);
             }
         }
 
-
         private void ConfigSet()
         {
+
+            Config.SaveOnConfigSet = false;
+            Config.Reload();
+
+            savedConfigValues = new Dictionary<ConfigDefinition, string>();
+
+            var OrphanedEntries = AccessTools.Property(typeof(ConfigFile), "OrphanedEntries").GetValue(Config) as Dictionary<ConfigDefinition, string>;
+
+            OrphanedEntries.ExecuteForEach(it =>
+            {
+                savedConfigValues.Add(it.Key, it.Value);
+            });
+
+
             squadSpawn = Config.Bind(baseSettings, "1 Squad spawn", true, new ConfigDescription("Spawn with followers"));
             squadSize = Config.Bind(baseSettings, "1.2  -  Squad size", 2, new ConfigDescription("Number of followers to spawn with", new AcceptableValueRange<int>(1, 30)));
 
             returnChanceDeath = Config.Bind(baseSettings, "1.3  -  Squadmate return chance after death", 50, new ConfigDescription("Chance your followers will return the items you gave them should you die. This applies only to members you spawned with.", new AcceptableValueRange<int>(1, 100)));
 
             squadSetup = Config.Bind(baseSettings, "1.4  -  Use Squad setup", false, new ConfigDescription("Use specific setup for your squad"));
-
-            Config.SettingChanged += (sender, args) =>
-            {
-                if (
-                    args.ChangedSetting.Definition == squadSize.Definition ||
-                    args.ChangedSetting.Definition == squadSetup.Definition
-                )
-                {
-                    Components.Logger.LogInfo(args.ChangedSetting.Definition.Key);
-
-                    ConfigSquadMembersSet();
-                    Config.Save();
-                    configurationManager.BuildSettingList();
-                }
-            };
-
-            ConfigSquadMembersSet();
 
             extraPickups = Config.Bind(baseSettings, "2 Maximum followers", 1, new ConfigDescription("Maximum followers the player can have. This is in addition to the squad.", new AcceptableValueRange<int>(1, 30)));
 
@@ -316,24 +296,61 @@ namespace friendlyPMC
             bigPipeSpawn = Config.Bind(testSettings, "1.2  -  Spawn with BigPipe", true, new ConfigDescription("Experimental: Only when Spawn with The Goons is active"));
 
             birdEyeSpawn = Config.Bind(testSettings, "1.3  -  Spawn with BirdEye", true, new ConfigDescription("Experimental: Only when Spawn with The Goons is active"));
+
+            
+            ConfigSquadMembersSet();
+
+            Config.SettingChanged += (sender, args) =>
+            {
+                if (
+                    args.ChangedSetting.Definition == squadSize.Definition ||
+                    args.ChangedSetting.Definition == squadSetup.Definition ||
+                    args.ChangedSetting.Definition.Key.Contains("Squad size") ||
+                    args.ChangedSetting.Definition.Key.Contains("Squad setup")
+                )
+                {
+                    Components.Logger.LogInfo("RefreshManager Called");
+                    RefreshManager().Forget();
+                }
+            };
+
+            Config.SaveOnConfigSet = true;
+            Config.Save();
         }
 
         private void ConfigSquadMembersSet()
         {
+            
             if (squadSetup.Value)
             {
-
                 for (int i = 0; i < squadSize.Value; i++)
                 {
 
                     if (!squadMembers.ContainsKey(i))
                     {
+                        string key = "1.4.1  -    -  Squad Member " + (i + 1) + " Tactic";
+                        string value = "Default";
+
+                        string seckey = "1.4.1  -    -  Squad Member " + (i + 1) + " Equipment";
+                        string secvalue = "Random";
+
+                        savedConfigValues.ExecuteForEach(saved =>
+                        {
+                            if(saved.Key.Key == key)
+                            {
+                                value = saved.Value;
+                            } else if (saved.Key.Key == seckey)
+                            {
+                                secvalue = saved.Value;
+                            }
+                        });
+
                         List<ConfigEntry<string>> configEntries = new List<ConfigEntry<string>>
                         {
                             Config.Bind(
                                 baseSettings,
-                                "1.4.1  -    -  Squad Member #" + (i + 1) + " Tactic",
-                                "Default",
+                                key,
+                                value,
                                 new ConfigDescription("Set Squad member fight tactic. Default is a combination of Pusher and Holder. Pusher tries to push the enemy often. Holder will stay in place around the boss. Marksman will try to get a position from where he can shoot preferably from behind the player, at a distance and will not push even if ordered.",
                                     new AcceptableValueList<string>(new string[] {
                                         "Default",
@@ -343,7 +360,7 @@ namespace friendlyPMC
                                     })
                                 )
                             ),
-                            EquipmentOptions("1.4.1  -    -  Squad Member #" + (i + 1) + " Equipment","Random")
+                            EquipmentOptions(seckey,secvalue)
                         };
 
                         squadMembers.Add(i, configEntries);
@@ -352,21 +369,26 @@ namespace friendlyPMC
 
                 if (squadSize.Value < squadMembers.Count)
                 {
-                    int i = squadMembers.Count - squadSize.Value;
+                    int i = squadMembers.Count;
 
                     while (i > squadSize.Value)
                     {
-                        var entries = squadMembers[i];
-                        entries.ForEach(e =>
+
+                        if (squadMembers.TryGetValue(i-1, out var entries))
                         {
-                            if (Config.TryGetEntry<string>(e.Definition, out var entry))
+
+                            entries.ForEach(e =>
                             {
-                                Config.Remove(e.Definition);
-                            }
-                        });
-                        squadMembers.Remove(i - 1);
+                                if (Config.TryGetEntry<string>(e.Definition, out var entry))
+                                {
+                                    Config.Remove(e.Definition);
+                                }
+                            });
+                            squadMembers.Remove(i - 1);
+                        }
                         i--;
                     }
+                    Components.Logger.LogInfo("Reduce squad");
                 }
             } else
             {
@@ -384,20 +406,33 @@ namespace friendlyPMC
 
                 squadMembers.Clear();
             }
+
+            savedConfigValues.Clear();
         }
 
         private ConfigEntry<string> EquipmentOptions(string name, string value)
         {
-            return Config.Bind(
+
+            string[] list = equipPresets;
+
+            if(!equipPresets.Contains(value))
+            {
+                list = equipPresets.AddItem(value).ToArray();
+            }
+
+            ConfigEntry<string> entry = Config.Bind(
                 baseSettings,
                 name,
                 value,
-                new ConfigDescription("Set Squad member equipment. You can choose between random, which is default SPT, user's current equipment or user created presets (recommended if using a tactic different than default.", new AcceptableValueList<string>(equipPresets))
+                new ConfigDescription("Set Squad member equipment. You can choose between random, which is default SPT, user's current equipment or user created presets (recommended if using a tactic different than default.", new AcceptableValueList<string>(list))
              );
+
+            return entry;
         }
 
         private void BuildEquipmentPresets()
         {
+
             var presets = Utils.Equipment.CustomPresets;
 
             var updatedPresets = new string[] {
@@ -421,6 +456,18 @@ namespace friendlyPMC
                 }
             }
 
+            if (!wasUpdated)
+            {
+                foreach(var item in equipPresets)
+                {
+                    if (!updatedPresets.Contains(item))
+                    {
+                        wasUpdated = true;
+                        break;
+                    }
+                }
+            }
+
             if (wasUpdated)
             {
 
@@ -440,12 +487,38 @@ namespace friendlyPMC
                             value = "Random";
                         }
 
-                        member.Value[1] = EquipmentOptions(name, value);
+                        Components.Logger.LogInfo("entry.Value " + value + " e.Value " + e.Value);
 
                         Config.Remove(entry.Definition);
+
+                        member.Value[1] = EquipmentOptions(name, value);
                     }
                 }
             }
+        }
+
+        private async UniTask RefreshManager()
+        {
+            refreshTokens.ForEach(tk =>
+            {
+                tk.Cancel();
+            });
+
+            refreshTokens.Clear();
+
+            var tokenSource = new CancellationTokenSource();
+            refreshTokens.Add(tokenSource);
+            try
+            {
+                await Task.Delay(100, tokenSource.Token).ContinueWith(t =>
+                {
+                    ConfigSquadMembersSet();
+                });
+                await Task.Delay(300, tokenSource.Token).ContinueWith(task =>
+                {
+                    configurationManager.BuildSettingList();
+                });
+            } catch { }
         }
     }
 }

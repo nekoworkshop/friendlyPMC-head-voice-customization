@@ -3,6 +3,7 @@ using System;
 using UnityEngine;
 using EFT.InventoryLogic;
 using System.Reflection.Emit;
+using friendlyPMC.Components.Tactics;
 
 namespace friendlyPMC.Components.BossFollower
 {
@@ -15,10 +16,6 @@ namespace friendlyPMC.Components.BossFollower
 
         protected readonly float fightRange = 50f;
         protected readonly float fightLongRange = 100f;
-
-        protected bool ordersChanged = false;
-
-        protected FollowerFightLayer followerFightLayer;
 
         protected bool bool_14;
 
@@ -33,20 +30,24 @@ namespace friendlyPMC.Components.BossFollower
 
         protected int int_16 = 0;
 
+        protected FollowerCommonLayer commonLayer;
+        protected FollowerPusherLayer pusherLayer;
+
         public KnightFightLayer(BotOwner bot, int priority) : base(bot, priority)
         {
-            followerFightLayer = new FollowerFightLayer(bot, priority);
+            pusherLayer = new FollowerPusherLayer(bot, priority);
+            commonLayer = pusherLayer.CommonLayer;
         }
         public override void OnActivate()
         {
-            followerFightLayer?.OnActivate();
+            pusherLayer?.OnActivate();
             base.OnActivate();
         }
 
         public override void Dispose()
         {
+            pusherLayer?.Dispose();
             base.Dispose();
-            followerFightLayer?.Dispose();
         }
 
         public override bool ShallUseNow()
@@ -86,31 +87,34 @@ namespace friendlyPMC.Components.BossFollower
         }
         protected bool HasBoss()
         {
-            return followerFightLayer.HasBoss();
+            return commonLayer.HasBoss();
         }
 
         protected pitAIBossPlayer GetBoss()
         {
-            return followerFightLayer.GetBoss();
+            return commonLayer.GetBoss();
         }
 
         public void OrdersChanged()
         {
-            ordersChanged = true;
-            Utils.Utils.SetTimeout(() =>
-            {
-                ordersChanged = false;
-            },1000);
+            pusherLayer.OrdersChanged();
+        }
+
+        public override void DecisionChanged(AICoreActionResultStruct<BotLogicDecision>? prevDecision, AICoreActionResultStruct<BotLogicDecision> nextDecision)
+        {
+            pusherLayer.DecisionChanged(prevDecision, nextDecision);
+
+            base.DecisionChanged(prevDecision, nextDecision);
         }
 
         public override AICoreActionResultStruct<BotLogicDecision> GetDecision()
         {
             // is in dogfight?
-            AICoreActionResultStruct<BotLogicDecision>? aicoreActionResultStruct = followerFightLayer.DogFight();
+            AICoreActionResultStruct<BotLogicDecision>? aicoreActionResultStruct = commonLayer.DogFight(out customNavigationPoint_0);
             if (aicoreActionResultStruct != null) return (AICoreActionResultStruct<BotLogicDecision>)aicoreActionResultStruct;
 
             // needs healing?
-            aicoreActionResultStruct = followerFightLayer.NeedHeal();
+            aicoreActionResultStruct = commonLayer.NeedHeal(out customNavigationPoint_0);
             if (aicoreActionResultStruct != null) return (AICoreActionResultStruct<BotLogicDecision>)aicoreActionResultStruct;
 
             // player requests?
@@ -189,9 +193,8 @@ namespace friendlyPMC.Components.BossFollower
 
             BotRequest request = botOwner_0.BotRequestController.CurRequest;
 
-            if (request != null && !ordersChanged)
+            if (request != null && !commonLayer.OrderHasChangedRecently)
             {
-                Components.Logger.LogInfo(request.BotRequestType + " is not an order");
                 request.Complete();
                 return null;
             }
@@ -201,15 +204,15 @@ namespace friendlyPMC.Components.BossFollower
 
             // player needs help or has call for a regroup
             if (
-                ordersChanged && request != null &&
+                commonLayer.OrderHasChangedRecently && request != null &&
                 request.BotRequestType == (BotRequestType)CustomBotRequestType.Regroup &&
-                Utils.Utils.GetNavDistance(botPosition, bossPosition) > friendlyPMC.regroupMinDistance
+                Utils.Utils.GetNavDistance(botPosition, bossPosition) > commonLayer.regroupMinDistance
             )
             {
 
                 if (!botOwner_0.Memory.HaveEnemy || !botOwner_0.Memory.GoalEnemy.IsVisible)
                 {
-                    followerFightLayer.GetCloserToBoss();
+                    commonLayer.GetCloserToBoss(out customNavigationPoint_0);
 
                 }
                 else
@@ -222,13 +225,15 @@ namespace friendlyPMC.Components.BossFollower
             // do not pursue a marksman
             if (botOwner_0.Memory.GoalEnemy.Owner.IsRole(WildSpawnType.marksman))
             {
-                return followerFightLayer.MarksManFight();
+                return commonLayer.MarksManFight(out customNavigationPoint_0);
             }
 
             // player suggested to do a push
-            if (ordersChanged && request != null && request.BotRequestType == BotRequestType.attackClose)
+            if (commonLayer.OrderHasChangedRecently && request != null && request.BotRequestType == BotRequestType.attackClose)
             {
-                return followerFightLayer.EngageEnemy(true);
+                AICoreActionResultStruct<BotLogicDecision> forcePush = pusherLayer.EngageEnemy(true);
+                customNavigationPoint_0 = pusherLayer.NavigationPoint;
+                return forcePush;
             }
 
             return null;
@@ -244,7 +249,7 @@ namespace friendlyPMC.Components.BossFollower
                 {
                     if (botOwner_0.Memory.GoalEnemy != null && botOwner_0.Memory.GoalEnemy.CanShoot && botOwner_0.Memory.GoalEnemy.IsVisible)
                     {
-                        return followerFightLayer.DogFight();
+                        return commonLayer.DogFight(out customNavigationPoint_0);
                     }
 
                     GetClosestAttackCoverPoint(botOwner_0.Memory.GoalEnemy.CurrPosition,10f);
@@ -283,7 +288,7 @@ namespace friendlyPMC.Components.BossFollower
             if (int_16 >= num)
             {
                 int_16 = 0;
-                return followerFightLayer.HoldPositionFor(7f,"bad covers");
+                return commonLayer.HoldPositionFor(7f,"bad covers");
             }
             float_52 = Time.time;
 
@@ -321,10 +326,10 @@ namespace friendlyPMC.Components.BossFollower
                 
                 if (method_12() && botOwner_0.Memory.GoalEnemy.CanShoot && botOwner_0.Memory.GoalEnemy.IsVisible)
                 {
-                    return followerFightLayer.DogFight();
+                    return commonLayer.DogFight(out customNavigationPoint_0);
                 }
 
-                if (followerFightLayer.IsEnemyLowThreat() && Utils.EnemyInfo.Distance(botOwner_0) < Utils.EnemyInfo.EnemyDistance.Mid)
+                if (commonLayer.IsEnemyLowThreat() && Utils.EnemyInfo.Distance(botOwner_0) < Utils.EnemyInfo.EnemyDistance.Mid)
                 {
                     return KnightAssault();
                 }
@@ -340,16 +345,22 @@ namespace friendlyPMC.Components.BossFollower
 
             if (baseDecision.HasValue) return baseDecision.Value;
 
-            return followerFightLayer.EngageEnemy(false,true);
+            AICoreActionResultStruct<BotLogicDecision> push = pusherLayer.EngageEnemy();
+            customNavigationPoint_0 = pusherLayer.NavigationPoint;
+            return push;
         }
 
         public override AICoreActionEndStruct ShallEndCurrentDecision(AICoreActionResultStruct<BotLogicDecision> curDecision)
         {
-            AICoreActionEndStruct? common = followerFightLayer.ShallEndCurrentDecisionAllies(curDecision, ordersChanged);
+            AICoreActionEndStruct? common = commonLayer.ShallEndCurrentDecisionAllies(curDecision);
 
             if (common != null) return (AICoreActionEndStruct)common;
 
-            if(curDecision.Reason == "assaultRush" && Utils.EnemyInfo.Distance(botOwner_0) <= Utils.EnemyInfo.EnemyDistance.VeryClose)
+            AICoreActionEndStruct? push = pusherLayer.ShallEndDecision(curDecision);
+
+            if(push.HasValue) return push.Value;
+
+            if (curDecision.Reason == "assaultRush" && Utils.EnemyInfo.Distance(botOwner_0) <= Utils.EnemyInfo.EnemyDistance.VeryClose)
             {
                 return new AICoreActionEndStruct("assault.closeEnough", true);
             }
@@ -357,49 +368,38 @@ namespace friendlyPMC.Components.BossFollower
             return base.ShallEndCurrentDecision(curDecision);
         }
 
-        public override void DecisionChanged(AICoreActionResultStruct<BotLogicDecision>? prevDecision, AICoreActionResultStruct<BotLogicDecision> nextDecision)
-        {
-            followerFightLayer.DecisionChanged(prevDecision, nextDecision);
-
-            base.DecisionChanged(prevDecision, nextDecision);
-        }
         public override CustomNavigationPoint FindPoint(CoverSearchData data, Func<CoverSearchData, CustomNavigationPoint> p, bool checkCurrent)
         {
-            customNavigationPoint_0 = followerFightLayer.FindPoint(data, p, checkCurrent);
+            customNavigationPoint_0 = commonLayer.FindPoint(data, p, checkCurrent);
             return customNavigationPoint_0;
         }
 
         public AICoreActionEndStruct EndGetInClose()
         {
-            return followerFightLayer.EndGetInClose();
+            return commonLayer.EndGetInClose();
         }
         public override AICoreActionEndStruct EndGoToPoint()
         {
-            return followerFightLayer.EndGoToPoint();
-        }
-
-        public override AICoreActionEndStruct EndSearch()
-        {
-            return followerFightLayer.EndSearch();
+            return commonLayer.EndGoToPoint();
         }
 
         public override AICoreActionEndStruct EndHoldPosition()
         {
-            return followerFightLayer.EndHoldPosition();
+            return pusherLayer.EndHoldPosition();
         }
 
         public override AICoreActionEndStruct EndRunToEnemy()
         {
-            return followerFightLayer.EndRunToEnemy();
+            return pusherLayer.EndRunToEnemy();
         }
 
         public override AICoreActionEndStruct EndHeal()
         {
-            return followerFightLayer.EndHeal();
+            return commonLayer.EndHeal();
         }
         public override AICoreActionEndStruct EndTakeItem()
         {
-            return followerFightLayer.EndTakeItem();
+            return commonLayer.EndTakeItem();
         }
 
         public override AICoreActionEndStruct EndFollowerPatrolItem()
@@ -410,21 +410,21 @@ namespace friendlyPMC.Components.BossFollower
 
         protected void GetClosestCoverPoint(Vector3 centerPosition, float searchRadius)
         {
-            customNavigationPoint_0 = followerFightLayer.GetClosestCoverPoint(centerPosition, searchRadius);
+            customNavigationPoint_0 = commonLayer.GetClosestCoverPoint(centerPosition, searchRadius);
         }
         protected virtual void GetCoverPoint(Vector3 centerPosition, float searchRadius)
         {
-            customNavigationPoint_0 = followerFightLayer.GetCoverPoint(centerPosition, searchRadius);
+            customNavigationPoint_0 = commonLayer.GetCoverPoint(centerPosition, searchRadius);
         }
 
         protected void GetApproachablePoint()
         {
-            customNavigationPoint_0 = followerFightLayer.GetApproachablePoint();
+            customNavigationPoint_0 = commonLayer.GetApproachablePoint();
         }
 
         protected void GetClosestAttackCoverPoint(Vector3 centerPosition, float minDistance = 5f)
         {
-            customNavigationPoint_0 = followerFightLayer.GetClosestAttackCoverPoint(centerPosition, minDistance);
+            customNavigationPoint_0 = commonLayer.GetClosestAttackCoverPoint(centerPosition, minDistance);
         }
     }
 }

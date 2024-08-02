@@ -45,7 +45,7 @@ namespace friendlyPMC.Components.BossFollower
         {
             BotRequest request = botOwner_0.Memory.HaveEnemy ? null : botOwner_0.BotRequestController.CurRequest != null ? botOwner_0.BotRequestController.CurRequest : null;
 
-            float regroupMinDistance = friendlyPMC.regroupMinDistance;
+            float regroupMinDistance = 7f;
 
             float sprintDistance = 10f;
             Vector3 bossPosition = GetBossPosition();

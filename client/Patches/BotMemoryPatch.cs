@@ -21,7 +21,6 @@ namespace friendlyPMC.Patches
         protected override MethodBase GetTargetMethod()
         {
             return AccessTools.Method(typeof(BotMemoryClass), "AddEnemy");
-
         }
         [PatchPrefix]
         private static bool PatchPrefix(BotMemoryClass __instance, [NotNull] IPlayer enemy, BotSettingsClass groupInfo, bool onActivation)

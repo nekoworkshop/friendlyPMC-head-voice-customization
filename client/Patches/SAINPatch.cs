@@ -49,8 +49,8 @@ namespace friendlyPMC.Patches
                     harmony.Patch(AccessTools.Method(squadType, "calcGoalForBot"), new HarmonyMethod(typeof(SAINPatch).GetMethod(nameof(PatchCalcGoalForBot), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance)));
                 }
 
-                if (hearingType != null)
-                    harmony.Patch(AccessTools.Method(hearingType, "CheckCalcGoal"), new HarmonyMethod(typeof(SAINPatch).GetMethod(nameof(PatchCheckCalcGoal), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance)));
+                /*if (hearingType != null)
+                    harmony.Patch(AccessTools.Method(hearingType, "CheckCalcGoal"), new HarmonyMethod(typeof(SAINPatch).GetMethod(nameof(PatchCheckCalcGoal), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance)));*/
             }
         }
 
