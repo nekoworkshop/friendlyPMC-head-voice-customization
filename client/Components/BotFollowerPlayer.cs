@@ -5,7 +5,6 @@ using friendlyPMC.Modules;
 using HarmonyLib;
 
 using LootingBots.Patch.Components;
-using LootingBots.Patch.Util;
 
 using System;
 using System.Collections.Generic;

@@ -871,6 +871,8 @@ namespace friendlyPMC.Patches
 
                 PingTeamates.Enable();
 
+                friendlyPMC.Instance.GetEquipmentBuilds(); // ensure equipment is gathered
+
                 Components.Logger.LogInfo("Raid Started");
 
                 Controller = __instance;

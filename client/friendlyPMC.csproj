@@ -35,7 +35,7 @@
       <HintPath>..\..\core\0Harmony.dll</HintPath>
     </Reference>
     <Reference Include="ConfigurationManager">
-      <HintPath>..\..\..\XboxGames\AKI-Streets-3.9\BepInEx\plugins\spt\ConfigurationManager.dll</HintPath>
+      <HintPath>E:\Aki-Streets\BepInEx\plugins\spt\ConfigurationManager.dll</HintPath>
     </Reference>
     <Reference Include="spt-custom">
       <HintPath>..\..\..\XboxGames\AKI-Streets-3.9\BepInEx\plugins\spt\spt-custom.dll</HintPath>

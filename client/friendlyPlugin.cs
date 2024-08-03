@@ -309,7 +309,6 @@ namespace friendlyPMC
                     args.ChangedSetting.Definition.Key.Contains("Squad setup")
                 )
                 {
-                    Components.Logger.LogInfo("RefreshManager Called");
                     RefreshManager().Forget();
                 }
             };

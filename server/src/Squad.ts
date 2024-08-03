@@ -163,7 +163,7 @@ class friendlyPMC {
 						sender: MessageType.USER_MESSAGE,
 						senderDetails: member,
 						//@prettier-ignore
-						messageText: randomUtil.getArrayValue(["Here is your stuff. Uhm, anything in there for me? ", "Got your things right here. Where's my cut?", "Here is everything you gave me. So... we are splitting this, right?", "Here, this is everything you gave me.\nYou know carrying all of this is pretty challenging. Don't blame me if next time some of it falls off.\nOf course you can always... insure, if you know what I mean.", "Here you go my friend, all the stuff you gave me. Yeah... friends always look out for each other, right?", "I got your stuff right here. Anything in there you can spare?"]),
+						messageText: randomUtil.getArrayValue(["Here is your stuff. Uhm, anything in there for me? ", "Got your things right here. Where's my cut?", "Here is everything you gave me. So... we are splitting this, right?", "Here, this is everything you gave me.\nAnything in there for me?", "Here you go my friend, all the stuff you gave me.", "I got your stuff right here. Anything in there you can spare?"]),
 					};
 
 					// Add items to message - recreation of sendMessageToPlayer in order to insert the NPC as a user
