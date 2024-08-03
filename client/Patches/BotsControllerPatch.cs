@@ -623,7 +623,7 @@ namespace friendlyPMC.Patches
                                             {
                                                 if(eq == preset.Name)
                                                 {
-                                                    var equipment = preset.Equipment;
+                                                    var equipment = preset.Equipment.CloneItem(null);
 
                                                     if (!bundleJobs.Contains(preset.Name))
                                                     {

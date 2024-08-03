@@ -114,10 +114,6 @@ namespace friendlyPMC.Actions
 
                     _hasCome = false;
 
-                    if (!covering)
-                        botOwner_0.Steering.LookToPoint(botOwner_0.Memory.GoalEnemy.GetCenterPart());
-                    else
-                        botOwner_0.LookData.SetLookPointByHearing(null);
 
                     if (float_4 < Time.time)
                     {
@@ -165,10 +161,7 @@ namespace friendlyPMC.Actions
                     sprint = Utils.Utils.GetNavDistance(botOwner_0.GetPlayer.Transform.position, (Vector3)spotPosition) > 20f;
                     botOwner_0.GoToSomePointData.UpdateToGo(sprint);
 
-                    if (covering)
-                        botOwner_0.Steering.LookToMovingDirection();
-                    else
-                        botOwner_0.Steering.LookToPoint(botOwner_0.Memory.GoalEnemy.GetCenterPart());
+                    botOwner_0.Steering.LookToPoint(botOwner_0.Memory.GoalEnemy.GetCenterPart());
 
                 }
                 else

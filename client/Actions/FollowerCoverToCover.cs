@@ -90,7 +90,6 @@ namespace friendlyPMC.Actions
             {
 
                 botOwner_0.GoToSomePointData.UpdateToGo(sprint);
-                botOwner_0.LookData.SetLookPointByHearing(_closestPoint);
                 if (float_4 < Time.time)
                 {
                     float_4 = Time.time + 2f;
@@ -150,7 +149,7 @@ namespace friendlyPMC.Actions
                     
                     sprint = Utils.Utils.GetNavDistance(botOwner_0.GetPlayer.Transform.position, (Vector3)coverPosition) > 20f;
                     botOwner_0.GoToSomePointData.UpdateToGo(sprint);
-                    botOwner_0.LookData.SetLookPointByHearing(null);
+                    botOwner_0.Steering.LookToPoint(botOwner_0.Memory.GoalEnemy.GetCenterPart());
 
                     coverChange = true;
                 }

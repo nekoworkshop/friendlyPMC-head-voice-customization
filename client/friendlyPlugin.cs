@@ -66,7 +66,7 @@ namespace friendlyPMC
         }
     }
 
-    [BepInPlugin("xyz.pit.companion", "friendlyPMC", "3.4.1")]
+    [BepInPlugin("xyz.pit.companion", "friendlyPMC", "3.5.0")]
     [BepInDependency("xyz.drakia.bigbrain")]
     [BepInDependency("xyz.drakia.waypoints")]
     [BepInDependency("com.Arys.UnityToolkit")]
@@ -486,8 +486,6 @@ namespace friendlyPMC
                         {
                             value = "Random";
                         }
-
-                        Components.Logger.LogInfo("entry.Value " + value + " e.Value " + e.Value);
 
                         Config.Remove(entry.Definition);
 
