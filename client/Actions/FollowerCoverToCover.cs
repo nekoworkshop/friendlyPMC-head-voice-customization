@@ -1,5 +1,6 @@
 ﻿using EFT;
 using friendlyPMC.Components;
+using friendlyPMC.Utils;
 using HarmonyLib;
 using System;
 using System.Collections.Generic;
@@ -123,7 +124,7 @@ namespace friendlyPMC.Actions
 
                 var _members = AccessTools.Field(typeof(BotsGroup), "_members").GetValue(botOwner_0.BotsGroup) as List<BotOwner>;
 
-                CustomNavigationPoint cover = Utils.Covers.GetClosestCoverPoint(botOwner_0, bossPos, 50f, 5f, (CustomNavigationPoint point) =>
+                CustomNavigationPoint cover = Covers.GetClosestCoverPoint(botOwner_0, bossPos, Props.searchRadius, 5f, (CustomNavigationPoint point) =>
                 {
                     if (botOwner_0.BotsGroup.MembersCount == 1) return true;
 

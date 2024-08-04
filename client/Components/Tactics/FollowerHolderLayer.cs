@@ -84,6 +84,16 @@ namespace friendlyPMC.Components.Tactics
                 // Else check if the bot needs to get close to the boss
                 if (ShallGoNearBoss())
                 {
+                    customNavigationPoint_0 = commonLayer.GetClosestCoverPointGroup(interestPosition, commonLayer.coverSearchRadius);
+
+                    if (customNavigationPoint_0 != null)
+                    {
+                        if (commonLayer.GetNavDistance(customNavigationPoint_0.Position) < commonLayer.sprintDistance)
+                            return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMoving, "regroupToBoss");
+                        else
+                            return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "regroupToBossFast");
+                    }
+
                     return new AICoreActionResultStruct<BotLogicDecision>((BotLogicDecision)CustomBotDecisions.CoverToCover, "coverBoss");
                 }
                 // Otherwise, hold position
@@ -107,7 +117,7 @@ namespace friendlyPMC.Components.Tactics
             }
             else
             {
-                customNavigationPoint_0 = commonLayer.GetClosestCoverPoint(botPosition, commonLayer.coverSearchRadius);
+                customNavigationPoint_0 = commonLayer.GetClosestCoverPoint(interestPosition, commonLayer.coverSearchRadius);
             }
 
             if (customNavigationPoint_0 != null)

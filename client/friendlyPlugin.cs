@@ -66,7 +66,7 @@ namespace friendlyPMC
         }
     }
 
-    [BepInPlugin("xyz.pit.companion", "friendlyPMC", "3.5.0")]
+    [BepInPlugin("xyz.pit.companion", "friendlyPMC", "3.5.1")]
     [BepInDependency("xyz.drakia.bigbrain")]
     [BepInDependency("xyz.drakia.waypoints")]
     [BepInDependency("com.Arys.UnityToolkit")]

@@ -122,19 +122,64 @@ namespace friendlyPMC.Components.Tactics
             BotLogicDecision.heal
         };
 
-        public readonly float coverSearchRadius = 80f;
-        public readonly float sprintDistance = 15f;
-        public readonly float regroupMinDistance = 7f;
-        public readonly float searchRadius = 50f;
-        public readonly float nearSearchRadius = 30f;
+        public float coverSearchRadius
+        {
+            get
+            {
+                return Props.coverSearchRadius;
+            }
+        }
+        public float sprintDistance
+        {
+            get
+            {
+                return Props.sprintDistance;
+            }
+        }
+        public float regroupMinDistance
+        {
+            get => Props.regroupMinDistance;
+        }
+        public float searchRadius
+        {
+            get { return Props.searchRadius; }
+        }
+        public float nearSearchRadius
+        {
+            get { return Props.nearSearchRadius; }
+        }
         
 
-        public readonly float bossInnerRadius = 30f;
+        public float bossInnerRadius
+        {
+            get
+            {
+                return Props.bossInnerRadius;
+            }
+        }
 
-        public readonly float bossOuterRadius = 50f;
+        public float bossOuterRadius
+        {
+            get
+            {
+                return Props.bossOuterRadius;
+            }
+        }
 
-        public readonly float bossMaxCoverDistance = 35f;
-        public readonly float bossMinCoverDistance = 10f;
+        public float bossMaxCoverDistance
+        {
+            get
+            {
+                return Props.bossMaxCoverDistance;
+            }
+        }
+        public float bossMinCoverDistance
+        {
+            get
+            {
+                return Props.bossMinCoverDistance;
+            }
+        }
 
         private AICoreActionResultStruct<BotLogicDecision>? previousDecision = null;
 
@@ -688,7 +733,16 @@ namespace friendlyPMC.Components.Tactics
 
             if (customNavigationPoint_2 != null)
             {
-                if (request != null) request.Complete();
+                
+                if (request != null)
+                    Utils.Utils.SetTimeout(() =>
+                    {
+                        if (botOwner_0 != null && !botOwner_0.IsDead && botOwner_0.BotState == EBotState.Active && request != null && request.BotRequestType == (BotRequestType)CustomBotRequestType.Regroup)
+                        {
+                            request.Complete();
+                        }
+
+                    },2000); 
 
                 if (GetNavDistance(customNavigationPoint_2.Position) < sprintDistance)
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMoving, "moveCloserToBoss");
@@ -877,6 +931,9 @@ namespace friendlyPMC.Components.Tactics
         
         public AICoreActionEndStruct EndCoverToCover()
         {
+            if(OrderHasChangedRecently)
+                return new AICoreActionEndStruct("orders.Received", true);
+
             if (!botOwner_0.Memory.HaveEnemy)
             {
                 return new AICoreActionEndStruct("enemy.None", true);

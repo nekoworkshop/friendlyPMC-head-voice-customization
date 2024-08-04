@@ -15,7 +15,7 @@ namespace friendlyPMC.Components
     internal class FollowerFightLayer : GClass47
     {
 
-        private float bossInnerRadius 
+        private float bossInnerRadius
         {
             get { return commonLayer.bossInnerRadius; }
         }
@@ -45,8 +45,8 @@ namespace friendlyPMC.Components
 
         public NavMeshPath NavMeshPath
         {
-            get { 
-                return commonLayer.NavMeshPath; 
+            get {
+                return commonLayer.NavMeshPath;
             }
         }
 
@@ -62,7 +62,7 @@ namespace friendlyPMC.Components
                 return commonLayer.OrderHasChangedRecently;
             }
         }
-        
+
         public FollowerCommonLayer CommonLayer
         {
             get => commonLayer;
@@ -88,8 +88,8 @@ namespace friendlyPMC.Components
             sniperLayer = new FollowerSniperLayer(bot, priority);
             commonLayer = sniperLayer.CommonLayer;
             holderLayer = new FollowerHolderLayer(bot, priority, commonLayer);
-            pusherLayer = new FollowerPusherLayer(bot, priority,commonLayer);
-            
+            pusherLayer = new FollowerPusherLayer(bot, priority, commonLayer);
+
         }
         public override void OnActivate()
         {
@@ -119,17 +119,17 @@ namespace friendlyPMC.Components
                 allyTactic = true;
                 (botOwner_0.Brain.BaseBrain as FollowerBrain).SetTactic("Assist");
             }
-            else if(tactic == "push")
+            else if (tactic == "push")
             {
                 rushTactic = true;
                 (botOwner_0.Brain.BaseBrain as FollowerBrain).SetTactic("Push");
             }
-            else if (tactic == "defend") 
+            else if (tactic == "defend")
             {
                 holdTactic = true;
                 (botOwner_0.Brain.BaseBrain as FollowerBrain).SetTactic("Hold");
-            } 
-            else if(tactic == "marksman")
+            }
+            else if (tactic == "marksman")
             {
                 sniperTactic = true;
                 (botOwner_0.Brain.BaseBrain as FollowerBrain).SetTactic("Marksman");
@@ -156,7 +156,7 @@ namespace friendlyPMC.Components
         {
             if (!botOwner_0.Memory.HaveEnemy)
             {
-                if(ordersAreAttack || ordersAreHold)
+                if (ordersAreAttack || ordersAreHold)
                 {
                     ordersAreAttack = false;
                     ordersAreHold = false;
@@ -205,7 +205,7 @@ namespace friendlyPMC.Components
             return holder;
         }
 
-        public AICoreActionResultStruct<BotLogicDecision>  EngageEnemy(bool pushOrdered = false)
+        public AICoreActionResultStruct<BotLogicDecision> EngageEnemy(bool pushOrdered = false)
         {
             AICoreActionResultStruct<BotLogicDecision> engage = pusherLayer.EngageEnemy(pushOrdered);
             customNavigationPoint_0 = pusherLayer.NavigationPoint;
@@ -251,7 +251,7 @@ namespace friendlyPMC.Components
 
             if (allyTactic)
             {
-                
+
                 if (botOwner_0.Memory.AttackImmediately && commonLayer.IsEnemyLowThreat() && Utils.EnemyInfo.Distance(botOwner_0) <= Utils.EnemyInfo.EnemyDistance.Mid)
                     return EngageEnemy();
 
@@ -294,7 +294,7 @@ namespace friendlyPMC.Components
         {
 
             BotRequest request = botOwner_0.BotRequestController.CurRequest;
-            
+
             Vector3 botPosition = botOwner_0.GetPlayer.Transform.position;
             Vector3 bossPosition = HasBoss() ? GetBoss().Position : botPosition;
 
@@ -325,6 +325,7 @@ namespace friendlyPMC.Components
             if (request != null && request.BotRequestType == (BotRequestType)CustomBotRequestType.Regroup)
             {
                 ordersAreReqroup = true;
+                Components.Logger.LogInfo("Orders are to regroup");
             }
             else
             {
@@ -332,10 +333,10 @@ namespace friendlyPMC.Components
             }
 
             // assist and sniper do not do push
-            if(allyTactic || sniperTactic)
+            if (allyTactic || sniperTactic)
             {
                 ordersAreAttack = false;
-                if(allyTactic) ordersAreHold = false; 
+                if (allyTactic) ordersAreHold = false;
             }
 
             // is in dogfight/
@@ -358,13 +359,14 @@ namespace friendlyPMC.Components
             // Check if the bot has received the regroup command
             if (ordersAreReqroup && GetNavDistance(bossPosition) > commonLayer.regroupMinDistance && (!botOwner_0.Memory.HaveEnemy || !botOwner_0.Memory.GoalEnemy.IsVisible))
             {
+                Components.Logger.LogInfo("Do regroup");
                 return commonLayer.GetCloserToBoss(out customNavigationPoint_0);
             }
 
-            
+
             if (!botOwner_0.Memory.HaveEnemy && !allyTactic)
             {
-                if(bossUnderAttack)
+                if (bossUnderAttack)
                 {
                     var closestEnemy = GetBoss().ClosestEnemy();
                     if (closestEnemy != null)
@@ -378,13 +380,13 @@ namespace friendlyPMC.Components
                     }
                 }
 
-                if(!HasBoss())
+                if (!HasBoss())
                 {
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.simplePatrol, "simplePatrol");
                 } else
                 {
-                    GetClosestCoverPointGroup(GetBoss().Position,bossInnerRadius);
-                    if(customNavigationPoint_0 != null)
+                    GetClosestCoverPointGroup(GetBoss().Position, bossInnerRadius);
+                    if (customNavigationPoint_0 != null)
                         return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMoving, "regroupToBoss");
 
                     return BotLogicDecisions.RegroupToBoss(botOwner_0);
@@ -392,7 +394,7 @@ namespace friendlyPMC.Components
             }
 
             // suppression fire request
-            if((!botOwner_0.Memory.HaveEnemy || !botOwner_0.Memory.GoalEnemy.IsVisible) && request != null && request.BotRequestType == BotRequestType.suppressionFire)
+            if ((!botOwner_0.Memory.HaveEnemy || !botOwner_0.Memory.GoalEnemy.IsVisible) && request != null && request.BotRequestType == BotRequestType.suppressionFire)
             {
                 botOwner_0.BotTalk.TrySay(EPhraseTrigger.Covering, true);
                 suppressTime = Time.time + 2f;
@@ -400,10 +402,10 @@ namespace friendlyPMC.Components
             }
 
             // throw grenate request
-            if(!sniperTactic && request != null && request.BotRequestType == BotRequestType.throwGrenade)
+            if (!sniperTactic && request != null && request.BotRequestType == BotRequestType.throwGrenade)
                 return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.throwGrenadeFromPlace, "throwGrenadeRequest");
 
-            if (botOwner_0.Memory.GoalEnemy.Owner.IsRole(WildSpawnType.marksman)) 
+            if (botOwner_0.Memory.GoalEnemy.Owner.IsRole(WildSpawnType.marksman))
                 return commonLayer.MarksManFight(out customNavigationPoint_0);
 
             // ally tactic will make the bot always fight in hold mode
@@ -412,9 +414,9 @@ namespace friendlyPMC.Components
                 return DefendPosition(bossPosition);
             }
 
-            if(sniperTactic)
+            if (sniperTactic)
             {
-                AICoreActionResultStruct<BotLogicDecision>  decision = sniperLayer.GetDecision();
+                AICoreActionResultStruct<BotLogicDecision> decision = sniperLayer.GetDecision();
                 customNavigationPoint_0 = sniperLayer.NavigationPoint;
                 return decision;
             }
@@ -470,7 +472,7 @@ namespace friendlyPMC.Components
             BotRequest curRequest = botOwner_0.BotRequestController.CurRequest;
             if (curRequest != null && curRequest.BotRequestType == BotRequestType.suppressionFire)
             {
-                if(suppressTime < Time.time)
+                if (suppressTime < Time.time)
                 {
                     suppressTime = 0;
                     curRequest.Complete();
@@ -505,28 +507,29 @@ namespace friendlyPMC.Components
         {
             if (!botOwner_0.Memory.HaveEnemy)
                 return new AICoreActionEndStruct("enemy.None", true);
-            
+
             else if (!botOwner_0.Memory.GoalEnemy.IsVisible)
                 return base.EndFollowerPatrolItem();
-            else 
+            else
                 return new AICoreActionEndStruct("enemy.Present", true);
         }
 
- 
+
         public override AICoreActionEndStruct ShallEndCurrentDecision(AICoreActionResultStruct<BotLogicDecision> curDecision)
         {
             if (!botOwner_0.Memory.HaveEnemy)
             {
                 return aICoreActionEndStruct;
             }
-            
+
             // orders changed
             if (
                 ordersChanged &&
                 (
-                    
+
                     ordersAreAttack ||
                     ordersAreHold ||
+                    ordersAreReqroup ||
                     (
                         !commonLayer.ordersIgnoreReasons.Contains(curDecision.Reason) &&
                         !commonLayer.ordersIgnoreDecisions.Contains(curDecision.Action) &&
@@ -546,12 +549,6 @@ namespace friendlyPMC.Components
             if (shallEndCommon.HasValue) return shallEndCommon.Value;
 
             return base.ShallEndCurrentDecision(curDecision);
-        }
-
-
-        public AICoreActionEndStruct? ShallEndCurrentDecisionAllies(AICoreActionResultStruct<BotLogicDecision> curDecision, bool ordersChanged)
-        {
-            return commonLayer.ShallEndCurrentDecisionAllies(curDecision);
         }
 
         public override void DecisionChanged(AICoreActionResultStruct<BotLogicDecision>? prevDecision, AICoreActionResultStruct<BotLogicDecision> nextDecision)

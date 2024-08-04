@@ -218,6 +218,7 @@
     <Compile Include="Utils\EnemyInfo.cs" />
     <Compile Include="Utils\Equipment.cs" />
     <Compile Include="Utils\PingTeamates.cs" />
+    <Compile Include="Utils\Props.cs" />
     <Compile Include="Utils\Utils.cs" />
     <Compile Include="Utils\WorldScreen.cs" />
   </ItemGroup>

@@ -872,10 +872,19 @@ namespace friendlyPMC.Patches
                 PingTeamates.Enable();
 
                 friendlyPMC.Instance.GetEquipmentBuilds(); // ensure equipment is gathered
+                
+                Props.Reset();
+            
+                Controller = __instance;
+
+                string locationId = Singleton<GameWorld>.Instance.LocationId;
+
+                if(locationId == "factory4_day" || locationId == "factory4_night")
+                {
+                    Props.FactoryMapSett();
+                }
 
                 Components.Logger.LogInfo("Raid Started");
-
-                Controller = __instance;
             }
 
            
