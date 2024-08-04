@@ -215,38 +215,6 @@ namespace friendlyPMC.Components
 
         public AICoreActionResultStruct<BotLogicDecision> DecideTactic()
         {
-
-            // Check if the boss is under attack
-            if (bossUnderAttack && (!botOwner_0.Memory.HaveEnemy || !botOwner_0.Memory.GoalEnemy.IsVisible))
-            {
-                // - switch the bot's enemy to the one attacking the boss
-                var closestEnemy = GetBoss().ClosestEnemy();
-                if (closestEnemy != null)
-                {
-                    GetBoss().PrioritizeEnemy(botOwner_0, closestEnemy);
-                }
-
-                // - try and get back to the boss
-                Vector3 bossPosition = GetBoss().Position;
-                GetClosestCoverPoint(bossPosition, bossOuterRadius);
-
-                if (customNavigationPoint_0 != null)
-                {
-                    if (GetNavDistance(customNavigationPoint_0.Position) > commonLayer.sprintDistance)
-                    {
-                        return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "protectBossFast");
-                    }
-                    else
-                    {
-                        return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMoving, "protectBossSlow");
-                    }
-                }
-                else
-                {
-                    return BotLogicDecisions.RegroupToBoss(botOwner_0);
-                }
-            }
-
             Vector3 interestPosition = HasBoss() ? GetBoss().Position : botOwner_0.GetPlayer.Transform.position;
 
             if (allyTactic)
@@ -325,7 +293,6 @@ namespace friendlyPMC.Components
             if (request != null && request.BotRequestType == (BotRequestType)CustomBotRequestType.Regroup)
             {
                 ordersAreReqroup = true;
-                Components.Logger.LogInfo("Orders are to regroup");
             }
             else
             {
@@ -359,37 +326,53 @@ namespace friendlyPMC.Components
             // Check if the bot has received the regroup command
             if (ordersAreReqroup && GetNavDistance(bossPosition) > commonLayer.regroupMinDistance && (!botOwner_0.Memory.HaveEnemy || !botOwner_0.Memory.GoalEnemy.IsVisible))
             {
-                Components.Logger.LogInfo("Do regroup");
                 return commonLayer.GetCloserToBoss(out customNavigationPoint_0);
             }
 
 
             if (!botOwner_0.Memory.HaveEnemy && !allyTactic)
             {
-                if (bossUnderAttack)
+                // Check if the boss is under attack
+                if (bossUnderAttack && (!botOwner_0.Memory.HaveEnemy || !botOwner_0.Memory.GoalEnemy.IsVisible))
                 {
+                    // - switch the bot's enemy to the one attacking the boss
                     var closestEnemy = GetBoss().ClosestEnemy();
                     if (closestEnemy != null)
                     {
                         GetBoss().PrioritizeEnemy(botOwner_0, closestEnemy);
                     }
+                    // - sniper try to find shooting spot
+                    if(sniperTactic)
+                    {
+                        GetClosestAttackCoverPoint(bossPosition, bossOuterRadius);
+                        if(customNavigationPoint_0 != null)
+                        {
+                            return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "relocateFast");
+                        } 
+                        else 
+                        {
+                            return new AICoreActionResultStruct<BotLogicDecision>((BotLogicDecision)CustomBotDecisions.CoverToCover, "coverBoss");
+                        }
+                    }
 
-                    if (!sniperTactic)
+                    // - try and get back to the boss
+                    GetClosestCoverPoint(bossPosition, bossOuterRadius);
+
+                    if (customNavigationPoint_0 != null)
+                    {
+                        if (GetNavDistance(customNavigationPoint_0.Position) > commonLayer.sprintDistance)
+                        {
+                            return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "protectBossFast");
+                        }
+                        else
+                        {
+                            return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMoving, "protectBossSlow");
+                        }
+                    }
+                    else
                     {
                         return BotLogicDecisions.RegroupToBoss(botOwner_0);
                     }
-                }
-
-                if (!HasBoss())
-                {
-                    return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.simplePatrol, "simplePatrol");
-                } else
-                {
-                    GetClosestCoverPointGroup(GetBoss().Position, bossInnerRadius);
-                    if (customNavigationPoint_0 != null)
-                        return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMoving, "regroupToBoss");
-
-                    return BotLogicDecisions.RegroupToBoss(botOwner_0);
                 }
             }
 

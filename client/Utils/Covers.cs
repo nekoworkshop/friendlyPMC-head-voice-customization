@@ -370,7 +370,7 @@ namespace friendlyPMC.Utils
 
             return false;
         }
-        private static bool IsNavigablePoint(Vector3 botPosition, Vector3 point, float maxDistance, NavMeshPath existingMesh = null)
+        public static bool IsNavigablePoint(Vector3 botPosition, Vector3 point, float maxDistance, NavMeshPath existingMesh = null)
         {
             NavMeshPath navMeshPath = existingMesh != null ? existingMesh : new NavMeshPath();
 

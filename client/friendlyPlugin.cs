@@ -262,7 +262,6 @@ namespace friendlyPMC
         {
 
             Config.SaveOnConfigSet = false;
-            Config.Reload();
 
             savedConfigValues = new Dictionary<ConfigDefinition, string>();
 
