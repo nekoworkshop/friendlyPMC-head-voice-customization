@@ -429,7 +429,7 @@ namespace friendlyPMC.Components
             settings.FileSettings.Look.NO_GREEN_DIST = 4.0f;
             settings.FileSettings.Look.NO_GRASS_DIST = 5.0f;
 
-            settings.FileSettings.Hearing.CHANCE_TO_HEAR_SIMPLE_SOUND_0_1 = 0.2f;
+            settings.FileSettings.Hearing.CHANCE_TO_HEAR_SIMPLE_SOUND_0_1 = 0.4f;
             settings.FileSettings.Hearing.DISPERSION_COEF = 1f;
             settings.FileSettings.Hearing.CLOSE_DIST = 6f;
             settings.FileSettings.Hearing.FAR_DIST = 35f;
