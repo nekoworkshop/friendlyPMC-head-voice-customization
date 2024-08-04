@@ -541,6 +541,7 @@ namespace friendlyPMC.Components
                 )
             )
             {
+                commonLayer.OrderReset();
                 return new AICoreActionEndStruct("orders.Received", true);
             }
 

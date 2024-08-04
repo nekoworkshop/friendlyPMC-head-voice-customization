@@ -296,6 +296,11 @@ namespace friendlyPMC.Components.Tactics
             }, 1000);
         }
 
+        public void OrderReset()
+        { 
+            ordersChanged = false;
+        }
+
         public bool IsEnemyLowThreat(bool ignoreEquip = false)
         {
             if (!ignoreEquip && dangerTimer > Time.time) return dangerResult;
@@ -863,6 +868,7 @@ namespace friendlyPMC.Components.Tactics
                 )
             )
             {
+                OrderReset();
                 return new AICoreActionEndStruct("orders.Received", true);
             }
 
@@ -903,7 +909,7 @@ namespace friendlyPMC.Components.Tactics
 
         public AICoreActionEndStruct EndEnemySearch()
         {
-            if (OrderHasChangedRecently)
+            if (ordersChanged)
                 return new AICoreActionEndStruct("search.End", true);
 
             if (!botOwner_0.Memory.HaveEnemy)
@@ -931,7 +937,7 @@ namespace friendlyPMC.Components.Tactics
         
         public AICoreActionEndStruct EndCoverToCover()
         {
-            if(OrderHasChangedRecently)
+            if(ordersChanged)
                 return new AICoreActionEndStruct("orders.Received", true);
 
             if (!botOwner_0.Memory.HaveEnemy)
