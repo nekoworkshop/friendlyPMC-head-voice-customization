@@ -394,6 +394,8 @@ namespace friendlyPMC.Components
             // ally tactic will make the bot always fight in hold mode
             if (allyTactic)
             {
+                ordersAreAttack = false;
+                ordersAreHold = false;
                 return DefendPosition(bossPosition);
             }
 
@@ -447,6 +449,8 @@ namespace friendlyPMC.Components
 
         public override AICoreActionEndStruct EndHoldPosition()
         {
+            if (ordersAreHold || allyTactic || (holdTactic && !ordersAreAttack)) return holderLayer.EndHoldPosition();
+
             return pusherLayer.EndHoldPosition();
         }
 
@@ -512,7 +516,6 @@ namespace friendlyPMC.Components
 
                     ordersAreAttack ||
                     ordersAreHold ||
-                    ordersAreReqroup ||
                     (
                         !commonLayer.ordersIgnoreReasons.Contains(curDecision.Reason) &&
                         !commonLayer.ordersIgnoreDecisions.Contains(curDecision.Action) &&
