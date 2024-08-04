@@ -730,7 +730,18 @@ namespace friendlyPMC.Components.Tactics
             Vector3 bossPosition = HasBoss() ? GetBoss().Position : botOwner_0.GetPlayer.Transform.position;
             BotRequest request = botOwner_0.BotRequestController.CurRequest;
 
-            if (request != null) ResetTimer("coverTimer_2");
+            if (request != null)
+            {
+                Utils.Utils.SetTimeout(() =>
+                {
+                    if (botOwner_0 != null && !botOwner_0.IsDead && botOwner_0.BotState == EBotState.Active && request != null && request.BotRequestType == (BotRequestType)CustomBotRequestType.Regroup)
+                    {
+                        request.Complete();
+                    }
+
+                }, 2000);
+                ResetTimer("coverTimer_2");
+            }
 
             GetClosestCoverPointGroup(bossPosition, bossInnerRadius);
 
@@ -738,17 +749,6 @@ namespace friendlyPMC.Components.Tactics
 
             if (customNavigationPoint_2 != null)
             {
-                
-                if (request != null)
-                    Utils.Utils.SetTimeout(() =>
-                    {
-                        if (botOwner_0 != null && !botOwner_0.IsDead && botOwner_0.BotState == EBotState.Active && request != null && request.BotRequestType == (BotRequestType)CustomBotRequestType.Regroup)
-                        {
-                            request.Complete();
-                        }
-
-                    },2000); 
-
                 if (GetNavDistance(customNavigationPoint_2.Position) < sprintDistance)
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMoving, "moveCloserToBoss");
                 else

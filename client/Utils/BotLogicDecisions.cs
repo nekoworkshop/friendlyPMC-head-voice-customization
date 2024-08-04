@@ -1,5 +1,7 @@
 ﻿using EFT;
+using TMPro;
 using UnityEngine;
+using UnityEngine.AI;
 
 namespace friendlyPMC.Utils
 {
@@ -13,26 +15,47 @@ namespace friendlyPMC.Utils
 
             IPlayer requester = request != null ? bot.BotRequestController.CurRequest.Requester : null;
 
+            if(requester == null && bot.BotFollower.HaveBoss)
+            {
+                requester = bot.BotFollower.BossToFollow.Player();
+            }
+
             if(requester == null) {
                 return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.followerPatrol, "requester.None");
             }
 
             Vector3 requestPos = requester.Transform.position;
-            
-            request.Complete();
 
-            float randomX = GClass761.Random(-5f, 5f);
-            float randomZ = GClass761.Random(-5f, 5f);
-            Vector3 offset = new Vector3(randomX, 0f, randomZ);
+            NavMeshPath mesh = new NavMeshPath();
 
-            Vector3 finPos = requestPos + offset;
-            finPos.y = requester.PlayerBody.PlayerBones.Head.position.y;
+            // try to find a valid position within the sphere
+            Vector3? finPos = null;
+            for (int i = 0; i < 50; i++) // Adjust the number of attempts as needed
+            {
+                Vector3 randomPosition = requestPos + UnityEngine.Random.insideUnitSphere * Props.bossInnerRadius;
 
-            Vector3 point = new Vector3(finPos.x, requestPos.y, finPos.z);
+                NavMeshHit navMeshHit;
 
-            bot.GoToSomePointData.SetPoint(point);
+                if (!NavMesh.SamplePosition(randomPosition, out navMeshHit, 10f, -1)) continue;
 
-            bool shouldSprint01 = Vector3.Distance(point, bot.GetPlayer.Transform.position) >= sprintDistance;
+                if (!Covers.IsNavigablePoint(bot.GetPlayer.Transform.position, navMeshHit.position, 150f, mesh)) continue;
+                if (!finPos.HasValue)
+                {
+                    finPos = navMeshHit.position;
+                } else if((requestPos - navMeshHit.position).sqrMagnitude < (requestPos - finPos.Value).sqrMagnitude)
+                {
+                    finPos = navMeshHit.position;
+                }
+            }
+            // no valid point found
+            if(!finPos.HasValue)
+            {
+                return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.followerPatrol, "requester.badPosition");
+            }
+
+            bot.GoToSomePointData.SetPoint(finPos.Value);
+
+            bool shouldSprint01 = Vector3.Distance(finPos.Value, bot.GetPlayer.Transform.position) >= sprintDistance;
             bot.GoToSomePointData.UpdateToGo(shouldSprint01);
             if (!shouldSprint01) bot.Sprint(false);
 
