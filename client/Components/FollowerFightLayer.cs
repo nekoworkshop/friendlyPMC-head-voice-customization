@@ -473,7 +473,7 @@ namespace friendlyPMC.Components
 
         public override AICoreActionEndStruct EndRunToEnemy()
         {
-            return pusherLayer.EndRunToEnemy();
+            return commonLayer.EndRunToEnemy();
         }
 
         public override AICoreActionEndStruct EndGoToPoint()

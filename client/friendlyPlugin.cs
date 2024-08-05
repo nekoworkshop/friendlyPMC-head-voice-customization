@@ -91,8 +91,6 @@ namespace friendlyPMC
 
         public static Dictionary<int, List<ConfigEntry<string>>> squadMembers = new Dictionary<int, List<ConfigEntry<string>>>();
 
-        private bool squadSet = false;
-
         public static ConfigEntry<bool> copyEquip;
 
         public static ConfigEntry<int> enemyRemember;
@@ -108,7 +106,7 @@ namespace friendlyPMC
         public static ConfigEntry<bool> birdEyeSpawn;
         public static ConfigEntry<bool> justKnightSpawn;
         private string[] equipPresets = new string[] {
-            "Random",
+            "Default",
             "Player Equipment"
         };
 
@@ -280,7 +278,7 @@ namespace friendlyPMC
 
             squadSetup = Config.Bind(baseSettings, "1.4  -  Use Squad setup", false, new ConfigDescription("Use specific setup for your squad"));
 
-            extraPickups = Config.Bind(baseSettings, "2 Maximum followers", 1, new ConfigDescription("Maximum followers the player can have. This is in addition to the squad.", new AcceptableValueRange<int>(1, 30)));
+            extraPickups = Config.Bind(baseSettings, "2 Maximum followers", 1, new ConfigDescription("Maximum followers the player can have. This is in addition to the squad.", new AcceptableValueRange<int>(0, 30)));
 
             scanDistance = Config.Bind(miscSettings, "1 Maximum scan distance", 140, new ConfigDescription("Maximum distance to pick up any visible enemy that the player is signaling when issuing 'Contact' phrase", new AcceptableValueRange<int>(50, 300)));
 
@@ -330,7 +328,7 @@ namespace friendlyPMC
                         string value = "Default";
 
                         string seckey = "1.4.1  -    -  Squad Member " + (i + 1) + " Equipment";
-                        string secvalue = "Random";
+                        string secvalue = "Default";
 
                         savedConfigValues.ExecuteForEach(saved =>
                         {
@@ -422,7 +420,7 @@ namespace friendlyPMC
                 baseSettings,
                 name,
                 value,
-                new ConfigDescription("Set Squad member equipment. You can choose between random, which is default SPT, user's current equipment or user created presets (recommended if using a tactic different than default.", new AcceptableValueList<string>(list))
+                new ConfigDescription("Set Squad member equipment. You can choose between default (which is SPT random equipment), user's current equipment or user created presets (recommended if using a tactic different than default.", new AcceptableValueList<string>(list))
              );
 
             return entry;
@@ -434,7 +432,7 @@ namespace friendlyPMC
             var presets = Utils.Equipment.CustomPresets;
 
             var updatedPresets = new string[] {
-                "Random",
+                "Default",
                 "Player Equipment"
             };
 
@@ -482,7 +480,7 @@ namespace friendlyPMC
 
                         if(!equipPresets.Contains(value))
                         {
-                            value = "Random";
+                            value = "Default";
                         }
 
                         Config.Remove(entry.Definition);

@@ -953,6 +953,21 @@ namespace friendlyPMC.Components.Tactics
             return aICoreActionEndStruct;
         }
 
+        public override AICoreActionEndStruct EndRunToEnemy()
+        {
+            if (!botOwner_0.Memory.HaveEnemy)
+            {
+                return new AICoreActionEndStruct("enemy.None", true);
+            }
+
+            if (botOwner_0.Memory.GoalEnemy.CanShoot)
+            {
+                return new AICoreActionEndStruct("enemy.canSh", true);
+            }
+
+            return base.EndRunToEnemy();
+        }
+
         public override AICoreActionEndStruct EndHeal()
         {
             if (!botOwner_0.Medecine.FirstAid.Have2Do && !botOwner_0.Medecine.SurgicalKit.HaveWork)

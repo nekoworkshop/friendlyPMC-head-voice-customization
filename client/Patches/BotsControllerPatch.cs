@@ -17,14 +17,6 @@ using IProfileData = GClass592;
 
 using friendlyPMC.Utils;
 using Comfort.Common;
-using System.Threading.Tasks;
-using Newtonsoft.Json.Linq;
-using System.Security.Policy;
-using static RootMotion.FinalIK.IKSolver;
-using UnityEngine.Profiling;
-using EFT.InventoryLogic;
-using System.ComponentModel;
-using BepInEx.Configuration;
 
 
 
@@ -611,7 +603,7 @@ namespace friendlyPMC.Patches
                                 if(friendlyPMC.squadMembers.ContainsKey(pid))
                                 {
                                     string eq = friendlyPMC.squadMembers[pid][1].Value;
-                                    if(eq != null && eq != "Random") 
+                                    if(eq != null && eq != "Default") 
                                     {
                                         if (eq == "Player Equipment")
                                         {
@@ -698,7 +690,7 @@ namespace friendlyPMC.Patches
 
                 } catch (Exception ex)
                 {
-                    Components.Logger.LogInfo("Failed to use custom presets, will fall back to random loadout :" + ex.Message);
+                    Components.Logger.LogInfo("Failed to use custom presets, will fall back to default loadout :" + ex.Message);
                 }
             }
 

@@ -66,8 +66,6 @@ class friendlyPMC {
 		this.Logger = container.resolve("WinstonLogger");
 		this.mailSendService = container.resolve("MailSendService");
 
-		const botGenerator = container.resolve<BotGenerator>("BotGenerator");
-
 		try {
 			this.config = Object.assign(this.config, require("../config.json"));
 		} catch (e) {
