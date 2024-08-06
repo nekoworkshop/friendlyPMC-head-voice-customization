@@ -66,11 +66,10 @@ namespace friendlyPMC
         }
     }
 
-    [BepInPlugin("xyz.pit.companion", "friendlyPMC", "3.5.2")]
+    [BepInPlugin("xyz.pit.companion", "friendlyPMC", "3.6.0")]
     [BepInDependency("xyz.drakia.bigbrain")]
     [BepInDependency("xyz.drakia.waypoints")]
     [BepInDependency("com.Arys.UnityToolkit")]
-    [BepInDependency("me.skwizzy.lootingbots")]
     public class friendlyPMC : BaseUnityPlugin
     {
         public static bool awaken;

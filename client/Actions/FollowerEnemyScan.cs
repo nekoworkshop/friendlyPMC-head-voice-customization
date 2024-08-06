@@ -1,14 +1,6 @@
-﻿using ChartAndGraph;
-using EFT;
-using LootingBots.Patch.Util;
-using RootMotion.FinalIK;
-using System;
+﻿using EFT;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
-using static UnityEngine.EventSystems.EventTrigger;
 
 namespace friendlyPMC.Actions
 {

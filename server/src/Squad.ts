@@ -273,6 +273,12 @@ class friendlyPMC {
 				Bear_1_Eng: 1,
 				Bear_2_Eng: 1,
 			};
+		} else {
+			tables.bots.types["bear"].appearance.voice = {
+				Bear_1: 1,
+				Bear_2: 1,
+				Bear_3: 1,
+			};
 		}
 
 		// open all zones to the bots

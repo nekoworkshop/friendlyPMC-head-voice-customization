@@ -13,6 +13,9 @@ using System.Reflection;
 using EFT.InventoryLogic;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using HarmonyLib;
+using EFT.Interactive;
+using Comfort.Common;
 
 namespace friendlyPMC.Actions
 {
@@ -20,181 +23,176 @@ namespace friendlyPMC.Actions
     {
         private BotFollowerPlayer _follower;
 
-        private bool bool_0 = false;
+        private LootItem _lootItem = null;
 
         private bool bool_1 = false;    
 
-        private bool takingLoot = false;
-        private float lootTimer = 0f;
+        private bool bool_2 = false;
 
         public FollowerTakeLoot(BotOwner bot) : base(bot)
         {
         }
 
-        public void EnableTransactions()
-        {
-            _follower.LootingBrain.EnableTransactions();
-            _follower.LootingBrain.UpdateGridStats();
-        }
-
         public override void Update()
         {
-            if(_follower == null)
+            botOwner_0.DoorOpener.Update();
+
+
+            if (bool_1)
+            {
+                return;
+            }
+
+
+            if (_follower == null)
             {
                 _follower = BossPlayers.Instance.GetFollower(botOwner_0);
             }
 
-            if(takingLoot && lootTimer < Time.time)
+            if(_lootItem == null)
             {
-                if (botOwner_0.IsDead || botOwner_0.BotState != EBotState.Active || _follower.LootingBrain == null || _follower.LootingBrain.IsBotLooting) return;
+                _lootItem = AccessTools.Field(typeof(BotItemTaker), "_itemToTake").GetValue(botOwner_0.ItemTaker) as LootItem;
+            }
 
-                InteractableObjects.RemoveTaker(botOwner_0);
-                bool_0 = false;
-                bool_1 = false;
-                takingLoot = false;
+
+            if(_lootItem == null)
+            {
+                ClearLoot();
                 return;
             }
 
-            if (!bool_0)
+            if (bool_2)
             {
-
-                Vector3 dest = Vector3.zero;
-                bool destset = false;
-                
-                if(_follower.LootingBrain.ActiveCorpse != null || _follower.LootingBrain.ActiveItem != null)
+                if (botOwner_0.GoToSomePointData.IsCome() && !bool_1)
                 {
-                    destset = true;
-                }
-
-                if (_follower.LootingBrain.ActiveItem != null) dest = _follower.LootingBrain.ActiveItem.transform.position;
-                else if (_follower.LootingBrain.ActiveCorpse != null) dest = _follower.LootingBrain.ActiveCorpse.gameObject.transform.position;
-
-                if(!destset)
-                {
-                    _follower.LootingBrain.ActiveItem = null;
-                    _follower.LootingBrain.ActiveCorpse = null;
+                    bool_1 = true;
+                    PickupLoot().Forget();
                     return;
                 }
 
-                // try get closer to the loot item/body
-                NavMeshPathStatus pathStatus = botOwner_0.GoToPoint(dest, true, -1f, false, false, true, false);
-
-                if (pathStatus != NavMeshPathStatus.PathComplete)
-                {
-                    _follower.LootingBrain.ActiveItem = null;
-                    _follower.LootingBrain.ActiveCorpse = null;
-                    return;
-                }
-
-                _follower.LootingBrain.Destination = dest;
-                _follower.LootingBrain.LootObjectPosition = dest;
-                botOwner_0.SetPose(1f);
-                botOwner_0.SetTargetMoveSpeed(1f);
-                botOwner_0.Steering.LookToMovingDirection();
-
-                bool_0 = true;
-            }
-
-            
-            if (!botOwner_0.Mover.IsComeTo(0.5f, false))
-            {
                 return;
             }
 
-            if (!bool_1) {
-                botOwner_0.StopMove();
-                botOwner_0.SetPose(0f);
+            botOwner_0.Steering.LookToMovingDirection();
+            botOwner_0.GoToSomePointData.SetPoint(InteractableObjects.GetLootPosition());
+            botOwner_0.GoToSomePointData.UpdateToGo(false);
 
-                // start looting the body
-                if (_follower.LootingBrain.ActiveCorpse != null)
-                {
-                    Vector3 position = _follower.LootingBrain.LootObjectPosition;
-                    position.y += 0.5f;
-                    position.Normalize();
-
-                    botOwner_0.Steering.LookToPoint(position);
-
-                    takingLoot = true;
-                    lootTimer = Time.time + 15f;
-
-                    Task.Delay(TimeSpan.FromSeconds(10)).ContinueWith( t =>{
-                        if (botOwner_0.IsDead || botOwner_0.BotState != EBotState.Active || _follower.LootingBrain == null || _follower.LootingBrain.IsBotLooting) return;
-                        try
-                        {
-                            InteractableObjects.RemoveTaker(botOwner_0);
-                            bool_0 = false;
-                            bool_1 = false;
-                            takingLoot = false;
-                        }
-                        catch { }
-                    });
-
-                    EnableTransactions();
-                    _follower.LootingBrain.StartCoroutine(_follower.LootingBrain.LootCorpse());
-                    if (_follower.IsSquadMate) 
-                        _follower.LootingBrain.StartCoroutine(MonitorLootingCoroutine(() => OnLootingComplete()));
-                }
-                // pick up the given item
-                else if (_follower.LootingBrain.ActiveItem != null && _follower.LootingBrain.ActiveItem.Item != null)
-                {
-                    PickUpItem().Forget();
-                }
-
-                bool_1 = true;
-            }
+            bool_2 = true;
         }
 
-        private async UniTask PickUpItem()
+
+        private async UniTask PickupLoot()
         {
+            Item item = _lootItem.Item;
+
+            if (item == null)
+            {
+                ClearLoot();
+                return;
+            }
+
+            Vector3 pos = _lootItem.transform.position;
+
+            botOwner_0.Steering.LookToPoint(pos);
+
+            await Task.Delay(2000);
+
+            if(botOwner_0.IsDead || botOwner_0.BotState != EBotState.Active || InteractableObjects.Instance == null || !InteractableObjects.IsTaker(botOwner_0))
+            {
+                ClearLoot();
+                return;
+            }
 
             try
             {
+                InventoryControllerClass inventoryControllerClass = botOwner_0.GetPlayer.InventoryControllerClass;
 
-                EnableTransactions();
-
-                Item item = _follower.LootingBrain.ActiveItem.Item;
-                bool result = false;
-
-                result = await _follower.TransactionController.TryPickupItem(item);
-                if (result && _follower.IsSquadMate)
+                List<EquipmentSlot> possibleSlots = new List<EquipmentSlot> {
+                    EquipmentSlot.Backpack,
+                    EquipmentSlot.TacticalVest,
+                    EquipmentSlot.ArmorVest,
+                    EquipmentSlot.Pockets
+                };
+                // find an available grid in the equipment slots to which the key can be transferred
+                ItemAddress locationForItem = FindLocationForItem(item, possibleSlots, inventoryControllerClass);
+                //  - no space left
+                if (locationForItem == null)
                 {
+                    botOwner_0.BotTalk.TrySay(EPhraseTrigger.Negative, true);
+                    ClearLoot();
+                    return;
+                }
+
+                // initialize the transation to transfer the key to the bot
+                var moveResult = InteractionsHandlerClass.Move(item, locationForItem, inventoryControllerClass, true);
+
+                // - failed to make the transaction
+                if (!moveResult.Succeeded)
+                {
+                    ClearLoot();
+                    return;
+                }
+
+
+                // execute transaction
+                IResult result =  await inventoryControllerClass.TryRunNetworkTransaction(moveResult, null);
+                if (botOwner_0.IsDead || botOwner_0.BotState != EBotState.Active)
+                {
+                    ClearLoot();
+                    return;
+                }
+                if (result.Succeed)
+                {
+                    OnLootingComplete();
                     InteractableObjects.StoreItem(botOwner_0, item);
                 }
-                // mark loot as being ignored as if bot tries to get it the second item, it will end up getting stucked
-                if(!result)
-                {
-                    _follower.LootingBrain.IgnoreLoot(item.Id);
-                }
 
-                _follower.LootingBrain.InventoryController.UpdateKnownItems();
-                _follower.LootingBrain.CleanupItem(result, item);
-                _follower.LootingBrain.OnLootTaskEnd(result);
-
-            } catch(Exception ex)
-            {
-                Components.Logger.LogInfo("Failed to pickup loot: " + ex.Message);
+                await Task.Delay(1000);
+                ClearLoot();
             }
-            try
+            catch (Exception e)
             {
-                InteractableObjects.RemoveTaker(botOwner_0);
-            } catch(Exception ex)
-            {
-                Components.Logger.LogInfo("Failed to cleanup loot: " + ex.Message);
+                Components.Logger.LogInfo("Failed to pickup Loot : " + e.Message);
+                Components.Logger.LogInfo("StacTrace : " + e.StackTrace);
+                ClearLoot();
             }
-            bool_0 = false;
-            bool_1 = false;
         }
 
-        private IEnumerator MonitorLootingCoroutine(Action callBack = null)
+        private ItemAddress FindLocationForItem(Item item, IEnumerable<EquipmentSlot> possibleSlots, InventoryControllerClass botInventoryController)
         {
-            while (botOwner_0 != null && botOwner_0.BotState == EBotState.Active && botOwner_0.HealthController.IsAlive && _follower != null && _follower.LootingBrain.IsBotLooting)
+            foreach (EquipmentSlot slot in possibleSlots)
             {
-                yield return null; // Wait for the next frame
+                SearchableItemClass equipmentSlot = botInventoryController.Inventory.Equipment.GetSlot(slot).ContainedItem as SearchableItemClass;
+                foreach (StashGridClass grid in (equipmentSlot?.Grids ?? (new StashGridClass[0])))
+                {
+                    LocationInGrid locationInGrid = grid.FindFreeSpace(item);
+                    if (locationInGrid != null)
+                    {
+
+                        return new ItemAddressClass(grid, locationInGrid);
+                    }
+                }
             }
 
-            // Perform the task after looting is complete
-            if (callBack != null) callBack();
+            return null;
         }
+
+        private void ClearLoot()
+        {
+            AccessTools.Field(typeof(BotItemTaker), "_itemToTake").SetValue(botOwner_0.ItemTaker, null);
+            InteractableObjects.RemoveTaker(botOwner_0);
+            InteractableObjects.ClearCurLootItem();
+            BotRequest currRequest = botOwner_0.BotRequestController.CurRequest;
+            if (currRequest != null && currRequest.BotRequestType == (BotRequestType)CustomBotRequestType.TakeLoot)
+            {
+                currRequest.Complete();
+            }
+
+            bool_1 = false;
+            bool_2 = false;
+            _lootItem = null;
+        }
+        
 
         /** Check if the bot still has the items given by the player in his inventory **/
         private void OnLootingComplete()

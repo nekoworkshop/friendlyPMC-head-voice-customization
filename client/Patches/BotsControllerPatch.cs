@@ -569,7 +569,7 @@ namespace friendlyPMC.Patches
             int memberCount = friendlyPMC.squadSize.Value;
 
             BotSpawnParams @params = new BotSpawnParams();
-            @params.ShallBeGroup = new ShallBeGroupParams(true, false, memberCount);
+            @params.ShallBeGroup = new ShallBeGroupParams(true, false, memberCount + 1);
 
             IProfileData botData = new IProfileData(side, type, BotDifficulty.hard, 0f, @params);
 
@@ -822,7 +822,7 @@ namespace friendlyPMC.Patches
                             follower.BotTalk.TrySay(EPhraseTrigger.Ready, false);
                         }, 2000);
 
-                    }), false, stopWatch);
+                    }), shallBeGroup, stopWatch);
 
                 });
 

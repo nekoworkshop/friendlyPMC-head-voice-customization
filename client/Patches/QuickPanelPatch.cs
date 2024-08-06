@@ -42,18 +42,9 @@ namespace friendlyPMC.Patches
 
                     // modification here
                     Corpse x = player.InteractableObject as Corpse;
-                    if (x != null)
-                    {
-                        InteractableObjects.SetCurCorpse(x);
-                        InteractableObjects.SetCurLootItem(null);
-                    }
-                    else
-                        InteractableObjects.SetCurCorpse(null);
-
-                    __instance.method_7(EPhraseTrigger.LootBody, x != null);
-                    __instance.method_7(EPhraseTrigger.CheckHim, x != null);
-
-                    __instance.method_7(EPhraseTrigger.LootContainer, player.InteractableObject as LootableContainer != null);
+			        __instance.method_7(EPhraseTrigger.LootBody, false);
+                    __instance.method_7(EPhraseTrigger.CheckHim, false);
+                    __instance.method_7(EPhraseTrigger.LootContainer, false);
                 }
                 catch (Exception e) { Components.Logger.LogInfo("Loot Commands Failed: " + e.Message); }
 

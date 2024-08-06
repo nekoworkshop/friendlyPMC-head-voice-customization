@@ -1,12 +1,5 @@
 ﻿using EFT;
-using EFT.Interactive;
-using EFT.InventoryLogic;
 using friendlyPMC.Modules;
-
-using LootingBots.Brain.Logics;
-using System;
-using System.Reflection;
-using UnityEngine;
 
 namespace friendlyPMC.Components
 {
@@ -52,16 +45,10 @@ namespace friendlyPMC.Components
         {
             _follower = BossPlayers.Instance.GetFollower(botOwner_0);
             
-            if (!InteractableObjects.IsTaker(botOwner_0) || (_follower.LootingBrain.ActiveItem == null && _follower.LootingBrain.ActiveCorpse == null))
+            if (!InteractableObjects.IsTaker(botOwner_0))
             {
                 InteractableObjects.RemoveTaker(botOwner_0);
                 return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.followerPatrol, "loot.Error");
-            }
-
-            if (_follower.LootingBrain.ActiveItem.Item != null && _follower.LootingBrain.IsLootIgnored(_follower.LootingBrain.ActiveItem.Item.Id))
-            {
-                botOwner_0.Gesture.TryGestus(EGesture.Bad, false);
-                return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.followerPatrol, "item.ignore");
             }
             
 

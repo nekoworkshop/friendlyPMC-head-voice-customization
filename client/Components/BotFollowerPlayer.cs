@@ -4,8 +4,6 @@ using friendlyPMC.Actions;
 using friendlyPMC.Modules;
 using HarmonyLib;
 
-using LootingBots.Patch.Components;
-
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -22,29 +20,7 @@ namespace friendlyPMC.Components
 
         protected BotDifficultySettingsClass _OldSettings;
         protected string _OldGroupID;
-
-        protected LootingBrain _lootingBrain;
-
-        protected TransactionController _transactionController;
-
-        protected LootFinder _lootFinder;
-
         protected GClass528 settingModif;
-
-        public LootingBrain LootingBrain
-        {
-            get { return _lootingBrain; }
-        }
-
-        public TransactionController TransactionController
-        { 
-            get { return _transactionController; } 
-        }
-
-        public LootFinder LootFinder
-        {
-            get { return _lootFinder; }
-        }
 
         protected bool _IsSquadMate = false;
 
@@ -130,30 +106,6 @@ namespace friendlyPMC.Components
             // add a new receiver
             _bot.Receiver = GetFollowerReceiver(_bot);
             _bot.Receiver.Init();
-            try
-            {
-
-                // initialize LootingBots brain
-                _lootingBrain = _bot.GetPlayer.GetComponentInParent<LootingBrain>();
-                if (_lootingBrain != null)
-                {
-                    _transactionController = AccessTools.Field(typeof(InventoryController), "_transactionController").GetValue(_lootingBrain.InventoryController) as TransactionController;
-                   
-                    _lootingBrain.UpdateGridStats();
-
-                    _lootFinder = _bot.GetPlayer.GetComponentInParent<LootFinder>();
-                } else
-                {
-                    Logger.LogInfo("Can't find LootBrain - looting will be disabled");
-                }
-
-
-            }
-            catch (Exception ex)
-            {
-                Logger.LogInfo("Failed to add Looting Brain to a follower: " + ex.Message);
-                Logger.LogInfo("StackTrace: " + ex.StackTrace);
-            }
             // add the new follower brain
             _bot.Brain.BaseBrain = GetFollowerBrain(_bot, _player);
             _bot.Brain.Agent = GetFollowerAIAgent(_bot);
@@ -241,7 +193,7 @@ namespace friendlyPMC.Components
                 _player.bossGroup.AddMember(_bot, false);
             }
 
-            try
+/*            try
             {
                 if (_transactionController != null)
                 {
@@ -253,7 +205,7 @@ namespace friendlyPMC.Components
             catch (Exception ex)
             {
                 Logger.LogInfo("Could not add ammo to follower: " + ex.Message);
-            }
+            }*/
 
 
             // apply some of settings modifier
@@ -473,17 +425,6 @@ namespace friendlyPMC.Components
         /** End Follower Brain **/
         public virtual void Dismiss()
         {
-            if (_lootingBrain != null)
-            {
-                _lootingBrain.StopAllCoroutines();
-                _lootingBrain.DisableTransactions();
-                _lootingBrain.ActiveItem = null;
-                _lootingBrain.ActiveCorpse = null;
-            }
-
-            if (_transactionController != null)
-                _transactionController = null;
-
             if (_bot == null || _bot.HealthController.IsAlive) return;
 
             try

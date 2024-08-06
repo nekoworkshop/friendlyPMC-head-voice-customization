@@ -87,9 +87,6 @@
     <Reference Include="Sirenix.Serialization">
       <HintPath>..\..\..\XboxGames\AKI-Streets-3.9\EscapeFromTarkov_Data\Managed\Sirenix.Serialization.dll</HintPath>
     </Reference>
-    <Reference Include="skwizzy.LootingBots">
-      <HintPath>..\..\..\XboxGames\AKI-Streets-3.9\BepInEx\plugins\skwizzy.LootingBots.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Threading" />

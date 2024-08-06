@@ -760,74 +760,33 @@ namespace friendlyPMC.Components
 
                         if (closest != null && closest.ProfileId == botOwner_0.ProfileId)
                         {
-                            Player alivePlayerByProfileID = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(requester.ProfileId);
+                            if(InteractableObjects.SetTaker(botOwner_0)) {
 
-                            if (botOwner_0.BotRequestController.TryStopCurrent(alivePlayerByProfileID, false))
-                            {
-                                FollowerTakeLootRequest gclass = new FollowerTakeLootRequest(requester);
+                                Player alivePlayerByProfileID = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(requester.ProfileId);
 
-                                if (botOwner_0.BotsGroup.RequestsController.TryAddRequest(gclass))
+                                if (botOwner_0.BotRequestController.TryStopCurrent(alivePlayerByProfileID, false))
                                 {
-                                    gclass.AddPossibleExecutors(botOwner_0);
-                                    gclass.SetGroup(botOwner_0.BotsGroup.RequestsController);
+                                    FollowerTakeLootRequest gclass = new FollowerTakeLootRequest(requester);
 
-                                    botOwner_0.BotTalk.TrySay(EPhraseTrigger.Roger, false);
-                                    botOwner_0.Gesture.TryGestus(EGesture.Good, false);
+                                    if (botOwner_0.BotsGroup.RequestsController.TryAddRequest(gclass))
+                                    {
+                                        gclass.AddPossibleExecutors(botOwner_0);
+                                        gclass.SetGroup(botOwner_0.BotsGroup.RequestsController);
+
+                                        botOwner_0.BotTalk.TrySay(EPhraseTrigger.Roger, false);
+                                        botOwner_0.Gesture.TryGestus(EGesture.Good, false);
+
+                                        return;
+                                    }
                                 }
                             }
+                            
+                            botOwner_0.BotTalk.TrySay(EPhraseTrigger.Negative, false);
+                            botOwner_0.Gesture.TryGestus(EGesture.Bad, false);
                         }
                     }
 
                     return;
-                }
-                else if(info.phrase == EPhraseTrigger.CheckHim || info.phrase == EPhraseTrigger.LootBody)
-                {
-                    if (!notBusy)
-                    {
-                        botOwner_0.BotTalk.TrySay(EPhraseTrigger.DontKnow, false);
-                        botOwner_0.Gesture.TryGestus(EGesture.Bad, false);
-                        return;
-                    }
-                   
-                    Corpse item = InteractableObjects.GetCurCorpse();
-                    if (item != null)
-                    {
-                        float dist = Mathf.Infinity;
-                        BotOwner closest = null;
-                        boss.Followers.ForEach(fl =>
-                        {
-                            bool isAiBoss = false;
-                            foreach (WildSpawnType role in Utils.Utils.BossFollowersRoles)
-                            {
-                                if (botOwner_0.IsRole(role))
-                                {
-                                    isAiBoss = true;
-                                    break;
-                                }
-                            }
-                            
-                            if (isAiBoss) return;
-
-                            Vector3 pos = fl.GetPlayer.Transform.position;
-                            float fldist = (item.transform.position - pos).sqrMagnitude;
-                            //fl.HealthController.
-                            if (fldist < dist)
-                            {
-                                closest = fl;
-                                dist = fldist;
-                            }
-
-                        });
-                        if (closest != null && closest.ProfileId == botOwner_0.ProfileId)
-                        {
-                            InteractableObjects.SetTaker(botOwner_0);
-
-                            botOwner_0.BotTalk.TrySay(EPhraseTrigger.Roger, false);
-                            botOwner_0.Gesture.TryGestus(EGesture.Good, false);
-                        }
-                    }
-
-                    return; 
                 }
                 else if(info.phrase == (EPhraseTrigger)CustomPhrases.TeamStatus)
                 {
