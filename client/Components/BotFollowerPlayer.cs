@@ -168,19 +168,8 @@ namespace friendlyPMC.Components
                         _bot.BotsGroup.RemoveAlly(mem);
                     });
 
+                    BossPlayers.AddGroupToBoss(_player, _bot.BotsGroup);
                     _player.bossGroup = _bot.BotsGroup;
-                    BossPlayers.Instance.AddFollowerGroup(_player.bossGroup.Id);
-                    _player.bossGroup.AddAlly((Player)_player.Player());
-                    _player.bossGroup.Lock();
-                    _player.bossGroup.OnEnemyAdd += (IPlayer pl, EBotEnemyCause cause) =>
-                    {
-                        if (pl != null && _player.Player().ProfileId == pl.ProfileId)
-                        {
-                            _player.bossGroup.RemoveEnemy(_player.Player());
-                            _player.bossGroup.AddAlly(_player.realPlayer);
-                        }
-                    };
-                    _player.bossGroup.AnyBodyShootImmediately = true;
                 }
                 else if (_bot.BotsGroup.Id != _player.bossGroup.Id)
                 {

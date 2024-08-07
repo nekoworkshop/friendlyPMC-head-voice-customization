@@ -60,7 +60,7 @@ namespace friendlyPMC.Components
                     }
                 });
             }
-            BossPlayers.Instance.RemoveBossPlayer(realPlayer.ProfileId);
+            BossPlayers.RemovePlayerBoss(realPlayer.ProfileId);
         }
 
         public void PhraseSaid(BotEventHandler.GClass599 info)
@@ -285,7 +285,7 @@ namespace friendlyPMC.Components
                 arg1.Player.AIData != null && 
                 arg1.Player.AIData.BotOwner != null &&
                 _aiplayer != null &&
-                !BossPlayers.Instance.IsFollower(arg1.Player.AIData.BotOwner,_aiplayer)
+                !BossPlayers.IsFollower(arg1.Player.AIData.BotOwner,_aiplayer)
             )
             {
                 _lastTimeHit = Time.time;

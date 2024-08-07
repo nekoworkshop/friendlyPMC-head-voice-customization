@@ -34,7 +34,8 @@ namespace friendlyPMC.Modules
 
         private bool IsDisposed = false;
 
-        private Dictionary<string, Dictionary<string,Item>> _lootedItems;
+        private Dictionary<string, List<string>> _lootedItems;
+        private List<Item> _toSendItems;
         private Dictionary<string, Dictionary<string, object>> _followersWithLoot;
 
         public InteractableObjects() { 
@@ -42,7 +43,8 @@ namespace friendlyPMC.Modules
             {
                 Instance = this;
 
-                _lootedItems = new Dictionary<string, Dictionary<string,Item>>();
+                _lootedItems = new Dictionary<string, List<string>>();
+                _toSendItems = new List<Item>();
                 _followersWithLoot = new Dictionary<string, Dictionary<string, object>>();
             }
 
@@ -50,27 +52,9 @@ namespace friendlyPMC.Modules
         /** Send any items given to the followers back to the player **/
         public void SendStoreItems()
         {
+            GatherItems();
 
-            List<Item> items = new List<Item>();
-
-            List<string> keys = _lootedItems.Keys.ToList();
-            // loop through all looted items inside _lootedItems and add them to the list
-            foreach (var key in keys)
-            {
-                if(_lootedItems.TryGetValue(key, out Dictionary<string, Item> stack))
-                {
-                    List<string> stackKeys = stack.Keys.ToList();
-                    foreach (var stackKey in stackKeys)
-                    {
-                        if (stack.TryGetValue(stackKey, out Item item))
-                        {
-                            if(item != null) items.Add(item);
-                        }
-                    }
-                }
-            }
-
-            var flatItems = Singleton<ItemFactory>.Instance.TreeToFlatItems(items);
+            var flatItems = Singleton<ItemFactory>.Instance.TreeToFlatItems(_toSendItems);
 
             var converterClass = typeof(AbstractGame).Assembly.GetTypes()
                 .First(t => t.GetField("Converters", BindingFlags.Static | BindingFlags.Public) != null);
@@ -92,6 +76,81 @@ namespace friendlyPMC.Modules
                     items = flatItems,
                     member = info
                 }.ToJson(_defaultJsonConverters));
+            }
+        }
+
+        private void GatherItems()
+        {
+            var bossPlayers = BossPlayers.Instance.GetBossPlayers();
+            foreach (var player in bossPlayers)
+            {
+                foreach (var bot in player.Value.Followers)
+                {
+                    if (bot.BotState != EBotState.Active || !bot.HealthController.IsAlive) return;
+
+                    InventoryControllerClass _botInventoryController = bot.GetPlayer.InventoryControllerClass;
+
+                    SearchableItemClass tacVest = (SearchableItemClass)
+                        _botInventoryController.Inventory.Equipment
+                            .GetSlot(EquipmentSlot.TacticalVest)
+                            .ContainedItem;
+
+                    SearchableItemClass backpack = (SearchableItemClass)
+                        _botInventoryController.Inventory.Equipment
+                            .GetSlot(EquipmentSlot.Backpack)
+                            .ContainedItem;
+
+                    SearchableItemClass pockets = (SearchableItemClass)
+                        _botInventoryController.Inventory.Equipment
+                            .GetSlot(EquipmentSlot.Pockets)
+                            .ContainedItem;
+
+                    var storedItems = GetStoredItems(bot.ProfileId);
+
+                    List<string> toRemove = new List<string>();
+
+                    if (storedItems != null)
+                    {
+                        foreach (var stored in storedItems)
+                        {
+                            bool found = false;
+                            if (tacVest.Grids.Length > 0)
+                            {
+                                foreach (var item in tacVest.GetAllItems())
+                                {
+                                    if (item.Id == stored)
+                                    {
+                                        _toSendItems.Add(item.CloneItem());
+                                    }
+                                }
+                            }
+
+                            if (!found && backpack.Grids.Length > 0)
+                            {
+                                foreach (var item in backpack.GetAllItems())
+                                {
+                                    if (item.Id == stored)
+                                    {
+                                        _toSendItems.Add(item.CloneItem());
+                                        break;
+                                    }
+                                }
+                            }
+
+                            if (!found && pockets.Grids.Length > 0)
+                            {
+                                foreach (var item in pockets.GetAllItems())
+                                {
+                                    if (item.Id == stored)
+                                    {
+                                        _toSendItems.Add(item.CloneItem());
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
 
@@ -236,7 +295,7 @@ namespace friendlyPMC.Modules
         public static void StoreItem(BotOwner bot, Item item)
         {
             if(!Instance._lootedItems.ContainsKey(bot.ProfileId)) {
-                Instance._lootedItems.Add(bot.ProfileId, new Dictionary<string, Item>());
+                Instance._lootedItems.Add(bot.ProfileId, new List<string>());
                 Instance._followersWithLoot.Add(bot.ProfileId, new Dictionary<string, object> {
                     { "_id" , bot.ProfileId  },
                     { "aid" , bot.Profile.AccountId },
@@ -253,9 +312,9 @@ namespace friendlyPMC.Modules
 
             var list = Instance._lootedItems[bot.ProfileId];
 
-            if (!list.ContainsKey(item.Id))
+            if (!list.Contains(item.Id))
             {
-                list.Add(item.Id, item.CloneItem());
+                list.Add(item.Id);
             }
         }
 
@@ -264,14 +323,14 @@ namespace friendlyPMC.Modules
             if (Instance._lootedItems.ContainsKey(bot))
             {
                 var list = Instance._lootedItems[bot];
-                if(list.ContainsKey(itemId))
+                if(list.Contains(itemId))
                 {
                     list.Remove(itemId);
                 }
             }
         }
 
-        public static Dictionary<string, Item> GetStoredItems(string bot)
+        public static List<string> GetStoredItems(string bot)
         {
             if (Instance._lootedItems.ContainsKey(bot))
             {

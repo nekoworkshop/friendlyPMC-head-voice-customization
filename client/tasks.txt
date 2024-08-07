@@ -1,25 +1,18 @@
-3.5:
-
-- x - improve scav runs with followers
-- x - change how items are returned so that random followers report returning the items
-
-- x - see if FIKA compatibility can be improved
-
-- fix glitchy behavior of boss followers
-- goons send messages at the end of the raid
-- add ability to select saved presets as custom loadout for the squad
-- make squad have skill relative to the player's skill
-
 3.6:
-- add new command "hold fire" to stop followers from enganging enemies unless enemy is too close or they shoot at us
+ - x - remove the dependency of LootingBots plugin
+ - #inprogres if followers are given meds, at the end of the raid we should update the status of the med item based on whether the follower used it or not
+ - fix bots not appearing as being in the same group as the player
+ - have followers send message at the end of the raid depending on status and how many made it out
+ - if we have a follower that was picked up, that one should send a thank you message if he was able to make it out with the player
 
 3.7:
-- add load selection for squad members 
-- - rifle preset 
-- - sniper preset
-- - shotgun preset
-- - user preset 
+- fix glitchy behavior of boss followers
+- goons send messages at the end of the raid
+- make squad have skill relative to the player's skill
+- improve follwoer holder and pusher tactics
 
-3.8?:
-- add ability to give followers money
-- make given loot randomly "falloff" in case user is not giving any money to the followers
+
+
+FUTURE IDEAS:
+ - ability to send commands individually to followers
+ - abilit to add squad member using + sign and a special UI screen for dealing with the follower

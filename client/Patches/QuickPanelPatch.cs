@@ -65,7 +65,7 @@ namespace friendlyPMC.Patches
                 {
                     if (player.InteractablePlayer != null && player.InteractablePlayer.IsAI && player.InteractablePlayer.HealthController.IsAlive)
                     {
-                        if (BossPlayers.Instance.IsFollower(player.InteractablePlayer.AIData.BotOwner) || player.InteractablePlayer.Side != player.Side)
+                        if (BossPlayers.IsFollower(player.InteractablePlayer.AIData.BotOwner) || player.InteractablePlayer.Side != player.Side)
                         {
                             __instance.method_7(EPhraseTrigger.Cooperation, false);
 

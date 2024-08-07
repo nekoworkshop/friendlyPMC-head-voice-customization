@@ -150,25 +150,7 @@ namespace friendlyPMC.Patches
             }
             player.bossGroup = botsGroup;
 
-            BossPlayers.Instance.AddFollowerGroup(player.bossGroup.Id);
-            player.bossGroup.Lock();
-
-            player.bossGroup.OnEnemyAdd += (IPlayer pl, EBotEnemyCause cause) =>
-            {
-                if (pl != null)
-                {
-                    if (player.Player().ProfileId == pl.ProfileId)
-                    {
-                        player.bossGroup.RemoveEnemy(player.Player());
-                        player.bossGroup.AddAlly(player.realPlayer);
-                    }
-                    else if (pl.IsAI && player.bossGroup.Contains(pl.AIData.BotOwner))
-                    {
-                        player.bossGroup.RemoveEnemy(pl);
-                        player.bossGroup.AddAlly(pl.AIData.Player);
-                    }
-                }
-            };
+            BossPlayers.AddGroupToBoss(player,botsGroup);
 
             // revert changes
             bt.Settings.FileSettings.Mind.USE_ADD_TO_ENEMY_VALIDATION = false;
@@ -454,7 +436,7 @@ namespace friendlyPMC.Patches
 
                                 }
 
-                                BossPlayers.Instance.AddFollower(me, player, false, botRole); // make bot a follower
+                                BossPlayers.AddFollower(me, player, false, botRole); // make bot a follower
 
                                 Utils.Utils.SetTimeout(() =>
                                 {
@@ -787,7 +769,7 @@ namespace friendlyPMC.Patches
 
                             Components.Logger.LogInfo("Tactic is " + tactic);
 
-                            BossPlayers.Instance.AddFollower(me, player, true, botType, tactic);
+                            BossPlayers.AddFollower(me, player, true, botType, tactic);
 
                         }
                         catch (Exception ex)
@@ -880,7 +862,7 @@ namespace friendlyPMC.Patches
             }
 
            
-            pitAIBossPlayer playerBoss = BossPlayers.AddBoss(player);
+            pitAIBossPlayer playerBoss = BossPlayers.AddPlayerAsBoss(player);
             spawnedPlayers.Add(playerBoss);
 
             if (friendlyPMC.knightSpawn.Value)

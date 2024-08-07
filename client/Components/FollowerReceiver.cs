@@ -186,7 +186,7 @@ namespace friendlyPMC.Components
 
             float gestusDistance = (botOwner_0.GetPlayer.Transform.position - data.Player.Transform.position).magnitude;
 
-            bool shouldDefault = !BossPlayers.Instance.IsBoss(data.Player.ProfileId);
+            bool shouldDefault = !BossPlayers.IsPlayerBoss(data.Player.ProfileId);
 
             List<EGesture> bossNoGesture = new List<EGesture>
             {
@@ -340,7 +340,7 @@ namespace friendlyPMC.Components
             
             bool isAllyRequesting = IsAllyRequester(requester);
 
-            bool shouldDefault = !BossPlayers.Instance.IsBoss(requester.ProfileId);
+            bool shouldDefault = !BossPlayers.IsPlayerBoss(requester.ProfileId);
 
             bool isClose = (botOwner_0.GetPlayer.Transform.position - requester.Transform.position).magnitude < 14f;
             bool notBusy = !botOwner_0.Memory.HaveEnemy;
@@ -799,7 +799,7 @@ namespace friendlyPMC.Components
                 // on dismiss remove the bot from being a follower
                 else if (info.phrase == EPhraseTrigger.OnYourOwn)
                 {
-                    BotFollowerPlayer follower = BossPlayers.Instance.GetBossFollowers(boss.Player().ProfileId).Find((BotFollowerPlayer fl) =>
+                    BotFollowerPlayer follower = BossPlayers.GetFollowersByBoss(boss.Player().ProfileId).Find((BotFollowerPlayer fl) =>
                     {
                         return fl.IsBot(botOwner_0);
                     });

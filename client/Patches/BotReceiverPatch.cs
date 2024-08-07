@@ -82,7 +82,7 @@ namespace friendlyPMC.Patches
                     if (requester != null && (botOwner.GetPlayer.Transform.position - requester.Transform.position).magnitude < 10f)
                     {
 
-                        if (!BossPlayers.Instance.IsFollower(botOwner) && BossPlayers.Instance.IsBoss(requester.ProfileId))
+                        if (!BossPlayers.IsFollower(botOwner) && BossPlayers.IsPlayerBoss(requester.ProfileId))
                         {
                             // this will switch the BotReceiver to our own, so the rest can be altered there
                             botOwner.BotsGroup.RequestsController.TryAskFollowMeRequest(requester, botOwner);

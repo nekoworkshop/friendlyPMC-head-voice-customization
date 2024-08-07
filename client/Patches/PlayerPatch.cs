@@ -88,7 +88,7 @@ namespace friendlyPMC.Patches
         [PatchPrefix]
         private static bool PatchPrefix(AIData __instance, ref AIBossPlayer __result)
         {
-            if(BossPlayers.Instance != null && BossPlayers.Instance.IsBoss(__instance.Player.ProfileId))
+            if(BossPlayers.Instance != null && BossPlayers.IsPlayerBoss(__instance.Player.ProfileId))
             {
                 __result = BossPlayers.Instance.GetBossPlayer(__instance.Player.ProfileId);
                 return false;

@@ -53,7 +53,7 @@ namespace friendlyPMC
     {
         public static bool IsFollower(BotOwner Bot)
         {
-            return BossPlayers.Instance.IsFollower(Bot);
+            return BossPlayers.IsFollower(Bot);
         }
     }
 
@@ -192,7 +192,7 @@ namespace friendlyPMC
 
                 if (BossPlayers.Instance != null)
                 {
-                    var followers = BossPlayers.Instance.GetBossFollowers(id);
+                    var followers = BossPlayers.GetFollowersByBoss(id);
                     Vector3 position = GamePlayerOwner.MyPlayer.Transform.position;
                     foreach (var follower in followers)
                     {

@@ -119,7 +119,7 @@ namespace friendlyPMC.Patches
                                 return true;
                             }
 
-                            if (botOwner != null && BossPlayers.Instance.IsFollower(botOwner))
+                            if (botOwner != null && BossPlayers.IsFollower(botOwner))
                             {
                                 allow = false;
                                 break;
@@ -136,7 +136,7 @@ namespace friendlyPMC.Patches
 
         private static bool PatchCalcGoalForBot(object __instance, BotOwner botOwner)
         {
-            return BossPlayers.Instance == null || botOwner == null || !BossPlayers.Instance.IsFollower(botOwner);
+            return BossPlayers.Instance == null || botOwner == null || !BossPlayers.IsFollower(botOwner);
         }
 
         private static bool PatchCheckCalcGoal(object __instance)
@@ -146,7 +146,7 @@ namespace friendlyPMC.Patches
             BotOwner botObject = botOwnerProperty.GetValue(__instance) as BotOwner;
             if(botObject == null) return true;
 
-            if (BossPlayers.Instance != null && BossPlayers.Instance.IsFollower(botObject))
+            if (BossPlayers.Instance != null && BossPlayers.IsFollower(botObject))
             {
                 EnemyInfo potentialEnemy = botObject.EnemyChooser.FindDangerEnemy();
 

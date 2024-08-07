@@ -51,13 +51,10 @@ namespace friendlyPMC.Patches
             var plBoss = BossPlayers.GetBoss(person.ProfileId);
             var isgroup = BossPlayers.IsBossGroup(__instance.Id);
             
-            
-            
             if (isgroup && plBoss != null)
             {
                 BotsGroup bossGroup = plBoss.bossGroup;
                 // prevent boss players from being added as enemy to the group
-
                 if ((bossGroup != null && __instance.Id == bossGroup.Id) || __instance.Side == plBoss.realPlayer.Side)
                 {
                     __result = false;
@@ -131,7 +128,7 @@ namespace friendlyPMC.Patches
         private static bool PatchPrefix(BotsGroup __instance, ref bool __result, IPlayer player)
         {
 
-            if (BossPlayers.Instance != null && BossPlayers.Instance.IsBoss(player.ProfileId))
+            if (BossPlayers.Instance != null && BossPlayers.IsPlayerBoss(player.ProfileId))
             {
                 BotsGroup bossGroup = BossPlayers.Instance.GetBossPlayer(player.ProfileId).bossGroup;
                 if (bossGroup != null && __instance.Id == bossGroup.Id)

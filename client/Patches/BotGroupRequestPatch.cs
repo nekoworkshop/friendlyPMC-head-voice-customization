@@ -27,7 +27,7 @@ namespace friendlyPMC.Patches
 
             if (playerBoss != null && posibleExecuter != null)
             {
-                bool isAFollower = BossPlayers.Instance.IsFollower(posibleExecuter);
+                bool isAFollower = BossPlayers.IsFollower(posibleExecuter);
 
                 if (isAFollower)
                 {
@@ -55,9 +55,9 @@ namespace friendlyPMC.Patches
                     if (friendlyPMC.squadSpawn.Value) followLimit = followLimit + friendlyPMC.squadSize.Value;
 
                     // add BOT as follower to the player BOSS if limit was not reached
-                    if (BossPlayers.Instance.GetBossFollowers(player.ProfileId).Count < followLimit)
+                    if (BossPlayers.GetFollowersByBoss(player.ProfileId).Count < followLimit)
                     {
-                        BossPlayers.Instance.AddFollower(posibleExecuter, playerBoss);
+                        BossPlayers.AddFollower(posibleExecuter, playerBoss);
                         // - bot signals "OK"
                         posibleExecuter.BotTalk.TrySay(EPhraseTrigger.Roger);
                         posibleExecuter.Gesture.TryGestus(EGesture.Good, true);
@@ -104,7 +104,7 @@ namespace friendlyPMC.Patches
             if (playerBoss != null && posibleExecuter != null)
             {
                 // boss can only send hold requests to it's followers
-                if (BossPlayers.Instance.IsFollower(posibleExecuter, playerBoss))
+                if (BossPlayers.IsFollower(posibleExecuter, playerBoss))
                 {
 
                     return true;

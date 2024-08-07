@@ -68,7 +68,7 @@ namespace friendlyPMC.Modules
         }
        
 
-        public pitAIBossPlayer AddBossPlayer(Player player)
+        private pitAIBossPlayer AddBossPlayer(Player player)
         {
             if(_bosses.ContainsKey(player.ProfileId)) return _bosses[player.ProfileId];
 
@@ -165,7 +165,7 @@ namespace friendlyPMC.Modules
         
         }
 
-        public bool RemoveBossPlayer(string name)
+        private bool RemoveBossPlayer(string name)
         {
             if (_bosses.ContainsKey(name))
             {
@@ -213,7 +213,7 @@ namespace friendlyPMC.Modules
             return false;
         }
 
-        public void Destroy()
+        private void Destroy()
         {
             if (IsDisposed) return;
 
@@ -233,7 +233,7 @@ namespace friendlyPMC.Modules
             Instance = null;
         }
 
-        public BotFollowerPlayer AddFollower(BotOwner bot, pitAIBossPlayer player, bool squadMate = false, WildSpawnType role = WildSpawnType.assault, string tactic = "balance")
+        private BotFollowerPlayer AddBotFollower(BotOwner bot, pitAIBossPlayer player, bool squadMate = false, WildSpawnType role = WildSpawnType.assault, string tactic = "balance")
         {
 
             BotFollowerPlayer _follower = null;
@@ -292,7 +292,30 @@ namespace friendlyPMC.Modules
             return _follower;
         }
 
-        public void RemoveBotFollower(BotOwner bot, pitAIBossPlayer player,bool dismissed = false)
+        private bool IsBotFollower(BotOwner bot, AIBossPlayer boss = null)
+        {
+            if (bot == null || bot.BotFollower == null || !bot.BotFollower.HaveBoss) return false;
+
+            BotFollowerPlayer _follower = null;
+
+            foreach (var item in _followers)
+            {
+                if (item != null && item.IsBot(bot))
+                {
+                    _follower = item;
+                    break;
+                }
+            }
+
+            if (_follower != null && boss != null && bot != null && bot.BotFollower.HaveBoss)
+            {
+                return bot.BotFollower.BossToFollow.Player().ProfileId == boss.Player().ProfileId;
+            }
+
+            return _follower != null;
+        }
+
+        private void RemoveBotFollower(BotOwner bot, pitAIBossPlayer player,bool dismissed = false)
         {
 
             BotFollowerPlayer _follower = null;
@@ -322,29 +345,6 @@ namespace friendlyPMC.Modules
 
         }
 
-        public bool IsFollower(BotOwner bot, AIBossPlayer boss = null)
-        {
-            if (bot == null || bot.BotFollower == null || !bot.BotFollower.HaveBoss) return false;
-
-            BotFollowerPlayer _follower = null;
-
-            foreach (var item in _followers)
-            {
-                if (item != null && item.IsBot(bot))
-                {
-                    _follower = item;
-                    break;
-                }
-            }
-
-            if (_follower != null && boss != null && bot != null && bot.BotFollower.HaveBoss)
-            {
-                return bot.BotFollower.BossToFollow.Player().ProfileId == boss.Player().ProfileId;
-            }
-
-            return _follower != null;
-        }
-
         public BotFollowerPlayer GetFollower(BotOwner bot)
         {
             if (bot == null) return null;
@@ -362,22 +362,8 @@ namespace friendlyPMC.Modules
             return _follower;
 
         }
-        public void AddFollowerGroup(int id)
-        {
-            if (!_botsGroup.Contains(id)) _botsGroup.Add(id);
-        }
 
-        public bool IsFollowerGroup(int id)
-        {
-            return _botsGroup.Contains(id);
-        }
-
-        public void removeFollowerGroup(int id)
-        {
-            if(_botsGroup.Contains(id)) _botsGroup.Remove(id);
-        }
-
-        public bool IsBoss(string id)
+        private bool IsBoss(string id)
         {
             if(_bosses == null) return false;
 
@@ -400,7 +386,7 @@ namespace friendlyPMC.Modules
             return _bosses;
         }
 
-        public List<BotFollowerPlayer> GetBossFollowers(string name)
+        private List<BotFollowerPlayer> GetBossFollowers(string name)
         {
             List<BotFollowerPlayer> botFollowers = new List<BotFollowerPlayer>();
 
@@ -424,40 +410,85 @@ namespace friendlyPMC.Modules
             return botFollowers;
         }
 
-        public List<CustomNavigationPoint> GetCovers()
+        private List<CustomNavigationPoint> GetCovers()
         {
             return _groupPoints;
         }
 
 
-        public static List<BotFollowerPlayer> GetFollowersByBoss(string name)
-        {
-            return Instance.GetBossFollowers(name);
-        }
-
-        public static pitAIBossPlayer AddBoss(Player player)
-        {
-            return Instance.AddBossPlayer(player);
-        }
 
         public static pitAIBossPlayer GetBoss(string name)
         {
             return Instance.GetBossPlayer(name);
         }
 
+        public static bool IsPlayerBoss(string profileId)
+        {
+            return Instance.IsBoss(profileId);
+        }
+
+        public static List<BotFollowerPlayer> GetFollowersByBoss(string bossName)
+        {
+            return Instance.GetBossFollowers(bossName);
+        }
+
+        public static bool IsFollower(BotOwner bot, AIBossPlayer boss = null)
+        {
+            return Instance.IsBotFollower(bot, boss);
+        }
         public static List<CustomNavigationPoint> GetAICovers()
         {
             return Instance.GetCovers();
         }
 
-        public static bool IsBossGroup(int it)
+        public static void AddGroupToBoss(pitAIBossPlayer player, BotsGroup group)
         {
-            return Instance.IsFollowerGroup(it);
+            player.bossGroup = group;
+            player.bossGroup.Lock();
+            // prevent group from ever making the player an enemy
+            player.bossGroup.OnEnemyAdd += (IPlayer pl, EBotEnemyCause cause) =>
+            {
+                if (pl != null)
+                {
+                    if (player.Player().ProfileId == pl.ProfileId)
+                    {
+                        player.bossGroup.RemoveEnemy(player.Player());
+                        player.bossGroup.AddAlly(player.realPlayer);
+                    }
+                    else if (pl.IsAI && player.bossGroup.Contains(pl.AIData.BotOwner))
+                    {
+                        player.bossGroup.RemoveEnemy(pl);
+                        player.bossGroup.AddAlly(pl.AIData.Player);
+                    }
+                }
+            };
+            if (!Instance._botsGroup.Contains(group.Id)) Instance._botsGroup.Add(group.Id);
+
+            player.bossGroup.AddAlly((Player)player.Player());
+        }
+        public static bool IsBossGroup(int id)
+        {
+            return Instance._botsGroup.Contains(id);
         }
 
         public static void RemoveFollower(BotOwner bot, pitAIBossPlayer player, bool dismissed = false)
         {
             Instance.RemoveBotFollower(bot, player, dismissed);
+        }
+
+        public static pitAIBossPlayer AddPlayerAsBoss(Player player)
+        {
+            return Instance.AddBossPlayer(player);
+        }
+
+        public static void RemovePlayerBoss(string profileId)
+        {
+            Instance.RemoveBossPlayer(profileId);
+        }
+
+        public static BotFollowerPlayer AddFollower(BotOwner bot, pitAIBossPlayer player, bool squadMate = false, WildSpawnType role = WildSpawnType.assault, string tactic = "balance")
+        {
+            return Instance.AddBotFollower(bot,player,squadMate,role,tactic);
         }
     }
 }

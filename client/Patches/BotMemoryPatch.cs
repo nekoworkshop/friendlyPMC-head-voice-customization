@@ -32,8 +32,8 @@ namespace friendlyPMC.Patches
 
             if(botOwner_0 == null) return true;
 
-            bool isfollower = BossPlayers.Instance.IsFollower(botOwner_0);
-            bool isBossEnemy = BossPlayers.Instance.IsBoss(enemy.ProfileId);
+            bool isfollower = BossPlayers.IsFollower(botOwner_0);
+            bool isBossEnemy = BossPlayers.IsPlayerBoss(enemy.ProfileId);
 
             pitAIBossPlayer playerBoss = null;
             if(isBossEnemy) playerBoss = BossPlayers.Instance.GetBossPlayer(enemy.ProfileId);
@@ -66,7 +66,7 @@ namespace friendlyPMC.Patches
                 if (isTeammate) return false;
             }
             // prevent followers from adding boss player as an enemy
-            else if (playerBoss != null && BossPlayers.Instance.IsFollower(botOwner_0, playerBoss))
+            else if (playerBoss != null && BossPlayers.IsFollower(botOwner_0, playerBoss))
             {
                 return false;
             }

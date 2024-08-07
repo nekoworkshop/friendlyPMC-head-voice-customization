@@ -25,12 +25,12 @@ namespace friendlyPMC.Patches
         [PatchPrefix]
         private static bool PatchPrefix(BotOwner __instance, DamageInfo damageInfo, EBodyPart bodyType, float damageReducedByArmor)
         {
-            if (__instance != null && __instance.BotFollower != null && __instance.BotFollower.HaveBoss && BossPlayers.Instance.IsFollower(__instance) && damageInfo.Player != null)
+            if (__instance != null && __instance.BotFollower != null && __instance.BotFollower.HaveBoss && BossPlayers.IsFollower(__instance) && damageInfo.Player != null)
             {
 
                 AIBossPlayer player = BossPlayers.Instance.GetBossPlayer(damageInfo.Player.iPlayer.ProfileId);
 
-                if (player != null && BossPlayers.Instance.IsFollower(__instance, player))
+                if (player != null && BossPlayers.IsFollower(__instance, player))
                 {
                     // - yell "friendly fire"
                     __instance.BotTalk.TrySay(EPhraseTrigger.FriendlyFire);
@@ -59,7 +59,7 @@ namespace friendlyPMC.Patches
         private static bool PatchPrefix(BotOwner __instance, ref bool __result)
         {   
 
-            if (BossPlayers.Instance.IsFollower(__instance))
+            if (BossPlayers.IsFollower(__instance))
             {
                 __result = true;
                 return false;
@@ -115,7 +115,7 @@ namespace friendlyPMC.Patches
         [PatchPostfix]
         private static void PatchPostfix(BotOwner __instance)
         {
-            if (BossPlayers.Instance.IsFollower(__instance)) return;
+            if (BossPlayers.IsFollower(__instance)) return;
 
             Dictionary<string, pitAIBossPlayer> playerBosses = BossPlayers.Instance.GetBossPlayers();
 
