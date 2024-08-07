@@ -102,7 +102,6 @@ namespace friendlyPMC.Patches
             EPlayerSide side = player.realPlayer.Side;
 
             BotsGroup botsGroup;
-            WildSpawnType role = bt.Profile.Info.Settings.Role;
             List<BotOwner> list = new List<BotOwner>();
 
             // botsGroup take on the values of the inital bot, attempt to prevent the group from being hostile to the player
