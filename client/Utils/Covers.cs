@@ -222,10 +222,11 @@ namespace friendlyPMC.Utils
 
             return pt;
         }
-        /** (V2) Get cover point from which the bot can shoot that is closest to the specified position, that is at min and max distance from danger and optionally that is not towards the direction of danger */
+        /** (V2) Get cover point from which the bot can shoot at the enemy that is closest to the specified position and that is at min and max distance from danger and optionally that is not towards the direction of danger */
         public static CustomNavigationPoint GetClosestAttackCoverPoint(
             int botOwnerId,
             Vector3 botPosition,
+            Vector3 desiredPostion,
             Vector3 enemyPosition,
 
             List<CustomNavigationPoint> areaPoints,
@@ -240,7 +241,7 @@ namespace friendlyPMC.Utils
 
             ShootPointClass shootTarget = new ShootPointClass(enemyPosition, 1f);
 
-            CustomNavigationPoint pt = ClosestPoint(botOwnerId, botPosition, enemyPosition, areaPoints, 
+            CustomNavigationPoint pt = ClosestPoint(botOwnerId, botPosition, desiredPostion, areaPoints, 
             (CustomNavigationPoint point) =>
             {
                 float enemyRange = Vector3.Distance(enemyPosition, point.Position);

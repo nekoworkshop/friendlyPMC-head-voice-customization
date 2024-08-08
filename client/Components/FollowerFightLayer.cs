@@ -45,7 +45,8 @@ namespace friendlyPMC.Components
 
         public NavMeshPath NavMeshPath
         {
-            get {
+            get
+            {
                 return commonLayer.NavMeshPath;
             }
         }
@@ -245,7 +246,7 @@ namespace friendlyPMC.Components
             // do not go after distant enemies
             if (Utils.Enemy.Distance(botOwner_0) >= Utils.Enemy.EnemyDistance.Distant)
             {
-                return new AICoreActionResultStruct<BotLogicDecision>((BotLogicDecision)CustomBotDecisions.CoverToCover, "coverBoss");
+                return pusherLayer.EnemySearch();
             }
 
             if (botOwner_0.Memory.AttackImmediately && Utils.Enemy.Distance(botOwner_0) <= Utils.Enemy.EnemyDistance.Mid)
@@ -254,7 +255,7 @@ namespace friendlyPMC.Components
             }
             else
             {
-                return DefendPosition(interestPosition);
+                return pusherLayer.EnemySearch();
             }
         }
 
@@ -342,14 +343,14 @@ namespace friendlyPMC.Components
                         GetBoss().PrioritizeEnemy(botOwner_0, closestEnemy);
                     }
                     // - sniper try to find shooting spot
-                    if(sniperTactic)
+                    if (sniperTactic)
                     {
                         GetClosestAttackCoverPoint(bossPosition, bossOuterRadius);
-                        if(customNavigationPoint_0 != null)
+                        if (customNavigationPoint_0 != null)
                         {
                             return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "relocateFast");
-                        } 
-                        else 
+                        }
+                        else
                         {
                             return new AICoreActionResultStruct<BotLogicDecision>((BotLogicDecision)CustomBotDecisions.CoverToCover, "coverBoss");
                         }
@@ -555,16 +556,16 @@ namespace friendlyPMC.Components
 
         public void GetClosestCoverPoint(Vector3 centerPosition, float searchRadius, float safeDistance = 5f, Func<CustomNavigationPoint, bool> extraChecks = null)
         {
-            customNavigationPoint_0 = commonLayer.GetClosestCoverPoint(centerPosition,searchRadius, safeDistance, extraChecks);
+            customNavigationPoint_0 = commonLayer.GetClosestCoverPoint(centerPosition, searchRadius, safeDistance, extraChecks);
         }
         /** Find the closest safe cover point to the given position, within the given radius **/
         public void GetClosestSafeCoverPoint(Vector3 centerPosition, float safeDistance = 10f)
         {
-            customNavigationPoint_0 = commonLayer.GetClosestSafeCoverPoint(centerPosition,safeDistance);
+            customNavigationPoint_0 = commonLayer.GetClosestSafeCoverPoint(centerPosition, safeDistance);
         }
 
         /** Find closest cover point to pointA between pointA and pointB ensuring it is at minimum safeDistance from danger **/
-        
+
         /** Find a random cover point at the given position, within the given radius **/
         public CustomNavigationPoint GetCoverPoint(Vector3 centerPosition, float searchRadius)
         {
@@ -592,7 +593,7 @@ namespace friendlyPMC.Components
         {
             customNavigationPoint_0 = commonLayer.GetClosestAttackCoverPoint(centerPosition, minDistance, maxDistance);
         }
-        
+
         private void GetClosestCoverPointGroup(Vector3 centerPosition, float searchRadius)
         {
             customNavigationPoint_0 = commonLayer.GetClosestCoverPointGroup(centerPosition, searchRadius);
@@ -601,16 +602,16 @@ namespace friendlyPMC.Components
         private bool IsPointFreeGroup(CustomNavigationPoint point)
         {
             if (!HasBoss()) return point.IsFreeById(botOwner_0.Id);
-            
+
             bool isfree = true;
 
             foreach (var follower in GetBoss().Followers)
             {
-                if(follower.Id != botOwner_0.Id && !point.IsFreeById(follower.Id))
+                if (follower.Id != botOwner_0.Id && !point.IsFreeById(follower.Id))
                 {
                     isfree = false;
                     break;
-                } 
+                }
             }
             return isfree;
 

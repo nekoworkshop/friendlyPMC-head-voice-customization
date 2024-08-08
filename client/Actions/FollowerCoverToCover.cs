@@ -97,7 +97,8 @@ namespace friendlyPMC.Actions
                     sprint = Utils.Utils.GetNavDistance(botOwner_0.GetPlayer.Transform.position, coverPosition.Value) > 20f;
                 }
                 return;
-            } else
+            }
+            else
                 RefreshCoverPoint();
 
         }
@@ -133,7 +134,7 @@ namespace friendlyPMC.Actions
                     {
                         if (item == null || item.IsDead || item.BotState != EBotState.Active || item.Id == botOwner_0.Id) continue;
 
-                        if (Vector3.Distance(point.Position,item.GetPlayer.Transform.position) < 2f)
+                        if (Vector3.Distance(point.Position, item.GetPlayer.Transform.position) < 2f)
                         {
                             isgood = false;
                             break;
@@ -147,7 +148,7 @@ namespace friendlyPMC.Actions
                     coverPosition = cover.Position;
                     _closestPoint = cover;
                     botOwner_0.GoToSomePointData.SetPoint((Vector3)coverPosition);
-                    
+
                     sprint = Utils.Utils.GetNavDistance(botOwner_0.GetPlayer.Transform.position, (Vector3)coverPosition) > 20f;
                     botOwner_0.GoToSomePointData.UpdateToGo(sprint);
                     botOwner_0.Steering.LookToPoint(botOwner_0.Memory.GoalEnemy.GetCenterPart());

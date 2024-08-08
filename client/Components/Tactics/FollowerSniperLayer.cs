@@ -12,7 +12,7 @@ namespace friendlyPMC.Components.Tactics
     /** This class is not meant to be used directly as a brain layer, but within one **/
     internal class FollowerSniperLayer : GClass61
     {
-  
+
         protected float coverTimer = 0f;
         protected float holdTimer = 0f;
 
