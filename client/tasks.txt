@@ -9,7 +9,6 @@
  - fix "contact" not always picking up an enemy. Also make bots switch target if player is signaling an enemy that is much closer
 
  3.6.1:
- - fix bears not being russian
  - fix bots not being silent on issuing silence command
  - have followers send message at the end of the raid depending on status and how many made it out
  - if we have a follower that was picked up, that one should send a thank you message if he was able to make it out with the player
