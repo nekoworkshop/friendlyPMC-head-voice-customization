@@ -157,9 +157,9 @@ namespace friendlyPMC.Components.Tactics
                         // -- not in cover
                         else
                         {
-                            GetClosestCoverPointBetween(botPosition, enemyPos, 20f);
+                            GetClosestCoverPointBetween(botPosition, enemyPos, 10f);
 
-                            if(customNavigationPoint_0 == null) 
+                            if (customNavigationPoint_0 == null)
                                 GetClosestCoverPoint(botPosition, commonLayer.coverSearchRadius);
 
                             if (customNavigationPoint_0 != null)
@@ -171,7 +171,7 @@ namespace friendlyPMC.Components.Tactics
                     // -- enemy is distant but visible
                     else
                     {
-                        GetClosestAttackCoverPoint(enemyPos, 10f);
+                        GetClosestCoverPointBetween(botPosition, enemyPos, 20f);
                         if (customNavigationPoint_0 != null)
                         {
                             return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "approachEnemyFast");
