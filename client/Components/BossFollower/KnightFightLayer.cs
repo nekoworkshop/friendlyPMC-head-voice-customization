@@ -122,7 +122,7 @@ namespace friendlyPMC.Components.BossFollower
             if (preFightDecision != null) return (AICoreActionResultStruct<BotLogicDecision>)preFightDecision;
 
             // do not go after distant enemies
-            if (Utils.EnemyInfo.Distance(botOwner_0) >= Utils.EnemyInfo.EnemyDistance.Distant)
+            if (Utils.Enemy.Distance(botOwner_0) >= Utils.Enemy.EnemyDistance.Distant)
             {
                 return new AICoreActionResultStruct<BotLogicDecision>((BotLogicDecision)CustomBotDecisions.CoverToCover, "coverBoss");
             }
@@ -141,13 +141,13 @@ namespace friendlyPMC.Components.BossFollower
         public AICoreActionResultStruct<BotLogicDecision> KnightAssault()
         {
             bool enemyVisible = botOwner_0.Memory.GoalEnemy.IsVisible;
-            Utils.EnemyInfo.EnemyDistance distanceToEnemy = Utils.EnemyInfo.Distance(botOwner_0);
+            Utils.Enemy.EnemyDistance distanceToEnemy = Utils.Enemy.Distance(botOwner_0);
 
             // If the enemy is visible
             if (enemyVisible)
             {
                 // If the enemy is close or mid-range
-                if (distanceToEnemy <= Utils.EnemyInfo.EnemyDistance.Mid)
+                if (distanceToEnemy <= Utils.Enemy.EnemyDistance.Mid)
                 {
                     // Rush towards the enemy while suppressing
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToEnemy, "assaultRush");
@@ -329,7 +329,7 @@ namespace friendlyPMC.Components.BossFollower
                     return commonLayer.DogFight(out customNavigationPoint_0);
                 }
 
-                if (commonLayer.IsEnemyLowThreat() && Utils.EnemyInfo.Distance(botOwner_0) < Utils.EnemyInfo.EnemyDistance.Mid)
+                if (commonLayer.IsEnemyLowThreat() && Utils.Enemy.Distance(botOwner_0) < Utils.Enemy.EnemyDistance.Mid)
                 {
                     return KnightAssault();
                 }
@@ -360,7 +360,7 @@ namespace friendlyPMC.Components.BossFollower
 
             if(push.HasValue) return push.Value;
 
-            if (curDecision.Reason == "assaultRush" && Utils.EnemyInfo.Distance(botOwner_0) <= Utils.EnemyInfo.EnemyDistance.VeryClose)
+            if (curDecision.Reason == "assaultRush" && Utils.Enemy.Distance(botOwner_0) <= Utils.Enemy.EnemyDistance.VeryClose)
             {
                 return new AICoreActionEndStruct("assault.closeEnough", true);
             }

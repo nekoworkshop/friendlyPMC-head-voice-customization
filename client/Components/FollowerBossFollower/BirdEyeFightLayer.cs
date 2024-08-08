@@ -123,12 +123,12 @@ namespace friendlyPMC.Components.FollowerBossFollower
                 // default to hold tactic if enemy is too close
                 bool enemyClose = false;
                 bool enemyVeryClose = false;
-                if (Utils.EnemyInfo.Distance(botOwner_0) <= Utils.EnemyInfo.EnemyDistance.VeryClose)
+                if (Utils.Enemy.Distance(botOwner_0) <= Utils.Enemy.EnemyDistance.VeryClose)
                 {
                     decision = new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.dogFight, "getReady");
                     enemyVeryClose = true;
                 }
-                else if (Utils.EnemyInfo.Distance(botOwner_0) <= Utils.EnemyInfo.EnemyDistance.Close)
+                else if (Utils.Enemy.Distance(botOwner_0) <= Utils.Enemy.EnemyDistance.Close)
                 {
                     if (followerCommonLayer.HasBoss() && Vector3.Distance(followerCommonLayer.GetBoss().Position,botPosition) <= 35f)
                     {
@@ -166,7 +166,7 @@ namespace friendlyPMC.Components.FollowerBossFollower
                 else if (goalEnemy != null && customNavigationPoint_0 != null)
                 {
                     // switch to secondary weapon if we are getting closer to the enemy
-                    var proxydist = Utils.EnemyInfo.DistanceProxy(botOwner_0, customNavigationPoint_0.Position);
+                    var proxydist = Utils.Enemy.DistanceProxy(botOwner_0, customNavigationPoint_0.Position);
                     if (
                         !botOwner_0.Memory.GoalEnemy.IsVisible &&
                             (
@@ -177,7 +177,7 @@ namespace friendlyPMC.Components.FollowerBossFollower
                         &&
                         botOwner_0.WeaponManager.Selector.LastEquipmentSlot != EquipmentSlot.SecondPrimaryWeapon &&
                         botOwner_0.WeaponManager.Selector.CanChangeToSecondWeapons &&
-                        proxydist < Utils.EnemyInfo.ProxyDistance.Mid && proxydist > Utils.EnemyInfo.ProxyDistance.VeryClose
+                        proxydist < Utils.Enemy.ProxyDistance.Mid && proxydist > Utils.Enemy.ProxyDistance.VeryClose
                     )
                     {
                         botOwner_0.WeaponManager.Selector.TryChangeWeapon(true);
@@ -185,7 +185,7 @@ namespace friendlyPMC.Components.FollowerBossFollower
                     }
                     // switch back to sniper if we are moving to a sniper shot
                     else if (
-                        Utils.EnemyInfo.DistanceProxy(botOwner_0, customNavigationPoint_0.Position) >= Utils.EnemyInfo.ProxyDistance.Mid &&
+                        Utils.Enemy.DistanceProxy(botOwner_0, customNavigationPoint_0.Position) >= Utils.Enemy.ProxyDistance.Mid &&
                         !botOwner_0.Memory.GoalEnemy.IsVisible &&
                             (
                                 decision.Reason == "repositionFast" ||
@@ -248,7 +248,7 @@ namespace friendlyPMC.Components.FollowerBossFollower
             {
                 if(
                     botOwner_0.WeaponManager.Selector.LastEquipmentSlot != EquipmentSlot.FirstPrimaryWeapon && 
-                    Utils.EnemyInfo.DistanceProxy(botOwner_0, botOwner_0.GetPlayer.Transform.position) >= Utils.EnemyInfo.ProxyDistance.Mid
+                    Utils.Enemy.DistanceProxy(botOwner_0, botOwner_0.GetPlayer.Transform.position) >= Utils.Enemy.ProxyDistance.Mid
                 )
                 {
                     botOwner_0.WeaponManager.Selector.TryChangeToMain();

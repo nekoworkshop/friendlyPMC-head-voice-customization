@@ -220,7 +220,7 @@ namespace friendlyPMC.Components
             if (allyTactic)
             {
 
-                if (botOwner_0.Memory.AttackImmediately && commonLayer.IsEnemyLowThreat() && Utils.EnemyInfo.Distance(botOwner_0) <= Utils.EnemyInfo.EnemyDistance.Mid)
+                if (botOwner_0.Memory.AttackImmediately && commonLayer.IsEnemyLowThreat() && Utils.Enemy.Distance(botOwner_0) <= Utils.Enemy.EnemyDistance.Mid)
                     return EngageEnemy();
 
                 return DefendPosition(interestPosition);
@@ -232,7 +232,7 @@ namespace friendlyPMC.Components
                 if (!ordersAreHold && !ordersAreAttack && holdTactic)
                 {
 
-                    if (botOwner_0.Memory.AttackImmediately && commonLayer.IsEnemyLowThreat() && Utils.EnemyInfo.Distance(botOwner_0) <= Utils.EnemyInfo.EnemyDistance.Close)
+                    if (botOwner_0.Memory.AttackImmediately && commonLayer.IsEnemyLowThreat() && Utils.Enemy.Distance(botOwner_0) <= Utils.Enemy.EnemyDistance.Close)
                         return EngageEnemy();
 
                 }
@@ -243,12 +243,12 @@ namespace friendlyPMC.Components
 
 
             // do not go after distant enemies
-            if (Utils.EnemyInfo.Distance(botOwner_0) >= Utils.EnemyInfo.EnemyDistance.Distant)
+            if (Utils.Enemy.Distance(botOwner_0) >= Utils.Enemy.EnemyDistance.Distant)
             {
                 return new AICoreActionResultStruct<BotLogicDecision>((BotLogicDecision)CustomBotDecisions.CoverToCover, "coverBoss");
             }
 
-            if (botOwner_0.Memory.AttackImmediately && Utils.EnemyInfo.Distance(botOwner_0) <= Utils.EnemyInfo.EnemyDistance.Mid)
+            if (botOwner_0.Memory.AttackImmediately && Utils.Enemy.Distance(botOwner_0) <= Utils.Enemy.EnemyDistance.Mid)
             {
                 return EngageEnemy();
             }

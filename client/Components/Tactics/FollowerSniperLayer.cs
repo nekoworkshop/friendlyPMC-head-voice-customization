@@ -183,7 +183,7 @@ namespace friendlyPMC.Components.Tactics
                 return new AICoreActionEndStruct("enemy.ShotMe", true);
             }
 
-            if (Utils.EnemyInfo.Distance(botOwner_0) <= Utils.EnemyInfo.EnemyDistance.VeryClose)
+            if (Utils.Enemy.Distance(botOwner_0) <= Utils.Enemy.EnemyDistance.VeryClose)
             {
                 return new AICoreActionEndStruct("enemy.Close", true);
             }

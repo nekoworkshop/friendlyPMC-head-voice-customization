@@ -168,6 +168,8 @@ namespace friendlyPMC
 
             var harmony = new Harmony("xyz.pit.companion");
             harmony.PatchAll(typeof(LocalGameCtorPatch).Assembly);
+            
+            harmony.PatchAll(typeof(GoalEnemyTracePatch).Assembly);
 
             SAINPatch.PatchSAINIfInstalled();
 

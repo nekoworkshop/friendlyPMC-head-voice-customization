@@ -67,17 +67,17 @@ namespace friendlyPMC.Components.Tactics
             float lastEnemySeenTime = botOwner_0.Memory.GoalEnemy.PersonalLastSeenTime;
             bool inCover = botOwner_0.Memory.IsInCover;
 
-            Utils.EnemyInfo.EnemyDistance distanceToEnemy = Utils.EnemyInfo.Distance(botOwner_0);
+            Utils.Enemy.EnemyDistance distanceToEnemy = Utils.Enemy.Distance(botOwner_0);
             float enemiesAtLocation = 0;
             if (botOwner_0.Memory.GoalEnemy.ProfileId != null)
-                Utils.EnemyInfo.GetEnemiesAtLocation(botOwner_0, botOwner_0.Memory.GoalEnemy.ProfileId, enemyPos);
+                Utils.Enemy.GetEnemiesAtLocation(botOwner_0, botOwner_0.Memory.GoalEnemy.ProfileId, enemyPos);
 
             // PUSH CASE
             if (botOwner_0.Memory.AttackImmediately || pushOrdered)
             {
                 if (
                     // - go for it if enemy is already close
-                    distanceToEnemy == Utils.EnemyInfo.EnemyDistance.Close ||
+                    distanceToEnemy == Utils.Enemy.EnemyDistance.Close ||
                     // - go for it if enemy is just 1
                     (enemiesAtLocation < 2) ||
                     // - go for it if there is strength in numbers
@@ -94,7 +94,7 @@ namespace friendlyPMC.Components.Tactics
 
                         if (customNavigationPoint_0 != null)
                         {
-                            if (distanceToEnemy >= Utils.EnemyInfo.EnemyDistance.Mid && commonLayer.CurrentDecision?.Reason != "getInCloseFast")
+                            if (distanceToEnemy >= Utils.Enemy.EnemyDistance.Mid && commonLayer.CurrentDecision?.Reason != "getInCloseFast")
                             {
                                 return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "getInCloseFast");
                             }
@@ -108,7 +108,7 @@ namespace friendlyPMC.Components.Tactics
                 // - enemy visible and push conditions not met
                 if (enemyVisible)
                 {
-                    if (distanceToEnemy <= Utils.EnemyInfo.EnemyDistance.Mid)
+                    if (distanceToEnemy <= Utils.Enemy.EnemyDistance.Mid)
                     {
                         // -- in cover
                         if (inCover)
@@ -289,7 +289,7 @@ namespace friendlyPMC.Components.Tactics
                 {
                     AICoreActionResultStruct<BotLogicDecision>? previousDecision = commonLayer.CurrentDecision;
 
-                    if (Utils.EnemyInfo.Distance(botOwner_0) > Utils.EnemyInfo.EnemyDistance.Mid && previousDecision?.Reason != "getInCloseFast" && previousDecision?.Reason != "waitAbit")
+                    if (Utils.Enemy.Distance(botOwner_0) > Utils.Enemy.EnemyDistance.Mid && previousDecision?.Reason != "getInCloseFast" && previousDecision?.Reason != "waitAbit")
                     {
                         GetClosestCoverPointBetween(botPosition, enemyPos, 10f);
                         if (customNavigationPoint_0 != null)
@@ -355,7 +355,7 @@ namespace friendlyPMC.Components.Tactics
                 return new AICoreActionEndStruct("enemy.ShotMe", true);
             }
 
-            if (Utils.EnemyInfo.Distance(botOwner_0) <= Utils.EnemyInfo.EnemyDistance.VeryClose)
+            if (Utils.Enemy.Distance(botOwner_0) <= Utils.Enemy.EnemyDistance.VeryClose)
             {
                 return new AICoreActionEndStruct("enemy.Close", true);
             }

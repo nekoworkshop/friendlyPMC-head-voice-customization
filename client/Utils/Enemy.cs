@@ -3,13 +3,12 @@ using EFT;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.AI;
 
 namespace friendlyPMC.Utils
 {
-    internal class EnemyInfo
+    internal class Enemy
     {
         private struct CachedEnemyInfo
         {
@@ -217,6 +216,38 @@ namespace friendlyPMC.Utils
                 Components.Logger.LogInfo("GetEnemiesAtLocation Error: " + ex.Message);
                 return 1;
             }
+        }
+        
+        public static EnemyInfo MakeEnemy(BotOwner bot, Player enemy)
+        {
+                BotSettingsClass groupInfo;
+                bot.BotsGroup.Enemies.TryGetValue(enemy, out groupInfo);
+                
+                if (groupInfo == null)
+                {
+                    bot.BotsGroup.AddEnemy(enemy, EBotEnemyCause.addPlayerToBoss);
+                    bot.BotsGroup.Enemies.TryGetValue(enemy, out groupInfo);
+                    Components.Logger.LogInfo("Making " + enemy.Profile.Nickname + " enemy to others");
+                }
+
+                if (groupInfo == null)
+                {
+                    groupInfo = new BotSettingsClass(enemy, bot.BotsGroup, EBotEnemyCause.addPlayerToBoss);
+
+                    bot.Memory.AddEnemy(enemy, groupInfo, false);
+                }
+
+                EnemyInfo info;
+
+                bot.EnemiesController.EnemyInfos.TryGetValue(enemy, out info);
+                
+                if(info == null)
+                {
+                    info = bot.EnemiesController.AddNew(bot.BotsGroup, enemy, groupInfo);
+                }
+                
+                return info;
+
         }
 
         public static void ClearEnemyLocations(string enemyId)

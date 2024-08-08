@@ -147,7 +147,6 @@ namespace friendlyPMC.Patches
             {
                 spawnGroups.Add(zn, side, botsGroup, false);
             }
-            player.bossGroup = botsGroup;
 
             BossPlayers.AddGroupToBoss(player,botsGroup);
 
@@ -993,7 +992,7 @@ namespace friendlyPMC.Patches
 
             PingTeamates.Disable();
 
-            Utils.EnemyInfo.ClearEnemiesLocations();
+            Utils.Enemy.ClearEnemiesLocations();
             Utils.Utils.FlagsClear();
 
             if (LocalGameCtorPatch.Instance != null) LocalGameCtorPatch.Instance = null;

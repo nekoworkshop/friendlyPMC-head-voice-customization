@@ -71,41 +71,9 @@ namespace friendlyPMC.Actions
                 
                 if (bot.Memory.HaveEnemy && bot.Memory.GoalEnemy.ProfileId == closet.Profile.ProfileId) return;
 
-                BotSettingsClass groupInfo;
-                bot.BotsGroup.Enemies.TryGetValue(closet, out groupInfo);
-                
-                if (groupInfo == null)
-                {
-                    bot.BotsGroup.AddEnemy(closet, EBotEnemyCause.addPlayerToBoss);
-                    bot.BotsGroup.Enemies.TryGetValue(closet, out groupInfo);
-                    Components.Logger.LogInfo("Making " + closet.Profile.Nickname + " enemy to others");
-                }
+                EnemyInfo info = Utils.Enemy.MakeEnemy(bot, closet);
 
-
-                if (
-                    bot.Memory.HaveEnemy && 
-                    (   bot.Memory.GoalEnemy.IsVisible || 
-                        (bot.Memory.GoalEnemy.HaveSeen && bot.Memory.GoalEnemy.PersonalLastSeenTime < 3f)
-                    )
-                ) return;
-
-                if (groupInfo == null)
-                {
-                    groupInfo = new BotSettingsClass(closet, bot.BotsGroup, EBotEnemyCause.addPlayerToBoss);
-
-                    bot.Memory.AddEnemy(closet, groupInfo, false);
-                }
-
-                EnemyInfo info;
-
-                bot.EnemiesController.EnemyInfos.TryGetValue(closet, out info);
-                
-                if(info == null)
-                {
-                    info = bot.EnemiesController.AddNew(bot.BotsGroup, closet, groupInfo);
-                }
-
-                if (info != null)
+                if (info != null && !bot.Memory.HaveEnemy)
                 {
                     info.PriorityIndex = 0;
                     info.SetVisible(true);

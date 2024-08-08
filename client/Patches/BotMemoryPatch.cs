@@ -74,4 +74,30 @@ namespace friendlyPMC.Patches
             return true;
         }
     }
+    // whoever makes the boss player an enemy, becomes the enemy of the group
+    [HarmonyPatch(typeof(BotMemoryClass), "GoalEnemy", MethodType.Setter)]
+    public static class GoalEnemyTracePatch
+    {
+        public static void Postfix(BotMemoryClass __instance, EnemyInfo value)
+        {
+            var enemyInfo_0 = AccessTools.Field(typeof(BotMemoryClass), "enemyInfo_0").GetValue(__instance) as EnemyInfo;
+            var botOwner_0 = AccessTools.Field(typeof(BotMemoryClass), "botOwner_0").GetValue(__instance) as BotOwner;
+            if(
+                !BossPlayers.IsFollower(botOwner_0) && 
+                enemyInfo_0 != null && 
+                enemyInfo_0.Person != null
+            )
+            {
+                var boss = BossPlayers.GetBoss(enemyInfo_0.Person.ProfileId);
+                if (boss != null)
+                {
+                    foreach (var flw in boss.Followers)
+                    {
+                        var info = Utils.Enemy.MakeEnemy(flw, botOwner_0.GetPlayer);
+                        if(!flw.Memory.HaveEnemy) flw.Memory.GoalEnemy = info;
+                    }
+                }
+            }
+        }
+    }
 }
