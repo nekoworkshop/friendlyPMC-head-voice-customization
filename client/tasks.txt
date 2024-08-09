@@ -1,4 +1,4 @@
-3.6:
+--- ==== 3.6 ==== ---:
  - x - remove the dependency of LootingBots plugin
  - x - if followers are given meds, at the end of the raid we should update the status of the med item based on whether the follower used it or not
  - x - fix bots not appearing as being in the same group (player is not possible)
@@ -7,25 +7,39 @@
  - #inprogress - ensure followers add enemy when a same side bot adds the player as enemy
  - x - rename EnemyInfo utility class to Enemy
  - fix "contact" not always picking up an enemy. Also make bots switch target if player is signaling an enemy that is much closer
- - fix looting not working with SWAG
- - fix looting animation
- - remove the "fire" command that switches to push
- - remove the "stop" command
- - change the "hold position" command to be temporary hold
+ - fix looting not working with SWAG (can't reproduce anymore)
+ - x - remove the "fire" command that switches to push
+ - x - remove the "stop" command
+ - x - make hold positon and stop gesture behave the same
 
- 3.6.1:
+--- ==== 3.6.1 ==== ---:
  - fix bots not being silent on issuing silence command
  - have followers send message at the end of the raid depending on status and how many made it out
  - if we have a follower that was picked up, that one should send a thank you message if he was able to make it out with the player
 
 
- >=3.6.2 < 3.7:
+--- ==== >=3.6.2 < 3.7 ==== ---:
  - improve followers holder and pusher tactics
 
-3.7:
+--- ==== 3.7 ==== ---:
 - fix glitchy behavior of boss followers
 - goons send messages at the end of the raid
 - make squad have skill relative to the player's skill
+
+==================================================================================
+RELEASE NOTES (3.6.0):
+ - removed looting bots dependencies
+ - changed "balance" tactic which is now named "default" where bots will look for shooting spots when at a distance from the enemy instead of falling back to holder tactic
+ - fixed bots not appearing under the same group. Player will not apear as such as Raid Review Mod uses botsGroup id for determining thins
+ - fixed BEAR still speaking English when englishBear flag is off
+ - "Fire" command removed
+ - "Stop" command removed
+ - "Hold Position" command changed to be temporary hold when in combat or tell bots to wait when out of combat. This does not affect Marksman
+ - "Stop" gesture now behaves just like "Hold Position" except its for followers within 15 meter radius.
+
+==================================================================================
+REVISIT:
+ - fix looting animation for loot on the ground
 
 FUTURE IDEAS:
  - ability to send commands individually to followers

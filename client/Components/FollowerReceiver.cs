@@ -24,7 +24,7 @@ namespace friendlyPMC.Components
 
         private static BotOwner closestPlayer = null;
 
-        private static readonly float maxGestusDistance = 18f;
+        private static readonly float maxGestusDistance = 15f;
         public FollowerReceiver(BotOwner owner) : base(owner)
         {
             Receivers.AddReceiver(owner.ProfileId, this);
@@ -249,8 +249,23 @@ namespace friendlyPMC.Components
                 {
                     if (gestusDistance < maxGestusDistance)
                     {
-                        botOwner_0.BotsGroup.RequestsController.TryActivateWait(data.Player, botOwner_0);
+                        (botOwner_0.Brain.BaseBrain as FollowerBrain).BossOrdersChanged();
+
+                        Player alivePlayerByProfileID = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(data.Player.ProfileId);
+
+                        if (botOwner_0.BotRequestController.TryStopCurrent(alivePlayerByProfileID, false))
+                        {
+                            FollowerHold holdit = new FollowerHold(alivePlayerByProfileID);
+
+                            if (botOwner_0.BotsGroup.RequestsController.TryAddRequest(holdit))
+                            {
+                                holdit.AddPossibleExecutors(botOwner_0);
+                                holdit.SetGroup(botOwner_0.BotsGroup.RequestsController);
+                            }
+                        }
                     }
+
+                    return;
                 }
                 else if (shouldDefault)
                 {
@@ -650,7 +665,6 @@ namespace friendlyPMC.Components
                 // temporary hold position
                 else if (info.phrase == EPhraseTrigger.HoldPosition)
                 {
-
                     (botOwner_0.Brain.BaseBrain as FollowerBrain).BossOrdersChanged();
 
                     Player alivePlayerByProfileID = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(requester.ProfileId);
