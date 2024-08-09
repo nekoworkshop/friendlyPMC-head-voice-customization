@@ -79,13 +79,13 @@ namespace friendlyPMC.Utils
         public static EnemyDistance Distance(BotOwner bot)
         {
             if (!bot.Memory.HaveEnemy) return EnemyDistance.Far;
-            
+
             Vector3 botPosition = bot.GetPlayer.Transform.position;
             Vector3 enemyPosition = bot.Memory.GoalEnemy.CurrPosition;
 
             float distance = Utils.GetNavDistance(botPosition, enemyPosition);
 
-            if(distance < 15f) return EnemyDistance.VeryClose;
+            if (distance < 15f) return EnemyDistance.VeryClose;
 
             if (distance < 31f)
             {
@@ -211,42 +211,43 @@ namespace friendlyPMC.Utils
 
                 return result;
 
-            } catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 Components.Logger.LogInfo("GetEnemiesAtLocation Error: " + ex.Message);
                 return 1;
             }
         }
-        
+
         public static EnemyInfo MakeEnemy(BotOwner bot, Player enemy)
         {
-                BotSettingsClass groupInfo;
+            BotSettingsClass groupInfo;
+            bot.BotsGroup.Enemies.TryGetValue(enemy, out groupInfo);
+
+            if (groupInfo == null)
+            {
+                bot.BotsGroup.AddEnemy(enemy, EBotEnemyCause.addPlayerToBoss);
                 bot.BotsGroup.Enemies.TryGetValue(enemy, out groupInfo);
-                
-                if (groupInfo == null)
-                {
-                    bot.BotsGroup.AddEnemy(enemy, EBotEnemyCause.addPlayerToBoss);
-                    bot.BotsGroup.Enemies.TryGetValue(enemy, out groupInfo);
-                    Components.Logger.LogInfo("Making " + enemy.Profile.Nickname + " enemy to others");
-                }
+                Components.Logger.LogInfo("Making " + enemy.Profile.Nickname + " enemy to others");
+            }
 
-                if (groupInfo == null)
-                {
-                    groupInfo = new BotSettingsClass(enemy, bot.BotsGroup, EBotEnemyCause.addPlayerToBoss);
+            if (groupInfo == null)
+            {
+                groupInfo = new BotSettingsClass(enemy, bot.BotsGroup, EBotEnemyCause.addPlayerToBoss);
 
-                    bot.Memory.AddEnemy(enemy, groupInfo, false);
-                }
+                bot.Memory.AddEnemy(enemy, groupInfo, false);
+            }
 
-                EnemyInfo info;
+            EnemyInfo info;
 
-                bot.EnemiesController.EnemyInfos.TryGetValue(enemy, out info);
-                
-                if(info == null)
-                {
-                    info = bot.EnemiesController.AddNew(bot.BotsGroup, enemy, groupInfo);
-                }
-                
-                return info;
+            bot.EnemiesController.EnemyInfos.TryGetValue(enemy, out info);
+
+            if (info == null)
+            {
+                info = bot.EnemiesController.AddNew(bot.BotsGroup, enemy, groupInfo);
+            }
+
+            return info;
 
         }
 

@@ -30,13 +30,13 @@ namespace friendlyPMC.Patches
 
             var botOwner_0 = AccessTools.Field(typeof(BotMemoryClass), "botOwner_0").GetValue(__instance) as BotOwner;
 
-            if(botOwner_0 == null) return true;
+            if (botOwner_0 == null) return true;
 
             bool isfollower = BossPlayers.IsFollower(botOwner_0);
             bool isBossEnemy = BossPlayers.IsPlayerBoss(enemy.ProfileId);
 
             pitAIBossPlayer playerBoss = null;
-            if(isBossEnemy) playerBoss = BossPlayers.Instance.GetBossPlayer(enemy.ProfileId);
+            if (isBossEnemy) playerBoss = BossPlayers.Instance.GetBossPlayer(enemy.ProfileId);
 
             // prevent same side from being added on creation just because they have a different role
             if (
@@ -78,23 +78,28 @@ namespace friendlyPMC.Patches
     [HarmonyPatch(typeof(BotMemoryClass), "GoalEnemy", MethodType.Setter)]
     public static class GoalEnemyTracePatch
     {
+        private static List<string> addedEnemies = new List<string>();
+
         public static void Postfix(BotMemoryClass __instance, EnemyInfo value)
         {
-            var enemyInfo_0 = AccessTools.Field(typeof(BotMemoryClass), "enemyInfo_0").GetValue(__instance) as EnemyInfo;
             var botOwner_0 = AccessTools.Field(typeof(BotMemoryClass), "botOwner_0").GetValue(__instance) as BotOwner;
-            if(
-                !BossPlayers.IsFollower(botOwner_0) && 
-                enemyInfo_0 != null && 
-                enemyInfo_0.Person != null
+
+            if (addedEnemies.Contains(botOwner_0.ProfileId)) return;
+
+            if (
+                !BossPlayers.IsFollower(botOwner_0) &&
+                value != null &&
+                value.Person != null
             )
             {
-                var boss = BossPlayers.GetBoss(enemyInfo_0.Person.ProfileId);
+                var boss = BossPlayers.GetBoss(value.Person.ProfileId);
                 if (boss != null)
                 {
+                    addedEnemies.Add(botOwner_0.ProfileId);
                     foreach (var flw in boss.Followers)
                     {
                         var info = Utils.Enemy.MakeEnemy(flw, botOwner_0.GetPlayer);
-                        if(!flw.Memory.HaveEnemy) flw.Memory.GoalEnemy = info;
+                        if (!flw.Memory.HaveEnemy) flw.Memory.GoalEnemy = info;
                     }
                 }
             }

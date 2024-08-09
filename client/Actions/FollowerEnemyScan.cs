@@ -45,7 +45,7 @@ namespace friendlyPMC.Actions
                 if (hit.collider != null)
                 {
                     var enemy = bot.ShootData.method_4(hit.collider);
-                    
+
                     if (enemy != null && enemy.IsAI && enemy.HealthController.IsAlive && enemy.Side != player.Side)
                     {
                         enemies.Add(enemy);
@@ -65,10 +65,10 @@ namespace friendlyPMC.Actions
                 }
             }
 
-            if ( closet != null)
+            if (closet != null)
             {
                 Components.Logger.LogInfo("Player has seen " + closet.Profile.Nickname);
-                
+
                 if (bot.Memory.HaveEnemy && bot.Memory.GoalEnemy.ProfileId == closet.Profile.ProfileId) return;
 
                 EnemyInfo info = Utils.Enemy.MakeEnemy(bot, closet);
