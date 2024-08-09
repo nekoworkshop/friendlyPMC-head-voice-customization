@@ -32,7 +32,7 @@ namespace friendlyPMC.Components
             }
         }
 
-       
+
         protected WildSpawnType _botRole;
 
         public BotFollowerPlayer(BotOwner bot, pitAIBossPlayer player, bool isSquad = false, WildSpawnType botRole = WildSpawnType.assault)
@@ -40,10 +40,10 @@ namespace friendlyPMC.Components
             _bot = bot;
             _player = player;
             _botRole = botRole == WildSpawnType.assault ? _bot.Profile.Info.Settings.Role : botRole;
-            
+
             _IsSquadMate = isSquad;
 
-            settingModif = new GClass528(1.2f,1.2f,1f,1f,1f,1f,0.9f,1f,1f);
+            settingModif = new GClass528(1.2f, 1.2f, 1f, 1f, 1f, 1f, 0.9f, 1f, 1f);
         }
 
         public virtual void Init()
@@ -182,19 +182,19 @@ namespace friendlyPMC.Components
                 _player.bossGroup.AddMember(_bot, false);
             }
 
-/*            try
-            {
-                if (_transactionController != null)
-                {
-                    Weapon primWeapon = _bot.AIData.Player.HandsController.Item as Weapon;
+            /*            try
+                        {
+                            if (_transactionController != null)
+                            {
+                                Weapon primWeapon = _bot.AIData.Player.HandsController.Item as Weapon;
 
-                    _transactionController.AddExtraAmmo(primWeapon);
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger.LogInfo("Could not add ammo to follower: " + ex.Message);
-            }*/
+                                _transactionController.AddExtraAmmo(primWeapon);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.LogInfo("Could not add ammo to follower: " + ex.Message);
+                        }*/
 
 
             // apply some of settings modifier
@@ -221,12 +221,73 @@ namespace friendlyPMC.Components
             Logger.LogInfo($"Bot {_bot.Profile.Nickname} is now a follower of {_player.Player().Profile.Nickname}");
         }
 
-        private InventoryControllerClass GetInventoryController(BotOwner bot)
+        public InventoryControllerClass GetInventoryController()
         {
-            Type playerType = typeof(Player);
+            return _bot.GetPlayer.InventoryControllerClass;
+        }
 
-            FieldInfo inventoryControllerField = playerType.GetField("_inventoryController", BindingFlags.NonPublic | BindingFlags.Instance);
-            return (InventoryControllerClass)inventoryControllerField.GetValue(bot.GetPlayer);
+        protected void AddExtraAmmo()
+        {
+
+            InventoryControllerClass inventory = GetInventoryController();
+            SearchableItemClass secureContainer = inventory.Inventory.Equipment.GetSlot(EquipmentSlot.SecuredContainer).ContainedItem;
+
+
+            Weapon weapon = _bot.AIData.Player.HandsController.Item as Weapon;
+
+            Item ammoToAdd =
+                    weapon.GetCurrentMagazine()?.FirstRealAmmo()
+                    ?? Singleton<ItemFactory>.Instance.CreateItem(
+                        MongoID.Generate(),
+                        weapon.CurrentAmmoTemplate._id,
+                        null
+                    );
+
+            int ammoAdded = 0;
+
+            for (int i = 0; i < 10; i++)
+            {
+                Item ammo = ammoToAdd.CloneItem();
+                ammo.StackObjectsCount = ammo.StackMaxSize;
+
+                string[] visitorIds = new string[] { inventory.ID };
+
+                var location = inventory.FindGridToPickUp(ammo, secureContainer.Grids);
+
+                if (location != null)
+                {
+                    var result = location.AddWithoutRestrictions(ammo, visitorIds);
+                    if (result.Succeeded)
+                    {
+                        ammoAdded += ammo.StackObjectsCount;
+                        Singleton<GridCacheClass>.Instance.Add(
+                            location.GetOwner().ID,
+                            location.Grid as GridClassEx,
+                            ammo
+                        );
+                    }
+                    else if (_log.ErrorEnabled)
+                    {
+                        _log.LogError(
+                            $"Failed to add {ammo.Name.Localized()} to secure container"
+                        );
+                    }
+                }
+                else if (_log.ErrorEnabled)
+                {
+                    _log.LogError(
+                                $"Cannot find location in secure container for {ammo.Name.Localized()}"
+                            );
+                }
+            }
+
+            if (ammoAdded > 0 && _log.DebugEnabled)
+            {
+                _log.LogDebug(
+                            $"Successfully added {ammoAdded} round of {ammoToAdd.Name.Localized()}"
+                        );
+            }
+
         }
 
         public virtual FollowerBrain GetFollowerBrain(BotOwner bot, pitAIBossPlayer boss)
@@ -375,7 +436,7 @@ namespace friendlyPMC.Components
             settings.FileSettings.Hearing.CLOSE_DIST = 6f;
             settings.FileSettings.Hearing.FAR_DIST = 35f;
 
-            
+
 
             bot.Settings = settings;
             bot.ENEMY_LOOK_AT_ME = Mathf.Cos(settings.FileSettings.Mind.ENEMY_LOOK_AT_ME_ANG * 0.017453292f);
@@ -421,7 +482,7 @@ namespace friendlyPMC.Components
 
                 _bot.BotFollower.PatrolDataFollower.Dispose();
                 (_bot.Receiver as FollowerReceiver).Dispose();
-                
+
                 _bot.Brain.Dispose();
 
                 _bot.BotsController.AICoreController.Stop();
@@ -445,9 +506,10 @@ namespace friendlyPMC.Components
                 _bot.GetPlayer.Physical.Stamina.ForceMode = false;
                 _bot.GetPlayer.Physical.HandsStamina.ForceMode = false;
 
-            } catch(Exception ex)
+            }
+            catch (Exception ex)
             {
-                Logger.LogInfo("Error on dismiss for a follower: " +ex.Message);
+                Logger.LogInfo("Error on dismiss for a follower: " + ex.Message);
             }
             // @TODO : see what else can be reverted
         }
