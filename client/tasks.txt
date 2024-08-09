@@ -11,6 +11,7 @@
  - x - remove the "fire" command that switches to push
  - x - remove the "stop" command
  - x - make hold positon and stop gesture behave the same
+ - x - make bots have extra ammo
 
 --- ==== 3.6.1 ==== ---:
  - fix bots not being silent on issuing silence command
@@ -28,7 +29,8 @@
 
 ==================================================================================
 RELEASE NOTES (3.6.0):
- - removed looting bots dependencies
+ - removed looting bots dependencies, this also means you cannot use the loot corpse command anymore but you can now tell bots to pick up loot that is elivated (like on a table)
+ - reserved secure container of bots for extra ammo. The secure container of a bot will be used for adding extra ammo for the main weapon. If you create presets that include a secure container, that will be ignored and instead use the default one the bot would spawn with.
  - changed "balance" tactic which is now named "default" where bots will look for shooting spots when at a distance from the enemy instead of falling back to holder tactic
  - fixed bots not appearing under the same group. Player will not apear as such as Raid Review Mod uses botsGroup id for determining thins
  - fixed BEAR still speaking English when englishBear flag is off

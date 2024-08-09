@@ -10,6 +10,10 @@ using System.Reflection;
 
 using UnityEngine;
 using EFT.InventoryLogic;
+using System.Linq;
+
+using GridClassEx = GClass2516;
+using GridCacheClass = GClass1401;
 
 namespace friendlyPMC.Components
 {
@@ -182,19 +186,7 @@ namespace friendlyPMC.Components
                 _player.bossGroup.AddMember(_bot, false);
             }
 
-            /*            try
-                        {
-                            if (_transactionController != null)
-                            {
-                                Weapon primWeapon = _bot.AIData.Player.HandsController.Item as Weapon;
-
-                                _transactionController.AddExtraAmmo(primWeapon);
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            Logger.LogInfo("Could not add ammo to follower: " + ex.Message);
-                        }*/
+            AddExtraAmmo();
 
 
             // apply some of settings modifier
@@ -230,8 +222,31 @@ namespace friendlyPMC.Components
         {
 
             InventoryControllerClass inventory = GetInventoryController();
-            SearchableItemClass secureContainer = inventory.Inventory.Equipment.GetSlot(EquipmentSlot.SecuredContainer).ContainedItem;
+            SearchableItemClass secureContainer;
 
+            try
+            {
+                secureContainer = (SearchableItemClass)inventory.Inventory.Equipment.GetSlot(EquipmentSlot.SecuredContainer).ContainedItem;
+            } catch
+            {
+                Components.Logger.LogInfo("Cannot access secure container of bot, extra ammo will not be added");
+                return;
+            }
+
+            if (secureContainer == null)
+            {
+                Components.Logger.LogInfo("Bot has no secure container, cannot add extra ammo");
+                return;
+            }
+
+            
+
+            StashGridClass stashGridClass = secureContainer.Grids.FirstOrDefault();
+
+            if (stashGridClass == null)
+            {
+                return;
+            }
 
             Weapon weapon = _bot.AIData.Player.HandsController.Item as Weapon;
 
@@ -252,7 +267,7 @@ namespace friendlyPMC.Components
 
                 string[] visitorIds = new string[] { inventory.ID };
 
-                var location = inventory.FindGridToPickUp(ammo, secureContainer.Grids);
+                var location = stashGridClass.FindLocationForItem(ammo);
 
                 if (location != null)
                 {
@@ -266,26 +281,22 @@ namespace friendlyPMC.Components
                             ammo
                         );
                     }
-                    else if (_log.ErrorEnabled)
+                    else
                     {
-                        _log.LogError(
-                            $"Failed to add {ammo.Name.Localized()} to secure container"
-                        );
+                        Components.Logger.LogInfo("Failed to add ammo to bot");
+                        break;
                     }
                 }
-                else if (_log.ErrorEnabled)
+                else
                 {
-                    _log.LogError(
-                                $"Cannot find location in secure container for {ammo.Name.Localized()}"
-                            );
+                    Components.Logger.LogInfo("No space left to add ammo to bot");
+                    break;
                 }
             }
 
-            if (ammoAdded > 0 && _log.DebugEnabled)
+            if (ammoAdded > 0)
             {
-                _log.LogDebug(
-                            $"Successfully added {ammoAdded} round of {ammoToAdd.Name.Localized()}"
-                        );
+                Components.Logger.LogInfo("Added " + ammoAdded + " of ammo to bot");
             }
 
         }

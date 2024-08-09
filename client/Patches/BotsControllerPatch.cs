@@ -18,6 +18,7 @@ using IProfileData = GClass592;
 using friendlyPMC.Utils;
 using Comfort.Common;
 using System.Linq;
+using EFT.InventoryLogic;
 
 
 
@@ -569,7 +570,8 @@ namespace friendlyPMC.Patches
             Dictionary<string,EquipmentClass> profileEquipment = new Dictionary<string,EquipmentClass>();
 
             Dictionary<string,string> profileTactic = new Dictionary<string,string>();
-            
+            Dictionary<string, Item> secureContainers = new Dictionary<string, Item>();
+
             if (side != EPlayerSide.Savage)
             {
 
@@ -588,60 +590,63 @@ namespace friendlyPMC.Patches
                     bot.Profiles.ForEach(profile =>
                     {
                         if (profile != null)
-                        {   if (friendlyPMC.squadSetup.Value)
+                        {   
+                            if (friendlyPMC.squadSetup.Value && friendlyPMC.squadMembers.ContainsKey(pid))
                             {
-                                if(friendlyPMC.squadMembers.ContainsKey(pid))
+                                string eq = friendlyPMC.squadMembers[pid][1].Value;
+                                if (eq != null && eq != "Default")
                                 {
-                                    string eq = friendlyPMC.squadMembers[pid][1].Value;
-                                    if(eq != null && eq != "Default") 
+                                    var secureContainer = profile.Inventory.Equipment.GetSlot(EquipmentSlot.SecuredContainer).ContainedItem;
+
+                                    if (eq == "Player Equipment")
                                     {
-                                        if (eq == "Player Equipment")
+                                        profile.Inventory.Equipment = player.Player().Profile.Inventory.Equipment.CloneItem(null);
+                                        profile.Inventory.Equipment.GetSlot(EquipmentSlot.SecuredContainer).ContainedItem = secureContainer;
+                                    }
+                                    else
+                                    {
+                                        secureContainers.Add(profile.Id,secureContainer.CloneItem());
+
+                                        foreach (var preset in presets)
                                         {
-                                            profile.Inventory.Equipment = player.Player().Profile.Inventory.Equipment.CloneItem(null);
-                                        }
-                                        else
-                                        {
-                                            foreach (var preset in presets)
+                                            if (eq == preset.Name)
                                             {
-                                                if(eq == preset.Name)
+                                                var equipment = preset.Equipment.CloneItem(null);
+
+                                                if (!bundleJobs.Contains(preset.Name))
                                                 {
-                                                    var equipment = preset.Equipment.CloneItem(null);
-
-                                                    if (!bundleJobs.Contains(preset.Name))
+                                                    foreach (var item in equipment.GetAllItems())
                                                     {
-                                                        foreach (var item in equipment.GetAllItems())
-                                                        {
-                                                            bundleTokens.Add(item.GetAllBundleTokens());
-                                                        };
-                                                        bundleJobs.Add(preset.Name);
-                                                    }
-
-                                                    profileEquipment.Add(profile.Id, equipment);
+                                                        bundleTokens.Add(item.GetAllBundleTokens());
+                                                    };
+                                                    bundleJobs.Add(preset.Name);
                                                 }
+
+                                                profileEquipment.Add(profile.Id, equipment);
                                             }
                                         }
                                     }
+                                }
 
-                                    string tactic = friendlyPMC.squadMembers[pid][0].Value;
-                                    if(tactic != null && tactic != "Default")
+                                string tactic = friendlyPMC.squadMembers[pid][0].Value;
+                                if (tactic != null && tactic != "Default")
+                                {
+                                    switch (tactic)
                                     {
-                                        switch (tactic)
-                                        {
-                                            case "Pusher":
-                                                tactic = "push";
-                                                break;
-                                            case "Holder":
-                                                tactic = "defend";
-                                                break;
-                                            case "Marksman":
-                                                tactic = "marksman";
-                                                // some cheating here, making our marskman good
-                                                profile.Skills.Sniper.SetCurrent(5100f, true);
-                                                profile.Skills.RecoilControl.SetCurrent(4800f, true);
-                                                break;
-                                        }
-                                        profileTactic.Add(profile.ProfileId, tactic);
+                                        case "Pusher":
+                                            tactic = "push";
+                                            break;
+                                        case "Holder":
+                                            tactic = "defend";
+                                            break;
+                                        case "Marksman":
+                                            tactic = "marksman";
+                                            // some cheating here, making our marskman good
+                                            profile.Skills.Sniper.SetCurrent(5100f, true);
+                                            profile.Skills.RecoilControl.SetCurrent(4800f, true);
+                                            break;
                                     }
+                                    profileTactic.Add(profile.ProfileId, tactic);
                                 }
                             }
                             // - else leave it random
@@ -674,6 +679,10 @@ namespace friendlyPMC.Patches
                             if(profileEquipment.ContainsKey(profile.Id))
                             {
                                 profile.Inventory.Equipment = profileEquipment[profile.Id];
+                                if(secureContainers.ContainsKey(profile.Id))
+                                {
+                                    profile.Inventory.Equipment.GetSlot(EquipmentSlot.SecuredContainer).ContainedItem = secureContainers[profile.Id];
+                                }
                             }
                         }
                     });
