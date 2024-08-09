@@ -21,10 +21,10 @@ namespace friendlyPMC.Modules
                 Instance = this;
             }
         }
-        
+
         public void Destroy()
         {
-            if(IsDisposed) return;
+            if (IsDisposed) return;
             List<FollowerReceiver> receiversToDispose = new List<FollowerReceiver>(followerReceivers.Values);
 
             foreach (var receiver in receiversToDispose)
@@ -39,7 +39,7 @@ namespace friendlyPMC.Modules
 
         public static void Dispose()
         {
-            if(Instance != null)
+            if (Instance != null)
             {
                 Instance.Destroy();
                 Instance = null;
@@ -48,7 +48,7 @@ namespace friendlyPMC.Modules
 
         public static void AddReceiver(string id, FollowerReceiver receiver)
         {
-            if(followerReceivers.ContainsKey(id))
+            if (followerReceivers.ContainsKey(id))
             {
                 if (followerReceivers.TryGetValue(id, out receiver))
                 {
@@ -64,7 +64,7 @@ namespace friendlyPMC.Modules
         {
             foreach (var item in followerReceivers)
             {
-                if(item.Value == receiver)
+                if (item.Value == receiver)
                 {
                     followerReceivers.Remove(item.Key);
                     break;
