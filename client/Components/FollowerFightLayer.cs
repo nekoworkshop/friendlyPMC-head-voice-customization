@@ -41,7 +41,7 @@ namespace friendlyPMC.Components
 
         private bool bossUnderAttack = false;
 
-        private string tactic = "balance";
+        private string tactic = "default";
 
         public NavMeshPath NavMeshPath
         {
@@ -137,7 +137,7 @@ namespace friendlyPMC.Components
             }
             else
             {
-                (botOwner_0.Brain.BaseBrain as FollowerBrain).SetTactic("Balance");
+                (botOwner_0.Brain.BaseBrain as FollowerBrain).SetTactic("Default");
             }
         }
 
@@ -147,7 +147,7 @@ namespace friendlyPMC.Components
             else if (rushTactic) tactic = "push";
             else if (allyTactic) tactic = "assist";
             else if (sniperTactic) tactic = "marksman";
-            else tactic = "balance";
+            else tactic = "default";
             if (ordersAreAttack) tactic += ":atk";
             else if (ordersAreHold) tactic += ":hld";
 

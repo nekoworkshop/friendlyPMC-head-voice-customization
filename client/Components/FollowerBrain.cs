@@ -33,7 +33,7 @@ namespace friendlyPMC.Components
             owner.Memory.OnAddEnemy += OnAddEnemy;
 
 
-            _currentTactic = "Balance";
+            _currentTactic = "Default";
 
         }
         /** Exposed method for adding brain layers so it can be patched by addons **/

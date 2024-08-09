@@ -228,7 +228,6 @@ namespace friendlyPMC.Utils
             {
                 bot.BotsGroup.AddEnemy(enemy, EBotEnemyCause.addPlayerToBoss);
                 bot.BotsGroup.Enemies.TryGetValue(enemy, out groupInfo);
-                Components.Logger.LogInfo("Making " + enemy.Profile.Nickname + " enemy to others");
             }
 
             if (groupInfo == null)

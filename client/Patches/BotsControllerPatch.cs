@@ -17,6 +17,7 @@ using IProfileData = GClass592;
 
 using friendlyPMC.Utils;
 using Comfort.Common;
+using System.Linq;
 
 
 
@@ -62,6 +63,16 @@ namespace friendlyPMC.Patches
             return groupPoint.CorePointInGame;
         }
 
+        private bool HasFIkaDonuts()
+        {
+            Type fikaType = Type.GetType("Fika.Core.Coop.GameMode.CoopGame, Fika.Core");
+
+            if(fikaType != null) return true;
+
+            //if (AppDomain.CurrentDomain.GetAssemblies().Any(a => a.GetName().Name == "dvize.Donuts")) return true;
+
+            return false;
+        }
 
         private BotsGroup GetPlayerGroup(pitAIBossPlayer player, BotOwner bt, BotZone zn)
         {
@@ -75,7 +86,6 @@ namespace friendlyPMC.Patches
             var deadBodiesController = AccessTools.Field(typeof(BotSpawner), "_deadBodiesController").GetValue(botSpawnerClass) as DeadBodiesController;
             var allPlayers = AccessTools.Field(typeof(BotSpawner), "_allPlayers").GetValue(botSpawnerClass) as List<Player>;
 
-            var allBotZones = AccessTools.Field(typeof(BotSpawner), "_allBotZones").GetValue(botSpawnerClass) as BotZone[];
             bool _freeForAll = true;
 
             WildSpawnType sptBear = WildSpawnType.pmcBEAR;
@@ -157,7 +167,7 @@ namespace friendlyPMC.Patches
             bt.Settings.FileSettings.Mind.DEFAULT_USEC_BEHAVIOUR = oldBehaviorUsec;
             bt.Settings.FileSettings.Mind.DEFAULT_SAVAGE_BEHAVIOUR = oldBehaviorSavage;
 
-            return player.bossGroup;
+            return botsGroup;
         }
 
         public void GetSameSideHostile(WildSpawnType role, EPlayerSide side, out bool isHostile)
@@ -227,6 +237,8 @@ namespace friendlyPMC.Patches
                             token
                         );
         }
+
+
         public async UniTask SpawnBossFollower(pitAIBossPlayer player, WildSpawnType boss = WildSpawnType.bossKnight, CancelToken cancelToken = null)
         {
             
@@ -482,9 +494,7 @@ namespace friendlyPMC.Patches
                         return GetPlayerGroup(player, bt, zn);
                     });
 
-                    Type fikaType = Type.GetType("Fika.Core.Coop.GameMode.CoopGame, Fika.Core");
-
-                    if (fikaType != null)
+                    if (HasFIkaDonuts())
                     {
                         ActivateFikaBot(
                             botCreator,
@@ -681,8 +691,6 @@ namespace friendlyPMC.Patches
 
             float spawnedFollowers = 0;
 
-            Type fikaType = Type.GetType("Fika.Core.Coop.GameMode.CoopGame, Fika.Core");
-
             Func<BotOwner, BotZone, BotsGroup> GroupAction = new Func<BotOwner, BotZone, BotsGroup>((BotOwner bt, BotZone zn) =>
             {
                 return GetPlayerGroup(player, bt, zn);
@@ -756,7 +764,7 @@ namespace friendlyPMC.Patches
                             string tactic = null;
                             profileTactic.TryGetValue(profile.ProfileId, out tactic);
 
-                            if (tactic == null) tactic = "balance";
+                            if (tactic == null) tactic = "default";
 
                             WildSpawnType botType = type;
 
@@ -806,12 +814,14 @@ namespace friendlyPMC.Patches
 
                 });
 
-                if (fikaType == null)
+                if (!HasFIkaDonuts())
                     await ActivateBot(
                         botCreator, profile, position, closestCorePoint.Id, zone,
                         GroupAction, OnActivate
                     );
                 else
+                {
+                    Components.Logger.LogInfo("Use FIKA setup");
                     await ActivateFikaBot(
                         botCreator,
                         profile,
@@ -821,6 +831,7 @@ namespace friendlyPMC.Patches
                         OnActivate,
                         token.GetCancelToken()
                     );
+                }
 
             });
 
@@ -992,7 +1003,8 @@ namespace friendlyPMC.Patches
 
             PingTeamates.Disable();
 
-            Utils.Enemy.ClearEnemiesLocations();
+            Enemy.ClearEnemiesLocations();
+            GoalEnemyTracePatch.ClearCache();
             Utils.Utils.FlagsClear();
 
             if (LocalGameCtorPatch.Instance != null) LocalGameCtorPatch.Instance = null;

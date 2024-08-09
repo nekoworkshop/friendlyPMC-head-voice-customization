@@ -233,7 +233,7 @@ namespace friendlyPMC.Modules
             Instance = null;
         }
 
-        private BotFollowerPlayer AddBotFollower(BotOwner bot, pitAIBossPlayer player, bool squadMate = false, WildSpawnType role = WildSpawnType.assault, string tactic = "balance")
+        private BotFollowerPlayer AddBotFollower(BotOwner bot, pitAIBossPlayer player, bool squadMate = false, WildSpawnType role = WildSpawnType.assault, string tactic = "default")
         {
 
             BotFollowerPlayer _follower = null;
@@ -486,7 +486,7 @@ namespace friendlyPMC.Modules
             Instance.RemoveBossPlayer(profileId);
         }
 
-        public static BotFollowerPlayer AddFollower(BotOwner bot, pitAIBossPlayer player, bool squadMate = false, WildSpawnType role = WildSpawnType.assault, string tactic = "balance")
+        public static BotFollowerPlayer AddFollower(BotOwner bot, pitAIBossPlayer player, bool squadMate = false, WildSpawnType role = WildSpawnType.assault, string tactic = "default")
         {
             return Instance.AddBotFollower(bot,player,squadMate,role,tactic);
         }

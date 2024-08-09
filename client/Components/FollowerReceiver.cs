@@ -785,11 +785,11 @@ namespace friendlyPMC.Components
                                     }
                                 }
                             }
-
-                            botOwner_0.BotTalk.TrySay(EPhraseTrigger.Negative, false);
-                            botOwner_0.Gesture.TryGestus(EGesture.Bad, false);
                         }
                     }
+
+                    botOwner_0.BotTalk.TrySay(EPhraseTrigger.Negative, false);
+                    botOwner_0.Gesture.TryGestus(EGesture.Bad, false);
 
                     return;
                 }

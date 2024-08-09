@@ -92,7 +92,6 @@ namespace friendlyPMC.Actions
             }
 
             Vector3 pos = _lootItem.transform.position;
-
             botOwner_0.Steering.LookToPoint(pos);
 
             await Task.Delay(2000);
