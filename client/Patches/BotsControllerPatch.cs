@@ -880,41 +880,15 @@ namespace friendlyPMC.Patches
         }
     }*/
 
-    internal class BotsControllerStopPatch : ModulePatch
+    [HarmonyPatch(typeof(LocalGame), MethodType.Constructor)]
+    internal class LocalGameCtorPatch
     {
-        protected override MethodBase GetTargetMethod()
+        public static LocalGame Instance;
+        public static void Postfix(LocalGame __instance)
         {
-            return AccessTools.Method(typeof(BotsController), "Stop");
-
-        }
-        [PatchPrefix]
-        private static bool PatchPrefix(BotsController __instance)
-        {
-            InteractableObjects.Dispose();
-
-            BossPlayers.Dispose();
-            Receivers.Dispose();
-            FollowerPatrolInstances.Dispose();
-
-            BotsControllerPatch.spawnedPlayers.Clear();
-            BotsControllerPatch.Controller = null;
-
-            BotOwnerManualUpdatePatch.BotOwnerUpdate.Clear();
-
-            PingTeamates.Disable();
-
-            Enemy.ClearEnemiesLocations();
-            GoalEnemyTracePatch.ClearCache();
-            Utils.Utils.FlagsClear();
-
-            if (LocalGameCtorPatch.Instance != null) LocalGameCtorPatch.Instance = null;
-
-            Components.Logger.LogInfo("Raid Ended");
-
-            return true;
+            Instance = __instance;
         }
     }
-
 
     [HarmonyPatch(typeof(LocalGame))]
     [HarmonyPatch("vmethod_4")]
@@ -930,8 +904,14 @@ namespace friendlyPMC.Patches
             yield break;
         }
 
+        public static bool squadSpawned = false;
+
         public static void SpawnFollowers()
         {
+
+            if (squadSpawned) return;
+
+            squadSpawned = true;
 
             List<UniTask> squadSpawners = new List<UniTask>();
 
@@ -976,13 +956,39 @@ namespace friendlyPMC.Patches
         }
     }
 
-    [HarmonyPatch(typeof(LocalGame),MethodType.Constructor)]
-    internal class LocalGameCtorPatch
+    internal class BotsControllerStopPatch : ModulePatch
     {
-        public static LocalGame Instance;
-        public static void Postfix(LocalGame __instance)
+        protected override MethodBase GetTargetMethod()
         {
-            Instance = __instance;
+            return AccessTools.Method(typeof(BotsController), "Stop");
+
+        }
+        [PatchPrefix]
+        private static bool PatchPrefix(BotsController __instance)
+        {
+            InteractableObjects.Dispose();
+
+            BossPlayers.Dispose();
+            Receivers.Dispose();
+            FollowerPatrolInstances.Dispose();
+
+            BotsControllerPatch.spawnedPlayers.Clear();
+            BotsControllerPatch.Controller = null;
+
+            BotOwnerManualUpdatePatch.BotOwnerUpdate.Clear();
+
+            PingTeamates.Disable();
+
+            Enemy.ClearEnemiesLocations();
+            GoalEnemyTracePatch.ClearCache();
+            Utils.Utils.FlagsClear();
+
+            LocalGameVmethod4Patch.squadSpawned = false;
+            if (LocalGameCtorPatch.Instance != null) LocalGameCtorPatch.Instance = null;
+
+            Components.Logger.LogInfo("Raid Ended");
+
+            return true;
         }
     }
 

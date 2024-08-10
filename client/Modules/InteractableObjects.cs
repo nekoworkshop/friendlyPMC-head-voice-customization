@@ -82,6 +82,7 @@ namespace friendlyPMC.Modules
         private void GatherItems()
         {
             var bossPlayers = BossPlayers.Instance.GetBossPlayers();
+            _toSendItems.Clear();
             foreach (var player in bossPlayers)
             {
                 foreach (var bot in player.Value.Followers)
@@ -121,6 +122,8 @@ namespace friendlyPMC.Modules
                                     if (item.Id == stored)
                                     {
                                         _toSendItems.Add(item.CloneItem());
+                                        found = true;
+                                        break;
                                     }
                                 }
                             }
@@ -170,6 +173,7 @@ namespace friendlyPMC.Modules
                 stack.Value.Clear();
             }
             _lootedItems.Clear();
+            _toSendItems.Clear();
 
             _currDoor = null;
             

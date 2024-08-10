@@ -302,11 +302,6 @@ namespace friendlyPMC.Components
                 }
             }
 
-            if (ammoAdded > 0)
-            {
-                Components.Logger.LogInfo("Added " + ammoAdded + " of ammo to bot");
-            }
-
         }
 
         public virtual FollowerBrain GetFollowerBrain(BotOwner bot, pitAIBossPlayer boss)
