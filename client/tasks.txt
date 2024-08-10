@@ -12,12 +12,16 @@
  - x - fix looting not working with SWAG (can't reproduce anymore)
  - x - remove the "fire" command that switches to push
  - x - remove the "stop" command
- - x - make hold positon and stop gesture behave the same
+ - x - updates hold positon and stop gesture
  - x - make bots have extra ammo
+ - have bots react with ok if player says exist located and do a regroup if far
+ - have bots react with hello or ok sign if player signals ok
 
 
 --- ==== 3.6.1 ==== ---:
  - fix bots not being silent on issuing silence command
+ - update getBack request to make bots cover boss at a distance during combat
+ - update coverMe request to reset cover boss distance
  - have followers send message at the end of the raid depending on status and how many made it out
  - if we have a follower that was picked up, that one should send a thank you message if he was able to make it out with the player
 
@@ -41,8 +45,10 @@ RELEASE NOTES (3.6.0):
  - changed the squad spawn logic (again) to help deal with an error SAIN was throwing because of not liking that the bots where spawning first
  - "Fire" command removed
  - "Stop" command removed
- - "Hold Position" command changed to be temporary hold when in combat or tell bots to wait when out of combat. This does not affect Marksman
- - "Stop" gesture now behaves just like "Hold Position" except its for followers within 15 meter radius.
+ - "Hold Position" command uodated ( triggers hold tactic if in combat and hold position if out of combat).
+ - "Stop" gesture triggers hold position for any follower within 15 meter radius.
+ - hold position request, be it via gesture or phrase will transition over to hold tactic if request was made out of combat but never canceled by the time bot entered combat. This request affects Marksman as well
+ - when in an extraction zone if player says exist located all followers with rush to regroup to player location
 
 ==================================================================================
 REVISIT:

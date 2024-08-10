@@ -46,7 +46,7 @@ namespace friendlyPMC.Components
             // - requests
             FollowerRequestLayer layer4 = new FollowerRequestLayer(_owner, 55);
             method_0(2, layer4, true);
-            
+
             // - fight
             FollowerFightLayer layer6 = new FollowerFightLayer(_owner, 60);
             fightLayer = layer6;
@@ -125,7 +125,7 @@ namespace friendlyPMC.Components
         }
 
         public virtual void Dismissed()
-        { 
+        {
             ClearFollowerPatrol();
 
             _owner.GetPlayer.HealthController.DiedEvent -= OnDead;

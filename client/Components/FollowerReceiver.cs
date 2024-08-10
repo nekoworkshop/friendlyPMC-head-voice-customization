@@ -662,14 +662,16 @@ namespace friendlyPMC.Components
                         }
                     }
                 }
-                // temporary hold position
+                // switch to hold tactic and try hold position request 
                 else if (info.phrase == EPhraseTrigger.HoldPosition)
                 {
                     (botOwner_0.Brain.BaseBrain as FollowerBrain).BossOrdersChanged();
 
                     Player alivePlayerByProfileID = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(requester.ProfileId);
 
-                    if (botOwner_0.BotRequestController.TryStopCurrent(alivePlayerByProfileID, false))
+                    (botOwner_0.Brain.BaseBrain as FollowerBrain).SetBossTactic("defend");
+
+                    if (botOwner_0.BotRequestController.TryStopCurrent(alivePlayerByProfileID, false) && notBusy)
                     {
                         FollowerHold holdit = new FollowerHold(alivePlayerByProfileID);
 
@@ -692,6 +694,7 @@ namespace friendlyPMC.Components
 
                     Player alivePlayerByProfileID = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(requester.ProfileId);
                     botOwner_0.BotRequestController.TryStopCurrent(alivePlayerByProfileID, false);
+                    (botOwner_0.Brain.BaseBrain as FollowerBrain).SetBossTactic(null);
 
                     if (isClose && notBusy)
                     {
@@ -792,13 +795,15 @@ namespace friendlyPMC.Components
 
                                         return;
                                     }
+                                    else
+                                    {
+                                        botOwner_0.BotTalk.TrySay(EPhraseTrigger.Negative, false);
+                                        botOwner_0.Gesture.TryGestus(EGesture.Bad, false);
+                                    }
                                 }
                             }
                         }
                     }
-
-                    botOwner_0.BotTalk.TrySay(EPhraseTrigger.Negative, false);
-                    botOwner_0.Gesture.TryGestus(EGesture.Bad, false);
 
                     return;
                 }
