@@ -34,6 +34,8 @@ namespace friendlyPMC.Actions
 
         protected float maxDist = 100f;
 
+        protected float searchPose = 0.1f;
+
         protected Queue<Action> _actionsQueue = new Queue<Action>();
 
         protected bool _init = false;
@@ -101,7 +103,7 @@ namespace friendlyPMC.Actions
                     {
                         if (!_hasCome)
                         {
-                            botOwner_0.SetPose(0.5f);
+                            botOwner_0.SetPose(searchPose);
                             botOwner_0.StopMove();
                             botOwner_0.Steering.LookToPoint(botOwner_0.Memory.GoalEnemy.GetCenterPart());
                             _hasCome = true;
@@ -198,16 +200,16 @@ namespace friendlyPMC.Actions
             }
         }
 
-        private void ReachSearchPoint()
+        protected virtual void ReachSearchPoint()
         {
             SetSearchPosition();
             spotPosition = null;
             covering = false;
         }
 
-        private void SetSearchPosition()
+        protected virtual void SetSearchPosition()
         {
-            botOwner_0.SetPose(0.5f);
+            botOwner_0.SetPose(searchPose);
             botOwner_0.StopMove();
             if(botOwner_0.Memory.HaveEnemy)
                 botOwner_0.Steering.LookToPoint(botOwner_0.Memory.GoalEnemy.GetCenterPart());

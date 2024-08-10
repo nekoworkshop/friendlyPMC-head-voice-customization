@@ -890,12 +890,12 @@ namespace friendlyPMC.Patches
         }
     }
 
-    [HarmonyPatch(typeof(LocalGame))]
+    [HarmonyPatch(typeof(BaseLocalGame<EftGamePlayerOwner>))]
     [HarmonyPatch("vmethod_4")]
     public class LocalGameVmethod4Patch
     {
         [HarmonyPostfix]
-        public static IEnumerator Postfix(IEnumerator __result, LocalGame __instance, BotControllerSettings controllerSettings, ISpawnSystem spawnSystem, Callback runCallback)
+        public static IEnumerator Postfix(IEnumerator __result, BaseLocalGame<EftGamePlayerOwner> __instance, BotControllerSettings controllerSettings, ISpawnSystem spawnSystem, Callback runCallback)
         {
             yield return __result;
 
