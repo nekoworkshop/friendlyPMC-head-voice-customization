@@ -4,8 +4,9 @@
  - x - fix bots not appearing as being in the same group (player is not possible)
  - x - fix bears not speaking russian with englishBear flag is off
  - x - fix followers not being hostile to same side, when activated
- - #inprogress - ensure followers add enemy when a same side bot adds the player as enemy
- - #inprogress - change the spawn setup (needs FIKA adjustments)
+ - x - ensure followers add enemy when a same side bot adds the player as enemy
+ - #inprogress - change the spawn setup (needs Fika confirmation)
+ - #inprogress - fix issue with duplicated loot (test with weapons, magazines and vests)
  - x - rename EnemyInfo utility class to Enemy
  - x - fix "contact" not always picking up an enemy. Also make bots switch target if player is signaling an enemy that is much closer
  - x - fix looting not working with SWAG (can't reproduce anymore)
@@ -27,6 +28,7 @@
 --- ==== 3.7 ==== ---:
 - fix glitchy behavior of boss followers
 - goons send messages at the end of the raid
+- add new tactic that is based on marksman but allows for push command and others
 - make squad have skill relative to the player's skill
 
 ==================================================================================

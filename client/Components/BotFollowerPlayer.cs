@@ -207,7 +207,7 @@ namespace friendlyPMC.Components
                     _bot.BotLight.TurnOff(false, true);
                 }
             }, 300);
-            
+
             // ensure bot has enough ammo
             AddExtraAmmo();
 
@@ -228,7 +228,8 @@ namespace friendlyPMC.Components
             try
             {
                 secureContainer = (SearchableItemClass)inventory.Inventory.Equipment.GetSlot(EquipmentSlot.SecuredContainer).ContainedItem;
-            } catch
+            }
+            catch
             {
                 Components.Logger.LogInfo("Cannot access secure container of bot, extra ammo will not be added");
                 return;
@@ -240,7 +241,7 @@ namespace friendlyPMC.Components
                 return;
             }
 
-            
+
 
             StashGridClass stashGridClass = secureContainer.Grids.FirstOrDefault();
 
@@ -259,7 +260,7 @@ namespace friendlyPMC.Components
                         null
                     );
 
-            if(ammoToAdd == null )
+            if (ammoToAdd == null)
             {
                 Components.Logger.LogInfo("Bot has no weapon to add ammo");
                 return;
