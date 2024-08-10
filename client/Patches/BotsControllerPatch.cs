@@ -19,6 +19,8 @@ using friendlyPMC.Utils;
 using Comfort.Common;
 using System.Linq;
 using EFT.InventoryLogic;
+using EFT.Bots;
+using System.Collections;
 
 
 
@@ -184,65 +186,20 @@ namespace friendlyPMC.Patches
             }
         }
 
-        public async UniTask ActivateBot(GClass814 botCreator, Profile profile, Vector3 position, int pointId,  BotZone zone, Func<BotOwner, BotZone, BotsGroup>groupAction, Action<BotOwner> callback)
-        {
-            LocalGame game = LocalGameCtorPatch.Instance;
-
-            BotSpawner botSpawnerClass = Controller.BotSpawner;
-
-            IBotGame botGame = AccessTools.Field(typeof(BotSpawner), "_game").GetValue(botSpawnerClass) as IBotGame;
-
-            Dictionary<string, Player> dictionary_2 = null;
-
-            dictionary_2 = AccessTools.Field(typeof(LocalGame), "dictionary_2").GetValue(game) as Dictionary<string, Player>;
-
-            // recreation of ActivateBot from GClass814
-            GClass814.Class509 @class = new GClass814.Class509();
-            @class.gclass814_0 = botCreator;
-            @class.zone = zone;
-
-            @class.callback = callback;
-
-            @class.groupAction = groupAction;
-
-
-            GClass590 bornInfo = new GClass590(position, pointId, false);
-            // this is part of method_17 from LocalGame
-            int playerId = game.method_12();
-            profile.SetSpawnedInSession(profile.Info.Side == EPlayerSide.Savage);
-
-            LocalPlayer localPlayer = await LocalPlayer.Create(playerId, bornInfo.position, Quaternion.identity, "Player", "", EPointOfView.ThirdPerson, profile, true, game.UpdateQueue, Player.EUpdateMode.Auto, Player.EUpdateMode.Auto, BackendConfigAbstractClass.Config.CharacterController.BotPlayerMode, new Func<float>(LocalGame.Class1394.class1394_0.method_4), new Func<float>(LocalGame.Class1394.class1394_0.method_5), new GClass1800(), GClass1457.Default, null, null, false);
-            localPlayer.Location = game.Location_0.Id;
-
-            dictionary_2.Add(localPlayer.ProfileId, localPlayer);
-
-            // method_2 of GClass814
-            AICorePoint corePoint = Controller.CoversData.AICorePointsHolder.GetCorePoint(bornInfo.CorePointId);
-            BotOwner botOwner = BotOwner.Create(localPlayer, null, botGame.GameDateTime, Controller, true, corePoint);
-            botCreator.method_4(botOwner.GetPlayer);
-            botCreator.method_5(botOwner, false);
-            botOwner.GetComponentsInChildren<Collider>();
-            botOwner.GetPlayer.CharacterController.isEnabled = false;
-
-            @class.method_0(botOwner);
-        }
-
         public async UniTask ActivateFikaBot(GClass814 botCreator, Profile profile, GClass590 position, BotZone zone,bool shallBeGroup, Func<BotOwner, BotZone, BotsGroup> GroupAction, Action<BotOwner> OnActivate,CancellationToken token)
         {
             await botCreator.ActivateBot(
-                            profile,
-                            position,
-                            zone, true,
-                            GroupAction,
-                            OnActivate,
-                            token
-                        );
+                profile,
+                position,
+                zone, shallBeGroup,
+                GroupAction,
+                OnActivate,
+                token
+            );
         }
-
 
         public async UniTask SpawnBossFollower(pitAIBossPlayer player, WildSpawnType boss = WildSpawnType.bossKnight, CancelToken cancelToken = null)
         {
-            
             float dist;
 
             CancelToken token = cancelToken != null ? cancelToken :  new CancelToken();
@@ -495,27 +452,17 @@ namespace friendlyPMC.Patches
                         return GetPlayerGroup(player, bt, zn);
                     });
 
-                    if (HasFIkaDonuts())
-                    {
-                        ActivateFikaBot(
-                            botCreator,
-                            profile,
-                            new GClass590(position, closestCorePoint.Id, false),
-                            zone, true,
-                            GroupAction,
-                            OnActivate,
-                            token.GetCancelToken()
-                        ).Forget();
-                    }
-                    else
-                    {
-                        ActivateBot(botCreator, profile, position, closestCorePoint.Id, zone,
-                            GroupAction,
-                            OnActivate
-                        ).Forget();
-                    }
+                    ActivateFikaBot(
+                        botCreator,
+                        profile,
+                        new GClass590(position, closestCorePoint.Id, false),
+                        zone, true,
+                        GroupAction,
+                        OnActivate,
+                        token.GetCancelToken()
+                    ).Forget();
 
-            });   
+                });   
             });
 
             spanwers.Reverse();
@@ -601,7 +548,8 @@ namespace friendlyPMC.Patches
                                     if (eq == "Player Equipment")
                                     {
                                         profile.Inventory.Equipment = player.Player().Profile.Inventory.Equipment.CloneItem(null);
-                                        profile.Inventory.Equipment.GetSlot(EquipmentSlot.SecuredContainer).ContainedItem = secureContainer;
+                                        profile.Inventory.Equipment.GetSlot(EquipmentSlot.SecuredContainer).ChangeContainedItemDirectly(secureContainer);
+                                        profile.Inventory.Equipment.GetSlot(EquipmentSlot.SecuredContainer).ApplyContainedItem();
                                     }
                                     else
                                     {
@@ -681,7 +629,8 @@ namespace friendlyPMC.Patches
                                 profile.Inventory.Equipment = profileEquipment[profile.Id];
                                 if(secureContainers.ContainsKey(profile.Id))
                                 {
-                                    profile.Inventory.Equipment.GetSlot(EquipmentSlot.SecuredContainer).ContainedItem = secureContainers[profile.Id];
+                                    profile.Inventory.Equipment.GetSlot(EquipmentSlot.SecuredContainer).ChangeContainedItemDirectly(secureContainers[profile.Id]);
+                                    profile.Inventory.Equipment.GetSlot(EquipmentSlot.SecuredContainer).ApplyContainedItem();
                                 }
                             }
                         }
@@ -823,24 +772,15 @@ namespace friendlyPMC.Patches
 
                 });
 
-                if (!HasFIkaDonuts())
-                    await ActivateBot(
-                        botCreator, profile, position, closestCorePoint.Id, zone,
-                        GroupAction, OnActivate
-                    );
-                else
-                {
-                    Components.Logger.LogInfo("Use FIKA setup");
-                    await ActivateFikaBot(
-                        botCreator,
-                        profile,
-                        new GClass590(position, closestCorePoint.Id, false),
-                        zone, true,
-                        GroupAction,
-                        OnActivate,
-                        token.GetCancelToken()
-                    );
-                }
+                await ActivateFikaBot(
+                    botCreator,
+                    profile,
+                    new GClass590(position, closestCorePoint.Id, false),
+                    zone, true,
+                    GroupAction,
+                    OnActivate,
+                    token.GetCancelToken()
+                );
 
             });
 
@@ -895,16 +835,103 @@ namespace friendlyPMC.Patches
         }
     }
 
-    internal class WavesSpawnScenarioRunPatch : ModulePatch
+    /*internal class WavesSpawnScenarioRunPatch : ModulePatch
     {
         public static bool spawnRan = false;
 
+        
+
+        protected override MethodBase GetTargetMethod()
+        {
+            return AccessTools.Method(typeof(WavesSpawnScenario), "Run");
+        }
+        [PatchPostfix]
+        private static void PatchPostfix(WavesSpawnScenario __instance, EBotsSpawnMode spawnMode = EBotsSpawnMode.Anyway)
+        {
+            //SpawnFollowers();
+        }
+    }*/
+
+    /*internal class NonWavesSpawnScenarioRunPatch : ModulePatch
+    {
+        protected override MethodBase GetTargetMethod()
+        {
+            return AccessTools.Method(typeof(NonWavesSpawnScenario), "Run");
+        }
+        [PatchPostfix]
+        private static void PatchPostfix(NonWavesSpawnScenario __instance)
+        {
+            //WavesSpawnScenarioRunPatch.SpawnFollowers();
+        }
+    }*/
+
+
+    /*internal class Glass579RunPatch : ModulePatch
+    {
+        protected override MethodBase GetTargetMethod()
+        {
+            return AccessTools.Method(typeof(BossSpawnWaveManagerClass), "Run");
+
+        }
+        [PatchPostfix]
+        private static void PatchPostfix(BossSpawnWaveManagerClass __instance, EBotsSpawnMode spawnMode = EBotsSpawnMode.Anyway)
+        {
+            //WavesSpawnScenarioRunPatch.SpawnFollowers();
+        }
+    }*/
+
+    internal class BotsControllerStopPatch : ModulePatch
+    {
+        protected override MethodBase GetTargetMethod()
+        {
+            return AccessTools.Method(typeof(BotsController), "Stop");
+
+        }
+        [PatchPrefix]
+        private static bool PatchPrefix(BotsController __instance)
+        {
+            InteractableObjects.Dispose();
+
+            BossPlayers.Dispose();
+            Receivers.Dispose();
+            FollowerPatrolInstances.Dispose();
+
+            BotsControllerPatch.spawnedPlayers.Clear();
+            BotsControllerPatch.Controller = null;
+
+            BotOwnerManualUpdatePatch.BotOwnerUpdate.Clear();
+
+            PingTeamates.Disable();
+
+            Enemy.ClearEnemiesLocations();
+            GoalEnemyTracePatch.ClearCache();
+            Utils.Utils.FlagsClear();
+
+            if (LocalGameCtorPatch.Instance != null) LocalGameCtorPatch.Instance = null;
+
+            Components.Logger.LogInfo("Raid Ended");
+
+            return true;
+        }
+    }
+
+
+    [HarmonyPatch(typeof(LocalGame))]
+    [HarmonyPatch("vmethod_4")]
+    public class LocalGameVmethod4Patch
+    {
+        [HarmonyPostfix]
+        public static IEnumerator Postfix(IEnumerator __result, LocalGame __instance, BotControllerSettings controllerSettings, ISpawnSystem spawnSystem, Callback runCallback)
+        {
+            yield return __result;
+
+            SpawnFollowers();
+
+            yield break;
+        }
+
         public static void SpawnFollowers()
         {
-
-            if (spawnRan) return;
-
-            spawnRan = true;
 
             List<UniTask> squadSpawners = new List<UniTask>();
 
@@ -947,83 +974,7 @@ namespace friendlyPMC.Patches
                 }).Forget();
             }
         }
-
-        protected override MethodBase GetTargetMethod()
-        {
-            return AccessTools.Method(typeof(WavesSpawnScenario), "Run");
-        }
-        [PatchPostfix]
-        private static void PatchPostfix(WavesSpawnScenario __instance, EBotsSpawnMode spawnMode = EBotsSpawnMode.Anyway)
-        {
-            SpawnFollowers();
-        }
     }
-
-    internal class NonWavesSpawnScenarioRunPatch : ModulePatch
-    {
-        protected override MethodBase GetTargetMethod()
-        {
-            return AccessTools.Method(typeof(NonWavesSpawnScenario), "Run");
-        }
-        [PatchPostfix]
-        private static void PatchPostfix(NonWavesSpawnScenario __instance)
-        {
-            WavesSpawnScenarioRunPatch.SpawnFollowers();
-        }
-    }
-
-
-    internal class Glass579RunPatch : ModulePatch
-    {
-        protected override MethodBase GetTargetMethod()
-        {
-            return AccessTools.Method(typeof(BossSpawnWaveManagerClass), "Run");
-
-        }
-        [PatchPostfix]
-        private static void PatchPostfix(BossSpawnWaveManagerClass __instance, EBotsSpawnMode spawnMode = EBotsSpawnMode.Anyway)
-        {
-            WavesSpawnScenarioRunPatch.SpawnFollowers();
-        }
-    }
-
-    internal class BotsControllerStopPatch : ModulePatch
-    {
-        protected override MethodBase GetTargetMethod()
-        {
-            return AccessTools.Method(typeof(BotsController), "Stop");
-
-        }
-        [PatchPrefix]
-        private static bool PatchPrefix(BotsController __instance)
-        {
-            InteractableObjects.Dispose();
-
-            BossPlayers.Dispose();
-            Receivers.Dispose();
-            FollowerPatrolInstances.Dispose();
-
-            BotsControllerPatch.spawnedPlayers.Clear();
-            BotsControllerPatch.Controller = null;
-
-            WavesSpawnScenarioRunPatch.spawnRan = false;
-
-            BotOwnerManualUpdatePatch.BotOwnerUpdate.Clear();
-
-            PingTeamates.Disable();
-
-            Enemy.ClearEnemiesLocations();
-            GoalEnemyTracePatch.ClearCache();
-            Utils.Utils.FlagsClear();
-
-            if (LocalGameCtorPatch.Instance != null) LocalGameCtorPatch.Instance = null;
-
-            Components.Logger.LogInfo("Raid Ended");
-
-            return true;
-        }
-    }
-
 
     [HarmonyPatch(typeof(LocalGame),MethodType.Constructor)]
     internal class LocalGameCtorPatch

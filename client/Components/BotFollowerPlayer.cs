@@ -186,8 +186,6 @@ namespace friendlyPMC.Components
                 _player.bossGroup.AddMember(_bot, false);
             }
 
-            AddExtraAmmo();
-
 
             // apply some of settings modifier
             _bot.Settings.Current._hearingDistCoef = settingModif.HearingDistCoef;
@@ -209,6 +207,9 @@ namespace friendlyPMC.Components
                     _bot.BotLight.TurnOff(false, true);
                 }
             }, 300);
+            
+            // ensure bot has enough ammo
+            AddExtraAmmo();
 
             Logger.LogInfo($"Bot {_bot.Profile.Nickname} is now a follower of {_player.Player().Profile.Nickname}");
         }
@@ -258,6 +259,12 @@ namespace friendlyPMC.Components
                         null
                     );
 
+            if(ammoToAdd == null )
+            {
+                Components.Logger.LogInfo("Bot has no weapon to add ammo");
+                return;
+            }
+
             int ammoAdded = 0;
 
             for (int i = 0; i < 10; i++)
@@ -272,14 +279,15 @@ namespace friendlyPMC.Components
                 if (location != null)
                 {
                     var result = location.AddWithoutRestrictions(ammo, visitorIds);
+
                     if (result.Succeeded)
                     {
                         ammoAdded += ammo.StackObjectsCount;
-                        Singleton<GridCacheClass>.Instance.Add(
+                        /*Singleton<GridCacheClass>.Instance.Add(
                             location.GetOwner().ID,
                             location.Grid as GridClassEx,
                             ammo
-                        );
+                        );*/
                     }
                     else
                     {

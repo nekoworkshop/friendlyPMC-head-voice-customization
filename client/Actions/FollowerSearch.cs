@@ -59,7 +59,7 @@ namespace friendlyPMC.Actions
                 CustomNavigationPoint Spot = Utils.Covers.GetClosestAttackCoverPoint(
                     botOwner_0.Id,
                     botPosition,
-                    botPosition,
+                    enemySpot,
                     enemySpot,
                     areaCovers,
                     minDist,

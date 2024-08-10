@@ -250,7 +250,7 @@ namespace friendlyPMC.Actions
                 CustomNavigationPoint Spot = Utils.Covers.GetClosestAttackCoverPoint(
                     botOwner_0.Id,
                     botOwner_0.GetPlayer.Transform.position,
-                    botOwner_0.GetPlayer.Transform.position, 
+                    enemySpot,
                     enemySpot,
                     areaCovers,
                     minDist, 
