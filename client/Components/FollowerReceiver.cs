@@ -295,6 +295,25 @@ namespace friendlyPMC.Components
                     base.method_6(data);
                 }
             }
+            else if (gesture == EGesture.Good)
+            {
+                if (isBossCommunicating)
+                {
+                    if (
+                        gestusDistance < maxGestusDistance && 
+                        IsInteractivePlayer(botOwner_0, data.Player.Transform.position, data.Player.LookDirection) && 
+                        !botOwner_0.Memory.HaveEnemy
+                        )
+                    {
+                        botOwner_0.Gesture.TryGestus(EGesture.Good, false);
+                    }
+                    return;
+                }
+                else if (shouldDefault)
+                {
+                    base.method_6(data);
+                }
+            }
             // on gesture "go there", if bot has enemy, do a push, else the closest bot to the user will move forward 
             else if (gesture == EGesture.ThatDirection)
             {
@@ -620,7 +639,7 @@ namespace friendlyPMC.Components
                 // tell the bots to be quiet for a minute
                 else if (info.phrase == EPhraseTrigger.Silence)
                 {
-                    botOwner_0.BotTalk.SetSilence(60f);
+                    botOwner_0.BotTalk.SetSilence(120f);
                     if (isClose)
                     {
                         botOwner_0.Gesture.TryGestus(EGesture.Good, false);
@@ -813,6 +832,31 @@ namespace friendlyPMC.Components
                     {
                         botOwner_0.Gesture.TryGestus(EGesture.Hello, false);
                     }
+                    return;
+                }
+                else if (info.phrase == EPhraseTrigger.ExitLocated)
+                {
+                    if (isClose && notBusy)
+                    {
+                        botOwner_0.BotTalk.TrySay(EPhraseTrigger.Roger, false);
+                    }
+
+                    (botOwner_0.Brain.BaseBrain as FollowerBrain).BossOrdersChanged();
+
+
+                    Player alivePlayerByProfileID = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(requester.ProfileId);
+
+                    if (botOwner_0.BotRequestController.TryStopCurrent(alivePlayerByProfileID, true))
+                    {
+                        FollowerRegroup gclass = new FollowerRegroup(requester);
+
+                        if (botOwner_0.BotsGroup.RequestsController.TryAddRequest(gclass))
+                        {
+                            gclass.AddPossibleExecutors(botOwner_0);
+                            gclass.SetGroup(botOwner_0.BotsGroup.RequestsController);
+                        }
+                    }
+
                     return;
                 }
                 // on dismiss remove the bot from being a follower
