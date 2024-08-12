@@ -159,7 +159,7 @@ namespace friendlyPMC
 
             //new AIDataDisposePatch().Enable();
             new AIDataContructPatch().Enable();
-            //new AIDataBossPlayerPatch().Enable();
+            new AIBossPlayerPatch().Enable();
 
             new QuickPanelPatch().Enable();
             new GestureMenuPatch().Enable();

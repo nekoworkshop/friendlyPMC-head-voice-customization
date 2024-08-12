@@ -13,6 +13,7 @@ namespace friendlyPMC.Components
         protected pitAIBossPlayer _boss;
 
         protected string _currentTactic = null;
+        protected string _defaultTactic = null;
 
         public string currentTactic
         {
@@ -137,6 +138,10 @@ namespace friendlyPMC.Components
         {
             if (fightLayer != null)
             {
+                // whatever tactic we initially set when calling AddBotFollower, that becomes the default one
+                if (_defaultTactic == null && tactic != null) _defaultTactic = tactic;
+                else if(tactic == null && _defaultTactic != null) tactic = _defaultTactic;
+
                 fightLayer.SetBossFightTactic(tactic);
                 BossOrdersChanged();
             }

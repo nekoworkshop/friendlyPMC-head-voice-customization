@@ -243,11 +243,6 @@ namespace friendlyPMC.Components
             Logger.LogInfo("pitAIBossPlayer Dispose called");
         }
 
-        public new void OfferBot(BotOwner bot)
-        {
-            // do nothing, this is called by the game and we don't want followers to be added automatically
-        }
-
         public void AddFollower(BotOwner bot)
         {
             Followers.Add(bot);

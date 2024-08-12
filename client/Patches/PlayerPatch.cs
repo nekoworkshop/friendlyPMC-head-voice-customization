@@ -10,43 +10,7 @@ using System.Collections.Generic;
 
 namespace friendlyPMC.Patches
 {
-    internal class AIDataDisposePatch : ModulePatch
-    {
-        protected override MethodBase GetTargetMethod()
-        {
-            return AccessTools.Method(typeof(AIData), "Dispose");
-        }
-        // overwrite AIData Dispose
-        // replicate the method but keep note of AIBossPlayer being null
-        [PatchPrefix]
-        private static bool PatchPrefix(AIData __instance)
-        {
-            var _movementContext = AccessTools.Field(typeof(AIData), "_movementContext").GetValue(__instance) as MovementContext;
-            _movementContext.OnTiltChanged -= __instance.method_2;
-            _movementContext.OnMotionApplied -= __instance.method_0;
-            
-            __instance.AskRequests.Dispose();
-            try
-            {
-                // only players will have this null
-                if (__instance.AIBossPlayer != null && __instance.AIBossPlayer.Followers != null)
-                {
-                    BotOwner[] array = __instance.AIBossPlayer.Followers.ToArray();
-                    for (int i = 0; i < array.Length; i++)
-                    {
-                        if(array[i].BotFollower != null && array[i].BotFollower.PatrolDataFollower != null) array[i].BotFollower.Dispose();
-                    }
-                    __instance.AIBossPlayer.Followers.Clear();
-                }
-            } catch(Exception ex) 
-            {
-                Components.Logger.LogInfo("Error Dispose AIBossPlayer: " + ex.Message);
-            }
-
-            return false;
-        }
-    }
-
+    
     internal class AIDataContructPatch : ModulePatch
     {
 
@@ -80,23 +44,17 @@ namespace friendlyPMC.Patches
 
         }
     }
-    internal class AIDataBossPlayerPatch : ModulePatch
+    internal class AIBossPlayerPatch : ModulePatch
     {
         protected override MethodBase GetTargetMethod()
         {
-            return AccessTools.PropertyGetter(typeof(AIData), "AIBossPlayer");
+            return AccessTools.Method(typeof(AIBossPlayer), "OfferBot");
         }
-        // overwrite AIData to have our AIBossPlayer returned when needed
+        // do not let OfferBot run, we have our own method for adding followers to the player
         [PatchPrefix]
-        private static bool PatchPrefix(AIData __instance, ref AIBossPlayer __result)
+        private static bool PatchPrefix(AIBossPlayer __instance, BotOwner bot)
         {
-            if(BossPlayers.Instance != null && BossPlayers.IsPlayerBoss(__instance.Player.ProfileId))
-            {
-                __result = BossPlayers.Instance.GetBossPlayer(__instance.Player.ProfileId);
-                return false;
-            }
-
-            return true;
+            return false;
         }
     }
 }

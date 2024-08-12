@@ -1,6 +1,7 @@
 ﻿
 using EFT;
 using friendlyPMC.Components.Tactics;
+using friendlyPMC.Modules;
 using friendlyPMC.Utils;
 using System;
 using System.Collections.Generic;
@@ -174,6 +175,8 @@ namespace friendlyPMC.Components
 
                 return false;
             }
+
+            if (InteractableObjects.IsTaker(botOwner_0)) return false;
 
             return true;
         }

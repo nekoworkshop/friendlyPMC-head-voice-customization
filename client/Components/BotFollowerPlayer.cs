@@ -214,6 +214,7 @@ namespace friendlyPMC.Components
             Logger.LogInfo($"Bot {_bot.Profile.Nickname} is now a follower of {_player.Player().Profile.Nickname}");
         }
 
+
         public InventoryControllerClass GetInventoryController()
         {
             return _bot.GetPlayer.InventoryControllerClass;
@@ -313,7 +314,6 @@ namespace friendlyPMC.Components
                 return FollowerCreateNode.CreateNode(decision, bot);
             }));
         }
-
 
         public virtual void SetFollowerSettings(BotOwner bot)
         {

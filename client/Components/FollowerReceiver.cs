@@ -797,7 +797,6 @@ namespace friendlyPMC.Components
                         {
                             if (InteractableObjects.SetTaker(botOwner_0))
                             {
-
                                 Player alivePlayerByProfileID = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(requester.ProfileId);
 
                                 if (botOwner_0.BotRequestController.TryStopCurrent(alivePlayerByProfileID, false))
@@ -818,8 +817,17 @@ namespace friendlyPMC.Components
                                     {
                                         botOwner_0.BotTalk.TrySay(EPhraseTrigger.Negative, false);
                                         botOwner_0.Gesture.TryGestus(EGesture.Bad, false);
+                                        InteractableObjects.RemoveTaker(botOwner_0);
                                     }
+                                } 
+                                else
+                                {
+                                    InteractableObjects.RemoveTaker(botOwner_0);
                                 }
+                            }
+                            else
+                            {
+                                Components.Logger.LogInfo("Could not set a taker");
                             }
                         }
                     }

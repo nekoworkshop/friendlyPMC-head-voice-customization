@@ -71,19 +71,29 @@ namespace friendlyPMC.Modules
                     items = flatItems,
                     member = info
                 }.ToJson(_defaultJsonConverters));
+            } else
+            {
+                Components.Logger.LogInfo("No items to send");
             }
         }
 
         private void GatherItems()
         {
+            Components.Logger.LogInfo("Gather items");
             var bossPlayers = BossPlayers.Instance.GetBossPlayers();
             _toSendItems.Clear();
             List<string> gathered = new List<string>();
+
             foreach (var player in bossPlayers)
             {
+                Components.Logger.LogInfo("Total player followers " + player.Value.Followers.Count);
+
                 foreach (var bot in player.Value.Followers)
                 {
-                    if (bot.BotState != EBotState.Active || !bot.HealthController.IsAlive) return;
+                    if (bot.BotState != EBotState.Active || !bot.HealthController.IsAlive)
+                    {
+                        continue;
+                    }
 
                     InventoryControllerClass _botInventoryController = bot.GetPlayer.InventoryControllerClass;
 
@@ -103,8 +113,6 @@ namespace friendlyPMC.Modules
                             .ContainedItem;
 
                     var storedItems = GetStoredItems(bot.ProfileId);
-
-                    List<string> toRemove = new List<string>();
 
                     if (storedItems != null)
                     {
@@ -327,6 +335,7 @@ namespace friendlyPMC.Modules
 
             if (!list.Contains(item.Id))
             {
+                Components.Logger.LogInfo("Stored item " + item.Name + " for " + bot.ProfileId);
                 list.Add(item.Id);
             }
         }
