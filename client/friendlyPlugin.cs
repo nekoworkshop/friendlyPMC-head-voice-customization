@@ -157,9 +157,9 @@ namespace friendlyPMC
             new BotsControllerStopPatch().Enable();
             new LocalGameCleanupPatch().Enable();
 
-            new AIDataDisposePatch().Enable();
+            //new AIDataDisposePatch().Enable();
             new AIDataContructPatch().Enable();
-            new AIDataBossPlayerPatch().Enable();
+            //new AIDataBossPlayerPatch().Enable();
 
             new QuickPanelPatch().Enable();
             new GestureMenuPatch().Enable();
@@ -167,7 +167,6 @@ namespace friendlyPMC
             new EPhraseTriggerPatch().Enable();
 
             var harmony = new Harmony("xyz.pit.companion");
-            harmony.PatchAll(typeof(LocalGameCtorPatch).Assembly);
             harmony.PatchAll(typeof(LocalGameVmethod4Patch).Assembly);
 
             harmony.PatchAll(typeof(GoalEnemyTracePatch).Assembly);

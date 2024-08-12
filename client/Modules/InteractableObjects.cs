@@ -62,10 +62,10 @@ namespace friendlyPMC.Modules
 
             var _defaultJsonConverters = Traverse.Create(converterClass).Field<JsonConverter[]>("Converters").Value;
 
-            var info = Instance._followersWithLoot.Values.Random();
-
             if (flatItems != null && flatItems.Any())
             {
+                var info = Instance._followersWithLoot.Values.Random();
+
                 RequestHandler.PutJson("/singleplayer/returnitems", new
                 {
                     items = flatItems,
@@ -177,8 +177,10 @@ namespace friendlyPMC.Modules
             {
                 stack.Value.Clear();
             }
+
             _lootedItems.Clear();
             _toSendItems.Clear();
+            _followersWithLoot.Clear();
 
             _currDoor = null;
 

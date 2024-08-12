@@ -273,22 +273,16 @@ namespace friendlyPMC.Components
                 Item ammo = ammoToAdd.CloneItem();
                 ammo.StackObjectsCount = ammo.StackMaxSize;
 
-                string[] visitorIds = new string[] { inventory.ID };
-
                 var location = stashGridClass.FindLocationForItem(ammo);
 
                 if (location != null)
                 {
-                    var result = location.AddWithoutRestrictions(ammo, visitorIds);
+
+                    var result = stashGridClass.AddItemWithoutRestrictions(ammo);
 
                     if (result.Succeeded)
                     {
                         ammoAdded += ammo.StackObjectsCount;
-                        /*Singleton<GridCacheClass>.Instance.Add(
-                            location.GetOwner().ID,
-                            location.Grid as GridClassEx,
-                            ammo
-                        );*/
                     }
                     else
                     {

@@ -806,7 +806,9 @@ namespace friendlyPMC.Patches
                 friendlyPMC.Instance.GetEquipmentBuilds(); // ensure equipment is gathered
                 
                 Props.Reset();
-            
+
+                LocalGameVmethod4Patch.squadSpawned = false;
+
                 Controller = __instance;
 
                 string locationId = Singleton<GameWorld>.Instance.LocationId;
@@ -821,6 +823,13 @@ namespace friendlyPMC.Patches
 
            
             pitAIBossPlayer playerBoss = BossPlayers.AddPlayerAsBoss(player);
+            var field = AccessTools.Field(typeof(AIData), "<AIBossPlayer>k__BackingField");
+            // replace player AIDATA AIBossPlayer with ours
+            if(AIDataContructPatch.playerAIData.TryGetValue(player.ProfileId,out var aidata))
+            {
+                field.SetValue(aidata, playerBoss);
+            }
+
             spawnedPlayers.Add(playerBoss);
 
             if (friendlyPMC.knightSpawn.Value)
@@ -832,61 +841,6 @@ namespace friendlyPMC.Patches
                 
             }
 
-        }
-    }
-
-    /*internal class WavesSpawnScenarioRunPatch : ModulePatch
-    {
-        public static bool spawnRan = false;
-
-        
-
-        protected override MethodBase GetTargetMethod()
-        {
-            return AccessTools.Method(typeof(WavesSpawnScenario), "Run");
-        }
-        [PatchPostfix]
-        private static void PatchPostfix(WavesSpawnScenario __instance, EBotsSpawnMode spawnMode = EBotsSpawnMode.Anyway)
-        {
-            //SpawnFollowers();
-        }
-    }*/
-
-    /*internal class NonWavesSpawnScenarioRunPatch : ModulePatch
-    {
-        protected override MethodBase GetTargetMethod()
-        {
-            return AccessTools.Method(typeof(NonWavesSpawnScenario), "Run");
-        }
-        [PatchPostfix]
-        private static void PatchPostfix(NonWavesSpawnScenario __instance)
-        {
-            //WavesSpawnScenarioRunPatch.SpawnFollowers();
-        }
-    }*/
-
-
-    /*internal class Glass579RunPatch : ModulePatch
-    {
-        protected override MethodBase GetTargetMethod()
-        {
-            return AccessTools.Method(typeof(BossSpawnWaveManagerClass), "Run");
-
-        }
-        [PatchPostfix]
-        private static void PatchPostfix(BossSpawnWaveManagerClass __instance, EBotsSpawnMode spawnMode = EBotsSpawnMode.Anyway)
-        {
-            //WavesSpawnScenarioRunPatch.SpawnFollowers();
-        }
-    }*/
-
-    [HarmonyPatch(typeof(LocalGame), MethodType.Constructor)]
-    internal class LocalGameCtorPatch
-    {
-        public static LocalGame Instance;
-        public static void Postfix(LocalGame __instance)
-        {
-            Instance = __instance;
         }
     }
 
@@ -909,7 +863,7 @@ namespace friendlyPMC.Patches
         public static void SpawnFollowers()
         {
 
-            if (squadSpawned) return;
+            if (squadSpawned || BotsControllerPatch.Controller == null) return;
 
             squadSpawned = true;
 
@@ -921,17 +875,14 @@ namespace friendlyPMC.Patches
                 BotsControllerPatch.spawnedPlayers.ForEach(playerBoss =>
                 {
 
-                    if (BotsControllerPatch.Controller != null)
+                    UniTask squadSpanner = BotsControllerPatch.Instance.SpawnGroupBots(playerBoss);
+                    if (!friendlyPMC.knightSpawn.Value)
                     {
-                        UniTask squadSpanner = BotsControllerPatch.Instance.SpawnGroupBots(playerBoss);
-                        if (!friendlyPMC.knightSpawn.Value)
-                        {
-                            squadSpanner.Forget();
-                        }
-                        else
-                        {
-                            squadSpawners.Add(squadSpanner);
-                        }
+                        squadSpanner.Forget();
+                    }
+                    else
+                    {
+                        squadSpawners.Add(squadSpanner);
                     }
                 });
             }
@@ -983,8 +934,9 @@ namespace friendlyPMC.Patches
             GoalEnemyTracePatch.ClearCache();
             Utils.Utils.FlagsClear();
 
+            AIDataContructPatch.playerAIData.Clear();
+
             LocalGameVmethod4Patch.squadSpawned = false;
-            if (LocalGameCtorPatch.Instance != null) LocalGameCtorPatch.Instance = null;
 
             Components.Logger.LogInfo("Raid Ended");
 

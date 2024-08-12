@@ -6,6 +6,7 @@ using friendlyPMC.Modules;
 using HarmonyLib;
 using System;
 using System.Reflection;
+using System.Collections.Generic;
 
 namespace friendlyPMC.Patches
 {
@@ -48,6 +49,8 @@ namespace friendlyPMC.Patches
 
     internal class AIDataContructPatch : ModulePatch
     {
+
+        public static Dictionary<string,AIData> playerAIData = new Dictionary<string, AIData>();
         protected override MethodBase GetTargetMethod()
         {
             return AccessTools.Constructor(typeof(AIData), new Type[] { typeof(BotOwner), typeof(Player) });
@@ -70,9 +73,8 @@ namespace friendlyPMC.Patches
                     Logger.LogInfo("Failed to dispose old AIBossPlayer: " + ex.Message);
                 }
 
-                var field = AccessTools.Field(typeof(AIData), "<AIBossPlayer>k__BackingField");
-                field.SetValue(__instance, null);
-                Components.Logger.LogInfo("Set AIData AIBossPlayer NULL for " + player.Profile.Nickname);
+                if(!playerAIData.ContainsKey(player.ProfileId))
+                    playerAIData.Add(player.ProfileId, __instance);
 
             }
 
