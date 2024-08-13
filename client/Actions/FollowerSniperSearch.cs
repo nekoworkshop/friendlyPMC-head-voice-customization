@@ -86,7 +86,8 @@ namespace friendlyPMC.Actions
                 }
                 catch (Exception ex)
                 {
-                    Components.Logger.LogInfo("Failed to init Search: " + ex.Message);
+                    Components.Logger.LogError("Failed to init Search");
+                    Components.Logger.LogError(ex);
                 }
 
                 if (!botOwner_0.Memory.HaveEnemy) return;
@@ -177,8 +178,8 @@ namespace friendlyPMC.Actions
                 }
             } catch (Exception ex)
             {
-                Components.Logger.LogInfo("SniperSearch Error: " + ex.Message);
-                Components.Logger.LogInfo("Trace: " + ex.StackTrace);
+                Components.Logger.LogError("SniperSearch Error");
+                Components.Logger.LogError(ex);
             }
         }
 

@@ -71,9 +71,6 @@ namespace friendlyPMC.Modules
                     items = flatItems,
                     member = info
                 }.ToJson(_defaultJsonConverters));
-            } else
-            {
-                Components.Logger.LogInfo("No items to send");
             }
         }
 
@@ -178,7 +175,8 @@ namespace friendlyPMC.Modules
             }
             catch (Exception e)
             {
-                Components.Logger.LogInfo($"Error sending store items: {e}");
+                Components.Logger.LogError("Error sending stored loot");
+                Components.Logger.LogError(e);
             }
 
             foreach (var stack in _lootedItems)
@@ -276,7 +274,8 @@ namespace friendlyPMC.Modules
                 }
                 catch (Exception ex)
                 {
-                    Components.Logger.LogInfo("SetTaker Error : " + ex.Message);
+                    Components.Logger.LogError("Could not make bot a Loot Taker");
+                    Components.Logger.LogError(ex);
                 }
             }
 
@@ -335,7 +334,6 @@ namespace friendlyPMC.Modules
 
             if (!list.Contains(item.Id))
             {
-                Components.Logger.LogInfo("Stored item " + item.Name + " for " + bot.ProfileId);
                 list.Add(item.Id);
             }
         }

@@ -419,21 +419,26 @@ namespace friendlyPMC.Modules
 
         public static pitAIBossPlayer GetBoss(string name)
         {
+            if(Instance  == null) return null;  
             return Instance.GetBossPlayer(name);
         }
 
         public static bool IsPlayerBoss(string profileId)
         {
+            if (Instance == null) return false;
+
             return Instance.IsBoss(profileId);
         }
 
         public static List<BotFollowerPlayer> GetFollowersByBoss(string bossName)
         {
+            if (Instance == null) return new List<BotFollowerPlayer>();
             return Instance.GetBossFollowers(bossName);
         }
 
         public static bool IsFollower(BotOwner bot, AIBossPlayer boss = null)
         {
+            if (Instance == null) return false;
             return Instance.IsBotFollower(bot, boss);
         }
         public static List<CustomNavigationPoint> GetAICovers()

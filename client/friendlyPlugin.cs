@@ -157,7 +157,6 @@ namespace friendlyPMC
             new BotsControllerStopPatch().Enable();
             new LocalGameCleanupPatch().Enable();
 
-            //new AIDataDisposePatch().Enable();
             new AIDataContructPatch().Enable();
             new AIBossPlayerPatch().Enable();
 

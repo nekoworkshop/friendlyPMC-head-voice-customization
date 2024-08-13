@@ -150,8 +150,8 @@ namespace friendlyPMC.Actions
             }
             catch (Exception e)
             {
-                Components.Logger.LogInfo("Failed to pickup Loot : " + e.Message);
-                Components.Logger.LogInfo("StacTrace : " + e.StackTrace);
+                Components.Logger.LogError("Failed to pickup Loot");
+                Components.Logger.LogError(e);
                 ClearLoot();
             }
         }

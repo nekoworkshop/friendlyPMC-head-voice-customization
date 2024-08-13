@@ -421,8 +421,8 @@ namespace friendlyPMC.Patches
                             }
                             catch (Exception ex)
                             {
-                                Components.Logger.LogInfo("Failed to add " + me.Profile.Nickname + " as ally: " + ex.Message);
-                                Components.Logger.LogInfo("Trace : " + ex.StackTrace);
+                                Components.Logger.LogError("Failed to add " + me.Profile.Nickname + " as ally");
+                                Components.Logger.LogError(ex);
                             }
                         });
 
@@ -603,7 +603,8 @@ namespace friendlyPMC.Patches
                     });
                 } catch(Exception ex)
                 {
-                    Components.Logger.LogInfo("Failed to set squad equipment " +  ex.Message);
+                    Components.Logger.LogError("Failed to set squad equipment for a bot");
+                    Components.Logger.LogError(ex);
                 }
             }
             
@@ -638,7 +639,8 @@ namespace friendlyPMC.Patches
 
                 } catch (Exception ex)
                 {
-                    Components.Logger.LogInfo("Failed to use custom presets, will fall back to default loadout :" + ex.Message);
+                    Components.Logger.LogError("Failed to use custom presets, will fall back to default loadout");
+                    Components.Logger.LogError(ex);
                 }
             }
 
@@ -738,8 +740,8 @@ namespace friendlyPMC.Patches
                         }
                         catch (Exception ex)
                         {
-                            Components.Logger.LogInfo("Failed to add " + me.Profile.Nickname + " as follower : " + ex.Message);
-                            Components.Logger.LogInfo("Trace: " + ex.StackTrace);
+                            Components.Logger.LogError("Failed to add " + me.Profile.Nickname + " as follower");
+                            Components.Logger.LogError(ex);
                         }
                     });
 
@@ -823,12 +825,6 @@ namespace friendlyPMC.Patches
 
            
             pitAIBossPlayer playerBoss = BossPlayers.AddPlayerAsBoss(player);
-            var field = AccessTools.Field(typeof(AIData), "<AIBossPlayer>k__BackingField");
-            // replace player AIDATA AIBossPlayer with ours
-            if(AIDataContructPatch.playerAIData.TryGetValue(player.ProfileId,out var aidata))
-            {
-                field.SetValue(aidata, playerBoss);
-            }
 
             spawnedPlayers.Add(playerBoss);
 
@@ -899,7 +895,11 @@ namespace friendlyPMC.Patches
                         {
                             BotsControllerPatch.Instance.SpawnBossFollower(playerBoss).Forget();
                         }
-                        catch (Exception e) { Components.Logger.LogInfo("Failed Delayed Boss Ally Process " + e.Message); }
+                        catch (Exception e) 
+                        {  
+                            Components.Logger.LogError("Failed to spawn Boss Ally");
+                            Components.Logger.LogError(e);
+                        }
                     });
 
                 }).Forget();
@@ -977,12 +977,14 @@ namespace friendlyPMC.Patches
                         dictionary_2.Remove(key);
                     }
                 }
+                
+                Components.Logger.LogInfo("Raid CleanUp Finished");
+
             } catch (Exception ex)
             {
-                Components.Logger.LogInfo("CleanUp Failed :" + ex.Message);
+                Components.Logger.LogError("Raid CleanUp Failed");
+                Components.Logger.LogError(ex);
             }
-
-            Components.Logger.LogInfo("Raid CleanUp Finished");
 
             return true;
         }

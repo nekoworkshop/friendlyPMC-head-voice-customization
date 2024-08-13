@@ -825,10 +825,6 @@ namespace friendlyPMC.Components
                                     InteractableObjects.RemoveTaker(botOwner_0);
                                 }
                             }
-                            else
-                            {
-                                Components.Logger.LogInfo("Could not set a taker");
-                            }
                         }
                     }
 

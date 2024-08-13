@@ -31,8 +31,8 @@ namespace friendlyPMC.Components
             }
             catch (Exception ex)
             {
-                Components.Logger.LogInfo("AIAgent Error " + ex.Message);
-                Components.Logger.LogInfo("AIAgent Trace " + ex.StackTrace);
+                Logger.LogError("AIAgent Error");
+                Logger.LogError(ex);
             }
         }
 

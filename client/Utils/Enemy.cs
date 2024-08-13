@@ -214,7 +214,8 @@ namespace friendlyPMC.Utils
             }
             catch (Exception ex)
             {
-                Components.Logger.LogInfo("GetEnemiesAtLocation Error: " + ex.Message);
+                Components.Logger.LogError("GetEnemiesAtLocation Error");
+                Components.Logger.LogError(ex);
                 return 1;
             }
         }

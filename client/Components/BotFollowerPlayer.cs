@@ -140,8 +140,8 @@ namespace friendlyPMC.Components
             }
             catch (Exception e)
             {
-                Logger.LogInfo("Failed to activate new follower patrol mode: " + e.Message);
-                Logger.LogInfo("StackTrace : " + e.StackTrace);
+                Logger.LogError("Failed to activate new follower patrol mode, fallback to manual mode");
+                Logger.LogError(e);
 
                 _bot.BotFollower.PatrolDataFollower.InitPlayer(_player.realPlayer);
                 if (!_bot.BotFollower.PatrolDataFollower.IsInited)
