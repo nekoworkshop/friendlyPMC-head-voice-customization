@@ -160,15 +160,15 @@ namespace friendlyPMC.Components
 
         public void AddEnemy(BotOwner bot)
         {
-            if (!bossEnemies.Contains(bot))
+            if (!bossEnemies.Contains(bot) && !bot.IsDead && bot.BotState == EBotState.Active)
             {
                 bossEnemies.Add(bot);
 
-                bot.HealthController.DiedEvent += (EDamageType type) =>
+                if(bot.HealthController != null) bot.HealthController.DiedEvent += (EDamageType type) =>
                 {
                     RemoveEnemy(bot);
                 };
-                bot.LeaveData.OnLeave += (BotOwner _bot) =>
+                if(bot.LeaveData != null) bot.LeaveData.OnLeave += (BotOwner _bot) =>
                 {
                     RemoveEnemy(_bot);
                 };

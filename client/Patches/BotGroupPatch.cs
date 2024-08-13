@@ -6,6 +6,7 @@ using HarmonyLib;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using friendlyPMC.Utils;
 
 namespace friendlyPMC.Patches
 {
@@ -125,7 +126,6 @@ namespace friendlyPMC.Patches
         [PatchPrefix]
         private static bool PatchPrefix(BotsGroup __instance, ref bool __result, IPlayer player)
         {
-
             if (BossPlayers.Instance != null && BossPlayers.IsPlayerBoss(player.ProfileId))
             {
                 BotsGroup bossGroup = BossPlayers.Instance.GetBossPlayer(player.ProfileId).bossGroup;
@@ -163,6 +163,16 @@ namespace friendlyPMC.Patches
             RemoveEnemy(player.Player());
             AddAlly(player.realPlayer);
             Side = player.realPlayer.Side;
+            // clear BTR as anemy to the group
+            foreach (var item in Enemies)
+            {
+                if(item.Value.Player?.Profile?.Info?.Settings?.Role == WildSpawnType.shooterBTR)
+                {
+                    RemoveEnemy(item.Value.Player,item.Value.Cause);
+                    break;
+                }
+            }
+
         }
     }
 }

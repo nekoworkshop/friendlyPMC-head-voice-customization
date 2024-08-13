@@ -174,6 +174,16 @@ namespace friendlyPMC.Components
 
                     BossPlayers.AddGroupToBoss(_player, _bot.BotsGroup);
                     _player.bossGroup = _bot.BotsGroup;
+
+                    // remove BTR as an enemy for the player group
+                    foreach (var item in _player.bossGroup.Enemies)
+                    {
+                        if (item.Value.Player.Profile.Info.Settings.Role == WildSpawnType.shooterBTR)
+                        {
+                            _player.bossGroup.RemoveEnemy(item.Value.Player);
+                            break;
+                        }
+                    }
                 }
                 else if (_bot.BotsGroup.Id != _player.bossGroup.Id)
                 {
@@ -183,6 +193,16 @@ namespace friendlyPMC.Components
             }
             else if (_player.bossGroup != null)
             {
+                // clear BTR as anemy
+                foreach (var item in _bot.EnemiesController.EnemyInfos)
+                {
+                    if (item.Value.Person?.Profile?.Info?.Settings?.Role == WildSpawnType.shooterBTR)
+                    {
+                        _bot.Memory.DeleteInfoAboutEnemy(item.Value.Person);
+                        break;
+                    }
+                }
+
                 _player.bossGroup.AddMember(_bot, false);
             }
 
@@ -193,7 +213,7 @@ namespace friendlyPMC.Components
             _bot.Settings.Current._accuratySpeedCoef = settingModif.AccuratySpeedCoef;
             _bot.Settings.Current._scatteringCoef = settingModif.ScatteringCoef;
 
-            // reset enemy state
+            // force  reset enemy state
             Utils.Utils.SetTimeout(() =>
             {
                 if (_bot != null && !_bot.IsDead && _bot.BotState == EBotState.Active && _bot.Memory.HaveEnemy)
@@ -201,6 +221,7 @@ namespace friendlyPMC.Components
                     _bot.Memory.DeleteInfoAboutEnemy(_bot.Memory.GoalEnemy.Person);
                     _bot.Memory.GoalEnemy = null;
                 }
+
                 // TURN OFF THE FLASHLIGHT!
                 if (_bot.BotLight != null && _bot.BotLight.IsEnable)
                 {
@@ -232,13 +253,13 @@ namespace friendlyPMC.Components
             }
             catch
             {
-                Components.Logger.LogInfo("Cannot access secure container of bot, extra ammo will not be added");
+                Components.Logger.LogError("Cannot access secure container of bot, extra ammo will not be added");
                 return;
             }
 
             if (secureContainer == null)
             {
-                Components.Logger.LogInfo("Bot has no secure container, cannot add extra ammo");
+                Components.Logger.LogError("Bot has no secure container, cannot add extra ammo");
                 return;
             }
 
@@ -263,7 +284,7 @@ namespace friendlyPMC.Components
 
             if (ammoToAdd == null)
             {
-                Components.Logger.LogInfo("Bot has no weapon to add ammo");
+                Components.Logger.LogError("Bot has no weapon to add ammo");
                 return;
             }
 
@@ -287,13 +308,11 @@ namespace friendlyPMC.Components
                     }
                     else
                     {
-                        Components.Logger.LogInfo("Failed to add ammo to bot");
                         break;
                     }
                 }
                 else
                 {
-                    Components.Logger.LogInfo("No space left to add ammo to bot");
                     break;
                 }
             }
