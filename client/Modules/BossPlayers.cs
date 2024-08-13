@@ -233,7 +233,7 @@ namespace friendlyPMC.Modules
             Instance = null;
         }
 
-        private BotFollowerPlayer AddBotFollower(BotOwner bot, pitAIBossPlayer player, bool squadMate = false, WildSpawnType role = WildSpawnType.assault, string tactic = "balance")
+        private BotFollowerPlayer AddBotFollower(BotOwner bot, pitAIBossPlayer player, bool squadMate = false, WildSpawnType role = WildSpawnType.assault, string tactic = "default")
         {
 
             BotFollowerPlayer _follower = null;
@@ -419,21 +419,26 @@ namespace friendlyPMC.Modules
 
         public static pitAIBossPlayer GetBoss(string name)
         {
+            if(Instance  == null) return null;  
             return Instance.GetBossPlayer(name);
         }
 
         public static bool IsPlayerBoss(string profileId)
         {
+            if (Instance == null) return false;
+
             return Instance.IsBoss(profileId);
         }
 
         public static List<BotFollowerPlayer> GetFollowersByBoss(string bossName)
         {
+            if (Instance == null) return new List<BotFollowerPlayer>();
             return Instance.GetBossFollowers(bossName);
         }
 
         public static bool IsFollower(BotOwner bot, AIBossPlayer boss = null)
         {
+            if (Instance == null) return false;
             return Instance.IsBotFollower(bot, boss);
         }
         public static List<CustomNavigationPoint> GetAICovers()
@@ -486,7 +491,7 @@ namespace friendlyPMC.Modules
             Instance.RemoveBossPlayer(profileId);
         }
 
-        public static BotFollowerPlayer AddFollower(BotOwner bot, pitAIBossPlayer player, bool squadMate = false, WildSpawnType role = WildSpawnType.assault, string tactic = "balance")
+        public static BotFollowerPlayer AddFollower(BotOwner bot, pitAIBossPlayer player, bool squadMate = false, WildSpawnType role = WildSpawnType.assault, string tactic = "default")
         {
             return Instance.AddBotFollower(bot,player,squadMate,role,tactic);
         }

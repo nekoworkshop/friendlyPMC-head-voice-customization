@@ -34,6 +34,8 @@ namespace friendlyPMC.Actions
 
         protected float maxDist = 100f;
 
+        protected float searchPose = 0.1f;
+
         protected Queue<Action> _actionsQueue = new Queue<Action>();
 
         protected bool _init = false;
@@ -84,7 +86,8 @@ namespace friendlyPMC.Actions
                 }
                 catch (Exception ex)
                 {
-                    Components.Logger.LogInfo("Failed to init Search: " + ex.Message);
+                    Components.Logger.LogError("Failed to init Search");
+                    Components.Logger.LogError(ex);
                 }
 
                 if (!botOwner_0.Memory.HaveEnemy) return;
@@ -101,7 +104,7 @@ namespace friendlyPMC.Actions
                     {
                         if (!_hasCome)
                         {
-                            botOwner_0.SetPose(0.5f);
+                            botOwner_0.SetPose(searchPose);
                             botOwner_0.StopMove();
                             botOwner_0.Steering.LookToPoint(botOwner_0.Memory.GoalEnemy.GetCenterPart());
                             _hasCome = true;
@@ -175,8 +178,8 @@ namespace friendlyPMC.Actions
                 }
             } catch (Exception ex)
             {
-                Components.Logger.LogInfo("SniperSearch Error: " + ex.Message);
-                Components.Logger.LogInfo("Trace: " + ex.StackTrace);
+                Components.Logger.LogError("SniperSearch Error");
+                Components.Logger.LogError(ex);
             }
         }
 
@@ -198,16 +201,16 @@ namespace friendlyPMC.Actions
             }
         }
 
-        private void ReachSearchPoint()
+        protected virtual void ReachSearchPoint()
         {
             SetSearchPosition();
             spotPosition = null;
             covering = false;
         }
 
-        private void SetSearchPosition()
+        protected virtual void SetSearchPosition()
         {
-            botOwner_0.SetPose(0.5f);
+            botOwner_0.SetPose(searchPose);
             botOwner_0.StopMove();
             if(botOwner_0.Memory.HaveEnemy)
                 botOwner_0.Steering.LookToPoint(botOwner_0.Memory.GoalEnemy.GetCenterPart());
@@ -250,7 +253,7 @@ namespace friendlyPMC.Actions
                 CustomNavigationPoint Spot = Utils.Covers.GetClosestAttackCoverPoint(
                     botOwner_0.Id,
                     botOwner_0.GetPlayer.Transform.position,
-                    botOwner_0.GetPlayer.Transform.position, 
+                    enemySpot,
                     enemySpot,
                     areaCovers,
                     minDist, 

@@ -44,6 +44,18 @@ namespace friendlyPMC.Components
             coverCoroutine = player.StartCoroutine(UpdateCoversCoroutine());
         }
 
+
+        public new void Dispose()
+        {
+            // do nothing
+            Logger.LogInfo("pitAIBossPlayer Dispose called");
+        }
+
+        public new void OfferBot(BotOwner bot)
+        {
+            Logger.LogInfo("pitAIBossPlayer OfferBot called");
+        }
+
         private void OnDead(EDamageType _damageType)
         {
             if (Followers != null && Followers.Count > 0)
@@ -124,8 +136,8 @@ namespace friendlyPMC.Components
                     }
                 } catch (Exception ex)
                 {
-                    Logger.LogInfo("Covers Coroutine failing : " + ex.Message);
-                    Logger.LogInfo("Trace : " + ex.StackTrace);
+                    Logger.LogError("Covers Coroutine failing");
+                    Logger.LogError(ex);
                 }
 
             });
@@ -148,15 +160,15 @@ namespace friendlyPMC.Components
 
         public void AddEnemy(BotOwner bot)
         {
-            if (!bossEnemies.Contains(bot))
+            if (!bossEnemies.Contains(bot) && !bot.IsDead && bot.BotState == EBotState.Active)
             {
                 bossEnemies.Add(bot);
 
-                bot.HealthController.DiedEvent += (EDamageType type) =>
+                if(bot.HealthController != null) bot.HealthController.DiedEvent += (EDamageType type) =>
                 {
                     RemoveEnemy(bot);
                 };
-                bot.LeaveData.OnLeave += (BotOwner _bot) =>
+                if(bot.LeaveData != null) bot.LeaveData.OnLeave += (BotOwner _bot) =>
                 {
                     RemoveEnemy(_bot);
                 };
@@ -236,18 +248,6 @@ namespace friendlyPMC.Components
 
             Logger.LogInfo("Player Boss Disposed");
         }
-
-        public new void Dispose()
-        {
-            // do nothing
-            Logger.LogInfo("pitAIBossPlayer Dispose called");
-        }
-
-        public new void OfferBot(BotOwner bot)
-        {
-            // do nothing, this is called by the game and we don't want followers to be added automatically
-        }
-
         public void AddFollower(BotOwner bot)
         {
             Followers.Add(bot);
@@ -300,7 +300,8 @@ namespace friendlyPMC.Components
                 }
                 catch (Exception e)
                 {
-                    Logger.LogInfo("Failed to add Enemy to group: "+e.Message);
+                    Logger.LogError("Failed to add Enemy to group");
+                    Logger.LogError(e);
                 }
             }
         }

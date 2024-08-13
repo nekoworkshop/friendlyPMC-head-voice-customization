@@ -214,7 +214,8 @@ namespace friendlyPMC.Utils
             }
             catch (Exception ex)
             {
-                Components.Logger.LogInfo("GetEnemiesAtLocation Error: " + ex.Message);
+                Components.Logger.LogError("GetEnemiesAtLocation Error");
+                Components.Logger.LogError(ex);
                 return 1;
             }
         }
@@ -228,7 +229,6 @@ namespace friendlyPMC.Utils
             {
                 bot.BotsGroup.AddEnemy(enemy, EBotEnemyCause.addPlayerToBoss);
                 bot.BotsGroup.Enemies.TryGetValue(enemy, out groupInfo);
-                Components.Logger.LogInfo("Making " + enemy.Profile.Nickname + " enemy to others");
             }
 
             if (groupInfo == null)

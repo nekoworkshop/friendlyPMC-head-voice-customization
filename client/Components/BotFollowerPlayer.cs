@@ -10,6 +10,10 @@ using System.Reflection;
 
 using UnityEngine;
 using EFT.InventoryLogic;
+using System.Linq;
+
+using GridClassEx = GClass2516;
+using GridCacheClass = GClass1401;
 
 namespace friendlyPMC.Components
 {
@@ -32,7 +36,7 @@ namespace friendlyPMC.Components
             }
         }
 
-       
+
         protected WildSpawnType _botRole;
 
         public BotFollowerPlayer(BotOwner bot, pitAIBossPlayer player, bool isSquad = false, WildSpawnType botRole = WildSpawnType.assault)
@@ -40,10 +44,10 @@ namespace friendlyPMC.Components
             _bot = bot;
             _player = player;
             _botRole = botRole == WildSpawnType.assault ? _bot.Profile.Info.Settings.Role : botRole;
-            
+
             _IsSquadMate = isSquad;
 
-            settingModif = new GClass528(1.2f,1.2f,1f,1f,1f,1f,0.9f,1f,1f);
+            settingModif = new GClass528(1.2f, 1.2f, 1f, 1f, 1f, 1f, 0.9f, 1f, 1f);
         }
 
         public virtual void Init()
@@ -136,8 +140,8 @@ namespace friendlyPMC.Components
             }
             catch (Exception e)
             {
-                Logger.LogInfo("Failed to activate new follower patrol mode: " + e.Message);
-                Logger.LogInfo("StackTrace : " + e.StackTrace);
+                Logger.LogError("Failed to activate new follower patrol mode, fallback to manual mode");
+                Logger.LogError(e);
 
                 _bot.BotFollower.PatrolDataFollower.InitPlayer(_player.realPlayer);
                 if (!_bot.BotFollower.PatrolDataFollower.IsInited)
@@ -170,6 +174,16 @@ namespace friendlyPMC.Components
 
                     BossPlayers.AddGroupToBoss(_player, _bot.BotsGroup);
                     _player.bossGroup = _bot.BotsGroup;
+
+                    // remove BTR as an enemy for the player group
+                    foreach (var item in _player.bossGroup.Enemies)
+                    {
+                        if (item.Value.Player.Profile.Info.Settings.Role == WildSpawnType.shooterBTR)
+                        {
+                            _player.bossGroup.RemoveEnemy(item.Value.Player);
+                            break;
+                        }
+                    }
                 }
                 else if (_bot.BotsGroup.Id != _player.bossGroup.Id)
                 {
@@ -179,22 +193,18 @@ namespace friendlyPMC.Components
             }
             else if (_player.bossGroup != null)
             {
+                // clear BTR as anemy
+                foreach (var item in _bot.EnemiesController.EnemyInfos)
+                {
+                    if (item.Value.Person?.Profile?.Info?.Settings?.Role == WildSpawnType.shooterBTR)
+                    {
+                        _bot.Memory.DeleteInfoAboutEnemy(item.Value.Person);
+                        break;
+                    }
+                }
+
                 _player.bossGroup.AddMember(_bot, false);
             }
-
-/*            try
-            {
-                if (_transactionController != null)
-                {
-                    Weapon primWeapon = _bot.AIData.Player.HandsController.Item as Weapon;
-
-                    _transactionController.AddExtraAmmo(primWeapon);
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger.LogInfo("Could not add ammo to follower: " + ex.Message);
-            }*/
 
 
             // apply some of settings modifier
@@ -203,7 +213,7 @@ namespace friendlyPMC.Components
             _bot.Settings.Current._accuratySpeedCoef = settingModif.AccuratySpeedCoef;
             _bot.Settings.Current._scatteringCoef = settingModif.ScatteringCoef;
 
-            // reset enemy state
+            // force  reset enemy state
             Utils.Utils.SetTimeout(() =>
             {
                 if (_bot != null && !_bot.IsDead && _bot.BotState == EBotState.Active && _bot.Memory.HaveEnemy)
@@ -211,6 +221,7 @@ namespace friendlyPMC.Components
                     _bot.Memory.DeleteInfoAboutEnemy(_bot.Memory.GoalEnemy.Person);
                     _bot.Memory.GoalEnemy = null;
                 }
+
                 // TURN OFF THE FLASHLIGHT!
                 if (_bot.BotLight != null && _bot.BotLight.IsEnable)
                 {
@@ -218,15 +229,94 @@ namespace friendlyPMC.Components
                 }
             }, 300);
 
+            // ensure bot has enough ammo
+            AddExtraAmmo();
+
             Logger.LogInfo($"Bot {_bot.Profile.Nickname} is now a follower of {_player.Player().Profile.Nickname}");
         }
 
-        private InventoryControllerClass GetInventoryController(BotOwner bot)
-        {
-            Type playerType = typeof(Player);
 
-            FieldInfo inventoryControllerField = playerType.GetField("_inventoryController", BindingFlags.NonPublic | BindingFlags.Instance);
-            return (InventoryControllerClass)inventoryControllerField.GetValue(bot.GetPlayer);
+        public InventoryControllerClass GetInventoryController()
+        {
+            return _bot.GetPlayer.InventoryControllerClass;
+        }
+
+        protected void AddExtraAmmo()
+        {
+
+            InventoryControllerClass inventory = GetInventoryController();
+            SearchableItemClass secureContainer;
+
+            try
+            {
+                secureContainer = (SearchableItemClass)inventory.Inventory.Equipment.GetSlot(EquipmentSlot.SecuredContainer).ContainedItem;
+            }
+            catch
+            {
+                Components.Logger.LogError("Cannot access secure container of bot, extra ammo will not be added");
+                return;
+            }
+
+            if (secureContainer == null)
+            {
+                Components.Logger.LogError("Bot has no secure container, cannot add extra ammo");
+                return;
+            }
+
+
+
+            StashGridClass stashGridClass = secureContainer.Grids.FirstOrDefault();
+
+            if (stashGridClass == null)
+            {
+                return;
+            }
+
+            Weapon weapon = _bot.AIData.Player.HandsController.Item as Weapon;
+
+            Item ammoToAdd =
+                    weapon.GetCurrentMagazine()?.FirstRealAmmo()
+                    ?? Singleton<ItemFactory>.Instance.CreateItem(
+                        MongoID.Generate(),
+                        weapon.CurrentAmmoTemplate._id,
+                        null
+                    );
+
+            if (ammoToAdd == null)
+            {
+                Components.Logger.LogError("Bot has no weapon to add ammo");
+                return;
+            }
+
+            int ammoAdded = 0;
+
+            for (int i = 0; i < 10; i++)
+            {
+                Item ammo = ammoToAdd.CloneItem();
+                ammo.StackObjectsCount = ammo.StackMaxSize;
+
+                var location = stashGridClass.FindLocationForItem(ammo);
+
+                if (location != null)
+                {
+
+                    var result = stashGridClass.AddItemWithoutRestrictions(ammo);
+
+                    if (result.Succeeded)
+                    {
+                        ammoAdded += ammo.StackObjectsCount;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                else
+                {
+                    break;
+                }
+            }
+
         }
 
         public virtual FollowerBrain GetFollowerBrain(BotOwner bot, pitAIBossPlayer boss)
@@ -243,7 +333,6 @@ namespace friendlyPMC.Components
                 return FollowerCreateNode.CreateNode(decision, bot);
             }));
         }
-
 
         public virtual void SetFollowerSettings(BotOwner bot)
         {
@@ -375,7 +464,7 @@ namespace friendlyPMC.Components
             settings.FileSettings.Hearing.CLOSE_DIST = 6f;
             settings.FileSettings.Hearing.FAR_DIST = 35f;
 
-            
+
 
             bot.Settings = settings;
             bot.ENEMY_LOOK_AT_ME = Mathf.Cos(settings.FileSettings.Mind.ENEMY_LOOK_AT_ME_ANG * 0.017453292f);
@@ -421,7 +510,7 @@ namespace friendlyPMC.Components
 
                 _bot.BotFollower.PatrolDataFollower.Dispose();
                 (_bot.Receiver as FollowerReceiver).Dispose();
-                
+
                 _bot.Brain.Dispose();
 
                 _bot.BotsController.AICoreController.Stop();
@@ -445,9 +534,10 @@ namespace friendlyPMC.Components
                 _bot.GetPlayer.Physical.Stamina.ForceMode = false;
                 _bot.GetPlayer.Physical.HandsStamina.ForceMode = false;
 
-            } catch(Exception ex)
+            }
+            catch (Exception ex)
             {
-                Logger.LogInfo("Error on dismiss for a follower: " +ex.Message);
+                Logger.LogInfo("Error on dismiss for a follower: " + ex.Message);
             }
             // @TODO : see what else can be reverted
         }

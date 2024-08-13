@@ -25,7 +25,7 @@ namespace friendlyPMC.Actions
 
         private LootItem _lootItem = null;
 
-        private bool bool_1 = false;    
+        private bool bool_1 = false;
 
         private bool bool_2 = false;
 
@@ -49,13 +49,13 @@ namespace friendlyPMC.Actions
                 _follower = BossPlayers.Instance.GetFollower(botOwner_0);
             }
 
-            if(_lootItem == null)
+            if (_lootItem == null)
             {
                 _lootItem = AccessTools.Field(typeof(BotItemTaker), "_itemToTake").GetValue(botOwner_0.ItemTaker) as LootItem;
             }
 
 
-            if(_lootItem == null)
+            if (_lootItem == null)
             {
                 ClearLoot();
                 return;
@@ -92,12 +92,11 @@ namespace friendlyPMC.Actions
             }
 
             Vector3 pos = _lootItem.transform.position;
-
             botOwner_0.Steering.LookToPoint(pos);
 
             await Task.Delay(2000);
 
-            if(botOwner_0.IsDead || botOwner_0.BotState != EBotState.Active || InteractableObjects.Instance == null || !InteractableObjects.IsTaker(botOwner_0))
+            if (botOwner_0.IsDead || botOwner_0.BotState != EBotState.Active || InteractableObjects.Instance == null || !InteractableObjects.IsTaker(botOwner_0))
             {
                 ClearLoot();
                 return;
@@ -135,7 +134,7 @@ namespace friendlyPMC.Actions
 
 
                 // execute transaction
-                IResult result =  await inventoryControllerClass.TryRunNetworkTransaction(moveResult, null);
+                IResult result = await inventoryControllerClass.TryRunNetworkTransaction(moveResult, null);
                 if (botOwner_0.IsDead || botOwner_0.BotState != EBotState.Active)
                 {
                     ClearLoot();
@@ -151,8 +150,8 @@ namespace friendlyPMC.Actions
             }
             catch (Exception e)
             {
-                Components.Logger.LogInfo("Failed to pickup Loot : " + e.Message);
-                Components.Logger.LogInfo("StacTrace : " + e.StackTrace);
+                Components.Logger.LogError("Failed to pickup Loot");
+                Components.Logger.LogError(e);
                 ClearLoot();
             }
         }

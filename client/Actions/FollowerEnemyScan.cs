@@ -81,6 +81,10 @@ namespace friendlyPMC.Actions
 
                     Components.Logger.LogInfo("Made " + closet.Profile.Nickname + " an active enemy to " + bot.Profile.Nickname);
                 }
+                else if (info == null)
+                {
+                    Components.Logger.LogInfo("Cannot make " + bot.Profile.Nickname + " an active enemy");
+                }
             }
         }
     }

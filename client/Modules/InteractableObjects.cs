@@ -38,8 +38,9 @@ namespace friendlyPMC.Modules
         private List<Item> _toSendItems;
         private Dictionary<string, Dictionary<string, object>> _followersWithLoot;
 
-        public InteractableObjects() { 
-            if(Instance == null)
+        public InteractableObjects()
+        {
+            if (Instance == null)
             {
                 Instance = this;
 
@@ -61,15 +62,9 @@ namespace friendlyPMC.Modules
 
             var _defaultJsonConverters = Traverse.Create(converterClass).Field<JsonConverter[]>("Converters").Value;
 
-            var info = Instance._followersWithLoot.Values.Random();
-
             if (flatItems != null && flatItems.Any())
             {
-                /*RequestHandler.PutJson("/singleplayer/traderServices/itemDelivery", new
-                {
-                    items = flatItems,
-                    traderId = "friendlypmc-return-loot"
-                }.ToJson(_defaultJsonConverters));*/
+                var info = Instance._followersWithLoot.Values.Random();
 
                 RequestHandler.PutJson("/singleplayer/returnitems", new
                 {
@@ -81,12 +76,21 @@ namespace friendlyPMC.Modules
 
         private void GatherItems()
         {
+            Components.Logger.LogInfo("Gather items");
             var bossPlayers = BossPlayers.Instance.GetBossPlayers();
+            _toSendItems.Clear();
+            List<string> gathered = new List<string>();
+
             foreach (var player in bossPlayers)
             {
+                Components.Logger.LogInfo("Total player followers " + player.Value.Followers.Count);
+
                 foreach (var bot in player.Value.Followers)
                 {
-                    if (bot.BotState != EBotState.Active || !bot.HealthController.IsAlive) return;
+                    if (bot.BotState != EBotState.Active || !bot.HealthController.IsAlive)
+                    {
+                        continue;
+                    }
 
                     InventoryControllerClass _botInventoryController = bot.GetPlayer.InventoryControllerClass;
 
@@ -107,12 +111,12 @@ namespace friendlyPMC.Modules
 
                     var storedItems = GetStoredItems(bot.ProfileId);
 
-                    List<string> toRemove = new List<string>();
-
                     if (storedItems != null)
                     {
                         foreach (var stored in storedItems)
                         {
+                            if (gathered.Contains(stored)) continue;
+
                             bool found = false;
                             if (tacVest.Grids.Length > 0)
                             {
@@ -121,6 +125,9 @@ namespace friendlyPMC.Modules
                                     if (item.Id == stored)
                                     {
                                         _toSendItems.Add(item.CloneItem());
+                                        gathered.Add(stored);
+                                        found = true;
+                                        break;
                                     }
                                 }
                             }
@@ -132,6 +139,8 @@ namespace friendlyPMC.Modules
                                     if (item.Id == stored)
                                     {
                                         _toSendItems.Add(item.CloneItem());
+                                        found = true;
+                                        gathered.Add(stored);
                                         break;
                                     }
                                 }
@@ -144,6 +153,7 @@ namespace friendlyPMC.Modules
                                     if (item.Id == stored)
                                     {
                                         _toSendItems.Add(item.CloneItem());
+                                        gathered.Add(stored);
                                         break;
                                     }
                                 }
@@ -156,23 +166,30 @@ namespace friendlyPMC.Modules
 
         public void Destroy()
         {
-            if(IsDisposed) return;
-            
-            
-            try{
+            if (IsDisposed) return;
+
+
+            try
+            {
                 SendStoreItems();
-            } catch(Exception e) {
-                Components.Logger.LogInfo($"Error sending store items: {e}");
+            }
+            catch (Exception e)
+            {
+                Components.Logger.LogError("Error sending stored loot");
+                Components.Logger.LogError(e);
             }
 
-            foreach(var stack in _lootedItems)
+            foreach (var stack in _lootedItems)
             {
                 stack.Value.Clear();
             }
+
             _lootedItems.Clear();
+            _toSendItems.Clear();
+            _followersWithLoot.Clear();
 
             _currDoor = null;
-            
+
             _lootItem = null;
             _lootedItems = null;
 
@@ -182,14 +199,15 @@ namespace friendlyPMC.Modules
 
         public static void Dispose()
         {
-            if(Instance != null)
+            if (Instance != null)
             {
                 Instance.Destroy();
                 Instance = null;
             }
         }
 
-        public static void SetCurDoor(Door door) {
+        public static void SetCurDoor(Door door)
+        {
 
             if (Instance != null)
                 Instance._currDoor = door;
@@ -200,7 +218,7 @@ namespace friendlyPMC.Modules
             return Instance._currDoor;
         }
 
-        public static void SetCurLootItem(LootItem item) 
+        public static void SetCurLootItem(LootItem item)
         {
             if (Instance != null)
             {
@@ -226,7 +244,7 @@ namespace friendlyPMC.Modules
 
             var _follower = BossPlayers.Instance.GetFollower(bot);
 
-            if(_follower == null) return false; 
+            if (_follower == null) return false;
 
             if (Instance._lootItem != null)
             {
@@ -248,7 +266,7 @@ namespace friendlyPMC.Modules
                     }
 
                     Instance._lootPosition = navMeshHit.position;
-                    
+
                     Instance._botToLoot = _follower;
 
                     return true;
@@ -256,7 +274,8 @@ namespace friendlyPMC.Modules
                 }
                 catch (Exception ex)
                 {
-                    Components.Logger.LogInfo("SetTaker Error : " + ex.Message);
+                    Components.Logger.LogError("Could not make bot a Loot Taker");
+                    Components.Logger.LogError(ex);
                 }
             }
 
@@ -266,7 +285,7 @@ namespace friendlyPMC.Modules
         public static bool IsTaker(BotOwner bot)
         {
             var _follower = BossPlayers.Instance.GetFollower(bot);
- 
+
             return _follower != null && _follower == Instance._botToLoot;
         }
 
@@ -277,7 +296,7 @@ namespace friendlyPMC.Modules
 
             BotFollowerPlayer follower = BossPlayers.Instance.GetFollower(bot);
 
-            if (follower != null  && Instance._botToLoot == follower)
+            if (follower != null && Instance._botToLoot == follower)
             {
                 Instance._botToLoot = null;
             }
@@ -294,18 +313,19 @@ namespace friendlyPMC.Modules
 
         public static void StoreItem(BotOwner bot, Item item)
         {
-            if(!Instance._lootedItems.ContainsKey(bot.ProfileId)) {
+            if (!Instance._lootedItems.ContainsKey(bot.ProfileId))
+            {
                 Instance._lootedItems.Add(bot.ProfileId, new List<string>());
                 Instance._followersWithLoot.Add(bot.ProfileId, new Dictionary<string, object> {
                     { "_id" , bot.ProfileId  },
                     { "aid" , bot.Profile.AccountId },
-                    { 
+                    {
                         "Info" , new Dictionary<string, object>{
                             { "Level", bot.Profile.Info.Level },
                             { "MemberCategory", bot.Profile.Info.MemberCategory },
                             { "Nickname",  bot.Profile.Info.Nickname },
                             { "Side",  bot.Profile.Info.Side },
-                        } 
+                        }
                     },
                 });
             }
@@ -323,7 +343,7 @@ namespace friendlyPMC.Modules
             if (Instance._lootedItems.ContainsKey(bot))
             {
                 var list = Instance._lootedItems[bot];
-                if(list.Contains(itemId))
+                if (list.Contains(itemId))
                 {
                     list.Remove(itemId);
                 }
@@ -342,7 +362,7 @@ namespace friendlyPMC.Modules
 
         public static void ClearStoredItems(string bot)
         {
-            if(Instance._lootedItems.ContainsKey(bot))
+            if (Instance._lootedItems.ContainsKey(bot))
             {
                 Instance._lootedItems.Remove(bot);
                 Instance._followersWithLoot.Remove(bot);

@@ -13,6 +13,7 @@ namespace friendlyPMC.Components
         protected pitAIBossPlayer _boss;
 
         protected string _currentTactic = null;
+        protected string _defaultTactic = null;
 
         public string currentTactic
         {
@@ -33,7 +34,7 @@ namespace friendlyPMC.Components
             owner.Memory.OnAddEnemy += OnAddEnemy;
 
 
-            _currentTactic = "Balance";
+            _currentTactic = "Default";
 
         }
         /** Exposed method for adding brain layers so it can be patched by addons **/
@@ -46,7 +47,7 @@ namespace friendlyPMC.Components
             // - requests
             FollowerRequestLayer layer4 = new FollowerRequestLayer(_owner, 55);
             method_0(2, layer4, true);
-            
+
             // - fight
             FollowerFightLayer layer6 = new FollowerFightLayer(_owner, 60);
             fightLayer = layer6;
@@ -125,7 +126,7 @@ namespace friendlyPMC.Components
         }
 
         public virtual void Dismissed()
-        { 
+        {
             ClearFollowerPatrol();
 
             _owner.GetPlayer.HealthController.DiedEvent -= OnDead;
@@ -137,6 +138,10 @@ namespace friendlyPMC.Components
         {
             if (fightLayer != null)
             {
+                // whatever tactic we initially set when calling AddBotFollower, that becomes the default one
+                if (_defaultTactic == null && tactic != null) _defaultTactic = tactic;
+                else if(tactic == null && _defaultTactic != null) tactic = _defaultTactic;
+
                 fightLayer.SetBossFightTactic(tactic);
                 BossOrdersChanged();
             }

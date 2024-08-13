@@ -18,6 +18,7 @@ namespace friendlyPMC.Actions
         {
             minDist = 5f;
             maxDist = 60f;
+            searchPose = 1f;
             Action = (BotLogicDecision)CustomBotDecisions.EnemySearch;
         }
 
@@ -25,7 +26,7 @@ namespace friendlyPMC.Actions
         {
             if (_nextShootPositionUpdateTime > Time.time) return;
 
-            _nextShootPositionUpdateTime = Time.time + 1.5f;
+            _nextShootPositionUpdateTime = Time.time + 2f;
 
             Vector3[] carePosition = new Vector3[] { };
 
@@ -75,13 +76,13 @@ namespace friendlyPMC.Actions
                     _actionsQueue.Enqueue(() =>
                     {
                         // else get the next cover between the bot and the enemy
-                        CustomNavigationPoint Spot = Utils.Covers.GetClosestCoverPointBetween(
+                        CustomNavigationPoint Spot2 = Utils.Covers.GetClosestCoverPointBetween(
                             botOwner_0,
                             botPosition,
                             enemySpot
                         );
 
-                        if (Spot != null) _lastSpot = Spot.Position;
+                        if (Spot2 != null) _lastSpot = Spot2.Position;
                         else _lastSpot = null;
 
                         if (!_lastSpot.HasValue)

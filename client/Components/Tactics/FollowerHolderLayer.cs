@@ -182,7 +182,8 @@ namespace friendlyPMC.Components.Tactics
             }
             catch (Exception e)
             {
-                Components.Logger.LogInfo("HoldPosition Error:" + e.StackTrace);
+                Logger.LogError("EndHoldPosition Error");
+                Logger.LogError(e);
                 return new AICoreActionEndStruct("hpError", true);
             }
         }

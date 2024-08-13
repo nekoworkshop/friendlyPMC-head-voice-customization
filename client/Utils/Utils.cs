@@ -66,8 +66,8 @@ namespace friendlyPMC.Utils
                 }
                 catch (Exception ex)
                 {
-                    Components.Logger.LogInfo($"Exception in SetTimeout: {ex.Message}");
-                    Components.Logger.LogInfo($"StackTrace in SetTimeout: {ex.StackTrace}");
+                    Components.Logger.LogError("Exception in SetTimeout");
+                    Components.Logger.LogError(ex);
                 }
             };
 
@@ -87,8 +87,8 @@ namespace friendlyPMC.Utils
                 }
                 catch (Exception ex)
                 {
-                    Components.Logger.LogInfo($"Exception in SetBotTimer: {ex.Message}");
-                    Components.Logger.LogInfo($"StackTrace in SetBotTimer: {ex.StackTrace}");
+                    Components.Logger.LogError("Exception in SetBotTimer");
+                    Components.Logger.LogError(ex);
                 }
             };
 

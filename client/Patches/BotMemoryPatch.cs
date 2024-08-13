@@ -104,5 +104,10 @@ namespace friendlyPMC.Patches
                 }
             }
         }
+
+        public static void ClearCache()
+        {
+            addedEnemies.Clear();
+        }
     }
 }

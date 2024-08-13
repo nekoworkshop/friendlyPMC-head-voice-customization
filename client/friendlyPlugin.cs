@@ -150,16 +150,15 @@ namespace friendlyPMC
 
             new BotsControllerPatch().Enable();
 
-            new NonWavesSpawnScenarioRunPatch().Enable();
-            new WavesSpawnScenarioRunPatch().Enable();
-            new Glass579RunPatch().Enable();
+            //new NonWavesSpawnScenarioRunPatch().Enable();
+            //new WavesSpawnScenarioRunPatch().Enable();
+            //new Glass579RunPatch().Enable();
 
             new BotsControllerStopPatch().Enable();
             new LocalGameCleanupPatch().Enable();
 
-            new AIDataDisposePatch().Enable();
             new AIDataContructPatch().Enable();
-            new AIDataBossPlayerPatch().Enable();
+            new AIBossPlayerPatch().Enable();
 
             new QuickPanelPatch().Enable();
             new GestureMenuPatch().Enable();
@@ -167,8 +166,8 @@ namespace friendlyPMC
             new EPhraseTriggerPatch().Enable();
 
             var harmony = new Harmony("xyz.pit.companion");
-            harmony.PatchAll(typeof(LocalGameCtorPatch).Assembly);
-            
+            harmony.PatchAll(typeof(LocalGameVmethod4Patch).Assembly);
+
             harmony.PatchAll(typeof(GoalEnemyTracePatch).Assembly);
 
             SAINPatch.PatchSAINIfInstalled();

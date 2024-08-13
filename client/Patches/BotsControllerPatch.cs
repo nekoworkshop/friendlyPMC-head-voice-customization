@@ -17,6 +17,10 @@ using IProfileData = GClass592;
 
 using friendlyPMC.Utils;
 using Comfort.Common;
+using System.Linq;
+using EFT.InventoryLogic;
+using EFT.Bots;
+using System.Collections;
 
 
 
@@ -62,6 +66,16 @@ namespace friendlyPMC.Patches
             return groupPoint.CorePointInGame;
         }
 
+        private bool HasFIkaDonuts()
+        {
+            Type fikaType = Type.GetType("Fika.Core.Coop.GameMode.CoopGame, Fika.Core");
+
+            if(fikaType != null) return true;
+
+            //if (AppDomain.CurrentDomain.GetAssemblies().Any(a => a.GetName().Name == "dvize.Donuts")) return true;
+
+            return false;
+        }
 
         private BotsGroup GetPlayerGroup(pitAIBossPlayer player, BotOwner bt, BotZone zn)
         {
@@ -75,7 +89,6 @@ namespace friendlyPMC.Patches
             var deadBodiesController = AccessTools.Field(typeof(BotSpawner), "_deadBodiesController").GetValue(botSpawnerClass) as DeadBodiesController;
             var allPlayers = AccessTools.Field(typeof(BotSpawner), "_allPlayers").GetValue(botSpawnerClass) as List<Player>;
 
-            var allBotZones = AccessTools.Field(typeof(BotSpawner), "_allBotZones").GetValue(botSpawnerClass) as BotZone[];
             bool _freeForAll = true;
 
             WildSpawnType sptBear = WildSpawnType.pmcBEAR;
@@ -157,7 +170,7 @@ namespace friendlyPMC.Patches
             bt.Settings.FileSettings.Mind.DEFAULT_USEC_BEHAVIOUR = oldBehaviorUsec;
             bt.Settings.FileSettings.Mind.DEFAULT_SAVAGE_BEHAVIOUR = oldBehaviorSavage;
 
-            return player.bossGroup;
+            return botsGroup;
         }
 
         public void GetSameSideHostile(WildSpawnType role, EPlayerSide side, out bool isHostile)
@@ -173,63 +186,20 @@ namespace friendlyPMC.Patches
             }
         }
 
-        public async UniTask ActivateBot(GClass814 botCreator, Profile profile, Vector3 position, int pointId,  BotZone zone, Func<BotOwner, BotZone, BotsGroup>groupAction, Action<BotOwner> callback)
-        {
-            LocalGame game = LocalGameCtorPatch.Instance;
-
-            BotSpawner botSpawnerClass = Controller.BotSpawner;
-
-            IBotGame botGame = AccessTools.Field(typeof(BotSpawner), "_game").GetValue(botSpawnerClass) as IBotGame;
-
-            Dictionary<string, Player> dictionary_2 = null;
-
-            dictionary_2 = AccessTools.Field(typeof(LocalGame), "dictionary_2").GetValue(game) as Dictionary<string, Player>;
-
-            // recreation of ActivateBot from GClass814
-            GClass814.Class509 @class = new GClass814.Class509();
-            @class.gclass814_0 = botCreator;
-            @class.zone = zone;
-
-            @class.callback = callback;
-
-            @class.groupAction = groupAction;
-
-
-            GClass590 bornInfo = new GClass590(position, pointId, false);
-            // this is part of method_17 from LocalGame
-            int playerId = game.method_12();
-            profile.SetSpawnedInSession(profile.Info.Side == EPlayerSide.Savage);
-
-            LocalPlayer localPlayer = await LocalPlayer.Create(playerId, bornInfo.position, Quaternion.identity, "Player", "", EPointOfView.ThirdPerson, profile, true, game.UpdateQueue, Player.EUpdateMode.Auto, Player.EUpdateMode.Auto, BackendConfigAbstractClass.Config.CharacterController.BotPlayerMode, new Func<float>(LocalGame.Class1394.class1394_0.method_4), new Func<float>(LocalGame.Class1394.class1394_0.method_5), new GClass1800(), GClass1457.Default, null, null, false);
-            localPlayer.Location = game.Location_0.Id;
-
-            dictionary_2.Add(localPlayer.ProfileId, localPlayer);
-
-            // method_2 of GClass814
-            AICorePoint corePoint = Controller.CoversData.AICorePointsHolder.GetCorePoint(bornInfo.CorePointId);
-            BotOwner botOwner = BotOwner.Create(localPlayer, null, botGame.GameDateTime, Controller, true, corePoint);
-            botCreator.method_4(botOwner.GetPlayer);
-            botCreator.method_5(botOwner, false);
-            botOwner.GetComponentsInChildren<Collider>();
-            botOwner.GetPlayer.CharacterController.isEnabled = false;
-
-            @class.method_0(botOwner);
-        }
-
         public async UniTask ActivateFikaBot(GClass814 botCreator, Profile profile, GClass590 position, BotZone zone,bool shallBeGroup, Func<BotOwner, BotZone, BotsGroup> GroupAction, Action<BotOwner> OnActivate,CancellationToken token)
         {
             await botCreator.ActivateBot(
-                            profile,
-                            position,
-                            zone, true,
-                            GroupAction,
-                            OnActivate,
-                            token
-                        );
+                profile,
+                position,
+                zone, shallBeGroup,
+                GroupAction,
+                OnActivate,
+                token
+            );
         }
+
         public async UniTask SpawnBossFollower(pitAIBossPlayer player, WildSpawnType boss = WildSpawnType.bossKnight, CancelToken cancelToken = null)
         {
-            
             float dist;
 
             CancelToken token = cancelToken != null ? cancelToken :  new CancelToken();
@@ -451,8 +421,8 @@ namespace friendlyPMC.Patches
                             }
                             catch (Exception ex)
                             {
-                                Components.Logger.LogInfo("Failed to add " + me.Profile.Nickname + " as ally: " + ex.Message);
-                                Components.Logger.LogInfo("Trace : " + ex.StackTrace);
+                                Components.Logger.LogError("Failed to add " + me.Profile.Nickname + " as ally");
+                                Components.Logger.LogError(ex);
                             }
                         });
 
@@ -482,29 +452,17 @@ namespace friendlyPMC.Patches
                         return GetPlayerGroup(player, bt, zn);
                     });
 
-                    Type fikaType = Type.GetType("Fika.Core.Coop.GameMode.CoopGame, Fika.Core");
+                    ActivateFikaBot(
+                        botCreator,
+                        profile,
+                        new GClass590(position, closestCorePoint.Id, false),
+                        zone, true,
+                        GroupAction,
+                        OnActivate,
+                        token.GetCancelToken()
+                    ).Forget();
 
-                    if (fikaType != null)
-                    {
-                        ActivateFikaBot(
-                            botCreator,
-                            profile,
-                            new GClass590(position, closestCorePoint.Id, false),
-                            zone, true,
-                            GroupAction,
-                            OnActivate,
-                            token.GetCancelToken()
-                        ).Forget();
-                    }
-                    else
-                    {
-                        ActivateBot(botCreator, profile, position, closestCorePoint.Id, zone,
-                            GroupAction,
-                            OnActivate
-                        ).Forget();
-                    }
-
-            });   
+                });   
             });
 
             spanwers.Reverse();
@@ -559,7 +517,8 @@ namespace friendlyPMC.Patches
             Dictionary<string,EquipmentClass> profileEquipment = new Dictionary<string,EquipmentClass>();
 
             Dictionary<string,string> profileTactic = new Dictionary<string,string>();
-            
+            Dictionary<string, Item> secureContainers = new Dictionary<string, Item>();
+
             if (side != EPlayerSide.Savage)
             {
 
@@ -578,60 +537,64 @@ namespace friendlyPMC.Patches
                     bot.Profiles.ForEach(profile =>
                     {
                         if (profile != null)
-                        {   if (friendlyPMC.squadSetup.Value)
+                        {   
+                            if (friendlyPMC.squadSetup.Value && friendlyPMC.squadMembers.ContainsKey(pid))
                             {
-                                if(friendlyPMC.squadMembers.ContainsKey(pid))
+                                string eq = friendlyPMC.squadMembers[pid][1].Value;
+                                if (eq != null && eq != "Default")
                                 {
-                                    string eq = friendlyPMC.squadMembers[pid][1].Value;
-                                    if(eq != null && eq != "Default") 
+                                    var secureContainer = profile.Inventory.Equipment.GetSlot(EquipmentSlot.SecuredContainer).ContainedItem;
+
+                                    if (eq == "Player Equipment")
                                     {
-                                        if (eq == "Player Equipment")
+                                        profile.Inventory.Equipment = player.Player().Profile.Inventory.Equipment.CloneItem(null);
+                                        profile.Inventory.Equipment.GetSlot(EquipmentSlot.SecuredContainer).ChangeContainedItemDirectly(secureContainer);
+                                        profile.Inventory.Equipment.GetSlot(EquipmentSlot.SecuredContainer).ApplyContainedItem();
+                                    }
+                                    else
+                                    {
+                                        secureContainers.Add(profile.Id,secureContainer.CloneItem());
+
+                                        foreach (var preset in presets)
                                         {
-                                            profile.Inventory.Equipment = player.Player().Profile.Inventory.Equipment.CloneItem(null);
-                                        }
-                                        else
-                                        {
-                                            foreach (var preset in presets)
+                                            if (eq == preset.Name)
                                             {
-                                                if(eq == preset.Name)
+                                                var equipment = preset.Equipment.CloneItem(null);
+
+                                                if (!bundleJobs.Contains(preset.Name))
                                                 {
-                                                    var equipment = preset.Equipment.CloneItem(null);
-
-                                                    if (!bundleJobs.Contains(preset.Name))
+                                                    foreach (var item in equipment.GetAllItems())
                                                     {
-                                                        foreach (var item in equipment.GetAllItems())
-                                                        {
-                                                            bundleTokens.Add(item.GetAllBundleTokens());
-                                                        };
-                                                        bundleJobs.Add(preset.Name);
-                                                    }
-
-                                                    profileEquipment.Add(profile.Id, equipment);
+                                                        bundleTokens.Add(item.GetAllBundleTokens());
+                                                    };
+                                                    bundleJobs.Add(preset.Name);
                                                 }
+
+                                                profileEquipment.Add(profile.Id, equipment);
                                             }
                                         }
                                     }
+                                }
 
-                                    string tactic = friendlyPMC.squadMembers[pid][0].Value;
-                                    if(tactic != null && tactic != "Default")
+                                string tactic = friendlyPMC.squadMembers[pid][0].Value;
+                                if (tactic != null && tactic != "Default")
+                                {
+                                    switch (tactic)
                                     {
-                                        switch (tactic)
-                                        {
-                                            case "Pusher":
-                                                tactic = "push";
-                                                break;
-                                            case "Holder":
-                                                tactic = "defend";
-                                                break;
-                                            case "Marksman":
-                                                tactic = "marksman";
-                                                // some cheating here, making our marskman good
-                                                profile.Skills.Sniper.SetCurrent(5100f, true);
-                                                profile.Skills.RecoilControl.SetCurrent(4800f, true);
-                                                break;
-                                        }
-                                        profileTactic.Add(profile.ProfileId, tactic);
+                                        case "Pusher":
+                                            tactic = "push";
+                                            break;
+                                        case "Holder":
+                                            tactic = "defend";
+                                            break;
+                                        case "Marksman":
+                                            tactic = "marksman";
+                                            // some cheating here, making our marskman good
+                                            profile.Skills.Sniper.SetCurrent(5100f, true);
+                                            profile.Skills.RecoilControl.SetCurrent(4800f, true);
+                                            break;
                                     }
+                                    profileTactic.Add(profile.ProfileId, tactic);
                                 }
                             }
                             // - else leave it random
@@ -640,7 +603,8 @@ namespace friendlyPMC.Patches
                     });
                 } catch(Exception ex)
                 {
-                    Components.Logger.LogInfo("Failed to set squad equipment " +  ex.Message);
+                    Components.Logger.LogError("Failed to set squad equipment for a bot");
+                    Components.Logger.LogError(ex);
                 }
             }
             
@@ -664,13 +628,19 @@ namespace friendlyPMC.Patches
                             if(profileEquipment.ContainsKey(profile.Id))
                             {
                                 profile.Inventory.Equipment = profileEquipment[profile.Id];
+                                if(secureContainers.ContainsKey(profile.Id))
+                                {
+                                    profile.Inventory.Equipment.GetSlot(EquipmentSlot.SecuredContainer).ChangeContainedItemDirectly(secureContainers[profile.Id]);
+                                    profile.Inventory.Equipment.GetSlot(EquipmentSlot.SecuredContainer).ApplyContainedItem();
+                                }
                             }
                         }
                     });
 
                 } catch (Exception ex)
                 {
-                    Components.Logger.LogInfo("Failed to use custom presets, will fall back to default loadout :" + ex.Message);
+                    Components.Logger.LogError("Failed to use custom presets, will fall back to default loadout");
+                    Components.Logger.LogError(ex);
                 }
             }
 
@@ -680,8 +650,6 @@ namespace friendlyPMC.Patches
             bot.AddPosition(position, closestCorePoint.Id);
 
             float spawnedFollowers = 0;
-
-            Type fikaType = Type.GetType("Fika.Core.Coop.GameMode.CoopGame, Fika.Core");
 
             Func<BotOwner, BotZone, BotsGroup> GroupAction = new Func<BotOwner, BotZone, BotsGroup>((BotOwner bt, BotZone zn) =>
             {
@@ -756,7 +724,7 @@ namespace friendlyPMC.Patches
                             string tactic = null;
                             profileTactic.TryGetValue(profile.ProfileId, out tactic);
 
-                            if (tactic == null) tactic = "balance";
+                            if (tactic == null) tactic = "default";
 
                             WildSpawnType botType = type;
 
@@ -772,8 +740,8 @@ namespace friendlyPMC.Patches
                         }
                         catch (Exception ex)
                         {
-                            Components.Logger.LogInfo("Failed to add " + me.Profile.Nickname + " as follower : " + ex.Message);
-                            Components.Logger.LogInfo("Trace: " + ex.StackTrace);
+                            Components.Logger.LogError("Failed to add " + me.Profile.Nickname + " as follower");
+                            Components.Logger.LogError(ex);
                         }
                     });
 
@@ -806,21 +774,15 @@ namespace friendlyPMC.Patches
 
                 });
 
-                if (fikaType == null)
-                    await ActivateBot(
-                        botCreator, profile, position, closestCorePoint.Id, zone,
-                        GroupAction, OnActivate
-                    );
-                else
-                    await ActivateFikaBot(
-                        botCreator,
-                        profile,
-                        new GClass590(position, closestCorePoint.Id, false),
-                        zone, true,
-                        GroupAction,
-                        OnActivate,
-                        token.GetCancelToken()
-                    );
+                await ActivateFikaBot(
+                    botCreator,
+                    profile,
+                    new GClass590(position, closestCorePoint.Id, false),
+                    zone, true,
+                    GroupAction,
+                    OnActivate,
+                    token.GetCancelToken()
+                );
 
             });
 
@@ -846,7 +808,9 @@ namespace friendlyPMC.Patches
                 friendlyPMC.Instance.GetEquipmentBuilds(); // ensure equipment is gathered
                 
                 Props.Reset();
-            
+
+                LocalGameVmethod4Patch.squadSpawned = false;
+
                 Controller = __instance;
 
                 string locationId = Singleton<GameWorld>.Instance.LocationId;
@@ -861,6 +825,7 @@ namespace friendlyPMC.Patches
 
            
             pitAIBossPlayer playerBoss = BossPlayers.AddPlayerAsBoss(player);
+
             spawnedPlayers.Add(playerBoss);
 
             if (friendlyPMC.knightSpawn.Value)
@@ -875,16 +840,28 @@ namespace friendlyPMC.Patches
         }
     }
 
-    internal class WavesSpawnScenarioRunPatch : ModulePatch
+    [HarmonyPatch(typeof(BaseLocalGame<EftGamePlayerOwner>))]
+    [HarmonyPatch("vmethod_4")]
+    public class LocalGameVmethod4Patch
     {
-        public static bool spawnRan = false;
+        [HarmonyPostfix]
+        public static IEnumerator Postfix(IEnumerator __result, BaseLocalGame<EftGamePlayerOwner> __instance, BotControllerSettings controllerSettings, ISpawnSystem spawnSystem, Callback runCallback)
+        {
+            yield return __result;
+
+            SpawnFollowers();
+
+            yield break;
+        }
+
+        public static bool squadSpawned = false;
 
         public static void SpawnFollowers()
         {
 
-            if (spawnRan) return;
+            if (squadSpawned || BotsControllerPatch.Controller == null) return;
 
-            spawnRan = true;
+            squadSpawned = true;
 
             List<UniTask> squadSpawners = new List<UniTask>();
 
@@ -894,17 +871,14 @@ namespace friendlyPMC.Patches
                 BotsControllerPatch.spawnedPlayers.ForEach(playerBoss =>
                 {
 
-                    if (BotsControllerPatch.Controller != null)
+                    UniTask squadSpanner = BotsControllerPatch.Instance.SpawnGroupBots(playerBoss);
+                    if (!friendlyPMC.knightSpawn.Value)
                     {
-                        UniTask squadSpanner = BotsControllerPatch.Instance.SpawnGroupBots(playerBoss);
-                        if (!friendlyPMC.knightSpawn.Value)
-                        {
-                            squadSpanner.Forget();
-                        }
-                        else
-                        {
-                            squadSpawners.Add(squadSpanner);
-                        }
+                        squadSpanner.Forget();
+                    }
+                    else
+                    {
+                        squadSpawners.Add(squadSpanner);
                     }
                 });
             }
@@ -921,49 +895,15 @@ namespace friendlyPMC.Patches
                         {
                             BotsControllerPatch.Instance.SpawnBossFollower(playerBoss).Forget();
                         }
-                        catch (Exception e) { Components.Logger.LogInfo("Failed Delayed Boss Ally Process " + e.Message); }
+                        catch (Exception e) 
+                        {  
+                            Components.Logger.LogError("Failed to spawn Boss Ally");
+                            Components.Logger.LogError(e);
+                        }
                     });
 
                 }).Forget();
             }
-        }
-
-        protected override MethodBase GetTargetMethod()
-        {
-            return AccessTools.Method(typeof(WavesSpawnScenario), "Run");
-        }
-        [PatchPostfix]
-        private static void PatchPostfix(WavesSpawnScenario __instance, EBotsSpawnMode spawnMode = EBotsSpawnMode.Anyway)
-        {
-            SpawnFollowers();
-        }
-    }
-
-    internal class NonWavesSpawnScenarioRunPatch : ModulePatch
-    {
-        protected override MethodBase GetTargetMethod()
-        {
-            return AccessTools.Method(typeof(NonWavesSpawnScenario), "Run");
-        }
-        [PatchPostfix]
-        private static void PatchPostfix(NonWavesSpawnScenario __instance)
-        {
-            WavesSpawnScenarioRunPatch.SpawnFollowers();
-        }
-    }
-
-
-    internal class Glass579RunPatch : ModulePatch
-    {
-        protected override MethodBase GetTargetMethod()
-        {
-            return AccessTools.Method(typeof(BossSpawnWaveManagerClass), "Run");
-
-        }
-        [PatchPostfix]
-        private static void PatchPostfix(BossSpawnWaveManagerClass __instance, EBotsSpawnMode spawnMode = EBotsSpawnMode.Anyway)
-        {
-            WavesSpawnScenarioRunPatch.SpawnFollowers();
         }
     }
 
@@ -986,31 +926,21 @@ namespace friendlyPMC.Patches
             BotsControllerPatch.spawnedPlayers.Clear();
             BotsControllerPatch.Controller = null;
 
-            WavesSpawnScenarioRunPatch.spawnRan = false;
-
             BotOwnerManualUpdatePatch.BotOwnerUpdate.Clear();
 
             PingTeamates.Disable();
 
-            Utils.Enemy.ClearEnemiesLocations();
+            Enemy.ClearEnemiesLocations();
+            GoalEnemyTracePatch.ClearCache();
             Utils.Utils.FlagsClear();
 
-            if (LocalGameCtorPatch.Instance != null) LocalGameCtorPatch.Instance = null;
+            AIDataContructPatch.playerAIData.Clear();
+
+            LocalGameVmethod4Patch.squadSpawned = false;
 
             Components.Logger.LogInfo("Raid Ended");
 
             return true;
-        }
-    }
-
-
-    [HarmonyPatch(typeof(LocalGame),MethodType.Constructor)]
-    internal class LocalGameCtorPatch
-    {
-        public static LocalGame Instance;
-        public static void Postfix(LocalGame __instance)
-        {
-            Instance = __instance;
         }
     }
 
@@ -1047,12 +977,14 @@ namespace friendlyPMC.Patches
                         dictionary_2.Remove(key);
                     }
                 }
+                
+                Components.Logger.LogInfo("Raid CleanUp Finished");
+
             } catch (Exception ex)
             {
-                Components.Logger.LogInfo("CleanUp Failed :" + ex.Message);
+                Components.Logger.LogError("Raid CleanUp Failed");
+                Components.Logger.LogError(ex);
             }
-
-            Components.Logger.LogInfo("Raid CleanUp Finished");
 
             return true;
         }

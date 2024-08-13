@@ -22,16 +22,17 @@ namespace friendlyPMC.Components
         {
 
             try
-            { 
+            {
                 base.Update();
                 AICoreActionResultStruct<T>? actionResultStruct = base.LastResult();
 
-                if (actionResultStruct != null)OnUpdate?.Invoke(actionResultStruct.Value);
+                if (actionResultStruct != null) OnUpdate?.Invoke(actionResultStruct.Value);
 
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
-                Components.Logger.LogInfo("AIAgent Error " + ex.Message);
-                Components.Logger.LogInfo("AIAgent Trace " + ex.StackTrace);
+                Logger.LogError("AIAgent Error");
+                Logger.LogError(ex);
             }
         }
 
