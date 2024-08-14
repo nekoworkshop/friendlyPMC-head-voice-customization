@@ -10,13 +10,18 @@ using friendlyPMC.Components.FollowerBossFollower;
 using friendlyPMC.Actions;
 
 using System.Linq;
+using friendlyPMC.Modules;
 
 namespace friendlyPMC.Components
 {
     internal class BossFollowerPlayer : BotFollowerPlayer
     {
 
-        public BossFollowerPlayer(BotOwner bot, pitAIBossPlayer player, WildSpawnType bossRole) : base(bot, player, false, bossRole) {}
+        public BossFollowerPlayer(BotOwner bot, pitAIBossPlayer player, WildSpawnType bossRole) : base(bot, player, false, bossRole) {
+
+            NpcMessage.RemoveNpc(bot.ProfileId);
+            NpcMessage.AddNpc(bot, false, true);
+        }
 
         public override void Init()
         {

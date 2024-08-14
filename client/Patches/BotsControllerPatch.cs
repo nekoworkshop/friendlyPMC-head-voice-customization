@@ -956,6 +956,7 @@ namespace friendlyPMC.Patches
         private static bool PatchPrefix(BotsController __instance)
         {
             InteractableObjects.Dispose();
+            NpcMessage.Dispose();
 
             BossPlayers.Dispose();
             Receivers.Dispose();

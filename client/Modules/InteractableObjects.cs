@@ -38,6 +38,8 @@ namespace friendlyPMC.Modules
         private List<Item> _toSendItems;
         private Dictionary<string, Dictionary<string, object>> _followersWithLoot;
 
+        private bool _isBossDead = false;
+
         public InteractableObjects()
         {
             if (Instance == null)
@@ -51,7 +53,7 @@ namespace friendlyPMC.Modules
 
         }
         /** Send any items given to the followers back to the player **/
-        public void SendStoreItems()
+        private bool SendStoreItems()
         {
             GatherItems();
 
@@ -69,9 +71,14 @@ namespace friendlyPMC.Modules
                 RequestHandler.PutJson("/singleplayer/returnitems", new
                 {
                     items = flatItems,
-                    member = info
+                    member = info,
+                    alive = !_isBossDead
                 }.ToJson(_defaultJsonConverters));
+
+                return true;
             }
+
+            return false;
         }
 
         private void GatherItems()
@@ -171,7 +178,19 @@ namespace friendlyPMC.Modules
 
             try
             {
-                SendStoreItems();
+                if (!SendStoreItems())
+                {
+                    NpcMessage.NpcSendThankYou();
+                } else
+                {
+                    string id = NpcMessage.GetNpcType("boss");
+                    if (id == null) id = NpcMessage.GetNpcType("ally");
+
+                    if(id != null)
+                    {
+                        NpcMessage.NpcSendThankYou(id);
+                    }
+                }
             }
             catch (Exception e)
             {
@@ -192,6 +211,8 @@ namespace friendlyPMC.Modules
 
             _lootItem = null;
             _lootedItems = null;
+
+            _isBossDead = false;
 
             IsDisposed = true;
             Instance = null;
@@ -367,6 +388,11 @@ namespace friendlyPMC.Modules
                 Instance._lootedItems.Remove(bot);
                 Instance._followersWithLoot.Remove(bot);
             }
+        }
+
+        public static void BossIsDead()
+        {
+            Instance._isBossDead = true;
         }
 
     }

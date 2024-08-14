@@ -4,10 +4,10 @@
  - have followers send message at the end of the raid depending on status and how many made it out
  - if we have a follower that was picked up, that one should send a thank you message if he was able to make it out with the Player
  - x - make squad have skill relative to the player's skill
+ - #inprogress - improve how bot goes to the enemy
 
 --- ==== >=3.6.2 < 3.7 ==== ---:
  - improve enemy.Search action
- - improve pusher tactic in regards to enemy rush
 
 --- ==== 3.7 ==== ---:
 - fix glitchy behavior of boss followers
@@ -19,7 +19,8 @@
 
 ==================================================================================
 RELEASE NOTES (3.6.1):
- - updated squad spawn where the followers's skill is now relative to the player
+ - updated squad spawn where the followers' skill is now relative to the player
+ - improvements on how bots push the enemy when condition is met
 
 ==================================================================================
 REVISIT:

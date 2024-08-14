@@ -263,9 +263,9 @@ namespace friendlyPMC
 
             savedConfigValues = new Dictionary<ConfigDefinition, string>();
 
-            var OrphanedEntries = AccessTools.Property(typeof(ConfigFile), "OrphanedEntries").GetValue(Config) as Dictionary<ConfigDefinition, string>;
+            var orphanedEntries = AccessTools.Property(typeof(ConfigFile), "OrphanedEntries").GetValue(Config) as Dictionary<ConfigDefinition, string>;
 
-            OrphanedEntries.ExecuteForEach(it =>
+            orphanedEntries.ExecuteForEach(it =>
             {
                 savedConfigValues.Add(it.Key, it.Value);
             });

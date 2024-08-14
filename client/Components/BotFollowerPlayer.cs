@@ -48,6 +48,9 @@ namespace friendlyPMC.Components
             _IsSquadMate = isSquad;
 
             settingModif = new GClass528(1.2f, 1.2f, 1f, 1f, 1f, 1f, 0.9f, 1f, 1f);
+
+            NpcMessage.AddNpc(bot,isSquad);
+            
         }
 
         public virtual void Init()
@@ -507,6 +510,8 @@ namespace friendlyPMC.Components
 
             try
             {
+                
+                NpcMessage.RemoveNpc(_bot.ProfileId);
 
                 _bot.BotFollower.PatrolDataFollower.Dispose();
                 (_bot.Receiver as FollowerReceiver).Dispose();

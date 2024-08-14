@@ -60,9 +60,12 @@ namespace friendlyPMC.Components
         {
             if (Followers != null && Followers.Count > 0)
             {
+                float chance = GClass761.Random(1, 100);
+                bool noreturn = chance > friendlyPMC.returnChanceDeath.Value;
+
                 Followers.ForEach(follower =>
                 {
-                    if (follower != null && GClass761.Random(1, 100) > friendlyPMC.returnChanceDeath.Value)
+                    if (follower != null && noreturn)
                     {
 
                         var flw = BossPlayers.Instance.GetFollower(follower);
@@ -71,6 +74,11 @@ namespace friendlyPMC.Components
                             InteractableObjects.ClearStoredItems(follower.ProfileId);
                     }
                 });
+
+                if(!noreturn)
+                {
+                    InteractableObjects.BossIsDead();
+                }
             }
             BossPlayers.RemovePlayerBoss(realPlayer.ProfileId);
         }

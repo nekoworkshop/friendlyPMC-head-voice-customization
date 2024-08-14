@@ -1,4 +1,5 @@
 import { DependencyContainer, inject } from "tsyringe";
+import fs from "fs";
 import { DatabaseServer } from "@spt/servers/DatabaseServer";
 
 import { BotDifficultyHelper } from "@spt/helpers/BotDifficultyHelper";
@@ -43,6 +44,7 @@ import { ISendMessageDetails } from "@spt/models/spt/dialog/ISendMessageDetails"
 import { MessageType } from "@spt/models/enums/MessageType";
 import { ProfileHelper } from "@spt/helpers/ProfileHelper";
 import { IGenerateBotsRequestData } from "@spt/models/eft/bot/IGenerateBotsRequestData";
+import { LocaleService } from "@spt/services/LocaleService";
 
 class friendlyPMC {
 	config = {
@@ -51,9 +53,47 @@ class friendlyPMC {
 		englishBear: true,
 	};
 
+	lang = {
+		returnItems: <string[]>[],
+		returnItemsDeath: <string[]>[],
+		teamEscaped: <string[]>[],
+		friendlyEscaped: <string[]>[],
+		allyBossEscaped: <string[]>[],
+	};
+
+	lang_en = {
+		//prettier-ignore
+		"returnItems" : [
+            "Here is your stuff. Uhm, anything in there for me? ", 
+            "Got your things right here.", 
+            "Here is everything you gave me. So... we are splitting this, right?", 
+            "Here, this is everything you gave me.\nAnything in there for me?", "Here you go my friend, all the stuff you gave me.", "I got your stuff right here. Anything in there you can spare?"
+        ],
+		//prettier-ignore
+		"returnItemsDeath" : [
+            "Don't worry boss, we managed to get out.\n I have your things right here.",
+            "We where able to get out of there. Here is everything you gave me. I hope your stuff is insured, that I could not get.",
+        ],
+		//prettier-ignore
+		teamEscaped: [
+            "Nice!\nWe managed to get out.",
+            "And that's a wrap! We made it boss.",
+        ],
+		//prettier-ignore
+		friendlyEscaped: [
+            "Glad we made it.\nThanks for letting me tag along. ",
+            "Whew, glad I found you.\nI didn't know if I was going to make it. Thanks!"
+        ],
+		//prettier-ignore
+		allyBossEscaped : [
+            "Nice run!\n You did good rookie, you did good",
+        ],
+	};
+
 	Logger: ILogger;
 	Bots: IBotConfig;
 	mailSendService: MailSendService;
+	LocaleService: LocaleService;
 
 	originalgetPmcDifficultySettings: BotDifficultyHelper["getPmcDifficultySettings"];
 	originalgetBotDifficulty: BotController["getBotDifficulty"];
@@ -67,6 +107,7 @@ class friendlyPMC {
 	preSptLoad(container: DependencyContainer) {
 		this.Logger = container.resolve("WinstonLogger");
 		this.mailSendService = container.resolve("MailSendService");
+		this.LocaleService = container.resolve("LocaleService");
 
 		try {
 			this.config = Object.assign(this.config, require("../config.json"));
@@ -74,6 +115,9 @@ class friendlyPMC {
 			this.Logger.error("friendlyPMC: something is wrong with the config, check below\n");
 			console.error(e);
 		}
+
+		this.lang = this.lang_en;
+
 		// patch getPmcDifficultySettings as that is where we actually make the bots be friendly
 		this.getPmcDifficultySettings = this.getPmcDifficultySettings.bind(this);
 		container.afterResolution(
@@ -162,12 +206,25 @@ class friendlyPMC {
 				new RouteAction("/singleplayer/returnitems", (url: string, info: any, sessionID: string, output: string): any => {
 					const member = <IUserDialogInfo>info.member;
 
+					if (this.LocaleService.getDesiredGameLocale()) {
+						let lang = this.LocaleService.getDesiredGameLocale();
+						try {
+							if (lang && fs.existsSync(`${__dirname}/../lang/${lang}.json`)) {
+								this.lang = require(`../lang/${lang}.json`);
+							}
+						} catch (e) {
+							this.Logger.error("friendlyPMC: bad language file for " + lang + " - falling back to en");
+							console.error(e);
+							this.lang = this.lang_en;
+						}
+					}
+
 					const details: ISendMessageDetails = {
 						recipientId: sessionID,
 						sender: MessageType.USER_MESSAGE,
 						senderDetails: member,
 						//@prettier-ignore
-						messageText: randomUtil.getArrayValue(["Here is your stuff. Uhm, anything in there for me? ", "Got your things right here. Where's my cut?", "Here is everything you gave me. So... we are splitting this, right?", "Here, this is everything you gave me.\nAnything in there for me?", "Here you go my friend, all the stuff you gave me.", "I got your stuff right here. Anything in there you can spare?"]),
+						messageText: randomUtil.getArrayValue(info.alive ? this.lang.returnItems : this.lang.returnItemsDeath),
 					};
 
 					// Add items to message - recreation of sendMessageToPlayer in order to insert the NPC as a user
@@ -207,6 +264,30 @@ class friendlyPMC {
 						this.mailSendService["notificationSendHelper"].sendMessage(details.recipientId, notificationMessage);
 					}
 
+					return httpResponseUtil.emptyResponse();
+				}),
+
+				new RouteAction("/singleplayer/teamescaped", (url: string, info: any, sessionID: string, output: string): any => {
+					const member: IUserDialogInfo & {
+						SquadInfo: {
+							Mate: boolean;
+							AllyBoss: boolean;
+						};
+					} = info.member;
+
+					let message = this.lang.friendlyEscaped;
+					if (member.SquadInfo.AllyBoss) {
+						message = this.lang.allyBossEscaped;
+					} else if (member.SquadInfo.Mate) {
+						message = this.lang.friendlyEscaped;
+					}
+
+					this.mailSendService.sendMessageToPlayer({
+						recipientId: sessionID,
+						sender: MessageType.USER_MESSAGE,
+						senderDetails: member,
+						messageText: randomUtil.getArrayValue(message),
+					});
 					return httpResponseUtil.emptyResponse();
 				}),
 
@@ -256,6 +337,9 @@ class friendlyPMC {
 						botGenerationDetails.botRelativeLevelDeltaMin = 5;
 
 						conditionPromises.push(botGenerator["generateBot"](sessionID, preparedBotBase, botJsonTemplateClone, botGenerationDetails));
+						conditionPromises.forEach(profile => {
+							profile.Info.Voice = this.config.englishBear ? `Bear_${randomUtil.getInt(1, 2)}_Eng` : `Bear_${randomUtil.getInt(1, 3)}`;
+						});
 
 						return httpResponseUtil.getBody(conditionPromises);
 					}

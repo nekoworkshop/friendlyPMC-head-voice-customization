@@ -43,6 +43,9 @@ namespace friendlyPMC.Modules
             if (type == (BotLogicDecision)CustomBotDecisions.EnemySearch)
                 return new FollowerSearch(bot);
 
+            if (type == BotLogicDecision.goToEnemy)
+                return new FollowerGoToEnemy(bot);
+
             return GClass459.CreateNode(type, bot);
         }
 

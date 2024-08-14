@@ -112,17 +112,18 @@ namespace friendlyPMC.Utils
             return pt;
         }
         /**
-         *  Get a random cover point for the bot around the given position, within the specified radius
+         * Get all cover poins around the center positions
          */
-        public static CustomNavigationPoint GetCoverPoint(BotOwner botOwner, Vector3 centerPosition, float searchRadius, Func<CustomNavigationPoint, bool> eligibilityCheck = null)
+        public static List<CustomNavigationPoint> GetCoverPoints(BotOwner botOwner, Vector3 centerPosition, float searchRadius, Func<CustomNavigationPoint, bool> eligibilityCheck = null)
         {
-            if (!botOwner.BotFollower.HaveBoss) return null;
+            List<CustomNavigationPoint> points = new List<CustomNavigationPoint>();
+
+            if (!botOwner.BotFollower.HaveBoss) return points;
 
             pitAIBossPlayer boss = botOwner.BotFollower.BossToFollow as pitAIBossPlayer;
 
-            //NavMeshPath navMeshPath = new NavMeshPath();
+            if (boss == null) return points;
 
-            List<CustomNavigationPoint> points = new List<CustomNavigationPoint>();
             List<CustomNavigationPoint> areaCovers = boss.GetAreaCovers();
             foreach (CustomNavigationPoint point in areaCovers)
             {
@@ -134,7 +135,7 @@ namespace friendlyPMC.Utils
                 }
 
 
-                if (Vector3.Distance(centerPosition,point.Position) <= searchRadius)
+                if (Vector3.Distance(centerPosition, point.Position) <= searchRadius)
                 {
                     if (eligibilityCheck != null && !eligibilityCheck(point)) continue;
                     points.Add(point);
@@ -142,6 +143,15 @@ namespace friendlyPMC.Utils
 
             }
 
+            return points;
+        }
+        /**
+         *  Get a random cover point for the bot around the given position, within the specified radius
+         */
+        public static CustomNavigationPoint GetCoverPoint(BotOwner botOwner, Vector3 centerPosition, float searchRadius, Func<CustomNavigationPoint, bool> eligibilityCheck = null)
+        {
+            List<CustomNavigationPoint> points = GetCoverPoints(botOwner,centerPosition,searchRadius,eligibilityCheck);
+            
             if (points.Count > 0)
             {
                 return points.Random();

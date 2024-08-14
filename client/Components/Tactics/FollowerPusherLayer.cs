@@ -84,9 +84,10 @@ namespace friendlyPMC.Components.Tactics
                     (pushOrdered && enemiesAtLocation < 4)
                 )
                 {
+                    BotLogicDecision pushDecision = pushOrdered ? BotLogicDecision.runToEnemy : BotLogicDecision.goToEnemy;
                     // -- push if not visible
                     if (!enemyVisible)
-                        return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToEnemy, "rushEnemy");
+                        return new AICoreActionResultStruct<BotLogicDecision>(pushDecision, "pushEnemy");
                     else
                     {
                         // -- cover push if visible
@@ -101,7 +102,7 @@ namespace friendlyPMC.Components.Tactics
                             return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMoving, "getInCloseSlow");
                         }
                         // -- no cover, go for it
-                        return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToEnemy, "rushEnemy");
+                        return new AICoreActionResultStruct<BotLogicDecision>(pushDecision, "pushEnemy");
                     }
                 }
 
