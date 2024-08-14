@@ -1,35 +1,13 @@
---- ==== 3.6 ==== ---:
- - x - remove the dependency of LootingBots plugin
- - x - if followers are given meds, at the end of the raid we should update the status of the med item based on whether the follower used it or not
- - x - fix bots not appearing as being in the same group (player is not possible)
- - x - fix bears not speaking russian with englishBear flag is off
- - x - fix followers not being hostile to same side, when activated
- - x - ensure followers add enemy when a same side bot adds the player as enemy
- - x - change the spawn setup (needs Fika confirmation)
- - x - fix issue with duplicated loot (test with weapons, magazines and vests)
- - x - rename EnemyInfo utility class to Enemy
- - x - fix "contact" not always picking up an enemy. Also make bots switch target if player is signaling an enemy that is much closer
- - x - fix looting not working with SWAG (can't reproduce anymore)
- - x - remove the "fire" command that switches to push
- - x - remove the "stop" command
- - x - updates hold positon and stop gesture
- - x - make bots have extra ammo
- - x - have bots react with ok if player says exist located and do a regroup if far
- - x - have bots react with hello or ok sign if player signals ok
- - x - remove BTR as enemy to followers
-
-
 --- ==== 3.6.1 ==== ---:
- - fix bots not being silent on issuing silence command
  - update getBack request to make bots cover boss at a distance during combat
  - update coverMe request to reset cover boss distance
  - have followers send message at the end of the raid depending on status and how many made it out
  - if we have a follower that was picked up, that one should send a thank you message if he was able to make it out with the Player
- - make squad have skill relative to the player's skill
-
+ - x - make squad have skill relative to the player's skill
 
 --- ==== >=3.6.2 < 3.7 ==== ---:
- - improve followers holder and pusher tactics
+ - improve enemy.Search action
+ - improve pusher tactic in regards to enemy rush
 
 --- ==== 3.7 ==== ---:
 - fix glitchy behavior of boss followers
@@ -37,34 +15,11 @@
 - add new tactic that is based on marksman but allows for push command and others
 - make BigPipe fight tactic unique (Supporter) 
 - make BirdEye fight tactic more unique (Enhanced Marskman)
-- make Knight fight tactis unique (Assaulter)
+- make Knight fight tactic unique (Assaulter)
 
 ==================================================================================
-RELEASE NOTES (3.6.0):
- - removed looting bots dependency, this also means you cannot use the loot corpse command anymore but you can now tell bots to pick up loot that is elevated (like on a table)
- - reserved secure container of bots for extra ammo. The secure container of a bot will be used for adding extra ammo for the main weapon. If you create presets that include a secure container, that will be ignored and instead use the default one the bot would spawn with.
- - changed "balance" tactic which is now named "default" where bots will look for shooting spots when at a distance from the enemy instead of falling back to holder tactic
- - fixed bots not appearing under the same group.
- - fixed BEAR still speaking English when englishBear flag is off
- - fixed BTR being seen as enemy to the followers
- - changed the squad spawn logic to help deal with an error SAIN was throwing because of not liking that the bots where spawning first
- - "Fire" command removed
- - "Stop" command removed
- - "Hold Position" command uodated ( triggers hold tactic if in combat and hold position if out of combat).
- - "Stop" gesture triggers hold position for any follower within 15 meter radius.
- - enabled "exit located" command to trigger followers to regroup on the player location
-
- Notes:
- Hold position request, be it via gesture or phrase will transition over to hold tactic if request was made out of combat but never canceled by the time bot entered combat. This request affects Marksman as well
- 
- For those using Raid Review Mod, even though the followers grouping is fixed, Player will not apear under the same team as bot group id is not something you can give to player
- 
- The new spawning system works similar to old ways with delay after player spawn. Your followers will be the first ones to spawn in terms of "wave" spawn that is controlled by the game. How long that takes, it dependds. Usually it is a couple of seconds, but I encounted one scenario where my system was under heavy load and I believe it took 1 minute for them to spawn. There should not be any issues with FIKA or Swag, it was tested with both.
-
- The new looting system clears up conflicts with question bot and I did my best to fixed bugs that showed up with it. I did have one bug, that showed only once, on FIKA +SWAG + Questing system where the bots refused to pick up loot. Could not replicate again so if you do encounter it, try to remember the under what circumstances you where and post details so we can find a way to replicate it. In other scenarios, if they do not go for it, it is because:
- 1) no space left
- 2) no nav points to reach it - just move the loot somewhere else
- 3) they are actively engaged with an enemy
+RELEASE NOTES (3.6.1):
+ - updated squad spawn where the followers's skill is now relative to the player
 
 ==================================================================================
 REVISIT:

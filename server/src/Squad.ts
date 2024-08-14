@@ -41,6 +41,8 @@ import { BotGenerationDetails } from "@spt/models/spt/bots/BotGenerationDetails"
 import { HashUtil } from "@spt/utils/HashUtil";
 import { ISendMessageDetails } from "@spt/models/spt/dialog/ISendMessageDetails";
 import { MessageType } from "@spt/models/enums/MessageType";
+import { ProfileHelper } from "@spt/helpers/ProfileHelper";
+import { IGenerateBotsRequestData } from "@spt/models/eft/bot/IGenerateBotsRequestData";
 
 class friendlyPMC {
 	config = {
@@ -150,8 +152,12 @@ class friendlyPMC {
 		const httpResponseUtil = container.resolve<HttpResponseUtil>("HttpResponseUtil");
 		const randomUtil = container.resolve<RandomUtil>("RandomUtil");
 
+		const botGenerator = container.resolve<BotGenerator>("BotGenerator");
+		const botController = container.resolve<BotController>("BotController");
+		const profileHelper = container.resolve<ProfileHelper>("ProfileHelper");
+
 		staticRouterModService.registerStaticRouter(
-			"SquadItemsGiver",
+			"friendlyPMC",
 			[
 				new RouteAction("/singleplayer/returnitems", (url: string, info: any, sessionID: string, output: string): any => {
 					const member = <IUserDialogInfo>info.member;
@@ -203,8 +209,59 @@ class friendlyPMC {
 
 					return httpResponseUtil.emptyResponse();
 				}),
+
+				new RouteAction("/client/game/bot/followergenerate", (url: string, info: IGenerateBotsRequestData, sessionID: string, output: string): any => {
+					const pmcProfile = profileHelper.getPmcProfile(sessionID);
+
+					const profiles = profileHelper.getProfiles();
+
+					let level = 0;
+					Object.keys(profiles).forEach(key => {
+						const profile = profiles[key];
+						let lvl = profile.characters.pmc.Info.Level;
+						if (lvl > level) {
+							level = lvl;
+						}
+					});
+
+					const conditionPromises: IBotBase[] = [];
+
+					for (const condition of info.conditions) {
+						const botGenerationDetails = botController["getBotGenerationDetailsForWave"](
+							condition,
+							pmcProfile,
+							false,
+							{
+								// max should be between level and level + 5 as integer
+								max: Math.round(Math.random() * (level + 5 - level) + level),
+								// min should be between level - 5 and level integer
+								min: Math.max(1, Math.round(Math.random() * (level - level + 5) + level - 5)),
+							},
+							botController["botConfig"].presetBatch[condition.Role],
+							false
+						);
+
+						const preparedBotBase = botGenerator["getPreparedBotBase"](
+							botGenerationDetails.eventRole ?? botGenerationDetails.role, // Use eventRole if provided,
+							botGenerationDetails.side,
+							botGenerationDetails.botDifficulty
+						);
+
+						const botRole = botGenerationDetails.isPmc
+							? preparedBotBase.Info.Side // Use side to get usec.json or bear.json when bot will be PMC
+							: botGenerationDetails.role;
+						const botJsonTemplateClone = botController["cloner"].clone(botController["botHelper"].getBotTemplate(botRole));
+
+						botGenerationDetails.botRelativeLevelDeltaMax = 5;
+						botGenerationDetails.botRelativeLevelDeltaMin = 5;
+
+						conditionPromises.push(botGenerator["generateBot"](sessionID, preparedBotBase, botJsonTemplateClone, botGenerationDetails));
+
+						return httpResponseUtil.getBody(conditionPromises);
+					}
+				}),
 			],
-			"custom-static-squad-items-giver"
+			"custom-static-friendly-pmc"
 		);
 	}
 

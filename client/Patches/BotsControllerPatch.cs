@@ -11,17 +11,16 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Threading;
 using UnityEngine;
-
-
-using IProfileData = GClass592;
-
 using friendlyPMC.Utils;
 using Comfort.Common;
-using System.Linq;
 using EFT.InventoryLogic;
 using EFT.Bots;
 using System.Collections;
+using System.Linq;
 
+using IProfileData = GClass592;
+using ProfileEndPoint = ProfileEndpointFactoryAbstractClass;
+using BotCreator = GClass814;
 
 
 namespace friendlyPMC.Patches
@@ -186,8 +185,9 @@ namespace friendlyPMC.Patches
             }
         }
 
-        public async UniTask ActivateFikaBot(GClass814 botCreator, Profile profile, GClass590 position, BotZone zone,bool shallBeGroup, Func<BotOwner, BotZone, BotsGroup> GroupAction, Action<BotOwner> OnActivate,CancellationToken token)
+        public async UniTask ActivateBotFollower(BotCreator botCreator, Profile profile, GClass590 position, BotZone zone,bool shallBeGroup, Func<BotOwner, BotZone, BotsGroup> GroupAction, Action<BotOwner> OnActivate,CancellationToken token)
         {
+            Components.Logger.LogInfo("Activating follower " + profile.Nickname);
             await botCreator.ActivateBot(
                 profile,
                 position,
@@ -198,6 +198,33 @@ namespace friendlyPMC.Patches
             );
         }
 
+        private async UniTask<Profile> GenerateFollowerProfile(
+            BotCreator botCreator,
+            WaveInfo[] source)
+        {
+
+            var botPresets = AccessTools.Field(typeof(BotCreator), "ginterface18_0").GetValue(botCreator) as BotsPresets;
+            var profileEndpoint = AccessTools.Field(typeof(BotsPresets), "iSession").GetValue(botPresets) as ProfileEndPoint;
+            var gclass1200_0 = AccessTools.Field(typeof(ProfileEndPoint), "gclass1200_0").GetValue(profileEndpoint) as GClass1200;
+
+            List<WaveInfo> limit = botPresets.method_1(source.ToList(), out var list3); ;
+
+            var result = await profileEndpoint.method_3<Profile[]>(new LegacyParamsStruct
+            {
+                    Url = gclass1200_0.Main + "/client/game/bot/followergenerate",
+                    Params = new Class17<List<WaveInfo>>(limit),
+                    Retries = new byte?(LegacyParamsStruct.DefaultRetries)
+            });
+
+            Profile profile = result.ToList().Random();
+
+            await Singleton<PoolManager>.Instance.LoadBundlesAndCreatePools(PoolManager.PoolsCategory.Raid, PoolManager.AssemblyType.Local, profile.GetAllPrefabPaths(false).ToArray<ResourceKey>(), JobPriority.General, null, PoolManager.DefaultCancellationToken);
+
+            Components.Logger.LogInfo("Generated Follower Profile " + profile.Nickname + " with level " + profile.Info.Level);
+
+            return profile;
+        }
+
         public async UniTask SpawnBossFollower(pitAIBossPlayer player, WildSpawnType boss = WildSpawnType.bossKnight, CancelToken cancelToken = null)
         {
             float dist;
@@ -205,7 +232,7 @@ namespace friendlyPMC.Patches
             CancelToken token = cancelToken != null ? cancelToken :  new CancelToken();
 
             var botSpawnerClass = Controller.BotSpawner;
-            var botCreator = AccessTools.Field(typeof(BotSpawner), "_botCreator").GetValue(botSpawnerClass) as GClass814;
+            var botCreator = AccessTools.Field(typeof(BotSpawner), "_botCreator").GetValue(botSpawnerClass) as BotCreator;
 
             Vector3 position = player.Position;
             EPlayerSide side = player.Player().Side;
@@ -416,6 +443,7 @@ namespace friendlyPMC.Patches
                                     else
                                     {
                                         token.Cancel();
+                                        bot.StopSpawn();
                                     }
                                 }, 1000);
                             }
@@ -452,7 +480,7 @@ namespace friendlyPMC.Patches
                         return GetPlayerGroup(player, bt, zn);
                     });
 
-                    ActivateFikaBot(
+                    ActivateBotFollower(
                         botCreator,
                         profile,
                         new GClass590(position, closestCorePoint.Id, false),
@@ -478,7 +506,7 @@ namespace friendlyPMC.Patches
             CancelToken token = new CancelToken();
 
             var botSpawnerClass = Controller.BotSpawner;
-            var botCreator = AccessTools.Field(typeof(BotSpawner), "_botCreator").GetValue(botSpawnerClass) as GClass814;
+            var botCreator = AccessTools.Field(typeof(BotSpawner), "_botCreator").GetValue(botSpawnerClass) as BotCreator;
            
 
             Vector3 position = player.Position;
@@ -511,7 +539,18 @@ namespace friendlyPMC.Patches
 
             IProfileData botData = new IProfileData(side, type, BotDifficulty.hard, 0f, @params);
 
-            BotCreationDataClass bot = await BotCreationDataClass.Create(botData, botCreator, memberCount, botSpawnerClass);
+
+            BotCreationDataClass botCreationData = new BotCreationDataClass(botData);
+            AccessTools.Field(typeof(BotCreationDataClass), "ginterface19_0").SetValue(botCreationData, botSpawnerClass);
+            AccessTools.Field(typeof(BotCreationDataClass), "iBotCreator").SetValue(botCreationData, botCreator);
+
+            for (int i = 0; i < memberCount; i++)
+            {
+                var pr = await GenerateFollowerProfile(botCreator, botData.PrepareToLoadBackend(1));
+                botCreationData.AddProfile(pr);
+            }
+
+            BotCreationDataClass bot = botCreationData; //await BotCreationDataClass.Create(botData, botCreator, memberCount, botSpawnerClass);
 
             List<DependencyGraph<IEasyBundle>.GClass3415> bundleTokens = new List<DependencyGraph<IEasyBundle>.GClass3415>();
             Dictionary<string,EquipmentClass> profileEquipment = new Dictionary<string,EquipmentClass>();
@@ -521,7 +560,6 @@ namespace friendlyPMC.Patches
 
             if (side != EPlayerSide.Savage)
             {
-
                 List<GClass3205> presets = new List<GClass3205>();
                 Utils.Equipment.CustomPresets.ForEach(preset =>
                 {
@@ -763,6 +801,7 @@ namespace friendlyPMC.Patches
                         if (spawnedFollowers >= memberCount)
                         {
                             token.Cancel();
+                            bot.StopSpawn();
                         }
 
                         Utils.Utils.SetTimeout(() =>
@@ -774,7 +813,7 @@ namespace friendlyPMC.Patches
 
                 });
 
-                await ActivateFikaBot(
+                await ActivateBotFollower(
                     botCreator,
                     profile,
                     new GClass590(position, closestCorePoint.Id, false),
@@ -785,7 +824,6 @@ namespace friendlyPMC.Patches
                 );
 
             });
-
         }
 
         protected override MethodBase GetTargetMethod()
