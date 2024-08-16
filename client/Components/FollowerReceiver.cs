@@ -305,7 +305,7 @@ namespace friendlyPMC.Components
                         !botOwner_0.Memory.HaveEnemy
                         )
                     {
-                        botOwner_0.Gesture.TryGestus(EGesture.Good, false);
+                        botOwner_0.Gesture.TryGestus(EGesture.Good, true);
                     }
                     return;
                 }
@@ -434,10 +434,11 @@ namespace friendlyPMC.Components
                 AccessTools.Field(typeof(BaseLogicLayerAbstractClass), "bool_1").SetValue(botOwner_0.Brain.BaseBrain.CurLayerInfo, true);
                 // try to get bot unstuck in item taker logic
                 InteractableObjects.RemoveTaker(botOwner_0);
+                // try to get bot unstuck in open door logic
+                InteractableObjects.RemoveOpener();
                 // clear current enemy
                 if (botOwner_0.Memory.HaveEnemy)
                 {
-                    botOwner_0.Memory.DeleteInfoAboutEnemy(botOwner_0.Memory.GoalEnemy.Person);
                     botOwner_0.Memory.GoalEnemy = null;
                 }
 
@@ -735,9 +736,6 @@ namespace friendlyPMC.Components
                     Door door = InteractableObjects.GetCurDoor();
                     if (door != null)
                     {
-
-                        InteractableObjects.SetCurDoor(null);
-
                         BotOwner closest = null;
                         float dist = 10f;
                         boss.Followers.ForEach(fl =>
@@ -754,9 +752,23 @@ namespace friendlyPMC.Components
                         // - the closest bot shall open the door
                         if (closest != null && closest == botOwner_0)
                         {
-                            botOwner_0.BotsGroup.RequestsController.TryActivateOpenDoorRequest(requester, door, null);
+                            Player alivePlayerByProfileID = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(requester.ProfileId);
+
+                            FollowerOpenDoorRequest gclass = new FollowerOpenDoorRequest(door, alivePlayerByProfileID, null);
+                            
+                            botOwner_0.BotRequestController.TryStopCurrent(alivePlayerByProfileID, false);
+                            
+                            if (botOwner_0.BotsGroup.RequestsController.TryAddRequest(gclass))
+                            {
+                                gclass.AddPossibleExecutors(botOwner_0);
+                                gclass.SetGroup(botOwner_0.BotsGroup.RequestsController);
+
+                                botOwner_0.BotTalk.TrySay(EPhraseTrigger.Roger, true);
+                            }
                         }
                     }
+
+                    return;
                 }
                 // loot item
                 else if (info.phrase == EPhraseTrigger.LootGeneric || info.phrase == EPhraseTrigger.LootWeapon)
@@ -808,8 +820,7 @@ namespace friendlyPMC.Components
                                         gclass.AddPossibleExecutors(botOwner_0);
                                         gclass.SetGroup(botOwner_0.BotsGroup.RequestsController);
 
-                                        botOwner_0.BotTalk.TrySay(EPhraseTrigger.Roger, false);
-                                        botOwner_0.Gesture.TryGestus(EGesture.Good, false);
+                                        botOwner_0.BotTalk.TrySay(EPhraseTrigger.Roger, true);
 
                                         return;
                                     }

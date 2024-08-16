@@ -53,15 +53,17 @@ namespace friendlyPMC.Components
                (BotRequestType)CustomBotRequestType.Regroup
             };
 
+
+            if (InteractableObjects.IsOpener(botOwner_0))
+            {
+                return true;
+            }
+
             if (currRequest == null)
             {
                 return false;
             }
 
-            if (currRequest.BotRequestType == BotRequestType.doorOpen)
-            {
-                return currRequest.CanProceed();
-            }
 
             pitAIBossPlayer boss = null;
             if (botOwner_0.BotFollower.BossToFollow != null)
@@ -111,7 +113,12 @@ namespace friendlyPMC.Components
 
             if(request == null)
             {
-                return new AICoreActionResultStruct<BotLogicDecision>(HoldOrCover(botOwner_0), "req:Error");
+                if (InteractableObjects.IsOpener(botOwner_0))
+                {
+                    return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.doorOpen, "doorOpen");
+                } 
+                else
+                    return new AICoreActionResultStruct<BotLogicDecision>(HoldOrCover(botOwner_0), "req:Error");
             }
 
             switch (request.BotRequestType)
@@ -199,11 +206,13 @@ namespace friendlyPMC.Components
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.goToPoint, "req:goCheck");
 
                 case BotRequestType.doorOpen:
-                    doorOpenTimer = Time.time + 5f;
+                    doorOpenTimer = Time.time + 7f;
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.doorOpen, "doorOpen");
             }
 
+            
             botOwner_0.BotTalk.TrySay(EPhraseTrigger.Negative, false);
+
             return new AICoreActionResultStruct<BotLogicDecision>(HasBoss() ? BotLogicDecision.followerPatrol : HoldOrCover(botOwner_0), "req:Error");
         }
 
@@ -215,7 +224,10 @@ namespace friendlyPMC.Components
             if(doorOpenTimer < Time.time)
             {
                 if (curRequest != null && curRequest.BotRequestType == BotRequestType.doorOpen)
+                {
+                    InteractableObjects.RemoveOpener();
                     curRequest.Complete();
+                }
 
                 return aICoreActionEndStruct;
             }

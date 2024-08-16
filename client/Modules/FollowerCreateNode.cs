@@ -1,5 +1,6 @@
 ﻿using EFT;
 using friendlyPMC.Actions;
+using friendlyPMC.Requests;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,11 +15,8 @@ namespace friendlyPMC.Modules
 
         public static GClass134 CreateNode(BotLogicDecision type, BotOwner bot)
         {
-
-            if (type == BotLogicDecision.doorOpen)
-            {
-                return new FollowerDoorOpener(bot, bot.BotRequestController.CurRequest as GClass508);
-            }
+            if(type == BotLogicDecision.doorOpen)
+                return new FollowerOpenDoor(bot);
 
             if (type == BotLogicDecision.botTakeItem)
             {

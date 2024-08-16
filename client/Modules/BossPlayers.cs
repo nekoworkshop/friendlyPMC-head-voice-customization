@@ -72,6 +72,7 @@ namespace friendlyPMC.Modules
         {
             if(_bosses.ContainsKey(player.ProfileId)) return _bosses[player.ProfileId];
 
+
             WildSpawnType roleType = player.Profile.Info.Settings.Role;
             player.Profile.Info.Settings.Role = WildSpawnType.bossKnight; // temp switch to boss role
             pitAIBossPlayer playerBoss = new pitAIBossPlayer(player);
@@ -88,6 +89,11 @@ namespace friendlyPMC.Modules
             }
 
             string name = player.ProfileId;
+
+            if(string.IsNullOrEmpty(player.Profile.Info.GroupId))
+            {
+                player.Profile.Info.GroupId = "bossGroup_" + name;
+            }
 
             if (_removedBosses.Contains(name))
             {

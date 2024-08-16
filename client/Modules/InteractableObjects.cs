@@ -27,6 +27,7 @@ namespace friendlyPMC.Modules
         public static InteractableObjects Instance;
 
         private Door _currDoor;
+        private string _botToOpen;
 
         private LootItem _lootItem;
         private Vector3? _lootPosition;
@@ -52,7 +53,7 @@ namespace friendlyPMC.Modules
             }
 
         }
-        /** Send any items given to the followers back to the player **/
+
         private bool SendStoreItems()
         {
             GatherItems();
@@ -322,6 +323,30 @@ namespace friendlyPMC.Modules
                 Instance._botToLoot = null;
             }
         }
+
+        public static bool SetOpener(BotOwner bot)
+        {
+            if (Instance._currDoor != null)
+            {
+                Instance._botToOpen = bot.ProfileId;
+                return true;
+            }
+            return false;
+        }
+
+        public static bool IsOpener(BotOwner bot)
+        {
+            return Instance._botToOpen == bot.ProfileId;
+        }
+
+        public static void RemoveOpener()
+        {
+
+            Instance._botToOpen = null; 
+            Instance._currDoor = null;
+        }
+   
+
 
         public static void ClearCurLootItem()
         {

@@ -78,6 +78,9 @@ namespace friendlyPMC.Components
                 if(!noreturn)
                 {
                     InteractableObjects.BossIsDead();
+                } else
+                {
+                    NpcMessage.PlayerDied();
                 }
             }
             BossPlayers.RemovePlayerBoss(realPlayer.ProfileId);

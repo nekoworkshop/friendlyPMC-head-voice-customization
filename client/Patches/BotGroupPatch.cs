@@ -172,7 +172,6 @@ namespace friendlyPMC.Patches
                     break;
                 }
             }
-
         }
     }
 }

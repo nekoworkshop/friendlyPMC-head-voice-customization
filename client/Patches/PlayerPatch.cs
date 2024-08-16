@@ -31,8 +31,6 @@ namespace friendlyPMC.Patches
                 {
                     if (__instance.AIBossPlayer != null && __instance.AIBossPlayer.GetType() != typeof(pitAIBossPlayer))
                     {
-
-                        Components.Logger.LogInfo("Disposed old AIBossPlayer");
                         __instance.AIBossPlayer.Dispose();
                         pitAIBossPlayer boss =  BossPlayers.GetBoss(player.ProfileId);
                         // replace AIBossPlayer with ours

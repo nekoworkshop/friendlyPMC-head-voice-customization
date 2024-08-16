@@ -163,9 +163,7 @@ namespace friendlyPMC.Actions
                     botOwner_0.GoToSomePointData.SetPoint((Vector3)spotPosition);
                     sprint = Utils.Utils.GetNavDistance(botOwner_0.GetPlayer.Transform.position, (Vector3)spotPosition) > 20f;
                     botOwner_0.GoToSomePointData.UpdateToGo(sprint);
-
-                    botOwner_0.Steering.LookToPoint(botOwner_0.Memory.GoalEnemy.GetCenterPart());
-
+                    botOwner_0.LookData.SetLookPointByHearing(null);
                 }
                 else
                 {

@@ -838,6 +838,7 @@ namespace friendlyPMC.Patches
             {
                 new BossPlayers();
                 new InteractableObjects();
+                new NpcMessage();
                 new Receivers();
                 new FollowerPatrolInstances();
 

@@ -505,6 +505,11 @@ namespace friendlyPMC.Components
                 return new AICoreActionEndStruct("enemy.Present", true);
         }
 
+        public override AICoreActionEndStruct EndDoorOpenRequest()
+        {
+            InteractableObjects.SetCurDoor(null);
+            return new AICoreActionEndStruct("enemy.Present", true);
+        }
 
         public override AICoreActionEndStruct ShallEndCurrentDecision(AICoreActionResultStruct<BotLogicDecision> curDecision)
         {

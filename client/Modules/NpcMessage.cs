@@ -17,6 +17,8 @@ namespace friendlyPMC.Modules
 
         private Dictionary<string, object> _npcs;
 
+        private bool _playerDied = false;
+
         public NpcMessage() { 
             if (Instance == null)
             {
@@ -85,6 +87,8 @@ namespace friendlyPMC.Modules
 
         public static void NpcSendThankYou(string id = null)
         {
+            if(Instance._playerDied) { return; }
+
             List<object> mates = new List<object>();
             List<object> allies = new List<object>();
             List<object> bosses = new List<object>();
@@ -128,10 +132,22 @@ namespace friendlyPMC.Modules
             }.ToJson(_defaultJsonConverters));
         }
 
+        public static void Flush()
+        {
+            if (Instance == null) return;
+            Instance._npcs.Clear();
+        }
+
+        public static void PlayerDied()
+        {
+            if(Instance == null) return;
+            Instance._playerDied = true;
+        }
+
         public static void Dispose()
         {
-            Instance = null;
             Instance._npcs.Clear();
+            Instance = null;
         }
     }
 }

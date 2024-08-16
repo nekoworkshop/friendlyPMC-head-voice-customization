@@ -30,17 +30,12 @@ namespace friendlyPMC.Actions
                 flag = true;
                 gclass136_0.Update();
             }
-            else if (!goalEnemy.IsVisible && Time.time - goalEnemy.GroupInfo.EnemyLastSeenTimeSense >= 5f)
-            {
-                botOwner_0.LookData.SetLookPointByHearing(null);
-            }
-            else
+            else if (goalEnemy.IsVisible || Time.time - goalEnemy.GroupInfo.EnemyLastSeenTimeSense < 5f)
             {
                 botOwner_0.Steering.LookToPoint(botOwner_0.Memory.GoalEnemy.GetCenterPart());
             }
             if (botOwner_0.Mover.HasPathAndNoComplete)
             {
-                botOwner_0.SetTargetMoveSpeed(1f);
                 botOwner_0.SetPose(1f);
                 bool flag2 = botOwner_0.Mover.IsComeTo(botOwner_0.Settings.FileSettings.Move.REACH_DIST, false);
                 if (!botOwner_0.WeaponManager.HaveBullets)
@@ -81,7 +76,7 @@ namespace friendlyPMC.Actions
             }
             float_0 = Time.time + 3f;
             Vector3 currPosition = botOwner_0.Memory.GoalEnemy.CurrPosition;
-            TryMoveToEnemy(currPosition);
+            if(TryMoveToEnemy(currPosition) && !botOwner_0.Memory.GoalEnemy.IsVisible) botOwner_0.Steering.LookToMovingDirection();
         }
 
         // replication of MoveToEnemyData.TryToMoveToEnemy, but adapted to use our cover system
@@ -110,29 +105,31 @@ namespace friendlyPMC.Actions
             {
                 return true;
             }
+
+            CustomNavigationPoint customNavigationPoint = null;
+
             List<CustomNavigationPoint> closePoints = Utils.Covers.GetCoverPoints(botOwner_0, targetPoint, 25f);
             if (closePoints.Count > 0)
             {
-                CustomNavigationPoint customNavigationPoint = closePoints.RandomElement();
-                if (customNavigationPoint != null && Mathf.Abs(customNavigationPoint.Position.y - targetPoint.y) < 1f && this.botOwner_0.GoToPoint(customNavigationPoint.Position, true, -1f, false, false, true, false) == NavMeshPathStatus.PathComplete)
-                {
-                    return true;
-                }
                 customNavigationPoint = closePoints.RandomElement();
-                if (customNavigationPoint != null)
+            }
+
+            if (customNavigationPoint == null)
+            {
+                CustomNavigationPoint freeClosePoint = Utils.Covers.GetClosestCoverPoint(botOwner_0, targetPoint, 30f, 1f);
+                if (freeClosePoint != null)
                 {
-                    shouldSprint = Utils.Utils.GetNavDistance(botOwner_0.GetPlayer.Transform.position, customNavigationPoint.Position) >= 20f;
-                    return true;
+                    freeClosePoint = customNavigationPoint;
                 }
             }
 
-            CustomNavigationPoint freeClosePoint = Utils.Covers.GetClosestCoverPoint(botOwner_0, targetPoint, 30f, 1f);
-            if (freeClosePoint != null)
+            if (customNavigationPoint != null && Mathf.Abs(customNavigationPoint.Position.y - targetPoint.y) < 1f && this.botOwner_0.GoToPoint(customNavigationPoint.Position, true, -1f, false, false, true, false) == NavMeshPathStatus.PathComplete)
             {
-                shouldSprint = Utils.Utils.GetNavDistance(botOwner_0.GetPlayer.Transform.position, freeClosePoint.Position) >= 20f;
+                shouldSprint = Utils.Utils.GetNavDistance(botOwner_0.GetPlayer.Transform.position, customNavigationPoint.Position) >= 20f;
+                return true;
             }
 
-            return freeClosePoint != null;
+            return false;
         }
     }
 }

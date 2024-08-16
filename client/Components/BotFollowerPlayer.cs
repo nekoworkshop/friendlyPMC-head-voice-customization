@@ -478,6 +478,7 @@ namespace friendlyPMC.Components
             bot.GetPlayer.HealthController.DisableMetabolism();
             // - have followers share the same groupId as the player
             bot.GetPlayer.Profile.Info.GroupId = _player.realPlayer.GroupId;
+            bot.GetPlayer.Profile.Info.TeamId = _player.realPlayer.Profile.Info.TeamId;
 
             bot.Tactic.AggressionCoef = 1f;
 

@@ -185,13 +185,14 @@
     <Compile Include="Requests\FollowerHold.cs" />
     <Compile Include="Actions\FollowerPatrol.cs" />
     <Compile Include="Actions\FollowerTakeLoot.cs" />
+    <Compile Include="Actions\FollowerOpenDoor.cs" />
+    <Compile Include="Requests\FollowerOpenDoorRequest.cs" />
     <Compile Include="Requests\FollowerRegroup.cs" />
     <Compile Include="Requests\FollowerRushEnemy.cs" />
     <Compile Include="Requests\FollowerTakeLootRequest.cs" />
     <Compile Include="Components\AIBossPlayer.cs" />
     <Compile Include="Components\BotFollowerPlayer.cs" />
     <Compile Include="Components\FollowerBrain.cs" />
-    <Compile Include="Actions\FollowerDoorOpener.cs" />
     <Compile Include="Components\FollowerFightLayer.cs" />
     <Compile Include="Components\FollowerLayer.cs" />
     <Compile Include="Components\FollowerLootLayer.cs" />
