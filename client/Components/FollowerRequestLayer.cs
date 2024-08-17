@@ -50,7 +50,8 @@ namespace friendlyPMC.Components
                BotRequestType.wait,
                BotRequestType.followMe,
                BotRequestType.goToPoint,
-               (BotRequestType)CustomBotRequestType.Regroup
+               (BotRequestType)CustomBotRequestType.Regroup,
+               BotRequestType.doorOpen
             };
 
 
@@ -113,12 +114,7 @@ namespace friendlyPMC.Components
 
             if(request == null)
             {
-                if (InteractableObjects.IsOpener(botOwner_0))
-                {
-                    return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.doorOpen, "doorOpen");
-                } 
-                else
-                    return new AICoreActionResultStruct<BotLogicDecision>(HoldOrCover(botOwner_0), "req:Error");
+                return new AICoreActionResultStruct<BotLogicDecision>(HoldOrCover(botOwner_0), "req:Error");
             }
 
             switch (request.BotRequestType)
@@ -213,29 +209,38 @@ namespace friendlyPMC.Components
             
             botOwner_0.BotTalk.TrySay(EPhraseTrigger.Negative, false);
 
-            return new AICoreActionResultStruct<BotLogicDecision>(HasBoss() ? BotLogicDecision.followerPatrol : HoldOrCover(botOwner_0), "req:Error");
+            return new AICoreActionResultStruct<BotLogicDecision>(HasBoss() ? BotLogicDecision.followerPatrol : HoldOrCover(botOwner_0), "req:Unhandled");
         }
 
 
         public override AICoreActionEndStruct EndDoorOpenRequest()
         {
-            BotRequest curRequest = this.botOwner_0.BotRequestController.CurRequest;
+            BotRequest curRequest = botOwner_0.BotRequestController.CurRequest;
 
             if(doorOpenTimer < Time.time)
             {
+
+                if (InteractableObjects.IsOpener(botOwner_0)) InteractableObjects.RemoveOpener(botOwner_0);
+
                 if (curRequest != null && curRequest.BotRequestType == BotRequestType.doorOpen)
                 {
-                    InteractableObjects.RemoveOpener();
                     curRequest.Complete();
                 }
 
-                return aICoreActionEndStruct;
+                return new AICoreActionEndStruct("door.Timeout", true);
             }
 
-            if (curRequest != null && curRequest.BotRequestType == BotRequestType.doorOpen && !botOwner_0.DoorOpener.Interacting)
+            if (!InteractableObjects.IsOpener(botOwner_0))
             {
-                return aICoreActionEndStruct_1;
+
+                if (curRequest != null && curRequest.BotRequestType == BotRequestType.doorOpen)
+                {
+                    curRequest.Complete();
+                }
+
+                return new AICoreActionEndStruct("door.None", true);
             }
+            
             return aICoreActionEndStruct;
         }
         public override AICoreActionEndStruct EndSuppressFire()

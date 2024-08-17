@@ -339,11 +339,14 @@ namespace friendlyPMC.Modules
             return Instance._botToOpen == bot.ProfileId;
         }
 
-        public static void RemoveOpener()
+        public static void RemoveOpener(BotOwner bot)
         {
-
-            Instance._botToOpen = null; 
-            Instance._currDoor = null;
+            if(Instance == null) return;
+            if (Instance._botToOpen == bot.ProfileId)
+            {
+                Instance._botToOpen = null;
+                Instance._currDoor = null;
+            }
         }
    
 

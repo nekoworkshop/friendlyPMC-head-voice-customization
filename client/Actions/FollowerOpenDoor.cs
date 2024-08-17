@@ -12,16 +12,8 @@ namespace friendlyPMC.Actions
 
         private bool bool_0;
         private bool bool_1;
-        private float float_0;
 
         private Door Door;
-        public FollowerOpenDoorRequest GClass509_0
-        {
-            get
-            {
-                return botOwner_0.BotRequestController.CurRequest as FollowerOpenDoorRequest;
-            }
-        }
 
         public FollowerOpenDoor(BotOwner bot) : base(bot) {
         }
@@ -31,76 +23,80 @@ namespace friendlyPMC.Actions
 
             botOwner_0.DoorOpener.Update();
 
-            if (Door == null) Door = InteractableObjects.GetCurDoor();
+            if (bool_1) return;
+
+            if (Door == null && botOwner_0.BotRequestController.CurRequest != null && botOwner_0.BotRequestController.CurRequest.BotRequestType == BotRequestType.doorOpen) 
+            {
+                Components.Logger.LogInfo("Door SET");
+                Door = (botOwner_0.BotRequestController.CurRequest as FollowerOpenDoorRequest).Door;
+            }
 
             if (Door == null) {
+                Components.Logger.LogInfo("No Door");
                 ClearOpener();
                 return;
             };
 
-            if (float_0 < Time.time)
+            if (Door.DoorState == EDoorState.Open)
             {
-                method_5();
+                ClearOpener();
+                return;
             }
-            
-            botOwner_0.SetPose(1f);
-            botOwner_0.SetTargetMoveSpeed(0.6f);
-            botOwner_0.LookData.SetLookPointByHearing(null);
-            botOwner_0.Sprint(false, true);
 
             if (!bool_0)
             {
-                
-                Components.Logger.LogInfo("Go to Door");
                 Vector3 position = Door.transform.position;
-                if(botOwner_0.GoToPoint(position, true, -1f, false, false, true, false) != NavMeshPathStatus.PathComplete)
+
+                NavMeshHit navMeshHit;
+                if (NavMesh.SamplePosition(position, out navMeshHit,2f, -1) && botOwner_0.GoToPoint(navMeshHit.position, false, -1f, false, false, true, false) == NavMeshPathStatus.PathComplete)
+                {
+                    Components.Logger.LogInfo("Go to Door");
+
+                    botOwner_0.GoToSomePointData.SetPoint(navMeshHit.position);
+                    botOwner_0.GoToSomePointData.UpdateToGo(false);
+                    botOwner_0.Steering.LookToMovingDirection();
+
+                }
+                else
                 {
                     ClearOpener();
-                    return;
                 }
+                
+
                 bool_0 = true;
+                return;
             }
 
-            if (!botOwner_0.Mover.IsComeTo(this.botOwner_0.Settings.FileSettings.Move.REACH_DIST, false))
+            if (!botOwner_0.GoToSomePointData.IsCome())
             {
-                
-                if (Door.DoorState == EDoorState.Open)
-                {
-                    ClearOpener();
-                    return;
-                }
-
                 return;
             }
 
             if (!bool_1)
             {
-                Components.Logger.LogInfo("Open Door");
                 botOwner_0.StopMove();
+                Components.Logger.LogInfo("Open Door");
+                botOwner_0.DoorOpener.OnEndInteract += ClearOpener;
                 botOwner_0.DoorOpener.Interact(Door, EInteractionType.Open);
 
-                ClearOpener();
-
                 bool_1 = true;
-            } else
-            {
-                if (Door.DoorState == EDoorState.Open)
-                {
-                    ClearOpener();
-                    return;
-                }
             }
-        }
-        public void method_5()
-        {
-            this.float_0 = Time.time + this.botOwner_0.Settings.FileSettings.Move.UPDATE_TIME_RECAL_WAY;
-            this.bool_0 = false;
+
         }
 
         public void ClearOpener()
         {
-            InteractableObjects.RemoveOpener();
+            InteractableObjects.RemoveOpener(botOwner_0);
             Door = null;
+            bool_0 = false;
+            bool_1 = false;
+            if(botOwner_0.BotRequestController.CurRequest != null && botOwner_0.BotRequestController.CurRequest.BotRequestType == BotRequestType.doorOpen)
+            {
+                botOwner_0.BotRequestController.CurRequest.Complete();
+            }
+            botOwner_0.DoorOpener.OnEndInteract -= ClearOpener;
+
+            Components.Logger.LogInfo("Clear Opener");
         }
     }
 }

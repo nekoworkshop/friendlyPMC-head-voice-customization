@@ -73,9 +73,9 @@ namespace friendlyPMC.Actions
                 return;
             }
 
-            botOwner_0.Steering.LookToMovingDirection();
             botOwner_0.GoToSomePointData.SetPoint(InteractableObjects.GetLootPosition());
             botOwner_0.GoToSomePointData.UpdateToGo(false);
+            botOwner_0.Steering.LookToMovingDirection();
 
             bool_2 = true;
         }

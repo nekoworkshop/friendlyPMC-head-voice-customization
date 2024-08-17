@@ -65,17 +65,6 @@ namespace friendlyPMC.Patches
             return groupPoint.CorePointInGame;
         }
 
-        private bool HasFIkaDonuts()
-        {
-            Type fikaType = Type.GetType("Fika.Core.Coop.GameMode.CoopGame, Fika.Core");
-
-            if(fikaType != null) return true;
-
-            //if (AppDomain.CurrentDomain.GetAssemblies().Any(a => a.GetName().Name == "dvize.Donuts")) return true;
-
-            return false;
-        }
-
         private BotsGroup GetPlayerGroup(pitAIBossPlayer player, BotOwner bt, BotZone zn)
         {
             if(player.bossGroup != null) return player.bossGroup;
@@ -187,7 +176,6 @@ namespace friendlyPMC.Patches
 
         public async UniTask ActivateBotFollower(BotCreator botCreator, Profile profile, GClass590 position, BotZone zone,bool shallBeGroup, Func<BotOwner, BotZone, BotsGroup> GroupAction, Action<BotOwner> OnActivate,CancellationToken token)
         {
-            Components.Logger.LogInfo("Activating follower " + profile.Nickname);
             await botCreator.ActivateBot(
                 profile,
                 position,

@@ -435,10 +435,11 @@ namespace friendlyPMC.Components
                 // try to get bot unstuck in item taker logic
                 InteractableObjects.RemoveTaker(botOwner_0);
                 // try to get bot unstuck in open door logic
-                InteractableObjects.RemoveOpener();
+                InteractableObjects.RemoveOpener(botOwner_0);
                 // clear current enemy
                 if (botOwner_0.Memory.HaveEnemy)
                 {
+                    botOwner_0.Memory.DeleteInfoAboutEnemy(botOwner_0.Memory.GoalEnemy.Person);
                     botOwner_0.Memory.GoalEnemy = null;
                 }
 
@@ -754,16 +755,24 @@ namespace friendlyPMC.Components
                         {
                             Player alivePlayerByProfileID = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(requester.ProfileId);
 
-                            FollowerOpenDoorRequest gclass = new FollowerOpenDoorRequest(door, alivePlayerByProfileID, null);
-                            
-                            botOwner_0.BotRequestController.TryStopCurrent(alivePlayerByProfileID, false);
-                            
-                            if (botOwner_0.BotsGroup.RequestsController.TryAddRequest(gclass))
-                            {
-                                gclass.AddPossibleExecutors(botOwner_0);
-                                gclass.SetGroup(botOwner_0.BotsGroup.RequestsController);
+                            FollowerOpenDoorRequest gclass = new FollowerOpenDoorRequest(door, alivePlayerByProfileID);
 
-                                botOwner_0.BotTalk.TrySay(EPhraseTrigger.Roger, true);
+                            if (botOwner_0.BotRequestController.TryStopCurrent(alivePlayerByProfileID, false))
+                            {
+
+                                if (botOwner_0.BotsGroup.RequestsController.TryAddRequest(gclass))
+                                {
+                                    gclass.AddPossibleExecutors(botOwner_0);
+                                    gclass.SetGroup(botOwner_0.BotsGroup.RequestsController);
+
+                                    botOwner_0.BotTalk.TrySay(EPhraseTrigger.Roger, true);
+                                }
+                                else
+                                {
+                                    botOwner_0.BotTalk.TrySay(EPhraseTrigger.Negative, false);
+                                    botOwner_0.Gesture.TryGestus(EGesture.Bad, false);
+                                    InteractableObjects.RemoveOpener(botOwner_0);
+                                }
                             }
                         }
                     }

@@ -282,12 +282,8 @@ class friendlyPMC {
 						message = this.lang.friendlyEscaped;
 					}
 
-					this.mailSendService.sendMessageToPlayer({
-						recipientId: sessionID,
-						sender: MessageType.USER_MESSAGE,
-						senderDetails: member,
-						messageText: randomUtil.getArrayValue(message),
-					});
+					this.mailSendService["notificationSendHelper"].sendMessageToPlayer(sessionID, member, randomUtil.getArrayValue(message), MessageType.USER_MESSAGE);
+
 					return httpResponseUtil.emptyResponse();
 				}),
 
@@ -313,9 +309,9 @@ class friendlyPMC {
 							pmcProfile,
 							false,
 							{
-								// max should be between level and level + 5 as integer
+								// max should be between level and level + 5
 								max: Math.round(Math.random() * (level + 5 - level) + level),
-								// min should be between level - 5 and level integer
+								// min should be between level - 5 and level
 								min: Math.max(1, Math.round(Math.random() * (level - level + 5) + level - 5)),
 							},
 							botController["botConfig"].presetBatch[condition.Role],

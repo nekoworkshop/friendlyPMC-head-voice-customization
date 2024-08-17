@@ -22,7 +22,7 @@ namespace friendlyPMC.Components
         public override bool ShallUseNow()
         {
             botOwner_0.PriorityAxeTarget.FindTarget();
-            return HasBoss() && !InteractableObjects.IsTaker(botOwner_0);
+            return HasBoss() && !InteractableObjects.IsTaker(botOwner_0) && !InteractableObjects.IsOpener(botOwner_0);
         }
 
         public override string Name()

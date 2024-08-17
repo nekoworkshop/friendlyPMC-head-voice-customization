@@ -78,9 +78,24 @@ namespace friendlyPMC
 
         public static Dictionary<GameObject, HashSet<Material>> objectsMaterials = new Dictionary<GameObject, HashSet<Material>>();
 
-        const string baseSettings = "Base Settings";
-        const string miscSettings = "Miscellaneous";
-        const string testSettings = "Testing";
+        private static Dictionary<string, object> optionsLang = new Dictionary<string, object>
+        {
+            { "baseSettings", "Base Settings" },
+            { "miscSettings", "Miscellaneous" },
+            { "testSettings", "Testing"},
+            {  
+                "statusSound" , new Dictionary<string,string>{
+                    { "Name", "Report Status Volume"},
+                    { "Description", "Spawn with followers"}
+                }
+            },
+            {
+                "squadSpawn", new Dictionary<string,string>{
+                    { "Name", "Squad Spawn"},
+                    { "Description", "Set the volume of the report status sound"}
+                }
+            }
+        };
 
         public static ConfigEntry<bool> squadSpawn;
         public static ConfigEntry<int> squadSize;
@@ -150,10 +165,6 @@ namespace friendlyPMC
 
             new BotsControllerPatch().Enable();
 
-            //new NonWavesSpawnScenarioRunPatch().Enable();
-            //new WavesSpawnScenarioRunPatch().Enable();
-            //new Glass579RunPatch().Enable();
-
             new BotsControllerStopPatch().Enable();
             new LocalGameCleanupPatch().Enable();
 
@@ -164,6 +175,8 @@ namespace friendlyPMC
             new GestureMenuPatch().Enable();
             new GestureMenuAvailablePhrasesPatch().Enable();
             new EPhraseTriggerPatch().Enable();
+
+            //new LookSensorPatch().Enable();
 
             var harmony = new Harmony("xyz.pit.companion");
             harmony.PatchAll(typeof(LocalGameVmethod4Patch).Assembly);
@@ -271,28 +284,32 @@ namespace friendlyPMC
             });
 
 
-            squadSpawn = Config.Bind(baseSettings, "1 Squad spawn", true, new ConfigDescription("Spawn with followers"));
-            squadSize = Config.Bind(baseSettings, "1.2  -  Squad size", 2, new ConfigDescription("Number of followers to spawn with", new AcceptableValueRange<int>(1, 30)));
+            squadSpawn = Config.Bind(
+                (string)optionsLang["baseSettings"], "1 " + ((Dictionary<string, string>)optionsLang["squadSpawn"])["Name"], 
+                true, 
+                new ConfigDescription(((Dictionary<string, string>)optionsLang["squadSpawn"])["Description"])
+            );
+            squadSize = Config.Bind((string)optionsLang["baseSettings"], "1.2  -  Squad size", 2, new ConfigDescription("Number of followers to spawn with", new AcceptableValueRange<int>(1, 30)));
 
-            returnChanceDeath = Config.Bind(baseSettings, "1.3  -  Squadmate return chance after death", 50, new ConfigDescription("Chance your followers will return the items you gave them should you die. This applies only to members you spawned with.", new AcceptableValueRange<int>(1, 100)));
+            returnChanceDeath = Config.Bind((string)optionsLang["baseSettings"], "1.3  -  Squadmate return chance after death", 50, new ConfigDescription("Chance your followers will return the items you gave them should you die. This applies only to members you spawned with.", new AcceptableValueRange<int>(1, 100)));
 
-            squadSetup = Config.Bind(baseSettings, "1.4  -  Use Squad setup", false, new ConfigDescription("Use specific setup for your squad"));
+            squadSetup = Config.Bind((string)optionsLang["baseSettings"], "1.4  -  Use Squad setup", false, new ConfigDescription("Use specific setup for your squad"));
 
-            extraPickups = Config.Bind(baseSettings, "2 Maximum followers", 1, new ConfigDescription("Maximum followers the player can have. This is in addition to the squad.", new AcceptableValueRange<int>(0, 30)));
+            extraPickups = Config.Bind((string)optionsLang["baseSettings"], "2 Maximum followers", 1, new ConfigDescription("Maximum followers the player can have. This is in addition to the squad.", new AcceptableValueRange<int>(0, 30)));
 
-            scanDistance = Config.Bind(miscSettings, "1 Maximum scan distance", 140, new ConfigDescription("Maximum distance to pick up any visible enemy that the player is signaling when issuing 'Contact' phrase", new AcceptableValueRange<int>(50, 300)));
+            scanDistance = Config.Bind((string)optionsLang["miscSettings"], "1 Maximum scan distance", 140, new ConfigDescription("Maximum distance to pick up any visible enemy that the player is signaling when issuing 'Contact' phrase", new AcceptableValueRange<int>(50, 300)));
 
-            enemyRemember = Config.Bind(miscSettings, "2 Time to forget about enemy (in sec.)", 20, new ConfigDescription("Maximum time a follower will remember an enemy. This is applied only at the begining of a raid", new AcceptableValueRange<int>(5, 60)));
+            enemyRemember = Config.Bind((string)optionsLang["miscSettings"], "2 Time to forget about enemy (in sec.)", 20, new ConfigDescription("Maximum time a follower will remember an enemy. This is applied only at the begining of a raid", new AcceptableValueRange<int>(5, 60)));
 
-            heatlhMultiplier = Config.Bind(miscSettings, "3 Squad Health Multiplier", 1f, new ConfigDescription("Health multiplier for the followers you spawn with. This is applied per each body part. Does not apply to boss followers.", new AcceptableValueRange<float>(1, 5)));
+            heatlhMultiplier = Config.Bind((string)optionsLang["miscSettings"], "3 Squad Health Multiplier", 1f, new ConfigDescription("Health multiplier for the followers you spawn with. This is applied per each body part. Does not apply to boss followers.", new AcceptableValueRange<float>(1, 5)));
 
-            knightSpawn = Config.Bind(testSettings, "1 Spawn with The Goons", false, new ConfigDescription("Experimental: Spawn with the goons squad. This works in combination with your own squad. Take note that a boss and his followers do not accept the same commands as your squad"));
+            knightSpawn = Config.Bind((string)optionsLang["testSettings"], "1 Spawn with The Goons", false, new ConfigDescription("Experimental: Spawn with the goons squad. This works in combination with your own squad. Take note that a boss and his followers do not accept the same commands as your squad"));
 
-            justKnightSpawn = Config.Bind(testSettings, "1.1  -  Spawn with Knight", true, new ConfigDescription("Experimental: Only when Spawn with The Goons is active"));
+            justKnightSpawn = Config.Bind((string)optionsLang["testSettings"], "1.1  -  Spawn with Knight", true, new ConfigDescription("Experimental: Only when Spawn with The Goons is active"));
 
-            bigPipeSpawn = Config.Bind(testSettings, "1.2  -  Spawn with BigPipe", true, new ConfigDescription("Experimental: Only when Spawn with The Goons is active"));
+            bigPipeSpawn = Config.Bind((string)optionsLang["testSettings"], "1.2  -  Spawn with BigPipe", true, new ConfigDescription("Experimental: Only when Spawn with The Goons is active"));
 
-            birdEyeSpawn = Config.Bind(testSettings, "1.3  -  Spawn with BirdEye", true, new ConfigDescription("Experimental: Only when Spawn with The Goons is active"));
+            birdEyeSpawn = Config.Bind((string)optionsLang["testSettings"], "1.3  -  Spawn with BirdEye", true, new ConfigDescription("Experimental: Only when Spawn with The Goons is active"));
 
             
             ConfigSquadMembersSet();
@@ -344,7 +361,7 @@ namespace friendlyPMC
                         List<ConfigEntry<string>> configEntries = new List<ConfigEntry<string>>
                         {
                             Config.Bind(
-                                baseSettings,
+                                (string)optionsLang["miscSettings"],
                                 key,
                                 value,
                                 new ConfigDescription("Set Squad member fight tactic. Default is a combination of Pusher and Holder. Pusher tries to push the enemy often. Holder will stay in place around the boss. Marksman will try to get a position from where he can shoot preferably from behind the player, at a distance and will not push even if ordered.",
@@ -417,7 +434,7 @@ namespace friendlyPMC
             }
 
             ConfigEntry<string> entry = Config.Bind(
-                baseSettings,
+                (string)optionsLang["miscSettings"],
                 name,
                 value,
                 new ConfigDescription("Set Squad member equipment. You can choose between default (which is SPT random equipment), user's current equipment or user created presets (recommended if using a tactic different than default.", new AcceptableValueList<string>(list))

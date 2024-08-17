@@ -1,18 +1,21 @@
 ﻿using EFT;
 using EFT.Interactive;
 using friendlyPMC.Modules;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace friendlyPMC.Requests
 {
-    internal class FollowerOpenDoorRequest : GClass508
+    internal class FollowerOpenDoorRequest : BotRequest
     {
-        public FollowerOpenDoorRequest(Door door, Player requester, Action completeCallback = null) : base(door,requester,completeCallback) 
+        private Door _door;
+        public FollowerOpenDoorRequest(Door door, IPlayer requester) : base(requester, BotRequestType.doorOpen)
         {
+            BotRequestType = BotRequestType.doorOpen;
+            _door = door;
+        }
+
+        public Door Door
+        {
+            get { return _door; } 
         }
 
         public override EBotRequestMode RequestMode
@@ -25,14 +28,14 @@ namespace friendlyPMC.Requests
 
         public override bool CanProceed()
         {
-            
-            if(!InteractableObjects.IsOpener(Executor))
-            {
-                Complete();
-                return true;
-            }
 
-            return base.CanProceed();
+            if (Executor == null) return false;
+
+            return true;
+        }
+        public override bool CanRequest(BotOwner requester)
+        {
+            return true;
         }
 
         public new void AddPossibleExecutors(BotOwner bot)

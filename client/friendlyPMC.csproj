@@ -180,6 +180,7 @@
     <Compile Include="Modules\RadioSound.cs" />
     <Compile Include="Patches\BotMemoryPatch.cs" />
     <Compile Include="Patches\GestureMenuPatch.cs" />
+    <Compile Include="Patches\LookSensorPatch.cs" />
     <Compile Include="Patches\SAINPatch.cs" />
     <Compile Include="Requests\FollowerGoCheck.cs" />
     <Compile Include="Requests\FollowerHold.cs" />

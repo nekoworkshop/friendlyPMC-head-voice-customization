@@ -57,16 +57,9 @@ namespace friendlyPMC.Actions
                 Vector3 enemySpot = botOwner_0.Memory.GoalEnemy.CurrPosition;
                 Vector3 botPosition = botOwner_0.GetPlayer.Transform.position;
                 // get the closet cover to the bot from where he can shoot the enemy
-                CustomNavigationPoint Spot = Utils.Covers.GetClosestAttackCoverPoint(
-                    botOwner_0.Id,
-                    botPosition,
-                    botPosition,
-                    enemySpot,
-                    areaCovers,
-                    minDist,
-                    maxDist,
-                    carePosition,
-                    false
+                CustomNavigationPoint Spot = Utils.Covers.GetApproachableCoverPoint(
+                    botOwner_0,
+                    enemySpot
                 );
 
                 if (Spot != null) _lastSpot = Spot.Position;
