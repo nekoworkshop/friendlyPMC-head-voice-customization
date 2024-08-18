@@ -6,7 +6,6 @@ namespace friendlyPMC.Components
     internal class FollowerLootLayer : GClass102
     {
 
-        private BotFollowerPlayer _follower;
         public FollowerLootLayer(BotOwner bot, int priority) : base(bot, priority)
         {
 
@@ -37,13 +36,8 @@ namespace friendlyPMC.Components
             return aICoreActionEndStruct;
         }
 
-        public override AICoreActionEndStruct ShallEndCurrentDecision(AICoreActionResultStruct<BotLogicDecision> curDecision)
-        {
-            return base.ShallEndCurrentDecision(curDecision);
-        }
         public override AICoreActionResultStruct<BotLogicDecision> GetDecision()
         {
-            _follower = BossPlayers.Instance.GetFollower(botOwner_0);
             
             if (!InteractableObjects.IsTaker(botOwner_0))
             {

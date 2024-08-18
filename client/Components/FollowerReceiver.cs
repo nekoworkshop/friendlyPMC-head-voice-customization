@@ -753,6 +753,14 @@ namespace friendlyPMC.Components
                         // - the closest bot shall open the door
                         if (closest != null && closest == botOwner_0)
                         {
+                            // -- cannot open locked doors
+                            if(door.DoorState == EDoorState.Locked)
+                            {
+                                botOwner_0.BotTalk.TrySay(EPhraseTrigger.Negative, true);
+                                botOwner_0.Gesture.TryGestus(EGesture.Bad, false);
+                                return;
+                            }
+
                             Player alivePlayerByProfileID = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(requester.ProfileId);
 
                             FollowerOpenDoorRequest gclass = new FollowerOpenDoorRequest(door, alivePlayerByProfileID);
@@ -769,7 +777,7 @@ namespace friendlyPMC.Components
                                 }
                                 else
                                 {
-                                    botOwner_0.BotTalk.TrySay(EPhraseTrigger.Negative, false);
+                                    botOwner_0.BotTalk.TrySay(EPhraseTrigger.Negative, true);
                                     botOwner_0.Gesture.TryGestus(EGesture.Bad, false);
                                     InteractableObjects.RemoveOpener(botOwner_0);
                                 }

@@ -1,18 +1,21 @@
 --- ==== 3.6.1 ==== ---:
- - x - fix issuing open door command
+ - #inprogress - fix issuing open door command
  - x - have followers send message at the end of the raid depending on status and how many made it out
  - x - if we have a follower that was picked up, that one should send a thank you message if he was able to make it out with the Player
  - x - make squad have skill relative to the player's skill
- - #inprogress - improve how bot goes to the enemy
- - add slider for adjusting the report status sound
+ - x - improve how bot goes to the enemy
+ - #inprogress - add slider for adjusting the report status sound
 
 --- ==== >=3.6.2 < 3.7 ==== ---:
  - improve enemy.Search action
  - update getBack request to make bots cover boss at a distance during combat
  - update coverMe request to reset cover boss distance
- - fix enemy marker when zooming
+ - fix enemy marker when zooming, if possible
 
 --- ==== 3.7 ==== ---:
+- followers that get picked up during raid should have "assist" tactic
+- improve the assist tactic for followers
+- updated squad spawn where the followers' skill is now relative to the player (the range is -5 to +5 relative to player's level)
 - fix glitchy behavior of boss followers
 - goons send messages at the end of the raid
 - add new tactic Supporter (an alternative version to Marskman that also allows for push order)
@@ -22,7 +25,6 @@
 
 ==================================================================================
 RELEASE NOTES (3.6.1):
- - updated squad spawn where the followers' skill is now relative to the player (the range is -5 to +5 relative to player's level)
  - improvements on how bots push the enemy when condition is met
  - fixed cursed open door command to finally work properly
  - made followers appear as friendly in Dynamic Maps mod

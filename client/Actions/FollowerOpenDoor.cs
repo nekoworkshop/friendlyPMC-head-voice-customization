@@ -23,13 +23,24 @@ namespace friendlyPMC.Actions
 
             botOwner_0.DoorOpener.Update();
 
-            if (bool_1) return;
+           
 
-            if (Door == null && botOwner_0.BotRequestController.CurRequest != null && botOwner_0.BotRequestController.CurRequest.BotRequestType == BotRequestType.doorOpen) 
+            if (botOwner_0.BotRequestController.CurRequest != null && botOwner_0.BotRequestController.CurRequest.BotRequestType == BotRequestType.doorOpen) 
             {
                 Components.Logger.LogInfo("Door SET");
-                Door = (botOwner_0.BotRequestController.CurRequest as FollowerOpenDoorRequest).Door;
+                Door reqDoor = (botOwner_0.BotRequestController.CurRequest as FollowerOpenDoorRequest).Door;
+                if (Door == null || Door != reqDoor)
+                {
+                    if(Door !=null)
+                    {
+                        bool_0 = false;
+                        bool_1 = false;
+                    }
+                    Door = reqDoor;
+                }
             }
+
+            if (bool_1) return;
 
             if (Door == null) {
                 Components.Logger.LogInfo("No Door");
@@ -53,7 +64,7 @@ namespace friendlyPMC.Actions
                     Components.Logger.LogInfo("Go to Door");
 
                     botOwner_0.GoToSomePointData.SetPoint(navMeshHit.position);
-                    botOwner_0.GoToSomePointData.UpdateToGo(false);
+                   
                     botOwner_0.Steering.LookToMovingDirection();
 
                 }
@@ -65,6 +76,9 @@ namespace friendlyPMC.Actions
 
                 bool_0 = true;
                 return;
+            } else if(!bool_1)
+            {
+                 botOwner_0.GoToSomePointData.UpdateToGo(false);
             }
 
             if (!botOwner_0.GoToSomePointData.IsCome())

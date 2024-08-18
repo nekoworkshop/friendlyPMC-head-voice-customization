@@ -51,8 +51,8 @@ namespace friendlyPMC.Components
             // - fight
             FollowerFightLayer layer6 = new FollowerFightLayer(_owner, 60);
             fightLayer = layer6;
-
             method_0(3, layer6, true);
+
             // - grenade
             GClass36 layer = new GClass36(_owner, 130);
             method_0(4, layer, true);
@@ -65,6 +65,9 @@ namespace friendlyPMC.Components
             // - item taker
             FollowerLootLayer layer9 = new FollowerLootLayer(_owner, 51);
             method_0(8, layer9, true);
+            // - door opener 
+            FollowerDoorLayer layer10 = new FollowerDoorLayer(_owner, 52);
+            method_0(9, layer10, true);
         }
 
         public override string ShortName()

@@ -527,14 +527,14 @@ namespace friendlyPMC.Patches
 
             IProfileData botData = new IProfileData(side, type, BotDifficulty.hard, 0f, @params);
 
-            List<Profile> followerProfiles = new List<Profile>();
+            /*List<Profile> followerProfiles = new List<Profile>();
 
             for (int i = 0; i < memberCount; i++)
             {
                 var pr = await GenerateFollowerProfile(botCreator, botData.PrepareToLoadBackend(1));
                 followerProfiles.Add(pr);
             }
-
+*/
             BotCreationDataClass bot = await BotCreationDataClass.Create(botData, botCreator, memberCount, botSpawnerClass);
 
             /*for (int i = 0; i < bot.Profiles.Count; i++)
@@ -544,11 +544,6 @@ namespace friendlyPMC.Patches
 
                 profile.Skills.ApplyChanges(fpr.Skills);
                 profile.Info.Settings.Experience = fpr.Info.Settings.Experience;
-                try
-                {
-                    profile.Inventory.Equipment.GetSlot(EquipmentSlot.Dogtag).ChangeContainedItemDirectly(fpr.Inventory.Equipment.GetSlot(EquipmentSlot.Dogtag).ContainedItem);
-                    profile.Inventory.Equipment.GetSlot(EquipmentSlot.Dogtag).ApplyContainedItem();
-                } catch { }
             }*/
 
             List<DependencyGraph<IEasyBundle>.GClass3415> bundleTokens = new List<DependencyGraph<IEasyBundle>.GClass3415>();
