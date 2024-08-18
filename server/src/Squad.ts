@@ -279,7 +279,7 @@ class friendlyPMC {
 					if (member.SquadInfo.AllyBoss) {
 						message = this.lang.allyBossEscaped;
 					} else if (member.SquadInfo.Mate) {
-						message = this.lang.friendlyEscaped;
+						message = this.lang.teamEscaped;
 					}
 
 					this.mailSendService["notificationSendHelper"].sendMessageToPlayer(sessionID, member, randomUtil.getArrayValue(message), MessageType.USER_MESSAGE);
@@ -310,9 +310,9 @@ class friendlyPMC {
 							false,
 							{
 								// max should be between level and level + 5
-								max: Math.round(Math.random() * (level + 5 - level) + level),
+								max: level + 5,
 								// min should be between level - 5 and level
-								min: Math.max(1, Math.round(Math.random() * (level - level + 5) + level - 5)),
+								min: Math.max(1, level - 5),
 							},
 							botController["botConfig"].presetBatch[condition.Role],
 							false

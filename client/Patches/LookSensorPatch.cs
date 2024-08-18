@@ -7,26 +7,23 @@ using System.Reflection;
 
 namespace friendlyPMC.Patches
 {
-    internal class LookSensorPatch : ModulePatch
+    [HarmonyPatch(typeof(LookSensor))]
+    [HarmonyPatch("GInterface10.AIPeriodicUpdate")]
+    internal class LookSensorPatch
     {
-        protected override MethodBase GetTargetMethod()
+        [HarmonyPrefix]
+        static bool Prefix(LookSensor __instance)
         {
-            return AccessTools.Method(typeof(LookSensor), "AIPeriodicUpdate");
-        }
-        [PatchPrefix]
-        private static bool PatchPrefix(LookSensor __instance)
-        {
+            // Your code to run before the original method
+            BotOwner botOwner = AccessTools.Field(typeof(LookSensor), "_botOwner").GetValue(__instance) as BotOwner;
             try
             {
                 __instance.UpdateLook();
-            }
-            catch (Exception ex)
-            {
-                BotOwner botOwner = (BotOwner)AccessTools.Field(typeof(LookSensor), "_botOwner").GetValue(__instance);
-
-                Components.Logger.LogError("AIPeriodicUpdate Error for Bot " + botOwner.Profile.Nickname);
+            } catch(Exception ex) {
+                Components.Logger.LogError("AIPeriodicUpdate Error for " + botOwner.Profile.Nickname);
                 Components.Logger.LogError(ex);
             }
+
             return false;
         }
     }

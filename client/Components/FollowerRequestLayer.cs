@@ -114,7 +114,8 @@ namespace friendlyPMC.Components
 
             if(request == null)
             {
-                return new AICoreActionResultStruct<BotLogicDecision>(HoldOrCover(botOwner_0), "req:Error");
+                if(InteractableObjects.IsOpener(botOwner_0)) InteractableObjects.RemoveOpener(botOwner_0);
+                return new AICoreActionResultStruct<BotLogicDecision>(HasBoss() ? BotLogicDecision.followerPatrol : HoldOrCover(botOwner_0), "req:Error");
             }
 
             switch (request.BotRequestType)
@@ -208,7 +209,7 @@ namespace friendlyPMC.Components
 
             
             botOwner_0.BotTalk.TrySay(EPhraseTrigger.Negative, false);
-
+            request.Complete();
             return new AICoreActionResultStruct<BotLogicDecision>(HasBoss() ? BotLogicDecision.followerPatrol : HoldOrCover(botOwner_0), "req:Unhandled");
         }
 

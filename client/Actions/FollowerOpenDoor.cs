@@ -86,7 +86,6 @@ namespace friendlyPMC.Actions
 
         public void ClearOpener()
         {
-            InteractableObjects.RemoveOpener(botOwner_0);
             Door = null;
             bool_0 = false;
             bool_1 = false;
@@ -95,6 +94,8 @@ namespace friendlyPMC.Actions
                 botOwner_0.BotRequestController.CurRequest.Complete();
             }
             botOwner_0.DoorOpener.OnEndInteract -= ClearOpener;
+
+            InteractableObjects.RemoveOpener(botOwner_0);
 
             Components.Logger.LogInfo("Clear Opener");
         }

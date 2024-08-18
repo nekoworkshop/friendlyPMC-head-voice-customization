@@ -527,18 +527,29 @@ namespace friendlyPMC.Patches
 
             IProfileData botData = new IProfileData(side, type, BotDifficulty.hard, 0f, @params);
 
-
-            BotCreationDataClass botCreationData = new BotCreationDataClass(botData);
-            AccessTools.Field(typeof(BotCreationDataClass), "ginterface19_0").SetValue(botCreationData, botSpawnerClass);
-            AccessTools.Field(typeof(BotCreationDataClass), "iBotCreator").SetValue(botCreationData, botCreator);
+            List<Profile> followerProfiles = new List<Profile>();
 
             for (int i = 0; i < memberCount; i++)
             {
                 var pr = await GenerateFollowerProfile(botCreator, botData.PrepareToLoadBackend(1));
-                botCreationData.AddProfile(pr);
+                followerProfiles.Add(pr);
             }
 
-            BotCreationDataClass bot = botCreationData; //await BotCreationDataClass.Create(botData, botCreator, memberCount, botSpawnerClass);
+            BotCreationDataClass bot = await BotCreationDataClass.Create(botData, botCreator, memberCount, botSpawnerClass);
+
+            /*for (int i = 0; i < bot.Profiles.Count; i++)
+            {
+                Profile fpr = followerProfiles[i];
+                Profile profile = bot.Profiles[i];
+
+                profile.Skills.ApplyChanges(fpr.Skills);
+                profile.Info.Settings.Experience = fpr.Info.Settings.Experience;
+                try
+                {
+                    profile.Inventory.Equipment.GetSlot(EquipmentSlot.Dogtag).ChangeContainedItemDirectly(fpr.Inventory.Equipment.GetSlot(EquipmentSlot.Dogtag).ContainedItem);
+                    profile.Inventory.Equipment.GetSlot(EquipmentSlot.Dogtag).ApplyContainedItem();
+                } catch { }
+            }*/
 
             List<DependencyGraph<IEasyBundle>.GClass3415> bundleTokens = new List<DependencyGraph<IEasyBundle>.GClass3415>();
             Dictionary<string,EquipmentClass> profileEquipment = new Dictionary<string,EquipmentClass>();
@@ -869,7 +880,7 @@ namespace friendlyPMC.Patches
 
     [HarmonyPatch(typeof(BaseLocalGame<EftGamePlayerOwner>))]
     [HarmonyPatch("vmethod_4")]
-    public class LocalGameVmethod4Patch
+    internal class LocalGameVmethod4Patch
     {
         [HarmonyPostfix]
         public static IEnumerator Postfix(IEnumerator __result, BaseLocalGame<EftGamePlayerOwner> __instance, BotControllerSettings controllerSettings, ISpawnSystem spawnSystem, Callback runCallback)

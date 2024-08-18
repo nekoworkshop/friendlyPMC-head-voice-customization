@@ -94,6 +94,12 @@ namespace friendlyPMC
                     { "Name", "Squad Spawn"},
                     { "Description", "Set the volume of the report status sound"}
                 }
+            },
+            {
+                "squadSize", new Dictionary<string,string>{
+                    { "Name", " Squad size"},
+                    { "Description", "Number of followers to spawn with"}
+                }
             }
         };
 
@@ -182,6 +188,8 @@ namespace friendlyPMC
             harmony.PatchAll(typeof(LocalGameVmethod4Patch).Assembly);
 
             harmony.PatchAll(typeof(GoalEnemyTracePatch).Assembly);
+
+            harmony.PatchAll(typeof(LookSensorPatch).Assembly);
 
             SAINPatch.PatchSAINIfInstalled();
 
@@ -289,13 +297,18 @@ namespace friendlyPMC
                 true, 
                 new ConfigDescription(((Dictionary<string, string>)optionsLang["squadSpawn"])["Description"])
             );
-            squadSize = Config.Bind((string)optionsLang["baseSettings"], "1.2  -  Squad size", 2, new ConfigDescription("Number of followers to spawn with", new AcceptableValueRange<int>(1, 30)));
+            squadSize = Config.Bind(
+                (string)optionsLang["baseSettings"], 
+                "1.2  -  " + ((Dictionary<string, string>)optionsLang["squadSize"])["Name"], 
+                2, 
+                new ConfigDescription(((Dictionary<string, string>)optionsLang["squadSize"])["Description"], new AcceptableValueRange<int>(1, 30))
+            );
 
             returnChanceDeath = Config.Bind((string)optionsLang["baseSettings"], "1.3  -  Squadmate return chance after death", 50, new ConfigDescription("Chance your followers will return the items you gave them should you die. This applies only to members you spawned with.", new AcceptableValueRange<int>(1, 100)));
 
             squadSetup = Config.Bind((string)optionsLang["baseSettings"], "1.4  -  Use Squad setup", false, new ConfigDescription("Use specific setup for your squad"));
 
-            extraPickups = Config.Bind((string)optionsLang["baseSettings"], "2 Maximum followers", 1, new ConfigDescription("Maximum followers the player can have. This is in addition to the squad.", new AcceptableValueRange<int>(0, 30)));
+            extraPickups = Config.Bind((string)optionsLang["baseSettings"], "2 Maximum pickup followers", 1, new ConfigDescription("Maximum followers the player can pickup during raid. This is in addition to the squad.", new AcceptableValueRange<int>(0, 30)));
 
             scanDistance = Config.Bind((string)optionsLang["miscSettings"], "1 Maximum scan distance", 140, new ConfigDescription("Maximum distance to pick up any visible enemy that the player is signaling when issuing 'Contact' phrase", new AcceptableValueRange<int>(50, 300)));
 
