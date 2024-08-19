@@ -527,24 +527,24 @@ namespace friendlyPMC.Patches
 
             IProfileData botData = new IProfileData(side, type, BotDifficulty.hard, 0f, @params);
 
-            /*List<Profile> followerProfiles = new List<Profile>();
+            List<Profile> followerProfiles = new List<Profile>();
 
             for (int i = 0; i < memberCount; i++)
             {
                 var pr = await GenerateFollowerProfile(botCreator, botData.PrepareToLoadBackend(1));
                 followerProfiles.Add(pr);
             }
-*/
+
             BotCreationDataClass bot = await BotCreationDataClass.Create(botData, botCreator, memberCount, botSpawnerClass);
 
-            /*for (int i = 0; i < bot.Profiles.Count; i++)
+            for (int i = 0; i < bot.Profiles.Count; i++)
             {
                 Profile fpr = followerProfiles[i];
                 Profile profile = bot.Profiles[i];
 
                 profile.Skills.ApplyChanges(fpr.Skills);
                 profile.Info.Settings.Experience = fpr.Info.Settings.Experience;
-            }*/
+            }
 
             List<DependencyGraph<IEasyBundle>.GClass3415> bundleTokens = new List<DependencyGraph<IEasyBundle>.GClass3415>();
             Dictionary<string,EquipmentClass> profileEquipment = new Dictionary<string,EquipmentClass>();
@@ -688,7 +688,7 @@ namespace friendlyPMC.Patches
                 return GetPlayerGroup(player, bt, zn);
             });
 
-            bot.Profiles.ForEach(async profile =>
+            bot.Profiles.ForEach(profile =>
             {
                 // followers should use the same groupID as the player
                 profile.Info.GroupId = player.realPlayer.GroupId;
@@ -807,7 +807,7 @@ namespace friendlyPMC.Patches
 
                 });
 
-                await ActivateBotFollower(
+                ActivateBotFollower(
                     botCreator,
                     profile,
                     new GClass590(position, closestCorePoint.Id, false),
@@ -815,7 +815,7 @@ namespace friendlyPMC.Patches
                     GroupAction,
                     OnActivate,
                     token.GetCancelToken()
-                );
+                ).Forget();
 
             });
         }

@@ -23,27 +23,20 @@ namespace friendlyPMC.Actions
 
             botOwner_0.DoorOpener.Update();
 
-           
-
-            if (botOwner_0.BotRequestController.CurRequest != null && botOwner_0.BotRequestController.CurRequest.BotRequestType == BotRequestType.doorOpen) 
+            Door reqDoor = InteractableObjects.GetDoorToOpen(botOwner_0);
+            if (Door == null || Door != reqDoor)
             {
-                Components.Logger.LogInfo("Door SET");
-                Door reqDoor = (botOwner_0.BotRequestController.CurRequest as FollowerOpenDoorRequest).Door;
-                if (Door == null || Door != reqDoor)
+                if (Door != null)
                 {
-                    if(Door !=null)
-                    {
-                        bool_0 = false;
-                        bool_1 = false;
-                    }
-                    Door = reqDoor;
+                    bool_0 = false;
+                    bool_1 = false;
                 }
+                Door = reqDoor;
             }
 
             if (bool_1) return;
 
             if (Door == null) {
-                Components.Logger.LogInfo("No Door");
                 ClearOpener();
                 return;
             };
@@ -61,10 +54,7 @@ namespace friendlyPMC.Actions
                 NavMeshHit navMeshHit;
                 if (NavMesh.SamplePosition(position, out navMeshHit,2f, -1) && botOwner_0.GoToPoint(navMeshHit.position, false, -1f, false, false, true, false) == NavMeshPathStatus.PathComplete)
                 {
-                    Components.Logger.LogInfo("Go to Door");
-
-                    botOwner_0.GoToSomePointData.SetPoint(navMeshHit.position);
-                   
+                    botOwner_0.GoToSomePointData.SetPoint(navMeshHit.position);   
                     botOwner_0.Steering.LookToMovingDirection();
 
                 }

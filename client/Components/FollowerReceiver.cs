@@ -692,16 +692,10 @@ namespace friendlyPMC.Components
 
                     (botOwner_0.Brain.BaseBrain as FollowerBrain).SetBossTactic("defend");
 
-                    if (botOwner_0.BotRequestController.TryStopCurrent(alivePlayerByProfileID, false) && notBusy)
-                    {
-                        FollowerHold holdit = new FollowerHold(alivePlayerByProfileID);
+                    botOwner_0.BotRequestController.TryStopCurrent(alivePlayerByProfileID, false);
 
-                        if (botOwner_0.BotsGroup.RequestsController.TryAddRequest(holdit))
-                        {
-                            holdit.AddPossibleExecutors(botOwner_0);
-                            holdit.SetGroup(botOwner_0.BotsGroup.RequestsController);
-                        }
-                    }
+                    botOwner_0.BotTalk.TrySay(EPhraseTrigger.Roger, false);
+                    botOwner_0.Gesture.TryGestus(EGesture.Good, false);
                 }
                 // disabled
                 else if (info.phrase == EPhraseTrigger.Stop)

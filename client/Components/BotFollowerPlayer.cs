@@ -308,6 +308,18 @@ namespace friendlyPMC.Components
                     if (result.Succeeded)
                     {
                         ammoAdded += ammo.StackObjectsCount;
+                        try
+                        {
+                            Singleton<GridCacheClass>.Instance.Add(
+                                        _bot.ProfileId,
+                                        location.Grid as GridClassEx,
+                                        ammo
+                                    );
+                        }
+                        catch (Exception e)
+                        {
+                            Components.Logger.LogError(e);
+                        }
                     }
                     else
                     {

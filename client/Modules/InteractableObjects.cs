@@ -27,7 +27,7 @@ namespace friendlyPMC.Modules
         public static InteractableObjects Instance;
 
         private Door _currDoor;
-        private string _botToOpen;
+        private Dictionary<string,Door> _doorsToOpen;
 
         private LootItem _lootItem;
         private Vector3? _lootPosition;
@@ -50,6 +50,8 @@ namespace friendlyPMC.Modules
                 _lootedItems = new Dictionary<string, List<string>>();
                 _toSendItems = new List<Item>();
                 _followersWithLoot = new Dictionary<string, Dictionary<string, object>>();
+                _doorsToOpen = new Dictionary<string, Door>();
+
             }
 
         }
@@ -209,6 +211,7 @@ namespace friendlyPMC.Modules
             _followersWithLoot.Clear();
 
             _currDoor = null;
+            _doorsToOpen.Clear();
 
             _lootItem = null;
             _lootedItems = null;
@@ -324,11 +327,17 @@ namespace friendlyPMC.Modules
             }
         }
 
-        public static bool SetOpener(BotOwner bot)
+        public static bool SetOpener(BotOwner bot, Door door = null)
         {
             if (Instance._currDoor != null)
             {
-                Instance._botToOpen = bot.ProfileId;
+                if (!Instance._doorsToOpen.ContainsKey(bot.ProfileId))
+                {
+                    Instance._doorsToOpen.Add(bot.ProfileId,Instance._currDoor);
+                } else
+                {
+                    Instance._doorsToOpen[bot.ProfileId] = door != null ? door : Instance._currDoor;
+                }
                 return true;
             }
             return false;
@@ -336,17 +345,20 @@ namespace friendlyPMC.Modules
 
         public static bool IsOpener(BotOwner bot)
         {
-            return Instance._botToOpen == bot.ProfileId;
+            return Instance._doorsToOpen.ContainsKey(bot.ProfileId);
         }
 
         public static void RemoveOpener(BotOwner bot)
         {
             if(Instance == null) return;
-            if (Instance._botToOpen == bot.ProfileId)
-            {
-                Instance._botToOpen = null;
-                Instance._currDoor = null;
-            }
+            if(Instance._doorsToOpen.ContainsKey(bot.ProfileId)) Instance._doorsToOpen.Remove(bot.ProfileId);
+        }
+
+        public static Door GetDoorToOpen(BotOwner bot)
+        {
+            if( Instance == null) return null;
+            if(!Instance._doorsToOpen.ContainsKey(bot.ProfileId)) return null;
+            return Instance._doorsToOpen[bot.ProfileId];
         }
    
 

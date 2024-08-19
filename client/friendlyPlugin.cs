@@ -182,16 +182,11 @@ namespace friendlyPMC
             new GestureMenuAvailablePhrasesPatch().Enable();
             new EPhraseTriggerPatch().Enable();
 
-            //new LookSensorPatch().Enable();
-
             var harmony = new Harmony("xyz.pit.companion");
+
             harmony.PatchAll(typeof(LocalGameVmethod4Patch).Assembly);
 
             harmony.PatchAll(typeof(GoalEnemyTracePatch).Assembly);
-
-            harmony.PatchAll(typeof(LookSensorPatch).Assembly);
-
-            SAINPatch.PatchSAINIfInstalled();
 
             ConsoleScreen.Processor.RegisterCommand("followerstome", delegate ()
             {
@@ -235,6 +230,13 @@ namespace friendlyPMC
             ConfigSet();
 
             harmony.PatchAll(typeof(ConfigurationManagerPatch).Assembly);
+            
+            // patch sain in regards to Squad 
+            SAINPatch.PatchSAINIfInstalled();
+            // some error catchers here - they do not seem related to this mod
+            new GClass974Patch().Enable();
+
+            harmony.PatchAll(typeof(LookSensorPatch).Assembly);
 
         }
 

@@ -40,7 +40,7 @@ namespace friendlyPMC.Requests
 
         public new void AddPossibleExecutors(BotOwner bot)
         {
-            InteractableObjects.SetOpener(bot);
+            InteractableObjects.SetOpener(bot, _door);
             base.AddPossibleExecutors(bot);
         }
     }
