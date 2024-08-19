@@ -19,6 +19,7 @@ namespace friendlyPMC.Patches
         }
 
         private static Type squadType = null;
+        private static Type SAINEnableClass = null;
 
         public static void PatchSAINIfInstalled()
         {
@@ -30,6 +31,11 @@ namespace friendlyPMC.Patches
                     squadType = Type.GetType("SAIN.BotController.Classes.Squad, SAIN");
                 }
 
+                if (SAINEnableClass != null)
+                {
+                    SAINEnableClass = Type.GetType("SAIN.SAINEnableClass, SAIN");
+                }
+
 
                 Harmony harmony = new Harmony("xyz.pit.companion.sain");
 
@@ -39,9 +45,11 @@ namespace friendlyPMC.Patches
                 {
                     // disable this for followers
                     harmony.Patch(AccessTools.Method(squadType, "clearPlayerPlace"), new HarmonyMethod(typeof(SAINPatch).GetMethod(nameof(PatchClearPlayerPlace), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance)));
+                }
 
-                    // this should not run for the boss player group
-                   /* harmony.Patch(AccessTools.Method(squadType, "calcGoalForBot"), new HarmonyMethod(typeof(SAINPatch).GetMethod(nameof(PatchCalcGoalForBot), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance)));*/
+                if(SAINEnableClass !=null)
+                {
+                    harmony.Patch(AccessTools.Method(SAINEnableClass, "IsSAINDisabledForBot"), new HarmonyMethod(typeof(SAINPatch).GetMethod(nameof(PatchIsSAINDisabledForBot), BindingFlags.NonPublic | BindingFlags.Static)));
                 }
             }
         }
@@ -126,9 +134,15 @@ namespace friendlyPMC.Patches
             return allow;
         }
 
-        private static bool PatchCalcGoalForBot(object __instance, BotOwner botOwner)
+        [HarmonyPrefix]
+        private static bool PatchIsSAINDisabledForBot(BotOwner botOwner, ref bool _result)
         {
-            return BossPlayers.Instance == null || botOwner == null || !BossPlayers.IsFollower(botOwner);
+            if (!BossPlayers.IsFollower(botOwner))
+            {
+                _result = false;
+                return false;
+            }
+            return true;
         }
     }
 }
