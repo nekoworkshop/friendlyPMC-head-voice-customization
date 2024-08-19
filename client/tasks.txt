@@ -7,7 +7,7 @@
  - x - add slider for adjusting the report status sound
 
 --- ==== >=3.6.2 < 3.7 ==== ---:
- - improve enemy.Search action
+ - improve enemy.Search action? (may already be done)
  - update getBack request to make bots cover boss at a distance during combat
  - update coverMe request to reset cover boss distance
  - fix enemy marker when zooming, if possible
@@ -15,7 +15,6 @@
 --- ==== 3.7 ==== ---:
 - followers that get picked up during raid should have "assist" tactic
 - improve the assist tactic for followers
-- updated squad spawn where the followers' skill is now relative to the player (the range is -5 to +5 relative to player's level)
 - fix glitchy behavior of boss followers
 - goons send messages at the end of the raid
 - add new tactic Supporter (an alternative version to Marskman that also allows for push order)

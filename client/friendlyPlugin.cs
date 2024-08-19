@@ -323,7 +323,7 @@ namespace friendlyPMC
 
             returnChanceDeath = Config.Bind((string)optionsLang["baseSettings"], "1.3  -  " + ((Dictionary<string, string>)optionsLang["returnChanceDeath"])["Name"], 50, new ConfigDescription(((Dictionary<string, string>)optionsLang["returnChanceDeath"])["Description"], new AcceptableValueRange<int>(1, 100)));
 
-            squadSetup = Config.Bind((string)optionsLang["baseSettings"], "1.4  -  " + ((Dictionary<string, string>)optionsLang["squadSetup"])["Name"], false, new ConfigDescription(((Dictionary<string, string>)optionsLang["squadSetup"])["Description"]);
+            squadSetup = Config.Bind((string)optionsLang["baseSettings"], "1.4  -  " + ((Dictionary<string, string>)optionsLang["squadSetup"])["Name"], false, new ConfigDescription(((Dictionary<string, string>)optionsLang["squadSetup"])["Description"]));
 
             extraPickups = Config.Bind((string)optionsLang["baseSettings"], "2 Maximum pickup followers", 1, new ConfigDescription("Maximum followers the player can pickup during raid. This is in addition to the squad.", new AcceptableValueRange<int>(0, 30)));
 
@@ -331,7 +331,7 @@ namespace friendlyPMC
 
             enemyRemember = Config.Bind((string)optionsLang["miscSettings"], "2 Time to forget about enemy (in sec.)", 20, new ConfigDescription("Maximum time a follower will remember an enemy. This is applied only at the begining of a raid", new AcceptableValueRange<int>(5, 60)));
 
-            statusSound = enemyRemember = Config.Bind((string)optionsLang["miscSettings"], "3 " + ((Dictionary<string, string>)optionsLang["statusSound"])["Name"], 100, new ConfigDescription(((Dictionary<string, string>)optionsLang["statusSound"])["Description"], new AcceptableValueRange<int>(0, 100)));
+            statusSound = Config.Bind((string)optionsLang["miscSettings"], "3 " + ((Dictionary<string, string>)optionsLang["statusSound"])["Name"], 100, new ConfigDescription(((Dictionary<string, string>)optionsLang["statusSound"])["Description"], new AcceptableValueRange<int>(0, 100)));
 
             heatlhMultiplier = Config.Bind((string)optionsLang["miscSettings"], "3 Squad Health Multiplier", 1f, new ConfigDescription("Health multiplier for the followers you spawn with. This is applied per each body part. Does not apply to boss followers.", new AcceptableValueRange<float>(1, 5)));
 

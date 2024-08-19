@@ -77,9 +77,11 @@ namespace friendlyPMC.Modules
                 }
             }
 
-            if (type == "ally") return allies.Random();
-            else if(type == "boss") return bosses.Random();
-            else return mates.Random();
+            if (type == "ally" && allies.Count > 0) return allies.Random();
+            else if(type == "boss" && bosses.Count > 0) return bosses.Random();
+            else if(mates.Count > 0) return mates.Random();
+
+            return null;
         }
 
         public static void NpcSendThankYou(string id = null)

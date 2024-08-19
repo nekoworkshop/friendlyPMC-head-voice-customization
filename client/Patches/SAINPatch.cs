@@ -49,7 +49,7 @@ namespace friendlyPMC.Patches
 
                 if(SAINEnableClass !=null)
                 {
-                    harmony.Patch(AccessTools.Method(SAINEnableClass, "IsSAINDisabledForBot"), new HarmonyMethod(typeof(SAINPatch), nameof(PatchIsSAINDisabledForBot)));
+                    harmony.Patch(AccessTools.Method(SAINEnableClass, "isBotExcluded"), new HarmonyMethod(typeof(SAINPatch), nameof(PatchisBotExcluded)));
                 }
             }
         }
@@ -134,10 +134,11 @@ namespace friendlyPMC.Patches
         }
 
         [HarmonyPrefix]
-        private static bool PatchIsSAINDisabledForBot(BotOwner botOwner)
+        private static bool PatchisBotExcluded(BotOwner botOwner, ref bool __result)
         {
             if (BossPlayers.IsFollower(botOwner))
             {
+                __result = true;
                 return false;
             }
             return true;

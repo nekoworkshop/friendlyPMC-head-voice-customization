@@ -449,6 +449,8 @@ namespace friendlyPMC.Patches
                         {
                             owner.GetPlayer.Profile.Info.Side = side;
                         }
+                        
+                        BossPlayers.ShallBeFollower(owner);
 
                         botSpawnerClass.method_10(owner, bot, new Action<BotOwner>((BotOwner follower) =>
                         {
