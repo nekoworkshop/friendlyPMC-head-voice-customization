@@ -4,7 +4,7 @@
  - x - if we have a follower that was picked up, that one should send a thank you message if he was able to make it out with the Player
  - x - make squad have skill relative to the player's skill
  - x - improve how bot goes to the enemy
- - #inprogress - add slider for adjusting the report status sound
+ - x - add slider for adjusting the report status sound
 
 --- ==== >=3.6.2 < 3.7 ==== ---:
  - improve enemy.Search action

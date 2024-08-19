@@ -78,7 +78,7 @@ public class RadioSound : MonoBehaviour
         if (radioSounnd != null)
         {
             audioSourceRadio.panStereo = 0.0f;
-            audioSourceLocation.volume = 0.5f;
+            audioSourceLocation.volume = (friendlyPMC.friendlyPMC.statusSound.Value / 100) * 0.5f;
             audioSourceRadio.PlayOneShot(radioSounnd);
         }
     }
@@ -87,7 +87,7 @@ public class RadioSound : MonoBehaviour
     {
         if (locationPing != null) {
             audioSourceLocation.panStereo = stereoPan;
-            audioSourceLocation.volume = 0.15f;
+            audioSourceLocation.volume = (friendlyPMC.friendlyPMC.statusSound.Value / 100) * 0.17f;
             audioSourceLocation.PlayOneShot(locationPing);
         }
     }

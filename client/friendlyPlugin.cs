@@ -86,7 +86,7 @@ namespace friendlyPMC
             {  
                 "statusSound" , new Dictionary<string,string>{
                     { "Name", "Report Status Volume"},
-                    { "Description", "Spawn with followers"}
+                    { "Description", "Volume of the radio sound when triggering report status"}
                 }
             },
             {
@@ -97,8 +97,20 @@ namespace friendlyPMC
             },
             {
                 "squadSize", new Dictionary<string,string>{
-                    { "Name", " Squad size"},
+                    { "Name", "Squad size"},
                     { "Description", "Number of followers to spawn with"}
+                }
+            },
+            {
+                "returnChanceDeath", new Dictionary<string,string>{
+                    { "Name", "Squadmate return chance after death"},
+                    { "Description", "Chance your followers will return the items you gave them should you die. This applies only to members you spawned with"}
+                }
+            },
+            {
+                "squadSetup", new Dictionary<string,string>{
+                    { "Name", "Use Squad setup"},
+                    { "Description", "Use specific setup for your squad"}
                 }
             }
         };
@@ -111,8 +123,6 @@ namespace friendlyPMC
 
         public static Dictionary<int, List<ConfigEntry<string>>> squadMembers = new Dictionary<int, List<ConfigEntry<string>>>();
 
-        public static ConfigEntry<bool> copyEquip;
-
         public static ConfigEntry<int> enemyRemember;
 
         public static ConfigEntry<float> heatlhMultiplier;
@@ -121,10 +131,15 @@ namespace friendlyPMC
 
         public static ConfigEntry<int> returnChanceDeath;
 
+        public static ConfigEntry<int> statusSound;
+
         public static ConfigEntry<bool> knightSpawn;
         public static ConfigEntry<bool> bigPipeSpawn;
         public static ConfigEntry<bool> birdEyeSpawn;
         public static ConfigEntry<bool> justKnightSpawn;
+
+
+
         private string[] equipPresets = new string[] {
             "Default",
             "Player Equipment"
@@ -306,15 +321,17 @@ namespace friendlyPMC
                 new ConfigDescription(((Dictionary<string, string>)optionsLang["squadSize"])["Description"], new AcceptableValueRange<int>(1, 30))
             );
 
-            returnChanceDeath = Config.Bind((string)optionsLang["baseSettings"], "1.3  -  Squadmate return chance after death", 50, new ConfigDescription("Chance your followers will return the items you gave them should you die. This applies only to members you spawned with.", new AcceptableValueRange<int>(1, 100)));
+            returnChanceDeath = Config.Bind((string)optionsLang["baseSettings"], "1.3  -  " + ((Dictionary<string, string>)optionsLang["returnChanceDeath"])["Name"], 50, new ConfigDescription(((Dictionary<string, string>)optionsLang["returnChanceDeath"])["Description"], new AcceptableValueRange<int>(1, 100)));
 
-            squadSetup = Config.Bind((string)optionsLang["baseSettings"], "1.4  -  Use Squad setup", false, new ConfigDescription("Use specific setup for your squad"));
+            squadSetup = Config.Bind((string)optionsLang["baseSettings"], "1.4  -  " + ((Dictionary<string, string>)optionsLang["squadSetup"])["Name"], false, new ConfigDescription(((Dictionary<string, string>)optionsLang["squadSetup"])["Description"]);
 
             extraPickups = Config.Bind((string)optionsLang["baseSettings"], "2 Maximum pickup followers", 1, new ConfigDescription("Maximum followers the player can pickup during raid. This is in addition to the squad.", new AcceptableValueRange<int>(0, 30)));
 
             scanDistance = Config.Bind((string)optionsLang["miscSettings"], "1 Maximum scan distance", 140, new ConfigDescription("Maximum distance to pick up any visible enemy that the player is signaling when issuing 'Contact' phrase", new AcceptableValueRange<int>(50, 300)));
 
             enemyRemember = Config.Bind((string)optionsLang["miscSettings"], "2 Time to forget about enemy (in sec.)", 20, new ConfigDescription("Maximum time a follower will remember an enemy. This is applied only at the begining of a raid", new AcceptableValueRange<int>(5, 60)));
+
+            statusSound = enemyRemember = Config.Bind((string)optionsLang["miscSettings"], "3 " + ((Dictionary<string, string>)optionsLang["statusSound"])["Name"], 100, new ConfigDescription(((Dictionary<string, string>)optionsLang["statusSound"])["Description"], new AcceptableValueRange<int>(0, 100)));
 
             heatlhMultiplier = Config.Bind((string)optionsLang["miscSettings"], "3 Squad Health Multiplier", 1f, new ConfigDescription("Health multiplier for the followers you spawn with. This is applied per each body part. Does not apply to boss followers.", new AcceptableValueRange<float>(1, 5)));
 
