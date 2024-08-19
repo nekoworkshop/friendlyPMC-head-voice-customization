@@ -527,24 +527,27 @@ namespace friendlyPMC.Patches
 
             IProfileData botData = new IProfileData(side, type, BotDifficulty.hard, 0f, @params);
 
-            List<Profile> followerProfiles = new List<Profile>();
+
+            BotCreationDataClass botCreationData = new BotCreationDataClass(botData);
+            AccessTools.Field(typeof(BotCreationDataClass), "ginterface19_0").SetValue(botCreationData, botSpawnerClass);
+            AccessTools.Field(typeof(BotCreationDataClass), "iBotCreator").SetValue(botCreationData, botCreator);
 
             for (int i = 0; i < memberCount; i++)
             {
                 var pr = await GenerateFollowerProfile(botCreator, botData.PrepareToLoadBackend(1));
-                followerProfiles.Add(pr);
+                botCreationData.AddProfile(pr);
             }
 
-            BotCreationDataClass bot = await BotCreationDataClass.Create(botData, botCreator, memberCount, botSpawnerClass);
+            BotCreationDataClass bot = botCreationData; // await BotCreationDataClass.Create(botData, botCreator, memberCount, botSpawnerClass);
 
-            for (int i = 0; i < bot.Profiles.Count; i++)
+            /*for (int i = 0; i < bot.Profiles.Count; i++)
             {
-                Profile fpr = followerProfiles[i];
+                Profile fpr = botCreationData.Profiles[i];
                 Profile profile = bot.Profiles[i];
 
                 profile.Skills.ApplyChanges(fpr.Skills);
                 profile.Info.Settings.Experience = fpr.Info.Settings.Experience;
-            }
+            }*/
 
             List<DependencyGraph<IEasyBundle>.GClass3415> bundleTokens = new List<DependencyGraph<IEasyBundle>.GClass3415>();
             Dictionary<string,EquipmentClass> profileEquipment = new Dictionary<string,EquipmentClass>();
@@ -659,12 +662,32 @@ namespace friendlyPMC.Patches
                         {
                             if(profileEquipment.ContainsKey(profile.Id))
                             {
-                                profile.Inventory.Equipment = profileEquipment[profile.Id];
-                                if(secureContainers.ContainsKey(profile.Id))
+                                //profile.Inventory.Equipment = profileEquipment[profile.Id];
+
+                                foreach (EquipmentSlot slotType in Enum.GetValues(typeof(EquipmentSlot)))
                                 {
-                                    profile.Inventory.Equipment.GetSlot(EquipmentSlot.SecuredContainer).ChangeContainedItemDirectly(secureContainers[profile.Id]);
-                                    profile.Inventory.Equipment.GetSlot(EquipmentSlot.SecuredContainer).ApplyContainedItem();
+                                    Slot cloneSlot = profileEquipment[profile.Id].GetSlot(slotType);
+                                    Item contained = cloneSlot.ContainedItem;
+
+                                    Slot botSlot = profile.Inventory.Equipment.GetSlot(slotType);
+
+                                    botSlot.RemoveItem();
+
+                                    if (contained != null)
+                                    {
+                                        contained.CurrentAddress = null;
+                                        botSlot.AddWithoutRestrictions(contained);
+                                    }
                                 }
+
+                                if (secureContainers.ContainsKey(profile.Id))
+                                {
+                                    Slot secCon = profile.Inventory.Equipment.GetSlot(EquipmentSlot.SecuredContainer);
+                                    secCon.RemoveItem();
+                                    secureContainers[profile.Id].CurrentAddress = null;
+                                    secCon.AddWithoutRestrictions(secureContainers[profile.Id]);
+                                }
+                                
                             }
                         }
                     });
@@ -785,6 +808,7 @@ namespace friendlyPMC.Patches
                         owner.GetPlayer.Profile.Info.Side = side;
                     }
 
+                    BossPlayers.ShallBeFollower(owner);
                     botSpawnerClass.method_10(owner, bot, new Action<BotOwner>((BotOwner follower) =>
                     {
 
@@ -797,6 +821,7 @@ namespace friendlyPMC.Patches
                             token.Cancel();
                             bot.StopSpawn();
                         }
+
 
                         Utils.Utils.SetTimeout(() =>
                         {

@@ -58,6 +58,9 @@ namespace friendlyPMC.Components
 
         private void OnDead(EDamageType _damageType)
         {
+            InteractableObjects.BossIsDead();
+            NpcMessage.PlayerDied();
+
             if (Followers != null && Followers.Count > 0)
             {
                 float chance = GClass761.Random(1, 100);
@@ -74,15 +77,8 @@ namespace friendlyPMC.Components
                             InteractableObjects.ClearStoredItems(follower.ProfileId);
                     }
                 });
-
-                if(!noreturn)
-                {
-                    InteractableObjects.BossIsDead();
-                } else
-                {
-                    NpcMessage.PlayerDied();
-                }
             }
+
             BossPlayers.RemovePlayerBoss(realPlayer.ProfileId);
         }
 

@@ -692,7 +692,8 @@ namespace friendlyPMC.Components
 
                     (botOwner_0.Brain.BaseBrain as FollowerBrain).SetBossTactic("defend");
 
-                    botOwner_0.BotRequestController.TryStopCurrent(alivePlayerByProfileID, false);
+                    if(botOwner_0.BotRequestController.CurRequest != null && botOwner_0.BotRequestController.CurRequest.BotRequestType != BotRequestType.hold)
+                        botOwner_0.BotRequestController.TryStopCurrent(alivePlayerByProfileID, false);
 
                     botOwner_0.BotTalk.TrySay(EPhraseTrigger.Roger, false);
                     botOwner_0.Gesture.TryGestus(EGesture.Good, false);

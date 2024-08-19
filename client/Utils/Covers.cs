@@ -11,6 +11,7 @@ using TMPro;
 using Cysharp.Threading.Tasks;
 using System.Threading.Tasks;
 using System.Threading;
+using friendlyPMC.Modules;
 
 namespace friendlyPMC.Utils
 {
@@ -120,11 +121,11 @@ namespace friendlyPMC.Utils
 
             if (!botOwner.BotFollower.HaveBoss) return points;
 
-            pitAIBossPlayer boss = botOwner.BotFollower.BossToFollow as pitAIBossPlayer;
+            pitAIBossPlayer boss = botOwner.BotFollower.HaveBoss ?  botOwner.BotFollower.BossToFollow as pitAIBossPlayer : null;
 
             if (boss == null) return points;
 
-            List<CustomNavigationPoint> areaCovers = boss.GetAreaCovers();
+            List<CustomNavigationPoint> areaCovers = boss != null ? boss.GetAreaCovers() : BossPlayers.GetAICovers();
             foreach (CustomNavigationPoint point in areaCovers)
             {
                 if (
@@ -301,32 +302,38 @@ namespace friendlyPMC.Utils
                 }
             }
 
-            pitAIBossPlayer boss = botOwner.BotFollower.BossToFollow as pitAIBossPlayer;
+            pitAIBossPlayer boss = botOwner.BotFollower.HaveBoss ? botOwner.BotFollower.BossToFollow as pitAIBossPlayer : null;
 
             float lastsqr = Mathf.Infinity;
             CustomNavigationPoint closest = null;
             
-            List<CustomNavigationPoint> areaCovers = boss.GetAreaCovers();
+            List<CustomNavigationPoint> areaCovers = boss != null ? boss.GetAreaCovers() : BossPlayers.GetAICovers();
             
             foreach (CustomNavigationPoint point in areaCovers)
             {
-                if (
-                    !point.IsFreeById(botOwner.Id) ||
-                    !GClass326.IsDangerPositionFarEnough(point.Position, carePosition, safeDistance * safeDistance) ||
-                    Vector3.Distance(point.Position, botOwner.GetPlayer.Transform.position) <= 1f ||
-                    !eligibleCheck(point)
-                )
+                try
                 {
-                    continue;
-                }
+                    if (
+                        !point.IsFreeById(botOwner.Id) ||
+                        !GClass326.IsDangerPositionFarEnough(point.Position, carePosition, safeDistance * safeDistance) ||
+                        Vector3.Distance(point.Position, botOwner.GetPlayer.Transform.position) <= 1f ||
+                        !eligibleCheck(point)
+                    )
+                    {
+                        continue;
+                    }
 
-                float dist = (centerPosition - point.Position).sqrMagnitude;
-                if (dist <= lastsqr)
+                    float dist = (centerPosition - point.Position).sqrMagnitude;
+                    if (dist <= lastsqr)
+                    {
+                        closest = point;
+                        lastsqr = dist;
+                    }
+
+                } catch
                 {
-                    closest = point;
-                    lastsqr = dist;
-                }
 
+                }
             }
 
             return closest;

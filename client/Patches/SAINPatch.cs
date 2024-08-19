@@ -31,7 +31,7 @@ namespace friendlyPMC.Patches
                     squadType = Type.GetType("SAIN.BotController.Classes.Squad, SAIN");
                 }
 
-                if (SAINEnableClass != null)
+                if (SAINEnableClass == null)
                 {
                     SAINEnableClass = Type.GetType("SAIN.SAINEnableClass, SAIN");
                 }
@@ -49,14 +49,13 @@ namespace friendlyPMC.Patches
 
                 if(SAINEnableClass !=null)
                 {
-                    harmony.Patch(AccessTools.Method(SAINEnableClass, "IsSAINDisabledForBot"), new HarmonyMethod(typeof(SAINPatch).GetMethod(nameof(PatchIsSAINDisabledForBot), BindingFlags.NonPublic | BindingFlags.Static)));
+                    harmony.Patch(AccessTools.Method(SAINEnableClass, "IsSAINDisabledForBot"), new HarmonyMethod(typeof(SAINPatch), nameof(PatchIsSAINDisabledForBot)));
                 }
             }
         }
-
+        [HarmonyPrefix]
         private static bool PatchClearPlayerPlace(object __instance, IPlayer player)
         {
-
 
             PropertyInfo membersProperty = squadType.GetProperty("Members");
 
@@ -135,11 +134,10 @@ namespace friendlyPMC.Patches
         }
 
         [HarmonyPrefix]
-        private static bool PatchIsSAINDisabledForBot(BotOwner botOwner, ref bool _result)
+        private static bool PatchIsSAINDisabledForBot(BotOwner botOwner)
         {
-            if (!BossPlayers.IsFollower(botOwner))
+            if (BossPlayers.IsFollower(botOwner))
             {
-                _result = false;
                 return false;
             }
             return true;

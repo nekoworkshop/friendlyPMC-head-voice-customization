@@ -15,9 +15,10 @@ namespace friendlyPMC.Modules
     {
         public static BossPlayers Instance { get; private set; }
 
-        private Dictionary<string, pitAIBossPlayer> _bosses { get; set; }
-        private List<BotFollowerPlayer> _followers { get; set; }
-        private List<int> _botsGroup { get; set; }
+        private Dictionary<string, pitAIBossPlayer> _bosses;
+        private List<BotFollowerPlayer> _followers;
+        private List<string> _shallBeFollower;
+        private List<int> _botsGroup;
 
         private List<CustomNavigationPoint> _groupPoints;
 
@@ -52,6 +53,7 @@ namespace friendlyPMC.Modules
             }
             _bosses = new Dictionary<string, pitAIBossPlayer>();
             _followers = new List<BotFollowerPlayer> { };
+            _shallBeFollower = new List<string> { };
             _removedBosses = new List<string> { };
             _botsGroup = new List<int> { };
 
@@ -231,9 +233,10 @@ namespace friendlyPMC.Modules
                     RemoveBossPlayer(key);
                 }
             }
-            _bosses = null;
-            _removedBosses = null;
-            _followers = null;
+            _bosses.Clear();
+            _removedBosses.Clear();
+            _followers.Clear();
+            _shallBeFollower.Clear();
 
             IsDisposed = true;
             Instance = null;
@@ -256,6 +259,8 @@ namespace friendlyPMC.Modules
             {
                 return _follower;
             }
+
+            if(_shallBeFollower.Contains(bot.name)) _shallBeFollower.Remove(bot.name);
 
             bool isAIBoss = false;
 
@@ -445,7 +450,7 @@ namespace friendlyPMC.Modules
         public static bool IsFollower(BotOwner bot, AIBossPlayer boss = null)
         {
             if (Instance == null) return false;
-            return Instance.IsBotFollower(bot, boss);
+            return Instance.IsBotFollower(bot, boss) || Instance._shallBeFollower.Contains(bot.name);
         }
         public static List<CustomNavigationPoint> GetAICovers()
         {
@@ -500,6 +505,11 @@ namespace friendlyPMC.Modules
         public static BotFollowerPlayer AddFollower(BotOwner bot, pitAIBossPlayer player, bool squadMate = false, WildSpawnType role = WildSpawnType.assault, string tactic = "default")
         {
             return Instance.AddBotFollower(bot,player,squadMate,role,tactic);
+        }
+
+        public static void ShallBeFollower(BotOwner bot)
+        {
+            if(!Instance._shallBeFollower.Contains(bot.name)) Instance._shallBeFollower.Add(bot.name);
         }
     }
 }

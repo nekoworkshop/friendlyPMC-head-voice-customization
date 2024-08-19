@@ -38,6 +38,7 @@ namespace friendlyPMC.Patches
         [PatchPrefix]
         private static bool PatchPrefix(GClass974 __instance, ref float __result, Vector3 listenerPos, BetterSource source)
         {
+            // @TODO : figure out out why it triggers error for followers in some circumstances
             try
             {
                 float maxDistance = source.MaxDistance;

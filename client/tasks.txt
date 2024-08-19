@@ -1,5 +1,5 @@
 --- ==== 3.6.1 ==== ---:
- - #inprogress - fix issuing open door command
+ - x - fix issuing open door command
  - x - have followers send message at the end of the raid depending on status and how many made it out
  - x - if we have a follower that was picked up, that one should send a thank you message if he was able to make it out with the Player
  - x - make squad have skill relative to the player's skill
@@ -29,10 +29,13 @@ RELEASE NOTES (3.6.1):
  - fixed cursed open door command to finally work properly
  - made followers appear as friendly in Dynamic Maps mod
  - added slider for adjusting the report status sound in the Configuration Manager
- - "Hold Position" phrase no longer triggers stay in place when out of combat. It only switches the followers to hold mode. 
+ - "Hold Position" phrase no longer triggers stay in place when out of combat. It only switches the followers to hold mode.
+ - made squad skill level be relative to the player's skill
+
 ==================================================================================
 REVISIT:
  - fix looting animation for loot on the ground
+ - error in LookSensor
 
 FUTURE IDEAS:
  - BirEye auto mark enemies as he sees them (enhanced Marskman)
