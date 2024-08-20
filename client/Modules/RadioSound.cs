@@ -80,7 +80,8 @@ namespace friendlyPMC.Modules
             if (radioSounnd != null)
             {
                 audioSourceRadio.panStereo = 0.0f;
-                audioSourceRadio.volume = 0.5f * (friendlyPMC.statusSound.Value / 100);
+                float level = (friendlyPMC.statusSound.Value / 100f) * 0.5f;
+                audioSourceRadio.volume = level;
                 audioSourceRadio.PlayOneShot(radioSounnd);
             }
         }
@@ -90,7 +91,7 @@ namespace friendlyPMC.Modules
             if (locationPing != null)
             {
                 audioSourceLocation.panStereo = stereoPan;
-                audioSourceLocation.volume = 0.17f * (friendlyPMC.statusSound.Value / 100);
+                audioSourceLocation.volume = (friendlyPMC.statusSound.Value / 100f) * 0.2f;
                 audioSourceLocation.PlayOneShot(locationPing);
             }
         }
