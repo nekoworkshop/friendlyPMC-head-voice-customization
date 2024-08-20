@@ -46,7 +46,11 @@ namespace friendlyPMC.Patches
                     __instance.method_7(EPhraseTrigger.CheckHim, false);
                     __instance.method_7(EPhraseTrigger.LootContainer, false);
                 }
-                catch (Exception e) { Components.Logger.LogInfo("Loot Commands Failed: " + e.Message); }
+                catch (Exception e) 
+                { 
+                    Components.Logger.LogError("Loot Command Failed:"); 
+                    Components.Logger.LogError(e); 
+                }
 
                 Door door = player.InteractableObject as Door;
                 try
@@ -56,7 +60,11 @@ namespace friendlyPMC.Patches
 
                     __instance.method_7(EPhraseTrigger.OpenDoor, door != null);
                 } 
-                catch (Exception e) { Components.Logger.LogInfo("Open Door Command Failed: " + e.Message); }
+                catch (Exception e) 
+                {
+                    Components.Logger.LogError("Open Door Command Failed:"); 
+                    Components.Logger.LogError(e);
+                }
 
                 __instance.method_7(EPhraseTrigger.LockedDoor, door != null && (door.DoorState == EDoorState.Locked || door.DoorState == EDoorState.Shut));
 
@@ -79,7 +87,11 @@ namespace friendlyPMC.Patches
                     {
                         __instance.method_7(EPhraseTrigger.Cooperation, false);
                     }
-                } catch (Exception e) { Components.Logger.LogInfo("Cooperation Command Failed: " + e.Message); }
+                } catch (Exception e) 
+                {
+                    Components.Logger.LogError("Cooperation Command Failed:"); 
+                    Components.Logger.LogError(e);
+                }
 
                 return false;
             }

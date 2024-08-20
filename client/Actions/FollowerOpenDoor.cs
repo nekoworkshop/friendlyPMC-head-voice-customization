@@ -79,7 +79,6 @@ namespace friendlyPMC.Actions
             if (!bool_1)
             {
                 botOwner_0.StopMove();
-                Components.Logger.LogInfo("Open Door");
                 botOwner_0.DoorOpener.OnEndInteract += ClearOpener;
                 botOwner_0.DoorOpener.Interact(Door, EInteractionType.Open);
 
@@ -100,8 +99,6 @@ namespace friendlyPMC.Actions
             botOwner_0.DoorOpener.OnEndInteract -= ClearOpener;
 
             InteractableObjects.RemoveOpener(botOwner_0);
-
-            Components.Logger.LogInfo("Clear Opener");
         }
     }
 }

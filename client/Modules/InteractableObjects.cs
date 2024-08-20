@@ -86,15 +86,12 @@ namespace friendlyPMC.Modules
 
         private void GatherItems()
         {
-            Components.Logger.LogInfo("Gather items");
             var bossPlayers = BossPlayers.Instance.GetBossPlayers();
             _toSendItems.Clear();
             List<string> gathered = new List<string>();
 
             foreach (var player in bossPlayers)
             {
-                Components.Logger.LogInfo("Total player followers " + player.Value.Followers.Count);
-
                 foreach (var bot in player.Value.Followers)
                 {
                     if (bot.BotState != EBotState.Active || !bot.HealthController.IsAlive)

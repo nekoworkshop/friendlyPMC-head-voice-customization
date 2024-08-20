@@ -433,7 +433,6 @@ namespace friendlyPMC
                         }
                         i--;
                     }
-                    Components.Logger.LogInfo("Reduce squad");
                 }
             } else
             {

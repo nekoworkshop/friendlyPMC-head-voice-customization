@@ -128,7 +128,8 @@ namespace friendlyPMC.Patches
                 }
             } catch(Exception ex)
             {
-                Components.Logger.LogInfo("Failed to run SAIN clearPlayerPlace Patch :" + ex.Message);
+                Components.Logger.LogError("Failed to run SAIN clearPlayerPlace Patch");
+                Components.Logger.LogError(ex);
             }
             return allow;
         }
