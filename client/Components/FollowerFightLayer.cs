@@ -225,8 +225,13 @@ namespace friendlyPMC.Components
 
             if (allyTactic)
             {
-                if (botOwner_0.Memory.AttackImmediately && commonLayer.IsEnemyLowThreat() && Enemy.Distance(botOwner_0) <= Enemy.EnemyDistance.Mid)
-                    return EngageEnemy();
+                if (botOwner_0.Memory.AttackImmediately && commonLayer.IsEnemyLowThreat())
+                {
+                    if(Enemy.Distance(botOwner_0) <= Enemy.EnemyDistance.Mid)
+                        return EngageEnemy();
+                    else
+                        return pusherLayer.EnemySearch();
+                }
 
                 if (Enemy.Distance(botOwner_0) > Enemy.EnemyDistance.Mid || !commonLayer.IsEnemyLowThreat()) return sniperLayer.GetDecision();
 

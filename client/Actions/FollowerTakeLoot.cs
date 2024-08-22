@@ -140,7 +140,7 @@ namespace friendlyPMC.Actions
                     ClearLoot();
                     return;
                 }
-                if (result.Succeed)
+                if (result.Succeed && _follower.IsSquadMate)
                 {
                     InteractableObjects.StoreItem(botOwner_0, item);
                 }

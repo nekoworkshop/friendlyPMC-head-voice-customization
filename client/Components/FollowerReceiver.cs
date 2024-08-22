@@ -909,7 +909,7 @@ namespace friendlyPMC.Components
                         Utils.Utils.SetTimeout(() =>
                         {
                             if(botOwner_0.BotState == EBotState.Active)
-                                botOwner_0.BotTalk.TrySay(EPhraseTrigger.Roger, true);
+                                botOwner_0.BotTalk.TrySay(EPhraseTrigger.GoodWork, true);
                         }, 1000);
                     }
 
