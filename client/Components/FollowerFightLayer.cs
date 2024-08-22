@@ -116,6 +116,8 @@ namespace friendlyPMC.Components
             allyTactic = false;
             sniperTactic = false;
 
+            if(tactic != null) tactic = tactic.ToLower();
+
             if (tactic == "ally" || tactic == "assist")
             {
                 allyTactic = true;
@@ -223,12 +225,12 @@ namespace friendlyPMC.Components
 
             if (allyTactic)
             {
-
-                if (botOwner_0.Memory.AttackImmediately && commonLayer.IsEnemyLowThreat() && Utils.Enemy.Distance(botOwner_0) <= Utils.Enemy.EnemyDistance.Mid)
+                if (botOwner_0.Memory.AttackImmediately && commonLayer.IsEnemyLowThreat() && Enemy.Distance(botOwner_0) <= Enemy.EnemyDistance.Mid)
                     return EngageEnemy();
 
-                return DefendPosition(interestPosition);
+                if (Enemy.Distance(botOwner_0) > Enemy.EnemyDistance.Mid || !commonLayer.IsEnemyLowThreat()) return sniperLayer.GetDecision();
 
+                return pusherLayer.EnemySearch();
             }
             else if ((ordersAreHold || holdTactic) && !ordersAreAttack)
             {
@@ -247,10 +249,10 @@ namespace friendlyPMC.Components
 
 
             // do not go after distant enemies
-            if (Utils.Enemy.Distance(botOwner_0) >= Utils.Enemy.EnemyDistance.Distant)
+            /*if (Utils.Enemy.Distance(botOwner_0) > Utils.Enemy.EnemyDistance.Mid)
             {
                 return pusherLayer.EnemySearch();
-            }
+            }*/
 
             if (botOwner_0.Memory.AttackImmediately && Utils.Enemy.Distance(botOwner_0) <= Utils.Enemy.EnemyDistance.Mid)
             {
@@ -400,7 +402,7 @@ namespace friendlyPMC.Components
             {
                 ordersAreAttack = false;
                 ordersAreHold = false;
-                return DefendPosition(bossPosition);
+                return DecideTactic();
             }
 
             if (sniperTactic)

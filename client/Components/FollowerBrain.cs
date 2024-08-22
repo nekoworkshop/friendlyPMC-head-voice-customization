@@ -82,19 +82,26 @@ namespace friendlyPMC.Components
 
         public virtual void OnDead(EDamageType damageType)
         {
-            BossPlayers.RemoveFollower(_owner, _boss);
-            ClearFollowerPatrol();
-            InteractableObjects.ClearStoredItems(_owner.ProfileId);
-            InteractableObjects.RemoveTaker(_owner);
+            OnKilled();
 
         }
 
         public virtual void OnLeave(BotOwner _bot)
         {
-            BossPlayers.RemoveFollower(_owner, _boss);
-            ClearFollowerPatrol();
+            OnKilled();
+        }
+
+        protected void OnKilled()
+        {
+
+
+            // clear info about this bot
+            NpcMessage.RemoveNpc(_owner.ProfileId);
             InteractableObjects.ClearStoredItems(_owner.ProfileId);
             InteractableObjects.RemoveTaker(_owner);
+
+            BossPlayers.RemoveFollower(_owner, _boss);
+            ClearFollowerPatrol();
         }
 
 
@@ -125,6 +132,12 @@ namespace friendlyPMC.Components
         public override void Dispose()
         {
             Dismissed();
+
+            // clear info about this bot
+            NpcMessage.RemoveNpc(_owner.ProfileId);
+            InteractableObjects.ClearStoredItems(_owner.ProfileId);
+            InteractableObjects.RemoveTaker(_owner);
+
             base.Dispose();
         }
 

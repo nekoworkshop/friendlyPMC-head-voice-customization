@@ -16,10 +16,10 @@ namespace friendlyPMC.Actions
         public FollowerSearch(BotOwner owner)
         : base(owner)
         {
-            minDist = 5f;
-            maxDist = 60f;
+            maxDist = 200f;
             searchPose = 1f;
             Action = (BotLogicDecision)CustomBotDecisions.EnemySearch;
+            searchType = "EnemySearch";
         }
 
         protected override void UpdateShootPosition()

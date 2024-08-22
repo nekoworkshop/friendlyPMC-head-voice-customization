@@ -12,7 +12,6 @@ namespace friendlyPMC.Components
     {
         float coverTimer = 0f;
         float suppressTime = 0f;
-        float doorOpenTimer = 0f;
 
         private readonly float sprintDistance = 15f;
 

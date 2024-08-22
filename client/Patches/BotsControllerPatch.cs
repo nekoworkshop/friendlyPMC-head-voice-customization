@@ -529,15 +529,23 @@ namespace friendlyPMC.Patches
 
             IProfileData botData = new IProfileData(side, type, BotDifficulty.hard, 0f, @params);
 
-
             BotCreationDataClass botCreationData = new BotCreationDataClass(botData);
             AccessTools.Field(typeof(BotCreationDataClass), "ginterface19_0").SetValue(botCreationData, botSpawnerClass);
             AccessTools.Field(typeof(BotCreationDataClass), "iBotCreator").SetValue(botCreationData, botCreator);
+
+            Profile playerProfile = player.Player().Profile;
 
             for (int i = 0; i < memberCount; i++)
             {
                 var pr = await GenerateFollowerProfile(botCreator, botData.PrepareToLoadBackend(1));
                 botCreationData.AddProfile(pr);
+                // math player's clothes if flag is turned on
+                if (friendlyPMC.squadUniform.Value)
+                {
+                    pr.Customization[EBodyModelPart.Body] = playerProfile.Customization[EBodyModelPart.Body];
+                    pr.Customization[EBodyModelPart.Feet] = playerProfile.Customization[EBodyModelPart.Feet];
+                    pr.Customization[EBodyModelPart.Hands] = playerProfile.Customization[EBodyModelPart.Hands];
+                }
             }
 
             BotCreationDataClass bot = botCreationData; // await BotCreationDataClass.Create(botData, botCreator, memberCount, botSpawnerClass);
@@ -584,9 +592,10 @@ namespace friendlyPMC.Patches
 
                                     if (eq == "Player Equipment")
                                     {
-                                        profile.Inventory.Equipment = player.Player().Profile.Inventory.Equipment.CloneItem(null);
+                                        profile.Inventory.Equipment = playerProfile.Inventory.Equipment.CloneItem(null);
                                         profile.Inventory.Equipment.GetSlot(EquipmentSlot.SecuredContainer).ChangeContainedItemDirectly(secureContainer);
                                         profile.Inventory.Equipment.GetSlot(EquipmentSlot.SecuredContainer).ApplyContainedItem();
+
                                     }
                                     else
                                     {
@@ -619,13 +628,13 @@ namespace friendlyPMC.Patches
                                     switch (tactic)
                                     {
                                         case "Pusher":
-                                            tactic = "push";
+                                            tactic = "Push";
                                             break;
                                         case "Holder":
-                                            tactic = "defend";
+                                            tactic = "Defend";
                                             break;
                                         case "Marksman":
-                                            tactic = "marksman";
+                                            tactic = "Marksman";
                                             // some cheating here, making our marskman good
                                             profile.Skills.Sniper.SetCurrent(5100f, true);
                                             profile.Skills.RecoilControl.SetCurrent(4800f, true);
@@ -781,7 +790,7 @@ namespace friendlyPMC.Patches
                             string tactic = null;
                             profileTactic.TryGetValue(profile.ProfileId, out tactic);
 
-                            if (tactic == null) tactic = "default";
+                            if (tactic == null) tactic = "Default";
 
                             WildSpawnType botType = type;
 

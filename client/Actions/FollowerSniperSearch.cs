@@ -32,7 +32,7 @@ namespace friendlyPMC.Actions
 
         protected float minDist = 10f;
 
-        protected float maxDist = 100f;
+        protected float maxDist = 150f;
 
         protected float searchPose = 0.1f;
 
@@ -41,6 +41,8 @@ namespace friendlyPMC.Actions
         protected bool _init = false;
 
         protected BotLogicDecision Action = (BotLogicDecision)CustomBotDecisions.SniperSearch;
+
+        protected string searchType = "SniperSearch";
         public FollowerSniperSearch(BotOwner bot) : base(bot)
         {
             
@@ -176,7 +178,7 @@ namespace friendlyPMC.Actions
                 }
             } catch (Exception ex)
             {
-                Components.Logger.LogError("SniperSearch Error");
+                Components.Logger.LogError($"{searchType} Error");
                 Components.Logger.LogError(ex);
             }
         }
@@ -186,9 +188,9 @@ namespace friendlyPMC.Actions
             Vector3 enemyPosition = botOwner_0.Memory.GoalEnemy.CurrPosition;
 
             Vector3 targetSpot = new Vector3(
-                Mathf.Floor(enemyPosition.x / 20f) * 20f,
+                Mathf.Floor(enemyPosition.x / 12f) * 12f,
                 Mathf.Floor(enemyPosition.y / 2f) * 2f,
-                Mathf.Floor(enemyPosition.z / 20f) * 20f
+                Mathf.Floor(enemyPosition.z / 12f) * 12f
             );
 
             if(targetSpot != _lastTarget)

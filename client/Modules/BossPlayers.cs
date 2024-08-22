@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using static RootMotion.FinalIK.IKSolver;
+using static UnityEngine.UI.GridLayoutGroup;
 
 namespace friendlyPMC.Modules
 {
@@ -242,7 +243,7 @@ namespace friendlyPMC.Modules
             Instance = null;
         }
 
-        private BotFollowerPlayer AddBotFollower(BotOwner bot, pitAIBossPlayer player, bool squadMate = false, WildSpawnType role = WildSpawnType.assault, string tactic = "default")
+        private BotFollowerPlayer AddBotFollower(BotOwner bot, pitAIBossPlayer player, bool squadMate = false, WildSpawnType role = WildSpawnType.assault, string tactic = "Default")
         {
 
             BotFollowerPlayer _follower = null;
@@ -287,10 +288,10 @@ namespace friendlyPMC.Modules
 
             if(!isAIBoss)
             {
-                // scavs have a special tactic
-                if (bot.Side == EPlayerSide.Savage)
+                // scavs and picked up followers have special tactic
+                if (bot.Side == EPlayerSide.Savage || !squadMate)
                 {
-                    (bot.Brain.BaseBrain as FollowerBrain).SetBossTactic("assist");
+                    (bot.Brain.BaseBrain as FollowerBrain).SetBossTactic("Assist");
                 }
                 else
                 {
@@ -344,8 +345,8 @@ namespace friendlyPMC.Modules
                 _followers.Remove(_follower);
                 if (player.bossGroup != null)
                     player.bossGroup.RemoveAlly(bot);
-                
-                // reset the bot receiever
+
+                // reset the bot's brain
                 if (dismissed && bot.HealthController.IsAlive)
                 {
                     _follower.Dismiss();
@@ -502,7 +503,7 @@ namespace friendlyPMC.Modules
             Instance.RemoveBossPlayer(profileId);
         }
 
-        public static BotFollowerPlayer AddFollower(BotOwner bot, pitAIBossPlayer player, bool squadMate = false, WildSpawnType role = WildSpawnType.assault, string tactic = "default")
+        public static BotFollowerPlayer AddFollower(BotOwner bot, pitAIBossPlayer player, bool squadMate = false, WildSpawnType role = WildSpawnType.assault, string tactic = "Default")
         {
             return Instance.AddBotFollower(bot,player,squadMate,role,tactic);
         }

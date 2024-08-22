@@ -184,19 +184,30 @@ namespace friendlyPMC.Components
             EGesture gesture = data.Gesture;
             bool isBossCommunicating = IsBossRequester(data.Player);
 
+            bool isAssisting = (botOwner_0.Brain.BaseBrain as FollowerBrain).currentTactic == "Assist";
+
             float gestusDistance = (botOwner_0.GetPlayer.Transform.position - data.Player.Transform.position).magnitude;
 
             bool shouldDefault = !BossPlayers.IsPlayerBoss(data.Player.ProfileId);
 
+            bool notBusy = !botOwner_0.Memory.HaveEnemy;
+
             List<EGesture> bossNoGesture = new List<EGesture>
             {
             };
-            List<EGesture> bossBusyNoGesture = new List<EGesture>
+            List<EGesture> bossBusyIgnore = new List<EGesture>
             {
+                EGesture.Stop,
+                EGesture.ComeToMe
             };
 
             List<EGesture> allyNoGesture = new List<EGesture> {
                 EGesture.ThatDirection
+            };
+            List<EGesture> allyBusyIgnore = new List<EGesture>
+            {
+                EGesture.ComeToMe,
+                EGesture.Stop
             };
 
             bool isFollowerBoss = false;
@@ -218,26 +229,33 @@ namespace friendlyPMC.Components
                     return;
                 }
 
-                if (botOwner_0.Side == EPlayerSide.Savage && allyNoGesture.Contains(gesture))
+                if (isAssisting)
                 {
-                    botOwner_0.Gesture.TryGestus(EGesture.Bad, false);
-                    return;
+                    if (allyNoGesture.Contains(gesture)) 
+                    { 
+                        if(notBusy) botOwner_0.Gesture.TryGestus(EGesture.Bad, false);
+                        return;
+
+                    } 
+                    else if (!notBusy && allyBusyIgnore.Contains(gesture))
+                    {
+                        return;
+                    }
                 }
                 else if (isFollowerBoss)
                 {
                     if (bossNoGesture.Contains(gesture))
                     {
 
-                        if (!botOwner_0.Memory.HaveEnemy)
+                        if (notBusy)
                         {
                             botOwner_0.Gesture.TryGestus(EGesture.Bad, false);
                         }
                         return;
                     }
 
-                    if (botOwner_0.Memory.HaveEnemy && bossBusyNoGesture.Contains(gesture))
+                    if (!notBusy && bossBusyIgnore.Contains(gesture))
                     {
-                        botOwner_0.BotTalk.TrySay(EPhraseTrigger.DontKnow, true);
                         return;
                     }
                 }
@@ -305,7 +323,10 @@ namespace friendlyPMC.Components
                         !botOwner_0.Memory.HaveEnemy
                         )
                     {
-                        botOwner_0.Gesture.TryGestus(EGesture.Good, true);
+                        Utils.Utils.SetTimeout(() =>
+                        {
+                            if (botOwner_0.BotState == EBotState.Active) botOwner_0.Gesture.TryGestus(EGesture.Good,false);
+                        }, 1000);
                     }
                     return;
                 }
@@ -375,6 +396,8 @@ namespace friendlyPMC.Components
 
             bool isAllyRequesting = IsAllyRequester(requester);
 
+            bool isAssisting = (botOwner_0.Brain.BaseBrain as FollowerBrain).currentTactic == "Assist";
+
             bool shouldDefault = !BossPlayers.IsPlayerBoss(requester.ProfileId);
 
             bool isClose = (botOwner_0.GetPlayer.Transform.position - requester.Transform.position).magnitude < 14f;
@@ -410,7 +433,15 @@ namespace friendlyPMC.Components
                 EPhraseTrigger.CoverMe,
                 EPhraseTrigger.Stop,
                 EPhraseTrigger.Gogogo,
-                EPhraseTrigger.OpenDoor
+                EPhraseTrigger.OpenDoor,
+                EPhraseTrigger.HoldPosition
+                
+            };
+
+            List<EPhraseTrigger> allyBusyIgnore = new List<EPhraseTrigger>
+            {
+                EPhraseTrigger.Regroup,
+                EPhraseTrigger.FollowMe
             };
 
             bool isFollowerBoss = false;
@@ -473,11 +504,21 @@ namespace friendlyPMC.Components
             }
 
             // scavs tend not to listen to anything
-            if (botOwner_0.Side == EPlayerSide.Savage && allyNoPhrase.Contains(info.phrase))
+            if (isAssisting && isBossCommunicating)
             {
-                botOwner_0.Gesture.TryGestus(EGesture.Bad, false);
-                botOwner_0.BotTalk.TrySay(EPhraseTrigger.Negative, true);
-                return;
+                if (allyNoPhrase.Contains(info.phrase))
+                {
+                    if (notBusy && isClose)
+                    {
+                        botOwner_0.Gesture.TryGestus(EGesture.Bad, false);
+                        botOwner_0.BotTalk.TrySay(EPhraseTrigger.Negative, true);
+                    }
+                    return;
+                }
+                else if (!notBusy && allyBusyIgnore.Contains(info.phrase))
+                {
+                    return;
+                }
             }
 
             if (isAllyRequesting)
@@ -690,7 +731,7 @@ namespace friendlyPMC.Components
 
                     Player alivePlayerByProfileID = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(requester.ProfileId);
 
-                    (botOwner_0.Brain.BaseBrain as FollowerBrain).SetBossTactic("defend");
+                    (botOwner_0.Brain.BaseBrain as FollowerBrain).SetBossTactic("Defend");
 
                     if(botOwner_0.BotRequestController.CurRequest != null && botOwner_0.BotRequestController.CurRequest.BotRequestType != BotRequestType.hold)
                         botOwner_0.BotRequestController.TryStopCurrent(alivePlayerByProfileID, false);
@@ -865,7 +906,11 @@ namespace friendlyPMC.Components
                 {
                     if (isClose && notBusy)
                     {
-                        botOwner_0.BotTalk.TrySay(EPhraseTrigger.Roger, false);
+                        Utils.Utils.SetTimeout(() =>
+                        {
+                            if(botOwner_0.BotState == EBotState.Active)
+                                botOwner_0.BotTalk.TrySay(EPhraseTrigger.Roger, true);
+                        }, 1000);
                     }
 
                     (botOwner_0.Brain.BaseBrain as FollowerBrain).BossOrdersChanged();

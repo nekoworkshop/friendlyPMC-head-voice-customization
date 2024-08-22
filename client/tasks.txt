@@ -1,20 +1,15 @@
---- ==== 3.6.1 ==== ---:
- - x - fix issuing open door command
- - x - have followers send message at the end of the raid depending on status and how many made it out
- - x - if we have a follower that was picked up, that one should send a thank you message if he was able to make it out with the Player
- - x - make squad have skill relative to the player's skill
- - x - improve how bot goes to the enemy
- - x - add slider for adjusting the report status sound
 
---- ==== >=3.6.2 < 3.7 ==== ---:
- - improve enemy.Search action? (may already be done)
+--- ==== >=3.6.2 ==== ---:
+ - #testing - improve the assist tactic for followers
+ - x - followers that get picked up during raid should have "assist" tactic
+ - #testing - improve enemy.Search action
+
+--- ==== >=3.6.3 < 3.7 ==== ---:
  - update getBack request to make bots cover boss at a distance during combat
  - update coverMe request to reset cover boss distance
- - fix enemy marker when zooming, if possible
 
 --- ==== 3.7 ==== ---:
-- followers that get picked up during raid should have "assist" tactic
-- improve the assist tactic for followers
+- add hold fire / fire commands
 - fix glitchy behavior of boss followers
 - goons send messages at the end of the raid
 - add new tactic Supporter (an alternative version to Marskman that also allows for push order)
@@ -23,22 +18,20 @@
 - make Knight fight tactic unique (Assaulter)
 
 ==================================================================================
-RELEASE NOTES (3.6.1):
- - improvements on how bots push the enemy when condition is met
- - fixed cursed open door command to finally work properly
- - made followers appear as friendly in Dynamic Maps mod
- - added slider for adjusting the report status sound in the Configuration Manager
- - "Hold Position" phrase no longer triggers stay in place when out of combat. It only switches the followers to hold mode.
- - made squad skill level be relative to the player's skill
+RELEASE NOTES (3.6.2):
+ - followers picked up in raid will now have "assist" tactic. In assist mode, followers do not listen to push or hold commands, they tend to do their own thing.
+ - added flag to copy player's clothes for squad setup in Configuration Manager
+ - extended the distance for which bot decides to search for a shooting spot during combat (Default tactic only)
+ - removed fence level settings that originally was used to force commands to work on bots (prior to version 3.x.x)
 
 ==================================================================================
 REVISIT:
  - fix looting animation for loot on the ground
  - error in LookSensor
+ - enemy marker when zooming, seems deep calculations must be made against the camera optics
 
 FUTURE IDEAS:
- - BirEye auto mark enemies as he sees them (enhanced Marskman)
- - goons should be locked behind some flag and once you play with them and able to end a raid with all 3 alive, 3 new tactis should unlock:
+ - BirEye auto marks enemies as he sees them (enhanced Marskman)
+ - goons should be locked behind some flag and once you play with them and are able to end a raid with all 3 alive, 3 new tactis should unlock:
  Enhanced Marksman, Assaulter and Supporter
  - ability to send commands individually to followers
- - abilit to add squad member using + sign and a special UI screen for dealing with the follower

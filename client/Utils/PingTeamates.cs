@@ -303,7 +303,21 @@ namespace friendlyPMC.Utils
                     }
 
 
-                    Vector3 screenPos = Camera.main.WorldToScreenPoint(bt.EnemyPos.Value);
+                    Vector3 screenPos;
+
+                    // take optics into consideration when triggering enemy location report
+                    if(
+                        CameraClass.Instance.OpticCameraManager.CurrentOpticSight != null && 
+                        CameraClass.Instance.OpticCameraManager.Camera != null
+                    )
+                    {
+                        return;
+
+                    }
+                    else 
+                    {
+                        screenPos = Camera.main.WorldToScreenPoint(bt.EnemyPos.Value);
+                    }
 
                     if (screenPos.z > 0)
                     {

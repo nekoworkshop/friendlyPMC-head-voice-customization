@@ -71,7 +71,7 @@ class friendlyPMC {
         ],
 		//prettier-ignore
 		"returnItemsDeath" : [
-            "Don't worry boss, we managed to get out.\n I have your things right here.",
+            "Don't worry boss, we managed to get out.\n I have what you gave me right here. I could not get your equipment though, the jackals where already on it.",
             "We where able to get out of there. Here is everything you gave me. I hope your stuff is insured, that I could not get.",
         ],
 		//prettier-ignore
@@ -81,12 +81,16 @@ class friendlyPMC {
         ],
 		//prettier-ignore
 		friendlyEscaped: [
-            "Glad we made it.\nThanks for letting me tag along. ",
+            "Glad we made it.\nThanks for letting me tag along.",
             "Whew, glad I found you.\nI didn't know if I was going to make it. Thanks!"
         ],
 		//prettier-ignore
 		allyBossEscaped : [
-            "Nice run!\n You did good rookie, you did good",
+            "Nice run!\n You did good rookie, you did good.",
+            "Not bad, not bad at all. Let's dot it again sometime rookie.",
+            "You the man!\n... neah, you are right, I am the man. But you did ok too rookie.",
+            "Was there even a doubt? They never stood a chance.\nDrinks are on me boys, the rookie is paying!",
+            "Come on, come on, try to keep up will ya? We got rookie here doing site scenes."
         ],
 	};
 
@@ -290,16 +294,7 @@ class friendlyPMC {
 				new RouteAction("/client/game/bot/followergenerate", (url: string, info: IGenerateBotsRequestData, sessionID: string, output: string): any => {
 					const pmcProfile = profileHelper.getPmcProfile(sessionID);
 
-					const profiles = profileHelper.getProfiles();
-
-					let level = 0;
-					Object.keys(profiles).forEach(key => {
-						const profile = profiles[key];
-						let lvl = profile.characters.pmc.Info.Level;
-						if (lvl > level) {
-							level = lvl;
-						}
-					});
+					let level = pmcProfile.Info.Level;
 
 					const conditionPromises: IBotBase[] = [];
 
@@ -320,7 +315,7 @@ class friendlyPMC {
 
 						const preparedBotBase = botGenerator["getPreparedBotBase"](
 							botGenerationDetails.eventRole ?? botGenerationDetails.role, // Use eventRole if provided,
-							botGenerationDetails.side,
+							pmcProfile.Info.Side,
 							botGenerationDetails.botDifficulty
 						);
 
@@ -360,7 +355,7 @@ class friendlyPMC {
 		// same side hostile is being changed elsewhere - do this to avoid unwanted outcome
 		PMCBOT.chanceSameSideIsHostilePercent = -1;
 		// this is what actually makes bots follow you
-		for (let lvl in globals.config.FenceSettings.Levels) {
+		/* for (let lvl in globals.config.FenceSettings.Levels) {
 			globals.config.FenceSettings.Levels[lvl].BotFollowChance = 100;
 			globals.config.FenceSettings.Levels[lvl].ScavAttackSupport = true;
 			globals.config.FenceSettings.Levels[lvl].BotApplySilenceChance = 100;
@@ -370,7 +365,7 @@ class friendlyPMC {
 			globals.config.FenceSettings.Levels[lvl].BotStopChance = 100;
 			// stop spt* bosses from attacking you
 			globals.config.FenceSettings.Levels[lvl].HostileBosses = false;
-		}
+		} */
 
 		this.Bots = Bots;
 

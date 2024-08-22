@@ -102,6 +102,12 @@ namespace friendlyPMC
                 }
             },
             {
+                "extraPickups",  new Dictionary<string,string>{
+                    { "Name", "Maximum pickup followers"},
+                    { "Description", "Maximum followers the player can pickup during raid. This is in addition to the squad"}
+                }
+            },
+            {
                 "returnChanceDeath", new Dictionary<string,string>{
                     { "Name", "Squadmate return chance after death"},
                     { "Description", "Chance your followers will return the items you gave them should you die. This applies only to members you spawned with"}
@@ -112,6 +118,42 @@ namespace friendlyPMC
                     { "Name", "Use Squad setup"},
                     { "Description", "Use specific setup for your squad"}
                 }
+            },
+            {
+                "squadUniform", new Dictionary<string,string>{
+                    { "Name", "Squad player uniform"},
+                    { "Description", "Use player clothes for all squad members"}
+                }
+            },
+            {
+                "scanDistance", new Dictionary<string,string>{
+                    { "Name", "Maximum scan distance"},
+                    { "Description", "Maximum distance to pick up any visible enemy that the player is signaling when issuing 'Contact' phrase"}
+                }
+            },
+            {
+                "enemyRemember", new Dictionary<string,string>{
+                    { "Name", "Time to forget about enemy (in sec.)"},
+                    { "Description", "Maximum time a follower will remember an enemy. This is applied only at the begining of a raid"}
+                }
+            },
+            {
+                "heatlhMultiplier", new Dictionary<string,string>{
+                    { "Name", "Squad Health Multiplier"},
+                    { "Description", "Health multiplier for the followers you spawn with. This is applied per each body part. Does not apply to boss followers"}
+                }
+            },
+            {
+                "memberTactic", new Dictionary<string,string>{
+                    { "Name", "Squad Member {0} Tactic"},
+                    { "Description", "Set Squad member fight tactic. Default is a combination of Pusher and Holder. Pusher tries to push the enemy often. Holder will stay in place around the boss. Marksman will try to get a position from where he can shoot preferably from behind the player, at a distance and will not push even if ordered"}
+                }
+            },
+            {
+                "memberEquipment", new Dictionary<string,string>{
+                    { "Name", "Squad Member {0} Equipment"},
+                    { "Description", "Set Squad member equipment. You can choose between default (which is SPT random equipment), user's current equipment or user created presets (recommended if using a tactic different than default"}
+                }
             }
         };
 
@@ -120,6 +162,7 @@ namespace friendlyPMC
         public static ConfigEntry<int> extraPickups;
 
         public static ConfigEntry<bool> squadSetup;
+        public static ConfigEntry<bool> squadUniform;
 
         public static Dictionary<int, List<ConfigEntry<string>>> squadMembers = new Dictionary<int, List<ConfigEntry<string>>>();
 
@@ -325,13 +368,15 @@ namespace friendlyPMC
 
             squadSetup = Config.Bind((string)optionsLang["baseSettings"], "1.4  -  " + ((Dictionary<string, string>)optionsLang["squadSetup"])["Name"], false, new ConfigDescription(((Dictionary<string, string>)optionsLang["squadSetup"])["Description"]));
 
-            extraPickups = Config.Bind((string)optionsLang["baseSettings"], "2 Maximum pickup followers", 1, new ConfigDescription("Maximum followers the player can pickup during raid. This is in addition to the squad.", new AcceptableValueRange<int>(0, 30)));
+            squadUniform = Config.Bind((string)optionsLang["baseSettings"], "1.5  -  " + ((Dictionary<string, string>)optionsLang["squadUniform"])["Name"], false, new ConfigDescription(((Dictionary<string, string>)optionsLang["squadUniform"])["Description"]));
 
-            scanDistance = Config.Bind((string)optionsLang["miscSettings"], "1 Maximum scan distance", 140, new ConfigDescription("Maximum distance to pick up any visible enemy that the player is signaling when issuing 'Contact' phrase", new AcceptableValueRange<int>(50, 300)));
+            extraPickups = Config.Bind((string)optionsLang["baseSettings"], "2 " + ((Dictionary<string, string>)optionsLang["extraPickups"])["Name"], 1, new ConfigDescription(((Dictionary<string, string>)optionsLang["extraPickups"])["Description"], new AcceptableValueRange<int>(0, 30)));
 
-            enemyRemember = Config.Bind((string)optionsLang["miscSettings"], "2 Time to forget about enemy (in sec.)", 20, new ConfigDescription("Maximum time a follower will remember an enemy. This is applied only at the begining of a raid", new AcceptableValueRange<int>(5, 60)));
+            scanDistance = Config.Bind((string)optionsLang["miscSettings"], "1 " + ((Dictionary<string, string>)optionsLang["scanDistance"])["Name"], 140, new ConfigDescription(((Dictionary<string, string>)optionsLang["scanDistance"])["Description"], new AcceptableValueRange<int>(50, 300)));
 
-            heatlhMultiplier = Config.Bind((string)optionsLang["miscSettings"], "3 Squad Health Multiplier", 1f, new ConfigDescription("Health multiplier for the followers you spawn with. This is applied per each body part. Does not apply to boss followers.", new AcceptableValueRange<float>(1, 5)));
+            enemyRemember = Config.Bind((string)optionsLang["miscSettings"], "2 " + ((Dictionary<string, string>)optionsLang["enemyRemember"])["Name"], 20, new ConfigDescription(((Dictionary<string, string>)optionsLang["enemyRemember"])["Description"], new AcceptableValueRange<int>(5, 60)));
+
+            heatlhMultiplier = Config.Bind((string)optionsLang["miscSettings"], "3 " + ((Dictionary<string, string>)optionsLang["heatlhMultiplier"])["Name"], 1f, new ConfigDescription(((Dictionary<string, string>)optionsLang["heatlhMultiplier"])["Description"], new AcceptableValueRange<float>(1, 5)));
 
             statusSound = Config.Bind((string)optionsLang["miscSettings"], "4 " + ((Dictionary<string, string>)optionsLang["statusSound"])["Name"], 100, new ConfigDescription(((Dictionary<string, string>)optionsLang["statusSound"])["Description"], new AcceptableValueRange<int>(0, 100)));
 
@@ -351,8 +396,8 @@ namespace friendlyPMC
                 if (
                     args.ChangedSetting.Definition == squadSize.Definition ||
                     args.ChangedSetting.Definition == squadSetup.Definition ||
-                    args.ChangedSetting.Definition.Key.Contains("Squad size") ||
-                    args.ChangedSetting.Definition.Key.Contains("Squad setup")
+                    args.ChangedSetting.Definition.Key.Contains(((Dictionary<string, string>)optionsLang["squadSize"])["Name"]) ||
+                    args.ChangedSetting.Definition.Key.Contains(((Dictionary<string, string>)optionsLang["squadSetup"])["Name"])
                 )
                 {
                     RefreshManager().Forget();
@@ -373,10 +418,10 @@ namespace friendlyPMC
 
                     if (!squadMembers.ContainsKey(i))
                     {
-                        string key = "1.4.1  -    -  Squad Member " + (i + 1) + " Tactic";
+                        string key = "1.4.1  -    -  " + String.Format(((Dictionary<string, string>)optionsLang["memberTactic"])["Name"],i+1);
                         string value = "Default";
 
-                        string seckey = "1.4.1  -    -  Squad Member " + (i + 1) + " Equipment";
+                        string seckey = "1.4.1  -    -  " + String.Format(((Dictionary<string, string>)optionsLang["memberEquipment"])["Name"], i + 1);
                         string secvalue = "Default";
 
                         savedConfigValues.ExecuteForEach(saved =>
@@ -396,7 +441,7 @@ namespace friendlyPMC
                                 (string)optionsLang["miscSettings"],
                                 key,
                                 value,
-                                new ConfigDescription("Set Squad member fight tactic. Default is a combination of Pusher and Holder. Pusher tries to push the enemy often. Holder will stay in place around the boss. Marksman will try to get a position from where he can shoot preferably from behind the player, at a distance and will not push even if ordered.",
+                                new ConfigDescription(((Dictionary<string, string>)optionsLang["memberTactic"])["Description"],
                                     new AcceptableValueList<string>(new string[] {
                                         "Default",
                                         "Marksman",
@@ -468,7 +513,7 @@ namespace friendlyPMC
                 (string)optionsLang["miscSettings"],
                 name,
                 value,
-                new ConfigDescription("Set Squad member equipment. You can choose between default (which is SPT random equipment), user's current equipment or user created presets (recommended if using a tactic different than default.", new AcceptableValueList<string>(list))
+                new ConfigDescription(((Dictionary<string, string>)optionsLang["memberEquipment"])["Description"], new AcceptableValueList<string>(list))
              );
 
             return entry;
