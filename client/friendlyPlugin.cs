@@ -1,6 +1,5 @@
 ﻿using BepInEx;
 using BepInEx.Configuration;
-using ConfigurationManager;
 using Comfort.Common;
 using EFT;
 using EFT.UI;
@@ -13,16 +12,12 @@ using System.Collections.Generic;
 using UnityEngine;
 
 using Logger = friendlyPMC.Components.Logger;
-using System.Collections;
+
 using System.Threading.Tasks;
 using System.Linq;
 using System;
 using EFT.Builds;
-using static UnityEngine.EventSystems.EventTrigger;
-using static GClass1750;
-using System.Security.Policy;
 using BepInEx.Bootstrap;
-using System.Net.Sockets;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 
@@ -66,7 +61,7 @@ namespace friendlyPMC
         }
     }
 
-    [BepInPlugin("xyz.pit.companion", "friendlyPMC", "3.6.1")]
+    [BepInPlugin("xyz.pit.companion", "friendlyPMC", "3.6.3")]
     [BepInDependency("xyz.drakia.bigbrain")]
     [BepInDependency("xyz.drakia.waypoints")]
     [BepInDependency("com.Arys.UnityToolkit")]
@@ -438,7 +433,7 @@ namespace friendlyPMC
                         List<ConfigEntry<string>> configEntries = new List<ConfigEntry<string>>
                         {
                             Config.Bind(
-                                (string)optionsLang["miscSettings"],
+                                (string)optionsLang["baseSettings"],
                                 key,
                                 value,
                                 new ConfigDescription(((Dictionary<string, string>)optionsLang["memberTactic"])["Description"],
@@ -510,7 +505,7 @@ namespace friendlyPMC
             }
 
             ConfigEntry<string> entry = Config.Bind(
-                (string)optionsLang["miscSettings"],
+                (string)optionsLang["baseSettings"],
                 name,
                 value,
                 new ConfigDescription(((Dictionary<string, string>)optionsLang["memberEquipment"])["Description"], new AcceptableValueList<string>(list))
