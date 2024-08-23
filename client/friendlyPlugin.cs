@@ -61,7 +61,7 @@ namespace friendlyPMC
         }
     }
 
-    [BepInPlugin("xyz.pit.companion", "friendlyPMC", "3.6.3")]
+    [BepInPlugin("xyz.pit.companion", "friendlyPMC", "3.6.4")]
     [BepInDependency("xyz.drakia.bigbrain")]
     [BepInDependency("xyz.drakia.waypoints")]
     [BepInDependency("com.Arys.UnityToolkit")]
@@ -601,6 +601,11 @@ namespace friendlyPMC
                     configurationManager.BuildSettingList();
                 });
             } catch { }
+        }
+
+        public static string[] GetEquipOptions()
+        {
+            return Instance.equipPresets;
         }
     }
 }

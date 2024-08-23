@@ -6,11 +6,12 @@ using HarmonyLib;
 
 using System;
 using System.Collections.Generic;
-using System.Reflection;
 
 using UnityEngine;
 using EFT.InventoryLogic;
 using System.Linq;
+
+using BepInEx.Bootstrap;
 
 using GridClassEx = GClass2516;
 using GridCacheClass = GClass1401;
@@ -49,8 +50,8 @@ namespace friendlyPMC.Components
 
             settingModif = new GClass528(1.2f, 1.2f, 1f, 1f, 1f, 1f, 0.9f, 1f, 1f);
 
-            NpcMessage.AddNpc(bot,isSquad);
-            
+            NpcMessage.AddNpc(bot, isSquad);
+
         }
 
         public virtual void Init()
@@ -96,6 +97,22 @@ namespace friendlyPMC.Components
                 _bot.Memory.DeleteInfoAboutEnemy(_bot.Memory.GoalEnemy.Person);
             }
 
+            // remove looting brain, if present
+            if (Chainloader.PluginInfos.ContainsKey("me.skwizzy.lootingbots"))
+            {
+                Type lootingBrain = Type.GetType("LootingBots.Patch.Components.LootingBrain, LootingBrain");
+
+                if (lootingBrain != null)
+                {
+                    Components.Logger.LogInfo("LootingBrain detected");
+                    if (_bot.GetPlayer.TryGetComponent(lootingBrain, out Component component))
+                    {
+                        Components.Logger.LogInfo("LootingBrain removed");
+                        UnityEngine.Object.Destroy(component);
+                    }
+                }
+            }
+
             // deactivate old brain
             if (baseBrain != null && baseBrain.CurLayerInfo != null && baseBrain.CurLayerInfo.IsActive)
             {
@@ -121,13 +138,11 @@ namespace friendlyPMC.Components
             _bot.BotTalk.SetSilence(0f);
             // force bot to turn off light
             if (_bot.BotLight != null && _bot.BotLight.IsEnable) _bot.BotLight.TurnOff(false, true);
-            //_bot.NightVision.H
             // make bot follower of player
             _player.AddFollower(_bot);
             // activate new following patrol mode
             try
             {
-
                 var followerAIBase = AccessTools.Field(typeof(PatrolDataFollower), "followerAIBase").GetValue(_bot.BotFollower.PatrolDataFollower) as GClass480;
 
                 if (followerAIBase != null)
@@ -523,7 +538,7 @@ namespace friendlyPMC.Components
 
             try
             {
-                
+
                 NpcMessage.RemoveNpc(_bot.ProfileId);
 
                 _bot.BotFollower.PatrolDataFollower.Dispose();

@@ -21,6 +21,8 @@ using System.Linq;
 using IProfileData = GClass592;
 using ProfileEndPoint = ProfileEndpointFactoryAbstractClass;
 using BotCreator = GClass814;
+using static HBAO_Core;
+using System.Security.Cryptography;
 
 
 namespace friendlyPMC.Patches
@@ -188,7 +190,8 @@ namespace friendlyPMC.Patches
 
         private async UniTask<Profile> GenerateFollowerProfile(
             BotCreator botCreator,
-            WaveInfo[] source)
+            WaveInfo[] source
+        )
         {
 
             var botPresets = AccessTools.Field(typeof(BotCreator), "ginterface18_0").GetValue(botCreator) as BotsPresets;
@@ -197,10 +200,14 @@ namespace friendlyPMC.Patches
 
             List<WaveInfo> limit = botPresets.method_1(source.ToList(), out var list3); ;
 
+
             var result = await profileEndpoint.method_3<Profile[]>(new LegacyParamsStruct
             {
                     Url = gclass1200_0.Main + "/client/game/bot/followergenerate",
-                    Params = new Class17<List<WaveInfo>>(limit),
+                    Params = new Dictionary<string, object>
+                    {
+                        { "Info",  new Class17<List<WaveInfo>>(limit) }
+                    },
                     Retries = new byte?(LegacyParamsStruct.DefaultRetries)
             });
 
@@ -540,7 +547,7 @@ namespace friendlyPMC.Patches
                 var pr = await GenerateFollowerProfile(botCreator, botData.PrepareToLoadBackend(1));
                 botCreationData.AddProfile(pr);
                 // math player's clothes if flag is turned on
-                if (friendlyPMC.squadUniform.Value)
+                if (friendlyPMC.squadUniform.Value && side != EPlayerSide.Savage)
                 {
                     pr.Customization[EBodyModelPart.Body] = playerProfile.Customization[EBodyModelPart.Body];
                     pr.Customization[EBodyModelPart.Feet] = playerProfile.Customization[EBodyModelPart.Feet];
@@ -550,14 +557,6 @@ namespace friendlyPMC.Patches
 
             BotCreationDataClass bot = botCreationData; // await BotCreationDataClass.Create(botData, botCreator, memberCount, botSpawnerClass);
 
-            /*for (int i = 0; i < bot.Profiles.Count; i++)
-            {
-                Profile fpr = botCreationData.Profiles[i];
-                Profile profile = bot.Profiles[i];
-
-                profile.Skills.ApplyChanges(fpr.Skills);
-                profile.Info.Settings.Experience = fpr.Info.Settings.Experience;
-            }*/
 
             List<DependencyGraph<IEasyBundle>.GClass3415> bundleTokens = new List<DependencyGraph<IEasyBundle>.GClass3415>();
             Dictionary<string,EquipmentClass> profileEquipment = new Dictionary<string,EquipmentClass>();
@@ -575,6 +574,7 @@ namespace friendlyPMC.Patches
 
                 Dictionary<string,int> usedPresets = new Dictionary<string,int>();
                 List<string> bundleJobs = new List<string>();
+
                 // change bot equipment based on preferences
                 try
                 {
@@ -592,14 +592,32 @@ namespace friendlyPMC.Patches
 
                                     if (eq == "Player Equipment")
                                     {
-                                        profile.Inventory.Equipment = playerProfile.Inventory.Equipment.CloneItem(null);
+                                        EquipmentClass equipClone = playerProfile.Inventory.Equipment.CloneItem(null);
+
+                                        foreach (EquipmentSlot slotType in Enum.GetValues(typeof(EquipmentSlot)))
+                                        {
+                                            if (slotType == EquipmentSlot.SecuredContainer) continue;
+
+                                            Slot cloneSlot = equipClone.GetSlot(slotType);
+                                            Item contained = cloneSlot.ContainedItem;
+
+                                            Slot botSlot = profile.Inventory.Equipment.GetSlot(slotType);
+
+                                            botSlot.RemoveItem();
+
+                                            if (contained != null)
+                                            {
+                                                contained.CurrentAddress = null;
+                                                botSlot.AddWithoutRestrictions(contained);
+                                            }
+                                        }
+
                                         profile.Inventory.Equipment.GetSlot(EquipmentSlot.SecuredContainer).ChangeContainedItemDirectly(secureContainer);
                                         profile.Inventory.Equipment.GetSlot(EquipmentSlot.SecuredContainer).ApplyContainedItem();
-
                                     }
                                     else
                                     {
-                                        secureContainers.Add(profile.Id,secureContainer.CloneItem());
+                                        secureContainers.Add(profile.Id, secureContainer.CloneItem());
 
                                         foreach (var preset in presets)
                                         {
@@ -671,10 +689,8 @@ namespace friendlyPMC.Patches
                     {
                         if (profile != null)
                         {
-                            if(profileEquipment.ContainsKey(profile.Id))
+                            if (profileEquipment.ContainsKey(profile.Id))
                             {
-                                //profile.Inventory.Equipment = profileEquipment[profile.Id];
-
                                 foreach (EquipmentSlot slotType in Enum.GetValues(typeof(EquipmentSlot)))
                                 {
                                     Slot cloneSlot = profileEquipment[profile.Id].GetSlot(slotType);
@@ -698,7 +714,7 @@ namespace friendlyPMC.Patches
                                     secureContainers[profile.Id].CurrentAddress = null;
                                     secCon.AddWithoutRestrictions(secureContainers[profile.Id]);
                                 }
-                                
+
                             }
                         }
                     });

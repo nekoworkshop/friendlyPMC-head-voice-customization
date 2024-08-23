@@ -45,6 +45,10 @@ import { MessageType } from "@spt/models/enums/MessageType";
 import { ProfileHelper } from "@spt/helpers/ProfileHelper";
 import { IGenerateBotsRequestData } from "@spt/models/eft/bot/IGenerateBotsRequestData";
 import { LocaleService } from "@spt/services/LocaleService";
+import { EquipmentSlots } from "@spt/models/enums/EquipmentSlots";
+import { Item } from "@spt/models/eft/common/tables/IItem";
+
+import { BuildController } from "@spt/controllers/BuildController";
 
 class friendlyPMC {
 	config = {
@@ -199,10 +203,12 @@ class friendlyPMC {
 		const staticRouterModService = container.resolve<StaticRouterModService>("StaticRouterModService");
 		const httpResponseUtil = container.resolve<HttpResponseUtil>("HttpResponseUtil");
 		const randomUtil = container.resolve<RandomUtil>("RandomUtil");
+		const hashUtil = container.resolve<HashUtil>("HashUtil");
 
 		const botGenerator = container.resolve<BotGenerator>("BotGenerator");
 		const botController = container.resolve<BotController>("BotController");
 		const profileHelper = container.resolve<ProfileHelper>("ProfileHelper");
+		const buildController = container.resolve<BuildController>("BuildController");
 
 		staticRouterModService.registerStaticRouter(
 			"friendlyPMC",
@@ -291,14 +297,16 @@ class friendlyPMC {
 					return httpResponseUtil.emptyResponse();
 				}),
 
-				new RouteAction("/client/game/bot/followergenerate", (url: string, info: IGenerateBotsRequestData, sessionID: string, output: string): any => {
+				new RouteAction("/client/game/bot/followergenerate", (url: string, info: { Info: IGenerateBotsRequestData; Preset?: string; PlayerUniform?: boolean }, sessionID: string, output: string): any => {
 					const pmcProfile = profileHelper.getPmcProfile(sessionID);
+
+					const userBuilds = buildController.getUserBuilds(sessionID);
 
 					let level = pmcProfile.Info.Level;
 
 					const conditionPromises: IBotBase[] = [];
 
-					for (const condition of info.conditions) {
+					for (const condition of info.Info.conditions) {
 						const botGenerationDetails = botController["getBotGenerationDetailsForWave"](
 							condition,
 							pmcProfile,
@@ -320,20 +328,81 @@ class friendlyPMC {
 						);
 
 						const botRole = botGenerationDetails.isPmc
-							? preparedBotBase.Info.Side // Use side to get usec.json or bear.json when bot will be PMC
+							? pmcProfile.Info.Side // Use side to get usec.json or bear.json when bot will be PMC
 							: botGenerationDetails.role;
 						const botJsonTemplateClone = botController["cloner"].clone(botController["botHelper"].getBotTemplate(botRole));
 
 						botGenerationDetails.botRelativeLevelDeltaMax = 5;
 						botGenerationDetails.botRelativeLevelDeltaMin = 5;
 
-						conditionPromises.push(botGenerator["generateBot"](sessionID, preparedBotBase, botJsonTemplateClone, botGenerationDetails));
-						conditionPromises.forEach(profile => {
-							profile.Info.Voice = this.config.englishBear ? `Bear_${randomUtil.getInt(1, 2)}_Eng` : `Bear_${randomUtil.getInt(1, 3)}`;
-						});
+						const bot = botGenerator["generateBot"](sessionID, preparedBotBase, botJsonTemplateClone, botGenerationDetails);
 
-						return httpResponseUtil.getBody(conditionPromises);
+						/* if (info.PlayerUniform) {
+							bot.Customization.Body = pmcProfile.Customization.Body;
+							bot.Customization.Feet = pmcProfile.Customization.Feet;
+						}
+
+						if (info.Preset != "default") {
+							let items: Item[];
+							let orgInvId: string;
+							if (info.Preset == "player") {
+								items = pmcProfile.Inventory.items;
+								orgInvId = pmcProfile.Inventory.equipment;
+							} else {
+								const preset = userBuilds.equipmentBuilds.find(x => x.Name == info.Preset);
+								items = preset.Items;
+								orgInvId = preset.Root;
+							}
+
+							let secContainer: Item;
+							let equipContainer;
+							bot.Inventory.items.forEach(it => {
+								if (it.slotId == EquipmentSlots.SECURED_CONTAINER) {
+									secContainer = it;
+								} else if (it._id == bot.Inventory.equipment) {
+									equipContainer = it;
+								}
+							});
+
+							bot.Inventory.items = [equipContainer, secContainer];
+
+							let itemsIds: { [key: string]: string } = {};
+
+							items.forEach(it => {
+								if (it._id == orgInvId || it.parentId != orgInvId) return;
+								if (it.slotId == EquipmentSlots.SECURED_CONTAINER || it.parentId == items.find(i => i.slotId == EquipmentSlots.SECURED_CONTAINER)?._id) return;
+
+								for (const key of Object.keys(EquipmentSlots)) {
+									if (it.slotId == EquipmentSlots[key]) {
+										it.parentId = bot.Inventory.equipment;
+									}
+								}
+								const id = hashUtil.generate();
+
+								itemsIds[it._id] = id;
+
+								it._id = id;
+
+								if (itemsIds[it.parentId]) {
+									it.parentId = itemsIds[it.parentId];
+								}
+
+								bot.Inventory.items.push(it);
+							});
+						} */
+
+						conditionPromises.push(bot);
+
+						if (pmcProfile.Info.Side.toLowerCase() == "bear") {
+							conditionPromises.forEach(profile => {
+								profile.Info.Voice = this.config.englishBear ? `Bear_${randomUtil.getInt(1, 2)}_Eng` : `Bear_${randomUtil.getInt(1, 3)}`;
+							});
+						}
 					}
+
+					const res = httpResponseUtil.getBody(conditionPromises);
+
+					return res;
 				}),
 			],
 			"custom-static-friendly-pmc"
@@ -354,18 +423,6 @@ class friendlyPMC {
 
 		// same side hostile is being changed elsewhere - do this to avoid unwanted outcome
 		PMCBOT.chanceSameSideIsHostilePercent = -1;
-		// this is what actually makes bots follow you
-		/* for (let lvl in globals.config.FenceSettings.Levels) {
-			globals.config.FenceSettings.Levels[lvl].BotFollowChance = 100;
-			globals.config.FenceSettings.Levels[lvl].ScavAttackSupport = true;
-			globals.config.FenceSettings.Levels[lvl].BotApplySilenceChance = 100;
-			globals.config.FenceSettings.Levels[lvl].BotGetInCoverChance = 100;
-			globals.config.FenceSettings.Levels[lvl].BotHelpChance = 100;
-			globals.config.FenceSettings.Levels[lvl].BotSpreadoutChance = 100;
-			globals.config.FenceSettings.Levels[lvl].BotStopChance = 100;
-			// stop spt* bosses from attacking you
-			globals.config.FenceSettings.Levels[lvl].HostileBosses = false;
-		} */
 
 		this.Bots = Bots;
 

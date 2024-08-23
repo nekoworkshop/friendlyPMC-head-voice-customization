@@ -1,8 +1,7 @@
 
---- ==== >=3.6.2 ==== ---:
- - #testing - improve the assist tactic for followers
- - x - followers that get picked up during raid should have "assist" tactic
- - #testing - improve enemy.Search action
+--- ==== >=3.6.4 ==== ---:
+ - x - fix using bear voices for usecs
+ - x - disable looting bots brain for followers
 
 --- ==== >=3.6.3 < 3.7 ==== ---:
  - update getBack request to make bots cover boss at a distance during combat
@@ -18,11 +17,11 @@
 - make Knight fight tactic unique (Assaulter)
 
 ==================================================================================
-RELEASE NOTES (3.6.2):
- - followers picked up in raid will now have "assist" tactic. In assist mode, followers do not listen to push or hold commands, they tend to do their own thing.
- - added flag to copy player's clothes for squad setup in Configuration Manager
- - extended the distance for which bot decides to search for a shooting spot during combat (Default tactic only)
- - removed fence level settings that originally was used to force commands to work on bots (prior to version 3.x.x)
+RELEASE NOTES (3.6.4):
+ - fixed using bear voices for usecs when englishBear is disabled
+ - ensure looting bots brain is disabled when a bot becomes a follower
+ - enforce followers to have the same side as the player on spawn
+ - refactor the code that deals with followers using player equipment in order to address some errors
 
 ==================================================================================
 REVISIT:
