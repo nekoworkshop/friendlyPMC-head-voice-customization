@@ -141,7 +141,7 @@ namespace friendlyPMC.Utils
                 float currentFOV = Camera.main.fieldOfView;
                 fovFactor = Camera.main.fieldOfView / currentFOV;
                 botMap.ForEach(DrawBotGUI);
-                botMap.ForEach(DrawEnemyMarkerGUI);
+                if(friendlyPMC.enemyMarker.Value) botMap.ForEach(DrawEnemyMarkerGUI);
             }
 
             //guiUpdate = false;

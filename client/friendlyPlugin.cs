@@ -85,6 +85,12 @@ namespace friendlyPMC
                 }
             },
             {
+                "enemyMarker" , new Dictionary<string,string>{
+                    { "Name", "Enemy Marker"},
+                    { "Description", "Show enemy position when reporting status. If disabled, the enemy marker sound will also be disabled."}
+                }
+            },
+            {
                 "squadSpawn", new Dictionary<string,string>{
                     { "Name", "Squad Spawn"},
                     { "Description", "Set the volume of the report status sound"}
@@ -170,6 +176,7 @@ namespace friendlyPMC
         public static ConfigEntry<int> returnChanceDeath;
 
         public static ConfigEntry<int> statusSound;
+        public static ConfigEntry<bool> enemyMarker;
 
         public static ConfigEntry<bool> knightSpawn;
         public static ConfigEntry<bool> bigPipeSpawn;
@@ -374,6 +381,7 @@ namespace friendlyPMC
             heatlhMultiplier = Config.Bind((string)optionsLang["miscSettings"], "3 " + ((Dictionary<string, string>)optionsLang["heatlhMultiplier"])["Name"], 1f, new ConfigDescription(((Dictionary<string, string>)optionsLang["heatlhMultiplier"])["Description"], new AcceptableValueRange<float>(1, 5)));
 
             statusSound = Config.Bind((string)optionsLang["miscSettings"], "4 " + ((Dictionary<string, string>)optionsLang["statusSound"])["Name"], 100, new ConfigDescription(((Dictionary<string, string>)optionsLang["statusSound"])["Description"], new AcceptableValueRange<int>(0, 100)));
+            enemyMarker = Config.Bind((string)optionsLang["miscSettings"], "5 " + ((Dictionary<string, string>)optionsLang["enemyMarker"])["Name"], true, new ConfigDescription(((Dictionary<string, string>)optionsLang["enemyMarker"])["Description"]));
 
             knightSpawn = Config.Bind((string)optionsLang["testSettings"], "1 Spawn with The Goons", false, new ConfigDescription("Experimental: Spawn with the goons squad. This works in combination with your own squad. Take note that a boss and his followers do not accept the same commands as your squad"));
 

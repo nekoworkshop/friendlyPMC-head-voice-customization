@@ -19,9 +19,10 @@
 ==================================================================================
 RELEASE NOTES (3.6.4):
  - fixed using bear voices for usecs when englishBear is disabled
- - ensure looting bots brain is disabled when a bot becomes a follower
+ - ensure looting bots brain, if present, is disabled when a bot becomes a follower
  - enforce followers to have the same side as the player on spawn
  - refactor the code that deals with followers using player equipment in order to address some errors
+ - added flag to turn of enemy marker when reporting status
 
 ==================================================================================
 REVISIT:
