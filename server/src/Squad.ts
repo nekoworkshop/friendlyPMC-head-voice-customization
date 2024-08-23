@@ -458,11 +458,13 @@ class friendlyPMC {
 		}
 
 		if (this.config.englishBear) {
+			this.Logger.logWithColor("friendlyPMC: Making all Bears speak English", LogTextColor.BLUE);
 			tables.bots.types["bear"].appearance.voice = {
 				Bear_1_Eng: 1,
 				Bear_2_Eng: 1,
 			};
 		} else {
+			this.Logger.logWithColor("friendlyPMC: Making all Bears speak Russian", LogTextColor.BLUE);
 			tables.bots.types["bear"].appearance.voice = {
 				Bear_1: 1,
 				Bear_2: 1,
@@ -532,8 +534,6 @@ class friendlyPMC {
 			});
 
 			if (!is_hostile) {
-				// do these do anything?
-
 				if (pmcType == "bear" || pmcType == "sptbear" || pmcType == "pmcbear") {
 					clearWrongEnemy(diff.Mind, "sptBear");
 					clearWrongEnemy(diff.Mind, "bear");

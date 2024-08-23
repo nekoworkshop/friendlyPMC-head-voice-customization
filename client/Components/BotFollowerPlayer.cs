@@ -100,7 +100,7 @@ namespace friendlyPMC.Components
             // remove looting brain, if present
             if (Chainloader.PluginInfos.ContainsKey("me.skwizzy.lootingbots"))
             {
-                Type lootingBrain = Type.GetType("LootingBots.Patch.Components.LootingBrain, LootingBrain");
+                Type lootingBrain = Type.GetType("LootingBots.Patch.Components.LootingBrain, LootingBots");
 
                 if (lootingBrain != null)
                 {
