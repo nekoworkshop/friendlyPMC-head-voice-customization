@@ -61,7 +61,7 @@ namespace friendlyPMC
         }
     }
 
-    [BepInPlugin("xyz.pit.companion", "friendlyPMC", "3.6.4")]
+    [BepInPlugin("xyz.pit.companion", "friendlyPMC", "3.6.5")]
     [BepInDependency("xyz.drakia.bigbrain")]
     [BepInDependency("xyz.drakia.waypoints")]
     [BepInDependency("com.Arys.UnityToolkit")]
@@ -245,7 +245,7 @@ namespace friendlyPMC
             var harmony = new Harmony("xyz.pit.companion");
 
             harmony.PatchAll(typeof(LocalGameVmethod4Patch).Assembly);
-
+            harmony.PatchAll(typeof(LocalGameCtorPatch).Assembly);
             harmony.PatchAll(typeof(GoalEnemyTracePatch).Assembly);
 
             ConsoleScreen.Processor.RegisterCommand("followerstome", delegate ()
@@ -292,7 +292,7 @@ namespace friendlyPMC
             harmony.PatchAll(typeof(ConfigurationManagerPatch).Assembly);
             
             // patch sain in regards to Squad 
-            SAINPatch.PatchSAINIfInstalled();
+            SAINPatch.PatchSAINIfInstalled(harmony);
             // some error catchers here - they do not seem related to this mod
             new GClass974Patch().Enable();
 

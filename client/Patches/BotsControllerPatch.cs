@@ -178,14 +178,62 @@ namespace friendlyPMC.Patches
 
         public async UniTask ActivateBotFollower(BotCreator botCreator, Profile profile, GClass590 position, BotZone zone,bool shallBeGroup, Func<BotOwner, BotZone, BotsGroup> GroupAction, Action<BotOwner> OnActivate,CancellationToken token)
         {
-            await botCreator.ActivateBot(
-                profile,
-                position,
-                zone, shallBeGroup,
-                GroupAction,
-                OnActivate,
-                token
-            );
+            
+            LocalGame game = LocalGameCtorPatch.Instance;
+            Type fikaType = Type.GetType("Fika.Core.Coop.GameMode.CoopGame, Fika.Core");
+
+            if (game != null  && fikaType == null) 
+            {
+
+                BotSpawner botSpawnerClass = Controller.BotSpawner;
+
+                IBotGame botGame = AccessTools.Field(typeof(BotSpawner), "_game").GetValue(botSpawnerClass) as IBotGame;
+
+                Dictionary<string, Player> dictionary_2 = null;
+
+                dictionary_2 = AccessTools.Field(typeof(LocalGame), "dictionary_2").GetValue(game) as Dictionary<string, Player>;
+
+                // recreation of ActivateBot from GClass814
+                GClass814.Class509 @class = new GClass814.Class509();
+                @class.gclass814_0 = botCreator;
+                @class.zone = zone;
+
+                @class.callback = OnActivate;
+
+                @class.groupAction = GroupAction;
+
+
+                GClass590 bornInfo = position;
+                // this is part of method_17 from LocalGame
+                int playerId = game.method_12();
+                profile.SetSpawnedInSession(profile.Info.Side == EPlayerSide.Savage);
+
+                LocalPlayer localPlayer = await LocalPlayer.Create(playerId, bornInfo.position, Quaternion.identity, "Player", "", EPointOfView.ThirdPerson, profile, true, game.UpdateQueue, Player.EUpdateMode.Auto, Player.EUpdateMode.Auto, BackendConfigAbstractClass.Config.CharacterController.BotPlayerMode, new Func<float>(LocalGame.Class1394.class1394_0.method_4), new Func<float>(LocalGame.Class1394.class1394_0.method_5), new GClass1800(), GClass1457.Default, null, null, false);
+                localPlayer.Location = game.Location_0.Id;
+
+                dictionary_2.Add(localPlayer.ProfileId, localPlayer);
+
+                // method_2 of GClass814
+                AICorePoint corePoint = Controller.CoversData.AICorePointsHolder.GetCorePoint(bornInfo.CorePointId);
+                BotOwner botOwner = BotOwner.Create(localPlayer, null, botGame.GameDateTime, Controller, true, corePoint);
+                botCreator.method_4(botOwner.GetPlayer);
+                botCreator.method_5(botOwner, false);
+                botOwner.GetComponentsInChildren<Collider>();
+                botOwner.GetPlayer.CharacterController.isEnabled = false;
+
+                @class.method_0(botOwner);
+            } 
+            else 
+            {
+                await botCreator.ActivateBot( 
+                    profile,
+                    position,
+                    zone, shallBeGroup,
+                    GroupAction,
+                    OnActivate,
+                    token
+                );
+            }
         }
 
         private async UniTask<Profile> GenerateFollowerProfile(
@@ -924,6 +972,16 @@ namespace friendlyPMC.Patches
 
         }
     }
+    
+    [HarmonyPatch(typeof(LocalGame),MethodType.Constructor)]
+    internal class LocalGameCtorPatch
+    {
+        public static LocalGame Instance;
+        public static void Postfix(LocalGame __instance)
+        {
+            Instance = __instance;
+        }
+    }
 
     [HarmonyPatch(typeof(BaseLocalGame<EftGamePlayerOwner>))]
     [HarmonyPatch("vmethod_4")]
@@ -1023,6 +1081,8 @@ namespace friendlyPMC.Patches
             AIDataContructPatch.playerAIData.Clear();
 
             LocalGameVmethod4Patch.squadSpawned = false;
+
+            LocalGameCtorPatch.Instance = null;
 
             Components.Logger.LogInfo("Raid Ended");
 
