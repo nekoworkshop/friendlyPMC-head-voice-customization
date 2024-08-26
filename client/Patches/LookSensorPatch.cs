@@ -47,7 +47,9 @@ namespace friendlyPMC.Patches
             }
             catch (Exception ex)
             {
-                Components.Logger.LogError(ex);
+                Components.Logger.LogInfo(ex.Message);
+                Components.Logger.LogInfo(ex.StackTrace);
+
                 __result = 0.5f;
             }
 

@@ -297,7 +297,7 @@ namespace friendlyPMC.Components.Tactics
         }
 
         public void OrderReset()
-        { 
+        {  
             ordersChanged = false;
         }
 
@@ -972,6 +972,9 @@ namespace friendlyPMC.Components.Tactics
         {
             if (!botOwner_0.Medecine.FirstAid.Have2Do && !botOwner_0.Medecine.SurgicalKit.HaveWork)
             {
+                if (botOwner_0.Medecine.FirstAid.Using) botOwner_0.Medecine.FirstAid.CancelCurrent();
+                else if (botOwner_0.Medecine.SurgicalKit.Using) botOwner_0.Medecine.SurgicalKit.CancelCurrent();
+                
                 return new AICoreActionEndStruct("EndHeal", true);
             }
             else if (heal_time + 20f < Time.time)

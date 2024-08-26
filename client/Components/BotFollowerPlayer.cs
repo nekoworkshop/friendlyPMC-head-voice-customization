@@ -109,7 +109,7 @@ namespace friendlyPMC.Components
                         UnityEngine.Object.Destroy(component);
                     }
                 }
-            }
+            } 
 
             // deactivate old brain
             if (baseBrain != null && baseBrain.CurLayerInfo != null && baseBrain.CurLayerInfo.IsActive)
@@ -464,7 +464,7 @@ namespace friendlyPMC.Components
 
             settings.FileSettings.Aiming.COEF_IF_MOVE = 2f;
             settings.FileSettings.Aiming.MAX_AIM_TIME = 1.5f;
-            settings.FileSettings.Aiming.DAMAGE_TO_DISCARD_AIM_0_100 = 100;
+            settings.FileSettings.Aiming.SHPERE_FRIENDY_FIRE_SIZE = 0.5f;
 
 
             settings.FileSettings.Look.CAN_USE_LIGHT = true;

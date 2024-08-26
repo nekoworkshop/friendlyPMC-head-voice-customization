@@ -21,7 +21,7 @@ namespace friendlyPMC.Patches
         private static Type squadType = null;
         private static Type SAINEnableClass = null;
 
-        public static void PatchSAINIfInstalled()
+        public static void PatchSAINIfInstalled(Harmony harmony)
         {
             if (IsSAINInstalled())
             {
@@ -37,10 +37,6 @@ namespace friendlyPMC.Patches
                 }
 
 
-                Harmony harmony = new Harmony("xyz.pit.companion.sain");
-
-                Components.Logger.LogInfo("Enable SAIN PATCH");
-
                 if (squadType != null)
                 {
                     // disable this for followers
@@ -50,6 +46,11 @@ namespace friendlyPMC.Patches
                 if(SAINEnableClass !=null)
                 {
                     harmony.Patch(AccessTools.Method(SAINEnableClass, "isBotExcluded"), new HarmonyMethod(typeof(SAINPatch), nameof(PatchisBotExcluded)));
+                }
+
+                if (squadType != null && SAINEnableClass != null)
+                {
+                    Components.Logger.LogInfo("Enabled SAIN PATCH");
                 }
             }
         }
