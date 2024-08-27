@@ -75,6 +75,8 @@ namespace friendlyPMC.Components.Tactics
 
         private GClass552.Class260 _damageTimer;
 
+        public string coverType = "close";
+
         private bool ordersChanged = false;
 
         public bool OrderHasChangedRecently
@@ -266,9 +268,9 @@ namespace friendlyPMC.Components.Tactics
         {
             return Utils.Utils.GetBoss(botOwner_0);
         }
-        public bool ShallGoNearBoss(bool assist = false)
+        public bool ShallGoNearBoss()
         {
-            if (!HasBoss()) return false;
+            if (!HasBoss() || coverType != "close") return false;
 
             EnemyInfo goalEnemy = this.botOwner_0.Memory.GoalEnemy;
             float bossDist = Vector3.Distance(botOwner_0.Position, GetBoss().Position);
@@ -320,6 +322,12 @@ namespace friendlyPMC.Components.Tactics
 
                 return dangerIgnoreEquipResult;
             }
+        }
+
+
+        public void CoverType(string type)
+        {
+            coverType = type;
         }
 
         /** Find a shoot positionm that is closest to the enemy but at a minimum distance and maximum from the enemy **/
@@ -811,7 +819,10 @@ namespace friendlyPMC.Components.Tactics
 
             navpoint = null;
 
-            return new AICoreActionResultStruct<BotLogicDecision>((BotLogicDecision)CustomBotDecisions.CoverToCover, "coverBoss");
+            if(coverType == "close")
+                return new AICoreActionResultStruct<BotLogicDecision>((BotLogicDecision)CustomBotDecisions.CoverToCover, "coverBoss");
+            else 
+                return new AICoreActionResultStruct<BotLogicDecision>(HoldFor(GClass761.Random(2f, 5f)), "wait4it");
         }
 
         public AICoreActionEndStruct? ShallEndCurrentDecisionCommon(AICoreActionResultStruct<BotLogicDecision> curDecision)

@@ -14,11 +14,12 @@
 
 --- ==== 4.0.0 (out of beta) ==== ---:
 - add squad screen
-- update get back and cover me commands where get back makes bots no longer cover boss
+- x - update get back and cover me commands where get back makes bots no longer cover boss
 - add hold fire / fire commands
 
 ==================================================================================
 RELEASE NOTES (4.0.0):
+- updated get back and cover me commands where in addition to following at a distance, "get back" also makes followers no longer rush to player's aid. "Cover Me" resets this
 
 
 ==================================================================================

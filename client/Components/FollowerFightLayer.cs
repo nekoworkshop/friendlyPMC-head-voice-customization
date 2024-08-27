@@ -144,6 +144,11 @@ namespace friendlyPMC.Components
             }
         }
 
+
+        public void CoverType(string type)
+        {
+            commonLayer.CoverType(type);
+        }
         public override string Name()
         {
             if (holdTactic) tactic = "defend";
@@ -195,7 +200,7 @@ namespace friendlyPMC.Components
 
         public bool ShallGoNearBoss()
         {
-            return commonLayer.ShallGoNearBoss(allyTactic);
+            return commonLayer.ShallGoNearBoss();
         }
 
         public void OrdersChanged()
@@ -222,6 +227,11 @@ namespace friendlyPMC.Components
         public AICoreActionResultStruct<BotLogicDecision> DecideTactic()
         {
             Vector3 interestPosition = HasBoss() ? GetBoss().Position : botOwner_0.GetPlayer.Transform.position;
+
+            if(commonLayer.coverType == "far")
+            {
+                interestPosition = botOwner_0.GetPlayer.Transform.position;
+            }
 
             if (allyTactic)
             {
@@ -344,7 +354,7 @@ namespace friendlyPMC.Components
             if (!botOwner_0.Memory.HaveEnemy && !allyTactic)
             {
                 // Check if the boss is under attack
-                if (bossUnderAttack && (!botOwner_0.Memory.HaveEnemy || !botOwner_0.Memory.GoalEnemy.IsVisible))
+                if (bossUnderAttack && commonLayer.coverType == "close" && (!botOwner_0.Memory.HaveEnemy || !botOwner_0.Memory.GoalEnemy.IsVisible))
                 {
                     // - switch the bot's enemy to the one attacking the boss
                     var closestEnemy = GetBoss().ClosestEnemy();

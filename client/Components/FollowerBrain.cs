@@ -23,6 +23,25 @@ namespace friendlyPMC.Components
             }
         }
 
+        protected bool _needsProtection = true;
+
+        public bool needsProtection
+        {
+            get
+            {
+                return _needsProtection;
+            }
+
+            set
+            {
+                _needsProtection = value;
+                if (fightLayer != null)
+                {
+                    fightLayer.CoverType(value ? "close" : "far");
+                }
+            }
+        }
+
         public FollowerBrain(BotOwner owner, pitAIBossPlayer boss) : base(owner)
         {
             AddLayers();

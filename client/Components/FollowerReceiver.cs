@@ -573,22 +573,49 @@ namespace friendlyPMC.Components
             {
 
                 pitAIBossPlayer boss = BossPlayers.Instance.GetBossPlayer(requester.ProfileId);
-                // on cover me, make bot follow boss near
+                // on cover me
                 if (info.phrase == EPhraseTrigger.CoverMe)
                 {
+                    // - make bot follow boss near
                     FollowerPatrolInstances.SetNearPatrol(botOwner_0);
+                    // - cover boss when under attack
+                    (botOwner_0.Brain.BaseBrain as FollowerBrain).needsProtection = true;
+
+                    (botOwner_0.Brain.BaseBrain as FollowerBrain).BossOrdersChanged();
+
+                    Player alivePlayerByProfileID = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(requester.ProfileId);
+                    // - regroup to boss
+                    if (botOwner_0.BotRequestController.TryStopCurrent(alivePlayerByProfileID, true))
+                    {
+                        FollowerRegroup gclass = new FollowerRegroup(requester);
+
+                        if (botOwner_0.BotsGroup.RequestsController.TryAddRequest(gclass))
+                        {
+                            gclass.AddPossibleExecutors(botOwner_0);
+                            gclass.SetGroup(botOwner_0.BotsGroup.RequestsController);
+                            if (isClose && (notBusy || !botOwner_0.Memory.GoalEnemy.IsVisible))
+                            {
+                                botOwner_0.BotTalk.TrySay(EPhraseTrigger.Roger, false);
+                                botOwner_0.Gesture.TryGestus(EGesture.Good, false);
+                            }
+                        }
+                        return;
+                    }
+
                 }
-                // on get back make bot follow boss at a distance
+                // on get back 
                 else if (info.phrase == EPhraseTrigger.GetBack)
                 {
+                    // - make bot follow boss at a distance
                     FollowerPatrolInstances.SetFarPatrol(botOwner_0);
+                    // - do not cover boss when under attack
+                    (botOwner_0.Brain.BaseBrain as FollowerBrain).needsProtection = false;
 
                 }
                 // on regroup all shall come near the boss
                 else if (info.phrase == EPhraseTrigger.Regroup || (isFollowerBoss && info.phrase == EPhraseTrigger.FollowMe && !botOwner_0.Memory.HaveEnemy))
                 {
                     (botOwner_0.Brain.BaseBrain as FollowerBrain).BossOrdersChanged();
-
 
                     Player alivePlayerByProfileID = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(requester.ProfileId);
 

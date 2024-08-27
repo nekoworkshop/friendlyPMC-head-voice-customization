@@ -54,7 +54,7 @@ namespace friendlyPMC.Components.Tactics
 
         public bool ShallGoNearBoss()
         {
-            return commonLayer.ShallGoNearBoss(onlyAssist);
+            return commonLayer.ShallGoNearBoss();
         }
 
         public override void DecisionChanged(AICoreActionResultStruct<BotLogicDecision>? prevDecision, AICoreActionResultStruct<BotLogicDecision> nextDecision)
@@ -101,7 +101,7 @@ namespace friendlyPMC.Components.Tactics
             }
 
             // If the bot is not in cover, find the closest cover and move to it
-            if (commonLayer.HasBoss())
+            if (commonLayer.HasBoss() && commonLayer.coverType == "close")
             {
                 customNavigationPoint_0 = commonLayer.GetClosestCoverPointGroup(interestPosition, commonLayer.coverSearchRadius);
 
