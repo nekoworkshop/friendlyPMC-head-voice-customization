@@ -1,28 +1,25 @@
+-- == 3.6.5 == --
+- try to use old spawn if FIKA is not available, but need to see why GClass974 gives errors - #releaseNote
+- add extra checks for canceling healing
+- do a test again with realism in attempt to catch the healing animation bug - #releaseNote
 
---- ==== >=3.6.4 ==== ---:
- - x - fix using bear voices for usecs
- - x - disable looting bots brain for followers
-
---- ==== >=3.6.3 < 3.7 ==== ---:
- - update getBack request to make bots cover boss at a distance during combat
- - update coverMe request to reset cover boss distance
-
---- ==== 3.7 ==== ---:
-- add hold fire / fire commands
+-- === 3.7 === ---:
 - fix glitchy behavior of boss followers
 - goons send messages at the end of the raid
+- goons send join offer
 - add new tactic Supporter (an alternative version to Marskman that also allows for push order)
 - make BigPipe fight tactic unique (Assault Supporter) 
 - make BirdEye fight tactic more unique (Enhanced Marskman)
 - make Knight fight tactic unique (Assaulter)
 
+--- ==== 4.0.0 (out of beta) ==== ---:
+- add squad screen
+- update get back and cover me commands where get back makes bots no longer cover boss
+- add hold fire / fire commands
+
 ==================================================================================
-RELEASE NOTES (3.6.4):
- - fixed using bear voices for usecs when englishBear is disabled
- - ensure looting bots brain, if present, is disabled when a bot becomes a follower
- - enforce followers to have the same side as the player on spawn
- - refactor the code that deals with followers using player equipment in order to address some errors
- - added flag to turn of enemy marker when reporting status
+RELEASE NOTES (4.0.0):
+
 
 ==================================================================================
 REVISIT:
