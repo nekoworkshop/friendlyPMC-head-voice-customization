@@ -207,7 +207,13 @@ namespace friendlyPMC.Components
 
         public override AICoreActionEndStruct ShallEndCurrentDecision(AICoreActionResultStruct<BotLogicDecision> curDecision)
         {
-            if(curDecision.Action == BotLogicDecision.runToCover && curDecision.Reason == "runToHeal")
+            if (curDecision.Action == BotLogicDecision.heal
+            )
+            {
+                return EndHeal();
+            }
+
+            if (curDecision.Action == BotLogicDecision.runToCover && curDecision.Reason == "runToHeal")
             {
                 return new AICoreActionEndStruct("enemy.None", true);
             }

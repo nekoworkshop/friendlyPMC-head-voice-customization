@@ -52,6 +52,7 @@ namespace friendlyPMC.Components.Tactics
         private float coverTimer_2 = 0f;
 
         private float heal_time = 0f;
+        private float heal_block_time = 0f;
 
         private float dangerTimer = 0f;
         private float dangerIgnoreEquipTimer = 0f;
@@ -183,14 +184,14 @@ namespace friendlyPMC.Components.Tactics
             }
         }
 
-        private AICoreActionResultStruct<BotLogicDecision>? previousDecision = null;
+        private AICoreActionResultStruct<BotLogicDecision>? currDecision = null;
 
 
         public AICoreActionResultStruct<BotLogicDecision>? CurrentDecision
         {
             get
             {
-                return previousDecision;
+                return currDecision;
             }
         }
 
@@ -607,7 +608,7 @@ namespace friendlyPMC.Components.Tactics
             }
 
             // Check if the bot needs to heal
-            if (botOwner_0.Medecine.FirstAid.Have2Do || botOwner_0.Medecine.SurgicalKit.HaveWork)
+            if  (heal_block_time < Time.time && (botOwner_0.Medecine.FirstAid.Have2Do || botOwner_0.Medecine.SurgicalKit.HaveWork))
             {
                 float lastSeen = Time.time - botOwner_0.Memory.GoalEnemy.PersonalLastSeenTime;
                 if (!botOwner_0.Memory.GoalEnemy.IsVisible && lastSeen > 3f)
@@ -892,7 +893,7 @@ namespace friendlyPMC.Components.Tactics
 
         public override void DecisionChanged(AICoreActionResultStruct<BotLogicDecision>? prevDecision, AICoreActionResultStruct<BotLogicDecision> nextDecision)
         {
-            previousDecision = prevDecision;
+            currDecision = nextDecision;
             base.DecisionChanged(prevDecision, nextDecision);
         }
 
@@ -985,7 +986,9 @@ namespace friendlyPMC.Components.Tactics
             {
                 if (botOwner_0.Medecine.FirstAid.Using) botOwner_0.Medecine.FirstAid.CancelCurrent();
                 else if (botOwner_0.Medecine.SurgicalKit.Using) botOwner_0.Medecine.SurgicalKit.CancelCurrent();
-                
+
+                heal_block_time = Time.time + 5f;
+
                 return new AICoreActionEndStruct("EndHeal", true);
             }
             else if (heal_time + 20f < Time.time)
@@ -994,7 +997,9 @@ namespace friendlyPMC.Components.Tactics
                 else if (botOwner_0.Medecine.SurgicalKit.Using) botOwner_0.Medecine.SurgicalKit.CancelCurrent();
 
                 botOwner_0.AIData.Player.ActiveHealthController.RestoreFullHealth();
-
+                
+                heal_block_time = Time.time + 5f;
+                
                 return new AICoreActionEndStruct("EndHealTimer", true);
             }
 

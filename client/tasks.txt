@@ -1,7 +1,7 @@
 -- == 3.6.5 == --
-- try to use old spawn if FIKA is not available, but need to see why GClass974 gives errors - #releaseNote
-- add extra checks for canceling healing
-- do a test again with realism in attempt to catch the healing animation bug - #releaseNote
+- x - try to use old spawn if FIKA is not available, but need to see why GClass974 gives errors
+- x - add extra checks for canceling healing
+- make "Get Back" and "Cover Me" always say the same thing
 
 -- === 3.7 === ---:
 - fix glitchy behavior of boss followers
@@ -14,12 +14,12 @@
 
 --- ==== 4.0.0 (out of beta) ==== ---:
 - add squad screen
-- x - update get back and cover me commands where get back makes bots no longer cover boss
 - add hold fire / fire commands
 
 ==================================================================================
-RELEASE NOTES (4.0.0):
+RELEASE NOTES (3.6.5):
 - updated get back and cover me commands where in addition to following at a distance, "get back" also makes followers no longer rush to player's aid. "Cover Me" resets this
+- attempt to fix bot getting stuck in healing animation under certain circumnstances
 
 
 ==================================================================================

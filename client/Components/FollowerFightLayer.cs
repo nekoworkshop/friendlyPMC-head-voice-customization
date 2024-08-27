@@ -530,6 +530,12 @@ namespace friendlyPMC.Components
 
         public override AICoreActionEndStruct ShallEndCurrentDecision(AICoreActionResultStruct<BotLogicDecision> curDecision)
         {
+            if (curDecision.Action == BotLogicDecision.heal
+            )
+            {
+                return commonLayer.EndHeal();
+            }
+
             if (!botOwner_0.Memory.HaveEnemy)
             {
                 return aICoreActionEndStruct;

@@ -102,6 +102,8 @@ namespace friendlyPMC.Actions
                                 if (!_lastPosition.HasValue && botOwner_0.BotFollower.HaveBoss)
                                 {
                                     Vector3 bossPos = botOwner_0.BotFollower.BossToFollow.Position;
+                                    Vector3 botPos = botOwner_0.GetPlayer.Transform.position;
+                                    bool protectBoss = (botOwner_0.Brain.BaseBrain as FollowerBrain).needsProtection;
 
                                     _actionsQueue.Enqueue(() =>
                                     {
@@ -109,7 +111,7 @@ namespace friendlyPMC.Actions
                                         CustomNavigationPoint cover = Utils.Covers.GetClosestCoverPoint(
                                             botOwner_0.Id,
                                             botOwner_0.GetPlayer.Transform.position,
-                                            bossPos,
+                                            protectBoss ? bossPos : botPos,
                                             areaCovers,
                                             30f,
                                             5f,

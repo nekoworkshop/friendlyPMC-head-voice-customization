@@ -21,8 +21,6 @@ using System.Linq;
 using IProfileData = GClass592;
 using ProfileEndPoint = ProfileEndpointFactoryAbstractClass;
 using BotCreator = GClass814;
-using static HBAO_Core;
-using System.Security.Cryptography;
 
 
 namespace friendlyPMC.Patches
@@ -194,7 +192,7 @@ namespace friendlyPMC.Patches
                 dictionary_2 = AccessTools.Field(typeof(LocalGame), "dictionary_2").GetValue(game) as Dictionary<string, Player>;
 
                 // recreation of ActivateBot from GClass814
-                GClass814.Class509 @class = new GClass814.Class509();
+                BotCreator.Class509 @class = new BotCreator.Class509();
                 @class.gclass814_0 = botCreator;
                 @class.zone = zone;
 

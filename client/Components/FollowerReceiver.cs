@@ -16,10 +16,6 @@ namespace friendlyPMC.Components
     internal class FollowerReceiver : BotReceiver
     {
 
-        private static Player interactivePlayer = null;
-
-        private static float interactiveTime = 0f;
-
         private static float closestTime = 0f;
 
         private static BotOwner closestPlayer = null;
@@ -31,65 +27,57 @@ namespace friendlyPMC.Components
         }
 
 
-        private static bool IsInteractivePlayer(BotOwner bot, Vector3 requestPosition, Vector3 requestDirection)
+        private static bool IsRequesterLookingAt(BotOwner bot, Player requester)
         {
-
-            if (interactiveTime > Time.time)
-            {
-                if (interactivePlayer == null) return false;
-                return interactivePlayer.ProfileId == bot.ProfileId;
-            }
-
-            float sphereRadius = 20f / 2;
-            float sphereDistance = sphereRadius;
-
-            RaycastHit[] hits = new RaycastHit[40];
-
-            List<Player> players = new List<Player>();
-
-            int numHits = Physics.SphereCastNonAlloc(
-                    new Ray(requestPosition, requestDirection),
-                    sphereRadius,
-                    hits,
-                    sphereDistance,
-                     LayerMaskClass.PlayerMask
-                );
-
-            for (int i = 0; i < numHits; i++)
-            {
-                RaycastHit hit = hits[i];
-                if (hit.collider != null)
-                {
-                    var player = bot.ShootData.method_4(hit.collider);
-
-                    if (player != null && player.IsAI && player.HealthController.IsAlive)
-                    {
-                        players.Add(player);
-                    }
-                }
-            }
-
-            float dist = Mathf.Infinity;
-            Player closet = null;
-            foreach (var pl in players)
-            {
-                float range = (requestPosition - pl.Transform.position).sqrMagnitude;
-                if (range < dist)
-                {
-                    dist = range;
-                    closet = pl;
-                }
-            }
-
-            interactivePlayer = closet;
-            interactiveTime = Time.time + 0.5f;
-
-            if (closet == null) return false;
-
-            return interactivePlayer.ProfileId == bot.ProfileId;
+            return bot.IsEnemyLookingAtMe(requester);
         }
 
-        private static bool IsClosestBot(BotOwner bot, IPlayer requester, out FollowerGoCheck request)
+
+        private static bool IsClosestBotToBoss(BotOwner bot)
+        {
+            if (closestTime > Time.time)
+            {
+                if (closestPlayer == null) return false;
+                return closestPlayer.ProfileId == bot.ProfileId;
+            }
+
+            closestTime = Time.time + 0.5f;
+
+            BotOwner closest = null;
+            float dist = Mathf.Infinity;
+
+            var boss = bot.BotFollower.BossToFollow;
+            
+            if (boss == null) return false;
+
+            Vector3 bossPos = bot.BotFollower.BossToFollow.Player().Transform.position;
+
+            boss.Followers.ForEach(fl =>
+            {
+                if (fl != null)
+                {
+                    Vector3 pos = fl.GetPlayer.Transform.position;
+                    float fldist = (bossPos - pos).sqrMagnitude;
+                    if (fldist < dist)
+                    {
+                        closest = fl;
+                        dist = fldist;
+                    }
+                }
+
+            });
+
+            closestPlayer = closest;
+
+            if (closestPlayer.ProfileId == bot.ProfileId)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        private static bool IsClosestBotToCheck(BotOwner bot, IPlayer requester, out FollowerGoCheck request)
         {
             request = null;
 
@@ -260,6 +248,9 @@ namespace friendlyPMC.Components
                     }
                 }
             }
+
+            Player playerRequester = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(data.Player.ProfileId);
+
             // on gesture "stop" nearby bots will hold position
             if (gesture == EGesture.Stop)
             {
@@ -269,11 +260,9 @@ namespace friendlyPMC.Components
                     {
                         (botOwner_0.Brain.BaseBrain as FollowerBrain).BossOrdersChanged();
 
-                        Player alivePlayerByProfileID = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(data.Player.ProfileId);
-
-                        if (botOwner_0.BotRequestController.TryStopCurrent(alivePlayerByProfileID, false))
+                        if (botOwner_0.BotRequestController.TryStopCurrent(playerRequester, false))
                         {
-                            FollowerHold holdit = new FollowerHold(alivePlayerByProfileID);
+                            FollowerHold holdit = new FollowerHold(playerRequester);
 
                             if (botOwner_0.BotsGroup.RequestsController.TryAddRequest(holdit))
                             {
@@ -295,7 +284,7 @@ namespace friendlyPMC.Components
             {
                 if (isBossCommunicating)
                 {
-                    if (gestusDistance < maxGestusDistance && IsInteractivePlayer(botOwner_0, data.Player.Transform.position, data.Player.LookDirection))
+                    if (gestusDistance < maxGestusDistance && IsRequesterLookingAt(botOwner_0, playerRequester) && IsClosestBotToBoss(botOwner_0)) 
                     {
                         FollowerGoCheck gclass = new FollowerGoCheck(data.Player, BotRequestType.followMe);
                         if (
@@ -318,8 +307,8 @@ namespace friendlyPMC.Components
                 if (isBossCommunicating)
                 {
                     if (
-                        gestusDistance < maxGestusDistance && 
-                        IsInteractivePlayer(botOwner_0, data.Player.Transform.position, data.Player.LookDirection) && 
+                        gestusDistance < maxGestusDistance &&
+                        IsRequesterLookingAt(botOwner_0, playerRequester) && IsClosestBotToBoss(botOwner_0) && 
                         !botOwner_0.Memory.HaveEnemy
                         )
                     {
@@ -366,7 +355,7 @@ namespace friendlyPMC.Components
                             {
                                 FollowerGoCheck gclass;
                                 // - the closest bot shall move
-                                if (IsClosestBot(botOwner_0, data.Player, out gclass) && botOwner_0.BotsGroup.RequestsController.TryAddRequest(gclass))
+                                if (IsClosestBotToCheck(botOwner_0, data.Player, out gclass) && botOwner_0.BotsGroup.RequestsController.TryAddRequest(gclass))
                                 {
                                     gclass.AddPossibleExecutors(botOwner_0);
                                     gclass.SetGroup(botOwner_0.BotsGroup.RequestsController);
