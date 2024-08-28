@@ -587,21 +587,30 @@ namespace friendlyPMC.Patches
             AccessTools.Field(typeof(BotCreationDataClass), "iBotCreator").SetValue(botCreationData, botCreator);
 
             Profile playerProfile = player.Player().Profile;
+            
+            BotCreationDataClass bot;
 
-            for (int i = 0; i < memberCount; i++)
+            if (side != EPlayerSide.Savage)
             {
-                var pr = await GenerateFollowerProfile(botCreator, botData.PrepareToLoadBackend(1));
-                botCreationData.AddProfile(pr);
-                // math player's clothes if flag is turned on
-                if (friendlyPMC.squadUniform.Value && side != EPlayerSide.Savage)
+                for (int i = 0; i < memberCount; i++)
                 {
-                    pr.Customization[EBodyModelPart.Body] = playerProfile.Customization[EBodyModelPart.Body];
-                    pr.Customization[EBodyModelPart.Feet] = playerProfile.Customization[EBodyModelPart.Feet];
-                    pr.Customization[EBodyModelPart.Hands] = playerProfile.Customization[EBodyModelPart.Hands];
+                    var pr = await GenerateFollowerProfile(botCreator, botData.PrepareToLoadBackend(1));
+                    botCreationData.AddProfile(pr);
+                    // take player's clothes if flag is turned on
+                    if (friendlyPMC.squadUniform.Value)
+                    {
+                        pr.Customization[EBodyModelPart.Body] = playerProfile.Customization[EBodyModelPart.Body];
+                        pr.Customization[EBodyModelPart.Feet] = playerProfile.Customization[EBodyModelPart.Feet];
+                        pr.Customization[EBodyModelPart.Hands] = playerProfile.Customization[EBodyModelPart.Hands];
+                    }
                 }
-            }
 
-            BotCreationDataClass bot = botCreationData; // await BotCreationDataClass.Create(botData, botCreator, memberCount, botSpawnerClass);
+                bot = botCreationData;
+            }
+            else
+            {
+                bot = await BotCreationDataClass.Create(botData, botCreator, memberCount, botSpawnerClass);
+            }
 
 
             List<DependencyGraph<IEasyBundle>.GClass3415> bundleTokens = new List<DependencyGraph<IEasyBundle>.GClass3415>();

@@ -337,60 +337,6 @@ class friendlyPMC {
 
 						const bot = botGenerator["generateBot"](sessionID, preparedBotBase, botJsonTemplateClone, botGenerationDetails);
 
-						/* if (info.PlayerUniform) {
-							bot.Customization.Body = pmcProfile.Customization.Body;
-							bot.Customization.Feet = pmcProfile.Customization.Feet;
-						}
-
-						if (info.Preset != "default") {
-							let items: Item[];
-							let orgInvId: string;
-							if (info.Preset == "player") {
-								items = pmcProfile.Inventory.items;
-								orgInvId = pmcProfile.Inventory.equipment;
-							} else {
-								const preset = userBuilds.equipmentBuilds.find(x => x.Name == info.Preset);
-								items = preset.Items;
-								orgInvId = preset.Root;
-							}
-
-							let secContainer: Item;
-							let equipContainer;
-							bot.Inventory.items.forEach(it => {
-								if (it.slotId == EquipmentSlots.SECURED_CONTAINER) {
-									secContainer = it;
-								} else if (it._id == bot.Inventory.equipment) {
-									equipContainer = it;
-								}
-							});
-
-							bot.Inventory.items = [equipContainer, secContainer];
-
-							let itemsIds: { [key: string]: string } = {};
-
-							items.forEach(it => {
-								if (it._id == orgInvId || it.parentId != orgInvId) return;
-								if (it.slotId == EquipmentSlots.SECURED_CONTAINER || it.parentId == items.find(i => i.slotId == EquipmentSlots.SECURED_CONTAINER)?._id) return;
-
-								for (const key of Object.keys(EquipmentSlots)) {
-									if (it.slotId == EquipmentSlots[key]) {
-										it.parentId = bot.Inventory.equipment;
-									}
-								}
-								const id = hashUtil.generate();
-
-								itemsIds[it._id] = id;
-
-								it._id = id;
-
-								if (itemsIds[it.parentId]) {
-									it.parentId = itemsIds[it.parentId];
-								}
-
-								bot.Inventory.items.push(it);
-							});
-						} */
-
 						conditionPromises.push(bot);
 
 						if (pmcProfile.Info.Side.toLowerCase() == "bear") {

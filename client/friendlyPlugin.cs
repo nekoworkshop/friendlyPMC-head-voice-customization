@@ -240,13 +240,14 @@ namespace friendlyPMC
             new QuickPanelPatch().Enable();
             new GestureMenuPatch().Enable();
             new GestureMenuAvailablePhrasesPatch().Enable();
+            new PhraseSpeakerClassPatch().Enable();
             new EPhraseTriggerPatch().Enable();
 
             var harmony = new Harmony("xyz.pit.companion");
 
             harmony.PatchAll(typeof(LocalGameVmethod4Patch).Assembly);
             harmony.PatchAll(typeof(LocalGameCtorPatch).Assembly);
-            harmony.PatchAll(typeof(GoalEnemyTracePatch).Assembly);
+            //harmony.PatchAll(typeof(GoalEnemyTracePatch).Assembly);
 
             ConsoleScreen.Processor.RegisterCommand("followerstome", delegate ()
             {

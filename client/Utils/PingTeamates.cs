@@ -270,18 +270,27 @@ namespace friendlyPMC.Utils
 
             if (bt.Data.Memory.HaveEnemy)
             {
-                Vector3 enemyPosition = bt.Data.Memory.GoalEnemy.CurrPosition;
+                Vector3? enemyPosition;
+
+                // I have seen the game throwing error when getting enemy position
+                try
+                {
+                    enemyPosition = bt.Data.Memory.GoalEnemy.CurrPosition;
+                } catch {
+
+                    return;
+                }
 
                 Vector3 targetSpot = new Vector3(
-                    Mathf.Floor(enemyPosition.x / 25f) * 25f,
-                    Mathf.Floor(enemyPosition.y / 25f) * 25f,
-                    Mathf.Floor(enemyPosition.z / 25f) * 25f
+                    Mathf.Floor(enemyPosition.Value.x / 25f) * 25f,
+                    Mathf.Floor(enemyPosition.Value.y / 25f) * 25f,
+                    Mathf.Floor(enemyPosition.Value.z / 25f) * 25f
                 );
 
                 if (targetSpot != bt.EnemyZone)
                 {
                     bt.EnemyZone = targetSpot;
-                    bt.EnemyPos = enemyPosition + (Vector3.up * 1.6f);
+                    bt.EnemyPos = enemyPosition.Value + (Vector3.up * 1.6f);
                 }
 
                 Color marker = bt.Data.Memory.GoalEnemy.IsVisible ? Color.red : Color.yellow;
@@ -327,7 +336,7 @@ namespace friendlyPMC.Utils
                     if (!locationPing)
                     {
                         locationPing = true;
-                        float stereoPan = CalculateStereoPane(enemyPosition);
+                        float stereoPan = CalculateStereoPane(enemyPosition.Value);
                         radioSound.PlayLocationSound(stereoPan);
                     }
                 }

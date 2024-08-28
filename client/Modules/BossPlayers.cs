@@ -482,6 +482,11 @@ namespace friendlyPMC.Modules
             if (!Instance._botsGroup.Contains(group.Id)) Instance._botsGroup.Add(group.Id);
 
             player.bossGroup.AddAlly((Player)player.Player());
+
+            foreach (var enemy in player.GetEnemies())
+            {
+                player.bossGroup.AddEnemy(enemy, EBotEnemyCause.addPlayerToBoss);
+            }
         }
         public static bool IsBossGroup(int id)
         {

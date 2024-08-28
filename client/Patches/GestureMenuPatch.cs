@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 
 using System.Reflection;
-
+using EFT;
 
 namespace friendlyPMC.Patches
 {
@@ -59,6 +59,43 @@ namespace friendlyPMC.Patches
         {
             var hashSet_1 = (HashSet<EPhraseTrigger>)AccessTools.Field(typeof(GesturesMenu), "hashSet_1").GetValue(__instance);
             hashSet_1.Add((EPhraseTrigger)CustomPhrases.TeamStatus);
+        }
+    }
+
+    internal class PhraseSpeakerClassPatch : ModulePatch
+    {
+        protected override MethodBase GetTargetMethod()
+        {
+            return AccessTools.Method(typeof(PhraseSpeakerClass), "Init");
+        }
+        [PatchPostfix]
+        private static void PatchPostfix(PhraseSpeakerClass __instance, EPlayerSide side, int id, string playerVoice, bool registerInSpeakerManager)
+        {
+
+            if (__instance.SideTag == ETagStatus.Bear || __instance.SideTag == ETagStatus.Usec)
+            {
+                foreach (var item in __instance.PhrasesBanks)
+                {
+                    if(item.Key == EPhraseTrigger.GetBack)
+                    {
+                        item.Value.Clips = new TaggedClip[] {
+                            item.Value.Clips[2]
+                        };
+                    } 
+                    else if (item.Key == EPhraseTrigger.HoldPosition)
+                    {
+                        item.Value.Clips = new TaggedClip[] {
+                            item.Value.Clips[0]
+                        };
+                    }
+                    else if (item.Key == EPhraseTrigger.CoverMe)
+                    {
+                        item.Value.Clips = new TaggedClip[] {
+                            item.Value.Clips[1]
+                        };
+                    }
+                }
+            }
         }
     }
 

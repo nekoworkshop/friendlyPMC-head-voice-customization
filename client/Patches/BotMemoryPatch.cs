@@ -73,6 +73,32 @@ namespace friendlyPMC.Patches
 
             return true;
         }
+
+        [PatchPostfix]
+        private static void PatchPostFix(BotMemoryClass __instance, [NotNull] IPlayer enemy, BotSettingsClass groupInfo, bool onActivation)
+        {
+            // whoever makes the boss player an enemy, becomes the enemy of the group
+            if (enemy != null)
+            {
+                var botOwner_0 = AccessTools.Field(typeof(BotMemoryClass), "botOwner_0").GetValue(__instance) as BotOwner;
+                if(botOwner_0.EnemiesController.EnemyInfos.ContainsKey(enemy))
+                {
+                    var boss = BossPlayers.GetBoss(enemy.ProfileId);
+                    if (boss != null)
+                    {
+                        if (boss.Followers.Count > 0)
+                            foreach (var flw in boss.Followers)
+                            {
+                                var info = Utils.Enemy.MakeEnemy(flw, botOwner_0.GetPlayer);
+                            }
+                        else if (boss.bossGroup != null)
+                            boss.bossGroup.AddEnemy(botOwner_0, EBotEnemyCause.addPlayerToBoss);
+                        else 
+                            boss.AddEnemy(botOwner_0);
+                    }
+                }
+            }
+        }
     }
     // whoever makes the boss player an enemy, becomes the enemy of the group
     [HarmonyPatch(typeof(BotMemoryClass), "GoalEnemy", MethodType.Setter)]
@@ -99,7 +125,7 @@ namespace friendlyPMC.Patches
                     foreach (var flw in boss.Followers)
                     {
                         var info = Utils.Enemy.MakeEnemy(flw, botOwner_0.GetPlayer);
-                        if (!flw.Memory.HaveEnemy) flw.Memory.GoalEnemy = info;
+                        //if (!flw.Memory.HaveEnemy) flw.Memory.GoalEnemy = info;
                     }
                 }
             }

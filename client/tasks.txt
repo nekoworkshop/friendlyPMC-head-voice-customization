@@ -1,9 +1,11 @@
 -- == 3.6.5 == --
 - x - try to use old spawn if FIKA is not available, but need to see why GClass974 gives errors
 - x - add extra checks for canceling healing
-- make "Get Back" and "Cover Me" always say the same thing
+- x - make "Get Back" and "Cover Me" always say the same thing
 
 -- === 3.7 === ---:
+- scav followers can turn hostile if your shoot them
+- picked up followers can turn hostile if you shoot them
 - fix glitchy behavior of boss followers
 - goons send messages at the end of the raid
 - goons send join offer
@@ -18,9 +20,10 @@
 
 ==================================================================================
 RELEASE NOTES (3.6.5):
-- updated get back and cover me commands where in addition to following at a distance, "get back" also makes followers no longer rush to player's aid. "Cover Me" resets this
+- updated get back and cover me commands where in addition to following at a distance, "get back" also makes followers no longer prioritize player position and to rush to his aid. "Cover Me" resets this
 - attempt to fix bot getting stuck in healing animation under certain circumnstances
-
+- altered "get back", "cover me" and "hold position" voices to always say the same thing instead of going through different phrases in order to bring them more closer to what the commands do relative to the followers
+- scav followers and pmc pickedup followers can now turn hostile if you accidentally shoot them
 
 ==================================================================================
 REVISIT:

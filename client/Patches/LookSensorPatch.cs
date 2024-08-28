@@ -16,12 +16,13 @@ namespace friendlyPMC.Patches
         static bool Prefix(LookSensor __instance)
         {
             BotOwner botOwner = AccessTools.Field(typeof(LookSensor), "_botOwner").GetValue(__instance) as BotOwner;
+            // @TODO : figure out out why it triggers error for followers in some circumstances
             try
             {
                 __instance.UpdateLook();
             } catch(Exception ex) {
-                Components.Logger.LogError("AIPeriodicUpdate Error for " + botOwner.Profile.Nickname);
-                Components.Logger.LogError(ex);
+                Components.Logger.LogInfo("AIPeriodicUpdate Error for " + botOwner.Profile.Nickname);
+                Components.Logger.LogInfo(ex.StackTrace);
             }
 
             return false;
@@ -47,9 +48,8 @@ namespace friendlyPMC.Patches
             }
             catch (Exception ex)
             {
-                Components.Logger.LogInfo(ex.Message);
+                Components.Logger.LogInfo("GClass974 Error");
                 Components.Logger.LogInfo(ex.StackTrace);
-
                 __result = 0.5f;
             }
 
