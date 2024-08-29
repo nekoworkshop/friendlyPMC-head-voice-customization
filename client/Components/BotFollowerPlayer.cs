@@ -251,118 +251,7 @@ namespace friendlyPMC.Components
             Logger.LogInfo($"Bot {_bot.Profile.Nickname} is now a follower of {_player.Player().Profile.Nickname}");
         }
 
-
-        public InventoryControllerClass GetInventoryController()
-        {
-            return _bot.GetPlayer.InventoryControllerClass;
-        }
-
-        protected void AddExtraAmmo()
-        {
-
-            InventoryControllerClass inventory = GetInventoryController();
-            SearchableItemClass secureContainer;
-
-            try
-            {
-                secureContainer = (SearchableItemClass)inventory.Inventory.Equipment.GetSlot(EquipmentSlot.SecuredContainer).ContainedItem;
-            }
-            catch
-            {
-                Components.Logger.LogError("Cannot access secure container of bot, extra ammo will not be added");
-                return;
-            }
-
-            if (secureContainer == null)
-            {
-                Components.Logger.LogError("Bot has no secure container, cannot add extra ammo");
-                return;
-            }
-
-
-
-            StashGridClass stashGridClass = secureContainer.Grids.FirstOrDefault();
-
-            if (stashGridClass == null)
-            {
-                return;
-            }
-
-            Weapon weapon = _bot.AIData.Player.HandsController.Item as Weapon;
-
-            Item ammoToAdd =
-                    weapon.GetCurrentMagazine()?.FirstRealAmmo()
-                    ?? Singleton<ItemFactory>.Instance.CreateItem(
-                        MongoID.Generate(),
-                        weapon.CurrentAmmoTemplate._id,
-                        null
-                    );
-
-            if (ammoToAdd == null)
-            {
-                Components.Logger.LogError("Bot has no weapon to add ammo");
-                return;
-            }
-
-            int ammoAdded = 0;
-
-            for (int i = 0; i < 10; i++)
-            {
-                Item ammo = ammoToAdd.CloneItem();
-                ammo.StackObjectsCount = ammo.StackMaxSize;
-
-                var location = stashGridClass.FindLocationForItem(ammo);
-
-                if (location != null)
-                {
-
-                    var result = stashGridClass.AddItemWithoutRestrictions(ammo);
-
-                    if (result.Succeeded)
-                    {
-                        ammoAdded += ammo.StackObjectsCount;
-                        try
-                        {
-                            Singleton<GridCacheClass>.Instance.Add(
-                                        _bot.ProfileId,
-                                        location.Grid as GridClassEx,
-                                        ammo
-                                    );
-                        }
-                        catch (Exception e)
-                        {
-                            Components.Logger.LogError(e);
-                        }
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-                else
-                {
-                    break;
-                }
-            }
-
-        }
-
-        public virtual FollowerBrain GetFollowerBrain(BotOwner bot, pitAIBossPlayer boss)
-        {
-            return new FollowerBrain(bot, boss);
-        }
-
-        public virtual AICoreAgentClass<BotLogicDecision> GetFollowerAIAgent(BotOwner bot)
-        {
-            string name = bot.name + " " + _botRole.ToString();
-
-            return new FollowerAIAgent<BotLogicDecision>(bot.BotsController.AICoreController, bot.Brain.BaseBrain, FollowerCreateNode.ActionsList(bot), bot.gameObject, name, new Func<BotLogicDecision, GClass134>((BotLogicDecision decision) =>
-            {
-                return FollowerCreateNode.CreateNode(decision, bot);
-            }));
-        }
-
-        public virtual void SetFollowerSettings(BotOwner bot)
+        protected virtual void SetFollowerSettings(BotOwner bot)
         {
             _OldSettings = _bot.Settings;
             _OldGroupID = _bot.GroupId;
@@ -507,6 +396,116 @@ namespace friendlyPMC.Components
 
             bot.Tactic.AggressionCoef = 1f;
 
+        }
+
+        protected void AddExtraAmmo()
+        {
+
+            InventoryControllerClass inventory = GetInventoryController();
+            SearchableItemClass secureContainer;
+
+            try
+            {
+                secureContainer = (SearchableItemClass)inventory.Inventory.Equipment.GetSlot(EquipmentSlot.SecuredContainer).ContainedItem;
+            }
+            catch
+            {
+                Components.Logger.LogError("Cannot access secure container of bot, extra ammo will not be added");
+                return;
+            }
+
+            if (secureContainer == null)
+            {
+                Components.Logger.LogError("Bot has no secure container, cannot add extra ammo");
+                return;
+            }
+
+
+
+            StashGridClass stashGridClass = secureContainer.Grids.FirstOrDefault();
+
+            if (stashGridClass == null)
+            {
+                return;
+            }
+
+            Weapon weapon = _bot.AIData.Player.HandsController.Item as Weapon;
+
+            Item ammoToAdd =
+                    weapon.GetCurrentMagazine()?.FirstRealAmmo()
+                    ?? Singleton<ItemFactory>.Instance.CreateItem(
+                        MongoID.Generate(),
+                        weapon.CurrentAmmoTemplate._id,
+                        null
+                    );
+
+            if (ammoToAdd == null)
+            {
+                Components.Logger.LogError("Bot has no weapon to add ammo");
+                return;
+            }
+
+            int ammoAdded = 0;
+
+            for (int i = 0; i < 10; i++)
+            {
+                Item ammo = ammoToAdd.CloneItem();
+                ammo.StackObjectsCount = ammo.StackMaxSize;
+
+                var location = stashGridClass.FindLocationForItem(ammo);
+
+                if (location != null)
+                {
+
+                    var result = stashGridClass.AddItemWithoutRestrictions(ammo);
+
+                    if (result.Succeeded)
+                    {
+                        ammoAdded += ammo.StackObjectsCount;
+                        try
+                        {
+                            Singleton<GridCacheClass>.Instance.Add(
+                                        _bot.ProfileId,
+                                        location.Grid as GridClassEx,
+                                        ammo
+                                    );
+                        }
+                        catch (Exception e)
+                        {
+                            Components.Logger.LogError(e);
+                        }
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+        }
+
+        public InventoryControllerClass GetInventoryController()
+        {
+            return _bot.GetPlayer.InventoryControllerClass;
+        }
+
+        public virtual FollowerBrain GetFollowerBrain(BotOwner bot, pitAIBossPlayer boss)
+        {
+            return new FollowerBrain(bot, boss);
+        }
+
+        public virtual AICoreAgentClass<BotLogicDecision> GetFollowerAIAgent(BotOwner bot)
+        {
+            string name = bot.name + " " + _botRole.ToString();
+
+            return new FollowerAIAgent<BotLogicDecision>(bot.BotsController.AICoreController, bot.Brain.BaseBrain, FollowerCreateNode.ActionsList(bot), bot.gameObject, name, new Func<BotLogicDecision, GClass134>((BotLogicDecision decision) =>
+            {
+                return FollowerCreateNode.CreateNode(decision, bot);
+            }));
         }
 
         public FollowerReceiver GetFollowerReceiver(BotOwner bot)

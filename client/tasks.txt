@@ -2,17 +2,20 @@
 - x - try to use old spawn if FIKA is not available, but need to see why GClass974 gives errors
 - x - add extra checks for canceling healing
 - x - make "Get Back" and "Cover Me" always say the same thing
+- totest - new way of becoming aware of the enemy without the watch of GoalEnemy
 
 -- === 3.7 === ---:
-- scav followers can turn hostile if your shoot them
-- picked up followers can turn hostile if you shoot them
+- scav followers to turn hostile if your shoot them (turning hostile can be done through BotMemoryClass > method_7)
+- picked up followers to turn hostile if you shoot them
 - fix glitchy behavior of boss followers
 - goons send messages at the end of the raid
-- goons send join offer
+- remove options to spawn with the goons
+- goons send join offer for specific maps (Woods, Shoreline, Customs, Lighthouse)
 - add new tactic Supporter (an alternative version to Marskman that also allows for push order)
 - make BigPipe fight tactic unique (Assault Supporter) 
 - make BirdEye fight tactic more unique (Enhanced Marskman)
 - make Knight fight tactic unique (Assaulter)
+- lock the new tactics under the goons challenge 
 
 --- ==== 4.0.0 (out of beta) ==== ---:
 - add squad screen
@@ -21,9 +24,11 @@
 ==================================================================================
 RELEASE NOTES (3.6.5):
 - updated get back and cover me commands where in addition to following at a distance, "get back" also makes followers no longer prioritize player position and to rush to his aid. "Cover Me" resets this
-- attempt to fix bot getting stuck in healing animation under certain circumnstances
+- attempt to fix follower still getting stuck in healing animation under certain circumnstances
 - altered "get back", "cover me" and "hold position" voices to always say the same thing instead of going through different phrases in order to bring them more closer to what the commands do relative to the followers
-- scav followers and pmc pickedup followers can now turn hostile if you accidentally shoot them
+- altered how enemy is added to followers as the current method would make followers be aware of any enemy position as soon as that enemy made the player his goal target.
+
+Notes: The way an enemy was added to the followers was by observing who the current target is for any bot. This created situations where your followers would instantly pick up the enemy position and even run to him. This is changed now, but it might feel different as you can now have situations where an enemy is shooting at you from a distance, not hitting you, which in turn makes your followers not react. "Contact" command makes them become aware of the situation. 
 
 ==================================================================================
 REVISIT:

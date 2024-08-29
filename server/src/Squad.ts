@@ -61,6 +61,7 @@ class friendlyPMC {
 		returnItems: <string[]>[],
 		returnItemsDeath: <string[]>[],
 		teamEscaped: <string[]>[],
+		teamSomeEscaped: <string[]>[],
 		friendlyEscaped: <string[]>[],
 		allyBossEscaped: <string[]>[],
 	};
@@ -82,11 +83,20 @@ class friendlyPMC {
 		teamEscaped: [
             "Nice!\nWe managed to get out.",
             "And that's a wrap! We made it boss.",
+            "When the last man hit the extract, it was like clockwork—everyone's safe",
+            "We coordinated perfectly, and now the whole crew's out and ready to gear up again"
+        ],
+		//prettier-ignore
+		teamSomeEscaped : [
+            "Well it's a shame about {0}, but at least the rest of us made it.",
+            "A few of us got clipped, but I'm glad some managed to get out alive"
         ],
 		//prettier-ignore
 		friendlyEscaped: [
             "Glad we made it.\nThanks for letting me tag along.",
-            "Whew, glad I found you.\nI didn't know if I was going to make it. Thanks!"
+            "Whew, glad I found you.\nI didn't know if I was going to make it. Thanks!",
+            "Not the best outcome, losing some teammates, but I'm glad I at least got out",
+            "Thanks for the help. I'm hauling my fallen teammates' gear back; it's the least I can do."
         ],
 		//prettier-ignore
 		allyBossEscaped : [
@@ -102,6 +112,12 @@ class friendlyPMC {
 	Bots: IBotConfig;
 	mailSendService: MailSendService;
 	LocaleService: LocaleService;
+
+	private _StringFormat(str: string, ...values: string[]) {
+		return str.replace(/\{(\d+)\}/g, function (match, number) {
+			return typeof values[number] != "undefined" && values[number] !== null ? values[number] : match;
+		});
+	}
 
 	originalgetPmcDifficultySettings: BotDifficultyHelper["getPmcDifficultySettings"];
 	originalgetBotDifficulty: BotController["getBotDifficulty"];
@@ -282,17 +298,38 @@ class friendlyPMC {
 						SquadInfo: {
 							Mate: boolean;
 							AllyBoss: boolean;
+							Partial?: boolean;
+							Lost?: string[];
 						};
 					} = info.member;
 
+					let lostMembers = "";
 					let message = this.lang.friendlyEscaped;
 					if (member.SquadInfo.AllyBoss) {
 						message = this.lang.allyBossEscaped;
 					} else if (member.SquadInfo.Mate) {
 						message = this.lang.teamEscaped;
+						if (member.SquadInfo.Partial) {
+							message = this.lang.teamSomeEscaped;
+							if (member.SquadInfo.Lost.length < 3) {
+								lostMembers = member.SquadInfo.Lost.map((name, i) => {
+									if (i > 0) {
+										if (i == member.SquadInfo.Lost.length - 1) {
+											return ` and ${name}`;
+										} else {
+											return `, ${name}`;
+										}
+									} else {
+										return name;
+									}
+								}).join("");
+							} else lostMembers = "the others";
+						}
 					}
 
-					this.mailSendService["notificationSendHelper"].sendMessageToPlayer(sessionID, member, randomUtil.getArrayValue(message), MessageType.USER_MESSAGE);
+					let notice = this._StringFormat(randomUtil.getArrayValue(message), lostMembers);
+
+					this.mailSendService["notificationSendHelper"].sendMessageToPlayer(sessionID, member, notice, MessageType.USER_MESSAGE);
 
 					return httpResponseUtil.emptyResponse();
 				}),

@@ -641,11 +641,11 @@ namespace friendlyPMC.Patches
                             if (friendlyPMC.squadSetup.Value && friendlyPMC.squadMembers.ContainsKey(pid))
                             {
                                 string eq = friendlyPMC.squadMembers[pid][1].Value;
-                                if (eq != null && eq != "Default")
+                                if (eq != null && eq != friendlyPMC.GetEquipOptions()[0])
                                 {
                                     var secureContainer = profile.Inventory.Equipment.GetSlot(EquipmentSlot.SecuredContainer).ContainedItem;
 
-                                    if (eq == "Player Equipment")
+                                    if (eq == friendlyPMC.GetEquipOptions()[1])
                                     {
                                         EquipmentClass equipClone = playerProfile.Inventory.Equipment.CloneItem(null);
 
@@ -696,23 +696,23 @@ namespace friendlyPMC.Patches
                                 }
 
                                 string tactic = friendlyPMC.squadMembers[pid][0].Value;
-                                if (tactic != null && tactic != "Default")
+                                string[] availableTactics = friendlyPMC.GetTacticOptions();
+                                if (tactic != null && tactic != availableTactics[0])
                                 {
-                                    switch (tactic)
+                                    if(tactic == availableTactics[2])
                                     {
-                                        case "Pusher":
-                                            tactic = "Push";
-                                            break;
-                                        case "Holder":
-                                            tactic = "Defend";
-                                            break;
-                                        case "Marksman":
-                                            tactic = "Marksman";
-                                            // some cheating here, making our marskman good
-                                            profile.Skills.Sniper.SetCurrent(5100f, true);
-                                            profile.Skills.RecoilControl.SetCurrent(4800f, true);
-                                            break;
+                                        tactic = "Push";
+                                    } else if (tactic == availableTactics[3])
+                                    {
+                                        tactic = "Defend";
+                                    } else if (tactic == availableTactics[1])
+                                    {
+                                        tactic = "Marksman";
+                                        // some cheating here, making our marskman good
+                                        profile.Skills.Sniper.SetCurrent(5100f, true);
+                                        profile.Skills.RecoilControl.SetCurrent(4800f, true);
                                     }
+
                                     profileTactic.Add(profile.ProfileId, tactic);
                                 }
                             }

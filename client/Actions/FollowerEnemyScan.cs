@@ -6,13 +6,13 @@ namespace friendlyPMC.Actions
 {
     internal class FollowerEnemyScan
     {
-        public static bool CheckLook(Player from, Player to, BodyPartType botType = BodyPartType.head)
+        public static bool CheckLook(Player from, Player to, LayerMask mask, BodyPartType botType = BodyPartType.head)
         {
             EnemyPart enemyPart = from.MainParts[botType];
             Vector3 direction = to.PlayerBones.Head.position - enemyPart.Position;
             float magnitude = direction.magnitude;
             RaycastHit raycastHit;
-            return Physics.Raycast(new Ray(enemyPart.Position, direction), out raycastHit, magnitude, LayerMaskClass.HighPolyWithTerrainMask);
+            return Physics.Raycast(new Ray(enemyPart.Position, direction), out raycastHit, magnitude, mask);
         }
         public static void ScanDirection(BotOwner bot, IPlayer player, Player realPlayer)
         {
@@ -58,7 +58,7 @@ namespace friendlyPMC.Actions
             foreach (var item in enemies)
             {
                 float edist = Vector3.Distance(playerPosition, item.Position);
-                if (edist < dist && (CheckLook(item, realPlayer) || CheckLook(item, realPlayer, BodyPartType.body)))
+                if (edist < dist && (CheckLook(item, realPlayer,bot.LookSensor.Mask) || CheckLook(item, realPlayer,bot.LookSensor.Mask, BodyPartType.body)))
                 {
                     dist = edist;
                     closet = item;

@@ -78,6 +78,21 @@ namespace friendlyPMC
             { "baseSettings", "Base Settings" },
             { "miscSettings", "Miscellaneous" },
             { "testSettings", "Testing"},
+            { "equipOptions", new string[]
+                {
+                    "Default",
+                    "Player Equipment"
+                } 
+            },
+            {
+                "tacticOptions", new string[]
+                {
+                    "Default",
+                    "Marksman",
+                    "Pusher",
+                    "Holder"
+                }
+            },
             {  
                 "statusSound" , new Dictionary<string,string>{
                     { "Name", "Report Status Volume"},
@@ -185,10 +200,7 @@ namespace friendlyPMC
 
 
 
-        private string[] equipPresets = new string[] {
-            "Default",
-            "Player Equipment"
-        };
+        private string[] equipPresets = new string[] {};
 
         public static TarkovApplication application;
 
@@ -342,6 +354,11 @@ namespace friendlyPMC
 
         private void ConfigSet()
         {
+            equipPresets = new string[]
+            {
+                ((string[])optionsLang["equipOptions"])[0],
+                ((string[])optionsLang["equipOptions"])[1]
+            };
 
             Config.SaveOnConfigSet = false;
 
@@ -423,10 +440,10 @@ namespace friendlyPMC
                     if (!squadMembers.ContainsKey(i))
                     {
                         string key = "1.4.1  -    -  " + String.Format(((Dictionary<string, string>)optionsLang["memberTactic"])["Name"],i+1);
-                        string value = "Default";
+                        string value = ((string[])optionsLang["tacticOptions"])[0];
 
                         string seckey = "1.4.1  -    -  " + String.Format(((Dictionary<string, string>)optionsLang["memberEquipment"])["Name"], i + 1);
-                        string secvalue = "Default";
+                        string secvalue = ((string[])optionsLang["tacticOptions"])[0];
 
                         savedConfigValues.ExecuteForEach(saved =>
                         {
@@ -446,12 +463,7 @@ namespace friendlyPMC
                                 key,
                                 value,
                                 new ConfigDescription(((Dictionary<string, string>)optionsLang["memberTactic"])["Description"],
-                                    new AcceptableValueList<string>(new string[] {
-                                        "Default",
-                                        "Marksman",
-                                        "Pusher",
-                                        "Holder"
-                                    })
+                                    new AcceptableValueList<string>((string[])optionsLang["tacticOptions"])
                                 )
                             ),
                             EquipmentOptions(seckey,secvalue)
@@ -529,8 +541,8 @@ namespace friendlyPMC
             var presets = Utils.Equipment.CustomPresets;
 
             var updatedPresets = new string[] {
-                "Default",
-                "Player Equipment"
+                ((string[])optionsLang["equipOptions"])[0],
+                ((string[])optionsLang["equipOptions"])[1]
             };
 
             foreach (var item in presets)
@@ -577,7 +589,7 @@ namespace friendlyPMC
 
                         if(!equipPresets.Contains(value))
                         {
-                            value = "Default";
+                            value = ((string[])optionsLang["equipOptions"])[0];
                         }
 
                         Config.Remove(entry.Definition);
@@ -615,6 +627,11 @@ namespace friendlyPMC
         public static string[] GetEquipOptions()
         {
             return Instance.equipPresets;
+        }
+
+        public static string[] GetTacticOptions()
+        {
+            return (string[])optionsLang["tacticOptions"];
         }
     }
 }

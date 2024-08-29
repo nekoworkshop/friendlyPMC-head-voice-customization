@@ -29,7 +29,7 @@ namespace friendlyPMC.Components
 
         private static bool IsRequesterLookingAt(BotOwner bot, Player requester)
         {
-            return bot.IsEnemyLookingAtMe(requester);
+            return bot.LookSensor.CheckLookSimple(requester, bot.GetPlayer) && bot.IsEnemyLookingAtMe(requester);
         }
 
 
@@ -284,9 +284,16 @@ namespace friendlyPMC.Components
             {
                 if (isBossCommunicating)
                 {
-                    if (gestusDistance < maxGestusDistance && IsRequesterLookingAt(botOwner_0, playerRequester) && IsClosestBotToBoss(botOwner_0)) 
+                    if (gestusDistance < maxGestusDistance && IsRequesterLookingAt(botOwner_0, playerRequester)) 
                     {
                         FollowerGoCheck gclass = new FollowerGoCheck(data.Player, BotRequestType.followMe);
+
+                        if (botOwner_0.BotRequestController.CurRequest?.BotRequestType == BotRequestType.goToPoint)
+                        {
+                            Player requester = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(data.Player.ProfileId);
+                            botOwner_0.BotRequestController.TryStopCurrent(requester, false);
+                        }
+
                         if (
                             gclass.CanRequest(botOwner_0) &&
                             botOwner_0.BotsGroup.RequestsController.TryAddRequest(gclass)
@@ -294,8 +301,15 @@ namespace friendlyPMC.Components
                         {
                             gclass.AddPossibleExecutors(botOwner_0);
                             gclass.SetGroup(botOwner_0.BotsGroup.RequestsController);
+
+                            if (botOwner_0.BotRequestController.CurRequest != null)
+                            {
+                                gclass.DisposeOtherRequestsWhenTaken = false;
+                                botOwner_0.BotRequestController.SetCurrentRequest(gclass);
+                            }
                         }
                     }
+                    return;
                 }
                 else if (shouldDefault)
                 {
@@ -334,33 +348,41 @@ namespace friendlyPMC.Components
 
                         Player alivePlayerByProfileID = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(data.Player.ProfileId);
 
-                        if (botOwner_0.BotRequestController.TryStopCurrent(alivePlayerByProfileID, false))
+                        if (botOwner_0.Memory.HaveEnemy && botOwner_0.BotRequestController.TryStopCurrent(alivePlayerByProfileID, false))
                         {
 
                             (botOwner_0.Brain.BaseBrain as FollowerBrain).BossOrdersChanged();
 
                             // if has enemy, on "That direction" rush the enemy
-                            if (botOwner_0.Memory.HaveEnemy)
+                            FollowerRushEnemy gclass = new FollowerRushEnemy(botOwner_0, alivePlayerByProfileID, BotRequestType.attackClose);
+                            if (botOwner_0.BotsGroup.RequestsController.TryAddRequest(gclass))
                             {
-                                FollowerRushEnemy gclass = new FollowerRushEnemy(botOwner_0, alivePlayerByProfileID, BotRequestType.attackClose);
-                                if (botOwner_0.BotsGroup.RequestsController.TryAddRequest(gclass))
-                                {
-                                    gclass.AddPossibleExecutors(botOwner_0);
-                                    gclass.SetGroup(botOwner_0.BotsGroup.RequestsController);
-                                }
-
+                                gclass.AddPossibleExecutors(botOwner_0);
+                                gclass.SetGroup(botOwner_0.BotsGroup.RequestsController);
                             }
-                            // else move somewhere in front of the player
-                            else
+                        }
+                        // else move somewhere in front of the player
+                        // - the closest bot shall move
+                        else if (!botOwner_0.Memory.HaveEnemy && IsClosestBotToBoss(botOwner_0))
+                        {
+                            if (botOwner_0.BotRequestController.CurRequest?.BotRequestType == BotRequestType.goToPoint)
                             {
-                                FollowerGoCheck gclass;
-                                // - the closest bot shall move
-                                if (IsClosestBotToCheck(botOwner_0, data.Player, out gclass) && botOwner_0.BotsGroup.RequestsController.TryAddRequest(gclass))
-                                {
-                                    gclass.AddPossibleExecutors(botOwner_0);
-                                    gclass.SetGroup(botOwner_0.BotsGroup.RequestsController);
-                                }
+                                Player requester = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(data.Player.ProfileId);
+                                botOwner_0.BotRequestController.TryStopCurrent(requester, false);
+                            }
 
+                            FollowerGoCheck gclass;
+                            
+                            if (IsClosestBotToCheck(botOwner_0, data.Player, out gclass) && botOwner_0.BotsGroup.RequestsController.TryAddRequest(gclass))
+                            {
+                                gclass.AddPossibleExecutors(botOwner_0);
+                                gclass.SetGroup(botOwner_0.BotsGroup.RequestsController);
+
+                                if (botOwner_0.BotRequestController.CurRequest != null)
+                                {
+                                    gclass.DisposeOtherRequestsWhenTaken = false;
+                                    botOwner_0.BotRequestController.SetCurrentRequest(gclass);
+                                }
                             }
                         }
                     }

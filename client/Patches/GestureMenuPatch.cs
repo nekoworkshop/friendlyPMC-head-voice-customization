@@ -72,26 +72,28 @@ namespace friendlyPMC.Patches
         private static void PatchPostfix(PhraseSpeakerClass __instance, EPlayerSide side, int id, string playerVoice, bool registerInSpeakerManager)
         {
 
-            if (__instance.SideTag == ETagStatus.Bear || __instance.SideTag == ETagStatus.Usec)
+            if (side == EPlayerSide.Bear || side == EPlayerSide.Usec)
             {
                 foreach (var item in __instance.PhrasesBanks)
                 {
+                    if (item.Value.Clips.Length <= 0) continue;
+
                     if(item.Key == EPhraseTrigger.GetBack)
                     {
                         item.Value.Clips = new TaggedClip[] {
-                            item.Value.Clips[2]
+                            item.Value.Clips[Math.Min(1,item.Value.Clips.Length -1)]
                         };
                     } 
                     else if (item.Key == EPhraseTrigger.HoldPosition)
                     {
                         item.Value.Clips = new TaggedClip[] {
-                            item.Value.Clips[0]
+                            item.Value.Clips[Math.Min(1,item.Value.Clips.Length -1)]
                         };
                     }
                     else if (item.Key == EPhraseTrigger.CoverMe)
                     {
-                        item.Value.Clips = new TaggedClip[] {
-                            item.Value.Clips[1]
+                        item.Value.Clips = new TaggedClip[] {   
+                            item.Value.Clips[Math.Min(2,item.Value.Clips.Length -1)]
                         };
                     }
                 }

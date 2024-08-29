@@ -201,15 +201,44 @@ namespace friendlyPMC.Components
             // make the closest enemy of boss, the enemy
             if(enemy != null)
             {
-                BotSettingsClass botSettingsClass = new BotSettingsClass(Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(enemy.ProfileId), bossGroup, EBotEnemyCause.pmcBossKill);
+               
+                EnemyInfo info = null;
+                
+                foreach (var item in follower.EnemiesController.EnemyInfos)
+                {
+                    if(item.Key.ProfileId == enemy.ProfileId)
+                    {
+                        info = item.Value;
+                        break;
+                    }
+                }
 
-                follower.Memory.AddEnemy(enemy, botSettingsClass, false);
-                EnemyInfo info;
-                follower.EnemiesController.EnemyInfos.TryGetValue(enemy.GetPlayer, out info);
                 if (info != null)
                 {
                     info.PriorityIndex = 0;
+                    if (!follower.Memory.HaveEnemy) follower.Memory.GoalEnemy = info;
+                } 
+                else
+                {
+                    BotSettingsClass botSettingsClass = new BotSettingsClass(Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(enemy.ProfileId), bossGroup, EBotEnemyCause.addPlayerToBoss);
+
+                    follower.Memory.AddEnemy(enemy, botSettingsClass, false);
+                   
+                    if (!follower.Memory.HaveEnemy)
+                    {
+                        foreach (var item in follower.EnemiesController.EnemyInfos)
+                        {
+                            if (item.Key.ProfileId == enemy.ProfileId)
+                            {
+                                info = item.Value;
+                                break;
+                            }
+                        }
+                        if(info != null) follower.Memory.GoalEnemy = info;
+                    }
                 }
+
+                
             }
         }
 
@@ -300,7 +329,8 @@ namespace friendlyPMC.Components
                 {
                     if (_aiplayer.bossGroup != null)
                     {
-                        _aiplayer.bossGroup.AddEnemy(arg1.Player.AIData.BotOwner, EBotEnemyCause.addPlayerToBoss);
+                        _aiplayer.bossGroup.AddEnemy(arg1.Player.iPlayer, EBotEnemyCause.addPlayerToBoss);
+                        _aiplayer.bossGroup.ReportAboutEnemy(arg1.Player.iPlayer, EEnemyPartVisibleType.sence);
                     }
 
                     _aiplayer.AddEnemy(arg1.Player.AIData.BotOwner);

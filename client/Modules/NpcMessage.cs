@@ -1,4 +1,5 @@
 ﻿using EFT;
+using EFT.InventoryLogic;
 using HarmonyLib;
 using Newtonsoft.Json;
 using SPT.Common.Http;
@@ -13,6 +14,7 @@ namespace friendlyPMC.Modules
         private static NpcMessage Instance = null;
 
         private Dictionary<string, object> _npcs;
+        private List<string> _matesLost;
 
         private bool _playerDied = false;
 
@@ -21,6 +23,7 @@ namespace friendlyPMC.Modules
             {
                 Instance = this;
                 _npcs = new Dictionary<string, object>();
+                _matesLost = new List<string>();
             }
         }
 
@@ -54,6 +57,16 @@ namespace friendlyPMC.Modules
         {
             if (Instance._npcs.ContainsKey(id))
             {
+                if (((Dictionary<string, object>)Instance._npcs[id])["SquadInfo"] is Dictionary<string, object> squadInfo)
+                {
+                    if ((bool)squadInfo["Mate"])
+                    {
+                        if (((Dictionary<string, object>)Instance._npcs[id])["Info"] is Dictionary<string, object> memberInfo)
+                        {
+                            Instance._matesLost.Add((string)memberInfo["Nickname"]);
+                        }
+                    }
+                }
                 Instance._npcs.Remove(id);
             }
         }
@@ -113,10 +126,18 @@ namespace friendlyPMC.Modules
             {
                 info = Instance._npcs[id];
             }
-            
-            if(bosses.Count > 0) info = bosses.Random();
+
+            if (bosses.Count > 0) info = bosses.Random();
             else if (allies.Count > 0) info = allies.Random();
-            else info = mates.Random();
+            else
+            {
+                info = mates.Random();
+                if (Instance._matesLost.Count > 0)
+                {
+                    ((Dictionary<string, object>)((Dictionary<string, object>)info)["SquadInfo"]).Add("Partial", true);
+                    ((Dictionary<string, object>)((Dictionary<string, object>)info)["SquadInfo"]).Add("Lost", Instance._matesLost);
+                }
+            }
 
             if (info == null) return;
 
@@ -135,6 +156,7 @@ namespace friendlyPMC.Modules
         {
             if (Instance == null) return;
             Instance._npcs.Clear();
+            Instance._matesLost.Clear();
         }
 
         public static void PlayerDied()

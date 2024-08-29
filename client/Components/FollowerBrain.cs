@@ -51,7 +51,7 @@ namespace friendlyPMC.Components
             owner.GetPlayer.HealthController.DiedEvent += OnDead;
             owner.LeaveData.OnLeave += OnLeave;
             owner.Memory.OnAddEnemy += OnAddEnemy;
-
+            owner.GetPlayer.BeingHitAction += BeingHitAction;
 
             _currentTactic = "Default";
 
@@ -99,10 +99,21 @@ namespace friendlyPMC.Components
             return new GClass578(1, 75, 45, 76);
         }
 
-        public virtual void OnDead(EDamageType damageType)
+        protected virtual void OnDead(EDamageType damageType)
         {
             OnKilled();
 
+        }
+        protected void BeingHitAction(DamageInfo damageInfo, EBodyPart bodyType, float damageReducedByArmor)
+        {
+            if (!_owner.Memory.HaveEnemy && damageInfo.Player != null)
+            {
+                Vector3? pos = damageInfo.Player.iPlayer?.Position;
+                if (pos.HasValue)
+                {
+                    _owner.Steering.LookToPoint((Vector3)pos, 90f);
+                }
+            }
         }
 
         public virtual void OnLeave(BotOwner _bot)
@@ -124,7 +135,7 @@ namespace friendlyPMC.Components
         }
 
 
-        public virtual void OnAddEnemy(IPlayer player)
+        protected virtual void OnAddEnemy(IPlayer player)
         {
             // how does the boss get added as Enemy?? - fix it
             if (player != null && player.ProfileId == _boss.Player().ProfileId)
@@ -167,6 +178,7 @@ namespace friendlyPMC.Components
             _owner.GetPlayer.HealthController.DiedEvent -= OnDead;
             _owner.LeaveData.OnLeave -= OnLeave;
             _owner.Memory.OnAddEnemy -= OnAddEnemy;
+            _owner.GetPlayer.BeingHitAction -= BeingHitAction;
         }
 
         public virtual void SetBossTactic(string tactic)

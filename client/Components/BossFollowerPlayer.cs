@@ -33,7 +33,7 @@ namespace friendlyPMC.Components
             }
         }
 
-        public override void SetFollowerSettings(BotOwner bot)
+        protected override void SetFollowerSettings(BotOwner bot)
         {
 
             settingModif.PrecicingSpeedCoef = 1.35f;

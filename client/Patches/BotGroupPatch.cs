@@ -48,7 +48,7 @@ namespace friendlyPMC.Patches
 
             var plBoss = BossPlayers.GetBoss(person.ProfileId);
             var isgroup = BossPlayers.IsBossGroup(__instance.Id);
-            
+
             if (isgroup && plBoss != null)
             {
                 BotsGroup bossGroup = plBoss.bossGroup;
@@ -96,15 +96,12 @@ namespace friendlyPMC.Patches
                 try
                 {
                     BotsGroup bossGroup = plBoss.bossGroup;
-                    if (bossGroup != null)
+                    var _members = AccessTools.Field(typeof(BotsGroup), "_members").GetValue(__instance) as List<BotOwner>;
+                    if (_members != null)
                     {
-                        var _members = AccessTools.Field(typeof(BotsGroup), "_members").GetValue(__instance) as List<BotOwner>;
-                        if (_members != null)
+                        foreach (var item in _members)
                         {
-                            foreach (var item in _members)
-                            {
-                                bossGroup.AddEnemy(item, EBotEnemyCause.addPlayerToBoss);
-                            }
+                            bossGroup.AddEnemy(item, EBotEnemyCause.addPlayerToBoss);
                         }
                     }
                 }

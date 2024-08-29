@@ -86,12 +86,12 @@ namespace friendlyPMC.Patches
                     var boss = BossPlayers.GetBoss(enemy.ProfileId);
                     if (boss != null)
                     {
-                        if (boss.Followers.Count > 0)
+                        /*if (boss.Followers.Count > 0)
                             foreach (var flw in boss.Followers)
                             {
                                 var info = Utils.Enemy.MakeEnemy(flw, botOwner_0.GetPlayer);
                             }
-                        else if (boss.bossGroup != null)
+                        else*/ if (boss.bossGroup != null)
                             boss.bossGroup.AddEnemy(botOwner_0, EBotEnemyCause.addPlayerToBoss);
                         else 
                             boss.AddEnemy(botOwner_0);

@@ -133,7 +133,6 @@ namespace friendlyPMC.Components
                     botOwner_0.GoToSomePointData.UpdateToGo(shouldSprint01);
                     if (!shouldSprint01) botOwner_0.Sprint(false);
 
-                    request.Complete();
 
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.goToPoint, "req:comeHere");
 
@@ -189,8 +188,6 @@ namespace friendlyPMC.Components
                     botOwner_0.GoToSomePointData.UpdateToGo(shouldSprint02);
                     if (!shouldSprint02) botOwner_0.Sprint(false);
 
-                    request.Complete();
-
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.goToPoint, "req:goCheck");
             }
 
@@ -242,6 +239,16 @@ namespace friendlyPMC.Components
 
             customNavigationPoint_0 = Covers.GetCoverPoint(botOwner_0, centerPosition, searchRadius);
             botOwner_0.Memory.SetCoverPoints(customNavigationPoint_0);
+        }
+
+        public override AICoreActionEndStruct EndGoToPoint()
+        {
+            AICoreActionEndStruct result = base.EndGoToPoint();
+            if(result.Value == true && botOwner_0.BotRequestController.CurRequest?.BotRequestType == BotRequestType.goToPoint)
+            {
+                botOwner_0.BotRequestController.CurRequest.Complete();
+            }
+            return result;
         }
     }
 }
