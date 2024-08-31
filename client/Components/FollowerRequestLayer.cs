@@ -1,4 +1,5 @@
-﻿using EFT;
+﻿using Comfort.Common;
+using EFT;
 using friendlyPMC.Modules;
 using friendlyPMC.Utils;
 using System;
@@ -113,38 +114,15 @@ namespace friendlyPMC.Components
             {
                 // on follow me request from the boss, just come closer to the boss or get out of hold position
                 case BotRequestType.followMe:
-                    botOwner_0.Gesture.TryGestus(EGesture.Good, false);
-
-                    Vector3 requestPos = requester.Position;
-                    Vector3 dir01 = requester.LookDirection;
-
-                    float offset = GClass761.RandomSing() * GClass761.Random(1f, 2f);
-                    Vector3 direction = Vector3.Cross(Vector3.up, dir01).normalized;
-
-                    Vector3 finPos = requestPos + direction * offset;
-
-                    Vector3 point = new Vector3(finPos.x, requestPos.y, finPos.z);
-                    
-                    botOwner_0.GoToSomePointData.SetPoint(point);
-
-                    botOwner_0.Steering.LookToMovingDirection();
-                    
-                    bool shouldSprint01 = Vector3.Distance(point, botOwner_0.GetPlayer.Transform.position) >= sprintDistance;
-                    botOwner_0.GoToSomePointData.UpdateToGo(shouldSprint01);
-                    if (!shouldSprint01) botOwner_0.Sprint(false);
-
 
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.goToPoint, "req:comeHere");
 
                 case (BotRequestType)CustomBotRequestType.Regroup:
-                    botOwner_0.BotTalk.TrySay(EPhraseTrigger.Roger, false);
                     request.Complete();
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.followerPatrol, "backToFLB");
 
                 // stay in place
                 case BotRequestType.wait:
-                    botOwner_0.BotTalk.TrySay(EPhraseTrigger.Roger, false);
-                    botOwner_0.Gesture.TryGestus(EGesture.Good,false);
 
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.holdPosition, "req:holdPos");
 
@@ -155,7 +133,6 @@ namespace friendlyPMC.Components
                     GetCoverPoint(botOwner_0.GetPlayer.Transform.position, 50f);
                     if (customNavigationPoint_0 != null)
                     {
-                        botOwner_0.BotTalk.TrySay(EPhraseTrigger.Going, false);
                         request.Complete();
                         if (!botOwner_0.CanSprintPlayer)
                         {
@@ -170,24 +147,6 @@ namespace friendlyPMC.Components
                     }
 
                 case BotRequestType.goToPoint:
-
-                    Vector3 dir02 = requester.LookDirection;
-                    float forwardDistance = GClass761.Random(3f, 5f);
-
-                    Vector3 forwardPosition = requester.Position + dir02.normalized * forwardDistance;
-                    float lateralOffset = GClass761.RandomSing() * GClass761.Random(0.5f, 1.5f);
-                    Vector3 lateralDirection = Vector3.Cross(Vector3.up, dir02).normalized;
-
-                    Vector3 finalPosition = forwardPosition + lateralDirection * lateralOffset;
-
-                    botOwner_0.BotTalk.TrySay(EPhraseTrigger.Going, false);
-
-                    botOwner_0.GoToSomePointData.SetPoint(finalPosition);
-                    botOwner_0.Steering.LookToMovingDirection();
-                    bool shouldSprint02 = Vector3.Distance(finalPosition, botOwner_0.GetPlayer.Transform.position) >= sprintDistance;
-                    botOwner_0.GoToSomePointData.UpdateToGo(shouldSprint02);
-                    if (!shouldSprint02) botOwner_0.Sprint(false);
-
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.goToPoint, "req:goCheck");
             }
 
@@ -195,6 +154,27 @@ namespace friendlyPMC.Components
             botOwner_0.BotTalk.TrySay(EPhraseTrigger.Negative, false);
             request.Complete();
             return new AICoreActionResultStruct<BotLogicDecision>(HasBoss() ? BotLogicDecision.followerPatrol : HoldOrCover(botOwner_0), "req:Unhandled");
+        }
+
+        public override AICoreActionEndStruct ShallEndCurrentDecision(AICoreActionResultStruct<BotLogicDecision> curDecision)
+        {
+
+            if(curDecision.Action == BotLogicDecision.goToPoint && botOwner_0.GoToSomePointData.IsCome())
+            {
+                if (botOwner_0.BotRequestController.CurRequest != null && botOwner_0.BotRequestController.CurRequest.BotRequestType == BotRequestType.goToPoint)
+                {
+                    botOwner_0.BotRequestController.CurRequest.Complete();
+                }
+
+                return new AICoreActionEndStruct("point.Reached", true);
+            }
+
+            if (curDecision.Action == BotLogicDecision.holdPosition && botOwner_0.BotRequestController.CurRequest?.BotRequestType == BotRequestType.goToPoint)
+            {
+                return new AICoreActionEndStruct("point.New", true);
+            }
+
+            return base.ShallEndCurrentDecision(curDecision);
         }
 
         public override AICoreActionEndStruct EndSuppressFire()
@@ -241,14 +221,6 @@ namespace friendlyPMC.Components
             botOwner_0.Memory.SetCoverPoints(customNavigationPoint_0);
         }
 
-        public override AICoreActionEndStruct EndGoToPoint()
-        {
-            AICoreActionEndStruct result = base.EndGoToPoint();
-            if(result.Value == true && botOwner_0.BotRequestController.CurRequest?.BotRequestType == BotRequestType.goToPoint)
-            {
-                botOwner_0.BotRequestController.CurRequest.Complete();
-            }
-            return result;
-        }
+        
     }
 }

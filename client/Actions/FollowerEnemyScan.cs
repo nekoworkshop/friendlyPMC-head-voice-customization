@@ -8,6 +8,8 @@ namespace friendlyPMC.Actions
     {
         public static bool CheckLook(Player from, Player to, LayerMask mask, BodyPartType botType = BodyPartType.head)
         {
+            if (Vector3.Dot((to.Transform.position - from.Transform.position), to.LookDirection) > 0f) return false;
+
             EnemyPart enemyPart = from.MainParts[botType];
             Vector3 direction = to.PlayerBones.Head.position - enemyPart.Position;
             float magnitude = direction.magnitude;

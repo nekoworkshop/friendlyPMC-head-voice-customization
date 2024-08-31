@@ -2,7 +2,8 @@
 - x - try to use old spawn if FIKA is not available, but need to see why GClass974 gives errors
 - x - add extra checks for canceling healing
 - x - make "Get Back" and "Cover Me" always say the same thing
-- totest - new way of becoming aware of the enemy without the watch of GoalEnemy
+- x - new way of becoming aware of the enemy without the watch of GoalEnemy
+- #inprogress - updated Come Here, Stop and That Direction commands to use them to move bots one by one where you want them. 
 
 -- === 3.7 === ---:
 - scav followers to turn hostile if your shoot them (turning hostile can be done through BotMemoryClass > method_7)
@@ -27,6 +28,7 @@ RELEASE NOTES (3.6.5):
 - attempt to fix follower still getting stuck in healing animation under certain circumnstances
 - altered "get back", "cover me" and "hold position" voices to always say the same thing instead of going through different phrases in order to bring them more closer to what the commands do relative to the followers
 - altered how enemy is added to followers as the current method would make followers be aware of any enemy position as soon as that enemy made the player his goal target.
+- updated Come Here, Stop and That Direction commands where you can now use them to move bots one by one where you want them. 
 
 Notes: The way an enemy was added to the followers was by observing who the current target is for any bot. This created situations where your followers would instantly pick up the enemy position and even run to him. This is changed now, but it might feel different as you can now have situations where an enemy is shooting at you from a distance, not hitting you, which in turn makes your followers not react. "Contact" command makes them become aware of the situation. 
 

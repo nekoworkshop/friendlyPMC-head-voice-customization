@@ -81,19 +81,19 @@ namespace friendlyPMC.Patches
                     if(item.Key == EPhraseTrigger.GetBack)
                     {
                         item.Value.Clips = new TaggedClip[] {
-                            item.Value.Clips[Math.Min(1,item.Value.Clips.Length -1)]
+                            item.Value.Clips[Math.Min(4,item.Value.Clips.Length -1)]
                         };
                     } 
                     else if (item.Key == EPhraseTrigger.HoldPosition)
                     {
                         item.Value.Clips = new TaggedClip[] {
-                            item.Value.Clips[Math.Min(1,item.Value.Clips.Length -1)]
+                            item.Value.Clips[0]
                         };
                     }
                     else if (item.Key == EPhraseTrigger.CoverMe)
                     {
                         item.Value.Clips = new TaggedClip[] {   
-                            item.Value.Clips[Math.Min(2,item.Value.Clips.Length -1)]
+                            item.Value.Clips[0]
                         };
                     }
                 }

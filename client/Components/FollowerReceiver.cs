@@ -9,6 +9,7 @@ using System;
 using UnityEngine;
 using System.Collections.Generic;
 using HarmonyLib;
+using RootMotion.FinalIK;
 
 namespace friendlyPMC.Components
 {
@@ -27,9 +28,41 @@ namespace friendlyPMC.Components
         }
 
 
-        private static bool IsRequesterLookingAt(BotOwner bot, Player requester)
+        private static bool IsRequesterLookingAt(BotOwner bot, Player requester, BodyPartType part = BodyPartType.body)
         {
-            return bot.LookSensor.CheckLookSimple(requester, bot.GetPlayer) && bot.IsEnemyLookingAtMe(requester);
+            Player player = null;
+
+            float shpere_FRIENDY_FIRE_SIZE = 0.5f;
+            float num = 0.6f;
+            LayerMask playerMask = LayerMaskClass.PlayerMask;
+            if (shpere_FRIENDY_FIRE_SIZE > 0f)
+            {
+                num += shpere_FRIENDY_FIRE_SIZE;
+            }
+
+            Vector3 weaponRootPos = requester.PlayerBones.WeaponRoot.position;
+
+            Vector3 v = bot.GetPlayer.MainParts[part].Position - weaponRootPos;
+            Vector3 vector = GClass760.NormalizeFastSelf(v);
+            weaponRootPos += vector * num;
+
+            RaycastHit[] array = new RaycastHit[1];
+            if (Physics.SphereCastNonAlloc(new Ray(weaponRootPos, vector), shpere_FRIENDY_FIRE_SIZE, array, v.magnitude, playerMask) > 0)
+            {
+                foreach (RaycastHit raycastHit in array)
+                {
+                    if (raycastHit.collider != null)
+                    {
+                        player = bot.ShootData.method_4(raycastHit.collider);
+                        if (player != null)
+                        {
+                            break;
+                        }
+                    }
+                }
+            }
+
+            return player != null && player.ProfileId == bot.ProfileId;
         }
 
 
@@ -268,6 +301,9 @@ namespace friendlyPMC.Components
                             {
                                 holdit.AddPossibleExecutors(botOwner_0);
                                 holdit.SetGroup(botOwner_0.BotsGroup.RequestsController);
+
+                                botOwner_0.BotTalk.TrySay(EPhraseTrigger.Roger, false);
+                                botOwner_0.Gesture.TryGestus(EGesture.Good, false);
                             }
                         }
                     }
@@ -287,10 +323,12 @@ namespace friendlyPMC.Components
                     if (gestusDistance < maxGestusDistance && IsRequesterLookingAt(botOwner_0, playerRequester)) 
                     {
                         FollowerGoCheck gclass = new FollowerGoCheck(data.Player, BotRequestType.followMe);
+                        Player requester = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(data.Player.ProfileId);
 
-                        if (botOwner_0.BotRequestController.CurRequest?.BotRequestType == BotRequestType.goToPoint)
+                        bool hadHold = botOwner_0.BotRequestController.CurRequest?.BotRequestType == BotRequestType.goToPoint;
+                        
+                        if(!hadHold)
                         {
-                            Player requester = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(data.Player.ProfileId);
                             botOwner_0.BotRequestController.TryStopCurrent(requester, false);
                         }
 
@@ -301,35 +339,14 @@ namespace friendlyPMC.Components
                         {
                             gclass.AddPossibleExecutors(botOwner_0);
                             gclass.SetGroup(botOwner_0.BotsGroup.RequestsController);
+                            botOwner_0.Gesture.TryGestus(EGesture.Good, false);
 
-                            if (botOwner_0.BotRequestController.CurRequest != null)
+                            if(hadHold)
                             {
-                                gclass.DisposeOtherRequestsWhenTaken = false;
-                                botOwner_0.BotRequestController.SetCurrentRequest(gclass);
+                                botOwner_0.AIData.AskRequests.MyRequestTaken(gclass);
                             }
+
                         }
-                    }
-                    return;
-                }
-                else if (shouldDefault)
-                {
-                    base.method_6(data);
-                }
-            }
-            else if (gesture == EGesture.Good)
-            {
-                if (isBossCommunicating)
-                {
-                    if (
-                        gestusDistance < maxGestusDistance &&
-                        IsRequesterLookingAt(botOwner_0, playerRequester) && IsClosestBotToBoss(botOwner_0) && 
-                        !botOwner_0.Memory.HaveEnemy
-                        )
-                    {
-                        Utils.Utils.SetTimeout(() =>
-                        {
-                            if (botOwner_0.BotState == EBotState.Active) botOwner_0.Gesture.TryGestus(EGesture.Good,false);
-                        }, 1000);
                     }
                     return;
                 }
@@ -363,29 +380,49 @@ namespace friendlyPMC.Components
                         }
                         // else move somewhere in front of the player
                         // - the closest bot shall move
-                        else if (!botOwner_0.Memory.HaveEnemy && IsClosestBotToBoss(botOwner_0))
+                        else if (!botOwner_0.Memory.HaveEnemy && IsClosestBotToCheck(botOwner_0, data.Player, out FollowerGoCheck gclass))
                         {
-                            if (botOwner_0.BotRequestController.CurRequest?.BotRequestType == BotRequestType.goToPoint)
-                            {
-                                Player requester = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(data.Player.ProfileId);
-                                botOwner_0.BotRequestController.TryStopCurrent(requester, false);
-                            }
+                            Player requester = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(data.Player.ProfileId);
 
-                            FollowerGoCheck gclass;
-                            
-                            if (IsClosestBotToCheck(botOwner_0, data.Player, out gclass) && botOwner_0.BotsGroup.RequestsController.TryAddRequest(gclass))
+                            bool hadHold = botOwner_0.BotRequestController.CurRequest?.BotRequestType == BotRequestType.goToPoint;
+
+                            botOwner_0.BotRequestController.TryStopCurrent(requester, false);
+
+                            if (
+                                gclass.CanRequest(botOwner_0) &&
+                                botOwner_0.BotsGroup.RequestsController.TryAddRequest(gclass)
+                            )
                             {
                                 gclass.AddPossibleExecutors(botOwner_0);
                                 gclass.SetGroup(botOwner_0.BotsGroup.RequestsController);
+                                botOwner_0.BotTalk.TrySay(EPhraseTrigger.Going, false);
 
-                                if (botOwner_0.BotRequestController.CurRequest != null)
-                                {
-                                    gclass.DisposeOtherRequestsWhenTaken = false;
-                                    botOwner_0.BotRequestController.SetCurrentRequest(gclass);
-                                }
                             }
+
                         }
                     }
+                }
+                else if (shouldDefault)
+                {
+                    base.method_6(data);
+                }
+            }
+            else if (gesture == EGesture.Good)
+            {
+                if (isBossCommunicating)
+                {
+                    if (
+                        gestusDistance < maxGestusDistance &&
+                        IsRequesterLookingAt(botOwner_0, playerRequester) && IsClosestBotToBoss(botOwner_0) && 
+                        !botOwner_0.Memory.HaveEnemy
+                        )
+                    {
+                        Utils.Utils.SetTimeout(() =>
+                        {
+                            if (botOwner_0.BotState == EBotState.Active) botOwner_0.Gesture.TryGestus(EGesture.Good,false);
+                        }, 1000);
+                    }
+                    return;
                 }
                 else if (shouldDefault)
                 {
@@ -607,7 +644,6 @@ namespace friendlyPMC.Components
                             if (isClose && (notBusy || !botOwner_0.Memory.GoalEnemy.IsVisible))
                             {
                                 botOwner_0.BotTalk.TrySay(EPhraseTrigger.Roger, false);
-                                botOwner_0.Gesture.TryGestus(EGesture.Good, false);
                             }
                         }
                         return;
@@ -621,6 +657,8 @@ namespace friendlyPMC.Components
                     FollowerPatrolInstances.SetFarPatrol(botOwner_0);
                     // - do not cover boss when under attack
                     (botOwner_0.Brain.BaseBrain as FollowerBrain).needsProtection = false;
+
+                    botOwner_0.Gesture.TryGestus(EGesture.Good, false);
 
                 }
                 // on regroup all shall come near the boss

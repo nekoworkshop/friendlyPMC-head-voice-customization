@@ -26,6 +26,16 @@ namespace friendlyPMC.Requests
             return true;
         }
 
+        public override bool CanStartExecute(BotOwner executor)
+        {
+            if(executor.BotRequestController.CurRequest?.BotRequestType == BotRequestType.goToPoint)
+            {
+                return false;
+            }
+
+            return base.CanStartExecute(executor);
+        }
+
         public override AICoreActionEndStruct EndHoldPosition()
         {
             return new AICoreActionEndStruct(false);

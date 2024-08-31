@@ -70,6 +70,7 @@ namespace friendlyPMC.Actions
             _actionsQueue?.Clear();
             (botOwner_0.Brain.Agent as FollowerAIAgent<BotLogicDecision>).OnUpdate -= OnAgentUpdate;
             (botOwner_0.Brain.Agent as FollowerAIAgent<BotLogicDecision>).OnDispose -= OnAgentDispose;
+            _init = false;
         }
 
         public override void Update()
