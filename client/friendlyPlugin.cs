@@ -259,7 +259,6 @@ namespace friendlyPMC
 
             harmony.PatchAll(typeof(LocalGameVmethod4Patch).Assembly);
             harmony.PatchAll(typeof(LocalGameCtorPatch).Assembly);
-            //harmony.PatchAll(typeof(GoalEnemyTracePatch).Assembly);
 
             ConsoleScreen.Processor.RegisterCommand("followerstome", delegate ()
             {

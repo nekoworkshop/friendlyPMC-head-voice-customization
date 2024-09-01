@@ -100,40 +100,4 @@ namespace friendlyPMC.Patches
             }
         }
     }
-    // whoever makes the boss player an enemy, becomes the enemy of the group
-    [HarmonyPatch(typeof(BotMemoryClass), "GoalEnemy", MethodType.Setter)]
-    public static class GoalEnemyTracePatch
-    {
-        private static List<string> addedEnemies = new List<string>();
-
-        public static void Postfix(BotMemoryClass __instance, EnemyInfo value)
-        {
-            var botOwner_0 = AccessTools.Field(typeof(BotMemoryClass), "botOwner_0").GetValue(__instance) as BotOwner;
-
-            if (addedEnemies.Contains(botOwner_0.ProfileId)) return;
-
-            if (
-                !BossPlayers.IsFollower(botOwner_0) &&
-                value != null &&
-                value.Person != null
-            )
-            {
-                var boss = BossPlayers.GetBoss(value.Person.ProfileId);
-                if (boss != null)
-                {
-                    addedEnemies.Add(botOwner_0.ProfileId);
-                    foreach (var flw in boss.Followers)
-                    {
-                        var info = Utils.Enemy.MakeEnemy(flw, botOwner_0.GetPlayer);
-                        //if (!flw.Memory.HaveEnemy) flw.Memory.GoalEnemy = info;
-                    }
-                }
-            }
-        }
-
-        public static void ClearCache()
-        {
-            addedEnemies.Clear();
-        }
-    }
 }

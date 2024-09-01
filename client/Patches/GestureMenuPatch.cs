@@ -81,7 +81,8 @@ namespace friendlyPMC.Patches
                     if(item.Key == EPhraseTrigger.GetBack)
                     {
                         item.Value.Clips = new TaggedClip[] {
-                            item.Value.Clips[Math.Min(4,item.Value.Clips.Length -1)]
+                            // 0 , 1 or 
+                            item.Value.Clips[Math.Min(2,item.Value.Clips.Length -1)]
                         };
                     } 
                     else if (item.Key == EPhraseTrigger.HoldPosition)
@@ -94,6 +95,12 @@ namespace friendlyPMC.Patches
                     {
                         item.Value.Clips = new TaggedClip[] {   
                             item.Value.Clips[0]
+                        };
+                    }
+                    else if (item.Key == EPhraseTrigger.Gogogo)
+                    {
+                        item.Value.Clips = new TaggedClip[] {
+                            item.Value.Clips[Math.Min(1,item.Value.Clips.Length -1)]
                         };
                     }
                 }

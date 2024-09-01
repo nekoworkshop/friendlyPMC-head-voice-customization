@@ -158,7 +158,7 @@
     <Compile Include="Components\BossFollower\KnightFightLayer.cs" />
     <Compile Include="Components\BossFollower\KnightWeaponMtnLayer.cs" />
     <Compile Include="Actions\FollowerAttackMove.cs" />
-    <Compile Include="Actions\FollowerEnemyScan.cs" />
+    <Compile Include="Actions\FollowerEnemyCheck.cs" />
     <Compile Include="Actions\FollowerGoToPoint.cs" />
     <Compile Include="Actions\FollowerHoldPosition.cs" />
     <Compile Include="Components\BossFollowerPlayer.cs" />

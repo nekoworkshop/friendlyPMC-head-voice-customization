@@ -59,12 +59,10 @@ namespace friendlyPMC.Actions
 
             base.method_0();
 
-            if (
-                botOwner_0.BotRequestController.CurRequest == null || 
-                botOwner_0.BotRequestController.CurRequest?.BotRequestType  != BotRequestType.goToPoint
-            ) return;
-
-            if (bool_2) return;
+            if (bool_2)
+            {
+                return;
+            }
 
             if (botOwner_0.Brain.Agent.LastReason == "req:goCheck" && !bool_0)
             {
@@ -79,7 +77,7 @@ namespace friendlyPMC.Actions
 
                 Vector3 finalPosition = forwardPosition + lateralDirection * lateralOffset;
 
-                if (botOwner_0.GoToPoint(finalPosition) == NavMeshPathStatus.PathComplete)
+                if (botOwner_0.GoToPoint(finalPosition,true,0.5f) == NavMeshPathStatus.PathComplete)
                 {
                     bool_0 = true;
                 }
@@ -103,7 +101,7 @@ namespace friendlyPMC.Actions
 
                 Vector3 point = new Vector3(finPos.x, requestPos.y, finPos.z);
 
-                if (botOwner_0.GoToPoint(point) == NavMeshPathStatus.PathComplete)
+                if (botOwner_0.GoToPoint(point,true,0.5f) == NavMeshPathStatus.PathComplete)
                 {
                     bool_1 = true;
                 }
@@ -118,14 +116,23 @@ namespace friendlyPMC.Actions
 
             if(botOwner_0.Mover.IsComeTo(0.5f, false))
             {
-                if(botOwner_0.BotRequestController.CurRequest?.BotRequestType == BotRequestType.goToPoint)
-                {
-                    botOwner_0.BotRequestController.CurRequest.Complete();
-                }
                 
                 bool_0 = false;
                 bool_1 = false;
                 bool_2 = true;
+
+
+                if (
+                    botOwner_0.BotRequestController.CurRequest?.BotRequestType == BotRequestType.followMe ||
+                    botOwner_0.BotRequestController.CurRequest?.BotRequestType == BotRequestType.goToPoint
+                )
+                {
+                    botOwner_0.BotRequestController.CurRequest.Complete();
+                    botOwner_0.BotRequestController.CurRequest = null;
+                }
+
+                botOwner_0.BotsGroup.RequestsController.FindForMe(botOwner_0);
+
 
                 return;
 

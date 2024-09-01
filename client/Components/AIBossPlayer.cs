@@ -14,7 +14,20 @@ namespace friendlyPMC.Components
     {
         private AIBossPlayerLogic aBossLogic;
 
-        public BotsGroup bossGroup = null;
+        private BotsGroup _group = null;
+
+        public BotsGroup bossGroup
+        {
+            get { return _group; }
+            set {
+                if(_group != null)
+                {
+                    _group.OnReportEnemy -= OnReportEnemy;
+                }
+                _group = value;
+                _group.OnReportEnemy += OnReportEnemy;
+            }
+        }
 
         public readonly Player realPlayer;
 
@@ -82,11 +95,25 @@ namespace friendlyPMC.Components
             BossPlayers.RemovePlayerBoss(realPlayer.ProfileId);
         }
 
+        private void OnReportEnemy(IPlayer enemy, Vector3 enemyPos, Vector3 weaponRootLast, EEnemyPartVisibleType isVisibleOnlyBySense)
+        {
+            if(enemy.ProfileId == realPlayer.ProfileId)
+            {
+                return;
+            }
+            _group.CheckAndAddEnemy(enemy);
+        }
+
         public void PhraseSaid(BotEventHandler.GClass599 info)
         {
-            if(info.phrase == (EPhraseTrigger)CustomPhrases.TeamStatus && info.PlayerRequester != null && info.PlayerRequester.ProfileId == realPlayer.ProfileId)
+            if(info.PlayerRequester != null && info.PlayerRequester.ProfileId == realPlayer.ProfileId)
             {
-                PingTeamates.Instance.Ping(this);
+                if(info.phrase == (EPhraseTrigger)CustomPhrases.TeamStatus)
+                    PingTeamates.Instance.Ping(this);
+                else if (info.phrase == EPhraseTrigger.OnRepeatedContact)
+                {
+                    InteractableObjects.CheckSeenEnemies(Player());
+                }
             }
         }
         public new AIBossPlayerLogic GetBossLogic()

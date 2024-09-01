@@ -3,7 +3,10 @@
 - x - add extra checks for canceling healing
 - x - make "Get Back" and "Cover Me" always say the same thing
 - x - new way of becoming aware of the enemy without the watch of GoalEnemy
-- #inprogress - updated Come Here, Stop and That Direction commands to use them to move bots one by one where you want them. 
+- x - updated Come Here, Stop and That Direction commands to use them to move bots one by one where you want them. 
+- #totest bots not accuaring enemy when hit from distance or behind
+- #totest - fix enemy report not making all other teammates aware
+- x - fix enemy scan to have code similar to IsRequesterLookingAt
 
 -- === 3.7 === ---:
 - scav followers to turn hostile if your shoot them (turning hostile can be done through BotMemoryClass > method_7)

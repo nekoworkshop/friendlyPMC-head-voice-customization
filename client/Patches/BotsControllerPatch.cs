@@ -1082,7 +1082,6 @@ namespace friendlyPMC.Patches
             PingTeamates.Disable();
 
             Enemy.ClearEnemiesLocations();
-            GoalEnemyTracePatch.ClearCache();
             Utils.Utils.FlagsClear();
 
             AIDataContructPatch.playerAIData.Clear();

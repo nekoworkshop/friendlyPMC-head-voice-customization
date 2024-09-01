@@ -41,6 +41,9 @@ namespace friendlyPMC.Modules
 
         private bool _isBossDead = false;
 
+        List<Player> _enemiesSeen;
+        Player _closestEnemySeen;
+
         public InteractableObjects()
         {
             if (Instance == null)
@@ -51,6 +54,8 @@ namespace friendlyPMC.Modules
                 _toSendItems = new List<Item>();
                 _followersWithLoot = new Dictionary<string, Dictionary<string, object>>();
                 _doorsToOpen = new Dictionary<string, Door>();
+
+                _enemiesSeen = new List<Player>();
 
             }
 
@@ -206,12 +211,17 @@ namespace friendlyPMC.Modules
             _lootedItems.Clear();
             _toSendItems.Clear();
             _followersWithLoot.Clear();
+            _enemiesSeen.Clear();
 
             _currDoor = null;
             _doorsToOpen.Clear();
 
             _lootItem = null;
             _lootedItems = null;
+           
+            _enemiesSeen = null;
+            
+            _doorsToOpen = null;
 
             _isBossDead = false;
 
@@ -357,8 +367,6 @@ namespace friendlyPMC.Modules
             if(!Instance._doorsToOpen.ContainsKey(bot.ProfileId)) return null;
             return Instance._doorsToOpen[bot.ProfileId];
         }
-   
-
 
         public static void ClearCurLootItem()
         {
@@ -425,6 +433,75 @@ namespace friendlyPMC.Modules
                 Instance._lootedItems.Remove(bot);
                 Instance._followersWithLoot.Remove(bot);
             }
+        }
+
+
+        public static void CheckSeenEnemies(IPlayer player)
+        {
+            Instance._closestEnemySeen = null;
+
+            float scanDistance = friendlyPMC.scanDistance.Value;
+
+            Vector3 playerPosition = player.Transform.position;
+            Vector3 playerLookDirection = player.LookDirection;
+            float sphereRadius = scanDistance / 2;
+            float sphereDistance = scanDistance / 2;
+
+            RaycastHit[] hits = new RaycastHit[100];
+            Ray visionRay = new Ray(playerPosition, playerLookDirection);
+            int numHits = Physics.SphereCastNonAlloc(
+                    new Ray(playerPosition, playerLookDirection),
+                    sphereRadius,
+                    hits,
+                    sphereDistance,
+                     LayerMaskClass.PlayerMask
+                );
+
+            // get all enemies the boss might have seen
+            for (int i = 0; i < numHits; i++)
+            {
+                RaycastHit hit = hits[i];
+                if (hit.collider != null)
+                {
+                    if (hit.collider != null && hit.collider.gameObject != null)
+                    {
+                        if (!Physics.Linecast(visionRay.origin, hit.point, GameWorld.LootMaskObstruction))
+                        {
+                            var enemy = hit.collider.gameObject.GetComponent<Player>();
+                            if (enemy != null)
+                            {
+                                Instance._enemiesSeen.Add(enemy);
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+
+            float dist = Mathf.Infinity;
+            Player closest = null;
+            foreach (var item in Instance._enemiesSeen)
+            {
+                float edist = Vector3.Distance(playerPosition, item.Position);
+                if (edist < dist)
+                {
+                    dist = edist;
+                    closest = item;
+                }
+            }
+
+            if(closest != null ) Instance._closestEnemySeen = closest;
+        }
+
+        public static List<Player> GetSeenEnemies()
+        {
+            return Instance._enemiesSeen;
+
+        }
+
+        public static Player GetClosestSeenEnemy()
+        {
+            return Instance._closestEnemySeen;
         }
 
         public static void BossIsDead()

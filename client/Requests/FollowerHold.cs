@@ -1,4 +1,5 @@
 ﻿using EFT;
+using System.CodeDom.Compiler;
 
 namespace friendlyPMC.Requests
 {
@@ -28,7 +29,10 @@ namespace friendlyPMC.Requests
 
         public override bool CanStartExecute(BotOwner executor)
         {
-            if(executor.BotRequestController.CurRequest?.BotRequestType == BotRequestType.goToPoint)
+            if(
+                executor.BotRequestController.CurRequest?.BotRequestType == BotRequestType.followMe ||
+                executor.BotRequestController.CurRequest?.BotRequestType == BotRequestType.goToPoint
+            )
             {
                 return false;
             }
@@ -38,6 +42,14 @@ namespace friendlyPMC.Requests
 
         public override AICoreActionEndStruct EndHoldPosition()
         {
+            if (Executor != null && 
+                (Executor.BotRequestController.CurRequest?.BotRequestType == BotRequestType.followMe ||
+                Executor.BotRequestController.CurRequest?.BotRequestType == BotRequestType.goToPoint)
+            )
+            {
+                return new AICoreActionEndStruct(true);
+            }
+
             return new AICoreActionEndStruct(false);
         }
     }

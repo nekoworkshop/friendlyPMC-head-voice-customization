@@ -14,8 +14,6 @@ namespace friendlyPMC.Components
         float coverTimer = 0f;
         float suppressTime = 0f;
 
-        private readonly float sprintDistance = 15f;
-
         private CustomNavigationPoint customNavigationPoint_0;
         public FollowerRequestLayer(BotOwner bot, int priority) : base(bot, priority)
         {
@@ -88,7 +86,6 @@ namespace friendlyPMC.Components
             return false;
         }
 
-
         private bool HasBoss()
         {
             return botOwner_0.BotFollower.HaveBoss;
@@ -159,9 +156,10 @@ namespace friendlyPMC.Components
         public override AICoreActionEndStruct ShallEndCurrentDecision(AICoreActionResultStruct<BotLogicDecision> curDecision)
         {
 
-            if(curDecision.Action == BotLogicDecision.goToPoint && botOwner_0.GoToSomePointData.IsCome())
+            if(curDecision.Action == BotLogicDecision.goToPoint && botOwner_0.Mover.IsComeTo(0.5f, false))
             {
-                if (botOwner_0.BotRequestController.CurRequest != null && botOwner_0.BotRequestController.CurRequest.BotRequestType == BotRequestType.goToPoint)
+                if (botOwner_0.BotRequestController.CurRequest?.BotRequestType == BotRequestType.followMe ||
+                    botOwner_0.BotRequestController.CurRequest?.BotRequestType == BotRequestType.goToPoint)
                 {
                     botOwner_0.BotRequestController.CurRequest.Complete();
                 }
@@ -169,10 +167,14 @@ namespace friendlyPMC.Components
                 return new AICoreActionEndStruct("point.Reached", true);
             }
 
-            if (curDecision.Action == BotLogicDecision.holdPosition && botOwner_0.BotRequestController.CurRequest?.BotRequestType == BotRequestType.goToPoint)
+            /* if (
+                curDecision.Action == BotLogicDecision.holdPosition && 
+                (botOwner_0.BotRequestController.CurRequest?.BotRequestType == BotRequestType.goToPoint ||
+                botOwner_0.BotRequestController.CurRequest?.BotRequestType == BotRequestType.followMe)
+            )
             {
                 return new AICoreActionEndStruct("point.New", true);
-            }
+            } */
 
             return base.ShallEndCurrentDecision(curDecision);
         }
