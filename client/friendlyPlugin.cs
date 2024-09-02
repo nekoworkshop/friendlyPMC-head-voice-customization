@@ -294,6 +294,40 @@ namespace friendlyPMC
 
             });
 
+            ConsoleScreen.Processor.RegisterCommand("followersfixheal", delegate ()
+            {
+                GameWorld gameWorld = Singleton<GameWorld>.Instance;
+
+                bool flag = !Singleton<AbstractGame>.Instantiated;
+                if (flag)
+                {
+                    ConsoleScreen.LogError("This command may only be used inraid");
+                    return;
+                }
+
+
+                if (GamePlayerOwner.MyPlayer.HealthController == null || !GamePlayerOwner.MyPlayer.HealthController.IsAlive)
+                {
+                    return;
+                }
+
+                string id = GamePlayerOwner.MyPlayer.ProfileId;
+
+                if (BossPlayers.Instance != null)
+                {
+                    var followers = BossPlayers.GetFollowersByBoss(id);
+                    Vector3 position = GamePlayerOwner.MyPlayer.Transform.position;
+                    foreach (var follower in followers)
+                    {
+                        if (follower != null && follower.GetBot().HealthController.IsAlive)
+                        {
+                            follower.GetBot().WeaponManager.Selector.TakePrevWeapon();
+                        }
+                    }
+                }
+
+            });
+
             configurationManager = Chainloader.PluginInfos
             .Values
             .FirstOrDefault(x => x.Instance.GetType().Name == "ConfigurationManager")

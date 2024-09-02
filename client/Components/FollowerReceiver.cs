@@ -41,7 +41,7 @@ namespace friendlyPMC.Components
 
             bool is_looking = false;
 
-            if (Physics.SphereCastNonAlloc(ray, shpere_FRIENDY_FIRE_SIZE, array, maxGestusDistance, playerMask) > 0)
+            if (Physics.SphereCastNonAlloc(ray, shpere_FRIENDY_FIRE_SIZE, array, 27f, playerMask) > 0)
             {
                 foreach (RaycastHit raycastHit in array)
                 {
@@ -238,11 +238,6 @@ namespace friendlyPMC.Components
             if (isBossCommunicating)
             {
 
-                if (gestusDistance > maxGestusDistance)
-                {
-                    return;
-                }
-
                 if (isAssisting)
                 {
                     if (allyNoGesture.Contains(gesture)) 
@@ -282,7 +277,7 @@ namespace friendlyPMC.Components
             {
                 if (isBossCommunicating)
                 {
-                    if (gestusDistance < maxGestusDistance)
+                    if (gestusDistance <= maxGestusDistance)
                     {
                         (botOwner_0.Brain.BaseBrain as FollowerBrain).BossOrdersChanged();
 
@@ -321,11 +316,9 @@ namespace friendlyPMC.Components
 
                 if (isBossCommunicating)
                 {
-                    if (gestusDistance < maxGestusDistance && 
-                        (
-                            ( IsRequesterLookingAt(botOwner_0, playerRequester) && !goThere ) || 
-                            ( goThere && IsClosestBot(botOwner_0,playerRequester) )
-                        )
+                    if (
+                        (IsRequesterLookingAt(botOwner_0, playerRequester) && !goThere) ||
+                        (goThere && gestusDistance <= maxGestusDistance && IsClosestBot(botOwner_0, playerRequester))
                     ) 
                     {
                         FollowerGoCheck gclass = new FollowerGoCheck(data.Player, goThere ? BotRequestType.goToPoint :  BotRequestType.followMe);
@@ -344,7 +337,7 @@ namespace friendlyPMC.Components
                         {
                             gclass.AddPossibleExecutors(botOwner_0);
                             gclass.SetGroup(botOwner_0.BotsGroup.RequestsController);
-                            botOwner_0.Gesture.TryGestus(EGesture.Good, false);
+                            if(gesture != EGesture.ThatDirection) botOwner_0.Gesture.TryGestus(EGesture.Good, false);
 
                             if (hadHold)
                             {
@@ -365,7 +358,7 @@ namespace friendlyPMC.Components
             {
                 if (isBossCommunicating)
                 {
-                    if (gestusDistance < maxGestusDistance)
+                    if (gestusDistance <= maxGestusDistance)
                     {
 
                         if (botOwner_0.BotRequestController.TryStopCurrent(playerRequester, false))
@@ -452,7 +445,8 @@ namespace friendlyPMC.Components
                 EPhraseTrigger.GoForward,
                 EPhraseTrigger.CoverMe,
                 EPhraseTrigger.CheckHim,
-                EPhraseTrigger.LootBody
+                EPhraseTrigger.LootBody,
+                EPhraseTrigger.OnYourOwn
             };
 
             List<EPhraseTrigger> allyNoPhrase = new List<EPhraseTrigger>{
@@ -637,8 +631,6 @@ namespace friendlyPMC.Components
                 {
                     // - make bot follow boss at a distance
                     FollowerPatrolInstances.SetFarPatrol(botOwner_0);
-                    // - do not cover boss when under attack
-                    (botOwner_0.Brain.BaseBrain as FollowerBrain).needsProtection = false;
 
                     botOwner_0.Gesture.TryGestus(EGesture.Good, false);
 
@@ -978,19 +970,13 @@ namespace friendlyPMC.Components
 
                     return;
                 }
-                // on dismiss remove the bot from being a follower
+                // do not cover boss when under attack
                 else if (info.phrase == EPhraseTrigger.OnYourOwn)
                 {
-                    BotFollowerPlayer follower = BossPlayers.GetFollowersByBoss(boss.Player().ProfileId).Find((BotFollowerPlayer fl) =>
-                    {
-                        return fl.IsBot(botOwner_0);
-                    });
-
-                    if (follower != null)
-                    {
-                        BossPlayers.RemoveFollower(botOwner_0, boss, true);
-                    }
-
+                    (botOwner_0.Brain.BaseBrain as FollowerBrain).needsProtection = false;
+                    (botOwner_0.Brain.BaseBrain as FollowerBrain).SetBossTactic(null);
+                    FollowerPatrolInstances.SetFarPatrol(botOwner_0);
+                    botOwner_0.BotTalk.TrySay(EPhraseTrigger.Roger, true);
                 }
 
             }

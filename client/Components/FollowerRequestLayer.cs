@@ -130,7 +130,7 @@ namespace friendlyPMC.Components
                     GetCoverPoint(botOwner_0.GetPlayer.Transform.position, 50f);
                     if (customNavigationPoint_0 != null)
                     {
-                        request.Complete();
+                        //request.Complete();
                         if (!botOwner_0.CanSprintPlayer)
                         {
                             return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.goToCoverPoint, "req:goHide");
@@ -153,7 +153,7 @@ namespace friendlyPMC.Components
             return new AICoreActionResultStruct<BotLogicDecision>(HasBoss() ? BotLogicDecision.followerPatrol : HoldOrCover(botOwner_0), "req:Unhandled");
         }
 
-        public override AICoreActionEndStruct ShallEndCurrentDecision(AICoreActionResultStruct<BotLogicDecision> curDecision)
+        /*public override AICoreActionEndStruct ShallEndCurrentDecision(AICoreActionResultStruct<BotLogicDecision> curDecision)
         {
 
             if(curDecision.Action == BotLogicDecision.goToPoint && botOwner_0.Mover.IsComeTo(0.5f, false))
@@ -167,17 +167,8 @@ namespace friendlyPMC.Components
                 return new AICoreActionEndStruct("point.Reached", true);
             }
 
-            /* if (
-                curDecision.Action == BotLogicDecision.holdPosition && 
-                (botOwner_0.BotRequestController.CurRequest?.BotRequestType == BotRequestType.goToPoint ||
-                botOwner_0.BotRequestController.CurRequest?.BotRequestType == BotRequestType.followMe)
-            )
-            {
-                return new AICoreActionEndStruct("point.New", true);
-            } */
-
             return base.ShallEndCurrentDecision(curDecision);
-        }
+        }*/
 
         public override AICoreActionEndStruct EndSuppressFire()
         {

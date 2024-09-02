@@ -209,7 +209,7 @@ namespace friendlyPMC.Components
             }
             else if (_player.bossGroup != null)
             {
-                // clear BTR as anemy
+                // do enemy clearing
                 foreach (var item in _bot.EnemiesController.EnemyInfos)
                 {
                     if (item.Value.Person?.Profile?.Info?.Settings?.Role == WildSpawnType.shooterBTR)
@@ -218,6 +218,13 @@ namespace friendlyPMC.Components
                         break;
                     }
                 }
+
+                _player.Followers.ForEach(bt => { 
+                    if(_bot.EnemiesController.EnemyInfos.TryGetValue(bt, out var info))
+                    {
+                        _bot.EnemiesController.EnemyInfos.Remove(bt);
+                    }
+                });
 
                 _player.bossGroup.AddMember(_bot, false);
             }

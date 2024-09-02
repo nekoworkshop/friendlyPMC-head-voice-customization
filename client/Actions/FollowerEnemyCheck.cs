@@ -21,7 +21,7 @@ namespace friendlyPMC.Actions
 
                     EnemyInfo info = Utils.Enemy.MakeEnemy(bot, closest);
 
-                    if (info != null && !bot.Memory.HaveEnemy)
+                    if (info != null && !bot.Memory.HaveEnemy && !bot.Medecine.FirstAid.Using && !bot.Medecine.SurgicalKit.Using)
                     {
                         info.PriorityIndex = 0;
                         info.SetVisible(true);

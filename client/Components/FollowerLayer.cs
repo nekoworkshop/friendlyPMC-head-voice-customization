@@ -167,7 +167,7 @@ namespace friendlyPMC.Components
                 else if (botOwner_0.Medecine.SurgicalKit.Using) botOwner_0.Medecine.SurgicalKit.CancelCurrent();
                 
                 return new AICoreActionEndStruct("EndHeal", true);
-            } else if(heal_time + 20f < Time.time) 
+            } else if(heal_time + 30f < Time.time) 
             {
                 if (botOwner_0.Medecine.FirstAid.Using) botOwner_0.Medecine.FirstAid.CancelCurrent();
                 else if (botOwner_0.Medecine.SurgicalKit.Using) botOwner_0.Medecine.SurgicalKit.CancelCurrent();

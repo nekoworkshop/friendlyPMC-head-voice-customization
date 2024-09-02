@@ -25,8 +25,6 @@ namespace friendlyPMC.Components
             get { return commonLayer.bossOuterRadius; }
         }
 
-        private readonly float nearSearchRadius = 30f;
-
         private float coverTimer = 0f;
         private float suppressTime = 0f;
 
@@ -172,8 +170,7 @@ namespace friendlyPMC.Components
 
                     if (
                         botOwner_0.BotRequestController.CurRequest != null &&
-                        (botOwner_0.BotRequestController.CurRequest.BotRequestType == BotRequestType.goToPoint ||
-                        botOwner_0.BotRequestController.CurRequest.BotRequestType == BotRequestType.attackClose)
+                        botOwner_0.BotRequestController.CurRequest.BotRequestType == BotRequestType.attackClose
                     )
                     {
                         botOwner_0.BotRequestController.CurRequest.Complete();
@@ -398,7 +395,7 @@ namespace friendlyPMC.Components
             }
 
             // suppression fire request
-            if ((!botOwner_0.Memory.HaveEnemy || !botOwner_0.Memory.GoalEnemy.IsVisible) && request != null && request.BotRequestType == BotRequestType.suppressionFire)
+            if (botOwner_0.Memory.HaveEnemy && request != null && request.BotRequestType == BotRequestType.suppressionFire)
             {
                 botOwner_0.BotTalk.TrySay(EPhraseTrigger.Covering, true);
                 suppressTime = Time.time + 2f;
@@ -425,44 +422,6 @@ namespace friendlyPMC.Components
                 AICoreActionResultStruct<BotLogicDecision> decision = sniperLayer.GetDecision();
                 customNavigationPoint_0 = sniperLayer.NavigationPoint;
                 return decision;
-            }
-
-            if (request != null && request.BotRequestType == BotRequestType.goToPoint)
-            {
-                if (botOwner_0.Memory.HaveEnemy)
-                {
-                    Vector3 enemyPos = botOwner_0.Memory.GoalEnemy.CurrPosition;
-
-                    GetApproachablePoint();
-                    if (customNavigationPoint_0 == null)
-                    {
-                        GetClosestCoverPoint(enemyPos, nearSearchRadius);
-                    }
-
-                    if (customNavigationPoint_0 == null)
-                    {
-                        float diste = GetNavDistance(enemyPos);
-                        if (diste < commonLayer.sprintDistance)
-                        {
-                            return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.goToEnemy, "getInCloseSlow");
-                        }
-                        else
-                        {
-                            return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToEnemy, "getInCloseFast");
-                        }
-                    }
-
-                    float dist = GetNavDistance(customNavigationPoint_0.Position);
-
-                    if (dist < commonLayer.sprintDistance)
-                    {
-                        return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMoving, "getInCloseSlow");
-                    }
-                    else
-                    {
-                        return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "getInCloseFast");
-                    }
-                }
             }
 
             return DecideTactic();
