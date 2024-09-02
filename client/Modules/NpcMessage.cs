@@ -131,8 +131,8 @@ namespace friendlyPMC.Modules
             else if (allies.Count > 0) info = allies.Random();
             else
             {
-                info = mates.Random();
-                if (Instance._matesLost.Count > 0)
+                info = mates.Count > 0 ? mates.Random() : null;
+                if (info != null && Instance._matesLost.Count > 0)
                 {
                     ((Dictionary<string, object>)((Dictionary<string, object>)info)["SquadInfo"]).Add("Partial", true);
                     ((Dictionary<string, object>)((Dictionary<string, object>)info)["SquadInfo"]).Add("Lost", Instance._matesLost);

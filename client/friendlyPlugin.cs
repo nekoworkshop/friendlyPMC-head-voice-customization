@@ -36,7 +36,8 @@ namespace friendlyPMC
     {
         SniperSearch = 100,
         CoverToCover = 101,
-        EnemySearch = 102
+        EnemySearch = 102,
+        MoveToPoint = 103
     }
 
     public enum CustomPhrases
@@ -169,6 +170,12 @@ namespace friendlyPMC
                 "memberEquipment", new Dictionary<string,string>{
                     { "Name", "Squad Member {0} Equipment"},
                     { "Description", "Set Squad member equipment. You can choose between default (which is SPT random equipment), user's current equipment or user created presets (recommended if using a tactic different than default"}
+                }
+            },
+            {
+                "equipmentLock", new Dictionary<string,string>{
+                    { "Name", "Lock Squad Equipment"},
+                    { "Description", "Locks the equipment of the squad members. This is useful if you want to use your own equipment presets and do not wish to loose the equipment if you or them die."}
                 }
             }
         };

@@ -147,9 +147,7 @@ namespace friendlyPMC.Components.Tactics
 
                 if (customNavigationPoint_0 != null && coverTimer < Time.time)
                 {
-                    coverTimer = Time.time + GClass761.Random(3f, 5f);
-                    botOwner_0.GoToSomePointData.SetPoint(customNavigationPoint_0.Position);
-                    return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.goToPoint, "reposition");
+                    return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.goToCoverPoint, "reposition");
                 }
                 // -- fallback #1, just wait
                 if (holdTimer < Time.time)

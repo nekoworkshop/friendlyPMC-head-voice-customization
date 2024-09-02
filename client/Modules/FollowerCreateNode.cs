@@ -32,6 +32,9 @@ namespace friendlyPMC.Modules
             if (type == BotLogicDecision.goToPoint)
                 return new FollowerGoToPoint(bot);
 
+            if (type == (BotLogicDecision)CustomBotDecisions.MoveToPoint)
+                return new FollowerMoveToPoint(bot);
+
             if(type == (BotLogicDecision)CustomBotDecisions.SniperSearch)
                 return new FollowerSniperSearch(bot);
 

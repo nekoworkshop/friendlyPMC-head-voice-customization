@@ -26,7 +26,7 @@ namespace friendlyPMC.Components
                 base.Update();
                 AICoreActionResultStruct<T>? actionResultStruct = base.LastResult();
 
-                if (actionResultStruct != null) OnUpdate?.Invoke(actionResultStruct.Value);
+                if (actionResultStruct.HasValue) OnUpdate?.Invoke(actionResultStruct.Value);
 
             }
             catch (Exception ex)

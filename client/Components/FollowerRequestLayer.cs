@@ -91,16 +91,9 @@ namespace friendlyPMC.Components
             return botOwner_0.BotFollower.HaveBoss;
         }
 
-        private pitAIBossPlayer GetBoss()
-        {
-            return (pitAIBossPlayer)botOwner_0.BotFollower.BossToFollow;
-        }
-
         public override AICoreActionResultStruct<BotLogicDecision> GetDecision()
         {
             BotRequest request = botOwner_0.BotRequestController.CurRequest;
-
-            IPlayer requester = request != null ? botOwner_0.BotRequestController.CurRequest.Requester : null;
 
             if(request == null)
             {
@@ -112,7 +105,7 @@ namespace friendlyPMC.Components
                 // on follow me request from the boss, just come closer to the boss or get out of hold position
                 case BotRequestType.followMe:
 
-                    return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.goToPoint, "req:comeHere");
+                    return new AICoreActionResultStruct<BotLogicDecision>((BotLogicDecision)CustomBotDecisions.MoveToPoint, "req:comeHere");
 
                 case (BotRequestType)CustomBotRequestType.Regroup:
                     request.Complete();
@@ -144,7 +137,7 @@ namespace friendlyPMC.Components
                     }
 
                 case BotRequestType.goToPoint:
-                    return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.goToPoint, "req:goCheck");
+                    return new AICoreActionResultStruct<BotLogicDecision>((BotLogicDecision)CustomBotDecisions.MoveToPoint, "req:goCheck");
             }
 
             
@@ -153,22 +146,16 @@ namespace friendlyPMC.Components
             return new AICoreActionResultStruct<BotLogicDecision>(HasBoss() ? BotLogicDecision.followerPatrol : HoldOrCover(botOwner_0), "req:Unhandled");
         }
 
-        /*public override AICoreActionEndStruct ShallEndCurrentDecision(AICoreActionResultStruct<BotLogicDecision> curDecision)
+        public override AICoreActionEndStruct ShallEndCurrentDecision(AICoreActionResultStruct<BotLogicDecision> curDecision)
         {
 
             if(curDecision.Action == BotLogicDecision.goToPoint && botOwner_0.Mover.IsComeTo(0.5f, false))
             {
-                if (botOwner_0.BotRequestController.CurRequest?.BotRequestType == BotRequestType.followMe ||
-                    botOwner_0.BotRequestController.CurRequest?.BotRequestType == BotRequestType.goToPoint)
-                {
-                    botOwner_0.BotRequestController.CurRequest.Complete();
-                }
-
                 return new AICoreActionEndStruct("point.Reached", true);
             }
 
             return base.ShallEndCurrentDecision(curDecision);
-        }*/
+        }
 
         public override AICoreActionEndStruct EndSuppressFire()
         {
