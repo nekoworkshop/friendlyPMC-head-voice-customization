@@ -364,7 +364,7 @@ namespace friendlyPMC.Components
 
 
             settings.FileSettings.Look.CAN_USE_LIGHT = true;
-            settings.FileSettings.Look.FULL_SECTOR_VIEW = false; // seems this makes them too aware of everything around them
+            settings.FileSettings.Look.FULL_SECTOR_VIEW = true; // seems this makes them aware of everything around them
             settings.FileSettings.Look.NIGHT_VISION_ON = 75.0f;
             settings.FileSettings.Look.NIGHT_VISION_OFF = 125.0f;
             settings.FileSettings.Look.NIGHT_VISION_DIST = 125.0f;
@@ -383,12 +383,11 @@ namespace friendlyPMC.Components
             settings.FileSettings.Look.NO_GREEN_DIST = 4.0f;
             settings.FileSettings.Look.NO_GRASS_DIST = 5.0f;
 
-            settings.FileSettings.Hearing.CHANCE_TO_HEAR_SIMPLE_SOUND_0_1 = 0.4f;
             settings.FileSettings.Hearing.DISPERSION_COEF = 1f;
             settings.FileSettings.Hearing.CLOSE_DIST = 6f;
             settings.FileSettings.Hearing.FAR_DIST = 35f;
 
-
+            settings.FileSettings.Cover.SIT_DOWN_WHEN_HOLDING = true;
 
             bot.Settings = settings;
             bot.ENEMY_LOOK_AT_ME = Mathf.Cos(settings.FileSettings.Mind.ENEMY_LOOK_AT_ME_ANG * 0.017453292f);

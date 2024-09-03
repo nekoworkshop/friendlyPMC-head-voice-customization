@@ -41,80 +41,42 @@ namespace friendlyPMC.Components
             RaycastHit[] array = new RaycastHit[20];
             Ray ray = requester.InteractionRay;
 
-            Player bot = null;
+            pitAIBossPlayer boss = BossPlayers.GetBoss(requester.ProfileId);
 
-            if (Physics.SphereCastNonAlloc(ray, shpere_FRIENDY_FIRE_SIZE, array, magnitude, playerMask) > 0)
+            lookedAtPlayer = null;
+            try
             {
-                foreach (RaycastHit raycastHit in array)
+                if (Physics.SphereCastNonAlloc(ray, shpere_FRIENDY_FIRE_SIZE, array, magnitude, playerMask) > 0)
                 {
-                    if (raycastHit.collider != null && raycastHit.collider.gameObject != null)
+                    foreach (RaycastHit raycastHit in array)
                     {
-                        if (!Physics.Linecast(ray.origin, raycastHit.point, GameWorld.LootMaskObstruction))
+                        if (raycastHit.collider != null && raycastHit.collider.gameObject != null)
                         {
-                            bot = raycastHit.collider.gameObject.GetComponent<Player>();
-                            if (bot != null)
+                            if (!Physics.Linecast(ray.origin, raycastHit.point, GameWorld.LootMaskObstruction))
                             {
-                                break;
+                                BotOwner bot = raycastHit.collider.gameObject.GetComponent<BotOwner>();
+                                if (bot != null && BossPlayers.IsFollower(bot, boss))
+                                {
+
+                                    lookedAtPlayer = bot.GetPlayer;
+                                    break;
+                                }
                             }
                         }
                     }
                 }
+            } catch(Exception ex) {
+                Components.Logger.LogError(ex);
             }
-            
-            lookedAtPlayer = bot;
+
             lookedAtTime = Time.time + 0.5f;
-            return bot;
+            return lookedAtPlayer;
         }
 
         private static bool IsRequesterLookingAt(BotOwner bot, Player requester, float distance = 27f)
         {
             Player at = IsRequesterLookingAtSomeone(requester,distance);
             return at != null && at.ProfileId == bot.ProfileId;
-        }
-
-
-        private static bool IsClosestBotToBoss(BotOwner bot)
-        {
-            if (closestTime > Time.time)
-            {
-                if (closestPlayer == null) return false;
-                return closestPlayer.ProfileId == bot.ProfileId;
-            }
-
-            closestTime = Time.time + 0.5f;
-
-            BotOwner closest = null;
-            float dist = Mathf.Infinity;
-
-            var boss = bot.BotFollower.BossToFollow;
-            
-            if (boss == null) return false;
-
-            Vector3 bossPos = bot.BotFollower.BossToFollow.Player().Transform.position;
-
-            boss.Followers.ForEach(fl =>
-            {
-                if (fl != null)
-                {
-                    Vector3 pos = fl.GetPlayer.Transform.position;
-                    float fldist = (bossPos - pos).sqrMagnitude;
-                    if (fldist < dist)
-                    {
-                        closest = fl;
-                        dist = fldist;
-                    }
-                }
-
-            });
-
-            closestPlayer = closest;
-
-            if (closestPlayer.ProfileId == bot.ProfileId)
-            {
-                return true;
-            }
-
-            return false;
         }
 
         private static bool IsClosestBot(BotOwner bot, IPlayer requester)
@@ -296,8 +258,6 @@ namespace friendlyPMC.Components
                             return;
                         }
 
-                        (botOwner_0.Brain.BaseBrain as FollowerBrain).BossOrdersChanged();
-
                         if (botOwner_0.BotRequestController.TryStopCurrent(playerRequester, false))
                         {
                             FollowerHold holdit = new FollowerHold(playerRequester);
@@ -338,28 +298,22 @@ namespace friendlyPMC.Components
                         (goThere && gestusDistance <= maxGestusDistance && IsClosestBot(botOwner_0, playerRequester))
                     ) 
                     {
-                        FollowerGoCheck gclass = new FollowerGoCheck(data.Player, goThere ? BotRequestType.goToPoint :  BotRequestType.followMe);
-
                         bool hadHold = botOwner_0.BotRequestController.CurRequest?.BotRequestType == BotRequestType.wait;
 
-                        if (!hadHold)
-                        {
-                            botOwner_0.BotRequestController.TryStopCurrent(playerRequester, false);
-                        }
+                        FollowerGoCheck gclass = new FollowerGoCheck(data.Player, goThere ? BotRequestType.goToPoint :  BotRequestType.followMe,hadHold);
+
+                        
+
 
                         if (
+                            botOwner_0.BotRequestController.TryStopCurrent(playerRequester, false) &&
                             gclass.CanRequest(botOwner_0) &&
-                            (hadHold || botOwner_0.BotsGroup.RequestsController.TryAddRequest(gclass))
+                            botOwner_0.BotsGroup.RequestsController.TryAddRequest(gclass)
                         )
                         {
                             gclass.AddPossibleExecutors(botOwner_0);
                             gclass.SetGroup(botOwner_0.BotsGroup.RequestsController);
                             if(gesture != EGesture.ThatDirection) botOwner_0.Gesture.TryGestus(EGesture.Good, false);
-
-                            if (hadHold)
-                            {
-                                botOwner_0.BotRequestController.SetCurrentRequest(gclass);
-                            }
 
                         }
                     }
@@ -405,7 +359,7 @@ namespace friendlyPMC.Components
                 {
                     if (
                         gestusDistance <= maxGestusDistance &&
-                        IsRequesterLookingAt(botOwner_0, playerRequester) && IsClosestBotToBoss(botOwner_0) && 
+                        IsRequesterLookingAt(botOwner_0, playerRequester) && IsClosestBot(botOwner_0, playerRequester) && 
                         !botOwner_0.Memory.HaveEnemy
                         )
                     {
@@ -632,7 +586,6 @@ namespace friendlyPMC.Components
                     FollowerPatrolInstances.SetNearPatrol(botOwner_0);
                     // - cover boss when under attack
                     (botOwner_0.Brain.BaseBrain as FollowerBrain).needsProtection = true;
-
                     (botOwner_0.Brain.BaseBrain as FollowerBrain).BossOrdersChanged();
 
                     // - regroup to boss
@@ -802,13 +755,12 @@ namespace friendlyPMC.Components
                 // on Hold Position switch to hold tactic 
                 else if (info.phrase == EPhraseTrigger.HoldPosition && (botLookedAt == null || botLookedAt.ProfileId == botOwner_0.ProfileId))
                 {
+                    (botOwner_0.Brain.BaseBrain as FollowerBrain).SetBossTactic("Defend");
                     (botOwner_0.Brain.BaseBrain as FollowerBrain).BossOrdersChanged();
 
                     Player alivePlayerByProfileID = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(requester.ProfileId);
 
-                    (botOwner_0.Brain.BaseBrain as FollowerBrain).SetBossTactic("Defend");
-
-                    if(botOwner_0.BotRequestController.CurRequest != null && botOwner_0.BotRequestController.CurRequest.BotRequestType != BotRequestType.hold)
+                    if (botOwner_0.BotRequestController.CurRequest != null && botOwner_0.BotRequestController.CurRequest.BotRequestType != BotRequestType.wait)
                         botOwner_0.BotRequestController.TryStopCurrent(alivePlayerByProfileID, false);
 
                     if(isClose) {
@@ -824,8 +776,6 @@ namespace friendlyPMC.Components
                         if(isClose && !botOwner_0.Memory.GoalEnemy.IsVisible) botOwner_0.BotTalk.Say(EPhraseTrigger.Negative, true, null);
                         return;
                     } 
-
-                    (botOwner_0.Brain.BaseBrain as FollowerBrain).BossOrdersChanged();
 
                     if (botOwner_0.BotRequestController.TryStopCurrent(playerRequester, false))
                     {
@@ -845,11 +795,12 @@ namespace friendlyPMC.Components
                 // on Go Go Go reset tactic
                 else if (info.phrase == EPhraseTrigger.Gogogo && (botLookedAt == null || botLookedAt.ProfileId == botOwner_0.ProfileId))
                 {
+                    (botOwner_0.Brain.BaseBrain as FollowerBrain).SetBossTactic(null);
                     (botOwner_0.Brain.BaseBrain as FollowerBrain).BossOrdersChanged();
 
                     Player alivePlayerByProfileID = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(requester.ProfileId);
-                    botOwner_0.BotRequestController.TryStopCurrent(alivePlayerByProfileID, false);
-                    (botOwner_0.Brain.BaseBrain as FollowerBrain).SetBossTactic(null);
+                    if (botOwner_0.BotRequestController.CurRequest != null && botOwner_0.BotRequestController.CurRequest.BotRequestType != BotRequestType.wait)
+                        botOwner_0.BotRequestController.TryStopCurrent(alivePlayerByProfileID, false);
 
                     if (isClose && notBusy)
                     {
@@ -1027,7 +978,11 @@ namespace friendlyPMC.Components
                     (botOwner_0.Brain.BaseBrain as FollowerBrain).needsProtection = false;
                     (botOwner_0.Brain.BaseBrain as FollowerBrain).SetBossTactic(null);
                     FollowerPatrolInstances.SetFarPatrol(botOwner_0);
-                    if(isClose) botOwner_0.BotTalk.TrySay(EPhraseTrigger.Roger, true);
+
+                    Player alivePlayerByProfileID = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(requester.ProfileId);
+                    botOwner_0.BotRequestController.TryStopCurrent(alivePlayerByProfileID, false);
+
+                    if (isClose) botOwner_0.BotTalk.TrySay(EPhraseTrigger.Roger, true);
                 }
 
             }

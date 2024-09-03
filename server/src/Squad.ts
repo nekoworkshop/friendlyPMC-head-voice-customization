@@ -337,8 +337,6 @@ class friendlyPMC {
 				new RouteAction("/client/game/bot/followergenerate", (url: string, info: { Info: IGenerateBotsRequestData; Preset?: string; PlayerUniform?: boolean }, sessionID: string, output: string): any => {
 					const pmcProfile = profileHelper.getPmcProfile(sessionID);
 
-					const userBuilds = buildController.getUserBuilds(sessionID);
-
 					let level = pmcProfile.Info.Level;
 
 					const conditionPromises: IBotBase[] = [];

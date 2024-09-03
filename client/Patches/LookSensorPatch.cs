@@ -15,13 +15,25 @@ namespace friendlyPMC.Patches
         [HarmonyPrefix]
         static bool Prefix(LookSensor __instance)
         {
-            BotOwner botOwner = AccessTools.Field(typeof(LookSensor), "_botOwner").GetValue(__instance) as BotOwner;
-            // @TODO : figure out out why it triggers error for followers in some circumstances
+            // @TODO : figure out out why _weaponRootTransform is null
             try
             {
+                BifacialTransform _weaponRootTransform = AccessTools.Field(typeof(LookSensor), "_weaponRootTransform").GetValue(__instance) as BifacialTransform;
+
+                if (_weaponRootTransform == null)
+                {
+                    BotOwner botOwner = AccessTools.Field(typeof(LookSensor), "_botOwner").GetValue(__instance) as BotOwner;
+                    if (botOwner.Fireport != null)
+                    {
+                        AccessTools.Field(typeof(LookSensor), "_weaponRootTransform").SetValue(__instance, botOwner.Fireport);
+                    }
+                }
+
+                if (_weaponRootTransform == null) return false;
+
                 __instance.UpdateLook();
             } catch(Exception ex) {
-                Components.Logger.LogInfo("AIPeriodicUpdate Error for " + botOwner.Profile.Nickname);
+                Components.Logger.LogInfo("AIPeriodicUpdate Error");
                 Components.Logger.LogInfo(ex.StackTrace);
             }
 

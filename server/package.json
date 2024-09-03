@@ -1,6 +1,6 @@
 {
 	"name": "friendlyPMC",
-	"version": "3.6.5",
+	"version": "3.7.0",
 	"main": "src/Squad.js",
 	"license": "See License file",
 	"author": "Pit Alex",

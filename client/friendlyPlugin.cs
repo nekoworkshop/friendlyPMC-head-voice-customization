@@ -62,7 +62,7 @@ namespace friendlyPMC
         }
     }
 
-    [BepInPlugin("xyz.pit.companion", "friendlyPMC", "3.6.5")]
+    [BepInPlugin("xyz.pit.companion", "friendlyPMC", "3.7.0")]
     [BepInDependency("xyz.drakia.bigbrain")]
     [BepInDependency("xyz.drakia.waypoints")]
     [BepInDependency("com.Arys.UnityToolkit")]
@@ -264,8 +264,9 @@ namespace friendlyPMC
 
             var harmony = new Harmony("xyz.pit.companion");
 
-            harmony.PatchAll(typeof(LocalGameVmethod4Patch).Assembly);
             harmony.PatchAll(typeof(LocalGameCtorPatch).Assembly);
+            harmony.PatchAll(typeof(LocalGameVmethod4Patch).Assembly); // backup spawn patch
+            new BossSpawnWaveManagerClassPatch().Enable(); // normal spawn patch
 
             ConsoleScreen.Processor.RegisterCommand("followerstome", delegate ()
             {

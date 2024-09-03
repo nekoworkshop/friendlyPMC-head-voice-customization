@@ -1,5 +1,6 @@
 ﻿using Comfort.Common;
 using EFT;
+using friendlyPMC.Components.Tactics;
 using friendlyPMC.Modules;
 using friendlyPMC.Utils;
 using System;
@@ -15,9 +16,13 @@ namespace friendlyPMC.Components
         float suppressTime = 0f;
 
         private CustomNavigationPoint customNavigationPoint_0;
+
+        private FollowerCommonLayer commonLayer;
+
+        float heal_time = 0f;
         public FollowerRequestLayer(BotOwner bot, int priority) : base(bot, priority)
         {
-
+            commonLayer = new FollowerCommonLayer(bot, priority);
         }
 
         public override string Name()
@@ -113,7 +118,11 @@ namespace friendlyPMC.Components
 
                 // stay in place
                 case BotRequestType.wait:
-
+                    if(heal_time + 30f < Time.time  && (botOwner_0.Medecine.FirstAid.Have2Do || botOwner_0.Medecine.SurgicalKit.HaveWork))
+                    {
+                        heal_time = Time.time;
+                        return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.heal, "heal");
+                    }
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.holdPosition, "req:holdPos");
 
                 // spread out requests
@@ -172,6 +181,21 @@ namespace friendlyPMC.Components
                 return aICoreActionEndStruct_1;
             }
             return aICoreActionEndStruct;
+        }
+
+        public override AICoreActionEndStruct EndHeal()
+        {
+            if (heal_time + 30f < Time.time)
+            {
+                if (botOwner_0.Medecine.FirstAid.Using) botOwner_0.Medecine.FirstAid.CancelCurrent();
+                else if (botOwner_0.Medecine.SurgicalKit.Using) botOwner_0.Medecine.SurgicalKit.CancelCurrent();
+
+                botOwner_0.AIData.Player.ActiveHealthController.RestoreFullHealth();
+
+                return new AICoreActionEndStruct("EndHealTimer", true);
+            }
+
+            return aICoreActionEndStruct_1;
         }
 
         public override CustomNavigationPoint FindPoint(CoverSearchData data, Func<CoverSearchData, CustomNavigationPoint> p, bool checkCurrent)

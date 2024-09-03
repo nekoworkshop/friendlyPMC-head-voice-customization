@@ -59,7 +59,7 @@ namespace friendlyPMC.Patches
                     {
                         BossPlayers.AddFollower(posibleExecuter, playerBoss);
                         // - bot signals "OK"
-                        posibleExecuter.BotTalk.TrySay(EPhraseTrigger.Roger);
+                        posibleExecuter.BotTalk.TrySay(EPhraseTrigger.Roger,false);
                         posibleExecuter.Gesture.TryGestus(EGesture.Good, true);
 
                     }

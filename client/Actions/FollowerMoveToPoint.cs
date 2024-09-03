@@ -1,13 +1,14 @@
 ﻿using EFT;
 using friendlyPMC.Components;
+using friendlyPMC.Requests;
 using HarmonyLib;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 using UnityEngine;
 using UnityEngine.AI;
+
+using Comfort.Common;
 
 namespace friendlyPMC.Actions
 {
@@ -70,6 +71,8 @@ namespace friendlyPMC.Actions
             {
                 return;
             }
+
+            if (botOwner_0.BotRequestController.CurRequest == null) return;
 
             if (botOwner_0.Brain.Agent.LastReason == "req:goCheck" && !bool_0)
             {
@@ -141,37 +144,28 @@ namespace friendlyPMC.Actions
                     botOwner_0.BotRequestController.CurRequest?.BotRequestType == BotRequestType.goToPoint
                 )
                 {
+                    var req = botOwner_0.BotRequestController.CurRequest as FollowerGoCheck;
+                    var requester = req != null ? req.Requester : null;
+
                     botOwner_0.BotRequestController.CurRequest.Complete();
                     botOwner_0.BotRequestController.CurRequest = null;
-                }
-                // switch back to hold position if available
-                bool hasHold = false;
-                try
-                {
-                    var _listOfRequests = AccessTools.Field(typeof(BotGroupRequestController), "_listOfRequests").GetValue(botOwner_0.BotsGroup.RequestsController) as List<BotRequest>;
-                    if (_listOfRequests != null)
+                    // back to hold position
+                    if (req != null && req.FromWait && !botOwner_0.Memory.HaveEnemy)
                     {
-                        foreach (BotRequest botRequest2 in _listOfRequests)
+                        Player playerRequester = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(requester.ProfileId);
+
+                        if (botOwner_0.BotRequestController.TryStopCurrent(playerRequester, false))
                         {
-                            if (
-                                botRequest2.CanExecuteByMyself &&
-                                botOwner_0.GetPlayer.Id != botRequest2.Requester.Id &&
-                                botRequest2.CanStartExecute(botOwner_0) &&
-                                botRequest2.BotRequestType == BotRequestType.wait
-                            )
+                            FollowerHold holdit = new FollowerHold(playerRequester);
+
+                            if (botOwner_0.BotsGroup.RequestsController.TryAddRequest(holdit))
                             {
-                                botOwner_0.BotRequestController.SetCurrentRequest(botRequest2);
-                                hasHold = true;
-                                break;
+                                holdit.AddPossibleExecutors(botOwner_0);
+                                holdit.SetGroup(botOwner_0.BotsGroup.RequestsController);
                             }
                         }
                     }
                 }
-                catch
-                {
-                }
-
-                if (!hasHold) botOwner_0.BotsGroup.RequestsController.FindForMe(botOwner_0);
 
                 return;
 

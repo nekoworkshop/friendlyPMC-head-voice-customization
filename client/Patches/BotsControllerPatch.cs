@@ -21,6 +21,7 @@ using System.Linq;
 using IProfileData = GClass592;
 using ProfileEndPoint = ProfileEndpointFactoryAbstractClass;
 using BotCreator = GClass814;
+using System.Threading.Tasks;
 
 
 namespace friendlyPMC.Patches
@@ -589,21 +590,28 @@ namespace friendlyPMC.Patches
             Profile playerProfile = player.Player().Profile;
             
             BotCreationDataClass bot;
+            
+            List<UniTask> profileTasks = new List<UniTask>();
 
             if (side != EPlayerSide.Savage)
             {
                 for (int i = 0; i < memberCount; i++)
                 {
-                    var pr = await GenerateFollowerProfile(botCreator, botData.PrepareToLoadBackend(1));
-                    botCreationData.AddProfile(pr);
-                    // take player's clothes if flag is turned on
-                    if (friendlyPMC.squadUniform.Value)
-                    {
-                        pr.Customization[EBodyModelPart.Body] = playerProfile.Customization[EBodyModelPart.Body];
-                        pr.Customization[EBodyModelPart.Feet] = playerProfile.Customization[EBodyModelPart.Feet];
-                        pr.Customization[EBodyModelPart.Hands] = playerProfile.Customization[EBodyModelPart.Hands];
-                    }
+                     profileTasks.Add(GenerateFollowerProfile(botCreator, botData.PrepareToLoadBackend(1)).ContinueWith(pr =>
+                     {
+                         botCreationData.AddProfile(pr);
+                         // take player's clothes if flag is turned on
+                         if (friendlyPMC.squadUniform.Value)
+                         {
+                             pr.Customization[EBodyModelPart.Body] = playerProfile.Customization[EBodyModelPart.Body];
+                             pr.Customization[EBodyModelPart.Feet] = playerProfile.Customization[EBodyModelPart.Feet];
+                             pr.Customization[EBodyModelPart.Hands] = playerProfile.Customization[EBodyModelPart.Hands];
+                         }
+                     }));
+                    
                 }
+
+                await UniTask.WhenAll(profileTasks);
 
                 bot = botCreationData;
             }
@@ -613,11 +621,15 @@ namespace friendlyPMC.Patches
             }
 
 
-            List<DependencyGraph<IEasyBundle>.GClass3415> bundleTokens = new List<DependencyGraph<IEasyBundle>.GClass3415>();
-            Dictionary<string,EquipmentClass> profileEquipment = new Dictionary<string,EquipmentClass>();
-
             Dictionary<string,string> profileTactic = new Dictionary<string,string>();
             Dictionary<string, Item> secureContainers = new Dictionary<string, Item>();
+
+
+            Dictionary<string,List<DependencyGraph<IEasyBundle>.GClass3415>> bundleTokens = new Dictionary<string,List<DependencyGraph<IEasyBundle>.GClass3415>>();
+
+            Dictionary<string, EquipmentClass> profileEquipment = new Dictionary<string, EquipmentClass>();
+
+            Dictionary<string,string> bundleJobs = new Dictionary<string, string>();
 
             if (side != EPlayerSide.Savage)
             {
@@ -626,9 +638,6 @@ namespace friendlyPMC.Patches
                 {
                     presets.Add(preset);
                 });
-
-                Dictionary<string,int> usedPresets = new Dictionary<string,int>();
-                List<string> bundleJobs = new List<string>();
 
                 // change bot equipment based on preferences
                 try
@@ -643,8 +652,9 @@ namespace friendlyPMC.Patches
                                 string eq = friendlyPMC.squadMembers[pid][1].Value;
                                 if (eq != null && eq != friendlyPMC.GetEquipOptions()[0])
                                 {
+                                    // remember the original secure container to put it back later as custom presets might overwrite it
                                     var secureContainer = profile.Inventory.Equipment.GetSlot(EquipmentSlot.SecuredContainer).ContainedItem;
-
+                                    // if cloning player equipment
                                     if (eq == friendlyPMC.GetEquipOptions()[1])
                                     {
                                         EquipmentClass equipClone = playerProfile.Inventory.Equipment.CloneItem(null);
@@ -670,6 +680,7 @@ namespace friendlyPMC.Patches
                                         profile.Inventory.Equipment.GetSlot(EquipmentSlot.SecuredContainer).ChangeContainedItemDirectly(secureContainer);
                                         profile.Inventory.Equipment.GetSlot(EquipmentSlot.SecuredContainer).ApplyContainedItem();
                                     }
+                                    // if using custom equipment store the original secure container to use it later, prepare what bundles must be downloaded and associate the bot's profile with the specific preset
                                     else
                                     {
                                         secureContainers.Add(profile.Id, secureContainer.CloneItem());
@@ -679,14 +690,24 @@ namespace friendlyPMC.Patches
                                             if (eq == preset.Name)
                                             {
                                                 var equipment = preset.Equipment.CloneItem(null);
-
-                                                if (!bundleJobs.Contains(preset.Name))
+                                                // - use bundleJobs to detect when more than 1 bot is using the same equipment
+                                                if (!bundleJobs.ContainsKey(preset.Name))
                                                 {
+                                                    // - start collecting all the items used by this preset in order to do bundle load for each
                                                     foreach (var item in equipment.GetAllItems())
                                                     {
-                                                        bundleTokens.Add(item.GetAllBundleTokens());
+                                                        if(!bundleTokens.ContainsKey(profile.Id))
+                                                        {
+                                                            bundleTokens.Add(profile.Id, new List<DependencyGraph<IEasyBundle>.GClass3415>());
+                                                        }
+                                                        bundleTokens[profile.Id].Add(item.GetAllBundleTokens());
                                                     };
-                                                    bundleJobs.Add(preset.Name);
+                                                    
+                                                    bundleJobs[preset.Name] = profile.Id;
+
+                                                } else
+                                                {
+                                                    bundleTokens[profile.Id] = bundleTokens[bundleJobs[preset.Name]];
                                                 }
 
                                                 profileEquipment.Add(profile.Id, equipment);
@@ -694,9 +715,10 @@ namespace friendlyPMC.Patches
                                         }
                                     }
                                 }
-
+                                // remember what tactic this bot is associated with as the tactic will be set after spawn
                                 string tactic = friendlyPMC.squadMembers[pid][0].Value;
                                 string[] availableTactics = friendlyPMC.GetTacticOptions();
+
                                 if (tactic != null && tactic != availableTactics[0])
                                 {
                                     if(tactic == availableTactics[2])
@@ -708,7 +730,7 @@ namespace friendlyPMC.Patches
                                     } else if (tactic == availableTactics[1])
                                     {
                                         tactic = "Marksman";
-                                        // some cheating here, making our marskman good
+                                        // - some cheating here, making our marskman good
                                         profile.Skills.Sniper.SetCurrent(5100f, true);
                                         profile.Skills.RecoilControl.SetCurrent(4800f, true);
                                     }
@@ -727,59 +749,7 @@ namespace friendlyPMC.Patches
                 }
             }
             
-            // if we have build presets we must ensure we load all their assets
-            if(bundleTokens.Count > 0)
-            {
-                Components.Logger.LogInfo("Fetching presets assets");
-                try
-                {
-                    List<UniTask> bundleTasks = new List<UniTask>();
-                    foreach (var bundleToken in bundleTokens)
-                    {
-                        bundleTasks.Add(GClass1458.WaitForAllBundlesJob(bundleToken, new Action(GClass1947.Class1694.class1694_0.method_0), default(CancellationToken), null).AsUniTask());
-                    }
-                    await UniTask.WhenAll(bundleTasks);
-
-                    bot.Profiles.ForEach(profile =>
-                    {
-                        if (profile != null)
-                        {
-                            if (profileEquipment.ContainsKey(profile.Id))
-                            {
-                                foreach (EquipmentSlot slotType in Enum.GetValues(typeof(EquipmentSlot)))
-                                {
-                                    Slot cloneSlot = profileEquipment[profile.Id].GetSlot(slotType);
-                                    Item contained = cloneSlot.ContainedItem;
-
-                                    Slot botSlot = profile.Inventory.Equipment.GetSlot(slotType);
-
-                                    botSlot.RemoveItem();
-
-                                    if (contained != null)
-                                    {
-                                        contained.CurrentAddress = null;
-                                        botSlot.AddWithoutRestrictions(contained);
-                                    }
-                                }
-
-                                if (secureContainers.ContainsKey(profile.Id))
-                                {
-                                    Slot secCon = profile.Inventory.Equipment.GetSlot(EquipmentSlot.SecuredContainer);
-                                    secCon.RemoveItem();
-                                    secureContainers[profile.Id].CurrentAddress = null;
-                                    secCon.AddWithoutRestrictions(secureContainers[profile.Id]);
-                                }
-
-                            }
-                        }
-                    });
-
-                } catch (Exception ex)
-                {
-                    Components.Logger.LogError("Failed to use custom presets, will fall back to default loadout");
-                    Components.Logger.LogError(ex);
-                }
-            }
+            
 
             Components.Logger.LogInfo("Spawn Followers");
 
@@ -874,6 +844,11 @@ namespace friendlyPMC.Patches
 
                             BossPlayers.AddFollower(me, player, true, botType, tactic);
 
+                            Utils.Utils.SetTimeout(() =>
+                            {
+                                me.BotTalk.TrySay(EPhraseTrigger.Ready, true);
+                            }, 1000);
+
                         }
                         catch (Exception ex)
                         {
@@ -904,25 +879,72 @@ namespace friendlyPMC.Patches
                             bot.StopSpawn();
                         }
 
-
-                        Utils.Utils.SetTimeout(() =>
-                        {
-                            follower.BotTalk.TrySay(EPhraseTrigger.Ready, false);
-                        }, 2000);
-
                     }), shallBeGroup, stopWatch);
 
                 });
 
-                ActivateBotFollower(
-                    botCreator,
-                    profile,
-                    new GClass590(position, closestCorePoint.Id, false),
-                    zone, true,
-                    GroupAction,
-                    OnActivate,
-                    token.GetCancelToken()
-                ).Forget();
+                // gather what equipment bundles this bot needs to wait for
+                List<UniTask> bundleTasks = new List<UniTask>();
+                if(bundleTokens.ContainsKey(profile.Id))
+                {
+                    bundleTokens[profile.Id].ForEach(bundle =>
+                    {
+                        bundleTasks.Add(GClass1458.WaitForAllBundlesJob(bundle, new Action(GClass1947.Class1694.class1694_0.method_0), default(CancellationToken), null).AsUniTask());
+                    });
+                    
+                }
+
+                UniTask.Void(async () =>
+                {
+                    Components.Logger.LogInfo("Fetching preset assets for " + profile.Nickname);
+                    try
+                    {
+                        await UniTask.WhenAll(bundleTasks);
+                    }
+                    catch (Exception ex)
+                    {
+                        Components.Logger.LogError("Failed to use custom preset, will fall back to default loadout for " + profile.Nickname);
+                        Components.Logger.LogError(ex);
+                    }
+                    // apply the custom preset for the bot as bundles are ready
+                    if (profileEquipment.ContainsKey(profile.Id))
+                    {
+                        foreach (EquipmentSlot slotType in Enum.GetValues(typeof(EquipmentSlot)))
+                        {
+                            Slot cloneSlot = profileEquipment[profile.Id].GetSlot(slotType);
+                            Item contained = cloneSlot.ContainedItem;
+
+                            Slot botSlot = profile.Inventory.Equipment.GetSlot(slotType);
+
+                            botSlot.RemoveItem();
+
+                            if (contained != null)
+                            {
+                                contained.CurrentAddress = null;
+                                botSlot.AddWithoutRestrictions(contained);
+                            }
+                        }
+                        // - restore original secure container
+                        if (secureContainers.ContainsKey(profile.Id))
+                        {
+                            Slot secCon = profile.Inventory.Equipment.GetSlot(EquipmentSlot.SecuredContainer);
+                            secCon.RemoveItem();
+                            secureContainers[profile.Id].CurrentAddress = null;
+                            secCon.AddWithoutRestrictions(secureContainers[profile.Id]);
+                        }
+
+                    }
+                    // activate the bot
+                    await ActivateBotFollower(
+                        botCreator,
+                        profile,
+                        new GClass590(position, closestCorePoint.Id, false),
+                        zone, true,
+                        GroupAction,
+                        OnActivate,
+                        token.GetCancelToken()
+                    );
+                });
 
             });
         }
@@ -1054,6 +1076,22 @@ namespace friendlyPMC.Patches
 
                 }).Forget();
             }
+        }
+    }
+
+    internal class BossSpawnWaveManagerClassPatch : ModulePatch
+    {
+        protected override MethodBase GetTargetMethod()
+        {
+            return AccessTools.Method(typeof(BossSpawnWaveManagerClass), "Run");
+
+        }
+        [PatchPostfix]
+        private static void PatchPostfix(BossSpawnWaveManagerClass __instance)
+        {
+            // do not use this spawn patch in FIKA
+            if(Type.GetType("Fika.Core.Coop.GameMode.CoopGame, Fika.Core") == null)
+                LocalGameVmethod4Patch.SpawnFollowers();
         }
     }
 
