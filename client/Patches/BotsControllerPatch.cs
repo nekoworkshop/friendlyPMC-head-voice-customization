@@ -793,7 +793,7 @@ namespace friendlyPMC.Patches
                 return GetPlayerGroup(player, bt, zn);
             });
 
-            bot.Profiles.ForEach(profile =>
+            bot.Profiles.ForEach(async profile =>
             {
                 // followers should use the same groupID as the player
                 profile.Info.GroupId = player.realPlayer.GroupId;
@@ -914,7 +914,7 @@ namespace friendlyPMC.Patches
 
                 });
 
-                ActivateBotFollower(
+                await ActivateBotFollower(
                     botCreator,
                     profile,
                     new GClass590(position, closestCorePoint.Id, false),
@@ -922,7 +922,7 @@ namespace friendlyPMC.Patches
                     GroupAction,
                     OnActivate,
                     token.GetCancelToken()
-                ).Forget();
+                );
 
             });
         }

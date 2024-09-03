@@ -19,6 +19,8 @@ namespace friendlyPMC.Patches
             // @TODO : figure out out why it triggers error for followers in some circumstances
             try
             {
+                // prevent UpdateLook to run when bot is still using the medecine (seems to be the cause of the error?)
+                if (botOwner.Medecine.Using) return false;
                 __instance.UpdateLook();
             } catch(Exception ex) {
                 Components.Logger.LogInfo("AIPeriodicUpdate Error for " + botOwner.Profile.Nickname);

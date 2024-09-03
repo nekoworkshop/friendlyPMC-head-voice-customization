@@ -439,6 +439,11 @@ namespace friendlyPMC.Modules
         public static void CheckSeenEnemies(IPlayer player)
         {
             Instance._closestEnemySeen = null;
+            Instance._enemiesSeen.Clear();
+
+            pitAIBossPlayer boss = BossPlayers.GetBoss(player.ProfileId);
+
+            if(boss == null || boss.bossGroup == null) return;
 
             float scanDistance = friendlyPMC.scanDistance.Value;
 
@@ -470,8 +475,16 @@ namespace friendlyPMC.Modules
                             var enemy = hit.collider.gameObject.GetComponent<Player>();
                             if (enemy != null)
                             {
-                                Instance._enemiesSeen.Add(enemy);
-                                break;
+                                if(boss.Followers.Find(fl=>fl.ProfileId == enemy.ProfileId) != null) continue;
+                                bool isenemy = boss.bossGroup.IsEnemy(enemy);
+                            
+                                if(!enemy && boss.bossGroup.IsPlayerEnemy(enemy)) isenemy = true;
+
+                                if(isenemy) 
+                                {
+                                    Instance._enemiesSeen.Add(enemy);
+                                    break;
+                                }
                             }
                         }
                     }
@@ -490,7 +503,9 @@ namespace friendlyPMC.Modules
                 }
             }
 
-            if(closest != null ) Instance._closestEnemySeen = closest;
+            if(closest != null ) {
+                Instance._closestEnemySeen = closest;
+            }
         }
 
         public static List<Player> GetSeenEnemies()

@@ -296,8 +296,6 @@ namespace friendlyPMC.Components
                             return;
                         }
 
-                        (botOwner_0.Brain.BaseBrain as FollowerBrain).BossOrdersChanged();
-
                         if (botOwner_0.BotRequestController.TryStopCurrent(playerRequester, false))
                         {
                             FollowerHold holdit = new FollowerHold(playerRequester);
@@ -338,28 +336,22 @@ namespace friendlyPMC.Components
                         (goThere && gestusDistance <= maxGestusDistance && IsClosestBot(botOwner_0, playerRequester))
                     ) 
                     {
-                        FollowerGoCheck gclass = new FollowerGoCheck(data.Player, goThere ? BotRequestType.goToPoint :  BotRequestType.followMe);
-
                         bool hadHold = botOwner_0.BotRequestController.CurRequest?.BotRequestType == BotRequestType.wait;
 
-                        if (!hadHold)
-                        {
-                            botOwner_0.BotRequestController.TryStopCurrent(playerRequester, false);
-                        }
+                        FollowerGoCheck gclass = new FollowerGoCheck(data.Player, goThere ? BotRequestType.goToPoint :  BotRequestType.followMe,hadHold);
+
+                        
+
 
                         if (
+                            botOwner_0.BotRequestController.TryStopCurrent(playerRequester, false) &&
                             gclass.CanRequest(botOwner_0) &&
-                            (hadHold || botOwner_0.BotsGroup.RequestsController.TryAddRequest(gclass))
+                            botOwner_0.BotsGroup.RequestsController.TryAddRequest(gclass)
                         )
                         {
                             gclass.AddPossibleExecutors(botOwner_0);
                             gclass.SetGroup(botOwner_0.BotsGroup.RequestsController);
                             if(gesture != EGesture.ThatDirection) botOwner_0.Gesture.TryGestus(EGesture.Good, false);
-
-                            if (hadHold)
-                            {
-                                botOwner_0.BotRequestController.SetCurrentRequest(gclass);
-                            }
 
                         }
                     }

@@ -3,8 +3,18 @@ namespace friendlyPMC.Actions
 {
     internal class FollowerGoCheck : BotRequest
     {
-        public FollowerGoCheck(IPlayer requester, BotRequestType request = BotRequestType.goToPoint) : base(requester, request)
+        private bool _fromWait = false;
+
+        public bool FromWait
         {
+            get
+            {
+                return _fromWait;
+            }
+        }
+        public FollowerGoCheck(IPlayer requester, BotRequestType request = BotRequestType.goToPoint, bool fromWait = false) : base(requester, request)
+        {
+            _fromWait = fromWait;
         }
 
         public override bool CanProceed()
