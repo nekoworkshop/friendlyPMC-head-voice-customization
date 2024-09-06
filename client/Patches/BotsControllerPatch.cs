@@ -737,6 +737,12 @@ namespace friendlyPMC.Patches
 
                                     profileTactic.Add(profile.ProfileId, tactic);
                                 }
+                                // assign custom nickname, if available
+                                string nickname = friendlyPMC.squadMembers[pid][2].Value;
+                                if(nickname != null && nickname.Length > 0)
+                                {
+                                    profile.Info.Nickname = nickname;
+                                }
                             }
                             // - else leave it random
                             pid++;

@@ -192,7 +192,7 @@ namespace friendlyPMC.Components
             return coverPoints;
         }
 
-        public void AddEnemy(BotOwner bot)
+        public bool AddEnemy(BotOwner bot)
         {
             if (!bossEnemies.Contains(bot) && !bot.IsDead && bot.BotState == EBotState.Active)
             {
@@ -206,8 +206,11 @@ namespace friendlyPMC.Components
                 {
                     RemoveEnemy(_bot);
                 };
+
+                return true;
             }
 
+            return false;
         }
         public void RemoveEnemy(BotOwner bot)
         {
@@ -354,13 +357,11 @@ namespace friendlyPMC.Components
                 _lastTimeHit = Time.time;
                 try
                 {
-                    if (_aiplayer.bossGroup != null)
+                    if (_aiplayer.bossGroup != null && _aiplayer.AddEnemy(arg1.Player.AIData.BotOwner))
                     {
                         _aiplayer.bossGroup.AddEnemy(arg1.Player.iPlayer, EBotEnemyCause.addPlayerToBoss);
                         _aiplayer.bossGroup.ReportAboutEnemy(arg1.Player.iPlayer, EEnemyPartVisibleType.sence);
                     }
-
-                    _aiplayer.AddEnemy(arg1.Player.AIData.BotOwner);
                 }
                 catch (Exception e)
                 {

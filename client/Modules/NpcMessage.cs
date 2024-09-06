@@ -99,7 +99,7 @@ namespace friendlyPMC.Modules
 
         public static void NpcSendThankYou(string id = null)
         {
-            if(Instance._playerDied) { return; }
+            if(Instance._playerDied || !friendlyPMC.npcSendMessage.Value) { return; }
 
             List<object> mates = new List<object>();
             List<object> allies = new List<object>();

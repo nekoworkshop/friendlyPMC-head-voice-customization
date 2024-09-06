@@ -3,6 +3,7 @@ using friendlyPMC.Actions;
 using friendlyPMC.Modules;
 using System;
 using UnityEngine;
+using static RootMotion.FinalIK.IKSolver;
 
 namespace friendlyPMC.Components
 {
@@ -42,6 +43,21 @@ namespace friendlyPMC.Components
             }
         }
 
+        private Vector3 weaponRootOffset => _owner.WeaponRoot.position - _owner.GetPlayer.Transform.position + (Vector3.down * 0.1f);
+
+        private float _gotShot;
+
+        private float _underFire;
+        public bool WasHit
+        {
+            get { return _gotShot > Time.time; }
+        }
+
+        public bool UnderFire
+        {
+            get { return _underFire > Time.time; }
+        }
+
         public FollowerBrain(BotOwner owner, pitAIBossPlayer boss) : base(owner)
         {
             AddLayers();
@@ -56,7 +72,7 @@ namespace friendlyPMC.Components
             _currentTactic = "Default";
 
         }
-        /** Exposed method for adding brain layers so it can be patched by addons **/
+        
         public virtual void AddLayers()
         {
             // order matters for which layer get the initial priority
@@ -104,6 +120,36 @@ namespace friendlyPMC.Components
             OnKilled();
 
         }
+        // taken from SAIN
+        protected float CalcTurnSpeed(Vector3 currLookDirection, Vector3 targetDirection)
+        {
+            float min = 125f;
+            float max = 360f;
+            float maxAngle = 150f;
+            float minAngle = 5f;
+
+
+
+            float angle = Vector3.Angle(currLookDirection, targetDirection.normalized);
+
+            if (angle >= maxAngle)
+            {
+                return max;
+            }
+           
+            if (angle <= minAngle)
+            {
+                return min;
+            }
+
+            float angleDiff = maxAngle - minAngle;
+            float targetDiff = angle - minAngle;
+            float ratio = targetDiff / angleDiff;
+            float result = Mathf.Lerp(min, max, ratio);
+            return result;
+        }
+
+        /** Bot should turn to the direction from where he got shot, if he is nor already in combat */
         protected void BeingHitAction(DamageInfo damageInfo, EBodyPart bodyType, float damageReducedByArmor)
         {
             if (!_owner.Memory.HaveEnemy && damageInfo.Player != null)
@@ -111,33 +157,41 @@ namespace friendlyPMC.Components
                 Vector3? pos = damageInfo.Player.iPlayer?.Position;
                 if (pos.HasValue)
                 {
-                    _owner.Steering.LookToPoint((Vector3)pos, 90f);
+                    try
+                    {
+                        Vector3 point = pos.Value + weaponRootOffset;
+                        Vector3 direction = point - _owner.WeaponRoot.position;
+                        
+                        if (direction.sqrMagnitude < 1f)
+                        {
+                            direction = direction.normalized;
+                        }
+
+                        _owner.Steering.LookToDirection(direction, CalcTurnSpeed(_owner.LookDirection, direction));
+                        _gotShot = Time.time + 3f;
+                    }
+                    catch
+                    {
+                    }
                 }
             }
         }
-
+        /** On Leave info about this bot should be cleared */
         public virtual void OnLeave(BotOwner _bot)
         {
             OnKilled();
         }
-
+        /** On Death info about this bot should be cleared */
         protected void OnKilled()
         {
 
-
-            // clear info about this bot
-            NpcMessage.RemoveNpc(_owner.ProfileId);
-            InteractableObjects.ClearStoredItems(_owner.ProfileId);
-            InteractableObjects.RemoveTaker(_owner);
-
-            BossPlayers.RemoveFollower(_owner, _boss);
-            ClearFollowerPatrol();
+            Dismissed();
         }
 
 
         protected virtual void OnAddEnemy(IPlayer player)
         {
-            // how does the boss get added as Enemy?? - fix it
+            // how does the boss get added as Enemy here ?? - fix it
             if (player != null && player.ProfileId == _boss.Player().ProfileId)
             {
                 _owner.Memory.DeleteInfoAboutEnemy(player);
@@ -158,27 +212,30 @@ namespace friendlyPMC.Components
                 }
             }
         }
-
+        /** On Dispose info about this bot should be cleared */
         public override void Dispose()
         {
             Dismissed();
-
-            // clear info about this bot
-            NpcMessage.RemoveNpc(_owner.ProfileId);
-            InteractableObjects.ClearStoredItems(_owner.ProfileId);
-            InteractableObjects.RemoveTaker(_owner);
 
             base.Dispose();
         }
 
         public virtual void Dismissed()
         {
+            // remove this bot from being a follower
+            BossPlayers.RemoveFollower(_owner, _boss);
+            // delete his patrol data
             ClearFollowerPatrol();
 
             _owner.GetPlayer.HealthController.DiedEvent -= OnDead;
             _owner.LeaveData.OnLeave -= OnLeave;
             _owner.Memory.OnAddEnemy -= OnAddEnemy;
             _owner.GetPlayer.BeingHitAction -= BeingHitAction;
+
+            // clear info about this bot
+            NpcMessage.RemoveNpc(_owner.ProfileId);
+            InteractableObjects.ClearStoredItems(_owner.ProfileId);
+            InteractableObjects.RemoveTaker(_owner);
         }
 
         public virtual void SetBossTactic(string tactic)

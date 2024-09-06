@@ -177,8 +177,16 @@ namespace friendlyPMC.Actions
 
                 float_0 = Time.time + 2f;
 
-                botOwner_0.Steering.LookToMovingDirection(30f);
-                botOwner_0.Mover.Sprint(_shouldSprint);
+                var brain = botOwner_0.Brain.BaseBrain as FollowerBrain;
+                bool wasHit = false;
+                // let the bot turn to the direction he was hit from
+                if (brain != null && brain.WasHit)
+                {
+                    wasHit = true;
+                }
+
+                if(!wasHit) botOwner_0.Steering.LookToMovingDirection(30f);
+                botOwner_0.Mover.Sprint(_shouldSprint && !wasHit);
             }
         }
     }

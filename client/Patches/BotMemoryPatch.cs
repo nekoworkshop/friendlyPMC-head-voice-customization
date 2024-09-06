@@ -84,17 +84,18 @@ namespace friendlyPMC.Patches
                 if(botOwner_0.EnemiesController.EnemyInfos.ContainsKey(enemy))
                 {
                     var boss = BossPlayers.GetBoss(enemy.ProfileId);
+                    // whoever makes the boss player an enemy, becomes the enemy of the group
                     if (boss != null)
                     {
-                        /*if (boss.Followers.Count > 0)
-                            foreach (var flw in boss.Followers)
-                            {
-                                var info = Utils.Enemy.MakeEnemy(flw, botOwner_0.GetPlayer);
-                            }
-                        else*/ if (boss.bossGroup != null)
+                        if (boss.bossGroup != null)
                             boss.bossGroup.AddEnemy(botOwner_0, EBotEnemyCause.addPlayerToBoss);
                         else 
                             boss.AddEnemy(botOwner_0);
+                    }
+                    // whoever makes a follower an enemy, becomes the enemy of the group
+                    else if (BossPlayers.IsFollower(enemy.AIData?.BotOwner) && enemy.AIData.BotOwner.BotFollower.HaveBoss)
+                    {
+                        enemy.AIData.BotOwner.BotsGroup.AddEnemy(botOwner_0, EBotEnemyCause.addPlayerToBoss);   
                     }
                 }
             }

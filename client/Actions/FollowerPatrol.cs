@@ -52,7 +52,17 @@ namespace friendlyPMC.Actions
 
         public void Update()
         {
-            botOwner_0.LookData.SetLookPointByHearing(null);
+            var brain = botOwner_0.Brain.BaseBrain as FollowerBrain;
+
+            bool wasHit = false;
+            // let the bot turn to the direction he was hit from
+            if (brain != null && brain.WasHit)
+            {
+                wasHit = true;
+            }
+
+            if(!wasHit) botOwner_0.LookData.SetLookPointByHearing(null);
+
             if (this.float_3 < Time.time)
             {
 
@@ -114,7 +124,7 @@ namespace friendlyPMC.Actions
                         {
                             lastCoverPoint = nearPoint;
                             botOwner.Memory.SetCoverPoints(nearPoint);
-                            botOwner_0.Steering.LookToMovingDirection();
+                            if (!wasHit) botOwner_0.Steering.LookToMovingDirection();
 
                             var status = botOwner.Mover.GoToPoint(nearPoint, true, true);
                             if (status == NavMeshPathStatus.PathComplete)

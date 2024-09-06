@@ -450,7 +450,7 @@ namespace friendlyPMC.Modules
 
         public static bool IsFollower(BotOwner bot, AIBossPlayer boss = null)
         {
-            if (Instance == null) return false;
+            if (Instance == null || bot == null) return false;
             return Instance.IsBotFollower(bot, boss) || Instance._shallBeFollower.Contains(bot.name);
         }
         public static List<CustomNavigationPoint> GetAICovers()

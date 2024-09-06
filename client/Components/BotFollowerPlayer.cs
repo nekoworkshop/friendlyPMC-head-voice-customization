@@ -15,6 +15,7 @@ using BepInEx.Bootstrap;
 
 using GridClassEx = GClass2516;
 using GridCacheClass = GClass1401;
+using static UnityEngine.UI.GridLayoutGroup;
 
 namespace friendlyPMC.Components
 {
@@ -166,7 +167,6 @@ namespace friendlyPMC.Components
                 }
                 _bot.BotFollower.PatrolDataFollower.ManualUpdate();
             }
-
             // make all followers have the same group
             if (_bot.BotsGroup != null)
             {
@@ -376,6 +376,7 @@ namespace friendlyPMC.Components
             settings.FileSettings.Look.GOAL_TO_FULL_DISSAPEAR = 0.25f;
             settings.FileSettings.Look.GOAL_TO_FULL_DISSAPEAR_GREEN = 0.15f;
             settings.FileSettings.Look.GOAL_TO_FULL_DISSAPEAR_SHOOT = 0.01f;
+            settings.FileSettings.Look.LOOK_THROUGH_GRASS = true;
             settings.FileSettings.Look.MAX_VISION_GRASS_METERS = 1.0f;
             settings.FileSettings.Look.MAX_VISION_GRASS_METERS_OPT = 1.0f;
             settings.FileSettings.Look.MAX_VISION_GRASS_METERS_FLARE = 4.0f;
@@ -416,13 +417,13 @@ namespace friendlyPMC.Components
             }
             catch
             {
-                Components.Logger.LogError("Cannot access secure container of bot, extra ammo will not be added");
+                Logger.LogError("Cannot access secure container of bot, extra ammo will not be added");
                 return;
             }
 
             if (secureContainer == null)
             {
-                Components.Logger.LogError("Bot has no secure container, cannot add extra ammo");
+                Logger.LogError("Bot has no secure container, cannot add extra ammo");
                 return;
             }
 
@@ -447,7 +448,7 @@ namespace friendlyPMC.Components
 
             if (ammoToAdd == null)
             {
-                Components.Logger.LogError("Bot has no weapon to add ammo");
+                Logger.LogError("Bot has no weapon to add ammo");
                 return;
             }
 
@@ -534,19 +535,20 @@ namespace friendlyPMC.Components
             if (_bot == null) return null;
             return _player;
         }
-        /** End Follower Brain **/
+        
         public virtual void Dismiss()
         {
-            if (_bot == null || _bot.HealthController.IsAlive) return;
-
+            if (_bot == null) return;
             try
             {
-
-                NpcMessage.RemoveNpc(_bot.ProfileId);
-
+                // these 2 are automatically called if bot dies or leaves
+                // we call them here in the case bot is still alive but has been dismissed
                 _bot.BotFollower.PatrolDataFollower.Dispose();
                 (_bot.Receiver as FollowerReceiver).Dispose();
+                
+                if (_bot.IsDead || _bot.BotState != EBotState.Active) return;
 
+                // turn off follower brain
                 _bot.Brain.Dispose();
 
                 _bot.BotsController.AICoreController.Stop();
@@ -557,11 +559,11 @@ namespace friendlyPMC.Components
                 _bot.ENEMY_LOOK_AT_ME = Mathf.Cos(_OldSettings.FileSettings.Mind.ENEMY_LOOK_AT_ME_ANG * 0.017453292f);
                 _bot.GetPlayer.ActiveHealthController.SetDamageCoeff(_OldSettings.FileSettings.Core.DamageCoeff);
 
-                // add old receiver
+                // put back old receiver
                 _bot.Receiver = new BotReceiver(_bot);
                 _bot.Receiver.Init();
 
-                // add old brain
+                // put back old brain
                 _bot.Brain = new StandartBotBrain(_bot);
                 _bot.Brain.Activate();
 
