@@ -55,7 +55,7 @@ namespace friendlyPMC.Modules
 
         public static void RemoveNpc(string id)
         {
-            if(Instance._playerDied) return;
+            if(Instance == null || Instance._playerDied) return;
             
             if (Instance._npcs.ContainsKey(id))
             {

@@ -186,6 +186,13 @@ namespace friendlyPMC.Components
                 }
             }
         }
+
+        public virtual void FakeShot(Vector3 direction)
+        {
+            _gotShot = Time.time + 3f;
+            _owner.Steering.LookToDirection(direction, CalcTurnSpeed(_owner.LookDirection, direction));
+        }
+
         /** On Leave info about this bot should be cleared */
         public virtual void OnLeave(BotOwner _bot)
         {

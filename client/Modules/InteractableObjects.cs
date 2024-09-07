@@ -428,7 +428,7 @@ namespace friendlyPMC.Modules
 
         public static void ClearStoredItems(string bot)
         {
-            if(Instance._isBossDead) return;
+            if (Instance == null ||Instance._isBossDead) return;
             
             if (Instance._lootedItems.ContainsKey(bot))
             {

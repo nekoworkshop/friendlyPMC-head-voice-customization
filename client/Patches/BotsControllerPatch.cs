@@ -901,7 +901,7 @@ namespace friendlyPMC.Patches
                             Utils.Utils.SetTimeout(() =>
                             {
                                 me.BotTalk.TrySay(EPhraseTrigger.Ready, true);
-                            }, 1000);
+                            }, 2000);
 
                         }
                         catch (Exception ex)
