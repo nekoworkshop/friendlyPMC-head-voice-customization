@@ -519,11 +519,12 @@ namespace friendlyPMC.Components.Tactics
 
         public AICoreActionResultStruct<BotLogicDecision>? DogFight(out CustomNavigationPoint navpoint)
         {
+            navpoint = null;
+
+            if (!botOwner_0.Memory.HaveEnemy || !botOwner_0.Memory.GoalEnemy.Person.HealthController.IsAlive) return null;
 
             Vector3 botPosition = botOwner_0.GetPlayer.Transform.position;
             Vector3 enemyPosition = botOwner_0.Memory.GoalEnemy.CurrPosition;
-
-            navpoint = null;
 
             AICoreActionResultStruct<BotLogicDecision>? aicoreActionResultStruct = InFightLogic();
 

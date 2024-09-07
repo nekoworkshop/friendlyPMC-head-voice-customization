@@ -22,6 +22,9 @@ using IProfileData = GClass592;
 using ProfileEndPoint = ProfileEndpointFactoryAbstractClass;
 using BotCreator = GClass814;
 using System.Threading.Tasks;
+using System.Security.Cryptography;
+using static UnityEngine.Rendering.PostProcessing.HableCurve;
+using UnityEngine.Profiling;
 
 
 namespace friendlyPMC.Patches
@@ -237,7 +240,8 @@ namespace friendlyPMC.Patches
 
         private async UniTask<Profile> GenerateFollowerProfile(
             BotCreator botCreator,
-            WaveInfo[] source
+            WaveInfo[] source,
+            Dictionary<string, dynamic> customization
         )
         {
 
@@ -247,13 +251,15 @@ namespace friendlyPMC.Patches
 
             List<WaveInfo> limit = botPresets.method_1(source.ToList(), out var list3); ;
 
+            customization["English"] = friendlyPMC.englishBear.Value;
 
             var result = await profileEndpoint.method_3<Profile[]>(new LegacyParamsStruct
             {
                     Url = gclass1200_0.Main + "/client/game/bot/followergenerate",
                     Params = new Dictionary<string, object>
                     {
-                        { "Info",  new Class17<List<WaveInfo>>(limit) }
+                        { "Info",  new Class17<List<WaveInfo>>(limit) },
+                        { "Custom", customization }
                     },
                     Retries = new byte?(LegacyParamsStruct.DefaultRetries)
             });
@@ -591,27 +597,75 @@ namespace friendlyPMC.Patches
             
             BotCreationDataClass bot;
             
-            List<UniTask> profileTasks = new List<UniTask>();
+            List<UniTask<Profile>> profileTasks = new List<UniTask<Profile>>();
 
             if (side != EPlayerSide.Savage)
             {
                 for (int i = 0; i < memberCount; i++)
                 {
-                     profileTasks.Add(GenerateFollowerProfile(botCreator, botData.PrepareToLoadBackend(1)).ContinueWith(pr =>
-                     {
-                         botCreationData.AddProfile(pr);
-                         // take player's clothes if flag is turned on
-                         if (friendlyPMC.squadUniform.Value)
-                         {
-                             pr.Customization[EBodyModelPart.Body] = playerProfile.Customization[EBodyModelPart.Body];
-                             pr.Customization[EBodyModelPart.Feet] = playerProfile.Customization[EBodyModelPart.Feet];
-                             pr.Customization[EBodyModelPart.Hands] = playerProfile.Customization[EBodyModelPart.Hands];
-                         }
-                     }));
+                    int pid = i;
+
+
+                    Dictionary<string, dynamic> customization = new Dictionary<string, dynamic>();
+
+                    if (friendlyPMC.squadSetup.Value && friendlyPMC.squadMembers.ContainsKey(pid))
+                    {
+                        List<string[]> uniforms = friendlyPMC.GetUniformOptions();
+                        string top = friendlyPMC.squadMembers[pid][2].Value;
+                        int idxt = uniforms[0].IndexOf(top);
+
+                        string btm = friendlyPMC.squadMembers[pid][3].Value;
+                        int idxb = uniforms[1].IndexOf(btm);
+
+                        if (top != uniforms[0][0])
+                        {
+                            // use player clothes if we selected the second option
+                            if (top == uniforms[0][1])
+                            {
+                                customization["Body"] = playerProfile.Customization[EBodyModelPart.Body];
+                            }
+                            else if (friendlyPMC.GetUniformPairs()[0].ContainsKey(idxt))
+                            {
+                                string id = friendlyPMC.GetUniformPairs()[0][idxt];
+                                customization["Body"] = id;
+                            }
+                        }
+
+                        if (btm != uniforms[1][0])
+                        {
+                            // use player clothes if we selected the second option
+                            if (btm == uniforms[1][1])
+                            {
+                                customization["Feet"] = playerProfile.Customization[EBodyModelPart.Feet];
+                            }
+                            else if (friendlyPMC.GetUniformPairs()[1].ContainsKey(idxb))
+                            {
+                                string id = friendlyPMC.GetUniformPairs()[1][idxb];
+                                customization["Feet"] = id;
+                            }
+                        }
+
+
+                        // assign custom nickname, if available
+                        string nickname = friendlyPMC.squadMembers[pid][4].Value;
+                        if (nickname != null && nickname.Length > 0)
+                        {
+                            customization["Nickname"] = nickname;
+                        }
+                    }
+
+
+                    profileTasks.Add(GenerateFollowerProfile(botCreator, botData.PrepareToLoadBackend(1), customization));
                     
                 }
 
-                await UniTask.WhenAll(profileTasks);
+                await UniTask.WhenAll(profileTasks).ContinueWith(profiles =>
+                {
+                    foreach (var pr in profiles)
+                    {
+                        botCreationData.AddProfile(pr);
+                    }
+                });
 
                 bot = botCreationData;
             }
@@ -736,12 +790,6 @@ namespace friendlyPMC.Patches
                                     }
 
                                     profileTactic.Add(profile.ProfileId, tactic);
-                                }
-                                // assign custom nickname, if available
-                                string nickname = friendlyPMC.squadMembers[pid][2].Value;
-                                if(nickname != null && nickname.Length > 0)
-                                {
-                                    profile.Info.Nickname = nickname;
                                 }
                             }
                             // - else leave it random

@@ -54,6 +54,7 @@ namespace friendlyPMC.Patches
             // @TODO : figure out out why it triggers error for followers in some circumstances
             try
             {
+                if(source == null || source.transform == null) return false;
                 float maxDistance = source.MaxDistance;
                 float value = Vector3.Distance(source.transform.position, listenerPos);
                 __result = Mathf.InverseLerp(0f, maxDistance, value);

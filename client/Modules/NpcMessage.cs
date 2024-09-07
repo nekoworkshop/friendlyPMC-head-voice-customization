@@ -55,6 +55,8 @@ namespace friendlyPMC.Modules
 
         public static void RemoveNpc(string id)
         {
+            if(Instance._playerDied) return;
+            
             if (Instance._npcs.ContainsKey(id))
             {
                 if (((Dictionary<string, object>)Instance._npcs[id])["SquadInfo"] is Dictionary<string, object> squadInfo)

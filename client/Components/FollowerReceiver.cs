@@ -337,7 +337,7 @@ namespace friendlyPMC.Components
 
                             (botOwner_0.Brain.BaseBrain as FollowerBrain).BossOrdersChanged();
 
-                            FollowerRushEnemy gclass = new FollowerRushEnemy(botOwner_0, playerRequester, BotRequestType.attackClose);
+                            FollowerRushEnemy gclass = new FollowerRushEnemy(botOwner_0, playerRequester);
                             if (botOwner_0.BotsGroup.RequestsController.TryAddRequest(gclass))
                             {
                                 gclass.AddPossibleExecutors(botOwner_0);
@@ -725,7 +725,7 @@ namespace friendlyPMC.Components
                         // if has enemy, on "go forward" move in closer to the enemy
                         if (botOwner_0.Memory.HaveEnemy)
                         {
-                            FollowerRushEnemy gclass = new FollowerRushEnemy(botOwner_0, alivePlayerByProfileID, BotRequestType.goToPoint);
+                            FollowerRushEnemy gclass = new FollowerRushEnemy(botOwner_0, alivePlayerByProfileID);
                             if (botOwner_0.BotsGroup.RequestsController.TryAddRequest(gclass))
                             {
                                 gclass.AddPossibleExecutors(botOwner_0);
@@ -980,7 +980,9 @@ namespace friendlyPMC.Components
                     FollowerPatrolInstances.SetFarPatrol(botOwner_0);
 
                     Player alivePlayerByProfileID = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(requester.ProfileId);
-                    botOwner_0.BotRequestController.TryStopCurrent(alivePlayerByProfileID, false);
+
+                    if (botOwner_0.BotRequestController.CurRequest != null && botOwner_0.BotRequestController.CurRequest.BotRequestType != BotRequestType.wait)
+                        botOwner_0.BotRequestController.TryStopCurrent(alivePlayerByProfileID, false);
 
                     if (isClose) botOwner_0.BotTalk.TrySay(EPhraseTrigger.Roger, true);
                 }
@@ -989,6 +991,17 @@ namespace friendlyPMC.Components
             else if (shouldDefault)
             {
                 base.method_0(info);
+                // check if what we heard was the enemy
+                if(!botOwner_0.Memory.HaveEnemy && (botOwner_0.GetPlayer.Transform.position - requester.Transform.position).sqrMagnitude < 900f)
+                {
+                    Player voicer = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(requester.ProfileId);
+                    if (botOwner_0.EnemiesController.IsEnemy(voicer) || botOwner_0.BotsGroup.IsEnemy(requester))
+                    {
+                        botOwner_0.CalcGoal();
+                        botOwner_0.BotTalk.TrySay(EPhraseTrigger.OnEnemyConversation, true);
+                        Components.Logger.LogInfo("Enemy Heard " + voicer.Profile.Nickname);
+                    }
+                }
             }
         }
 

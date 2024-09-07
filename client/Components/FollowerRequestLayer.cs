@@ -38,6 +38,10 @@ namespace friendlyPMC.Components
         {
             if (botOwner_0.Memory.HaveEnemy) return false;
 
+            var brain = botOwner_0.Brain.BaseBrain as FollowerBrain;
+
+            if (brain != null && brain.UnderFire) return false;
+
             BotRequest currRequest = botOwner_0.BotRequestController.CurRequest;
 
             List<BotRequestType> allyAllowedRequest = new List<BotRequestType>
@@ -60,6 +64,8 @@ namespace friendlyPMC.Components
             {
                 return false;
             }
+
+            if (botOwner_0.Medecine.FirstAid.Have2Do || botOwner_0.Medecine.SurgicalKit.HaveWork || botOwner_0.Medecine.Using) return false;
 
 
             pitAIBossPlayer boss = null;

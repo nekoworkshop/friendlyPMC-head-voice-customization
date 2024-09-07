@@ -18,6 +18,11 @@ namespace friendlyPMC.Components
 
         public override bool ShallUseNow()
         {
+            var brain = botOwner_0.Brain.BaseBrain as FollowerBrain;
+
+            if (brain != null && brain.UnderFire) return false;
+
+            if (botOwner_0.Medecine.FirstAid.Have2Do || botOwner_0.Medecine.SurgicalKit.HaveWork || botOwner_0.Medecine.Using) return false;
 
             return InteractableObjects.IsOpener(botOwner_0);
         }

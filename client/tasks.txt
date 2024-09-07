@@ -10,9 +10,20 @@
 - x - issuing Hold Position, Go Go Go, Get Back, Cover Me to bots individually
 - x - enemy scan should only take enemies into consideration
 - x - fix issue with long spawn delay
-- #inprogress - attempt to fix AIPeriodicUpdate Error
+- x - attempt to fix AIPeriodicUpdate Error
+- x - remove the server config and instead move those options in the config mananger and have server requests update these values
+- x - add field in the config manager to specify nickname per follower
+- x - add fields in the config manager to specify custom clotches per follower
+- x - fix receiver to recognize enemy voice
+- x - make bot add enemy after turning when hit and enemy was still not picked up
+- x - make bot run to cover when underfire
+- x - make the followers look in the direction of the shooting when bullets fly by the player
+- make bots obey "regroup" call when BTR is close
+- bots need to react to enemy talking (see SAIN)
+- final testing
 
 -- === 3.8 === ---:
+- improve Assist tactic to be less aggressive
 - scav followers to turn hostile if your shoot them (turning hostile can be done through BotMemoryClass > method_7)
 - picked up followers to turn hostile if you shoot them
 - fix glitchy behavior of boss followers
@@ -26,19 +37,26 @@
 - lock the new tactics under the goons challenge 
 - add "lock squad equipment" option
 
---- ==== 4.0.0 (out of beta) ==== ---:
+--- ==== 4.0.0 (final phase) ==== ---:
 - add squad screen
-- add hold fire / fire commands
+- add "hold fire/fire at will" commands
 
 ==================================================================================
 RELEASE NOTES (3.7):
-- added "On Your Own" command. This will tell bots to stay at a distance (similar to "Get Back"), switch to their default tactic and no longer prioritize your position and safety during fights. "Cover Me" resets this
-- attempt to fix follower still getting stuck in healing animation under certain circumnstances (still not 100% of the cause or how to replicate)
-- altered "get back", "cover me", "hold position" and "go go go" voices to always say the same thing instead of going through different phrases in order to bring them more closer to what the commands do relative to the followers
-- altered how enemy is added to followers as the current method would make followers be aware of any enemy position as soon as that enemy made the player his goal target.
+- !! all server configuration options has been moved into the Configuration Manager,you can now update them through that and they take effect at raid start
+
 - updated Come Here, That Direction and Stop gesture commands where you can now use them to move bots one by one where you want them. 
-- updated some Phrase commands to be able to be used on invidual followers by looking at the them. Be careful, bots too close in your view will be picked up and thus the command will not go for all.
+- updated some Phrase commands to be able to be used on invidual followers by looking at the them. Be careful, bots too close in your view will be picked up and thus the command will not go for all. Being in bushes can interfere with this or not seeing the bot clearly.
+- altered "get back", "cover me", "hold position" and "go go go" voices to always say the same thing instead of going through different phrases in order to bring them more closer to what the commands do relative to the followers
+
+- added "On Your Own" command. This will tell bots to stay at a distance (similar to "Get Back"), switch to their default tactic and no longer prioritize your position and safety during fights. "Cover Me" resets this
+- added field to provide custom nickname for each follower in the Configuration Manager
+- added fields to provide custom uniform (top and bottom) for each follower in the Configuration Manager
+- added "Raid End Messages" in the config manager to enable/disabled messages followers may send at the end of the raid (return loot messages are excluded)
+
 - fixed issue with long spawn delay that was happening for some people
+- attempt to fix follower still getting stuck in healing animation under certain circumnstances (still not 100% of the cause or how to replicate)
+- altered how enemy is added to followers as the current method would make followers be aware of any enemy position as soon as that enemy made the player his goal target.
 
 Notes: 
 The way an enemy was added to the followers was by observing who the current target is for any bot. This created situations where your followers would instantly pick up the enemy position and even run to him. This is changed now, but it might feel different as you can now have situations where an enemy is shooting at you from a distance, not hitting you, which in turn makes your followers not react. "Contact" command makes them become aware of the situation. 
@@ -49,15 +67,11 @@ Using That Direction works at a maxium 15m and it will affect the closest bot. B
 
 You can now use the following commands while looking at a bot, at a maximum 35 meters distance, to affect only him : Hold Position, Go Go Go, Get Back, Cover Me, On Your Own, Stop and Follow Me.
 
-## Test Notes - additional things to look for:
-- if you see AIPeriodicUpdate error in FullLogOutput.log 
-- if the bots are too aware of enemies due to FUll_SECTOR_VIEW being turned on
-- spawning still works with SWAG and on FIKA
-- confirm you don't see the bug where Usecs are speaking with bear voices
-
 
 Personal Notes:
 Need to update description on what commands are ignored by "Assist" tactic
+Need to redo the description to explain things better and add donation button
+AIPeriodicUpdate and GClass974 seems related to specific guns and not the bot
 
 ==================================================================================
 REVISIT:
@@ -69,4 +83,3 @@ FUTURE IDEAS:
  - BirEye auto marks enemies as he sees them (enhanced Marskman)
  - goons should be locked behind some flag and once you play with them and are able to end a raid with all 3 alive, 3 new tactis should unlock:
  Enhanced Marksman, Assaulter and Supporter
- - ability to send commands individually to followers

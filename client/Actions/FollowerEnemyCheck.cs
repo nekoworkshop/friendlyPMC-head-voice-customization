@@ -39,6 +39,8 @@ namespace friendlyPMC.Actions
                     Components.Logger.LogInfo(e.StackTrace);
                 }
             }
+
+            bot.CalcGoal();
         }
     }
 }

@@ -49,7 +49,7 @@ namespace friendlyPMC.Components
 
             _IsSquadMate = isSquad;
 
-            settingModif = new GClass528(1.2f, 1.2f, 1f, 1f, 1f, 1f, 0.9f, 1f, 1f);
+            settingModif = new GClass528(1.2f, 1.2f, 1f, 1.2f, 1f, 1f, 1f, 1f, 1f);
 
             NpcMessage.AddNpc(bot, isSquad);
 
@@ -349,12 +349,12 @@ namespace friendlyPMC.Components
 
             settings.FileSettings.Core.CanGrenade = true;
             settings.FileSettings.Core.CanRun = true;
-            settings.FileSettings.Core.VisibleAngle = 160;
+            /*settings.FileSettings.Core.VisibleAngle = 160;
             settings.FileSettings.Core.VisibleDistance = 185;
             settings.FileSettings.Core.GainSightCoef = 0.05f;
             settings.FileSettings.Core.ScatteringPerMeter = 0.045f;
             settings.FileSettings.Core.ScatteringClosePerMeter = 0.12f;
-            settings.FileSettings.Core.HearingSense = 0.8f;
+            settings.FileSettings.Core.HearingSense = 0.8f;*/
 
             settings.FileSettings.Cover.CHECK_CLOSEST_FRIEND = true;
 
@@ -385,7 +385,7 @@ namespace friendlyPMC.Components
             settings.FileSettings.Look.NO_GRASS_DIST = 5.0f;
 
             settings.FileSettings.Hearing.DISPERSION_COEF = 1f;
-            settings.FileSettings.Hearing.CLOSE_DIST = 6f;
+            settings.FileSettings.Hearing.CLOSE_DIST = 7f;
             settings.FileSettings.Hearing.FAR_DIST = 35f;
 
             settings.FileSettings.Cover.SIT_DOWN_WHEN_HOLDING = true;
@@ -545,10 +545,11 @@ namespace friendlyPMC.Components
                 // we call them here in the case bot is still alive but has been dismissed
                 _bot.BotFollower.PatrolDataFollower.Dispose();
                 (_bot.Receiver as FollowerReceiver).Dispose();
-                
+                // turn off follower brain
+                (_bot.Brain.BaseBrain as FollowerBrain).Dismissed();
+
                 if (_bot.IsDead || _bot.BotState != EBotState.Active) return;
 
-                // turn off follower brain
                 _bot.Brain.Dispose();
 
                 _bot.BotsController.AICoreController.Stop();
@@ -576,6 +577,7 @@ namespace friendlyPMC.Components
             catch (Exception ex)
             {
                 Logger.LogInfo("Error on dismiss for a follower: " + ex.Message);
+                Logger.LogInfo(ex.StackTrace);
             }
             // @TODO : see what else can be reverted
         }

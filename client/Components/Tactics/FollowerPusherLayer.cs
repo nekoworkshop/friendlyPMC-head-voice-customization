@@ -377,7 +377,7 @@ namespace friendlyPMC.Components.Tactics
                 AIBossPlayerLogic gclass363_0 = commonLayer.HasBoss() ? commonLayer.GetBoss().GetBossLogic() : null;
 
                 string text;
-                if (base.method_5(out text))
+                if (botOwner_0.Memory.HaveEnemy && botOwner_0.Memory.GoalEnemy.Person.HealthController.IsAlive && base.method_5(out text))
                 {
                     return new AICoreActionEndStruct("cst", true);
                 }

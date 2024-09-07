@@ -428,6 +428,8 @@ namespace friendlyPMC.Modules
 
         public static void ClearStoredItems(string bot)
         {
+            if(Instance._isBossDead) return;
+            
             if (Instance._lootedItems.ContainsKey(bot))
             {
                 Instance._lootedItems.Remove(bot);
@@ -522,6 +524,11 @@ namespace friendlyPMC.Modules
         public static void BossIsDead()
         {
             Instance._isBossDead = true;
+        }
+
+        public static bool IsBossDead()
+        {
+            return Instance._isBossDead;
         }
 
     }

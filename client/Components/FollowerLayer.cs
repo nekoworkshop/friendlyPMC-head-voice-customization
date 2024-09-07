@@ -22,6 +22,10 @@ namespace friendlyPMC.Components
         public override bool ShallUseNow()
         {
             botOwner_0.PriorityAxeTarget.FindTarget();
+            var brain = botOwner_0.Brain.BaseBrain as FollowerBrain;
+            
+            if (brain != null && brain.UnderFire && !botOwner_0.Memory.HaveEnemy) return true;
+
             return HasBoss() && !InteractableObjects.IsTaker(botOwner_0) && !InteractableObjects.IsOpener(botOwner_0);
         }
 
@@ -49,6 +53,17 @@ namespace friendlyPMC.Components
 
             if (!botOwner_0.Medecine.FirstAid.Have2Do && !botOwner_0.Medecine.SurgicalKit.HaveWork)
             {
+                var brain = botOwner_0.Brain.BaseBrain as FollowerBrain;
+
+                if (brain != null && brain.UnderFire && !botOwner_0.Memory.IsInCover)
+                {
+                    GetCoverPoint(botOwner_0.GetPlayer.Transform.position, 50f);
+                    if (customNavigationPoint_0 != null)
+                    {
+                        return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "runHide");
+                    }
+                }
+
                 if (botOwner_0.SmokeGrenade.IsInSmoke)
                 {
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.goToCoverPoint, "PeaceSmoke");

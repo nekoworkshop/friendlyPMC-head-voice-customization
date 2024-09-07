@@ -166,6 +166,7 @@
     <Compile Include="Components\BossFollower\BossFollowLayer.cs" />
     <Compile Include="Components\BossFollower\KnightFollowerBrain.cs" />
     <Compile Include="Components\FollowerAIAgent.cs" />
+    <Compile Include="Components\FollowerAvoidDanger.cs" />
     <Compile Include="Components\FollowerBossFollower\BigPipeArtilleryLayer.cs" />
     <Compile Include="Components\FollowerBossFollower\BigPipeFollowerBrain.cs" />
     <Compile Include="Components\FollowerBossFollower\BirdEyeFightLayer.cs" />
@@ -177,12 +178,15 @@
     <Compile Include="Components\Tactics\FollowerHolderLayer.cs" />
     <Compile Include="Components\Tactics\FollowerPusherLayer.cs" />
     <Compile Include="Components\Tactics\FollowerSniperLayer.cs" />
+    <Compile Include="ConfigurationManagerAttributes.cs" />
     <Compile Include="Modules\FollowerCreateNode.cs" />
     <Compile Include="Modules\NpcMessage.cs" />
     <Compile Include="Modules\RadioSound.cs" />
     <Compile Include="Patches\BotMemoryPatch.cs" />
+    <Compile Include="Patches\BulletImpactPatch.cs" />
     <Compile Include="Patches\GestureMenuPatch.cs" />
     <Compile Include="Patches\LookSensorPatch.cs" />
+    <Compile Include="Patches\RaidStartPatch.cs" />
     <Compile Include="Patches\SAINPatch.cs" />
     <Compile Include="Requests\FollowerGoCheck.cs" />
     <Compile Include="Requests\FollowerHold.cs" />

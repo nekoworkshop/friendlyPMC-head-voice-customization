@@ -55,6 +55,9 @@ namespace friendlyPMC.Patches
             if (isfollower && botOwner_0.BotFollower.HaveBoss)
             {
                 bool isTeammate = false;
+                
+                if (enemy.Profile.Info.Settings.Role == WildSpawnType.shooterBTR) return false;
+
                 foreach (var item in botOwner_0.BotFollower.BossToFollow.Followers)
                 {
                     if (item.ProfileId == enemy.ProfileId)
@@ -81,6 +84,9 @@ namespace friendlyPMC.Patches
             if (enemy != null)
             {
                 var botOwner_0 = AccessTools.Field(typeof(BotMemoryClass), "botOwner_0").GetValue(__instance) as BotOwner;
+                
+                if (botOwner_0.IsRole(WildSpawnType.shooterBTR)) return;
+
                 if(botOwner_0.EnemiesController.EnemyInfos.ContainsKey(enemy))
                 {
                     var boss = BossPlayers.GetBoss(enemy.ProfileId);

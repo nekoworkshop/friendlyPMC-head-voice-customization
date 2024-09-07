@@ -133,13 +133,6 @@ class friendlyPMC {
 		this.mailSendService = container.resolve("MailSendService");
 		this.LocaleService = container.resolve("LocaleService");
 
-		try {
-			this.config = Object.assign(this.config, require("../config.json"));
-		} catch (e) {
-			this.Logger.error("friendlyPMC: something is wrong with the config, check below\n");
-			console.error(e);
-		}
-
 		this.lang = this.lang_en;
 
 		// patch getPmcDifficultySettings as that is where we actually make the bots be friendly
@@ -333,11 +326,19 @@ class friendlyPMC {
 
 					return httpResponseUtil.emptyResponse();
 				}),
+				new RouteAction("/client/raid/pitconfig", (url: string, info: { Config: { sameSideHostile: boolean; englishBear: boolean; pmcArmbands: boolean } }, sessionID: string, output: string): any => {
+					this.config.armbands = info.Config.pmcArmbands;
+					this.config.sameSideHostile = info.Config.sameSideHostile;
+					this.config.englishBear = info.Config.englishBear;
 
-				new RouteAction("/client/game/bot/followergenerate", (url: string, info: { Info: IGenerateBotsRequestData; Preset?: string; PlayerUniform?: boolean }, sessionID: string, output: string): any => {
+					return httpResponseUtil.emptyResponse();
+				}),
+				new RouteAction("/client/game/bot/followergenerate", (url: string, info: { Info: IGenerateBotsRequestData; Preset?: string; Custom?: { Body?: string; Feet?: string; Nickname?: string; English?: boolean } }, sessionID: string, output: string): any => {
 					const pmcProfile = profileHelper.getPmcProfile(sessionID);
 
 					let level = pmcProfile.Info.Level;
+
+					const custom = info.Custom;
 
 					const conditionPromises: IBotBase[] = [];
 
@@ -374,11 +375,22 @@ class friendlyPMC {
 
 						conditionPromises.push(bot);
 
-						if (pmcProfile.Info.Side.toLowerCase() == "bear") {
-							conditionPromises.forEach(profile => {
-								profile.Info.Voice = this.config.englishBear ? `Bear_${randomUtil.getInt(1, 2)}_Eng` : `Bear_${randomUtil.getInt(1, 3)}`;
-							});
-						}
+						conditionPromises.forEach(profile => {
+							if (custom) {
+								if (custom.Body) {
+									profile.Customization.Body = custom.Body;
+								}
+								if (custom.Feet) {
+									profile.Customization.Feet = custom.Feet;
+								}
+
+								if (custom.Nickname) {
+									profile.Info.Nickname = custom.Nickname;
+									profile.Info.LowerNickname = custom.Nickname.toLowerCase();
+								}
+							}
+							if (pmcProfile.Info.Side.toLowerCase() == "bear") profile.Info.Voice = custom?.English ? `Bear_${randomUtil.getInt(1, 2)}_Eng` : `Bear_${randomUtil.getInt(1, 3)}`;
+						});
 					}
 
 					const res = httpResponseUtil.getBody(conditionPromises);

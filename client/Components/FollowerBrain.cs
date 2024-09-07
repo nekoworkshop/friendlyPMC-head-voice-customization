@@ -43,11 +43,9 @@ namespace friendlyPMC.Components
             }
         }
 
-        private Vector3 weaponRootOffset => _owner.WeaponRoot.position - _owner.GetPlayer.Transform.position + (Vector3.down * 0.1f);
+        private float _gotShot = 0f;
 
-        private float _gotShot;
-
-        private float _underFire;
+        private float _underFire = 0f;
         public bool WasHit
         {
             get { return _gotShot > Time.time; }
@@ -88,8 +86,8 @@ namespace friendlyPMC.Components
             fightLayer = layer6;
             method_0(3, layer6, true);
 
-            // - grenade
-            GClass36 layer = new GClass36(_owner, 130);
+            // - grenade and BTR
+            GClass36 layer = new FollowerAvoidDanger(_owner, 130);
             method_0(4, layer, true);
             // - weapon malfunction
             GClass98 layer3 = new GClass98(_owner, 88);
@@ -128,8 +126,6 @@ namespace friendlyPMC.Components
             float maxAngle = 150f;
             float minAngle = 5f;
 
-
-
             float angle = Vector3.Angle(currLookDirection, targetDirection.normalized);
 
             if (angle >= maxAngle)
@@ -154,13 +150,19 @@ namespace friendlyPMC.Components
         {
             if (!_owner.Memory.HaveEnemy && damageInfo.Player != null)
             {
+                if(_owner.BotFollower.HaveBoss)
+                {
+                    if(_owner.BotFollower.BossToFollow.Player().ProfileId == damageInfo.Player.iPlayer.ProfileId) return;
+                    if (_owner.BotFollower.BossToFollow.Followers.Find(bt => bt.ProfileId == damageInfo.Player.iPlayer.ProfileId)) return;
+                }
+
                 Vector3? pos = damageInfo.Player.iPlayer?.Position;
+                
                 if (pos.HasValue)
                 {
                     try
                     {
-                        Vector3 point = pos.Value + weaponRootOffset;
-                        Vector3 direction = point - _owner.WeaponRoot.position;
+                        Vector3 direction = pos.Value - _owner.GetPlayer.Transform.position;
                         
                         if (direction.sqrMagnitude < 1f)
                         {
@@ -168,6 +170,14 @@ namespace friendlyPMC.Components
                         }
 
                         _owner.Steering.LookToDirection(direction, CalcTurnSpeed(_owner.LookDirection, direction));
+                        
+                        if(_gotShot > Time.time && _underFire < Time.time)
+                        {
+                            _underFire = Time.time + 5f;
+                            _owner.Memory.SetUnderFire(damageInfo.Player.iPlayer);
+                            _owner.CalcGoal();
+                        }
+
                         _gotShot = Time.time + 3f;
                     }
                     catch
@@ -184,8 +194,8 @@ namespace friendlyPMC.Components
         /** On Death info about this bot should be cleared */
         protected void OnKilled()
         {
-
-            Dismissed();
+            // remove this bot from being a follower
+            BossPlayers.RemoveFollower(_owner, _boss);
         }
 
 
@@ -212,18 +222,18 @@ namespace friendlyPMC.Components
                 }
             }
         }
-        /** On Dispose info about this bot should be cleared */
+       
         public override void Dispose()
         {
-            Dismissed();
+            // remove this bot from being a follower
+            BossPlayers.RemoveFollower(_owner, _boss);
 
             base.Dispose();
         }
 
         public virtual void Dismissed()
         {
-            // remove this bot from being a follower
-            BossPlayers.RemoveFollower(_owner, _boss);
+
             // delete his patrol data
             ClearFollowerPatrol();
 
@@ -233,9 +243,9 @@ namespace friendlyPMC.Components
             _owner.GetPlayer.BeingHitAction -= BeingHitAction;
 
             // clear info about this bot
-            NpcMessage.RemoveNpc(_owner.ProfileId);
             InteractableObjects.ClearStoredItems(_owner.ProfileId);
             InteractableObjects.RemoveTaker(_owner);
+            NpcMessage.RemoveNpc(_owner.ProfileId);
         }
 
         public virtual void SetBossTactic(string tactic)
