@@ -242,10 +242,23 @@ namespace friendlyPMC.Utils
 
                         if (bt.Data.Brain.BaseBrain is FollowerBrain)
                         {
-                            string tactic = (bt.Data.Brain.BaseBrain as FollowerBrain).currentTactic;
-                            if (tactic != null)
+                            var decision = bt.Data.Brain.Agent.LastResult();
+
+                            if (decision.Action == BotLogicDecision.heal)
                             {
-                                stringBuilder.Append($" | Mode: {tactic}");
+                                stringBuilder.Append($" | Healing");
+                            }
+                            else if (decision.Reason == "runToHeal" || decision.Reason == "goforheal")
+                            {
+                                stringBuilder.Append($" | Want to Heal");
+                            }
+                            else
+                            {
+                                string tactic = (bt.Data.Brain.BaseBrain as FollowerBrain).currentTactic;
+                                if (tactic != null)
+                                {
+                                    stringBuilder.Append($" | Mode: {tactic}");
+                                }
                             }
                         }
 
