@@ -424,7 +424,6 @@ namespace friendlyPMC.Components
                 EPhraseTrigger.Fire,
                 EPhraseTrigger.GetBack,
                 EPhraseTrigger.GoForward,
-                EPhraseTrigger.CoverMe,
                 EPhraseTrigger.Gogogo,
                 EPhraseTrigger.OpenDoor,
                 EPhraseTrigger.HoldPosition
@@ -508,8 +507,8 @@ namespace friendlyPMC.Components
                 {
                     if (notBusy && isClose)
                     {
-                        botOwner_0.Gesture.TryGestus(EGesture.Bad, false);
                         botOwner_0.BotTalk.TrySay(EPhraseTrigger.Negative, true);
+                        botOwner_0.Gesture.TryGestus(EGesture.Bad, false);
                     }
                     return;
                 }

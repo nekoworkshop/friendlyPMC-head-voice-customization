@@ -376,7 +376,7 @@ namespace friendlyPMC.Components
             settings.FileSettings.Look.GOAL_TO_FULL_DISSAPEAR = 0.25f;
             settings.FileSettings.Look.GOAL_TO_FULL_DISSAPEAR_GREEN = 0.15f;
             settings.FileSettings.Look.GOAL_TO_FULL_DISSAPEAR_SHOOT = 0.01f;
-            settings.FileSettings.Look.LOOK_THROUGH_GRASS = true;
+            //settings.FileSettings.Look.LOOK_THROUGH_GRASS = true;
             settings.FileSettings.Look.MAX_VISION_GRASS_METERS = 1.0f;
             settings.FileSettings.Look.MAX_VISION_GRASS_METERS_OPT = 1.0f;
             settings.FileSettings.Look.MAX_VISION_GRASS_METERS_FLARE = 4.0f;

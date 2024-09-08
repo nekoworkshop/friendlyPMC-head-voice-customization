@@ -322,7 +322,6 @@ namespace friendlyPMC
 
             harmony.PatchAll(typeof(LocalGameCtorPatch).Assembly);
             harmony.PatchAll(typeof(LocalGameVmethod4Patch).Assembly); // backup spawn patch
-            new BossSpawnWaveManagerClassPatch().Enable(); // normal spawn patch
 
             ConsoleScreen.Processor.RegisterCommand("followerstome", delegate ()
             {

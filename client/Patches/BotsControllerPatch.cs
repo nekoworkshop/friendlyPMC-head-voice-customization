@@ -180,54 +180,8 @@ namespace friendlyPMC.Patches
 
         public async UniTask ActivateBotFollower(BotCreator botCreator, Profile profile, GClass590 position, BotZone zone,bool shallBeGroup, Func<BotOwner, BotZone, BotsGroup> GroupAction, Action<BotOwner> OnActivate,CancellationToken token)
         {
-            
-            LocalGame game = LocalGameCtorPatch.Instance;
-            Type fikaType = Type.GetType("Fika.Core.Coop.GameMode.CoopGame, Fika.Core");
 
-            if (game != null  && fikaType == null) 
-            {
-
-                BotSpawner botSpawnerClass = Controller.BotSpawner;
-
-                IBotGame botGame = AccessTools.Field(typeof(BotSpawner), "_game").GetValue(botSpawnerClass) as IBotGame;
-
-                Dictionary<string, Player> dictionary_2 = null;
-
-                dictionary_2 = AccessTools.Field(typeof(LocalGame), "dictionary_2").GetValue(game) as Dictionary<string, Player>;
-
-                // recreation of ActivateBot from GClass814
-                BotCreator.Class509 @class = new BotCreator.Class509();
-                @class.gclass814_0 = botCreator;
-                @class.zone = zone;
-
-                @class.callback = OnActivate;
-
-                @class.groupAction = GroupAction;
-
-
-                GClass590 bornInfo = position;
-                // this is part of method_17 from LocalGame
-                int playerId = game.method_12();
-                profile.SetSpawnedInSession(profile.Info.Side == EPlayerSide.Savage);
-
-                LocalPlayer localPlayer = await LocalPlayer.Create(playerId, bornInfo.position, Quaternion.identity, "Player", "", EPointOfView.ThirdPerson, profile, true, game.UpdateQueue, Player.EUpdateMode.Auto, Player.EUpdateMode.Auto, BackendConfigAbstractClass.Config.CharacterController.BotPlayerMode, new Func<float>(LocalGame.Class1394.class1394_0.method_4), new Func<float>(LocalGame.Class1394.class1394_0.method_5), new GClass1800(), GClass1457.Default, null, null, false);
-                localPlayer.Location = game.Location_0.Id;
-
-                dictionary_2.Add(localPlayer.ProfileId, localPlayer);
-
-                // method_2 of GClass814
-                AICorePoint corePoint = Controller.CoversData.AICorePointsHolder.GetCorePoint(bornInfo.CorePointId);
-                BotOwner botOwner = BotOwner.Create(localPlayer, null, botGame.GameDateTime, Controller, true, corePoint);
-                botCreator.method_4(botOwner.GetPlayer);
-                botCreator.method_5(botOwner, false);
-                botOwner.GetComponentsInChildren<Collider>();
-                botOwner.GetPlayer.CharacterController.isEnabled = false;
-
-                @class.method_0(botOwner);
-            } 
-            else 
-            {
-                await botCreator.ActivateBot( 
+            await botCreator.ActivateBot(
                     profile,
                     position,
                     zone, shallBeGroup,
@@ -235,7 +189,6 @@ namespace friendlyPMC.Patches
                     OnActivate,
                     token
                 );
-            }
         }
 
         private async UniTask<Profile> GenerateFollowerProfile(
@@ -988,6 +941,9 @@ namespace friendlyPMC.Patches
                         }
 
                     }
+
+                    Components.Logger.LogInfo("Trying to spawn " + profile.Nickname + " follower");
+
                     // activate the bot
                     await ActivateBotFollower(
                         botCreator,
@@ -998,6 +954,7 @@ namespace friendlyPMC.Patches
                         OnActivate,
                         token.GetCancelToken()
                     );
+
                 });
 
             });
@@ -1100,11 +1057,8 @@ namespace friendlyPMC.Patches
                     UniTask squadSpanner = BotsControllerPatch.Instance.SpawnGroupBots(playerBoss);
                     if (!friendlyPMC.knightSpawn.Value)
                     {
-                        squadSpanner.Forget();
-                    }
-                    else
-                    {
                         squadSpawners.Add(squadSpanner);
+
                     }
                 });
             }
@@ -1130,22 +1084,6 @@ namespace friendlyPMC.Patches
 
                 }).Forget();
             }
-        }
-    }
-
-    internal class BossSpawnWaveManagerClassPatch : ModulePatch
-    {
-        protected override MethodBase GetTargetMethod()
-        {
-            return AccessTools.Method(typeof(BossSpawnWaveManagerClass), "Run");
-
-        }
-        [PatchPostfix]
-        private static void PatchPostfix(BossSpawnWaveManagerClass __instance)
-        {
-            // do not use this spawn patch in FIKA
-            if(Type.GetType("Fika.Core.Coop.GameMode.CoopGame, Fika.Core") == null)
-                LocalGameVmethod4Patch.SpawnFollowers();
         }
     }
 

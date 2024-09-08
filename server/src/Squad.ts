@@ -49,6 +49,7 @@ import { EquipmentSlots } from "@spt/models/enums/EquipmentSlots";
 import { Item } from "@spt/models/eft/common/tables/IItem";
 
 import { BuildController } from "@spt/controllers/BuildController";
+import { IBots } from "@spt/models/spt/bots/IBots";
 
 class friendlyPMC {
 	config = {
@@ -112,6 +113,7 @@ class friendlyPMC {
 	Bots: IBotConfig;
 	mailSendService: MailSendService;
 	LocaleService: LocaleService;
+	randomUtil: RandomUtil;
 
 	private _StringFormat(str: string, ...values: string[]) {
 		return str.replace(/\{(\d+)\}/g, function (match, number) {
@@ -127,6 +129,8 @@ class friendlyPMC {
 	originalGetValidTraderIdByEnumValue: TraderHelper["getValidTraderIdByEnumValue"];
 
 	originalGenerateBot: BotGenerator["generateBot"];
+
+	botsTable: IBots;
 
 	preSptLoad(container: DependencyContainer) {
 		this.Logger = container.resolve("WinstonLogger");
@@ -212,6 +216,7 @@ class friendlyPMC {
 		const staticRouterModService = container.resolve<StaticRouterModService>("StaticRouterModService");
 		const httpResponseUtil = container.resolve<HttpResponseUtil>("HttpResponseUtil");
 		const randomUtil = container.resolve<RandomUtil>("RandomUtil");
+		this.randomUtil = randomUtil;
 		const hashUtil = container.resolve<HashUtil>("HashUtil");
 
 		const botGenerator = container.resolve<BotGenerator>("BotGenerator");
@@ -330,7 +335,54 @@ class friendlyPMC {
 					this.config.armbands = info.Config.pmcArmbands;
 					this.config.sameSideHostile = info.Config.sameSideHostile;
 					this.config.englishBear = info.Config.englishBear;
-					this.Logger.logWithColor("friendlyPMC: Setting Server Config as " + JSON.stringify(this.config), LogTextColor.BLUE);
+					this.Logger.logWithColor("friendlyPMC: Setting Server Config as " + JSON.stringify(info), LogTextColor.BLUE);
+
+					if (this.config.armbands) {
+						this.Logger.logWithColor("friendlyPMC: Adding Armbands to bots...", LogTextColor.BLUE);
+
+						const armbandColors: Record<string, string> = {
+							blue: "5b3f3af486f774679e752c1f",
+							green: "5b3f3b0186f774021a2afef7",
+							red: "5b3f3ade86f7746b6b790d8e",
+							white: "5b3f16c486f7747c327f55f7",
+							yellow: "5b3f3b0e86f7746752107cda",
+							purple: "5f9949d869e2777a0e779ba5",
+						};
+
+						for (const botType in this.botsTable.types) {
+							const bot = this.botsTable.types[botType];
+							const equipmentArmband: Record<string, number> = {};
+							switch (botType) {
+								case "assaultgroup":
+								case "usec":
+									bot.chances.equipment.ArmBand = 100;
+									equipmentArmband[armbandColors.blue] = 1;
+									bot.inventory.equipment.ArmBand = equipmentArmband;
+									break;
+								case "bear":
+									bot.chances.equipment.ArmBand = 100;
+									equipmentArmband[armbandColors.red] = 1;
+									bot.inventory.equipment.ArmBand = equipmentArmband;
+									break;
+							}
+						}
+					}
+
+					if (this.config.englishBear) {
+						this.Logger.logWithColor("friendlyPMC: Making all Bears speak English", LogTextColor.BLUE);
+						this.botsTable.types["bear"].appearance.voice = {
+							Bear_1_Eng: 1,
+							Bear_2_Eng: 1,
+						};
+					} else {
+						this.Logger.logWithColor("friendlyPMC: Making all Bears speak Russian", LogTextColor.BLUE);
+						this.botsTable.types["bear"].appearance.voice = {
+							Bear_1: 1,
+							Bear_2: 1,
+							Bear_3: 1,
+						};
+					}
+
 					return httpResponseUtil.emptyResponse();
 				}),
 				new RouteAction("/client/game/bot/followergenerate", (url: string, info: { Info: IGenerateBotsRequestData; Preset?: string; Custom?: { Body?: string; Feet?: string; Nickname?: string; English?: boolean } }, sessionID: string, output: string): any => {
@@ -419,58 +471,14 @@ class friendlyPMC {
 
 		this.Bots = Bots;
 
-		if (this.config.armbands) {
-			this.Logger.logWithColor("friendlyPMC: Adding Armbands to bots...", LogTextColor.BLUE);
-
-			const armbandColors: Record<string, string> = {
-				blue: "5b3f3af486f774679e752c1f",
-				green: "5b3f3b0186f774021a2afef7",
-				red: "5b3f3ade86f7746b6b790d8e",
-				white: "5b3f16c486f7747c327f55f7",
-				yellow: "5b3f3b0e86f7746752107cda",
-				purple: "5f9949d869e2777a0e779ba5",
-			};
-
-			for (const botType in tables.bots.types) {
-				const bot = tables.bots.types[botType];
-				const equipmentArmband: Record<string, number> = {};
-				switch (botType) {
-					case "assaultgroup":
-					case "usec":
-						bot.chances.equipment.ArmBand = 100;
-						equipmentArmband[armbandColors.blue] = 1;
-						bot.inventory.equipment.ArmBand = equipmentArmband;
-						break;
-					case "bear":
-						bot.chances.equipment.ArmBand = 100;
-						equipmentArmband[armbandColors.red] = 1;
-						bot.inventory.equipment.ArmBand = equipmentArmband;
-						break;
-				}
-			}
-		}
-
-		if (this.config.englishBear) {
-			this.Logger.logWithColor("friendlyPMC: Making all Bears speak English", LogTextColor.BLUE);
-			tables.bots.types["bear"].appearance.voice = {
-				Bear_1_Eng: 1,
-				Bear_2_Eng: 1,
-			};
-		} else {
-			this.Logger.logWithColor("friendlyPMC: Making all Bears speak Russian", LogTextColor.BLUE);
-			tables.bots.types["bear"].appearance.voice = {
-				Bear_1: 1,
-				Bear_2: 1,
-				Bear_3: 1,
-			};
-		}
-
 		// open all zones to the bots
 		const locations: ILocations = tables.locations;
 		for (const altLocation in openZonesMap) {
 			locations[altLocation].base.OpenZones = openZonesMap[altLocation].join(",");
 			this.Logger.info(`Opened ${locations[altLocation].base.OpenZones} for bots in ${locations[altLocation].base.Name} location`);
 		}
+
+		this.botsTable = tables.bots;
 
 		SetFreemanTrader(tables, Traders);
 	}
@@ -606,7 +614,9 @@ class friendlyPMC {
 			this.Logger.info("FriendlyPMC:  Patching bot generation for " + role);
 		}
 
-		return this.originalGenerateBot(sessionId, bot, botJsonTemplate, botGenerationDetails);
+		const result = this.originalGenerateBot(sessionId, bot, botJsonTemplate, botGenerationDetails);
+
+		return result;
 	}
 }
 

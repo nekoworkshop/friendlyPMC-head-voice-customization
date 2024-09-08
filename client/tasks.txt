@@ -69,6 +69,12 @@ Using That Direction works at a maxium 15m and it will affect the closest bot. B
 You can now use the following commands while looking at a bot, at a maximum 35 meters distance, to affect only him : Hold Position, Go Go Go, Get Back, Cover Me, On Your Own, Stop and Follow Me.
 
 
+Known Issues:
+- your followers can have an eagle eye observation or they can be as unaware as a drunken person.
+- your followers can end up teleporting. It's what the game does if it detects no viable path from the bot's position to the desired spot. Most notably during "come to me" requests.
+- avoid interrupting your both while healing
+- SAIN does x, y,z - can't the followers do the same? NO. Sain is not designed to have bots work with the player as a team at all. SAIN is not designed to take into account a cross map moving of a bot making decisions on what to ignore, what to engage. SAIN is focused on combat engagement and affects bot's senses in a way that would make your follower pick up targets left and right. SAIN can put the bot in cover holding when it detects enemy out of sight. That is not what you want your followers to do as you move around the map. So while SAIN has some affect on the followers, its minimal - think of it as dealing with 2 different brains here.
+
 Personal Notes:
 Need to update description on what commands are ignored by "Assist" tactic
 Need to redo the description to explain things better and add donation button

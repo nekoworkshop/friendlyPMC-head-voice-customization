@@ -37,7 +37,14 @@ namespace friendlyPMC.Actions
 
         private bool sprinting = false;
 
-        public readonly BotOwner botOwner;
+        private bool wasHit = false;
+
+        public BotOwner botOwner {
+            get
+            {
+                return botOwner_0;
+            }
+        }
 
         public FollowerPatrol(pitAIBossPlayer player, BotOwner owner) : base(owner)
         {
@@ -46,22 +53,20 @@ namespace friendlyPMC.Actions
             boss_0 = player;
 
             IsInited = true;
-
-            botOwner = owner;
         }
 
         public void Update()
         {
             var brain = botOwner_0.Brain.BaseBrain as FollowerBrain;
 
-            bool wasHit = false;
+
             // let the bot turn to the direction he was hit from
             if (brain != null && brain.WasHit)
             {
                 wasHit = true;
             }
 
-            if(!wasHit) botOwner_0.LookData.SetLookPointByHearing(null);
+            //if(!wasHit) botOwner_0.LookData.SetLookPointByHearing(null);
 
             if (this.float_3 < Time.time)
             {
@@ -105,7 +110,7 @@ namespace friendlyPMC.Actions
                             coverPoints.ForEach((point) =>
                             {
                                 float dist = (leaderPosition - point.Position).magnitude;
-                                if (point.IsFreeById(botOwner.Id) && Utils.Utils.GetNavDistance(leaderPosition, point.Position, navMeshPath) <= maxDist)
+                                if (point.IsFreeById(botOwner_0.Id) && Utils.Utils.GetNavDistance(leaderPosition, point.Position, navMeshPath) <= maxDist)
                                 {
                                     availCover.Add(point);
                                 }
@@ -123,10 +128,10 @@ namespace friendlyPMC.Actions
                         if (nearPoint != null)
                         {
                             lastCoverPoint = nearPoint;
-                            botOwner.Memory.SetCoverPoints(nearPoint);
+                            botOwner_0.Memory.SetCoverPoints(nearPoint);
                             if (!wasHit) botOwner_0.Steering.LookToMovingDirection();
 
-                            var status = botOwner.Mover.GoToPoint(nearPoint, true, true);
+                            var status = botOwner_0.Mover.GoToPoint(nearPoint, true, true);
                             if (status == NavMeshPathStatus.PathComplete)
                             {
                                 return;
@@ -143,13 +148,15 @@ namespace friendlyPMC.Actions
                         NavMeshHit navMeshHit;
                         if (!NavMesh.SamplePosition(new Vector3(x, leaderPosition.y, z), out navMeshHit, 2f, -1))
                         {
-                            botOwner.StopMove();
+                            botOwner_0.StopMove();
                             bool_0 = true;
                             return;
                         }
-                        if (botOwner.GoToPoint(navMeshHit.position, true, -1f, false, true, true, false) != NavMeshPathStatus.PathComplete)
+                        if (botOwner_0.GoToPoint(navMeshHit.position, true, -1f, false, true, true, false) != NavMeshPathStatus.PathComplete)
                         {
-                            botOwner.StopMove();
+                            if (!wasHit) botOwner_0.Steering.LookToMovingDirection();
+
+                            botOwner_0.StopMove();
                             bool_0 = true;
                             return;
                         }
@@ -163,8 +170,8 @@ namespace friendlyPMC.Actions
                     bool val = num > 14f;
                     
                     if(val && !sprinting)
-                        botOwner.Mover.Sprint(true, false);
-                    else if (!val && sprinting) botOwner.Mover.Sprint(false, false);
+                        botOwner_0.Mover.Sprint(true, false);
+                    else if (!val && sprinting) botOwner_0.Mover.Sprint(false, false);
 
                     sprinting = val;
                 }
@@ -202,6 +209,7 @@ namespace friendlyPMC.Actions
             NavMeshPathStatus navMeshPathStatus = this.botOwner_0.GoToPoint(v, true, -1f, false, true, true, false);
             if (navMeshPathStatus == NavMeshPathStatus.PathComplete)
             {
+                if (!wasHit) botOwner_0.Steering.LookToMovingDirection();
                 this.vector3_0 = v;
             }
             return navMeshPathStatus;

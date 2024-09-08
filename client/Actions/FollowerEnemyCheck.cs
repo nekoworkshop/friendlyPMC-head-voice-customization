@@ -24,7 +24,7 @@ namespace friendlyPMC.Actions
                         Vector3 bossPosition = bot.BotFollower.BossToFollow.Player().Transform.position;
                         Vector3 bossLookDirection = bot.BotFollower.BossToFollow.Player().LookDirection;
                         
-                        brain.FakeShot(bossPosition + (bossLookDirection.normalized * 50f));
+                        brain.FakeShot(bossPosition + bossLookDirection.normalized * 50f);
                     }
                 }
                 else
