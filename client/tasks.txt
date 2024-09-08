@@ -18,8 +18,6 @@
 - x - make bot add enemy after turning when hit and enemy was still not picked up
 - x - make bot run to cover when underfire
 - x - make the followers look in the direction of the shooting when bullets fly by the player
-- make bots obey "regroup" call when BTR is close
-- bots need to react to enemy talking (see SAIN)
 - final testing
 
 -- === 3.8 === ---:
@@ -36,6 +34,9 @@
 - make Knight fight tactic unique (Assaulter)
 - lock the new tactics under the goons challenge 
 - add "lock squad equipment" option
+
+- make bots obey "regroup" call when BTR is close
+- bots need to react to enemy talking (see SAIN)
 
 --- ==== 4.0.0 (final phase) ==== ---:
 - add squad screen

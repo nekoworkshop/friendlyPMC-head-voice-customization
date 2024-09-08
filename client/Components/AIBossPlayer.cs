@@ -148,7 +148,7 @@ namespace friendlyPMC.Components
                         List<CustomNavigationPoint> points = new List<CustomNavigationPoint>();
                         float lastsqr = float.MaxValue;
 
-                        int maxValue = 100;
+                        int maxValue = 120;
                         // sort all available points from the closest to the farthest
                         groupPoints.Sort((a, b) => Vector3.Distance(a.Position, squareCenter).CompareTo(Vector3.Distance(b.Position, squareCenter)));
 

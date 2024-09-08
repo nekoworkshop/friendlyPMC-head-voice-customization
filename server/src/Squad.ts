@@ -330,7 +330,7 @@ class friendlyPMC {
 					this.config.armbands = info.Config.pmcArmbands;
 					this.config.sameSideHostile = info.Config.sameSideHostile;
 					this.config.englishBear = info.Config.englishBear;
-
+					this.Logger.logWithColor("friendlyPMC: Setting Server Config as " + JSON.stringify(this.config), LogTextColor.BLUE);
 					return httpResponseUtil.emptyResponse();
 				}),
 				new RouteAction("/client/game/bot/followergenerate", (url: string, info: { Info: IGenerateBotsRequestData; Preset?: string; Custom?: { Body?: string; Feet?: string; Nickname?: string; English?: boolean } }, sessionID: string, output: string): any => {
