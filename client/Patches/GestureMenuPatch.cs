@@ -29,7 +29,7 @@ namespace friendlyPMC.Patches
                 {
                     GesturesMenu.Class2965 @class = new GesturesMenu.Class2965();
                     @class.gesturesMenu_0 = __instance;
-                    @class.isSituational = false;
+                    @class.isSituational = false; 
                     GestureBaseItem gestureBaseItem = item.CreateNewPhrase(EPhraseTrigger.OnRepeatedContact, @class.isSituational);
                     gestureBaseItem.OnPointerClicked.Subscribe(new Action<GestureBaseItem.GStruct399>(@class.method_0));
                     list_1.Add(gestureBaseItem);

@@ -25,6 +25,7 @@ using System.Threading.Tasks;
 using System.Security.Cryptography;
 using static UnityEngine.Rendering.PostProcessing.HableCurve;
 using UnityEngine.Profiling;
+using static ScreenshotCreator;
 
 
 namespace friendlyPMC.Patches
@@ -548,7 +549,7 @@ namespace friendlyPMC.Patches
 
             Profile playerProfile = player.Player().Profile;
             
-            BotCreationDataClass bot;
+            BotCreationDataClass botsData;
             
             List<UniTask<Profile>> profileTasks = new List<UniTask<Profile>>();
 
@@ -620,11 +621,11 @@ namespace friendlyPMC.Patches
                     }
                 });
 
-                bot = botCreationData;
+                botsData = botCreationData;
             }
             else
             {
-                bot = await BotCreationDataClass.Create(botData, botCreator, memberCount, botSpawnerClass);
+                botsData = await BotCreationDataClass.Create(botData, botCreator, memberCount, botSpawnerClass);
             }
 
 
@@ -650,7 +651,7 @@ namespace friendlyPMC.Patches
                 try
                 {
                     int pid = 0;
-                    bot.Profiles.ForEach(profile =>
+                    botsData.Profiles.ForEach(profile =>
                     {
                         if (profile != null)
                         {   
@@ -760,8 +761,7 @@ namespace friendlyPMC.Patches
 
             Components.Logger.LogInfo("Spawn Followers");
 
-            var closestCorePoint = GetClosestCorePoint(Controller, position);
-            bot.AddPosition(position, closestCorePoint.Id);
+            
 
             float spawnedFollowers = 0;
 
@@ -770,7 +770,7 @@ namespace friendlyPMC.Patches
                 return GetPlayerGroup(player, bt, zn);
             });
 
-            bot.Profiles.ForEach(profile =>
+            botsData.Profiles.ForEach(profile =>
             {
                 // followers should use the same groupID as the player
                 profile.Info.GroupId = player.realPlayer.GroupId;
@@ -819,6 +819,13 @@ namespace friendlyPMC.Patches
 
                 Stopwatch stopWatch = new Stopwatch();
                 stopWatch.Start();
+
+                BotCreationDataClass bot = new BotCreationDataClass(botData);
+
+                var closestCorePoint = GetClosestCorePoint(Controller, position);
+                bot.AddPosition(position, closestCorePoint.Id);
+
+                bot.AddProfile(profile);
 
                 Action<BotOwner> OnActivate = new Action<BotOwner>((BotOwner owner) =>
                 {
@@ -873,6 +880,7 @@ namespace friendlyPMC.Patches
                     }
 
                     BossPlayers.ShallBeFollower(owner);
+ 
                     botSpawnerClass.method_10(owner, bot, new Action<BotOwner>((BotOwner follower) =>
                     {
 
@@ -944,6 +952,10 @@ namespace friendlyPMC.Patches
 
                     Components.Logger.LogInfo("Trying to spawn " + profile.Nickname + " follower");
 
+
+                    var _inSpawnProcess = (int)AccessTools.Field(typeof(BotSpawner), "_inSpawnProcess").GetValue(botSpawnerClass);
+                    AccessTools.Field(typeof(BotSpawner), "_inSpawnProcess").SetValue(botSpawnerClass, _inSpawnProcess+1);
+
                     // activate the bot
                     await ActivateBotFollower(
                         botCreator,
@@ -982,7 +994,7 @@ namespace friendlyPMC.Patches
                 
                 Props.Reset();
 
-                LocalGameVmethod4Patch.squadSpawned = false;
+                BaseLocalGameVmethod4Patch.squadSpawned = false;
 
                 Controller = __instance;
 
@@ -1025,14 +1037,15 @@ namespace friendlyPMC.Patches
 
     [HarmonyPatch(typeof(BaseLocalGame<EftGamePlayerOwner>))]
     [HarmonyPatch("vmethod_4")]
-    internal class LocalGameVmethod4Patch
+    internal class BaseLocalGameVmethod4Patch
     {
         [HarmonyPostfix]
         public static IEnumerator Postfix(IEnumerator __result, BaseLocalGame<EftGamePlayerOwner> __instance, BotControllerSettings controllerSettings, ISpawnSystem spawnSystem, Callback runCallback)
         {
             yield return __result;
 
-            SpawnFollowers();
+            if (Type.GetType("Fika.Core.Coop.GameMode.CoopGame, Fika.Core") != null)
+                SpawnFollowers();
 
             yield break;
         }
@@ -1084,6 +1097,27 @@ namespace friendlyPMC.Patches
 
                 }).Forget();
             }
+            else
+            {
+                UniTask.WhenAll(squadSpawners).Forget();
+            }
+        }
+    }
+
+
+
+    [HarmonyPatch(typeof(LocalGame))]
+    [HarmonyPatch("vmethod_4")]
+    internal class LocalGameVmethod4Patch
+    {
+        [HarmonyPostfix]
+        public static IEnumerator Postfix(IEnumerator __result, BaseLocalGame<EftGamePlayerOwner> __instance, BotControllerSettings controllerSettings, ISpawnSystem spawnSystem, Callback runCallback)
+        {
+            yield return __result;
+            if (Type.GetType("Fika.Core.Coop.GameMode.CoopGame, Fika.Core") == null)
+                BaseLocalGameVmethod4Patch.SpawnFollowers();
+
+            yield break;
         }
     }
 
@@ -1116,7 +1150,7 @@ namespace friendlyPMC.Patches
 
             AIDataContructPatch.playerAIData.Clear();
 
-            LocalGameVmethod4Patch.squadSpawned = false;
+            BaseLocalGameVmethod4Patch.squadSpawned = false;
 
             LocalGameCtorPatch.Instance = null;
 

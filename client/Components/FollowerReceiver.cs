@@ -578,6 +578,11 @@ namespace friendlyPMC.Components
                 Player playerRequester = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(requester.ProfileId);
                 Player botLookedAt = IsRequesterLookingAtSomeone(playerRequester,37f);
 
+                if (botLookedAt != null && botLookedAt.ProfileId == botOwner_0.ProfileId)
+                {
+                    isClose = true;
+                }
+
                 // on Cover Me follow close and try to cover player in fights
                 if (info.phrase == EPhraseTrigger.CoverMe && (botLookedAt == null || botLookedAt.ProfileId == botOwner_0.ProfileId))
                 {
@@ -787,6 +792,7 @@ namespace friendlyPMC.Components
 
                             if(isClose) {
                                 botOwner_0.Gesture.TryGestus(EGesture.Good, true);
+                                botOwner_0.BotTalk.TrySay(EPhraseTrigger.Roger, true);
                             }
                         }
                     }
@@ -911,9 +917,11 @@ namespace friendlyPMC.Components
                             {
                                 Player alivePlayerByProfileID = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(requester.ProfileId);
 
+                                bool fromWait = botOwner_0.BotRequestController.CurRequest != null && botOwner_0.BotRequestController.CurRequest.BotRequestType == BotRequestType.wait;
+
                                 if (botOwner_0.BotRequestController.TryStopCurrent(alivePlayerByProfileID, false))
                                 {
-                                    FollowerTakeLootRequest gclass = new FollowerTakeLootRequest(requester);
+                                    FollowerTakeLootRequest gclass = new FollowerTakeLootRequest(requester, fromWait);
 
                                     if (botOwner_0.BotsGroup.RequestsController.TryAddRequest(gclass))
                                     {
@@ -998,7 +1006,6 @@ namespace friendlyPMC.Components
                     {
                         botOwner_0.CalcGoal();
                         botOwner_0.BotTalk.TrySay(EPhraseTrigger.OnEnemyConversation, true);
-                        Components.Logger.LogInfo("Enemy Heard " + voicer.Profile.Nickname);
                     }
                 }
             }

@@ -20,6 +20,8 @@ using EFT.Builds;
 using BepInEx.Bootstrap;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using static UnityEngine.Experimental.Rendering.RayTracingAccelerationStructure;
+using friendlyPMC.Utils;
 
 namespace friendlyPMC
 {
@@ -222,6 +224,20 @@ namespace friendlyPMC
                     { "Name", "BEARs speak English"},
                     { "Description", "Should BEAR bots speak English or Russian"}
                 }
+            },
+            {
+                "pingSquad" , new Dictionary<string,string>
+                {
+                    { "Name", "Ping Squad" },
+                    { "Description", "Shortcut key for triggering the Report call" }
+                }
+            },
+            {
+                "enemyContact" , new Dictionary<string,string>
+                {
+                    { "Name", "Enemy Report" },
+                    { "Description", "Shortcut key for triggering the Contact call" }
+                }
             }
         };
 
@@ -254,6 +270,9 @@ namespace friendlyPMC
         public static ConfigEntry<bool> birdEyeSpawn;
         public static ConfigEntry<bool> justKnightSpawn;
 
+
+        public static ConfigEntry<KeyboardShortcut> pingKey;
+        public static ConfigEntry<KeyboardShortcut> contactKey;
 
         private string[] equipPresets = new string[] {};
 
@@ -321,7 +340,8 @@ namespace friendlyPMC
             var harmony = new Harmony("xyz.pit.companion");
 
             harmony.PatchAll(typeof(LocalGameCtorPatch).Assembly);
-            harmony.PatchAll(typeof(LocalGameVmethod4Patch).Assembly); // backup spawn patch
+            harmony.PatchAll(typeof(BaseLocalGameVmethod4Patch).Assembly); // backup spawn patch
+            harmony.PatchAll(typeof(LocalGameVmethod4Patch).Assembly); // normal spawn patch
 
             ConsoleScreen.Processor.RegisterCommand("followerstome", delegate ()
             {
@@ -546,6 +566,11 @@ namespace friendlyPMC
             pmcArmbands = Config.Bind((string)optionsLang["miscSettings"], "8 " + ((Dictionary<string, string>)optionsLang["pmcArmbands"])["Name"], true, new ConfigDescription(((Dictionary<string, string>)optionsLang["pmcArmbands"])["Description"]));
 
             englishBear = Config.Bind((string)optionsLang["miscSettings"], "8 " + ((Dictionary<string, string>)optionsLang["englishBear"])["Name"], true, new ConfigDescription(((Dictionary<string, string>)optionsLang["englishBear"])["Description"]));
+
+
+            pingKey = Config.Bind((string)optionsLang["miscSettings"], "9.1 " + ((Dictionary<string, string>)optionsLang["pingSquad"])["Name"], new KeyboardShortcut(KeyCode.None), new ConfigDescription(((Dictionary<string, string>)optionsLang["pingSquad"])["Description"]));
+
+            contactKey = Config.Bind((string)optionsLang["miscSettings"], "9.2 " + ((Dictionary<string, string>)optionsLang["enemyContact"])["Name"], new KeyboardShortcut(KeyCode.None), new ConfigDescription(((Dictionary<string, string>)optionsLang["enemyContact"])["Description"]));
 
             knightSpawn = Config.Bind((string)optionsLang["testSettings"], "1 Spawn with The Goons", false, new ConfigDescription("Experimental: Spawn with the goons squad. This works in combination with your own squad. Take note that a boss and his followers do not accept the same commands as your squad"));
 
@@ -882,6 +907,38 @@ namespace friendlyPMC
         public static string[] GetTacticOptions()
         {
             return (string[])optionsLang["tacticOptions"];
+        }
+
+
+        void Update()
+        {
+            GameWorld gameWorld = Singleton<GameWorld>.Instance;
+            if (gameWorld == null) return;
+
+            if (GamePlayerOwner.MyPlayer == null || GamePlayerOwner.MyPlayer.HealthController == null || !GamePlayerOwner.MyPlayer.HealthController.IsAlive)
+            {
+                return;
+            }
+
+            if (pingKey.Value.IsPressed() || contactKey.Value.IsPressed())
+            {
+
+                string id = GamePlayerOwner.MyPlayer.ProfileId;
+
+                if (BossPlayers.Instance != null && PingTeamates.Instance != null)
+                {
+                    var boss = BossPlayers.Instance.GetBossPlayer(id);
+                    if (boss != null)
+                    {
+                        Components.Logger.LogInfo("Shortcuts pressed");
+                        if(pingKey.Value.IsPressed())
+                            boss.realPlayer.Say((EPhraseTrigger)CustomPhrases.TeamStatus,true);
+                        else
+                            boss.realPlayer.Say(EPhraseTrigger.OnRepeatedContact,true);
+                    }
+                }
+            }
+
         }
     }
 }

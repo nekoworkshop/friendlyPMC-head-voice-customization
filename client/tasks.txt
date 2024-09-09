@@ -19,9 +19,9 @@
 - x - make bot run to cover when underfire
 - x - make the followers look in the direction of the shooting when bullets fly by the player
 - final testing
-- add quick key option for contact and report in config mananger
-- stop should be replied with "yes"
-- item taker should not cancel hold position
+- x - add quick key option for contact and report in config mananger
+- x - stop should be replied with "yes"
+- x - item taker should not cancel hold position
 
 -- === 3.8 === ---:
 - improve Assist tactic to be less aggressive

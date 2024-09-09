@@ -16,6 +16,7 @@ using System.Threading.Tasks;
 using HarmonyLib;
 using EFT.Interactive;
 using Comfort.Common;
+using friendlyPMC.Requests;
 
 namespace friendlyPMC.Actions
 {
@@ -147,6 +148,27 @@ namespace friendlyPMC.Actions
 
                 await Task.Delay(1000);
                 ClearLoot();
+
+                // back to hold position
+                var req = botOwner_0.BotRequestController.CurRequest as FollowerTakeLootRequest;
+                if (req != null && req.FromWait && !botOwner_0.Memory.HaveEnemy)
+                {
+                    IPlayer requester = req != null ? req.Requester : null;
+
+                    Player playerRequester = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(requester.ProfileId);
+
+                    if (botOwner_0.BotRequestController.TryStopCurrent(playerRequester, false))
+                    {
+                        FollowerHold holdit = new FollowerHold(playerRequester);
+
+                        if (botOwner_0.BotsGroup.RequestsController.TryAddRequest(holdit))
+                        {
+                            holdit.AddPossibleExecutors(botOwner_0);
+                            holdit.SetGroup(botOwner_0.BotsGroup.RequestsController);
+                            botOwner_0.Gesture.TryGestus(EGesture.Good, true);
+                        }
+                    }
+                }
             }
             catch (Exception e)
             {

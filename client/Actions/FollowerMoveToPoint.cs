@@ -162,6 +162,7 @@ namespace friendlyPMC.Actions
                             {
                                 holdit.AddPossibleExecutors(botOwner_0);
                                 holdit.SetGroup(botOwner_0.BotsGroup.RequestsController);
+                                botOwner_0.Gesture.TryGestus(EGesture.Good, true);
                             }
                         }
                     }
