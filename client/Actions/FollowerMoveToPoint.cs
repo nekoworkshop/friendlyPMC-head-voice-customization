@@ -72,7 +72,15 @@ namespace friendlyPMC.Actions
                 return;
             }
 
+            
             if (botOwner_0.BotRequestController.CurRequest == null) return;
+
+            // cancel movement if we see the enemy
+            if (botOwner_0.Memory.HaveEnemy && botOwner_0.Memory.GoalEnemy.IsVisible)
+            {
+                botOwner_0.BotRequestController.CurRequest.Complete();
+                return;
+            }
 
             if (botOwner_0.Brain.Agent.LastReason == "req:goCheck" && !bool_0)
             {
@@ -186,7 +194,7 @@ namespace friendlyPMC.Actions
                     wasHit = true;
                 }
 
-                if(!wasHit) botOwner_0.Steering.LookToMovingDirection(30f);
+                if(!wasHit && !botOwner_0.Memory.HaveEnemy) botOwner_0.Steering.LookToMovingDirection(30f);
                 botOwner_0.Mover.Sprint(_shouldSprint && !wasHit);
             }
         }

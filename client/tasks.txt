@@ -56,11 +56,13 @@ RELEASE NOTES (3.7):
 - added "On Your Own" command. This will tell bots to stay at a distance (similar to "Get Back"), switch to their default tactic and no longer prioritize your position and safety during fights. "Cover Me" resets this
 - added field to provide custom nickname for each follower in the Configuration Manager
 - added fields to provide custom uniform (top and bottom) for each follower in the Configuration Manager
+- added options for set custom shortcut keys for Contact and Status Report phrase commands.(This means you can put these 2 on other than just F1-F12 keys) 
 - added "Raid End Messages" in the config manager to enable/disabled messages followers may send at the end of the raid (return loot messages are excluded)
 
 - fixed issue with long spawn delay that was happening for some people
 - attempt to fix follower still getting stuck in healing animation under certain circumnstances (still not 100% of the cause or how to replicate)
 - altered how enemy is added to followers as the current method would make followers be aware of any enemy position as soon as that enemy made the player his goal target.
+
 
 Notes: 
 The way an enemy was added to the followers was by observing who the current target is for any bot. This created situations where your followers would instantly pick up the enemy position and even run to him. This is changed now, but it might feel different as you can now have situations where an enemy is shooting at you from a distance, not hitting you, which in turn makes your followers not react. "Contact" command makes them become aware of the situation. 
@@ -73,15 +75,16 @@ You can now use the following commands while looking at a bot, at a maximum 35 m
 
 
 Known Issues:
-- your followers can have an eagle eye observation or they can be as unaware as a drunken person.
+- your followers can have an eagle eye observation but they can be stone deaf. Use a combination of stop and come here gestures to get them in positions you want and use Contact to have them look the direction you want.
 - your followers can end up teleporting. It's what the game does if it detects no viable path from the bot's position to the desired spot. Most notably during "come to me" requests.
-- avoid interrupting your both while healing
-- bots follow in straight line. Yes, that is the navigation logic of the game
-- SAIN does x, y,z - can't the followers do the same? NO. Sain is not designed to have bots work with the player as a team at all. SAIN is not designed to take into account a cross map moving of a bot making decisions on what to ignore, what to engage. SAIN is focused on combat engagement and affects bot's senses in a way that would make your follower pick up targets left and right. SAIN can put the bot in cover holding when it detects enemy out of sight. That is not what you want your followers to do as you move around the map. So while SAIN has some affect on the followers, its minimal - think of it as dealing with 2 different brains here.
+- avoid interrupting your both while healing (status report shows info when bots wants to heal or is healing)
+- bots follow in straight line and can end up intersecting into one another. Yes, that is the navigation logic of the game and cannot be resolved.
+- SAIN does x, y,z - can't the followers do the same? NO. Sain is not designed to have bots work with the player as a team at all. SAIN is not designed to take into account a cross map moving of a bot making decisions on what to ignore, what to engage. SAIN is focused on combat engagement and affects bot's senses in a way that would make your follower pick up targets left and right. SAIN can put the bot in cover holding when it detects enemy out of sight. That is not what you want your followers to do as you move around the map. So while SAIN has some affect on the followers, its minimal.
 
 Personal Notes:
 Need to update description on what commands are ignored by "Assist" tactic
 Need to redo the description to explain things better and add donation button
+
 AIPeriodicUpdate and GClass974 seems related to specific guns and not the bot
 
 ==================================================================================

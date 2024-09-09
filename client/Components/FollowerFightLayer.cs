@@ -406,6 +406,11 @@ namespace friendlyPMC.Components
             if (!sniperTactic && request != null && request.BotRequestType == BotRequestType.throwGrenade)
                 return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.throwGrenadeFromPlace, "throwGrenadeRequest");
 
+            // come here request during fights
+            if(request != null && request.BotRequestType == BotRequestType.followMe && !allyTactic)
+                return new AICoreActionResultStruct<BotLogicDecision>((BotLogicDecision)CustomBotDecisions.MoveToPoint, "req:comeHere");
+
+
             if (botOwner_0.Memory.GoalEnemy.Owner.IsRole(WildSpawnType.marksman))
                 return commonLayer.MarksManFight(out customNavigationPoint_0);
 

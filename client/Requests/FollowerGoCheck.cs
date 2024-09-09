@@ -27,26 +27,7 @@ namespace friendlyPMC.Actions
         public override bool CanRequest(BotOwner owner)
         {
 
-
             if (owner.Memory.HaveEnemy) return false;
-
-            /*if (
-                owner.IsRole(WildSpawnType.followerBirdEye)
-            )
-            {
-                if (Requester.IsAI && Requester.Profile.Info.Settings.Role == WildSpawnType.bossKnight)
-                {
-                    return true;
-                }
-                if (
-                    owner.BotFollower.BossToFollow != null &&
-                    !owner.BotFollower.BossToFollow.Followers.Exists((BotOwner follower) => follower.IsRole(WildSpawnType.bossKnight))
-                )
-                {
-                    return true;
-                }
-                return false;
-            }*/
 
             return true;
         }

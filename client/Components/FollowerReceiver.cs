@@ -285,11 +285,6 @@ namespace friendlyPMC.Components
             else if (gesture == EGesture.ComeToMe || (gesture == EGesture.ThatDirection && !botOwner_0.Memory.HaveEnemy))
             {
                 bool goThere = gesture == EGesture.ThatDirection;
-                if (botOwner_0.Memory.HaveEnemy)
-                {
-                    botOwner_0.BotTalk.TrySay(EPhraseTrigger.Negative, false);
-                    return;
-                }
 
                 if (isBossCommunicating)
                 {
@@ -301,8 +296,6 @@ namespace friendlyPMC.Components
                         bool hadHold = botOwner_0.BotRequestController.CurRequest?.BotRequestType == BotRequestType.wait;
 
                         FollowerGoCheck gclass = new FollowerGoCheck(data.Player, goThere ? BotRequestType.goToPoint :  BotRequestType.followMe,hadHold);
-
-                        
 
 
                         if (
@@ -651,6 +644,14 @@ namespace friendlyPMC.Components
                 // on Follow Me reset to follower patrol
                 else if (info.phrase == EPhraseTrigger.FollowMe && (botLookedAt == null || botLookedAt.ProfileId == botOwner_0.ProfileId))
                 {
+                    if(botOwner_0.Memory.HaveEnemy)
+                    {
+                        botOwner_0.Gesture.TryGestus(EGesture.Bad, true);
+                        botOwner_0.BotTalk.TrySay(EPhraseTrigger.DontKnow, false);
+
+                        return;
+                    }
+
                     Player alivePlayerByProfileID = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(requester.ProfileId);
                     botOwner_0.BotRequestController.TryStopCurrent(alivePlayerByProfileID, false);
                     if(isClose) {
