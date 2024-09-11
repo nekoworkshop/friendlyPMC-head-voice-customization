@@ -38,7 +38,7 @@ namespace friendlyPMC.Components
 
             LayerMask playerMask = LayerMaskClass.PlayerMask;
 
-            RaycastHit[] array = new RaycastHit[20];
+            RaycastHit[] array = new RaycastHit[10];
             Ray ray = requester.InteractionRay;
 
             pitAIBossPlayer boss = BossPlayers.GetBoss(requester.ProfileId);
@@ -52,7 +52,10 @@ namespace friendlyPMC.Components
                     {
                         if (raycastHit.collider != null && raycastHit.collider.gameObject != null)
                         {
-                            if (!Physics.Linecast(ray.origin, raycastHit.point, GameWorld.LootMaskObstruction))
+                            if (
+                                GClass301.CanShootToTarget(new ShootPointClass(raycastHit.point,1),ray.origin,LayerMaskClass.HighPolyWithTerrainMaskAI)
+                            )
+                            //if (!Physics.Linecast(ray.origin, raycastHit.point, GameWorld.LootMaskObstruction))
                             {
                                 BotOwner bot = raycastHit.collider.gameObject.GetComponent<BotOwner>();
                                 if (bot != null && BossPlayers.IsFollower(bot, boss))
@@ -582,7 +585,7 @@ namespace friendlyPMC.Components
                     // - make bot follow boss near
                     FollowerPatrolInstances.SetNearPatrol(botOwner_0);
                     // - cover boss when under attack
-                    (botOwner_0.Brain.BaseBrain as FollowerBrain).needsProtection = true;
+                    (botOwner_0.Brain.BaseBrain as FollowerBrain).bossNeedsProtection = true;
                     (botOwner_0.Brain.BaseBrain as FollowerBrain).BossOrdersChanged();
 
                     // - regroup to boss
@@ -983,7 +986,7 @@ namespace friendlyPMC.Components
                 // on On Your Own do not cover player when under attack
                 else if (info.phrase == EPhraseTrigger.OnYourOwn && (botLookedAt == null || botLookedAt.ProfileId == botOwner_0.ProfileId))
                 {
-                    (botOwner_0.Brain.BaseBrain as FollowerBrain).needsProtection = false;
+                    (botOwner_0.Brain.BaseBrain as FollowerBrain).bossNeedsProtection = false;
                     (botOwner_0.Brain.BaseBrain as FollowerBrain).SetBossTactic(null);
                     FollowerPatrolInstances.SetFarPatrol(botOwner_0);
 
@@ -1000,12 +1003,16 @@ namespace friendlyPMC.Components
             {
                 base.method_0(info);
                 // check if what we heard was the enemy
-                if(!botOwner_0.Memory.HaveEnemy && (botOwner_0.GetPlayer.Transform.position - requester.Transform.position).sqrMagnitude < 900f)
+                float sqrdist = (botOwner_0.GetPlayer.Transform.position - requester.Transform.position).sqrMagnitude;
+                if(!botOwner_0.Memory.HaveEnemy && sqrdist < 900f)
                 {
                     Player voicer = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(requester.ProfileId);
                     if (botOwner_0.EnemiesController.IsEnemy(voicer) || botOwner_0.BotsGroup.IsEnemy(requester))
                     {
-                        botOwner_0.CalcGoal();
+                        FollowerBrain brain = botOwner_0.Brain.BaseBrain as FollowerBrain;
+                        if(brain != null) brain.FakeShot(voicer.MainParts[BodyPartType.body].Position);
+
+                        botOwner_0.BotsGroup.ReportAboutEnemy(requester, EEnemyPartVisibleType.notVisible);
                         botOwner_0.BotTalk.TrySay(EPhraseTrigger.OnEnemyConversation, true);
                     }
                 }

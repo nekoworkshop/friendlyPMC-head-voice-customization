@@ -324,7 +324,7 @@ namespace friendlyPMC.Components
                 if (allyTactic) ordersAreHold = false;
             }
 
-            // is in dogfight/
+            // is in dogfight
             AICoreActionResultStruct<BotLogicDecision>? aicoreActionResultStruct = commonLayer.DogFight(out customNavigationPoint_0);
 
             if (aicoreActionResultStruct != null)
@@ -344,7 +344,8 @@ namespace friendlyPMC.Components
             // Check if the bot has received the regroup command
             if (ordersAreReqroup && GetNavDistance(bossPosition) > commonLayer.regroupMinDistance && (!botOwner_0.Memory.HaveEnemy || !botOwner_0.Memory.GoalEnemy.IsVisible))
             {
-                return commonLayer.GetCloserToBoss(out customNavigationPoint_0);
+                aicoreActionResultStruct = commonLayer.GetCloserToBoss(out customNavigationPoint_0);
+                return (AICoreActionResultStruct<BotLogicDecision>)aicoreActionResultStruct;
             }
 
 
@@ -360,7 +361,7 @@ namespace friendlyPMC.Components
                         GetBoss().PrioritizeEnemy(botOwner_0, closestEnemy);
                     }
                     // - sniper try to find shooting spot
-                    if (sniperTactic)
+                    if (sniperTactic || holdTactic)
                     {
                         GetClosestAttackCoverPoint(bossPosition, bossOuterRadius);
                         if (customNavigationPoint_0 != null)
@@ -523,7 +524,7 @@ namespace friendlyPMC.Components
                 )
             )
             {
-                commonLayer.OrderReset();
+                if(!ordersAreAttack && !ordersAreHold) commonLayer.OrderReset();
                 return new AICoreActionEndStruct("orders.Received", true);
             }
 

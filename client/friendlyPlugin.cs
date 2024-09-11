@@ -334,7 +334,6 @@ namespace friendlyPMC
             new QuickPanelPatch().Enable();
             new GestureMenuPatch().Enable();
             new GestureMenuAvailablePhrasesPatch().Enable();
-            new PhraseSpeakerClassPatch().Enable();
             new EPhraseTriggerPatch().Enable();
 
             var harmony = new Harmony("xyz.pit.companion");
@@ -423,8 +422,9 @@ namespace friendlyPMC
             SAINPatch.PatchSAINIfInstalled(harmony);
             // some error catchers here - they do not seem related to this mod
             new GClass974Patch().Enable();
-
             harmony.PatchAll(typeof(LookSensorPatch).Assembly);
+            // patch hearing
+            new HearingSensorPatch().Enable();
 
         }
 
@@ -929,7 +929,6 @@ namespace friendlyPMC
                     var boss = BossPlayers.Instance.GetBossPlayer(id);
                     if (boss != null)
                     {
-                        Components.Logger.LogInfo("Shortcuts pressed");
                         if(pingKey.Value.IsPressed())
                             boss.realPlayer.Say((EPhraseTrigger)CustomPhrases.TeamStatus,true);
                         else

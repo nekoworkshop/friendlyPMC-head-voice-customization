@@ -288,7 +288,7 @@ namespace friendlyPMC.Actions
                                 // else find the closest cover to the boss and cover him
                                 Vector3 botPos = botOwner_0.GetPlayer.Transform.position;
                                 Vector3 bossPos = botOwner_0.BotFollower.BossToFollow.Position;
-                                bool protectBoss = (botOwner_0.Brain.BaseBrain as FollowerBrain).needsProtection;
+                                bool protectBoss = (botOwner_0.Brain.BaseBrain as FollowerBrain).bossNeedsProtection;
 
                                 CustomNavigationPoint cover = Utils.Covers.GetClosestCoverPoint(
                                     botOwner_0.Id,

@@ -454,14 +454,14 @@ namespace friendlyPMC.Modules
             float sphereRadius = scanDistance / 2;
             float sphereDistance = scanDistance / 2;
 
-            RaycastHit[] hits = new RaycastHit[100];
+            RaycastHit[] hits = new RaycastHit[20];
             Ray visionRay = new Ray(playerPosition, playerLookDirection);
             int numHits = Physics.SphereCastNonAlloc(
                     new Ray(playerPosition, playerLookDirection),
                     sphereRadius,
                     hits,
                     sphereDistance,
-                     LayerMaskClass.PlayerMask
+                    LayerMaskClass.PlayerMask
                 );
 
             // get all enemies the boss might have seen
@@ -472,7 +472,9 @@ namespace friendlyPMC.Modules
                 {
                     if (hit.collider != null && hit.collider.gameObject != null)
                     {
-                        if (!Physics.Linecast(visionRay.origin, hit.point, GameWorld.LootMaskObstruction))
+                        if (
+                            GClass301.CanShootToTarget(new ShootPointClass(hit.point,1),player.PlayerBones.WeaponRoot.position,LayerMaskClass.HighPolyWithTerrainMaskAI)
+                        )
                         {
                             var enemy = hit.collider.gameObject.GetComponent<Player>();
                             if (enemy != null)

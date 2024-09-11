@@ -5,6 +5,7 @@ using System.Collections.Generic;
 
 using UnityEngine;
 using UnityEngine.AI;
+using static RootMotion.FinalIK.IKSolver;
 
 namespace friendlyPMC.Components.Tactics
 {
@@ -543,7 +544,7 @@ namespace friendlyPMC.Components.Tactics
             if (botOwner_0.Memory.GoalEnemy.IsVisible && botOwner_0.Memory.GoalEnemy.CanShoot)
             {
 
-                Utils.Enemy.EnemyDistance enemyDistance = Utils.Enemy.Distance(botOwner_0);
+                Enemy.EnemyDistance enemyDistance = Enemy.Distance(botOwner_0);
 
                 float common = 100f * botOwner_0.HealthController.GetBodyPartHealth(EBodyPart.Common, false).Normalized;
                 float headnum = 100f * botOwner_0.HealthController.GetBodyPartHealth(EBodyPart.Head, false).Normalized;
@@ -565,7 +566,7 @@ namespace friendlyPMC.Components.Tactics
                 }
 
                 //  - retreat as we are getting damaged
-                if (Time.time - LastTimeHit < 2f && ((health < 70f && enemyDistance < Utils.Enemy.EnemyDistance.Mid) || health < 60f))
+                if (Time.time - LastTimeHit < 2f && ((health < 70f && enemyDistance < Enemy.EnemyDistance.Mid) || health < 60f))
                 {
                     // -- find cover point behind
                     GetClosestCoverPoint(botPosition - (botOwner_0.LookDirection * coverSearchRadius), coverSearchRadius);
@@ -578,10 +579,10 @@ namespace friendlyPMC.Components.Tactics
                     
                     navpoint = customNavigationPoint_2;
 
-                    if (customNavigationPoint_2 != null)
+                    if (navpoint != null)
                     {
                         // -- critical damage and enemy has enough distance, run for cover
-                        if (health < 50f && Utils.Enemy.Distance(botOwner_0) > Utils.Enemy.EnemyDistance.VeryClose)
+                        if (health < 50f && Enemy.Distance(botOwner_0) > Enemy.EnemyDistance.VeryClose)
                         {
                             return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "damageCritical");
                         }
@@ -615,7 +616,7 @@ namespace friendlyPMC.Components.Tactics
                 if (!botOwner_0.Memory.GoalEnemy.IsVisible && lastSeen > 3f)
                 {
                     // - close to the enemy, but safe enough to apply meds
-                    if (botOwner_0.Memory.IsInCover && Utils.Enemy.DistanceProxy(botOwner_0, botPosition) > Utils.Enemy.ProxyDistance.VeryClose)
+                    if (botOwner_0.Memory.IsInCover && Enemy.DistanceProxy(botOwner_0, botPosition) > Enemy.ProxyDistance.VeryClose)
                     {
                         heal_time = Time.time;
                         return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.heal, "healInCover");
@@ -643,7 +644,7 @@ namespace friendlyPMC.Components.Tactics
                 else if (lastSeen <= 3f)
                 {
                     // not seeing the enemy and we are far enough
-                    if (Utils.Enemy.DistanceProxy(botOwner_0, botPosition) > Utils.Enemy.ProxyDistance.Close)
+                    if (Enemy.DistanceProxy(botOwner_0, botPosition) > Enemy.ProxyDistance.Close)
                     {
                         // - heal if already in cover
                         if (botOwner_0.Memory.IsInCover)
@@ -708,7 +709,7 @@ namespace friendlyPMC.Components.Tactics
 
                     if (customNavigationPoint_2 != null)
                     {
-                        if (GetNavDistance(customNavigationPoint_2.Position) > sprintDistance && Utils.Enemy.DistanceProxy(botOwner_0, botPosition) > Utils.Enemy.ProxyDistance.VeryClose)
+                        if (GetNavDistance(customNavigationPoint_2.Position) > sprintDistance && Enemy.DistanceProxy(botOwner_0, botPosition) > Enemy.ProxyDistance.VeryClose)
                         {
                             return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "runToHeal");
                         }

@@ -62,52 +62,7 @@ namespace friendlyPMC.Patches
         }
     }
 
-    internal class PhraseSpeakerClassPatch : ModulePatch
-    {
-        protected override MethodBase GetTargetMethod()
-        {
-            return AccessTools.Method(typeof(PhraseSpeakerClass), "Init");
-        }
-        [PatchPostfix]
-        private static void PatchPostfix(PhraseSpeakerClass __instance, EPlayerSide side, int id, string playerVoice, bool registerInSpeakerManager)
-        {
-
-            if (side == EPlayerSide.Bear || side == EPlayerSide.Usec)
-            {
-                foreach (var item in __instance.PhrasesBanks)
-                {
-                    if (item.Value.Clips.Length <= 0) continue;
-
-                    if(item.Key == EPhraseTrigger.GetBack)
-                    {
-                        item.Value.Clips = new TaggedClip[] {
-                            // 0 , 1 or 
-                            item.Value.Clips[Math.Min(0,item.Value.Clips.Length -1)]
-                        };
-                    } 
-                    else if (item.Key == EPhraseTrigger.HoldPosition)
-                    {
-                        item.Value.Clips = new TaggedClip[] {
-                            item.Value.Clips[0]
-                        };
-                    }
-                    else if (item.Key == EPhraseTrigger.CoverMe)
-                    {
-                        item.Value.Clips = new TaggedClip[] {   
-                            item.Value.Clips[0]
-                        };
-                    }
-                    else if (item.Key == EPhraseTrigger.Gogogo)
-                    {
-                        item.Value.Clips = new TaggedClip[] {
-                            item.Value.Clips[Math.Min(5,item.Value.Clips.Length -1)]
-                        };
-                    }
-                }
-            }
-        }
-    }
-
+    
     internal class EPhraseTriggerPatch : ModulePatch
     {
         protected override MethodBase GetTargetMethod()

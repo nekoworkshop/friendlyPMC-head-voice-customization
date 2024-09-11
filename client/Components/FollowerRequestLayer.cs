@@ -36,7 +36,13 @@ namespace friendlyPMC.Components
 
         public override bool ShallUseNow()
         {
-            if (botOwner_0.Memory.HaveEnemy) return false;
+            if (botOwner_0.Memory.HaveEnemy)
+            {
+                if (botOwner_0.BotRequestController.CurRequest?.BotRequestType == BotRequestType.wait)
+                    botOwner_0.BotRequestController.CurRequest.Complete();
+
+                return false;
+            }
 
             var brain = botOwner_0.Brain.BaseBrain as FollowerBrain;
 

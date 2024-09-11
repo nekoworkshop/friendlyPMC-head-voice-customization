@@ -103,7 +103,7 @@ namespace friendlyPMC.Actions
                                 {
                                     Vector3 bossPos = botOwner_0.BotFollower.BossToFollow.Position;
                                     Vector3 botPos = botOwner_0.GetPlayer.Transform.position;
-                                    bool protectBoss = (botOwner_0.Brain.BaseBrain as FollowerBrain).needsProtection;
+                                    bool protectBoss = (botOwner_0.Brain.BaseBrain as FollowerBrain).bossNeedsProtection;
 
                                     _actionsQueue.Enqueue(() =>
                                     {

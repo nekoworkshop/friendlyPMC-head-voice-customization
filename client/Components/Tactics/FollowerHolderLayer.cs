@@ -93,8 +93,6 @@ namespace friendlyPMC.Components.Tactics
                         else
                             return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "regroupToBossFast");
                     }
-
-                    return new AICoreActionResultStruct<BotLogicDecision>((BotLogicDecision)CustomBotDecisions.CoverToCover, "coverBoss");
                 }
                 // Otherwise, hold position
                 return commonLayer.HoldPositionFor(GClass761.Random(2f, 3f), "holdPositionInCover");
@@ -103,7 +101,7 @@ namespace friendlyPMC.Components.Tactics
             // If the bot is not in cover, find the closest cover and move to it
             if (commonLayer.HasBoss() && commonLayer.coverType == "close")
             {
-                customNavigationPoint_0 = commonLayer.GetClosestCoverPointGroup(interestPosition, commonLayer.coverSearchRadius);
+                /*customNavigationPoint_0 = commonLayer.GetClosestCoverPointGroup(interestPosition, commonLayer.coverSearchRadius);
 
                 if (customNavigationPoint_0 != null)
                 {
@@ -111,7 +109,7 @@ namespace friendlyPMC.Components.Tactics
                         return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMoving, "regroupToBoss");
                     else
                         return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "regroupToBossFast");
-                }
+                }*/
 
                 return new AICoreActionResultStruct<BotLogicDecision>((BotLogicDecision)CustomBotDecisions.CoverToCover, "coverBoss");
             }

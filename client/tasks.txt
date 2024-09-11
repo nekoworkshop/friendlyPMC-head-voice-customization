@@ -18,31 +18,38 @@
 - x - make bot add enemy after turning when hit and enemy was still not picked up
 - x - make bot run to cover when underfire
 - x - make the followers look in the direction of the shooting when bullets fly by the player
-- final testing
 - x - add quick key option for contact and report in config mananger
 - x - stop should be replied with "yes"
 - x - item taker should not cancel hold position
+- bots need to have better hearing
 
 -- === 3.8 === ---:
+- add Guard tactic which will have engage decisions in addition to position holding
 - improve Assist tactic to be less aggressive
 - scav followers to turn hostile if your shoot them (turning hostile can be done through BotMemoryClass > method_7)
 - picked up followers to turn hostile if you shoot them
+- implement proximity detection, if enemy is too close automatically aquire them for safety reasons
+
+- see if you can get inspired from SAIN to have better hearing
+- bots need to react to enemy talking (see SAIN)
+
+- add "lock squad equipment" option
+- make bots obey "regroup" call when BTR is close
+
+
+- x - remove options to spawn with the goons
 - fix glitchy behavior of boss followers
 - goons send messages at the end of the raid
-- remove options to spawn with the goons
+
 - goons send join offer for specific maps (Woods, Shoreline, Customs, Lighthouse)
 - add new tactic Supporter (an alternative version to Marskman that also allows for push order)
 - make BigPipe fight tactic unique (Assault Supporter) 
 - make BirdEye fight tactic more unique (Enhanced Marskman)
 - make Knight fight tactic unique (Assaulter)
 - lock the new tactics under the goons challenge 
-- add "lock squad equipment" option
-
-- make bots obey "regroup" call when BTR is close
-- bots need to react to enemy talking (see SAIN)
 
 --- ==== 4.0.0 (final phase) ==== ---:
-- add squad screen
+- add squad management terminal
 - add "hold fire/fire at will" commands
 
 ==================================================================================
@@ -68,11 +75,12 @@ Notes:
 The way an enemy was added to the followers was by observing who the current target is for any bot. This created situations where your followers would instantly pick up the enemy position and even run to him. This is changed now, but it might feel different as you can now have situations where an enemy is shooting at you from a distance, not hitting you, which in turn makes your followers not react. "Contact" command makes them become aware of the situation. 
 
 How to succesfully use the gesture commands in order to move your followers one by one:
-Always start with the Stop gesture and look at a bot, maxium 25m distance, and do the Come To Me gesture. The bot will come near the position your are and then switch back to hold. Repeat as necessary.
+Always start with the Stop gesture and look at a bot, maxium 25m distance, and do the Come To Me gesture. The bot will come near the position you are and then switch back to hold. Repeat as necessary.
 Using That Direction works at a maxium 15m and it will affect the closest bot. Best to do it with your back turned to him. Once the bot reaches the point it will switch back to hold. Repeat as necessary.
 
 You can now use the following commands while looking at a bot, at a maximum 35 meters distance, to affect only him : Hold Position, Go Go Go, Get Back, Cover Me, On Your Own, Stop and Follow Me.
 
+The stop command persists through combat. That means if you told your bots to stay in place and then they engage combat, once out of combat they will resume standing by. You can combine things, you can tell all of them to stand by and look at one and say "follow me" or "cover me" and only that one will resume follow. But, do not wander to far from the others as the cover system always has you at the center in a 120 meter radius.
 
 Known Issues:
 - your followers can have an eagle eye observation but they can be stone deaf. Use a combination of stop and come here gestures to get them in positions you want and use Contact to have them look the direction you want.

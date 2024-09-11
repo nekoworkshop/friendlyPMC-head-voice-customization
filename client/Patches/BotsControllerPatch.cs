@@ -1153,11 +1153,11 @@ namespace friendlyPMC.Patches
                 {
 
                     UniTask squadSpanner = BotsControllerPatch.Instance.SpawnGroupBots(playerBoss);
-                    if (!friendlyPMC.knightSpawn.Value)
+                    /*if (!friendlyPMC.knightSpawn.Value)
                     {
                         squadSpawners.Add(squadSpanner);
 
-                    }
+                    }*/
                 });
             }
 
@@ -1183,9 +1183,9 @@ namespace friendlyPMC.Patches
                 }).Forget();
             }
             else
-            {*/
+            {
                 UniTask.WhenAll(squadSpawners).Forget();
-            //}
+            }*/
         }
     }
 

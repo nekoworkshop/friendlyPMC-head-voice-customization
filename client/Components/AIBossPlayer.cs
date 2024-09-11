@@ -307,10 +307,15 @@ namespace friendlyPMC.Components
             aBossLogic.Dispose();
 
             // Stop the coroutine when the boss is disposed
-            if (coverCoroutine != null)
+            // throws exception in FIKA multiplayer somehow
+            try
             {
-                realPlayer.StopCoroutine(coverCoroutine);
+                if (coverCoroutine != null)
+                {
+                    realPlayer.StopCoroutine(coverCoroutine);
+                }
             }
+            catch { }
 
             Logger.LogInfo("Player Boss Disposed");
         }

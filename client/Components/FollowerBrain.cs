@@ -2,6 +2,7 @@
 using friendlyPMC.Actions;
 using friendlyPMC.Modules;
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using static RootMotion.FinalIK.IKSolver;
 
@@ -26,7 +27,7 @@ namespace friendlyPMC.Components
 
         protected bool _needsProtection = true;
 
-        public bool needsProtection
+        public bool bossNeedsProtection
         {
             get
             {
@@ -46,6 +47,7 @@ namespace friendlyPMC.Components
         private float _gotShot = 0f;
 
         private float _underFire = 0f;
+        
         public bool WasHit
         {
             get { return _gotShot > Time.time; }
@@ -55,6 +57,12 @@ namespace friendlyPMC.Components
         {
             get { return _underFire > Time.time; }
         }
+
+        private List<Vector3> processedSoundPositions = new List<Vector3>();
+
+        private float _lastSoundTime = 0f;
+
+        private float _lastGunshotTime = 0f;
 
         public FollowerBrain(BotOwner owner, pitAIBossPlayer boss) : base(owner)
         {
@@ -169,7 +177,9 @@ namespace friendlyPMC.Components
                             direction = direction.normalized;
                         }
 
-                        _owner.Steering.LookToDirection(direction, CalcTurnSpeed(_owner.LookDirection, direction));
+                        direction = direction * 20f; // ensure the bot will not look down at the ground
+
+                        _owner.Steering.LookToPoint(direction, CalcTurnSpeed(_owner.LookDirection, direction));
                         
                         if(_gotShot > Time.time && _underFire < Time.time)
                         {
@@ -191,6 +201,70 @@ namespace friendlyPMC.Components
         {
             _gotShot = Time.time + 3f;
             _owner.Steering.LookToPoint(direction, CalcTurnSpeed(_owner.LookDirection, direction));
+        }
+
+        /** On enemy sound heard make the bot either look towards the direction of the enemy or automatically make the enemy a target **/
+        public virtual void SoundHeard(Player enemy,Vector3 position, float distance, AISoundType type)
+        {
+           
+            if((type == AISoundType.silencedGun || type == AISoundType.gun) && Time.time < _lastGunshotTime + 3f) return;
+
+            // on gun shot if there is a line of sight, turn immmediately
+            if((type == AISoundType.silencedGun || type == AISoundType.gun) && !WasHit) 
+            {
+                if(distance <= 20f) Utils.Enemy.MakeEnemy(_owner, enemy);
+                else if(
+                    GClass301.CanShootToTarget(new ShootPointClass(_owner.GetPlayer.MainParts[BodyPartType.head].Position,1f),enemy.PlayerBones.WeaponRoot.position,_owner.LookSensor.Mask) ||
+                    GClass301.CanShootToTarget(new ShootPointClass(_owner.GetPlayer.MainParts[BodyPartType.head].Position,1f), enemy.PlayerBones.WeaponRoot.position, _owner.LookSensor.Mask)
+                ) {
+                    Vector3 shootdir = position - _owner.GetPlayer.Transform.position;
+
+                    if (shootdir.sqrMagnitude < 1f)
+                    {
+                        shootdir = shootdir.normalized;
+                    }
+                    
+                    shootdir *= 20f; // ensure the bot will not look down at the ground
+
+                    FakeShot(shootdir);
+                    _lastGunshotTime = Time.time;
+                    return;
+                }
+            }
+            // turn and face the step sound 
+            else if(type == AISoundType.step) 
+            {
+                 Vector3 positionZone = new Vector3(
+                    Mathf.Floor(position.x / 18f) * 18f,
+                    Mathf.Floor(position.y / 18f) * 18f,
+                    Mathf.Floor(position.z / 18f) * 18f
+                );
+
+                bool wasProcessed = processedSoundPositions.Contains(positionZone);
+
+                if(wasProcessed && Time.time - _lastSoundTime > 5f ) return;
+
+                if(distance <= 10f) Utils.Enemy.MakeEnemy(_owner, enemy);
+                else {
+                    _lastSoundTime = Time.time;
+
+                    Vector3 dir = position - _owner.GetPlayer.Transform.position;
+
+                    if (dir.sqrMagnitude < 1f)
+                    {
+                        dir = dir.normalized;
+                    }
+                    
+                    dir *= 20f; // ensure the bot will not look down at the ground
+
+                    if(!wasProcessed) {
+                        processedSoundPositions.Add(positionZone);
+                        if(processedSoundPositions.Count > 20) processedSoundPositions.RemoveAt(0);
+                    }
+                    
+                    FakeShot(dir);
+                }
+            }
         }
 
         /** On Leave info about this bot should be cleared */
