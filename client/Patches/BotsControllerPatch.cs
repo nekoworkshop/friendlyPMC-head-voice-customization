@@ -1107,7 +1107,7 @@ namespace friendlyPMC.Patches
                 spawnedPlayers.Add(playerBoss);
 
                 // prefetch follower profile data
-                if(playerBoss.Player().Side != EPlayerSide.Savage && friendlyPMC.squadSpawn.Value && friendlyPMC.squadSetup.Value)
+                if (Type.GetType("Fika.Core.Coop.GameMode.CoopGame, Fika.Core") != null && playerBoss.Player().Side != EPlayerSide.Savage && friendlyPMC.squadSpawn.Value && friendlyPMC.squadSetup.Value)
                     Instance?.CreateFollowerProfiles(playerBoss);
 
                 /*if (friendlyPMC.knightSpawn.Value)
