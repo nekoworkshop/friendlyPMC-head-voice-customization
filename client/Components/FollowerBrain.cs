@@ -276,6 +276,7 @@ namespace friendlyPMC.Components
         protected void OnKilled()
         {
             // remove this bot from being a follower
+            Dismissed();
             BossPlayers.RemoveFollower(_owner, _boss);
         }
 
