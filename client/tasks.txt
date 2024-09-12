@@ -1,7 +1,6 @@
 -- == 3.7 == --
 - x - try to use old spawn if FIKA is not available, but need to see why GClass974 gives errors
 - x - add extra checks for canceling healing
-- x - make "Get Back" and "Cover Me" always say the same thing
 - x - new way of becoming aware of the enemy without the watch of GoalEnemy
 - x - updated Come Here, Stop and That Direction commands to use them to move bots one by one where you want them. 
 - x - bots not accuaring enemy when hit from distance or behind
@@ -21,7 +20,9 @@
 - x - add quick key option for contact and report in config mananger
 - x - stop should be replied with "yes"
 - x - item taker should not cancel hold position
-- bots need to have better hearing
+- x - bots need to have better hearing
+- x - remove options to spawn with the goons
+- do not prefect profiles for which equipment is default
 
 -- === 3.8 === ---:
 - add Guard tactic which will have engage decisions in addition to position holding
@@ -36,8 +37,6 @@
 - add "lock squad equipment" option
 - make bots obey "regroup" call when BTR is close
 
-
-- x - remove options to spawn with the goons
 - fix glitchy behavior of boss followers
 - goons send messages at the end of the raid
 
