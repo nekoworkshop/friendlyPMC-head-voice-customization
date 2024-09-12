@@ -633,11 +633,11 @@ namespace friendlyPMC.Components.Tactics
                         {
                             return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "runToHeal");
                         }
-                        // - nothing found, just heal and pray
+                        // - nothing found, no heal
                         else
                         {
-                            heal_time = Time.time;
-                            return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.heal, "heal");
+                            heal_block_time = Time.time + 3f;
+                            return null;
                         }
                     }
                 }
@@ -661,11 +661,11 @@ namespace friendlyPMC.Components.Tactics
                         {
                             return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "runToHeal");
                         }
-                        // - nothing found, just heal and pray
+                        // - nothing found, no heal
                         else
                         {
-                            heal_time = Time.time;
-                            return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.heal, "heal");
+                            heal_block_time = Time.time + 3f;
+                            return null;
                         }
                     }
                     // not seeing the enemy but we are close
@@ -689,11 +689,11 @@ namespace friendlyPMC.Components.Tactics
                                 return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMoving, "moveToHeal");
                             }
                         }
-                        // - nothing found, just heal and pray
+                        // - nothing found, no heal
                         else
                         {
-                            heal_time = Time.time;
-                            return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.heal, "heal");
+                            heal_block_time = Time.time + 3f;
+                            return null;
                         }
                     }
                 }
@@ -719,6 +719,7 @@ namespace friendlyPMC.Components.Tactics
                         }
                     }
                     // - nothing found, do not heal
+                    heal_block_time = Time.time + 3f;
                 }
 
             }
