@@ -1013,7 +1013,7 @@ namespace friendlyPMC.Components
                         if(brain != null) brain.FakeShot(voicer.MainParts[BodyPartType.body].Position);
 
                         botOwner_0.BotsGroup.ReportAboutEnemy(requester, EEnemyPartVisibleType.notVisible);
-                        botOwner_0.BotTalk.TrySay(EPhraseTrigger.OnMutter, true);
+                        botOwner_0.BotTalk.TrySay(EPhraseTrigger.NoisePhrase, true);
                     }
                 }
             }

@@ -25,6 +25,7 @@
 - do not prefect profiles for which equipment is default
 
 -- === 3.8 === ---:
+- see if we can prevent questing bots from affecting followers the same way we do with looting
 - add Guard tactic which will have engage decisions in addition to position holding
 - improve Assist tactic to be less aggressive
 - scav followers to turn hostile if your shoot them (turning hostile can be done through BotMemoryClass > method_7)
