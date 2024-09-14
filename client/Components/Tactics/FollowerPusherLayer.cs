@@ -70,7 +70,7 @@ namespace friendlyPMC.Components.Tactics
             Utils.Enemy.EnemyDistance distanceToEnemy = Utils.Enemy.Distance(botOwner_0);
             float enemiesAtLocation = 0;
             if (botOwner_0.Memory.GoalEnemy.ProfileId != null)
-                Utils.Enemy.GetEnemiesAtLocation(botOwner_0, botOwner_0.Memory.GoalEnemy.ProfileId, enemyPos);
+                enemiesAtLocation = Utils.Enemy.GetEnemiesAtLocation(botOwner_0, botOwner_0.Memory.GoalEnemy.ProfileId, enemyPos);
 
             // PUSH CASE
             if (botOwner_0.Memory.AttackImmediately || pushOrdered)
@@ -84,7 +84,7 @@ namespace friendlyPMC.Components.Tactics
                     (pushOrdered && enemiesAtLocation < 4)
                 )
                 {
-                    BotLogicDecision pushDecision = pushOrdered ? BotLogicDecision.runToEnemy : BotLogicDecision.goToEnemy;
+                    BotLogicDecision pushDecision = pushOrdered && distanceToEnemy <= Utils.Enemy.EnemyDistance.Close ? BotLogicDecision.runToEnemy : BotLogicDecision.goToEnemy;
                     // -- push if not visible
                     if (!enemyVisible)
                         return new AICoreActionResultStruct<BotLogicDecision>(pushDecision, "pushEnemy");

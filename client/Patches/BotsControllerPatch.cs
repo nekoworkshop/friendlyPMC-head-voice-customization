@@ -884,20 +884,24 @@ namespace friendlyPMC.Patches
                             // - set what tactic this follower will have
                             if (tactic != null && tactic != availableTactics[0])
                             {
-                                if (tactic == availableTactics[2])
+                                if (tactic == availableTactics[3])
                                 {
                                     tactic = "Push";
                                 }
-                                else if (tactic == availableTactics[3])
+                                else if (tactic == availableTactics[4])
                                 {
                                     tactic = "Defend";
                                 }
-                                else if (tactic == availableTactics[1])
+                                else if (tactic == availableTactics[2])
                                 {
                                     tactic = "Marksman";
                                     // - - some cheating here, making our marskman good
                                     profile.Skills.Sniper.SetCurrent(5100f, true);
                                     profile.Skills.RecoilControl.SetCurrent(4800f, true);
+                                }
+                                else if (tactic == availableTactics[1])
+                                {
+                                    tactic = "Guard";
                                 }
 
                                 profileTactic.Add(profile.ProfileId, tactic);

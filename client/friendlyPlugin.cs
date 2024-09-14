@@ -93,9 +93,10 @@ namespace friendlyPMC
                 "tacticOptions", new string[]
                 {
                     "Default",
+                    "Guard",
                     "Marksman",
                     "Pusher",
-                    "Holder"
+                    "Holder",
                 }
             },
             { "clothesOptions", new string[]

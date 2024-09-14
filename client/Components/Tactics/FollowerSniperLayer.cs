@@ -17,7 +17,6 @@ namespace friendlyPMC.Components.Tactics
         protected float holdTimer = 0f;
 
         protected readonly float fightRange = 50f;
-        protected readonly float fightLongRange = 100f;
 
         private FollowerCommonLayer commonLayer;
 

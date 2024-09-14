@@ -22,12 +22,14 @@
 - x - item taker should not cancel hold position
 - x - bots need to have better hearing
 - x - remove options to spawn with the goons
-- do not prefect profiles for which equipment is default
+- x - do not prefetch profiles for which equipment is default
 
 -- === 3.8 === ---:
+- see if we can make bot swap weapons when asked to loot (DeadBodyWork)
+- DeadBodyWork should be implemented for "Assist"
 - see if we can prevent questing bots from affecting followers the same way we do with looting
-- add Guard tactic which will have engage decisions in addition to position holding
-- improve Assist tactic to be less aggressive
+- #testing - add Guard tactic which will have engage decisions in addition to position holding
+- x - improve Assist tactic to be less aggressive
 - scav followers to turn hostile if your shoot them (turning hostile can be done through BotMemoryClass > method_7)
 - picked up followers to turn hostile if you shoot them
 - implement proximity detection, if enemy is too close automatically aquire them for safety reasons

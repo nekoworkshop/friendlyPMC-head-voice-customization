@@ -221,7 +221,7 @@ namespace friendlyPMC.Actions
         {
             if (_nextShootPositionUpdateTime > Time.time) return;
 
-            _nextShootPositionUpdateTime = Time.time + 1.5f;
+            _nextShootPositionUpdateTime = Time.time + 2f;
 
             Vector3[] carePosition = new Vector3[] { };
 

@@ -175,6 +175,7 @@
     <Compile Include="Components\FollowerDoorLayer.cs" />
     <Compile Include="Components\FollowerEnemyChooser.cs" />
     <Compile Include="Components\Tactics\FollowerCommonLayer.cs" />
+    <Compile Include="Components\Tactics\FollowerGuard.cs" />
     <Compile Include="Components\Tactics\FollowerHolderLayer.cs" />
     <Compile Include="Components\Tactics\FollowerPusherLayer.cs" />
     <Compile Include="Components\Tactics\FollowerSniperLayer.cs" />
