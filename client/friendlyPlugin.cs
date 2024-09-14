@@ -114,7 +114,7 @@ namespace friendlyPMC
             {
                 "enemyMarker" , new Dictionary<string,string>{
                     { "Name", "Enemy Marker"},
-                    { "Description", "Show enemy position when reporting status. If disabled, the enemy marker sound will also be disabled."}
+                    { "Description", "Show enemy position when reporting status. If disabled, the enemy marker sound will also be disabled"}
                 }
             },
             {
@@ -132,7 +132,7 @@ namespace friendlyPMC
             {
                 "extraPickups",  new Dictionary<string,string>{
                     { "Name", "Maximum pickup followers"},
-                    { "Description", "Maximum followers the player can pickup during raid. This is in addition to the squad"}
+                    { "Description", "Maximum followers the player can pick up during a raid. This is in addition to the squad"}
                 }
             },
             {
@@ -155,14 +155,14 @@ namespace friendlyPMC
             },
             {
                 "enemyRemember", new Dictionary<string,string>{
-                    { "Name", "Time to forget about enemy (in sec.)"},
-                    { "Description", "Maximum time a follower will remember an enemy. This is applied only at the begining of a raid"}
+                    { "Name", "Time to forget about the enemy (in sec.)"},
+                    { "Description", "Maximum time a follower will remember an enemy. This is applied only at the beginning of a raid"}
                 }
             },
             {
                 "heatlhMultiplier", new Dictionary<string,string>{
                     { "Name", "Squad Health Multiplier"},
-                    { "Description", "Health multiplier for the followers you spawn with. This is applied per each body part. Does not apply to boss followers"}
+                    { "Description", "Health multiplier for the followers you spawn with. This is applied per each body part."}
                 }
             },
             {
@@ -180,7 +180,7 @@ namespace friendlyPMC
             {
                 "memberName", new Dictionary<string,string>{
                     { "Name", "Squad Member {0} Nickname"},
-                    { "Description", "Set a custom nickname for this squad member. Leave blank for default"}
+                    { "Description", "Set a custom nickname for this Squad member. Leave blank for default"}
                 }
             },
             {
@@ -211,7 +211,7 @@ namespace friendlyPMC
             {
                 "sameSideHostile", new Dictionary<string,string>{
                     { "Name", "Same PMC Side Hostile"},
-                    { "Description", "Should PMC Bots of the same side be hostile to each other (followers still remain friendly to you)"}
+                    { "Description", "Should PMC Bots of the same side be hostile to each other (followers remain friendly to you)"}
                 }
             },
             {
