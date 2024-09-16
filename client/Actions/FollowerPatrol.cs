@@ -167,7 +167,7 @@ namespace friendlyPMC.Actions
                     lastCoverPoint = null;
                     nocover = false;
                     method_0(leaderPosition);
-                    bool val = num > 14f;
+                    bool val = num > 15f;
                     
                     if(val && !sprinting)
                         botOwner_0.Mover.Sprint(true, false);

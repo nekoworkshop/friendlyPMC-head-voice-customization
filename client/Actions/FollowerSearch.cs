@@ -82,10 +82,11 @@ namespace friendlyPMC.Actions
                         {
                             _actionsQueue.Enqueue(() =>
                             {
-                                // else find a spot from where the bot can shoot the enemy, relative to his position
+                                // else find the next available spot from where the bot can shoot the enemy, relative to his position
                                 ShootPointClass shootTarget = new ShootPointClass(enemySpot, 1f);
                                 _lastPosition = Utils.Covers.FindShootPosition(
                                     botOwner_0.GetPlayer.Transform.position,
+                                    botOwner_0.ShootData.WeaponRootOffset,
                                     shootTarget,
                                     botOwner_0.LookSensor.Mask,
                                     minDist,
@@ -99,33 +100,42 @@ namespace friendlyPMC.Actions
                                     }
                                 );
 
-                                if (!_lastPosition.HasValue && botOwner_0.BotFollower.HaveBoss)
+                                if (!_lastPosition.HasValue)
                                 {
-                                    Vector3 bossPos = botOwner_0.BotFollower.BossToFollow.Position;
-                                    Vector3 botPos = botOwner_0.GetPlayer.Transform.position;
-                                    bool protectBoss = (botOwner_0.Brain.BaseBrain as FollowerBrain).bossNeedsProtection;
-
+                                    // find a cover closer to the enemy - this emulates search
                                     _actionsQueue.Enqueue(() =>
                                     {
-                                        // else get closest cover to the boss and cover him
-                                        CustomNavigationPoint cover = Utils.Covers.GetClosestCoverPoint(
-                                            botOwner_0.Id,
-                                            botOwner_0.GetPlayer.Transform.position,
-                                            protectBoss ? bossPos : botPos,
-                                            areaCovers,
-                                            30f,
-                                            5f,
-                                            carePosition
-                                        );
-
-                                        if (cover != null)
+                                       CustomNavigationPoint Spot3  = Utils.Covers.GetClosestCoverPoint(botOwner_0, enemySpot, 30f, 5f);
+                                        if(Spot3 != null) _lastSpot = Spot3.Position;
+                                        else if(botOwner_0.BotFollower.HaveBoss)
                                         {
-                                            _lastCover = cover.Position;
+                                            Vector3 bossPos = botOwner_0.BotFollower.BossToFollow.Position;
+                                            Vector3 botPos = botOwner_0.GetPlayer.Transform.position;
+                                            bool protectBoss = (botOwner_0.Brain.BaseBrain as FollowerBrain).bossNeedsProtection;
 
-                                        }
-                                        else
-                                        {
-                                            _lastCover = null;
+                                            _actionsQueue.Enqueue(() =>
+                                            {
+                                                // else get closest cover to the boss and cover him
+                                                CustomNavigationPoint cover = Utils.Covers.GetClosestCoverPoint(
+                                                    botOwner_0.Id,
+                                                    botOwner_0.GetPlayer.Transform.position,
+                                                    protectBoss ? bossPos : botPos,
+                                                    areaCovers,
+                                                    30f,
+                                                    5f,
+                                                    carePosition
+                                                );
+
+                                                if (cover != null)
+                                                {
+                                                    _lastCover = cover.Position;
+
+                                                }
+                                                else
+                                                {
+                                                    _lastCover = null;
+                                                }
+                                            });
                                         }
                                     });
                                 }

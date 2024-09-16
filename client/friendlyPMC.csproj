@@ -152,7 +152,9 @@
   <ItemGroup>
     <Compile Include="Actions\FollowerCoverToCover.cs" />
     <Compile Include="Actions\FollowerGoToEnemy.cs" />
+    <Compile Include="Actions\FollowerGuardCover.cs" />
     <Compile Include="Actions\FollowerMoveToPoint.cs" />
+    <Compile Include="Actions\FollowerRunToCover.cs" />
     <Compile Include="Actions\FollowerSniperSearch.cs" />
     <Compile Include="Actions\FollowerSearch.cs" />
     <Compile Include="Components\BossFollower\KnightAvoidDangerLayer.cs" />

@@ -865,10 +865,10 @@ namespace friendlyPMC.Patches
                 }
                 else
                 {
-                    botsData = await BotCreationDataClass.Create(data, botCreator, 0, botSpawnerClass);
-
 
                     Dictionary<int, Profile> botsProfile = await CreateFollowerProfiles(player).Value;
+
+                    botsData = await BotCreationDataClass.Create(data, botCreator, 0, botSpawnerClass);
 
                     followerCreationTask.Remove(player.realPlayer.ProfileId);
 

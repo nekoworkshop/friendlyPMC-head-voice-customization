@@ -450,7 +450,7 @@ namespace friendlyPMC.Components.Tactics
                 // should not be seen by any enemy
                 foreach (var enemy in botOwner_0.EnemiesController.EnemyInfos)
                 {
-                    if (enemy.Value.Person.HealthController.IsAlive && !Covers.CheckCoverVisibility(pt.Position, enemy.Value.Person.Transform.position))
+                    if (enemy.Value.Person.HealthController.IsAlive && pt.CanIHideFromPos(10f,true,true, enemy.Value.Person.Transform.position))
                     {
                         good = false;
                     }
@@ -464,7 +464,7 @@ namespace friendlyPMC.Components.Tactics
                     {
                         float dist = navMeshPath.CalculatePathLength();
 
-                        if (dist > Vector3.Distance(botPosition, pt.Position) + 20f) good = false;
+                        if (dist > Vector3.Distance(botPosition, pt.Position) + 10f) good = false;
                     }
                     else good = false;
                 }
@@ -672,9 +672,7 @@ namespace friendlyPMC.Components.Tactics
                     else
                     {
                         // - look for a spot to heal
-                        float safeDist = 10f;
-
-                        GetClosestSafeCoverPoint(botPosition, safeDist);
+                        GetClosestSafeCoverPoint(botPosition);
 
                         navpoint = customNavigationPoint_3;
 
@@ -840,7 +838,10 @@ namespace friendlyPMC.Components.Tactics
                 return EndEnemySearch();
             }
 
-            if (curDecision.Action == (BotLogicDecision)CustomBotDecisions.CoverToCover)
+            if (
+                curDecision.Action == (BotLogicDecision)CustomBotDecisions.CoverToCover ||
+                curDecision.Action == (BotLogicDecision)CustomBotDecisions.GuardToCover
+            )
             {
                 return EndCoverToCover();
             }
@@ -848,6 +849,11 @@ namespace friendlyPMC.Components.Tactics
             if (closeInDecisions.Contains(curDecision.Reason))
             {
                 return EndGetInClose();
+            }
+
+            if(curDecision.Action == (BotLogicDecision)CustomBotDecisions.RunToCover)
+            {
+                return EndRunToCover();
             }
 
             return null;
@@ -1037,6 +1043,28 @@ namespace friendlyPMC.Components.Tactics
 
             return base.EndGoToPoint();
         }
+
+
+        public override AICoreActionEndStruct EndRunToCover()
+	    {
+		    if (botOwner_0.Memory.HaveEnemy && botOwner_0.Memory.GoalEnemy.CanShoot && botOwner_0.BewareGrenade.SawGrenadeSoFar(5f))
+		    {
+			    return new AICoreActionEndStruct("saw grenade", true);
+		    }
+		    if (botOwner_0.Memory.IsInCover)
+		    {
+			    return new AICoreActionEndStruct("InCover", true);
+		    }
+		    if (!botOwner_0.CanSprintPlayer)
+		    {
+			    return new AICoreActionEndStruct("CanSprintPl", true);
+		    }
+		    if (base.method_2())
+		    {
+			    return new AICoreActionEndStruct("StartD", true);
+		    }
+		    return aICoreActionEndStruct_1;
+	    }
 
     }
 }

@@ -41,11 +41,17 @@ namespace friendlyPMC.Modules
             if(type == (BotLogicDecision)CustomBotDecisions.CoverToCover)
                 return new FollowerCoverToCover(bot);
 
+            if(type == (BotLogicDecision)CustomBotDecisions.GuardToCover)
+                return new FollowerGuardCover(bot);
+
             if (type == (BotLogicDecision)CustomBotDecisions.EnemySearch)
                 return new FollowerSearch(bot);
 
             if (type == BotLogicDecision.goToEnemy)
                 return new FollowerGoToEnemy(bot);
+
+            if(type == (BotLogicDecision)CustomBotDecisions.RunToCover)
+                return new FollowerRunToCover(bot);
 
             return GClass459.CreateNode(type, bot);
         }

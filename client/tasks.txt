@@ -1,34 +1,19 @@
--- == 3.7 == --
-- x - try to use old spawn if FIKA is not available, but need to see why GClass974 gives errors
-- x - add extra checks for canceling healing
-- x - new way of becoming aware of the enemy without the watch of GoalEnemy
-- x - updated Come Here, Stop and That Direction commands to use them to move bots one by one where you want them. 
-- x - bots not accuaring enemy when hit from distance or behind
-- x - fix enemy report not making all other teammates aware
-- x - fix enemy scan to have code similar to IsRequesterLookingAt
-- x - issuing Hold Position, Go Go Go, Get Back, Cover Me to bots individually
-- x - enemy scan should only take enemies into consideration
-- x - fix issue with long spawn delay
-- x - attempt to fix AIPeriodicUpdate Error
-- x - remove the server config and instead move those options in the config mananger and have server requests update these values
-- x - add field in the config manager to specify nickname per follower
-- x - add fields in the config manager to specify custom clotches per follower
-- x - fix receiver to recognize enemy voice
-- x - make bot add enemy after turning when hit and enemy was still not picked up
-- x - make bot run to cover when underfire
-- x - make the followers look in the direction of the shooting when bullets fly by the player
-- x - add quick key option for contact and report in config mananger
-- x - stop should be replied with "yes"
-- x - item taker should not cancel hold position
-- x - bots need to have better hearing
-- x - remove options to spawn with the goons
-- x - do not prefetch profiles for which equipment is default
+-- == 3.7.1 (focus on bugs and improvement) == --
+- improve run to heal:
+- x - cancel on going requests when running to heal
+- - check for cover where to heal better
+- improve enemy search
+- improve cover to cover
+- improve run to cover - this is to help with unstuck while running
+- dog fight seem to semi-crouch the bot, see if you can make them aim and shoot while standing
+- improve seeing
+- add unstuck checks
+- add voices as another personalization option
 
 -- === 3.8 === ---:
 - see if we can make bot swap weapons when asked to loot (DeadBodyWork)
 - DeadBodyWork should be implemented for "Assist"
 - see if we can prevent questing bots from affecting followers the same way we do with looting
-- #testing - add Guard tactic which will have engage decisions in addition to position holding
 - x - improve Assist tactic to be less aggressive
 - scav followers to turn hostile if your shoot them (turning hostile can be done through BotMemoryClass > method_7)
 - picked up followers to turn hostile if you shoot them

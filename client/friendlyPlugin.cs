@@ -20,7 +20,7 @@ using EFT.Builds;
 using BepInEx.Bootstrap;
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using static UnityEngine.Experimental.Rendering.RayTracingAccelerationStructure;
+
 using friendlyPMC.Utils;
 
 namespace friendlyPMC
@@ -39,7 +39,9 @@ namespace friendlyPMC
         SniperSearch = 100,
         CoverToCover = 101,
         EnemySearch = 102,
-        MoveToPoint = 103
+        MoveToPoint = 103,
+        RunToCover = 104,
+        GuardToCover = 105
     }
 
     public enum CustomPhrases
@@ -64,9 +66,8 @@ namespace friendlyPMC
         }
     }
 
-    [BepInPlugin("xyz.pit.companion", "friendlyPMC", "3.7.0")]
+    [BepInPlugin("xyz.pit.companion", "friendlyPMC", "3.7.1")]
     [BepInDependency("xyz.drakia.bigbrain")]
-    [BepInDependency("xyz.drakia.waypoints")]
     [BepInDependency("com.Arys.UnityToolkit")]
     public class friendlyPMC : BaseUnityPlugin
     {

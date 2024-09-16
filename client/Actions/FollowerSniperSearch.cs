@@ -274,6 +274,7 @@ namespace friendlyPMC.Actions
                         ShootPointClass shootTarget = new ShootPointClass(enemySpot, 1f);
                         _lastPosition = Utils.Covers.FindShootPosition(
                             botOwner_0.GetPlayer.Transform.position,
+                            botOwner_0.ShootData.WeaponRootOffset,
                             shootTarget,
                             botOwner_0.LookSensor.Mask,
                             minDist,

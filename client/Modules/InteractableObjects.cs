@@ -472,22 +472,23 @@ namespace friendlyPMC.Modules
                 {
                     if (hit.collider != null && hit.collider.gameObject != null)
                     {
-                        if (
-                            GClass301.CanShootToTarget(new ShootPointClass(hit.point,1),player.PlayerBones.WeaponRoot.position,LayerMaskClass.HighPolyWithTerrainMaskAI)
-                        )
+                        var enemy = hit.collider.gameObject.GetComponent<Player>();
+                        if (enemy != null)
                         {
-                            var enemy = hit.collider.gameObject.GetComponent<Player>();
-                            if (enemy != null)
-                            {
-                                if(boss.Followers.Find(fl=>fl.ProfileId == enemy.ProfileId) != null) continue;
-                                bool isenemy = boss.bossGroup.IsEnemy(enemy);
-                            
-                                if(!enemy && boss.bossGroup.IsPlayerEnemy(enemy)) isenemy = true;
+                            if (boss.Followers.Find(fl => fl.ProfileId == enemy.ProfileId) != null) continue;
+                            bool isenemy = boss.bossGroup.IsEnemy(enemy);
 
-                                if(isenemy) 
+                            if (!enemy && boss.bossGroup.IsPlayerEnemy(enemy)) isenemy = true;
+
+                            if (isenemy)
+                            {
+
+                                if (
+                                    GClass301.CanShootToTarget(new ShootPointClass(enemy.MainParts[BodyPartType.head].Position, 1), player.PlayerBones.WeaponRoot.position, LayerMaskClass.HighPolyWithTerrainMask, false) ||
+                                    GClass301.CanShootToTarget(new ShootPointClass(enemy.MainParts[BodyPartType.body].Position, 1), player.PlayerBones.WeaponRoot.position, LayerMaskClass.HighPolyWithTerrainMask, false)
+                                )
                                 {
                                     Instance._enemiesSeen.Add(enemy);
-                                    break;
                                 }
                             }
                         }

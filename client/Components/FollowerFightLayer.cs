@@ -377,6 +377,7 @@ namespace friendlyPMC.Components
             aicoreActionResultStruct = commonLayer.NeedHeal(out customNavigationPoint_0);
             if (aicoreActionResultStruct != null)
             {
+                if (request != null && request.BotRequestType != BotRequestType.wait) request.Complete(); // cancel requests when needing to heal
                 return (AICoreActionResultStruct<BotLogicDecision>)aicoreActionResultStruct;
             }
 
