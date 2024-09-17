@@ -483,11 +483,13 @@ namespace friendlyPMC.Modules
         }
         public static bool IsBossGroup(int id)
         {
+            if (Instance == null) return false;
             return Instance._botsGroup.Contains(id);
         }
 
         public static void RemoveFollower(BotOwner bot, pitAIBossPlayer player)
         {
+            if (Instance == null) return;
             Instance.RemoveBotFollower(bot, player);
         }
 

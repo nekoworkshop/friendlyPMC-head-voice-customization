@@ -1,16 +1,11 @@
 ﻿using EFT;
-using HarmonyLib;
+
 using System;
 using System.Collections.Generic;
-using System.Linq;
+
 using UnityEngine.AI;
 using UnityEngine;
 using friendlyPMC.Components;
-using static RootMotion.FinalIK.IKSolver;
-using TMPro;
-using Cysharp.Threading.Tasks;
-using System.Threading.Tasks;
-using System.Threading;
 using friendlyPMC.Modules;
 
 namespace friendlyPMC.Utils
@@ -24,7 +19,11 @@ namespace friendlyPMC.Utils
         public static CustomNavigationPoint GetClosestCoverPoint(BotOwner botOwner, Vector3 centerPosition, float searchRadius, float safeDistance = 5f, Func<CustomNavigationPoint, bool>extraChecks = null)
         {
             NavMeshPath navMeshPath = new NavMeshPath();
-            CustomNavigationPoint pt =  ClosestPoint(botOwner, centerPosition, (CustomNavigationPoint point) =>
+
+            pitAIBossPlayer boss = botOwner.BotFollower.HaveBoss ?  botOwner.BotFollower.BossToFollow as pitAIBossPlayer : null;
+            List<CustomNavigationPoint> areaCovers = boss != null ? boss.GetAreaCovers() : BossPlayers.GetAICovers();
+
+            CustomNavigationPoint pt =  ClosestPoint(botOwner.Id, botOwner.GetPlayer.Transform.position, centerPosition, areaCovers, (CustomNavigationPoint point) =>
             {
                 // cover too far
                 if(Vector3.Distance(point.Position, centerPosition) > searchRadius) return false;
@@ -102,7 +101,10 @@ namespace friendlyPMC.Utils
          */
         public static CustomNavigationPoint GetClosestCoverPointBetween(BotOwner botOwner, Vector3 pointA, Vector3 pointB, float safeDistance = 5f)
         {
-            CustomNavigationPoint pt = ClosestPoint(botOwner, pointA, (CustomNavigationPoint point) =>
+            pitAIBossPlayer boss = botOwner.BotFollower.HaveBoss ?  botOwner.BotFollower.BossToFollow as pitAIBossPlayer : null;
+            List<CustomNavigationPoint> areaCovers = boss != null ? boss.GetAreaCovers() : BossPlayers.GetAICovers();
+
+            CustomNavigationPoint pt =  ClosestPoint(botOwner.Id, botOwner.GetPlayer.Transform.position, pointA, areaCovers, (CustomNavigationPoint point) =>
             {
                 if(!IsPointBetween(point.Position, pointA, pointB)) return false;
 
@@ -203,7 +205,10 @@ namespace friendlyPMC.Utils
 
             ShootPointClass shootTarget = new ShootPointClass(enemyPos, 1f);
 
-            CustomNavigationPoint pt = ClosestPoint(botOwner, centerPosition, (CustomNavigationPoint point) =>
+            pitAIBossPlayer boss = botOwner.BotFollower.HaveBoss ?  botOwner.BotFollower.BossToFollow as pitAIBossPlayer : null;
+            List<CustomNavigationPoint> areaCovers = boss != null ? boss.GetAreaCovers() : BossPlayers.GetAICovers();
+
+            CustomNavigationPoint pt =  ClosestPoint(botOwner.Id, botOwner.GetPlayer.Transform.position, centerPosition, areaCovers, (CustomNavigationPoint point) =>
             {
                 float enemyRange = Vector3.Distance(enemyPos, point.Position);
                 if (enemyRange > maxDistance)
@@ -218,9 +223,6 @@ namespace friendlyPMC.Utils
                 {
                     return false;
                 }
-
-                
-
                 
                 return true;
 
@@ -243,7 +245,6 @@ namespace friendlyPMC.Utils
             bool behindEnemy = true
         )
         {
-
 
             ShootPointClass shootTarget = new ShootPointClass(enemyPosition, 1f);
 
@@ -271,8 +272,6 @@ namespace friendlyPMC.Utils
                     return false;
                 }
 
-                if (!GClass301.CanShootToTarget(shootTarget, point, LayerMaskClass.HighPolyWithTerrainMask, false)) return false;
-
                 
                 return true;
 
@@ -280,64 +279,7 @@ namespace friendlyPMC.Utils
 
             return pt;
         }
-        /** Get the point among the relative ones to the boss player that is the closest to centerPosition that meets the eligibility check **/
-        public static CustomNavigationPoint ClosestPoint(BotOwner botOwner, Vector3 centerPosition, Func<CustomNavigationPoint, bool> eligibleCheck,  float safeDistance = 5f)
-        {
-            
-            if (!botOwner.BotFollower.HaveBoss) return null;
-
-            Vector3[] carePosition = new Vector3[] { };
-
-            foreach (var item in botOwner.EnemiesController.EnemyInfos)
-            {
-                try
-                {
-                    carePosition = carePosition.AddItem(item.Value.CurrPosition).ToArray();
-                }
-                catch
-                {
-                }
-            }
-
-            pitAIBossPlayer boss = botOwner.BotFollower.HaveBoss ? botOwner.BotFollower.BossToFollow as pitAIBossPlayer : null;
-
-            float lastsqr = Mathf.Infinity;
-            CustomNavigationPoint closest = null;
-            
-            List<CustomNavigationPoint> areaCovers = boss != null ? boss.GetAreaCovers() : BossPlayers.GetAICovers();
-            
-            foreach (CustomNavigationPoint point in areaCovers)
-            {
-
-                try
-                {
-                    if (
-                        !(point.CoverLevel == CoverLevel.Sit || point.CoverLevel == CoverLevel.Stay) ||
-                        !point.IsFreeById(botOwner.Id) ||
-                        !GClass326.IsDangerPositionFarEnough(point.Position, carePosition, safeDistance * safeDistance) ||
-                        Vector3.Distance(point.Position, botOwner.GetPlayer.Transform.position) <= 1f ||
-                        !eligibleCheck(point)
-                    )
-                    {
-                        continue;
-                    }
-
-                    float dist = (centerPosition - point.Position).sqrMagnitude;
-                    if (dist <= lastsqr)
-                    {
-                        closest = point;
-                        lastsqr = dist;
-                    }
-
-                } catch
-                {
-
-                }
-            }
-
-            return closest;
-        }
-        /** (V2) Get the point among the given ones that is the closest to centerPosition that meets the eligibility check **/
+        /** Get the point among the given ones that is the closest to centerPosition that meets the eligibility check **/
         public static CustomNavigationPoint ClosestPoint(
             int botOwnerId,
             Vector3 botPosition, 
@@ -348,6 +290,7 @@ namespace friendlyPMC.Utils
             Vector3[] dangerPositions = null
         )
         {
+            if(dangerPositions == null) dangerPositions = new Vector3[0];
             CustomNavigationPoint closest = null;
 
             float lastsqr = Mathf.Infinity;

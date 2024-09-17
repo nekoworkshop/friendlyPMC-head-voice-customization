@@ -1,23 +1,33 @@
--- == 3.7.1 (focus on bugs and improvement) == --
-- improve run to heal:
-- x - cancel on going requests when running to heal
-- - check for cover where to heal better
-- improve enemy search
-- improve cover to cover
-- improve run to cover - this is to help with unstuck while running
-- dog fight seem to semi-crouch the bot, see if you can make them aim and shoot while standing
-- improve seeing
-- add unstuck checks
-- add voices as another personalization option
-
 -- === 3.8 === ---:
-- see if we can make bot swap weapons when asked to loot (DeadBodyWork)
-- DeadBodyWork should be implemented for "Assist"
-- see if we can prevent questing bots from affecting followers the same way we do with looting
+- x - improve run to heal:
 - x - improve Assist tactic to be less aggressive
+- x - add Guard Tactic
+- x - cancel on going requests when running to heal
+- x - check for cover where to heal better
+- x - remove "player equipment" as option for equipment
+- revert push order to act like old ways
+- #inprogress - improve cover scan
+- #inprogress - improve enemy search
+- #inprogress - improve cover to cover
+- #inprogress - improve guard to cover
+
+- #inprogress dog fight seem to semi-crouch the bot, see if you can make them aim and shoot while standing
+
+- add unstuck checks (check if bot is running in place and try to unstuck him)
+
+- implement proximity detection, if enemy is too close automatically aquire them for safety reasons
+
 - scav followers to turn hostile if your shoot them (turning hostile can be done through BotMemoryClass > method_7)
 - picked up followers to turn hostile if you shoot them
-- implement proximity detection, if enemy is too close automatically aquire them for safety reasons
+
+- improve seeing
+
+- add voices as another personalization option
+
+-- === 3.9 === ---:
+- see if we can make bot swap weapons when asked to loot (DeadBodyWork)
+- see if we can prevent questing bots from affecting followers the same way we do with looting
+
 
 - see if you can get inspired from SAIN to have better hearing
 - bots need to react to enemy talking (see SAIN)
@@ -40,41 +50,12 @@
 - add "hold fire/fire at will" commands
 
 ==================================================================================
-RELEASE NOTES (3.7):
-- !! all server configuration options has been moved into the Configuration Manager,you can now update them through that and they take effect at raid start
-
-- updated Come Here, That Direction and Stop gesture commands where you can now use them to move bots one by one where you want them. 
-- updated some Phrase commands to be able to be used on invidual followers by looking at the them. Be careful, bots too close in your view will be picked up and thus the command will not go for all. Being in bushes can interfere with this or not seeing the bot clearly.
-- altered "get back", "cover me", "hold position" and "go go go" voices to always say the same thing instead of going through different phrases in order to bring them more closer to what the commands do relative to the followers
-
-- added "On Your Own" command. This will tell bots to stay at a distance (similar to "Get Back"), switch to their default tactic and no longer prioritize your position and safety during fights. "Cover Me" resets this
-- added field to provide custom nickname for each follower in the Configuration Manager
-- added fields to provide custom uniform (top and bottom) for each follower in the Configuration Manager
-- added options for set custom shortcut keys for Contact and Status Report phrase commands.(This means you can put these 2 on other than just F1-F12 keys) 
-- added "Raid End Messages" in the config manager to enable/disabled messages followers may send at the end of the raid (return loot messages are excluded)
-
-- fixed issue with long spawn delay that was happening for some people
-- attempt to fix follower still getting stuck in healing animation under certain circumnstances (still not 100% of the cause or how to replicate)
-- altered how enemy is added to followers as the current method would make followers be aware of any enemy position as soon as that enemy made the player his goal target.
-
-
-Notes: 
-The way an enemy was added to the followers was by observing who the current target is for any bot. This created situations where your followers would instantly pick up the enemy position and even run to him. This is changed now, but it might feel different as you can now have situations where an enemy is shooting at you from a distance, not hitting you, which in turn makes your followers not react. "Contact" command makes them become aware of the situation. 
-
-How to succesfully use the gesture commands in order to move your followers one by one:
-Always start with the Stop gesture and look at a bot, maxium 25m distance, and do the Come To Me gesture. The bot will come near the position you are and then switch back to hold. Repeat as necessary.
-Using That Direction works at a maxium 15m and it will affect the closest bot. Best to do it with your back turned to him. Once the bot reaches the point it will switch back to hold. Repeat as necessary.
-
-You can now use the following commands while looking at a bot, at a maximum 35 meters distance, to affect only him : Hold Position, Go Go Go, Get Back, Cover Me, On Your Own, Stop and Follow Me.
-
-The stop command persists through combat. That means if you told your bots to stay in place and then they engage combat, once out of combat they will resume standing by. You can combine things, you can tell all of them to stand by and look at one and say "follow me" or "cover me" and only that one will resume follow. But, do not wander to far from the others as the cover system always has you at the center in a 120 meter radius.
-
-Known Issues:
-- your followers can have an eagle eye observation but they can be stone deaf. Use a combination of stop and come here gestures to get them in positions you want and use Contact to have them look the direction you want.
-- your followers can end up teleporting. It's what the game does if it detects no viable path from the bot's position to the desired spot. Most notably during "come to me" requests.
-- avoid interrupting your both while healing (status report shows info when bots wants to heal or is healing)
-- bots follow in straight line and can end up intersecting into one another. Yes, that is the navigation logic of the game and cannot be resolved.
-- SAIN does x, y,z - can't the followers do the same? NO. Sain is not designed to have bots work with the player as a team at all. SAIN is not designed to take into account a cross map moving of a bot making decisions on what to ignore, what to engage. SAIN is focused on combat engagement and affects bot's senses in a way that would make your follower pick up targets left and right. SAIN can put the bot in cover holding when it detects enemy out of sight. That is not what you want your followers to do as you move around the map. So while SAIN has some affect on the followers, its minimal.
+RELEASE NOTES (3.8):
+- removed "Player Equipment" as option for equipment for bots. When clonning player equipment people have reported to have delays in spawn. Because you can simply save your current equipment as a preset loadout - this is removed and you can use that instead. Also I encourge using custom presets that you personally made for bots because people tend to put the meds in the secure container of their own equipment, not realizing that will get deleted and ammo will be put instead for the bots to use. It will also not be there in the end when followers use the equipment you give them instead of clonning it. 
+- added a new tactic - Guard who prioritizes to be between you and the enemy
+- some improvements on the cover search logic in an effort to reduce the situations where bots end up running in a wall
+- added checks to attempt to unstuck followers who look like they are running in place
+- made push order act like the old way where follower goes up in the face to the enemy and shoots him
 
 Personal Notes:
 Need to update description on what commands are ignored by "Assist" tactic
@@ -92,3 +73,4 @@ FUTURE IDEAS:
  - BirEye auto marks enemies as he sees them (enhanced Marskman)
  - goons should be locked behind some flag and once you play with them and are able to end a raid with all 3 alive, 3 new tactis should unlock:
  Enhanced Marksman, Assaulter and Supporter
+ - DeadBodyWork should be implemented for "Assist"

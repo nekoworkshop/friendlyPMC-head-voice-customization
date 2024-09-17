@@ -68,7 +68,7 @@ namespace friendlyPMC.Actions
                     enemySpot,
                     areaCovers,
                     5f,
-                    300f,
+                    150f,
                     carePosition
                 );
 
@@ -77,8 +77,6 @@ namespace friendlyPMC.Actions
                     _lastSpot = Spot.Position;
                     return;
                 }
-
-
 
                 _actionsQueue.Enqueue(() =>
                 {
@@ -105,14 +103,7 @@ namespace friendlyPMC.Actions
                             shootTarget,
                             botOwner_0.LookSensor.Mask,
                             minDist,
-                            maxDist,
-                            (Vector3 position) =>
-                            {
-
-                                if (!Utils.Covers.IsPointBetween(position, botPosition, enemySpot)) return false;
-
-                                return true;
-                            }
+                            maxDist
                         );
 
                         if (_lastPosition != null)

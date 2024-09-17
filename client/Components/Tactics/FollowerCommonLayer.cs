@@ -1,4 +1,5 @@
 ﻿using EFT;
+using friendlyPMC.Modules;
 using friendlyPMC.Utils;
 using System;
 using System.Collections.Generic;
@@ -388,10 +389,12 @@ namespace friendlyPMC.Components.Tactics
             float maxInnerRadius = searchRadius;
 
             Vector3 botPosition = botOwner_0.Transform.position;
+            pitAIBossPlayer boss = botOwner_0.BotFollower.HaveBoss ?  botOwner_0.BotFollower.BossToFollow as pitAIBossPlayer : null;
+            List<CustomNavigationPoint> areaCovers = boss != null ? boss.GetAreaCovers() : BossPlayers.GetAICovers();
 
             NavMeshPath _navMeshPath = new NavMeshPath();
 
-            customNavigationPoint_2 = Covers.ClosestPoint(botOwner_0, centerPosition, (CustomNavigationPoint point) =>
+            customNavigationPoint_2 = Covers.ClosestPoint(botOwner_0.Id, botPosition, centerPosition, areaCovers, (CustomNavigationPoint point) =>
             {
                 if (IsPointFreeGroup(point)) return false;
 
@@ -445,12 +448,15 @@ namespace friendlyPMC.Components.Tactics
 
             NavMeshPath navMeshPath = new NavMeshPath();
 
-            CustomNavigationPoint point = Covers.ClosestPoint(botOwner_0, centerPosition, (CustomNavigationPoint pt) => {
+            pitAIBossPlayer boss = botOwner_0.BotFollower.HaveBoss ?  botOwner_0.BotFollower.BossToFollow as pitAIBossPlayer : null;
+            List<CustomNavigationPoint> areaCovers = boss != null ? boss.GetAreaCovers() : BossPlayers.GetAICovers();
+
+            CustomNavigationPoint point = Covers.ClosestPoint(botOwner_0.Id, botPosition, centerPosition, areaCovers, (CustomNavigationPoint pt) => {
                 bool good = true;
                 // should not be seen by any enemy
                 foreach (var enemy in botOwner_0.EnemiesController.EnemyInfos)
                 {
-                    if (enemy.Value.Person.HealthController.IsAlive && pt.CanIHideFromPos(10f,true,true, enemy.Value.Person.Transform.position))
+                    if (enemy.Value.Person.HealthController.IsAlive && pt.CanIHideFromPos(10f,true,false, enemy.Value.Person.Transform.position))
                     {
                         good = false;
                     }

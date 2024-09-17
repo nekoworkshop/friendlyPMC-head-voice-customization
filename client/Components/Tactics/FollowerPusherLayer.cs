@@ -76,17 +76,20 @@ namespace friendlyPMC.Components.Tactics
             if (botOwner_0.Memory.AttackImmediately || pushOrdered)
             {
                 if (
-                    // - go for it if enemy is already close
-                    distanceToEnemy == Utils.Enemy.EnemyDistance.Close ||
-                    // - go for it if enemy is just 1
-                    (enemiesAtLocation < 2) ||
-                    // - go for it if there is strength in numbers
+                    // - go for it if enemy is already close and if its low in numbers
+                    (distanceToEnemy <= Utils.Enemy.EnemyDistance.Close && enemiesAtLocation < 2) ||
+                    // - go for it if ordered
                     (pushOrdered && enemiesAtLocation < 4)
                 )
                 {
-                    BotLogicDecision pushDecision = pushOrdered && distanceToEnemy <= Utils.Enemy.EnemyDistance.Close ? BotLogicDecision.runToEnemy : BotLogicDecision.goToEnemy;
-                    // -- push if not visible
-                    if (!enemyVisible)
+                    BotLogicDecision pushDecision;
+                    
+                    if (pushOrdered) pushDecision = BotLogicDecision.runToEnemy;
+                    else if (distanceToEnemy <= Utils.Enemy.EnemyDistance.Close) pushDecision = BotLogicDecision.goToEnemy;
+                    else pushDecision = BotLogicDecision.runToEnemy;
+
+                    // -- push if not visible or ordered
+                    if (!enemyVisible || pushOrdered)
                         return new AICoreActionResultStruct<BotLogicDecision>(pushDecision, "pushEnemy");
                     else
                     {

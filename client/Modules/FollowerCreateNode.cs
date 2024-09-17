@@ -53,6 +53,9 @@ namespace friendlyPMC.Modules
             if(type == (BotLogicDecision)CustomBotDecisions.RunToCover)
                 return new FollowerRunToCover(bot);
 
+            if(type == BotLogicDecision.dogFight)
+                return new FollowerDogFight(bot);
+
             return GClass459.CreateNode(type, bot);
         }
 

@@ -87,7 +87,6 @@ namespace friendlyPMC
             { "equipOptions", new string[]
                 {
                     "Default",
-                    "Player Equipment"
                 } 
             },
             {
@@ -507,8 +506,7 @@ namespace friendlyPMC
         {
             equipPresets = new string[]
             {
-                ((string[])optionsLang["equipOptions"])[0],
-                ((string[])optionsLang["equipOptions"])[1]
+                ((string[])optionsLang["equipOptions"])[0]
             };
 
             UniformTop = new string[] {
@@ -743,8 +741,7 @@ namespace friendlyPMC
             var presets = Utils.Equipment.CustomPresets;
 
             var updatedPresets = new string[] {
-                ((string[])optionsLang["equipOptions"])[0],
-                ((string[])optionsLang["equipOptions"])[1]
+                ((string[])optionsLang["equipOptions"])[0]
             };
 
             foreach (var item in presets)

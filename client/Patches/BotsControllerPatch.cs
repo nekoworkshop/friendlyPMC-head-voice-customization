@@ -349,7 +349,7 @@ namespace friendlyPMC.Patches
 
                     string eq = friendlyPMC.squadMembers[pid][1].Value;
                     // when using custom preset - prepare what bundles will need to be prefected
-                    if (eq != null && eq != friendlyPMC.GetEquipOptions()[0] && eq != friendlyPMC.GetEquipOptions()[1])
+                    if (eq != null && eq != friendlyPMC.GetEquipOptions()[0])
                     {
                         // - remember the original secure container to put it back later as custom presets might overwrite it
                         var secureContainer = profile.Inventory.Equipment.GetSlot(EquipmentSlot.SecuredContainer).ContainedItem;
@@ -911,37 +911,8 @@ namespace friendlyPMC.Patches
                         }
                         else
                         {
-                            profile = await FetchMemberProfile(member, player.realPlayer.Profile, botCreator, side, type, @params);
-                            // else see if player equipment should be copied 
-                            if (eq != null && eq == friendlyPMC.GetEquipOptions()[1])
-                            {
-                                var secureContainer = profile.Inventory.Equipment.GetSlot(EquipmentSlot.SecuredContainer).ContainedItem;
-
-                                EquipmentClass equipClone = player.realPlayer.Inventory.Equipment.CloneItem(null);
-
-                                foreach (EquipmentSlot slotType in Enum.GetValues(typeof(EquipmentSlot)))
-                                {
-                                    if (slotType == EquipmentSlot.SecuredContainer) continue;
-
-                                    Slot cloneSlot = equipClone.GetSlot(slotType);
-                                    Item contained = cloneSlot.ContainedItem;
-
-                                    Slot botSlot = profile.Inventory.Equipment.GetSlot(slotType);
-
-                                    botSlot.RemoveItem();
-
-                                    if (contained != null)
-                                    {
-                                        contained.CurrentAddress = null;
-                                        botSlot.AddWithoutRestrictions(contained);
-                                    }
-                                }
-
-                                profile.Inventory.Equipment.GetSlot(EquipmentSlot.SecuredContainer).ChangeContainedItemDirectly(secureContainer);
-                                profile.Inventory.Equipment.GetSlot(EquipmentSlot.SecuredContainer).ApplyContainedItem();
-                            }
                             // else just use the profile as it is
-                            //..
+                            profile = await FetchMemberProfile(member, player.realPlayer.Profile, botCreator, side, type, @params);
 
                             botsData.AddProfile(profile);
                         }
