@@ -26,9 +26,12 @@ namespace friendlyPMC.Actions
             botOwner_0.Mover.SetTargetMoveSpeed(1f);
             botOwner_0.DogFight.Fight();
 
+            bool tense = false;
+
             if (goalEnemy != null && goalEnemy.IsVisible && goalEnemy.Distance < 15f)
             {
                 botOwner_0.SetPose(0.5f);
+                tense = true;
             }
 
             if (goalEnemy != null && goalEnemy.CanShoot && goalEnemy.IsVisible)
@@ -36,6 +39,9 @@ namespace friendlyPMC.Actions
                 botOwner_0.Steering.LookToPoint(goalEnemy.CurrPosition);
                 gclass136_1.Update();
                 return;
+            } else if(!tense)
+            {
+                botOwner_0.SetPose(1f);
             }
 
             botOwner_0.LookData.SetLookPointByHearing(null);

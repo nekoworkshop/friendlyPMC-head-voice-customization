@@ -996,6 +996,13 @@ namespace friendlyPMC.Components
                         botOwner_0.BotRequestController.TryStopCurrent(alivePlayerByProfileID, false);
 
                     if (isClose) botOwner_0.BotTalk.TrySay(EPhraseTrigger.Roger, true);
+                } 
+                else if (info.phrase == EPhraseTrigger.InTheFront && (botLookedAt == null || botLookedAt.ProfileId == botOwner_0.ProfileId))
+                {
+                    Player voicer = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(requester.ProfileId);
+
+                    FollowerBrain brain = botOwner_0.Brain.BaseBrain as FollowerBrain;
+                    if (brain != null) brain.FakeShot(voicer.LookDirection);
                 }
 
             }

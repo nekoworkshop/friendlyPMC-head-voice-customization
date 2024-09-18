@@ -426,7 +426,7 @@ namespace friendlyPMC
             harmony.PatchAll(typeof(LookSensorPatch).Assembly);
             // patch hearing
             new HearingSensorPatch().Enable();
-
+            new BulletImpactPatch().Enable();
         }
 
         public void GetEquipmentBuilds()

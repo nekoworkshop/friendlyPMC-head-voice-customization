@@ -1,10 +1,12 @@
 ﻿using EFT;
 using friendlyPMC.Actions;
 using friendlyPMC.Modules;
+using friendlyPMC.Utils;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 using static RootMotion.FinalIK.IKSolver;
+using static UnityEngine.UI.GridLayoutGroup;
 
 namespace friendlyPMC.Components
 {
@@ -64,6 +66,8 @@ namespace friendlyPMC.Components
 
         private float _lastGunshotTime = 0f;
 
+        public event Action<BotOwner> OnDispose;
+
         public FollowerBrain(BotOwner owner, pitAIBossPlayer boss) : base(owner)
         {
             AddLayers();
@@ -76,6 +80,9 @@ namespace friendlyPMC.Components
             owner.GetPlayer.BeingHitAction += BeingHitAction;
 
             _currentTactic = "Default";
+
+            //BotHelpers helpers = owner.GetPlayer.gameObject.AddComponent<BotHelpers>();
+            //helpers.AttachStuckWatcher(owner);
 
         }
         
@@ -199,6 +206,7 @@ namespace friendlyPMC.Components
 
         public virtual void FakeShot(Vector3 direction)
         {
+            if (_owner.Memory.HaveEnemy && _owner.Memory.GoalEnemy.IsVisible) return;
             _gotShot = Time.time + 3f;
             _owner.Steering.LookToPoint(direction, CalcTurnSpeed(_owner.LookDirection, direction));
         }
@@ -328,6 +336,8 @@ namespace friendlyPMC.Components
             InteractableObjects.ClearStoredItems(_owner.ProfileId);
             InteractableObjects.RemoveTaker(_owner);
             NpcMessage.RemoveNpc(_owner.ProfileId);
+
+            OnDispose?.Invoke(_owner);
         }
 
         public virtual void SetBossTactic(string tactic)

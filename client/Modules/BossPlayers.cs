@@ -441,6 +441,12 @@ namespace friendlyPMC.Modules
             return Instance.GetBossFollowers(bossName);
         }
 
+        public static List<BotFollowerPlayer> GetFollowers()
+        {
+            if (Instance == null) return new List<BotFollowerPlayer>();
+            return Instance._followers;
+        }
+
         public static bool IsFollower(BotOwner bot, AIBossPlayer boss = null)
         {
             if (Instance == null || bot == null) return false;

@@ -1,5 +1,6 @@
 ﻿using BepInEx.Logging;
 using System;
+using System.Diagnostics;
 using UnityEngine;
 
 namespace friendlyPMC.Components
@@ -16,6 +17,14 @@ namespace friendlyPMC.Components
         {
             #if DEBUG
             Instance.LogInfo($"[{Time.time}] " + message);
+            #endif
+        }
+
+        public static void LogTrace(string message)
+        {
+            #if DEBUG
+            var stackTrace = new StackTrace();
+            Instance.LogDebug($"[{Time.time}] {message}\nStackTrace:\n{stackTrace}");
             #endif
         }
 

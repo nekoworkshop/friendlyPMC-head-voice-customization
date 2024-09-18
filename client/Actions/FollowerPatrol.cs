@@ -39,6 +39,10 @@ namespace friendlyPMC.Actions
 
         private bool wasHit = false;
 
+        protected bool _init = false;
+
+        protected BotLogicDecision Action = (BotLogicDecision)CustomBotDecisions.SniperSearch;
+
         public BotOwner botOwner {
             get
             {
@@ -55,6 +59,32 @@ namespace friendlyPMC.Actions
             IsInited = true;
         }
 
+        private void Init()
+        {
+            (botOwner_0.Brain.Agent as FollowerAIAgent<BotLogicDecision>).OnUpdate += OnAgentUpdate;
+            (botOwner_0.Brain.Agent as FollowerAIAgent<BotLogicDecision>).OnDispose += OnAgentDispose;
+
+            _init = true;
+        }
+        private void OnAgentUpdate(AICoreActionResultStruct<BotLogicDecision> decision)
+        {
+            if (
+                botOwner_0.Memory.HaveEnemy
+            )
+            {
+                bool_0 = false;
+                bool_1 = false;
+                float_4 = 0f;
+            }
+        }
+
+        private void OnAgentDispose(object sender, EventArgs e)
+        {
+            (botOwner_0.Brain.Agent as FollowerAIAgent<BotLogicDecision>).OnUpdate -= OnAgentUpdate;
+            (botOwner_0.Brain.Agent as FollowerAIAgent<BotLogicDecision>).OnDispose -= OnAgentDispose;
+            _init = false;
+        }
+
         public void Update()
         {
             var brain = botOwner_0.Brain.BaseBrain as FollowerBrain;
@@ -65,6 +95,8 @@ namespace friendlyPMC.Actions
             {
                 wasHit = true;
             }
+
+            if (!_init) Init();
 
             //if(!wasHit) botOwner_0.LookData.SetLookPointByHearing(null);
 

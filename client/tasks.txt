@@ -5,22 +5,23 @@
 - x - cancel on going requests when running to heal
 - x - check for cover where to heal better
 - x - remove "player equipment" as option for equipment
-- revert push order to act like old ways
+- x - revert push order to act like old ways
+
 - #inprogress - improve cover scan
 - #inprogress - improve enemy search
 - #inprogress - improve cover to cover
 - #inprogress - improve guard to cover
 
-- #inprogress dog fight seem to semi-crouch the bot, see if you can make them aim and shoot while standing
+- #inprogress - improve awareness
 
+- x - dog fight seems to semi-crouch the bot, see if you can make them aim and shoot while standing
+- add look direction commands
 - add unstuck checks (check if bot is running in place and try to unstuck him)
 
 - implement proximity detection, if enemy is too close automatically aquire them for safety reasons
 
 - scav followers to turn hostile if your shoot them (turning hostile can be done through BotMemoryClass > method_7)
 - picked up followers to turn hostile if you shoot them
-
-- improve seeing
 
 - add voices as another personalization option
 
@@ -56,6 +57,7 @@ RELEASE NOTES (3.8):
 - some improvements on the cover search logic in an effort to reduce the situations where bots end up running in a wall
 - added checks to attempt to unstuck followers who look like they are running in place
 - made push order act like the old way where follower goes up in the face to the enemy and shoots him
+- made the look direction commands (In Front, On Six, etc...) have bots turn to the said direction relative to the direction the player is looking. This works in combat also as long as they do not have an enemy already in sight
 
 Personal Notes:
 Need to update description on what commands are ignored by "Assist" tactic

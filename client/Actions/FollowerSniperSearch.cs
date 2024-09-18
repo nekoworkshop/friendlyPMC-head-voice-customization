@@ -52,6 +52,8 @@ namespace friendlyPMC.Actions
         {
             (botOwner_0.Brain.Agent as FollowerAIAgent<BotLogicDecision>).OnUpdate += OnAgentUpdate;
             (botOwner_0.Brain.Agent as FollowerAIAgent<BotLogicDecision>).OnDispose += OnAgentDispose;
+
+            _init = true;
         }
         protected void OnAgentUpdate(AICoreActionResultStruct<BotLogicDecision> decision)
         {
@@ -84,7 +86,6 @@ namespace friendlyPMC.Actions
                     if (!_init)
                     {
                         Init();
-                        _init = true;
                     }
                 }
                 catch (Exception ex)

@@ -15,7 +15,6 @@ using BepInEx.Bootstrap;
 
 using GridClassEx = GClass2516;
 using GridCacheClass = GClass1401;
-using static UnityEngine.UI.GridLayoutGroup;
 
 namespace friendlyPMC.Components
 {
@@ -228,7 +227,6 @@ namespace friendlyPMC.Components
 
                 _player.bossGroup.AddMember(_bot, false);
             }
-
 
             // apply some of settings modifier
             _bot.Settings.Current._hearingDistCoef = settingModif.HearingDistCoef;
