@@ -299,7 +299,11 @@ namespace friendlyPMC.Actions
                                     areaCovers,
                                     30f,
                                     5f,
-                                    carePosition
+                                    carePosition,
+                                    (CustomNavigationPoint point)=>{
+                                        if(!GClass326.IsDangerPositionFarEnough(point.Position, new Vector3[]{ bossPos }, 0.5f * 0.5f)) return false;
+                                        return true;
+                                    }
                                 );
 
                                 if (cover != null)

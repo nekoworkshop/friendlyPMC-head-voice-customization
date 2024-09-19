@@ -23,7 +23,7 @@ namespace friendlyPMC.Utils
 
             botOwner = bot;
 
-            StartCoroutine(UpdateWatchCoroutine());
+            watchCoroutine = StartCoroutine(UpdateWatchCoroutine());
 
             botOwner.GetPlayer.HealthController.DiedEvent += OnDead;
             botOwner.LeaveData.OnLeave += OnLeave;
@@ -33,7 +33,7 @@ namespace friendlyPMC.Utils
         {
             FollowerBrain brain = bot.Brain.BaseBrain as FollowerBrain;
             brain.OnDispose -= DetachStuckWatcher;
-            StopCoroutine(UpdateWatchCoroutine());
+            StopCoroutine(watchCoroutine);
             botOwner.GetPlayer.HealthController.DiedEvent -= OnDead;
             botOwner.LeaveData.OnLeave -= OnLeave;
         }

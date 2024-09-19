@@ -1,4 +1,5 @@
-﻿using EFT;
+﻿using Comfort.Common;
+using EFT;
 using friendlyPMC.Actions;
 using friendlyPMC.Modules;
 using friendlyPMC.Utils;
@@ -49,6 +50,11 @@ namespace friendlyPMC.Components
         private float _gotShot = 0f;
 
         private float _underFire = 0f;
+
+        private float _hitFreq = 0f;
+
+        private const float _BULLET_HEAR_DIST = 50f * 50f;
+        private const float _BULLET_IMPACT_DISPERSION = 5f * 5f;
         
         public bool WasHit
         {
@@ -252,7 +258,7 @@ namespace friendlyPMC.Components
 
                 if(wasProcessed && Time.time - _lastSoundTime > 5f ) return;
 
-                if(distance <= 10f) Utils.Enemy.MakeEnemy(_owner, enemy);
+                if(distance <= 12f) Utils.Enemy.MakeEnemy(_owner, enemy);
                 else {
                     _lastSoundTime = Time.time;
 
@@ -274,7 +280,33 @@ namespace friendlyPMC.Components
                 }
             }
         }
+        /** INSPIRED FROM SAIN - follower to feel bullets flying **/
+        public virtual void BulletFelt(EftBulletClass bullet)
+        {
+            if(_owner.Memory.HaveEnemy) return;
+            if(Time.time > _hitFreq) return;
 
+            Player shooter = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(bullet.PlayerProfileID);
+
+            if (!(_owner.EnemiesController.IsEnemy(shooter) || (bullet.Player.iPlayer != null && _owner.BotsGroup.IsEnemy(bullet.Player.iPlayer))))
+            {
+                return;
+            }
+            
+            _hitFreq = Time.time + 1f;
+            float distance = (bullet.CurrentPosition - _owner.Position).sqrMagnitude;
+
+            if(distance > _BULLET_HEAR_DIST) return;
+
+            float dispersion = distance / _BULLET_IMPACT_DISPERSION;
+
+            Vector3 random = UnityEngine.Random.onUnitSphere;
+            random.y = 0;
+            random = random.normalized * dispersion;
+            Vector3 estimatedPos = shooter.Transform.position + random;
+
+            FakeShot(estimatedPos);
+        }
         /** On Leave info about this bot should be cleared */
         public virtual void OnLeave(BotOwner _bot)
         {
@@ -327,17 +359,24 @@ namespace friendlyPMC.Components
             // delete his patrol data
             ClearFollowerPatrol();
 
-            _owner.GetPlayer.HealthController.DiedEvent -= OnDead;
-            _owner.LeaveData.OnLeave -= OnLeave;
-            _owner.Memory.OnAddEnemy -= OnAddEnemy;
-            _owner.GetPlayer.BeingHitAction -= BeingHitAction;
-
             // clear info about this bot
             InteractableObjects.ClearStoredItems(_owner.ProfileId);
             InteractableObjects.RemoveTaker(_owner);
             NpcMessage.RemoveNpc(_owner.ProfileId);
 
             OnDispose?.Invoke(_owner);
+            if (_owner.GetPlayer != null)
+            {
+                if(_owner.GetPlayer.HealthController != null)
+                _owner.GetPlayer.HealthController.DiedEvent -= OnDead;
+
+                _owner.GetPlayer.BeingHitAction -= BeingHitAction;
+            }
+
+            _owner.LeaveData.OnLeave -= OnLeave;
+            _owner.Memory.OnAddEnemy -= OnAddEnemy;
+
+            
         }
 
         public virtual void SetBossTactic(string tactic)

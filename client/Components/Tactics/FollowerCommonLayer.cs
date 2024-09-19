@@ -341,7 +341,22 @@ namespace friendlyPMC.Components.Tactics
 
             coverTimer_1 = 1f + Time.time;
 
-            customNavigationPoint_1 = Covers.GetClosestAttackCoverPoint(botOwner_0, centerPosition, minDistance, maxDistance);
+            NavMeshPath navMeshPath = new NavMeshPath();
+            Vector3 botPosition = botOwner_0.Transform.position;
+            Vector3 enemyPos = botOwner_0.Memory.GoalEnemy.CurrPosition;
+
+            pitAIBossPlayer boss = HasBoss() ? GetBoss() : null;
+            Vector3[] bossPosition = boss != null ? new Vector3[] { boss.realPlayer.Transform.position } : new Vector3[] { };
+
+            List<CustomNavigationPoint> areaCovers = boss != null ? boss.GetAreaCovers() : BossPlayers.GetAICovers();
+
+            customNavigationPoint_1 = Covers.GetClosestAttackCoverPoint(botOwner_0.Id, botPosition, centerPosition, enemyPos, areaCovers, minDistance, maxDistance, new Vector3[] { }, true, (cover) =>
+            {
+                if (boss != null && !GClass326.IsDangerPositionFarEnough(cover.Position, bossPosition, 0.7f * 0.7f)) return false;
+
+                return true;
+            }, navMeshPath);
+
             botOwner_0.Memory.SetCoverPoints(customNavigationPoint_1);
             return customNavigationPoint_1;
         }
