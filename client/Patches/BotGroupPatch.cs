@@ -169,6 +169,10 @@ namespace friendlyPMC.Patches
                     break;
                 }
             }
+
+            initialBot.Settings.FileSettings.Mind.FRIENDLY_BOT_TYPES = new WildSpawnType[] {
+                WildSpawnType.shooterBTR
+            };
         }
     }
 }

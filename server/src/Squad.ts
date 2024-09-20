@@ -39,17 +39,15 @@ import { RandomUtil } from "@spt/utils/RandomUtil";
 import { BotGenerator } from "@spt/generators/BotGenerator";
 import { IBotBase } from "@spt/models/eft/common/tables/IBotBase";
 import { BotGenerationDetails } from "@spt/models/spt/bots/BotGenerationDetails";
-import { HashUtil } from "@spt/utils/HashUtil";
+
 import { ISendMessageDetails } from "@spt/models/spt/dialog/ISendMessageDetails";
 import { MessageType } from "@spt/models/enums/MessageType";
 import { ProfileHelper } from "@spt/helpers/ProfileHelper";
 import { IGenerateBotsRequestData } from "@spt/models/eft/bot/IGenerateBotsRequestData";
 import { LocaleService } from "@spt/services/LocaleService";
-import { EquipmentSlots } from "@spt/models/enums/EquipmentSlots";
-import { Item } from "@spt/models/eft/common/tables/IItem";
 
-import { BuildController } from "@spt/controllers/BuildController";
 import { IBots } from "@spt/models/spt/bots/IBots";
+import { DatabaseService } from "@spt/services/DatabaseService";
 
 class friendlyPMC {
 	config = {
@@ -217,12 +215,12 @@ class friendlyPMC {
 		const httpResponseUtil = container.resolve<HttpResponseUtil>("HttpResponseUtil");
 		const randomUtil = container.resolve<RandomUtil>("RandomUtil");
 		this.randomUtil = randomUtil;
-		const hashUtil = container.resolve<HashUtil>("HashUtil");
 
 		const botGenerator = container.resolve<BotGenerator>("BotGenerator");
 		const botController = container.resolve<BotController>("BotController");
 		const profileHelper = container.resolve<ProfileHelper>("ProfileHelper");
-		const buildController = container.resolve<BuildController>("BuildController");
+
+		const databaseService = container.resolve<DatabaseService>("DatabaseService");
 
 		staticRouterModService.registerStaticRouter(
 			"friendlyPMC",
@@ -385,12 +383,14 @@ class friendlyPMC {
 
 					return httpResponseUtil.emptyResponse();
 				}),
-				new RouteAction("/client/game/bot/followergenerate", (url: string, info: { Info: IGenerateBotsRequestData; Preset?: string; Custom?: { Body?: string; Feet?: string; Nickname?: string; English?: boolean } }, sessionID: string, output: string): any => {
+				new RouteAction("/client/game/bot/followergenerate", (url: string, info: { Info: IGenerateBotsRequestData; Preset?: string; Custom?: { Body?: string; Feet?: string; Nickname?: string; English?: boolean; Voice?: string } }, sessionID: string, output: string): any => {
 					const pmcProfile = profileHelper.getPmcProfile(sessionID);
 
 					let level = pmcProfile.Info.Level;
 
 					const custom = info.Custom;
+
+					console.log("Follower Options " + JSON.stringify(info.Custom));
 
 					const conditionPromises: IBotBase[] = [];
 
@@ -441,7 +441,11 @@ class friendlyPMC {
 									profile.Info.LowerNickname = custom.Nickname.toLowerCase();
 								}
 							}
-							if (pmcProfile.Info.Side.toLowerCase() == "bear") profile.Info.Voice = custom?.English ? `Bear_${randomUtil.getInt(1, 2)}_Eng` : `Bear_${randomUtil.getInt(1, 3)}`;
+							const customization = databaseService.getCustomization();
+
+							if (custom.Voice && customization[custom.Voice]) {
+								profile.Info.Voice = customization[custom.Voice]._name;
+							} else if (pmcProfile.Info.Side.toLowerCase() == "bear") profile.Info.Voice = custom?.English ? `Bear_${randomUtil.getInt(1, 2)}_Eng` : `Bear_${randomUtil.getInt(1, 3)}`;
 						});
 					}
 

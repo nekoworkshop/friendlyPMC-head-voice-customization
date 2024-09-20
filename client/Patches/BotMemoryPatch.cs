@@ -50,14 +50,12 @@ namespace friendlyPMC.Patches
             {
                 return false;
             }
-
+            if(isfollower && enemy.Profile.Info.Settings.Role == WildSpawnType.shooterBTR) return false;
             // prevent followers from adding teammates as an enemy
             if (isfollower && botOwner_0.BotFollower.HaveBoss)
             {
                 bool isTeammate = false;
                 
-                if (enemy.Profile.Info.Settings.Role == WildSpawnType.shooterBTR) return false;
-
                 foreach (var item in botOwner_0.BotFollower.BossToFollow.Followers)
                 {
                     if (item.ProfileId == enemy.ProfileId)

@@ -1002,28 +1002,28 @@ namespace friendlyPMC.Components
                     Player voicer = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(requester.ProfileId);
 
                     FollowerBrain brain = botOwner_0.Brain.BaseBrain as FollowerBrain;
-                    if (brain != null) brain.FakeShot(voicer.LookDirection * 20f);
+                    if (brain != null) brain.FakeShot(voicer.MainParts[BodyPartType.head].Position + voicer.LookDirection * 20f);
                 }
                 else if (info.phrase == EPhraseTrigger.OnSix)
                 {
                     Player voicer = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(requester.ProfileId);
 
                     FollowerBrain brain = botOwner_0.Brain.BaseBrain as FollowerBrain;
-                    if (brain != null) brain.FakeShot(-voicer.LookDirection * 20f);
+                    if (brain != null) brain.FakeShot(voicer.MainParts[BodyPartType.head].Position - voicer.LookDirection * 20f);
                 }
                 else if (info.phrase == EPhraseTrigger.LeftFlank)
                 {
                     Player voicer = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(requester.ProfileId);
 
                     FollowerBrain brain = botOwner_0.Brain.BaseBrain as FollowerBrain;
-                    if (brain != null) brain.FakeShot(Quaternion.Euler(0, -90, 0) * voicer.LookDirection * 20f);
+                    if (brain != null) brain.FakeShot(voicer.MainParts[BodyPartType.head].Position + Quaternion.Euler(0, -90, 0) * voicer.LookDirection * 20f);
                 }
                 else if (info.phrase == EPhraseTrigger.RightFlank)
                 {
                     Player voicer = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(requester.ProfileId);
 
                     FollowerBrain brain = botOwner_0.Brain.BaseBrain as FollowerBrain;
-                    if (brain != null) brain.FakeShot(Quaternion.Euler(0, 90, 0) * voicer.LookDirection * 20f);
+                    if (brain != null) brain.FakeShot(voicer.MainParts[BodyPartType.head].Position + Quaternion.Euler(0, 90, 0) * voicer.LookDirection * 20f);
                 }
 
             }

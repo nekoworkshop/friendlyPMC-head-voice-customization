@@ -197,6 +197,7 @@ namespace friendlyPMC.Patches
 
             Dictionary<string, dynamic> customization = new Dictionary<string, dynamic>();
 
+            // assign custom clothes, if se
             List<string[]> uniforms = friendlyPMC.GetUniformOptions();
             string top = member.Value[2].Value;
             int idxt = uniforms[0].IndexOf(top);
@@ -231,7 +232,6 @@ namespace friendlyPMC.Patches
                     customization["Feet"] = id;
                 }
             }
-
 
             // assign custom nickname, if set
             string nickname = member.Value[4].Value;

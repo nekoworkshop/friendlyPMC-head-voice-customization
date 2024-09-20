@@ -184,6 +184,12 @@ namespace friendlyPMC
                 }
             },
             {
+                "memberVoice", new Dictionary<string,string>{
+                    { "Name", "Squad Member {0} Voice"},
+                    { "Description", "Set a custom voice for this Squad member. Leave blank for default"}
+                }
+            },
+            {
                 "memberUniformTop", new Dictionary<string,string>{
                     { "Name", "Squad Member {0} Top"},
                     { "Description", "Set what the top clothes for this member should be. Leave blank for default"}
@@ -498,7 +504,6 @@ namespace friendlyPMC
                 }
 
                 BuildUniformOptions();
-
             }
         }
 
@@ -615,7 +620,7 @@ namespace friendlyPMC
                         string seckey = $"1.4.1.{i + 1}.2  -  -  " + String.Format(((Dictionary<string, string>)optionsLang["memberEquipment"])["Name"], i + 1);
                         string secvalue = ((string[])optionsLang["tacticOptions"])[0];
 
-                        string trdkey = $"1.4.1.{i + 1}.1  -  -  " + String.Format(((Dictionary<string, string>)optionsLang["memberName"])["Name"], i + 1);
+                        string trdkey = $"1.4.1.{i + 1}.1.1  -  -  " + String.Format(((Dictionary<string, string>)optionsLang["memberName"])["Name"], i + 1);
                         string trdvalue = "";
 
                         string frtkey = $"1.4.1.{i + 1}.3.1  -  -  " + String.Format(((Dictionary<string, string>)optionsLang["memberUniformTop"])["Name"], i + 1);
@@ -623,6 +628,9 @@ namespace friendlyPMC
 
                         string fiftkey = $"1.4.1.{i + 1}.3.2  -  -  " + String.Format(((Dictionary<string, string>)optionsLang["memberUniformBottom"])["Name"], i + 1);
                         string fiftvalue = "";
+
+                        string sixkey = $"1.4.1.{i + 1}.1.2  -  -  " + String.Format(((Dictionary<string, string>)optionsLang["memberVoice"])["Name"], i + 1);
+                        string sixvalue = "";
 
                         savedConfigValues.ExecuteForEach(saved =>
                         {
@@ -645,6 +653,10 @@ namespace friendlyPMC
                             else if (saved.Key.Key == fiftkey)
                             {
                                 fiftvalue = saved.Value;
+                            }
+                            else if (saved.Key.Key == sixkey)
+                            {
+                                sixvalue = saved.Value;
                             }
                         });
 

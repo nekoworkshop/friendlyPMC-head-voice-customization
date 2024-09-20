@@ -90,15 +90,13 @@ namespace friendlyPMC.Components.Tactics
                 {
                     // - find cover to shoot from
                     GetClosestAttackCoverPoint(botPosition);
-                    // - no attack cover, just find a shooting position
 
-                    if (customNavigationPoint_0 != null && coverTimer < Time.time)
+                    if (customNavigationPoint_0 != null)
                     {
                         if (commonLayer.GetNavDistance(customNavigationPoint_0.Position) < 25f)
                         {
                             return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMoving, "relocate");
                         }
-                        coverTimer = Time.time + GClass761.Random(3f, 5f);
                         return new AICoreActionResultStruct<BotLogicDecision>((BotLogicDecision)CustomBotDecisions.RunToCover, "relocateFast");
                     }
 
@@ -125,9 +123,8 @@ namespace friendlyPMC.Components.Tactics
                             GetClosestAttackCoverPoint(botPosition, fightRange);
                         }
                             
-                        if (customNavigationPoint_0 != null && coverTimer < Time.time)
+                        if (customNavigationPoint_0 != null)
                         {
-                            coverTimer = Time.time + GClass761.Random(3f, 5f);
                             return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMoving, getClose ? "getInCloseSlow" : "relocate");
                         }
                     }
@@ -140,8 +137,7 @@ namespace friendlyPMC.Components.Tactics
             {
                 // - approach enemy if close enough
                 if(
-                    Enemy.Distance(botOwner_0) <= Enemy.EnemyDistance.Close &&
-                    botOwner_0.Memory.AttackImmediately && Enemy.GetEnemiesAtLocation(botOwner_0, botOwner_0.Memory.GoalEnemy.ProfileId, enemyPos) < 3)
+                    Enemy.Distance(botOwner_0) <= Enemy.EnemyDistance.Close && Enemy.GetEnemiesAtLocation(botOwner_0, botOwner_0.Memory.GoalEnemy.ProfileId, enemyPos) < 3)
                 {
                     GetClosestAttackCoverPoint(enemyPos);
                     if (customNavigationPoint_0 != null)
@@ -162,10 +158,11 @@ namespace friendlyPMC.Components.Tactics
                 // - look for a shooting spot
                 GetApproachablePoint();
                 if(customNavigationPoint_0 == null)
-                GetClosestCoverPoint(commonLayer.GetBoss().realPlayer.Transform.position,30f);
+                    GetClosestAttackCoverPoint(commonLayer.GetBoss().realPlayer.Transform.position,50f);
 
-                if (customNavigationPoint_0 != null)
+                if (customNavigationPoint_0 != null && coverTimer < Time.time)
                 {
+                    coverTimer = Time.time + GClass761.Random(3f, 5f);
                     return new AICoreActionResultStruct<BotLogicDecision>((BotLogicDecision)CustomBotDecisions.RunToCover, "relocateFast");
                 }
 

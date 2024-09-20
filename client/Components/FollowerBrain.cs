@@ -323,8 +323,13 @@ namespace friendlyPMC.Components
 
         protected virtual void OnAddEnemy(IPlayer player)
         {
-            // how does the boss get added as Enemy here ?? - fix it
-            if (player != null && player.ProfileId == _boss.Player().ProfileId)
+            // how does the boss or BTR get added as Enemy here ?? - fix it
+            if (
+                player != null && 
+                (
+                    (player.ProfileId == _boss.Player().ProfileId) || 
+                    player.Profile.Info?.Settings?.Role == WildSpawnType.shooterBTR)
+                )
             {
                 _owner.Memory.DeleteInfoAboutEnemy(player);
                 _owner.BotsGroup.RemoveEnemy(player);

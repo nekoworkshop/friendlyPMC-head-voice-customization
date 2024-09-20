@@ -234,7 +234,8 @@ namespace friendlyPMC.Utils
 
              Func<CustomNavigationPoint, bool> eligibleCheck = null,
 
-            NavMeshPath path = null
+            NavMeshPath path = null,
+            LayerMask? Mask = null
         )
         {
 
@@ -249,7 +250,7 @@ namespace friendlyPMC.Utils
                     return false;
                 }
 
-                if (!GClass301.CanShootToTarget(shootTarget, point, LayerMaskClass.HighPolyWithTerrainMask, false)) return false;
+                if (!GClass301.CanShootToTarget(shootTarget, point, Mask.HasValue ? Mask.Value : LayerMaskClass.HighPolyWithTerrainMaskAI, false)) return false;
 
                 if (
                     notBehindEnemy &&
