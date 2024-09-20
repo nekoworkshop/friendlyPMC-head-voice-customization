@@ -494,6 +494,11 @@ namespace friendlyPMC.Components
             if(request != null && request.BotRequestType == BotRequestType.followMe && !allyTactic)
                 return new AICoreActionResultStruct<BotLogicDecision>((BotLogicDecision)CustomBotDecisions.MoveToPoint, "req:comeHere");
 
+            // spread out request
+            if(request != null && request.BotRequestType == BotRequestType.getInCover)
+            {
+
+            }
 
             if (botOwner_0.Memory.GoalEnemy.Owner.IsRole(WildSpawnType.marksman))
                 return commonLayer.MarksManFight(out customNavigationPoint_0);

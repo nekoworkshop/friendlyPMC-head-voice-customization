@@ -565,6 +565,12 @@ namespace friendlyPMC.Components
 
                     return;
                 }
+                // on Spreadout look for a random cover
+                else if (info.phrase == EPhraseTrigger.Spreadout)
+                {
+                    this.method_1(info, 10f, 5f);
+                    return;
+                }
             }
 
             if (isBossCommunicating)
