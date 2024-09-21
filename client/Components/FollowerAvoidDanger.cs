@@ -10,7 +10,6 @@ namespace friendlyPMC.Components
         public FollowerAvoidDanger(BotOwner bot, int priority) : base(bot, priority)
         {
             commonLayer = new FollowerCommonLayer(bot, priority);
-            // (BotRequestType)CustomBotRequestType.Regroup
         }
 
         public override AICoreActionResultStruct<BotLogicDecision> GetDecision()

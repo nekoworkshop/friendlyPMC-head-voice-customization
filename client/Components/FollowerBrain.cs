@@ -2,6 +2,7 @@
 using EFT;
 using friendlyPMC.Actions;
 using friendlyPMC.Modules;
+using friendlyPMC.Patches;
 using friendlyPMC.Utils;
 using System;
 using System.Collections.Generic;
@@ -91,7 +92,9 @@ namespace friendlyPMC.Components
             //helpers.AttachStuckWatcher(owner);
 
         }
+
         
+
         public virtual void AddLayers()
         {
             // order matters for which layer get the initial priority
@@ -360,26 +363,35 @@ namespace friendlyPMC.Components
 
         public virtual void Dismissed()
         {
-
-            // delete his patrol data
-            ClearFollowerPatrol();
-
-            // clear info about this bot
-            InteractableObjects.ClearStoredItems(_owner.ProfileId);
-            InteractableObjects.RemoveTaker(_owner);
-            NpcMessage.RemoveNpc(_owner.ProfileId);
-
-            OnDispose?.Invoke(_owner);
-            if (_owner.GetPlayer != null)
+            try
             {
-                if(_owner.GetPlayer.HealthController != null)
-                _owner.GetPlayer.HealthController.DiedEvent -= OnDead;
+                // delete his patrol data
+                ClearFollowerPatrol();
+                // clear info about this bot
+                InteractableObjects.ClearStoredItems(_owner.ProfileId);
+                InteractableObjects.RemoveTaker(_owner);
+                NpcMessage.RemoveNpc(_owner.ProfileId);
 
-                _owner.GetPlayer.BeingHitAction -= BeingHitAction;
+                OnDispose?.Invoke(_owner);
+
+                if (_owner.GetPlayer != null)
+                {
+                    if (_owner.GetPlayer.HealthController != null)
+                        _owner.GetPlayer.HealthController.DiedEvent -= OnDead;
+
+                    _owner.GetPlayer.BeingHitAction -= BeingHitAction;
+                }
+                if(_owner.LeaveData != null)
+                    _owner.LeaveData.OnLeave -= OnLeave;
+
+                if(_owner.Memory != null)
+                    _owner.Memory.OnAddEnemy -= OnAddEnemy;
+
             }
-
-            _owner.LeaveData.OnLeave -= OnLeave;
-            _owner.Memory.OnAddEnemy -= OnAddEnemy;
+            catch(Exception ex)
+            {
+                Logger.LogError(ex);
+            }
 
             
         }

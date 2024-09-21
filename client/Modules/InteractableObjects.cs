@@ -457,7 +457,7 @@ namespace friendlyPMC.Modules
             RaycastHit[] hits = new RaycastHit[20];
             Ray visionRay = new Ray(playerPosition, playerLookDirection);
             int numHits = Physics.SphereCastNonAlloc(
-                    new Ray(playerPosition, playerLookDirection),
+                    visionRay,
                     sphereRadius,
                     hits,
                     sphereDistance,

@@ -84,28 +84,10 @@ namespace friendlyPMC.Actions
 
             if (botOwner_0.Brain.Agent.LastReason == "req:goCheck" && !bool_0)
             {
+                FollowerGoCheck req = botOwner_0.BotRequestController.CurRequest as FollowerGoCheck;
 
-                IPlayer requester = botOwner_0.BotRequestController.CurRequest.Requester;
-                Vector3 dir02 = requester.LookDirection;
-                float forwardDistance = GClass761.Random(3f, 5f);
-
-                Vector3 forwardPosition = requester.Position + dir02.normalized * forwardDistance;
-                float lateralOffset = GClass761.RandomSing() * GClass761.Random(0.5f, 1.5f);
-                Vector3 lateralDirection = Vector3.Cross(Vector3.up, dir02).normalized;
-
-                Vector3 finalPosition = forwardPosition + lateralDirection * lateralOffset;
-
-                _point = finalPosition;
-
-                if (botOwner_0.GoToPoint(finalPosition, true, 0.5f) == NavMeshPathStatus.PathComplete)
-                {
-                    bool_0 = true;
-                }
-                else
-                {
-                    botOwner_0.BotRequestController.CurRequest.Complete();
-                    return;
-                }
+                if (req.HasPoint) bool_0 = true;
+                else req.Complete();
             }
             else if (botOwner_0.Brain.Agent.LastReason == "req:comeHere" && !bool_1)
             {
@@ -181,7 +163,8 @@ namespace friendlyPMC.Actions
             }
             else if (float_0 < Time.time && (bool_0 || bool_1))
             {
-                if (_point.HasValue)
+                if (bool_0) _shouldSprint = false;
+                else if (_point.HasValue)
                     _shouldSprint = Utils.Utils.GetNavDistance(botOwner_0.GetPlayer.Transform.position, _point.Value) > 15f;
 
                 float_0 = Time.time + 2f;
@@ -194,7 +177,7 @@ namespace friendlyPMC.Actions
                     wasHit = true;
                 }
 
-                if(!wasHit && !botOwner_0.Memory.HaveEnemy) botOwner_0.Steering.LookToMovingDirection(30f);
+                if(!wasHit && !botOwner_0.Memory.HaveEnemy) botOwner_0.Steering.LookToMovingDirection(45f);
                 botOwner_0.Mover.Sprint(_shouldSprint && !wasHit);
             }
         }
