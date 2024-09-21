@@ -433,6 +433,7 @@ namespace friendlyPMC
             // patch hearing
             new HearingSensorPatch().Enable();
             new BulletImpactPatch().Enable();
+            new PlayerSayPatch().Enable();
         }
 
         public void GetEquipmentBuilds()

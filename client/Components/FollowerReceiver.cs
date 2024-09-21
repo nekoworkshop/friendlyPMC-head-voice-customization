@@ -1036,20 +1036,6 @@ namespace friendlyPMC.Components
             else if (shouldDefault)
             {
                 base.method_0(info);
-                // check if what we heard was the enemy
-                float sqrdist = (botOwner_0.GetPlayer.Transform.position - requester.Transform.position).sqrMagnitude;
-                if(!botOwner_0.Memory.HaveEnemy && sqrdist < 900f)
-                {
-                    Player voicer = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(requester.ProfileId);
-                    if (botOwner_0.EnemiesController.IsEnemy(voicer) || botOwner_0.BotsGroup.IsEnemy(requester))
-                    {
-                        FollowerBrain brain = botOwner_0.Brain.BaseBrain as FollowerBrain;
-                        if(brain != null) brain.FakeShot(voicer.MainParts[BodyPartType.body].Position);
-
-                        botOwner_0.BotsGroup.ReportAboutEnemy(requester, EEnemyPartVisibleType.notVisible);
-                        botOwner_0.BotTalk.TrySay(EPhraseTrigger.NoisePhrase, true);
-                    }
-                }
             }
         }
 
