@@ -77,6 +77,8 @@ namespace friendlyPMC.Actions
                     _lastSpot = Spot.Position;
                     return;
                 }
+                
+                _lastSpot = null;
 
                 _actionsQueue.Enqueue(() =>
                 {
@@ -92,7 +94,8 @@ namespace friendlyPMC.Actions
                         _lastSpot = Spot2.Position;
                         return;
                     }
-                    
+                    _lastSpot = null;
+
                     _actionsQueue.Enqueue(() =>
                     {
                         // else find the next available spot from where the bot can shoot the enemy, relative to his position
@@ -110,6 +113,7 @@ namespace friendlyPMC.Actions
                         {
                             return;
                         }
+                        _lastPosition = null;
 
                         _actionsQueue.Enqueue(() =>
                         {
@@ -132,6 +136,9 @@ namespace friendlyPMC.Actions
                                     _lastSpot = Spot3.Position;
                                     return;
                                 }
+                                
+                                _lastSpot = null;
+
                                 // - else get closest cover to the boss and cover him
                                 _actionsQueue.Enqueue(() =>
                                 {
@@ -154,6 +161,8 @@ namespace friendlyPMC.Actions
                                         _lastCover = Spot5.Position;
                                         return;
                                     }
+
+                                    _lastCover = null;
                                 });
                             }
                             else
@@ -174,6 +183,8 @@ namespace friendlyPMC.Actions
                                     _lastCover = Spot4.Position;
                                     return;
                                 }
+
+                                _lastCover = null;
                             }
                         });
 

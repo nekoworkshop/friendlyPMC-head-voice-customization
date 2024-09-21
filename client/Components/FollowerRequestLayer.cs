@@ -125,8 +125,7 @@ namespace friendlyPMC.Components
                     return new AICoreActionResultStruct<BotLogicDecision>((BotLogicDecision)CustomBotDecisions.MoveToPoint, "req:comeHere");
 
                 case (BotRequestType)CustomBotRequestType.Regroup:
-                    request.Complete();
-                    return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.followerPatrol, "backToFLB");
+                    return commonLayer.GetCloserToBoss(out var customNavigationPoint_1);
 
                 // stay in place
                 case BotRequestType.wait:

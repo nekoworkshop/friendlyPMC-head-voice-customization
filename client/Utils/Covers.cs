@@ -250,7 +250,7 @@ namespace friendlyPMC.Utils
                     return false;
                 }
 
-                if (!GClass301.CanShootToTarget(shootTarget, point, Mask.HasValue ? Mask.Value : LayerMaskClass.HighPolyWithTerrainMaskAI, false)) return false;
+                if (!GClass301.CanShootToTarget(shootTarget, point, Mask.HasValue ? Mask.Value : LayerMaskClass.HighPolyWithTerrainMask, false)) return false;
 
                 if (
                     notBehindEnemy &&

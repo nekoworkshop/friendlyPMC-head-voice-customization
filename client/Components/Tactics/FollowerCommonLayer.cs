@@ -392,11 +392,6 @@ namespace friendlyPMC.Components.Tactics
         /** Find closest cover point at the given position taking into cosideration the rest of the followers **/
         public CustomNavigationPoint GetClosestCoverPointGroup(Vector3 centerPosition, float searchRadius)
         {
-            if (!HasBoss() || GetBoss().Followers.Count < 2)
-            {
-                return GetClosestCoverPoint(centerPosition, searchRadius);
-            }
-
             if (this.coverTimer_2 > Time.time) return customNavigationPoint_2;
 
             this.coverTimer_2 = 1.5f + Time.time;
@@ -404,17 +399,19 @@ namespace friendlyPMC.Components.Tactics
             float maxInnerRadius = searchRadius;
 
             Vector3 botPosition = botOwner_0.Transform.position;
-            pitAIBossPlayer boss = botOwner_0.BotFollower.HaveBoss ?  botOwner_0.BotFollower.BossToFollow as pitAIBossPlayer : null;
+            pitAIBossPlayer boss = HasBoss() ?  GetBoss() : null;
             List<CustomNavigationPoint> areaCovers = boss != null ? boss.GetAreaCovers() : BossPlayers.GetAICovers();
 
             NavMeshPath _navMeshPath = new NavMeshPath();
 
+            List<CustomNavigationPoint> sameLevelPoints = new List<CustomNavigationPoint>();
+
             customNavigationPoint_2 = Covers.ClosestPoint(botOwner_0.Id, botPosition, centerPosition, areaCovers, (CustomNavigationPoint point) =>
             {
-                if (IsPointFreeGroup(point)) return false;
+                if ( boss !=null && (boss.Followers.Count < 2 || !IsPointFreeGroup(point))) return false;
 
                 float range = Vector3.Distance(centerPosition, point.Position);
-                if (range < maxInnerRadius)
+                if (range <= maxInnerRadius)
                 {
                     _navMeshPath.ClearCorners();
                     bool resut = NavMesh.CalculatePath(botPosition, point.Position, -1, _navMeshPath);
@@ -427,10 +424,29 @@ namespace friendlyPMC.Components.Tactics
                             return false;
                         }
                     }
+                    float levelTolerance = 0.5f;
+                    bool isSameLevel = Mathf.Abs(point.Position.y - centerPosition.y) <= levelTolerance;
+                    
+                    if (isSameLevel) sameLevelPoints.Add(point);
+
                     return true;
                 }
-                return true;
+                
+                return false;
+
             }, 10f);
+
+            if(customNavigationPoint_2 != null && sameLevelPoints.Count > 0 && !sameLevelPoints.Contains(customNavigationPoint_2))
+            {
+                foreach(var pt in sameLevelPoints)
+                {
+                    if((centerPosition - pt.Position).magnitude < (centerPosition - customNavigationPoint_2.Position).magnitude * 1.4f)
+                    {
+                        customNavigationPoint_2 = pt;
+                        break;
+                    }
+                }
+            }
 
             botOwner_0.Memory.SetCoverPoints(customNavigationPoint_2);
 
@@ -786,6 +802,7 @@ namespace friendlyPMC.Components.Tactics
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "moveCloserToBossFast");
 
             }
+            
             return BotLogicDecisions.RegroupToBoss(botOwner_0);
         }
 
