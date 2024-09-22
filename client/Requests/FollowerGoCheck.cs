@@ -51,7 +51,7 @@ namespace friendlyPMC.Actions
             RaycastHit[] hits = new RaycastHit[10];
             int numHits = Physics.SphereCastNonAlloc(
                     visionRay,
-                    0.5f,
+                    0.3f,
                     hits,
                     28f,
                     LayerMaskClass.HighPolyWithTerrainNoGrassMask

@@ -92,28 +92,46 @@ namespace friendlyPMC.Patches
 
             if (BossPlayers.IsPlayerBoss(__instance.ProfileId)) return;
 
+            bool isfollower = false;
+            foreach(var f in BossPlayers.GetFollowers())
+            {
+                if(f.GetBot().ProfileId ==  __instance.ProfileId)
+                {
+                    isfollower = true;
+                    break;
+                }
+            }
+
+            if (isfollower) return;
+
+            bool reportEnemy = false;
             BossPlayers.GetFollowers().ForEach(follower=>{
                 BotOwner bot = follower.GetBot();
                 FollowerBrain brain = bot.Brain.BaseBrain as FollowerBrain;
                 
                 if(brain == null || brain.WasHit || bot.Memory.HaveEnemy || bot.BotsGroup == null) return;
                 if(
-                    bot.HearingSensor.method_6(__instance.Transform.position,30f,out var distance) &&
+                    bot.HearingSensor.method_6(__instance.Transform.position,40f,out var distance) &&
                     (bot.EnemiesController.IsEnemy(__instance) || bot.BotsGroup.IsEnemy(__instance))
                 )
                 {
                     if(distance < 12f)
                     {
-                        bot.BotsGroup.ReportAboutEnemy(__instance, EEnemyPartVisibleType.visible);
+                        if(!reportEnemy) bot.BotsGroup.ReportAboutEnemy(__instance, EEnemyPartVisibleType.visible);
                         Utils.Enemy.MakeEnemy(bot, __instance);
                         reported = Time.time + 3f;
+                        reportEnemy = true;
                     } 
-                    else if(distance < 30f)
+                    else if(distance < 32f)
                     {
                         reported = Time.time + 3f;
                         brain.FakeShot(__instance.MainParts[BodyPartType.body].Position);
-                        bot.BotsGroup.ReportAboutEnemy(__instance, EEnemyPartVisibleType.notVisible);
-                        bot.BotTalk.TrySay(EPhraseTrigger.NoisePhrase, true);
+                        if (!reportEnemy)
+                        {
+                            bot.BotsGroup.ReportAboutEnemy(__instance, EEnemyPartVisibleType.notVisible);
+                            bot.BotTalk.TrySay(EPhraseTrigger.NoisePhrase, true);
+                        }
+                        reportEnemy = true;
                     }
                 }
             });

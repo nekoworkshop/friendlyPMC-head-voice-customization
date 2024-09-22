@@ -48,39 +48,6 @@ namespace friendlyPMC.Patches
                         }
                     }
                 }
-                
-                if (player.Side == posibleExecuter.Side)
-                {
-                    int followLimit = friendlyPMC.extraPickups.Value;
-                    if (friendlyPMC.squadSpawn.Value) followLimit = followLimit + friendlyPMC.squadSize.Value;
-
-                    // add BOT as follower to the player BOSS if limit was not reached
-                    if (BossPlayers.GetFollowersByBoss(player.ProfileId).Count < followLimit)
-                    {
-                        BossPlayers.AddFollower(posibleExecuter, playerBoss);
-                        // - bot signals "OK"
-                        posibleExecuter.BotTalk.TrySay(EPhraseTrigger.Roger,false);
-                        posibleExecuter.Gesture.TryGestus(EGesture.Good, true);
-
-                    }
-                    else
-                    {
-                        // bot signals "NO"
-                        posibleExecuter.BotTalk.TrySay(EPhraseTrigger.Negative);
-                        posibleExecuter.Gesture.TryGestus(EGesture.Bad, true);
-                    }
-
-                    __result = false;
-                    return false;
-                } else
-                {
-                    // bot signals "NO"
-                    posibleExecuter.BotTalk.TrySay(EPhraseTrigger.Toxic);
-                    posibleExecuter.Gesture.TryGestus(EGesture.FuckYou, true);
-                    __result = false;
-                    return false;
-                }
-
             }
             // allow default to take place
             return true;

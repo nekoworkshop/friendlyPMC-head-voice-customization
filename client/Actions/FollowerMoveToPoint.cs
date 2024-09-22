@@ -177,7 +177,7 @@ namespace friendlyPMC.Actions
                     wasHit = true;
                 }
 
-                if(!wasHit && !botOwner_0.Memory.HaveEnemy) botOwner_0.Steering.LookToMovingDirection(45f);
+                if(!wasHit && !botOwner_0.Memory.HaveEnemy) botOwner_0.Steering.LookToMovingDirection(60f);
                 botOwner_0.Mover.Sprint(_shouldSprint && !wasHit);
             }
         }

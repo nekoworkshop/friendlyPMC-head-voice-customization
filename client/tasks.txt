@@ -20,10 +20,10 @@
 - x - make bots obey "regroup" call when BTR is close
 
 - #inrogress - add "spreadout" command
-- #inrogress - make bot auto aquire enemy is he is speaking too close
-- #nprogress - need to detect if boss is on a different level in height. When he is, regroup and scenarios that get close to boss must take into account this.
+- x - make bot auto aquire enemy is he is speaking too close
+- #nprogress - need to detect if boss is on a different level in height. When he is, regroup and scenarios that get close to boss must take into account this. (might need to be removed)
 
-- make bot go in search mode if player is looking down at a maxim 25m distance
+- x - make bot go in search mode if player is looking down at a maxim 25m distance
 
 - scav followers to turn hostile if your shoot them (turning hostile can be done through BotMemoryClass > method_7)
 - picked up followers to turn hostile if you shoot them
@@ -60,11 +60,11 @@ RELEASE NOTES (3.8):
 - bots can now be called to your position when BTR is nearby. As part of the game logic, bots hide when BTR is around so they don't get ran over. But this also makes them no longer follow you until BTR leaves the area. Now you can call them to your position to get them out of BTR radius. Take note, this can end up with them being ran over.
 - made "Spread Out" command functional. Bot will run towards some cover when this is executed.
 - updated "Contact" command to now take into consideration any visible part of the enemy instead of just the head and torso
-- "That Direction" has a new function when out of combat. You can look at the ground, at a maximum 25 m distance or to a a wall at the same distance and do the gesture. This is will make the bot to go there to investigate.
-- improved how bots get closer to the boss by taking height position into account in order to detect different levels (Dorms levels or Factory offices levels ). Does not affect simple following. Use "regroup" to get them on the same level as you when outside combat.
+- "That Direction" has a new function when out of combat. You can look at something, maximum 25 m distance,  and do the gesture. This is will make the bot to go there to investigate.
 - some improvements on the cover search logic in an effort to reduce the situations where bots end up running in a wall
 - made push order act like the old way where follower goes up in the face to the enemy and shoots him
 - improved awareness
+- some bug fixes
 
 Personal Notes:
 Need to update description on what commands are ignored by "Assist" tactic

@@ -404,8 +404,6 @@ namespace friendlyPMC.Components.Tactics
 
             NavMeshPath _navMeshPath = new NavMeshPath();
 
-            List<CustomNavigationPoint> sameLevelPoints = new List<CustomNavigationPoint>();
-
             customNavigationPoint_2 = Covers.ClosestPoint(botOwner_0.Id, botPosition, centerPosition, areaCovers, (CustomNavigationPoint point) =>
             {
                 if ( boss !=null && (boss.Followers.Count < 2 || !IsPointFreeGroup(point))) return false;
@@ -424,10 +422,6 @@ namespace friendlyPMC.Components.Tactics
                             return false;
                         }
                     }
-                    float levelTolerance = 0.5f;
-                    bool isSameLevel = Mathf.Abs(point.Position.y - centerPosition.y) <= levelTolerance;
-                    
-                    if (isSameLevel) sameLevelPoints.Add(point);
 
                     return true;
                 }
@@ -435,18 +429,6 @@ namespace friendlyPMC.Components.Tactics
                 return false;
 
             }, 10f);
-
-            if(customNavigationPoint_2 != null && sameLevelPoints.Count > 0 && !sameLevelPoints.Contains(customNavigationPoint_2))
-            {
-                foreach(var pt in sameLevelPoints)
-                {
-                    if((centerPosition - pt.Position).magnitude < (centerPosition - customNavigationPoint_2.Position).magnitude * 1.4f)
-                    {
-                        customNavigationPoint_2 = pt;
-                        break;
-                    }
-                }
-            }
 
             botOwner_0.Memory.SetCoverPoints(customNavigationPoint_2);
 
