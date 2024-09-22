@@ -17,16 +17,16 @@
 - x - dog fight seems to semi-crouch the bot, see if you can make them aim and shoot while standing
 - x - add look direction commands
 
-- x - make bots obey "regroup" call when BTR is close
+- #inrogress - make bots obey "regroup" call when BTR is close
 
 - #inrogress - add "spreadout" command
 - x - make bot auto aquire enemy is he is speaking too close
-- #nprogress - need to detect if boss is on a different level in height. When he is, regroup and scenarios that get close to boss must take into account this. (might need to be removed)
 
 - x - make bot go in search mode if player is looking down at a maxim 25m distance
 
-- scav followers to turn hostile if your shoot them (turning hostile can be done through BotMemoryClass > method_7)
-- picked up followers to turn hostile if you shoot them
+- #inrogress - bots in assist mode to turn hostile if your shoot them (turning hostile can be done through BotMemoryClass > method_7)
+
+- keep combat layer on while bot is healing or goes for healing even if enemy dies
 
 -- === 3.9 === ---:
 - see if we can make bot swap weapons when asked to loot (DeadBodyWork)
@@ -57,12 +57,11 @@
 RELEASE NOTES (3.8):
 - removed "Player Equipment" as option for equipment for bots. When clonning player equipment people have reported to have delays in spawn. Because you can simply save your current equipment as a preset loadout - this is removed and you can use that instead. Also I encourge using custom presets that you personally made for bots because people tend to put the meds in the secure container of their own equipment, not realizing that will get deleted and ammo will be put instead for the bots to use. It will also not be there in the end when followers use the equipment you give them instead of clonning it. 
 - added a new tactic - Guard who prioritizes to eliminate the treat quick and will try to get between player and the enemy when player is under attack
-- bots can now be called to your position when BTR is nearby. As part of the game logic, bots hide when BTR is around so they don't get ran over. But this also makes them no longer follow you until BTR leaves the area. Now you can call them to your position to get them out of BTR radius. Take note, this can end up with them being ran over.
+- bots can now be called to your position when BTR is nearby. As part of the game logic, bots hide when BTR is around so they don't get ran over. But this also makes them no longer follow you until BTR leaves the area. Now you can call them to your position to get them out of BTR radius.
 - made "Spread Out" command functional. Bot will run towards some cover when this is executed.
 - updated "Contact" command to now take into consideration any visible part of the enemy instead of just the head and torso
 - "That Direction" has a new function when out of combat. You can look at something, maximum 25 m distance,  and do the gesture. This is will make the bot to go there to investigate.
 - some improvements on the cover search logic in an effort to reduce the situations where bots end up running in a wall
-- made push order act like the old way where follower goes up in the face to the enemy and shoots him
 - improved awareness
 - some bug fixes
 

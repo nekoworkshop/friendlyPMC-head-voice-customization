@@ -309,7 +309,7 @@ namespace friendlyPMC.Patches
                 foreach (var member in friendlyPMC.squadMembers)
                 {
                     // generate profile only for bots with equipment other than default or player's equipment
-                    if (member.Value[1].Value != equipOptions[0] && member.Value[1].Value != equipOptions[1])
+                    if (member.Value[1].Value != equipOptions[0])
                     {
                         // fetch profile from server
                         profileTasks.Add(FetchMemberProfile(member,playerProfile,botCreator,side,type,@params).ContinueWith(dt =>
@@ -839,7 +839,7 @@ namespace friendlyPMC.Patches
             BotSpawnParams @params = new BotSpawnParams();
             @params.ShallBeGroup = new ShallBeGroupParams(true, false, memberCount + 1);
 
-            IProfileData data = new IProfileData(side, type, BotDifficulty.hard, 0f, @params);
+            IProfileData data = new IProfileData(side, type, BotDifficulty.hard, side == EPlayerSide.Savage ? 5f : 0f, @params);
 
             BotCreationDataClass botsData;
 

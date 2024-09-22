@@ -13,6 +13,8 @@ using System.Reflection;
 using System.Threading.Tasks;
 using UnityEngine;
 using System.Diagnostics;
+using Sirenix.Serialization.Utilities;
+using static WindowsManager;
 
 namespace friendlyPMC.Patches
 {
@@ -102,6 +104,62 @@ namespace friendlyPMC.Patches
                         enemy.AIData.BotOwner.BotsGroup.AddEnemy(botOwner_0, EBotEnemyCause.addPlayerToBoss);   
                     }
                 }
+            }
+        }
+    }
+
+    internal class BotMemoryDamagePatch : ModulePatch
+    {
+        protected override MethodBase GetTargetMethod()
+        {
+            return AccessTools.Method(typeof(BotMemoryClass), "method_7");
+        }
+        [PatchPostfix]
+        private static void PatchPostfix(BotMemoryClass __instance, DamageInfo damageInfo)
+        {
+            var botOwner_0 = AccessTools.Field(typeof(BotMemoryClass), "botOwner_0").GetValue(__instance) as BotOwner;
+            if (damageInfo.Player == null) return;
+            
+            bool isfollower = BossPlayers.IsFollower(botOwner_0);
+            if (!isfollower) return;
+
+            bool isBossEnemy = BossPlayers.IsPlayerBoss(damageInfo.Player.iPlayer.ProfileId);
+
+            bool isTeamate = false;
+
+            if (botOwner_0.BotFollower.BossToFollow == null) return;
+
+            botOwner_0.BotFollower.BossToFollow.Followers.ForEach(bt =>
+            {
+                if(bt.ProfileId == damageInfo.Player.iPlayer.ProfileId) isTeamate = true;
+            });
+
+            if(!(isBossEnemy || isTeamate)) return;
+
+            var brain = botOwner_0.Brain.BaseBrain as FollowerBrain;
+            if (brain == null) return;
+
+            if( brain.currentTactic == "Assist")
+            {
+                var boss = botOwner_0.BotFollower.BossToFollow as pitAIBossPlayer;
+                if (boss == null) return;
+
+                if (damageInfo.Damage <= botOwner_0.Settings.FileSettings.Aiming.MIN_DAMAGE_TO_GET_HIT_AFFETS) return;
+
+                BotZone zone = botOwner_0.BotsGroup.BotZone;
+
+                BossPlayers.Instance.GetFollower(botOwner_0).Dismiss();
+                BossPlayers.RemoveFollower(botOwner_0, boss);
+
+                // make a group to add this bot to as things do not work otherwise
+                var deadBodiesController = AccessTools.Field(typeof(BotSpawner), "_deadBodiesController").GetValue(botOwner_0.BotsController.BotSpawner) as DeadBodiesController;
+                var allPlayers = AccessTools.Field(typeof(BotSpawner), "_allPlayers").GetValue(botOwner_0.BotsController.BotSpawner) as List<Player>;
+
+                BotsGroup group = new BotsGroup(zone, botOwner_0.BotsController.BotGame, botOwner_0, new List<BotOwner>(), deadBodiesController, allPlayers, false);
+                botOwner_0.BotsGroup = group;
+                BotSettingsClass botSettingsClass = new BotSettingsClass(Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(damageInfo.Player.iPlayer.ProfileId), botOwner_0.BotsGroup, EBotEnemyCause.checkAddTODO);
+
+                botOwner_0.BotsGroup.AddEnemy(damageInfo.Player.iPlayer, EBotEnemyCause.checkAddTODO);
             }
         }
     }

@@ -66,7 +66,7 @@ namespace friendlyPMC
         }
     }
 
-    [BepInPlugin("xyz.pit.companion", "friendlyPMC", "3.7.1")]
+    [BepInPlugin("xyz.pit.companion", "friendlyPMC", "3.8.0")]
     [BepInDependency("xyz.drakia.bigbrain")]
     [BepInDependency("com.Arys.UnityToolkit")]
     public class friendlyPMC : BaseUnityPlugin
@@ -312,6 +312,7 @@ namespace friendlyPMC
             new BotGroupAddEnemy().Enable();
 
             new BotMemoryAddEnemyPatch().Enable();
+            new BotMemoryDamagePatch().Enable();
             new BotGroupUsecEnemyPatch().Enable();
 
             new BotOwnerIsFolowerPatch().Enable();
