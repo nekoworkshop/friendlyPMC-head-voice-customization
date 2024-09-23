@@ -19,14 +19,14 @@
 
 - #inrogress - make bots obey "regroup" call when BTR is close
 
-- #inrogress - add "spreadout" command
+- x - add "spreadout" command
 - x - make bot auto aquire enemy is he is speaking too close
 
 - x - make bot go in search mode if player is looking down at a maxim 25m distance
 
 - #inrogress - bots in assist mode to turn hostile if your shoot them (turning hostile can be done through BotMemoryClass > method_7)
 
-- keep combat layer on while bot is healing or goes for healing even if enemy dies
+- x - keep combat layer on while bot is healing even if enemy dies
 
 -- === 3.9 === ---:
 - see if we can make bot swap weapons when asked to loot (DeadBodyWork)

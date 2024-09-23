@@ -157,9 +157,10 @@ namespace friendlyPMC.Patches
 
                 BotsGroup group = new BotsGroup(zone, botOwner_0.BotsController.BotGame, botOwner_0, new List<BotOwner>(), deadBodiesController, allPlayers, false);
                 botOwner_0.BotsGroup = group;
-                BotSettingsClass botSettingsClass = new BotSettingsClass(Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(damageInfo.Player.iPlayer.ProfileId), botOwner_0.BotsGroup, EBotEnemyCause.checkAddTODO);
 
-                botOwner_0.BotsGroup.AddEnemy(damageInfo.Player.iPlayer, EBotEnemyCause.checkAddTODO);
+                Player enemy = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(damageInfo.Player.iPlayer.ProfileId);
+
+                EnemyInfo info = Utils.Enemy.MakeEnemy(botOwner_0, enemy, EBotEnemyCause.checkAddTODO);
             }
         }
     }

@@ -143,11 +143,18 @@ namespace friendlyPMC.Components
                     GetCoverPoint(botOwner_0.GetPlayer.Transform.position, 50f);
                     if (customNavigationPoint_0 != null)
                     {
-                        //request.Complete();
-                        if (!botOwner_0.CanSprintPlayer)
+                        Utils.Utils.SetTimeout(() =>
                         {
-                            return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.goToCoverPoint, "req:goHide");
-                        }
+                            if (
+                                botOwner_0 != null && !botOwner_0.IsDead && botOwner_0.BotState == EBotState.Active && request != null && 
+                                ( request.BotRequestType == BotRequestType.hide || request.BotRequestType == BotRequestType.getInCover)
+                            )
+                            {
+                                request.Complete();
+                            }
+
+                        }, 4000);
+
                         return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "req:runHide");
                     } else
                     {

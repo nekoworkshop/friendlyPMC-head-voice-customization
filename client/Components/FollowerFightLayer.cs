@@ -38,6 +38,7 @@ namespace friendlyPMC.Components
         private bool sniperTactic = false;
         private bool guardTactic = false;
 
+        private bool wantsToHeal = false;
 
         private bool bossUnderAttack = false;
 
@@ -174,6 +175,8 @@ namespace friendlyPMC.Components
         }
         public override bool ShallUseNow()
         {
+            if (wantsToHeal) return true;
+
             if (!botOwner_0.Memory.HaveEnemy)
             {
                 if (ordersAreAttack || ordersAreHold)
@@ -377,9 +380,12 @@ namespace friendlyPMC.Components
             aicoreActionResultStruct = commonLayer.NeedHeal(out customNavigationPoint_0);
             if (aicoreActionResultStruct != null)
             {
+                wantsToHeal = true;
                 if (request != null && request.BotRequestType != BotRequestType.wait) request.Complete(); // cancel requests when needing to heal
                 return (AICoreActionResultStruct<BotLogicDecision>)aicoreActionResultStruct;
             }
+
+            wantsToHeal = false;
 
             AIBossPlayerLogic gclass363_0 = HasBoss() ? GetBoss().GetBossLogic() : null;
             bossUnderAttack = gclass363_0 != null && gclass363_0.IsHitted;
@@ -486,7 +492,7 @@ namespace friendlyPMC.Components
                 return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.suppressFire, "suppressFire");
             }
 
-            // throw grenate request
+            // throw grenade request
             if (!sniperTactic && request != null && request.BotRequestType == BotRequestType.throwGrenade)
                 return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.throwGrenadeFromPlace, "throwGrenadeRequest");
 
@@ -495,9 +501,35 @@ namespace friendlyPMC.Components
                 return new AICoreActionResultStruct<BotLogicDecision>((BotLogicDecision)CustomBotDecisions.MoveToPoint, "req:comeHere");
 
             // spread out request
-            if(request != null && request.BotRequestType == BotRequestType.getInCover)
+            if (
+                request != null &&
+                (request.BotRequestType == BotRequestType.getInCover || request.BotRequestType == BotRequestType.hide)
+             )
             {
+                if (botOwner_0.Memory.HaveEnemy && botOwner_0.Memory.GoalEnemy.CanShoot)
+                {
+                    request.Complete();
+                }
+                else
+                {
+                    GetCoverPoint(botOwner_0.GetPlayer.Transform.position, 50f);
+                    if (customNavigationPoint_0 != null)
+                    {
+                        Utils.Utils.SetTimeout(() =>
+                        {
+                            if (
+                                botOwner_0 != null && !botOwner_0.IsDead && botOwner_0.BotState == EBotState.Active && request != null &&
+                                (request.BotRequestType == BotRequestType.hide || request.BotRequestType == BotRequestType.getInCover)
+                            )
+                            {
+                                request.Complete();
+                            }
 
+                        }, 4000);
+
+                        return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "runToCover");
+                    }
+                }
             }
 
             if (botOwner_0.Memory.GoalEnemy.Owner.IsRole(WildSpawnType.marksman))
@@ -557,7 +589,11 @@ namespace friendlyPMC.Components
 
         public override AICoreActionEndStruct EndHeal()
         {
-            return commonLayer.EndHeal();
+            AICoreActionEndStruct result =  commonLayer.EndHeal();
+
+            if (result.Value) wantsToHeal = false;
+
+            return result;
         }
 
         public override AICoreActionEndStruct EndTakeItem()

@@ -212,20 +212,20 @@ namespace friendlyPMC.Utils
             }
         }
 
-        public static EnemyInfo MakeEnemy(BotOwner bot, Player enemy)
+        public static EnemyInfo MakeEnemy(BotOwner bot, Player enemy, EBotEnemyCause cause = EBotEnemyCause.addPlayerToBoss)
         {
             BotSettingsClass groupInfo;
             bot.BotsGroup.Enemies.TryGetValue(enemy, out groupInfo);
 
             if (groupInfo == null)
             {
-                bot.BotsGroup.AddEnemy(enemy, EBotEnemyCause.addPlayerToBoss);
+                bot.BotsGroup.AddEnemy(enemy, cause);
                 bot.BotsGroup.Enemies.TryGetValue(enemy, out groupInfo);
             }
 
             if (groupInfo == null)
             {
-                groupInfo = new BotSettingsClass(enemy, bot.BotsGroup, EBotEnemyCause.addPlayerToBoss);
+                groupInfo = new BotSettingsClass(enemy, bot.BotsGroup, cause);
 
                 bot.Memory.AddEnemy(enemy, groupInfo, false);
             }

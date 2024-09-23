@@ -120,7 +120,7 @@ namespace friendlyPMC.Components.Tactics
                             getClose = true;
                         } else
                         {
-                            GetClosestAttackCoverPoint(botPosition, fightRange);
+                            GetClosestAttackCoverPoint(commonLayer.HasBoss()? commonLayer.GetBoss().Position : botPosition, fightRange);
                         }
                             
                         if (customNavigationPoint_0 != null)
