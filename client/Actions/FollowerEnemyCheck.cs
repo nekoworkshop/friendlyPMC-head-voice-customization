@@ -29,7 +29,7 @@ namespace friendlyPMC.Actions
                 }
                 else
                 {
-                    Components.Logger.LogInfo("Player has seen " + closest.Profile.Nickname);
+                    Modules.Logger.LogInfo("Player has seen " + closest.Profile.Nickname);
                     try
                     {
                         if (bot.Memory.HaveEnemy && bot.Memory.GoalEnemy.ProfileId == closest.Profile.ProfileId) return;
@@ -42,17 +42,17 @@ namespace friendlyPMC.Actions
                             info.SetVisible(true);
                             bot.Memory.GoalEnemy = info;
 
-                            Components.Logger.LogInfo("Made " + closest.Profile.Nickname + " an active enemy to " + bot.Profile.Nickname);
+                            Modules.Logger.LogInfo("Made " + closest.Profile.Nickname + " an active enemy to " + bot.Profile.Nickname);
                         }
                         else if (info == null)
                         {
-                            Components.Logger.LogInfo("Cannot make " + bot.Profile.Nickname + " an active enemy");
+                            Modules.Logger.LogInfo("Cannot make " + bot.Profile.Nickname + " an active enemy");
                         }
                     }
                     catch (Exception e)
                     {
-                        Components.Logger.LogInfo("Failed to accquire reported enemy:");
-                        Components.Logger.LogInfo(e.StackTrace);
+                        Modules.Logger.LogInfo("Failed to accquire reported enemy:");
+                        Modules.Logger.LogInfo(e.StackTrace);
                     }
                 }
             }

@@ -2,6 +2,7 @@
 using EFT.InventoryLogic;
 using friendlyPMC.Components.Tactics;
 using friendlyPMC.Utils;
+using friendlyPMC.Modules;
 using System;
 using UnityEngine;
 
@@ -205,8 +206,8 @@ namespace friendlyPMC.Components.FollowerBossFollower
                 return decision;
             } catch( Exception ex )
             {
-                Logger.LogInfo("BirdEye Decision Error: " + ex.Message);
-                Logger.LogInfo("Trace: " + ex.StackTrace);
+                Modules.Logger.LogInfo("BirdEye Decision Error: " + ex.Message);
+                Modules.Logger.LogInfo("Trace: " + ex.StackTrace);
                 return new AICoreActionResultStruct<BotLogicDecision>(HoldFor(GClass761.Random(1f, 2f)), "decision.Error");
             }
         }

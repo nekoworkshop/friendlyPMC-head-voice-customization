@@ -1,9 +1,6 @@
 ﻿using EFT;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using friendlyPMC.Modules;
 using UnityEngine;
 
 namespace friendlyPMC.Components.Tactics
@@ -434,8 +431,8 @@ namespace friendlyPMC.Components.Tactics
             }
             catch (Exception e)
             {
-                Logger.LogError("EndHoldPosition Error");
-                Logger.LogError(e);
+                Modules.Logger.LogError("EndHoldPosition Error");
+                Modules.Logger.LogError(e);
                 return new AICoreActionEndStruct("hpError", true);
             }
         }

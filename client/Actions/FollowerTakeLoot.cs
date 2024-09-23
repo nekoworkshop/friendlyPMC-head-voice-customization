@@ -172,8 +172,8 @@ namespace friendlyPMC.Actions
             }
             catch (Exception e)
             {
-                Components.Logger.LogError("Failed to pickup Loot");
-                Components.Logger.LogError(e);
+                Modules.Logger.LogError("Failed to pickup Loot");
+                Modules.Logger.LogError(e);
                 ClearLoot();
             }
         }

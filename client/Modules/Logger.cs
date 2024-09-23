@@ -3,7 +3,7 @@ using System;
 using System.Diagnostics;
 using UnityEngine;
 
-namespace friendlyPMC.Components
+namespace friendlyPMC.Modules
 {
     internal class Logger
     {

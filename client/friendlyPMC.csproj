@@ -210,7 +210,7 @@
     <Compile Include="Components\FollowerLootLayer.cs" />
     <Compile Include="Components\FollowerReceiver.cs" />
     <Compile Include="Components\FollowerRequestLayer.cs" />
-    <Compile Include="Components\Logger.cs" />
+    <Compile Include="Modules\Logger.cs" />
     <Compile Include="Modules\BossPlayers.cs" />
     <Compile Include="Modules\InteractableObjects.cs" />
     <Compile Include="Modules\Receivers.cs" />

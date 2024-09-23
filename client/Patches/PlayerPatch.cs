@@ -40,7 +40,7 @@ namespace friendlyPMC.Patches
                         {
                             var field = AccessTools.Field(typeof(AIData), "<AIBossPlayer>k__BackingField");
                             field.SetValue(__instance, boss);
-                            Components.Logger.LogInfo("Replaced AIBossPlayer in AIData with ours");
+                            Logger.LogInfo("Replaced AIBossPlayer in AIData with ours");
                         }
                     }
 

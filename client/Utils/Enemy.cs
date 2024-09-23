@@ -6,6 +6,8 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.AI;
 
+using friendlyPMC.Modules;
+
 namespace friendlyPMC.Utils
 {
     internal class Enemy
@@ -206,8 +208,8 @@ namespace friendlyPMC.Utils
             }
             catch (Exception ex)
             {
-                Components.Logger.LogError("GetEnemiesAtLocation Error");
-                Components.Logger.LogError(ex);
+                Modules.Logger.LogError("GetEnemiesAtLocation Error");
+                Modules.Logger.LogError(ex);
                 return 1;
             }
         }

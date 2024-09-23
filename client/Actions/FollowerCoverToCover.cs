@@ -67,8 +67,8 @@ namespace friendlyPMC.Actions
             }
             catch (Exception ex)
             {
-                Components.Logger.LogError("Failed to init CoverToCover");
-                Components.Logger.LogError(ex);
+                Modules.Logger.LogError("Failed to init CoverToCover");
+                Modules.Logger.LogError(ex);
             }
 
             if (!botOwner_0.Memory.HaveEnemy || !botOwner_0.BotFollower.HaveBoss) return;

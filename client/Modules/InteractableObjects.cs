@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 
 using friendlyPMC.Components;
+using friendlyPMC.Modules;
 using UnityEngine.AI;
 
 
@@ -199,8 +200,8 @@ namespace friendlyPMC.Modules
             }
             catch (Exception e)
             {
-                Components.Logger.LogError("Error sending stored loot");
-                Components.Logger.LogError(e);
+                Logger.LogError("Error sending stored loot");
+                Logger.LogError(e);
             }
 
             foreach (var stack in _lootedItems)
@@ -306,8 +307,8 @@ namespace friendlyPMC.Modules
                 }
                 catch (Exception ex)
                 {
-                    Components.Logger.LogError("Could not make bot a Loot Taker");
-                    Components.Logger.LogError(ex);
+                    Logger.LogError("Could not make bot a Loot Taker");
+                    Logger.LogError(ex);
                 }
             }
 

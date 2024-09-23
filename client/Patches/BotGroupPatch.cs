@@ -6,7 +6,6 @@ using HarmonyLib;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using friendlyPMC.Utils;
 
 namespace friendlyPMC.Patches
 {
@@ -107,8 +106,8 @@ namespace friendlyPMC.Patches
                 }
                 catch (Exception ex)
                 {
-                    Components.Logger.LogError("Failed to make a group an enemy");
-                    Components.Logger.LogError(ex);
+                    Logger.LogError("Failed to make a group an enemy");
+                    Logger.LogError(ex);
                 }
             }
         }

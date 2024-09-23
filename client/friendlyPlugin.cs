@@ -11,7 +11,6 @@ using HarmonyLib;
 using System.Collections.Generic;
 using UnityEngine;
 
-using Logger = friendlyPMC.Components.Logger;
 
 using System.Threading.Tasks;
 using System.Linq;
@@ -303,7 +302,7 @@ namespace friendlyPMC
             {
                 awaken = true;
                 Instance = this;
-                new Logger();
+                new Modules.Logger();
             }
 
             new RaidStartPatch().Enable();
@@ -348,6 +347,7 @@ namespace friendlyPMC
 
             harmony.PatchAll(typeof(LocalGameCtorPatch).Assembly);
             harmony.PatchAll(typeof(BaseLocalGameVmethod4Patch).Assembly); // spawn patch
+            harmony.PatchAll(typeof(GoalEnemyTracePatch).Assembly);
 
             ConsoleScreen.Processor.RegisterCommand("followerstome", delegate ()
             {
@@ -888,7 +888,7 @@ namespace friendlyPMC
                     configurationManager.BuildSettingList();
                 });
             } catch(Exception ex) {
-                Components.Logger.LogError(ex);
+                Modules.Logger.LogError(ex);
             }
         }
 

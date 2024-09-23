@@ -156,8 +156,8 @@ namespace friendlyPMC.Components
             }
             catch (Exception e)
             {
-                Logger.LogError("Failed to activate new follower patrol mode, fallback to manual mode");
-                Logger.LogError(e);
+                Modules.Logger.LogError("Failed to activate new follower patrol mode, fallback to manual mode");
+                Modules.Logger.LogError(e);
 
                 _bot.BotFollower.PatrolDataFollower.InitPlayer(_player.realPlayer);
                 if (!_bot.BotFollower.PatrolDataFollower.IsInited)
@@ -253,7 +253,7 @@ namespace friendlyPMC.Components
             // ensure bot has enough ammo
             AddExtraAmmo();
 
-            Logger.LogInfo($"Bot {_bot.Profile.Nickname} is now a follower of {_player.Player().Profile.Nickname}");
+            Modules.Logger.LogInfo($"Bot {_bot.Profile.Nickname} is now a follower of {_player.Player().Profile.Nickname}");
         }
 
         protected virtual void SetFollowerSettings(BotOwner bot)
@@ -415,13 +415,13 @@ namespace friendlyPMC.Components
             }
             catch
             {
-                Logger.LogError("Cannot access secure container of bot, extra ammo will not be added");
+                Modules.Logger.LogError("Cannot access secure container of bot, extra ammo will not be added");
                 return;
             }
 
             if (secureContainer == null)
             {
-                Logger.LogError("Bot has no secure container, cannot add extra ammo");
+                Modules.Logger.LogError("Bot has no secure container, cannot add extra ammo");
                 return;
             }
 
@@ -446,7 +446,7 @@ namespace friendlyPMC.Components
 
             if (ammoToAdd == null)
             {
-                Logger.LogError("Bot has no weapon to add ammo");
+                Modules.Logger.LogError("Bot has no weapon to add ammo");
                 return;
             }
 
@@ -477,7 +477,7 @@ namespace friendlyPMC.Components
                         }
                         catch (Exception e)
                         {
-                            Components.Logger.LogError(e);
+                            Modules.Logger.LogError(e);
                         }
                     }
                     else
@@ -574,8 +574,8 @@ namespace friendlyPMC.Components
             }
             catch (Exception ex)
             {
-                Logger.LogInfo("Error on dismiss for a follower: " + ex.Message);
-                Logger.LogInfo(ex.StackTrace);
+                Modules.Logger.LogInfo("Error on dismiss for a follower: " + ex.Message);
+                Modules.Logger.LogInfo(ex.StackTrace);
             }
             // @TODO : see what else can be reverted
         }

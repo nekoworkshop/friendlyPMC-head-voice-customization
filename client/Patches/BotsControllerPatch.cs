@@ -21,8 +21,6 @@ using System.Linq;
 using IProfileData = GClass592;
 using ProfileEndPoint = ProfileEndpointFactoryAbstractClass;
 using BotCreator = GClass814;
-using static Val;
-
 
 namespace friendlyPMC.Patches
 {
@@ -263,7 +261,7 @@ namespace friendlyPMC.Patches
             // process backend result
             await Singleton<PoolManager>.Instance.LoadBundlesAndCreatePools(PoolManager.PoolsCategory.Raid, PoolManager.AssemblyType.Local, profile.GetAllPrefabPaths(false).ToArray<ResourceKey>(), JobPriority.General, null, PoolManager.DefaultCancellationToken);
 
-            Components.Logger.LogInfo("Generated Follower Profile " + profile.Nickname + " with level " + profile.Info.Level);
+            Logger.LogInfo("Generated Follower Profile " + profile.Nickname + " with level " + profile.Info.Level);
 
             return profile;
         }
@@ -390,8 +388,8 @@ namespace friendlyPMC.Patches
             }
             catch (Exception ex)
             {
-                Components.Logger.LogError("Failed to set squad equipment for a bot");
-                Components.Logger.LogError(ex);
+                Logger.LogError("Failed to set squad equipment for a bot");
+                Logger.LogError(ex);
             }
 
             // gather what equipment bundles this bot needs to wait for
@@ -411,7 +409,7 @@ namespace friendlyPMC.Patches
                 }
             }
 
-            Components.Logger.LogInfo("Fetching preset assets...");
+            Logger.LogInfo("Fetching preset assets...");
             try
             {
                 if(bundleTasks.Count > 0) 
@@ -419,12 +417,12 @@ namespace friendlyPMC.Patches
             }
             catch (Exception ex)
             {
-                Components.Logger.LogError("Failed to use custom preset, will fall back to default loadout");
-                Components.Logger.LogError(ex);
+                Logger.LogError("Failed to use custom preset, will fall back to default loadout");
+                Logger.LogError(ex);
             }
 
 
-            Components.Logger.LogInfo("Preset assets fetched");
+            Logger.LogInfo("Preset assets fetched");
 
             
             foreach (var item in profiles)
@@ -507,7 +505,7 @@ namespace friendlyPMC.Patches
 
             }
 
-            Components.Logger.LogInfo("Return bot data");
+            Logger.LogInfo("Return bot data");
 
             return profiles;
 
@@ -751,8 +749,8 @@ namespace friendlyPMC.Patches
                             }
                             catch (Exception ex)
                             {
-                                Components.Logger.LogError("Failed to add " + me.Profile.Nickname + " as ally");
-                                Components.Logger.LogError(ex);
+                                Logger.LogError("Failed to add " + me.Profile.Nickname + " as ally");
+                                Logger.LogError(ex);
                             }
                         });
 
@@ -768,7 +766,7 @@ namespace friendlyPMC.Patches
 
                         botSpawnerClass.method_10(owner, bot, new Action<BotOwner>((BotOwner follower) =>
                         {
-                            Components.Logger.LogInfo("Ally " + follower.Profile.Nickname + " spawned");
+                            Logger.LogInfo("Ally " + follower.Profile.Nickname + " spawned");
 
                             Utils.Utils.SetTimeout(() =>
                             {
@@ -832,7 +830,7 @@ namespace friendlyPMC.Patches
                 type = WildSpawnType.assault;
             }
 
-            Components.Logger.LogInfo("Spawn Followers");
+            Logger.LogInfo("Spawn Followers");
 
             int memberCount = friendlyPMC.squadSize.Value;
 
@@ -966,7 +964,7 @@ namespace friendlyPMC.Patches
                                 botType = me.Profile.Info.Settings.Role;
                             }
 
-                            Components.Logger.LogInfo("Tactic is " + tactic);
+                            Logger.LogInfo("Tactic is " + tactic);
 
                             BossPlayers.AddFollower(me, player, true, botType, tactic);
 
@@ -978,8 +976,8 @@ namespace friendlyPMC.Patches
                         }
                         catch (Exception ex)
                         {
-                            Components.Logger.LogError("Failed to add " + me.Profile.Nickname + " as follower");
-                            Components.Logger.LogError(ex);
+                            Logger.LogError("Failed to add " + me.Profile.Nickname + " as follower");
+                            Logger.LogError(ex);
                         }
                     });
 
@@ -996,7 +994,7 @@ namespace friendlyPMC.Patches
                     botSpawnerClass.method_10(owner, botsData, new Action<BotOwner>((BotOwner follower) =>
                     {
 
-                        Components.Logger.LogInfo("Follower " + follower.Profile.Nickname + " spawned");
+                        Logger.LogInfo("Follower " + follower.Profile.Nickname + " spawned");
 
                         spawnedFollowers++;
 
@@ -1011,7 +1009,7 @@ namespace friendlyPMC.Patches
                 });
 
 
-                Components.Logger.LogInfo("Trying to spawn " + profile.Nickname + " follower");
+                Logger.LogInfo("Trying to spawn " + profile.Nickname + " follower");
 
                 var _inSpawnProcess = (int)AccessTools.Field(typeof(BotSpawner), "_inSpawnProcess").GetValue(botSpawnerClass);
                 AccessTools.Field(typeof(BotSpawner), "_inSpawnProcess").SetValue(botSpawnerClass, _inSpawnProcess + 1);
@@ -1034,7 +1032,7 @@ namespace friendlyPMC.Patches
             }
             catch (Exception ex)
             {
-                Components.Logger.LogError(ex);
+                Logger.LogError(ex);
             }
         }
 
@@ -1073,7 +1071,7 @@ namespace friendlyPMC.Patches
                         Props.FactoryMapSett();
                     }
 
-                    Components.Logger.LogInfo("Raid Started");
+                    Logger.LogInfo("Raid Started");
                 }
 
 
@@ -1096,7 +1094,7 @@ namespace friendlyPMC.Patches
             }
             catch (Exception e)
             {
-                Components.Logger.LogError(e);
+                Logger.LogError(e);
             }
 
         }
@@ -1126,7 +1124,7 @@ namespace friendlyPMC.Patches
             }
             catch (Exception e)
             {
-                Components.Logger.LogError(e);
+                Modules.Logger.LogError(e);
             }
             yield break;
         }
@@ -1144,7 +1142,7 @@ namespace friendlyPMC.Patches
 
             if (friendlyPMC.squadSpawn.Value)
             {
-                Components.Logger.LogInfo("Start Squad Spawn");
+                Modules.Logger.LogInfo("Start Squad Spawn");
 
                 BotsControllerPatch.spawnedPlayers.ForEach(playerBoss =>
                 {
@@ -1156,7 +1154,7 @@ namespace friendlyPMC.Patches
 
             /*if (friendlyPMC.knightSpawn.Value)
             {
-                Components.Logger.LogInfo("Start Boss Ally Spawn");
+                Logger.LogInfo("Start Boss Ally Spawn");
 
                 UniTask.WhenAll(squadSpawners).ContinueWith(() =>
                 {
@@ -1168,8 +1166,8 @@ namespace friendlyPMC.Patches
                         }
                         catch (Exception e) 
                         {  
-                            Components.Logger.LogError("Failed to spawn Boss Ally");
-                            Components.Logger.LogError(e);
+                            Logger.LogError("Failed to spawn Boss Ally");
+                            Logger.LogError(e);
                         }
                     });
 
@@ -1217,7 +1215,7 @@ namespace friendlyPMC.Patches
 
             LocalGameCtorPatch.Instance = null;
 
-            Components.Logger.LogInfo("Raid Ended");
+            Logger.LogInfo("Raid Ended");
 
             return true;
         }
@@ -1257,12 +1255,12 @@ namespace friendlyPMC.Patches
                     }
                 }
                 
-                Components.Logger.LogInfo("Raid CleanUp Finished");
+                Logger.LogInfo("Raid CleanUp Finished");
 
             } catch (Exception ex)
             {
-                Components.Logger.LogError("Raid CleanUp Failed");
-                Components.Logger.LogError(ex);
+                Logger.LogError("Raid CleanUp Failed");
+                Logger.LogError(ex);
             }
 
             return true;

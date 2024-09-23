@@ -390,7 +390,7 @@ namespace friendlyPMC.Components
             }
             catch(Exception ex)
             {
-                Logger.LogError(ex);
+                Modules.Logger.LogError(ex);
             }
 
             

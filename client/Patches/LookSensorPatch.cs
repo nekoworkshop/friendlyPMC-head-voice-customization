@@ -6,6 +6,8 @@ using System;
 using System.Reflection;
 using UnityEngine;
 
+using friendlyPMC.Modules;
+
 namespace friendlyPMC.Patches
 {
     [HarmonyPatch(typeof(LookSensor))]
@@ -33,8 +35,8 @@ namespace friendlyPMC.Patches
 
                 __instance.UpdateLook();
             } catch(Exception ex) {
-                Components.Logger.LogInfo("AIPeriodicUpdate Error");
-                Components.Logger.LogInfo(ex.StackTrace);
+                Modules.Logger.LogInfo("AIPeriodicUpdate Error");
+                Modules.Logger.LogInfo(ex.StackTrace);
             }
 
             return false;
@@ -61,8 +63,8 @@ namespace friendlyPMC.Patches
             }
             catch (Exception ex)
             {
-                Components.Logger.LogInfo("GClass974 Error");
-                Components.Logger.LogInfo(ex.StackTrace);
+                Logger.LogInfo("GClass974 Error");
+                Logger.LogInfo(ex.StackTrace);
                 __result = 0.5f;
             }
 

@@ -50,7 +50,7 @@ namespace friendlyPMC.Patches
 
                 if (squadType != null && SAINEnableClass != null)
                 {
-                    Components.Logger.LogInfo("Enabled SAIN PATCH");
+                    Logger.LogInfo("Enabled SAIN PATCH");
                 }
             }
         }
@@ -129,8 +129,8 @@ namespace friendlyPMC.Patches
                 }
             } catch(Exception ex)
             {
-                Components.Logger.LogError("Failed to run SAIN clearPlayerPlace Patch");
-                Components.Logger.LogError(ex);
+                Logger.LogError("Failed to run SAIN clearPlayerPlace Patch");
+                Logger.LogError(ex);
             }
             return allow;
         }

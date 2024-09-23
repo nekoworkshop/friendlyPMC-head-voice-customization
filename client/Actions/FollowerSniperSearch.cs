@@ -1,5 +1,6 @@
 ﻿using EFT;
 using friendlyPMC.Components;
+using friendlyPMC.Modules;
 using HarmonyLib;
 
 using System;
@@ -90,8 +91,8 @@ namespace friendlyPMC.Actions
                 }
                 catch (Exception ex)
                 {
-                    Components.Logger.LogError("Failed to init Search");
-                    Components.Logger.LogError(ex);
+                    Modules.Logger.LogError("Failed to init Search");
+                    Modules.Logger.LogError(ex);
                 }
 
                 if (!botOwner_0.Memory.HaveEnemy) return;
@@ -180,8 +181,8 @@ namespace friendlyPMC.Actions
                 }
             } catch (Exception ex)
             {
-                Components.Logger.LogError($"{searchType} Error");
-                Components.Logger.LogError(ex);
+                Modules.Logger.LogError($"{searchType} Error");
+                Modules.Logger.LogError(ex);
             }
         }
 

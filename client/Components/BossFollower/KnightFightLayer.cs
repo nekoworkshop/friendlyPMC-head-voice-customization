@@ -2,7 +2,7 @@
 using System;
 using UnityEngine;
 using EFT.InventoryLogic;
-using System.Reflection.Emit;
+using friendlyPMC.Modules;
 using friendlyPMC.Components.Tactics;
 
 namespace friendlyPMC.Components.BossFollower
@@ -132,8 +132,8 @@ namespace friendlyPMC.Components.BossFollower
                 return KnightFight();
             } catch (Exception ex)
             {
-                Components.Logger.LogInfo("KnightFight Error: " + ex.Message);
-                Components.Logger.LogInfo("Trace: " + ex.StackTrace);
+                Modules.Logger.LogInfo("KnightFight Error: " + ex.Message);
+                Modules.Logger.LogInfo("Trace: " + ex.StackTrace);
                 return new AICoreActionResultStruct<BotLogicDecision>(HoldFor(GClass761.Random(1f, 2f)), "decision.Error");
             }
         }

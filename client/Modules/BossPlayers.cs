@@ -1,7 +1,6 @@
 ﻿using EFT;
 using friendlyPMC.Components;
-using System;
-using System.Collections;
+using friendlyPMC.Modules;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -83,12 +82,12 @@ namespace friendlyPMC.Modules
 
             if (!playerBoss.IAmBoos)
             {
-                Components.Logger.LogInfo($"Could not make player {player.Profile.Nickname} as BOSS");
+                Logger.LogInfo($"Could not make player {player.Profile.Nickname} as BOSS");
                 return null;
             }
             else
             {
-                Components.Logger.LogInfo($"Made player {player.Profile.Nickname} a BOSS");
+                Logger.LogInfo($"Made player {player.Profile.Nickname} a BOSS");
             }
 
             string name = player.ProfileId;

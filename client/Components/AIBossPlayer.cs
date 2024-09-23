@@ -61,12 +61,12 @@ namespace friendlyPMC.Components
         public new void Dispose()
         {
             // do nothing
-            Logger.LogInfo("pitAIBossPlayer Dispose called");
+            Modules.Logger.LogInfo("pitAIBossPlayer Dispose called");
         }
 
         public new void OfferBot(BotOwner bot)
         {
-            Logger.LogInfo("pitAIBossPlayer OfferBot called");
+            Modules.Logger.LogInfo("pitAIBossPlayer OfferBot called");
         }
 
         private void OnDead(EDamageType _damageType)
@@ -170,8 +170,8 @@ namespace friendlyPMC.Components
                     }
                 } catch (Exception ex)
                 {
-                    Logger.LogError("Covers Coroutine failing");
-                    Logger.LogError(ex);
+                    Modules.Logger.LogError("Covers Coroutine failing");
+                    Modules.Logger.LogError(ex);
                 }
 
             });
@@ -317,7 +317,7 @@ namespace friendlyPMC.Components
             }
             catch { }
 
-            Logger.LogInfo("Player Boss Disposed");
+            Modules.Logger.LogInfo("Player Boss Disposed");
         }
         public void AddFollower(BotOwner bot)
         {
@@ -370,8 +370,8 @@ namespace friendlyPMC.Components
                 }
                 catch (Exception e)
                 {
-                    Logger.LogError("Failed to add Enemy to group");
-                    Logger.LogError(e);
+                    Modules.Logger.LogError("Failed to add Enemy to group");
+                    Modules.Logger.LogError(e);
                 }
             }
         }

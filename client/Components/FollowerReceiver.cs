@@ -9,7 +9,6 @@ using System;
 using UnityEngine;
 using System.Collections.Generic;
 using HarmonyLib;
-using RootMotion.FinalIK;
 
 namespace friendlyPMC.Components
 {
@@ -69,7 +68,7 @@ namespace friendlyPMC.Components
                     }
                 }
             } catch(Exception ex) {
-                Components.Logger.LogError(ex);
+                Modules.Logger.LogError(ex);
             }
 
             lookedAtTime = Time.time + 0.5f;

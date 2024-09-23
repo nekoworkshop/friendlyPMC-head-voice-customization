@@ -66,10 +66,6 @@ RELEASE NOTES (3.8):
 - some bug fixes
 
 Personal Notes:
-Need to update description on what commands are ignored by "Assist" tactic
-Need to redo the description to explain things better and add donation button
-
-AIPeriodicUpdate and GClass974 seems related to specific guns and not the bot
 
 ==================================================================================
 REVISIT:

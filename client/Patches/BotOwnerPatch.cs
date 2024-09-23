@@ -99,7 +99,7 @@ namespace friendlyPMC.Patches
             }
             catch (Exception e)
             {
-                Components.Logger.LogInfo("Exception on BotOwner UpdateManual PatchPostfix: " + e.Message);
+                Logger.LogInfo("Exception on BotOwner UpdateManual PatchPostfix: " + e.Message);
             }
         }
     }
