@@ -24,17 +24,13 @@
 
 - x - make bot go in search mode if player is looking down at a maxim 25m distance
 
-- #inrogress - bots in assist mode to turn hostile if your shoot them (turning hostile can be done through BotMemoryClass > method_7)
+- x - bots in assist mode to turn hostile if your shoot them (turning hostile can be done through BotMemoryClass > method_7)
 
 - x - keep combat layer on while bot is healing even if enemy dies
 
 -- === 3.9 === ---:
 - see if we can make bot swap weapons when asked to loot (DeadBodyWork)
 - see if we can prevent questing bots from affecting followers the same way we do with looting
-
-
-- see if you can get inspired from SAIN to have better hearing
-- bots need to react to enemy talking (see SAIN)
 
 - add "lock squad equipment" option
 

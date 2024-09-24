@@ -21,6 +21,8 @@ using System.Linq;
 using IProfileData = GClass592;
 using ProfileEndPoint = ProfileEndpointFactoryAbstractClass;
 using BotCreator = GClass814;
+using static Struct450;
+using System.Security.Policy;
 
 namespace friendlyPMC.Patches
 {
@@ -52,11 +54,13 @@ namespace friendlyPMC.Patches
         public static List<pitAIBossPlayer> spawnedPlayers = new List<pitAIBossPlayer>();
 
         public static Dictionary<string, UniTask<Dictionary<int, Profile>>> followerCreationTask;
+        public static Dictionary<string, UniTask<BotCreationDataClass>> alliesCreationTask;
 
         public BotsControllerPatch()
         {
             if (Instance == null) Instance = this;
             followerCreationTask = new Dictionary<string, UniTask<Dictionary<int, Profile>>>();
+            alliesCreationTask = new Dictionary<string, UniTask<BotCreationDataClass>>();
         }
 
         private AICorePoint GetClosestCorePoint(BotsController _botsController,Vector3 position)
@@ -106,58 +110,75 @@ namespace friendlyPMC.Patches
             BotsGroup botsGroup;
             List<BotOwner> list = new List<BotOwner>();
 
-            // botsGroup take on the values of the inital bot, attempt to prevent the group from being hostile to the player
-            bt.Settings.FileSettings.Mind.ENEMY_BY_GROUPS_PMC_PLAYERS = side != EPlayerSide.Savage ? false : true;
-            bt.Settings.FileSettings.Mind.ENEMY_BY_GROUPS_SAVAGE_PLAYERS = side == EPlayerSide.Savage ? false : true;
-
-            var oldBehaviourBear = bt.Settings.FileSettings.Mind.DEFAULT_BEAR_BEHAVIOUR;
-            var oldBehaviorUsec = bt.Settings.FileSettings.Mind.DEFAULT_USEC_BEHAVIOUR;
-            var oldBehaviorSavage = bt.Settings.FileSettings.Mind.DEFAULT_SAVAGE_BEHAVIOUR;
-
-            var old_reasons = bt.Settings.FileSettings.Mind.VALID_REASONS_TO_ADD_ENEMY;
-
-            bt.Settings.FileSettings.Mind.USE_ADD_TO_ENEMY_VALIDATION = true;
-            bt.Settings.FileSettings.Mind.VALID_REASONS_TO_ADD_ENEMY = new EBotEnemyCause[] { };
-
-            if (side == EPlayerSide.Savage)
+            if (side != EPlayerSide.Savage)
             {
-                bt.Settings.FileSettings.Mind.DEFAULT_SAVAGE_BEHAVIOUR = sameSideHostile ? EWarnBehaviour.Attack : EWarnBehaviour.Ignore;
-                bt.Settings.FileSettings.Mind.DEFAULT_BEAR_BEHAVIOUR = EWarnBehaviour.Attack;
-                bt.Settings.FileSettings.Mind.DEFAULT_USEC_BEHAVIOUR = EWarnBehaviour.Attack;
-            }
-            else if (side == EPlayerSide.Bear)
-            {
-                bt.Settings.FileSettings.Mind.DEFAULT_BEAR_BEHAVIOUR = sameSideHostile ? EWarnBehaviour.Attack : EWarnBehaviour.Ignore;
-                bt.Settings.FileSettings.Mind.DEFAULT_SAVAGE_BEHAVIOUR = EWarnBehaviour.Attack;
-            }
+                // botsGroup take on the values of the inital bot, attempt to prevent the group from being hostile to the player
+                bt.Settings.FileSettings.Mind.ENEMY_BY_GROUPS_PMC_PLAYERS = side != EPlayerSide.Savage ? false : true;
+                bt.Settings.FileSettings.Mind.ENEMY_BY_GROUPS_SAVAGE_PLAYERS = side == EPlayerSide.Savage ? false : true;
+
+                var oldBehaviourBear = bt.Settings.FileSettings.Mind.DEFAULT_BEAR_BEHAVIOUR;
+                var oldBehaviorUsec = bt.Settings.FileSettings.Mind.DEFAULT_USEC_BEHAVIOUR;
+                var oldBehaviorSavage = bt.Settings.FileSettings.Mind.DEFAULT_SAVAGE_BEHAVIOUR;
+
+                var old_reasons = bt.Settings.FileSettings.Mind.VALID_REASONS_TO_ADD_ENEMY;
+
+                bt.Settings.FileSettings.Mind.USE_ADD_TO_ENEMY_VALIDATION = true;
+                bt.Settings.FileSettings.Mind.VALID_REASONS_TO_ADD_ENEMY = new EBotEnemyCause[] { };
+
+                if (side == EPlayerSide.Bear)
+                {
+                    bt.Settings.FileSettings.Mind.DEFAULT_BEAR_BEHAVIOUR = sameSideHostile ? EWarnBehaviour.Attack : EWarnBehaviour.Ignore;
+                    bt.Settings.FileSettings.Mind.DEFAULT_SAVAGE_BEHAVIOUR = EWarnBehaviour.Attack;
+                }
+                else
+                {
+                    bt.Settings.FileSettings.Mind.DEFAULT_USEC_BEHAVIOUR = sameSideHostile ? EWarnBehaviour.Attack : EWarnBehaviour.Ignore;
+                    bt.Settings.FileSettings.Mind.DEFAULT_SAVAGE_BEHAVIOUR = EWarnBehaviour.Attack;
+                }
+
+                foreach (BotOwner item2 in botSpawnerClass.method_4(bt))
+                {
+                    list.Add(item2);
+                }
+                botsGroup = new BotsGroupPlayer(zn, botGame, bt, list, deadBodiesController, allPlayers, player);
+                if (_freeForAll)
+                {
+                    spawnGroups.AddNoKey(botsGroup, zn);
+                }
+                else
+                {
+                    spawnGroups.Add(zn, side, botsGroup, false);
+                }
+
+                BossPlayers.AddGroupToBoss(player, botsGroup);
+
+                // revert changes
+                bt.Settings.FileSettings.Mind.USE_ADD_TO_ENEMY_VALIDATION = false;
+                bt.Settings.FileSettings.Mind.VALID_REASONS_TO_ADD_ENEMY = old_reasons;
+                bt.Settings.FileSettings.Mind.DEFAULT_BEAR_BEHAVIOUR = oldBehaviourBear;
+                bt.Settings.FileSettings.Mind.DEFAULT_USEC_BEHAVIOUR = oldBehaviorUsec;
+                bt.Settings.FileSettings.Mind.DEFAULT_SAVAGE_BEHAVIOUR = oldBehaviorSavage;
+
+            } 
             else
             {
-                bt.Settings.FileSettings.Mind.DEFAULT_USEC_BEHAVIOUR = sameSideHostile ? EWarnBehaviour.Attack : EWarnBehaviour.Ignore;
-                bt.Settings.FileSettings.Mind.DEFAULT_SAVAGE_BEHAVIOUR = EWarnBehaviour.Attack;
-            }
+                foreach (BotOwner item2 in botSpawnerClass.method_4(bt))
+                {
+                    list.Add(item2);
+                }
+                botsGroup = new BotsGroupPlayer(zn, botGame, bt, list, deadBodiesController, allPlayers, player);
 
-            foreach (BotOwner item2 in botSpawnerClass.method_4(bt))
-            {
-                list.Add(item2);
-            }
-            botsGroup = new BotsGroupPlayer(zn, botGame, bt, list, deadBodiesController, allPlayers, player);
-            if (_freeForAll)
-            {
-                spawnGroups.AddNoKey(botsGroup, zn);
-            }
-            else
-            {
-                spawnGroups.Add(zn, side, botsGroup, false);
-            }
+                if (_freeForAll)
+                {
+                    spawnGroups.AddNoKey(botsGroup, zn);
+                }
+                else
+                {
+                    spawnGroups.Add(zn, side, botsGroup, false);
+                }
 
-            BossPlayers.AddGroupToBoss(player,botsGroup);
-
-            // revert changes
-            bt.Settings.FileSettings.Mind.USE_ADD_TO_ENEMY_VALIDATION = false;
-            bt.Settings.FileSettings.Mind.VALID_REASONS_TO_ADD_ENEMY = old_reasons;
-            bt.Settings.FileSettings.Mind.DEFAULT_BEAR_BEHAVIOUR = oldBehaviourBear;
-            bt.Settings.FileSettings.Mind.DEFAULT_USEC_BEHAVIOUR = oldBehaviorUsec;
-            bt.Settings.FileSettings.Mind.DEFAULT_SAVAGE_BEHAVIOUR = oldBehaviorSavage;
+                BossPlayers.AddGroupToBoss(player, botsGroup);
+            }
 
             return botsGroup;
         }
@@ -853,6 +874,7 @@ namespace friendlyPMC.Patches
                 {
                     profileTactic[profile.Id] = "Assist";
                 });
+                alliesCreationTask.Clear();
             }
             else 
             {
@@ -1199,6 +1221,7 @@ namespace friendlyPMC.Patches
 
             BotsControllerPatch.spawnedPlayers.Clear();
             BotsControllerPatch.followerCreationTask.Clear();
+            BotsControllerPatch.alliesCreationTask.Clear();
 
             BotsControllerPatch.Controller = null;
 

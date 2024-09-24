@@ -343,9 +343,13 @@ namespace friendlyPMC.Modules
             {
                 _followers.Remove(_follower);
                 if (player.bossGroup != null)
+                {
                     player.bossGroup.RemoveAlly(bot);
 
+                }
+
                 player.RemoveFollower(bot);
+                bot.BotFollower.BossToFollow = null;
             }
         }
 
@@ -419,8 +423,6 @@ namespace friendlyPMC.Modules
             return _groupPoints;
         }
 
-
-
         public static pitAIBossPlayer GetBoss(string name)
         {
             if(Instance  == null) return null;  
@@ -486,6 +488,7 @@ namespace friendlyPMC.Modules
                 player.bossGroup.AddEnemy(enemy, EBotEnemyCause.addPlayerToBoss);
             }
         }
+
         public static bool IsBossGroup(int id)
         {
             if (Instance == null) return false;

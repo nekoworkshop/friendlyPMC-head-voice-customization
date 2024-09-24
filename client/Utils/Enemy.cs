@@ -239,6 +239,10 @@ namespace friendlyPMC.Utils
             if (info == null)
             {
                 info = bot.EnemiesController.AddNew(bot.BotsGroup, enemy, groupInfo);
+
+                info.SetVisible(true);
+
+                bot.EnemiesController.SetInfo(enemy, info);
             }
 
             return info;
