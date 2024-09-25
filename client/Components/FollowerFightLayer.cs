@@ -500,6 +500,10 @@ namespace friendlyPMC.Components
             if(request != null && request.BotRequestType == BotRequestType.followMe && !allyTactic)
                 return new AICoreActionResultStruct<BotLogicDecision>((BotLogicDecision)CustomBotDecisions.MoveToPoint, "req:comeHere");
 
+            // go there request during fights
+            if (request != null && request.BotRequestType == BotRequestType.goToPoint && !allyTactic)
+                return new AICoreActionResultStruct<BotLogicDecision>((BotLogicDecision)CustomBotDecisions.MoveToPoint, "req:goCheck");
+
             // spread out request
             if (
                 request != null &&

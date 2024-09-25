@@ -1,5 +1,6 @@
 ﻿using EFT;
 using friendlyPMC.Components.Tactics;
+using System.Collections.Generic;
 
 namespace friendlyPMC.Components
 {
@@ -7,9 +8,34 @@ namespace friendlyPMC.Components
     {
 
         private FollowerCommonLayer commonLayer;
+
+        bool btrRegroup = false;
+        
+        List<string> regroupDecisions = new List<string>
+        {
+            "moveCloserToBoss",
+            "moveCloserToBossFast",
+            "regroupToBossFast",
+            "regroupToBoss"
+        };
+
         public FollowerAvoidDanger(BotOwner bot, int priority) : base(bot, priority)
         {
             commonLayer = new FollowerCommonLayer(bot, priority);
+        }
+
+        public override bool ShallUseNow()
+        {
+            bool use = base.ShallUseNow();
+            if (!botOwner_0.Memory.HaveEnemy && btrRegroup)
+            {
+                use = true;
+            }
+
+
+            if (use == false) btrRegroup = false;
+
+            return use;
         }
 
         public override AICoreActionResultStruct<BotLogicDecision> GetDecision()
@@ -17,12 +43,30 @@ namespace friendlyPMC.Components
 
             BotRequest request = botOwner_0.BotRequestController.CurRequest;
 
-            if(request != null && request.BotRequestType == (BotRequestType)CustomBotRequestType.Regroup)
+            if (request != null && request.BotRequestType == (BotRequestType)CustomBotRequestType.Regroup && this.botOwner_0.BewareBTR.ShallRunAway())
             {
-                return commonLayer.GetCloserToBoss(out var customNavigationPoint_0);
+                btrRegroup = true;
+                AICoreActionResultStruct<BotLogicDecision> decision = commonLayer.GetCloserToBoss(out var customNavigationPoint_0);
+                if (!regroupDecisions.Contains(decision.Reason))
+                {
+                    btrRegroup = false;
+                    request.Complete();
+                }
+                else return decision;
             }
 
             return base.GetDecision();
+        }
+
+        public override AICoreActionEndStruct ShallEndCurrentDecision(AICoreActionResultStruct<BotLogicDecision> curDecision)
+        {
+            
+            AICoreActionEndStruct result = base.ShallEndCurrentDecision(curDecision);
+            if(result.Value && regroupDecisions.Contains(curDecision.Reason))
+            {
+                btrRegroup = false;
+            }
+            return result;
         }
     }
 }

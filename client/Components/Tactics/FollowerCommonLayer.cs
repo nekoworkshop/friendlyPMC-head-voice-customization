@@ -763,9 +763,11 @@ namespace friendlyPMC.Components.Tactics
             {
                 Utils.Utils.SetTimeout(() =>
                 {
-                    if (botOwner_0 != null && !botOwner_0.IsDead && botOwner_0.BotState == EBotState.Active && request != null && request.BotRequestType == (BotRequestType)CustomBotRequestType.Regroup)
+                    BotRequest req = botOwner_0.BotRequestController.CurRequest;
+
+                    if (botOwner_0 != null && !botOwner_0.IsDead && botOwner_0.BotState == EBotState.Active && req != null && req.BotRequestType == (BotRequestType)CustomBotRequestType.Regroup)
                     {
-                        request.Complete();
+                        req.Complete();
                     }
 
                 }, 2000);

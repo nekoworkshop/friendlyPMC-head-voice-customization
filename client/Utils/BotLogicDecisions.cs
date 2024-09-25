@@ -30,7 +30,7 @@ namespace friendlyPMC.Utils
 
             // try to find a valid position within the sphere
             Vector3? finPos = null;
-            for (int i = 0; i < 50; i++) // Adjust the number of attempts as needed
+            for (int i = 0; i < 40; i++) // Adjust the number of attempts as needed
             {
                 Vector3 randomPosition = requestPos + UnityEngine.Random.insideUnitSphere * Props.bossInnerRadius;
 

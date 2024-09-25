@@ -33,7 +33,7 @@ namespace friendlyPMC.Components
         {
             if(lookedAtPlayer != null && lookedAtTime > Time.time) return lookedAtPlayer;
 
-            float shpere_FRIENDY_FIRE_SIZE = 0.5f;
+            float shpere_FRIENDY_FIRE_SIZE = 0.4f;
 
             LayerMask playerMask = LayerMaskClass.PlayerMask;
 
@@ -52,7 +52,7 @@ namespace friendlyPMC.Components
                         if (raycastHit.collider != null && raycastHit.collider.gameObject != null)
                         {
                             if (
-                                GClass301.CanShootToTarget(new ShootPointClass(raycastHit.point,1),ray.origin,LayerMaskClass.HighPolyWithTerrainMaskAI)
+                                GClass301.CanShootToTarget(new ShootPointClass(raycastHit.point,1),ray.origin,LayerMaskClass.HighPolyWithTerrainMask)
                             )
                             //if (!Physics.Linecast(ray.origin, raycastHit.point, GameWorld.LootMaskObstruction))
                             {
@@ -284,7 +284,7 @@ namespace friendlyPMC.Components
             }
             // on gesture "come here" only the bot that the player is looking at will come to the player
             // on gesture "go there", the closest bot to the user will move forward  
-            else if (gesture == EGesture.ComeToMe || (gesture == EGesture.ThatDirection && !botOwner_0.Memory.HaveEnemy))
+            else if (gesture == EGesture.ComeToMe || gesture == EGesture.ThatDirection)
             {
                 bool goThere = gesture == EGesture.ThatDirection;
 
@@ -318,7 +318,7 @@ namespace friendlyPMC.Components
                 {
                     base.method_6(data);
                 }
-            }
+            }/*
             // on gesture "go there", if bot has enemy, do a push
             else if (gesture == EGesture.ThatDirection && botOwner_0.Memory.HaveEnemy)
             {
@@ -347,21 +347,21 @@ namespace friendlyPMC.Components
                 {
                     base.method_6(data);
                 }
-            }
+            }*/
             else if (gesture == EGesture.Good)
             {
                 if (isBossCommunicating)
                 {
                     if (
                         gestusDistance <= maxGestusDistance &&
-                        IsRequesterLookingAt(botOwner_0, playerRequester) && IsClosestBot(botOwner_0, playerRequester) && 
+                        IsRequesterLookingAt(botOwner_0, playerRequester) && 
                         !botOwner_0.Memory.HaveEnemy
                         )
                     {
                         Utils.Utils.SetTimeout(() =>
                         {
                             if (botOwner_0.BotState == EBotState.Active) botOwner_0.Gesture.TryGestus(EGesture.Good,false);
-                        }, 1000);
+                        }, 500);
                     }
                     return;
                 }
@@ -1009,21 +1009,21 @@ namespace friendlyPMC.Components
                     FollowerBrain brain = botOwner_0.Brain.BaseBrain as FollowerBrain;
                     if (brain != null) brain.FakeShot(voicer.MainParts[BodyPartType.head].Position + voicer.LookDirection * 20f);
                 }
-                else if (info.phrase == EPhraseTrigger.OnSix)
+                else if (info.phrase == EPhraseTrigger.OnSix && (botLookedAt == null || botLookedAt.ProfileId == botOwner_0.ProfileId))
                 {
                     Player voicer = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(requester.ProfileId);
 
                     FollowerBrain brain = botOwner_0.Brain.BaseBrain as FollowerBrain;
                     if (brain != null) brain.FakeShot(voicer.MainParts[BodyPartType.head].Position - voicer.LookDirection * 20f);
                 }
-                else if (info.phrase == EPhraseTrigger.LeftFlank)
+                else if (info.phrase == EPhraseTrigger.LeftFlank && (botLookedAt == null || botLookedAt.ProfileId == botOwner_0.ProfileId))
                 {
                     Player voicer = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(requester.ProfileId);
 
                     FollowerBrain brain = botOwner_0.Brain.BaseBrain as FollowerBrain;
                     if (brain != null) brain.FakeShot(voicer.MainParts[BodyPartType.head].Position + Quaternion.Euler(0, -90, 0) * voicer.LookDirection * 20f);
                 }
-                else if (info.phrase == EPhraseTrigger.RightFlank)
+                else if (info.phrase == EPhraseTrigger.RightFlank && (botLookedAt == null || botLookedAt.ProfileId == botOwner_0.ProfileId))
                 {
                     Player voicer = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(requester.ProfileId);
 
