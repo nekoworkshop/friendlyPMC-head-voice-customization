@@ -1,6 +1,8 @@
 ﻿using EFT;
 using friendlyPMC.Components.Tactics;
+using friendlyPMC.Utils;
 using System.Collections.Generic;
+using static Koenigz.PerfectCulling.EFT.PerfectCullingTreePreProcess;
 
 namespace friendlyPMC.Components
 {
@@ -46,13 +48,19 @@ namespace friendlyPMC.Components
             if (request != null && request.BotRequestType == (BotRequestType)CustomBotRequestType.Regroup && this.botOwner_0.BewareBTR.ShallRunAway())
             {
                 btrRegroup = true;
-                AICoreActionResultStruct<BotLogicDecision> decision = commonLayer.GetCloserToBoss(out var customNavigationPoint_0);
-                if (!regroupDecisions.Contains(decision.Reason))
+                Utils.Utils.SetTimeout(() =>
                 {
-                    btrRegroup = false;
-                    request.Complete();
-                }
-                else return decision;
+                    BotRequest req = botOwner_0.BotRequestController.CurRequest;
+
+                    if (botOwner_0 != null && !botOwner_0.IsDead && botOwner_0.BotState == EBotState.Active && req != null && req.BotRequestType == (BotRequestType)CustomBotRequestType.Regroup)
+                    {
+                        btrRegroup = false;
+                        req.Complete();
+                    }
+
+                }, 2000);
+
+                return BotLogicDecisions.RegroupToBoss(botOwner_0);
             }
 
             return base.GetDecision();

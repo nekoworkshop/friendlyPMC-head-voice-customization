@@ -125,7 +125,17 @@ namespace friendlyPMC.Components
                     return new AICoreActionResultStruct<BotLogicDecision>((BotLogicDecision)CustomBotDecisions.MoveToPoint, "req:comeHere");
 
                 case (BotRequestType)CustomBotRequestType.Regroup:
-                    return commonLayer.GetCloserToBoss(out var customNavigationPoint_1);
+                    Utils.Utils.SetTimeout(() =>
+                    {
+                        BotRequest req = botOwner_0.BotRequestController.CurRequest;
+
+                        if (botOwner_0 != null && !botOwner_0.IsDead && botOwner_0.BotState == EBotState.Active && req != null && req.BotRequestType == (BotRequestType)CustomBotRequestType.Regroup)
+                        {
+                            req.Complete();
+                        }
+
+                    }, 2000);
+                    return BotLogicDecisions.RegroupToBoss(botOwner_0);
 
                 // stay in place
                 case BotRequestType.wait:

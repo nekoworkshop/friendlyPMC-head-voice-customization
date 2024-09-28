@@ -1,5 +1,5 @@
 -- === 3.8 === ---:
-- x - improve run to heal:
+- x - improve run to heal
 - x - improve Assist tactic to be less aggressive
 - x - add Guard Tactic
 - x - cancel on going requests when running to heal
@@ -17,22 +17,31 @@
 - x - dog fight seems to semi-crouch the bot, see if you can make them aim and shoot while standing
 - x - add look direction commands
 
-- #inrogress - make bots obey "regroup" call when BTR is close
+- #inprogress - make bots obey "regroup" call when BTR is close
 
 - x - add "spreadout" command
 - x - make bot auto aquire enemy is he is speaking too close
 
-- x - make bot go in search mode if player is looking down at a maxim 25m distance
+- #inprogress - make bot go in search mode if player is looking down at a maxim 25m distance
+- - should be done while in combat also
+
+- revamp holder tactic to stop having them check for position if player is not moving and for them to stay in place if no cover is found
 
 - x - bots in assist mode to turn hostile if your shoot them (turning hostile can be done through BotMemoryClass > method_7)
 
 - x - keep combat layer on while bot is healing even if enemy dies
 
+- x - make squad's equipment not lootable
+
 -- === 3.9 === ---:
+
+
+
+- add detection for when enemy is about to engage the player or any teamember (patch SET EnemyInfo.IsVisible and check if the enemy is a teammate and the distance is close enough for engagement)
+- - this detection will affect decisions of bots in hold mode who are not already active doing something
+
 - see if we can make bot swap weapons when asked to loot (DeadBodyWork)
 - see if we can prevent questing bots from affecting followers the same way we do with looting
-
-- add "lock squad equipment" option
 
 - fix glitchy behavior of boss followers
 - goons send messages at the end of the raid
@@ -42,7 +51,7 @@
 - make BigPipe fight tactic unique (Assault Supporter) 
 - make BirdEye fight tactic more unique (Enhanced Marskman)
 - make Knight fight tactic unique (Assaulter)
-- lock the new tactics under the goons challenge 
+- lock the new tactics under the goons challenge
 
 --- ==== 4.0.0 (final phase) ==== ---:
 - add squad management terminal
@@ -52,18 +61,25 @@
 ==================================================================================
 RELEASE NOTES (3.8):
 - removed "Player Equipment" as option for equipment for bots. When clonning player equipment people have reported to have delays in spawn. Because you can simply save your current equipment as a preset loadout - this is removed and you can use that instead. Also I encourge using custom presets that you personally made for bots because people tend to put the meds in the secure container of their own equipment, not realizing that will get deleted and ammo will be put instead for the bots to use. It will also not be there in the end when followers use the equipment you give them instead of clonning it. 
-- added a new tactic - Guard who prioritizes to eliminate the treat quick and will try to get between player and the enemy when player is under attack
+- added a new tactic - Guard
 - bots can now be called to your position when BTR is nearby. As part of the game logic, bots hide when BTR is around so they don't get ran over. But this also makes them no longer follow you until BTR leaves the area. Now you can call them to your position to get them out of BTR radius.
 - made "Spread Out" command functional. Bot will run towards some cover when this is executed.
 - updated "Contact" command to now take into consideration any visible part of the enemy instead of just the head and torso
-- "That Direction" has a new function when out of combat. You can look at something, maximum 25 m distance,  and do the gesture. This is will make the bot to go there to investigate.
+- all direction commands are now functional (under ENEMY STATUS)
+- "That Direction" has a new function. You can look at something, maximum 25 m distance,  and do the gesture. This is will make the nearest bot to go there to investigate.
+- "Holder" tactic has been revamp to stop bots from continously checking for where to place themselves while the player is not moving. 
+- scav followers and picked up followers will turn hostile on friendly fire
+- added detection for when enemy is about to engage the player or any teamember
 - some improvements on the cover search logic in an effort to reduce the situations where bots end up running in a wall
+- you can no longer loot your squad's equipment
 - improved awareness
 - some bug fixes
 
-Personal Notes:
 
 ==================================================================================
+NOTES:
+- we can save a bot's profile after it was generated in order to be re-used by simply sending the profile to BE. We should save it by nickname. (we still need to figure out how to progress the bot's level with the player )
+
 REVISIT:
  - fix looting animation for loot on the ground
  - error in LookSensor

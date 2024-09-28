@@ -351,13 +351,13 @@ namespace friendlyPMC.Utils
             NavMeshPath mesh = new NavMeshPath();
 
             // Try to find a valid position within the sphere
-            List<Vector3> positions = new List<Vector3>();
+            //List<Vector3> positions = new List<Vector3>();
 
-            for (int i = 0; i < 100; i++) // Adjust the number of attempts as needed
+            for (int i = 0; i < 20; i++) // Adjust the number of attempts as needed
             {
                 Vector3 randomPosition = targetPosition + UnityEngine.Random.insideUnitSphere * maxRadius;
                 if (randomPosition == Vector3.zero) continue;
-                if (positions.Contains(randomPosition)) continue;
+                //if (positions.Contains(randomPosition)) continue;
 
                 NavMeshHit navMeshHit;
 

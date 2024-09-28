@@ -454,17 +454,27 @@ namespace friendlyPMC.Patches
                 {
                     foreach (EquipmentSlot slotType in Enum.GetValues(typeof(EquipmentSlot)))
                     {
-                        Slot cloneSlot = profileEquipment[profile.Id].GetSlot(slotType);
-                        Item contained = cloneSlot.ContainedItem;
+                        if (slotType == EquipmentSlot.Dogtag) continue;
+
 
                         Slot botSlot = profile.Inventory.Equipment.GetSlot(slotType);
+
+                        if(botSlot.IsSpecial) continue;
+
+                        Slot cloneSlot = profileEquipment[profile.Id].GetSlot(slotType);
+                        Item contained = cloneSlot.ContainedItem;
 
                         botSlot.RemoveItem();
 
                         if (contained != null)
                         {
                             contained.CurrentAddress = null;
+                            contained.Template.Unlootable = true;
+                            contained.Template.UnlootableFromSlot = botSlot.ID;
+                            //Modules.Logger.LogInfo(" botSlot " + botSlot.ToString() + " " + botSlot.Name + " " + botSlot.ID);
+                            contained.Template.UnlootableFromSide = EPlayerSideMask.All;
                             botSlot.AddWithoutRestrictions(contained);
+
                         }
                     }
                     // - restore original secure container

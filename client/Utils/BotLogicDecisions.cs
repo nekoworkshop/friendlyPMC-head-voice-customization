@@ -30,7 +30,7 @@ namespace friendlyPMC.Utils
 
             // try to find a valid position within the sphere
             Vector3? finPos = null;
-            for (int i = 0; i < 40; i++) // Adjust the number of attempts as needed
+            for (int i = 0; i < 11; i++) // Adjust the number of attempts as needed
             {
                 Vector3 randomPosition = requestPos + UnityEngine.Random.insideUnitSphere * Props.bossInnerRadius;
 
@@ -38,7 +38,7 @@ namespace friendlyPMC.Utils
 
                 if (!NavMesh.SamplePosition(randomPosition, out navMeshHit, 10f, -1)) continue;
 
-                if (!Covers.IsNavigablePoint(bot.GetPlayer.Transform.position, navMeshHit.position, 150f, mesh)) continue;
+                //if (!Covers.IsNavigablePoint(bot.GetPlayer.Transform.position, navMeshHit.position, 150f, mesh)) continue;
                 if (!finPos.HasValue)
                 {
                     finPos = navMeshHit.position;
