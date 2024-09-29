@@ -22,7 +22,7 @@
 - x - add "spreadout" command
 - x - make bot auto aquire enemy is he is speaking too close
 
-- #inprogress - make bot go in search mode if player is looking down at a maxim 25m distance
+- x - make bot go in search mode if player is looking down at a maxim 25m distance
 - - should be done while in combat also
 
 - x - revamp holder tactic to stop having them check for position if player is not moving and for them to stay in place if no cover is found
@@ -32,25 +32,6 @@
 - x - keep combat layer on while bot is healing even if enemy dies
 
 - x - make squad's equipment not lootable
-
-- investigate GetClosestSafeCoverPoint throwing error:
-[Error  :friendlyPMC] AIAgent Error
-[Error  :friendlyPMC] System.NullReferenceException
-  at (wrapper managed-to-native) UnityEngine.Transform.get_position_Injected(UnityEngine.Transform,UnityEngine.Vector3&)
-  at UnityEngine.Transform.get_position () [0x00000] in <ca21460feb9c47d0ac337b9893474cc6>:0 
-  at EFT.BifacialTransform.get_position () [0x00023] in <a5b6eaefee6842aba73e4a77ea14a564>:0 
-  at friendlyPMC.Components.Tactics.FollowerCommonLayer+<>c__DisplayClass79_0.<GetClosestSafeCoverPoint>b__0 (CustomNavigationPoint pt) [0x0005b] in <195376ed497c40f79bc89a079d58e88c>:0 
-  at friendlyPMC.Utils.Covers.ClosestPoint (System.Int32 botOwnerId, UnityEngine.Vector3 botPosition, UnityEngine.Vector3 centerPosition, System.Collections.Generic.List`1[T] areaPoints, System.Func`2[T,TResult] eligibleCheck, System.Single safeDistance, UnityEngine.Vector3[] dangerPositions) [0x00077] in <195376ed497c40f79bc89a079d58e88c>:0 
-  at friendlyPMC.Components.Tactics.FollowerCommonLayer.GetClosestSafeCoverPoint (UnityEngine.Vector3 centerPosition, System.Single safeDistance) [0x000aa] in <195376ed497c40f79bc89a079d58e88c>:0 
-  at friendlyPMC.Components.Tactics.FollowerCommonLayer.NeedHeal (CustomNavigationPoint& navpoint) [0x001ee] in <195376ed497c40f79bc89a079d58e88c>:0 
-  at friendlyPMC.Components.FollowerFightLayer.GetDecision () [0x001ab] in <195376ed497c40f79bc89a079d58e88c>:0 
-  at AICoreLayerClass[T].Update (System.Nullable`1[T] prevDecision) [0x00051] in <a5b6eaefee6842aba73e4a77ea14a564>:0 
-  at DrakiaXYZ.BigBrain.Patches.BotBaseBrainUpdatePatch.PatchPrefix (System.Object __instance, AICoreActionResultStruct[T] prevResult, System.Nullable`1[AICoreActionResultStruct[BotLogicDecision]]& __result) [0x000b3] in <cea332baa1f944129bdf670704b05bbd>:0 
-  at (wrapper dynamic-method) AICoreStrategyAbstractClass[BotLogicDecision].DMD<AICoreStrategyAbstractClass[[BotLogicDecision, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]]::Update>(AICoreStrategyAbstractClass<BotLogicDecision>,AICoreActionResultStruct<BotLogicDecision>)
-  at (wrapper dynamic-method) MonoMod.Utils.DynamicMethodDefinition.Glue:ThiscallStructRetPtr<AICoreStrategyAbstractClass[[BotLogicDecision, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]]::Update,DMD<AICoreStrategyAbstractClass[[BotLogicDecision, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]]::Update>>(AICoreStrategyAbstractClass<BotLogicDecision>,System.Nullable`1<AICoreActionResultStruct<BotLogicDecision>>&,AICoreActionResultStruct<BotLogicDecision>)
-  at DrakiaXYZ.BigBrain.Patches.BotAgentUpdatePatch.PatchPrefix (System.Object __instance) [0x00032] in <cea332baa1f944129bdf670704b05bbd>:0 
-  at (wrapper dynamic-method) AICoreAgentClass[BotLogicDecision].DMD<AICoreAgentClass[[BotLogicDecision, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]]::Update>(AICoreAgentClass<BotLogicDecision>)
-  at friendlyPMC.Components.FollowerAIAgent`1[T].Update () [0x00002] in <195376ed497c40f79bc89a079d58e88c>:0 
 
 -- === 3.9 === ---:
 

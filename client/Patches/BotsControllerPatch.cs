@@ -469,9 +469,8 @@ namespace friendlyPMC.Patches
                         if (contained != null)
                         {
                             contained.CurrentAddress = null;
-                            contained.Template.Unlootable = true;
+                            //contained.Template.Unlootable = true;
                             contained.Template.UnlootableFromSlot = botSlot.ID;
-                            Modules.Logger.LogInfo(" botSlot " + botSlot.ToString() + " " + botSlot.Name + " " + botSlot.ID);
                             contained.Template.UnlootableFromSide = EPlayerSideMask.All;
                             try
                             {

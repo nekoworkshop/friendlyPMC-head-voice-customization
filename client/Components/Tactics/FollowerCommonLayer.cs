@@ -464,16 +464,24 @@ namespace friendlyPMC.Components.Tactics
             pitAIBossPlayer boss = botOwner_0.BotFollower.HaveBoss ?  botOwner_0.BotFollower.BossToFollow as pitAIBossPlayer : null;
             List<CustomNavigationPoint> areaCovers = boss != null ? boss.GetAreaCovers() : BossPlayers.GetAICovers();
 
-            CustomNavigationPoint point = Covers.ClosestPoint(botOwner_0.Id, botPosition, centerPosition, areaCovers, (CustomNavigationPoint pt) => {
+            CustomNavigationPoint point = Covers.ClosestPoint(botOwner_0.Id, botPosition, centerPosition, areaCovers, (CustomNavigationPoint pt) =>
+            {
                 bool good = true;
                 // should not be seen by any enemy
-                foreach (var enemy in botOwner_0.EnemiesController.EnemyInfos)
+                try
                 {
-                    if (enemy.Value.Person.HealthController.IsAlive && pt.CanIHideFromPos(10f,true,false, enemy.Value.Person.Transform.position))
+                    foreach (var enemy in botOwner_0.EnemiesController.EnemyInfos)
                     {
-                        good = false;
+                        if (enemy.Value.Person.HealthController.IsAlive && pt.CanIHideFromPos(10f, true, false, enemy.Value.Person.Transform.position))
+                        {
+                            good = false;
+                        }
                     }
                 }
+                catch
+                { 
+                    // some unknown error can happen on getting enemy position
+                } 
 
                 if (good)
                 {

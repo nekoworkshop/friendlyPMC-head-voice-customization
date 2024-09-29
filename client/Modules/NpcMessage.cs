@@ -169,6 +169,7 @@ namespace friendlyPMC.Modules
 
         public static void Dispose()
         {
+            if (Instance == null) return;
             Instance._npcs.Clear();
             Instance = null;
         }
