@@ -37,6 +37,10 @@
     <Reference Include="ConfigurationManager">
       <HintPath>E:\Aki-Streets\BepInEx\plugins\spt\ConfigurationManager.dll</HintPath>
     </Reference>
+    <Reference Include="ItemTemplate.Types, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\XboxGames\AKI-Streets-3.9\EscapeFromTarkov_Data\Managed\ItemTemplate.Types.dll</HintPath>
+    </Reference>
     <Reference Include="spt-custom">
       <HintPath>..\..\..\XboxGames\AKI-Streets-3.9\BepInEx\plugins\spt\spt-custom.dll</HintPath>
     </Reference>

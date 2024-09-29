@@ -109,8 +109,6 @@ namespace friendlyPMC.Actions
         public override bool CanRequest(BotOwner owner)
         {
 
-            if (owner.Memory.HaveEnemy) return false;
-
             return true;
         }
 

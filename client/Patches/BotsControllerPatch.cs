@@ -471,8 +471,17 @@ namespace friendlyPMC.Patches
                             contained.CurrentAddress = null;
                             contained.Template.Unlootable = true;
                             contained.Template.UnlootableFromSlot = botSlot.ID;
-                            //Modules.Logger.LogInfo(" botSlot " + botSlot.ToString() + " " + botSlot.Name + " " + botSlot.ID);
+                            Modules.Logger.LogInfo(" botSlot " + botSlot.ToString() + " " + botSlot.Name + " " + botSlot.ID);
                             contained.Template.UnlootableFromSide = EPlayerSideMask.All;
+                            try
+                            {
+                                var components = AccessTools.Field(typeof(Item), "Components").GetValue(contained) as List<IItemComponent>;
+                                components.Add(new UnlootableComponent(contained, contained.Template));
+                            }
+                            catch (Exception ex)
+                            {
+                                Modules.Logger.LogError(ex.ToString());
+                            }
                             botSlot.AddWithoutRestrictions(contained);
 
                         }
