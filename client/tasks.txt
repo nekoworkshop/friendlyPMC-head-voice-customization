@@ -17,31 +17,35 @@
 - x - dog fight seems to semi-crouch the bot, see if you can make them aim and shoot while standing
 - x - add look direction commands
 
-- #inprogress - make bots obey "regroup" call when BTR is close
+- x - make bots obey "regroup" call when BTR is close
 
 - x - add "spreadout" command
 - x - make bot auto aquire enemy is he is speaking too close
 
 - x - make bot go in search mode if player is looking down at a maxim 25m distance
-- - should be done while in combat also
-
-- x - revamp holder tactic to stop having them check for position if player is not moving and for them to stay in place if no cover is found
+- x - - should be done while in combat also
 
 - x - bots in assist mode to turn hostile if your shoot them (turning hostile can be done through BotMemoryClass > method_7)
 
 - x - keep combat layer on while bot is healing even if enemy dies
 
-- x - make squad's equipment not lootable
+- x - revamp holder tactic to stop having them check for position if player is not moving and for them to stay in place if no cover is found
+- x - see bug with them not moving even when under attack - they should try to cover
+
+- shortcut keys for contact and status seem to revert to F13
+
 
 -- === 3.9 === ---:
-
-
 
 - add detection for when enemy is about to engage the player or any teamember (patch SET EnemyInfo.IsVisible and check if the enemy is a teammate and the distance is close enough for engagement)
 - - this detection will affect decisions of bots in hold mode who are not already active doing something
 
+- see if we can use SAIN door checker
+
 - see if we can make bot swap weapons when asked to loot (DeadBodyWork)
 - see if we can prevent questing bots from affecting followers the same way we do with looting
+
+-  when using custom equipment, take consumables from player. Detect if player does not have them and skip them. At the end of raid the consumables in the player's stash should update to the consumed ammount
 
 - fix glitchy behavior of boss followers
 - goons send messages at the end of the raid
@@ -69,7 +73,6 @@ RELEASE NOTES (3.8):
 - "That Direction" has a new function. You can look at something, maximum 25 m distance,  and do the gesture. This is will make the nearest bot to go there to investigate.
 - "Holder" tactic has been revamp to stop bots from continously checking for where to place themselves while the player is not moving. 
 - scav followers and picked up followers will turn hostile on friendly fire
-- added detection for when enemy is about to engage the player or any teamember
 - some improvements on the cover search logic in an effort to reduce the situations where bots end up running in a wall
 - you can no longer loot your squad's equipment
 - improved awareness
@@ -85,6 +88,10 @@ REVISIT:
  - error in LookSensor
  - enemy marker when zooming, seems deep calculations must be made against the camera optics
  - add unstuck checks (check if bot is running in place and try to unstuck him)
+ - make squad's equipment not lootable
+ - - make gun parts unremovable
+ - - make armor parts unremovable
+ - - make helmet parts unremovable
 
 FUTURE IDEAS:
  - BirEye auto marks enemies as he sees them (enhanced Marskman)

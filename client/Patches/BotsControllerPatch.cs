@@ -1,9 +1,11 @@
 ﻿using SPT.Reflection.Patching;
 using Cysharp.Threading.Tasks;
 using EFT;
+
 using friendlyPMC.Actions;
 using friendlyPMC.Components;
 using friendlyPMC.Modules;
+
 using HarmonyLib;
 using System;
 using System.Collections.Generic;
@@ -21,8 +23,6 @@ using System.Linq;
 using IProfileData = GClass592;
 using ProfileEndPoint = ProfileEndpointFactoryAbstractClass;
 using BotCreator = GClass814;
-using static Struct450;
-using System.Security.Policy;
 
 namespace friendlyPMC.Patches
 {
@@ -462,6 +462,9 @@ namespace friendlyPMC.Patches
                         if(botSlot.IsSpecial) continue;
 
                         Slot cloneSlot = profileEquipment[profile.Id].GetSlot(slotType);
+
+                        if(cloneSlot.IsSpecial) continue;
+
                         Item contained = cloneSlot.ContainedItem;
 
                         botSlot.RemoveItem();
@@ -469,19 +472,38 @@ namespace friendlyPMC.Patches
                         if (contained != null)
                         {
                             contained.CurrentAddress = null;
-                            //contained.Template.Unlootable = true;
-                            contained.Template.UnlootableFromSlot = botSlot.ID;
-                            contained.Template.UnlootableFromSide = EPlayerSideMask.All;
-                            try
+                            
+                            // - prevent player from looting the main equipment
+                            /*if(slotType != EquipmentSlot.Pockets && !contained.Template.Unlootable)
                             {
-                                var components = AccessTools.Field(typeof(Item), "Components").GetValue(contained) as List<IItemComponent>;
-                                components.Add(new UnlootableComponent(contained, contained.Template));
-                            }
-                            catch (Exception ex)
-                            {
-                                Modules.Logger.LogError(ex.ToString());
-                            }
+                                //contained.Template.Unlootable = true;
+                                contained.Template.UnlootableFromSlot = botSlot.ID;
+                                contained.Template.UnlootableFromSide = EPlayerSideMask.All;
+                                try
+                                {
+                                    var components = AccessTools.Field(typeof(Item), "Components").GetValue(contained) as List<IItemComponent>;
+                                    components.Add(new UnlootableComponent(contained, contained.Template));
+
+                                }
+                                catch (Exception ex)
+                                {
+                                    Modules.Logger.LogError(ex.ToString());
+                                }
+                                
+                            }*/
+
                             botSlot.AddWithoutRestrictions(contained);
+
+                            /*if(slotType == EquipmentSlot.FirstPrimaryWeapon || slotType == EquipmentSlot.SecondPrimaryWeapon || slotType == EquipmentSlot.Holster || slotType == EquipmentSlot.ArmorVest || slotType == EquipmentSlot.Headwear)
+                            {
+                                foreach(var it in contained.GetAllItems())
+                                {
+                                    if(!it.IsUnremovable)
+                                    {
+                                        ItemPatch.Items.Add(it.Id);
+                                    }
+                                }
+                            }*/
 
                         }
                     }
@@ -495,6 +517,34 @@ namespace friendlyPMC.Patches
                     }
 
                 }
+                // else just prevent player from looting the main equipment
+                /*else
+                {
+                    foreach (EquipmentSlot slotType in Enum.GetValues(typeof(EquipmentSlot)))
+                    {
+                        if (slotType == EquipmentSlot.Dogtag || slotType == EquipmentSlot.SecuredContainer || slotType == EquipmentSlot.Pockets) continue;
+
+                        Slot botSlot = profile.Inventory.Equipment.GetSlot(slotType);
+                        
+                        if(botSlot.IsSpecial) continue;
+
+                        Item contained = botSlot.ContainedItem;
+                        if (contained != null && !contained.Template.Unlootable)
+                        {
+                            contained.Template.UnlootableFromSlot = botSlot.ID;
+                            contained.Template.UnlootableFromSide = EPlayerSideMask.All;
+                            try
+                            {
+                                var components = AccessTools.Field(typeof(Item), "Components").GetValue(contained) as List<IItemComponent>;
+                                components.Add(new UnlootableComponent(contained, contained.Template));
+                            }
+                            catch (Exception ex)
+                            {
+                                Modules.Logger.LogError(ex.ToString());
+                            }
+                        }
+                    }
+                }*/
 
                 // followers should use the same groupID as the player
                 profile.Info.GroupId = player.realPlayer.GroupId;
@@ -1255,6 +1305,8 @@ namespace friendlyPMC.Patches
             BaseLocalGameVmethod4Patch.squadSpawned = false;
 
             LocalGameCtorPatch.Instance = null;
+
+            ItemPatch.Items.Clear();
 
             Logger.LogInfo("Raid Ended");
 

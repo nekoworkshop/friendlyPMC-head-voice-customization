@@ -98,7 +98,7 @@ namespace friendlyPMC.Actions
 
             if (!_init) Init();
 
-            //if(!wasHit) botOwner_0.LookData.SetLookPointByHearing(null);
+            botOwner_0.DoorOpener.Update();
 
             if (this.float_3 < Time.time)
             {

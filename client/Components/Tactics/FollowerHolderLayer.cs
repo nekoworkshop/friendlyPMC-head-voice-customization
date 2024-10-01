@@ -69,7 +69,7 @@ namespace friendlyPMC.Components.Tactics
             // If the bot is already in cover
             if (botOwner_0.Memory.IsInCover)
             {
-                // If the enemy is visible and can be shot, shoot from cover
+                // - if the enemy is visible and can be shot, shoot from cover
                 if (enemyVisible && (botOwner_0.Memory.CurCustomCoverPoint.CanIShootToEnemy || botOwner_0.Memory.GoalEnemy.CanShoot))
                 {
                     if (botOwner_0.Memory.CurCustomCoverPoint.CanIShootToEnemy)
@@ -78,7 +78,7 @@ namespace friendlyPMC.Components.Tactics
                         return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.shootFromPlace, "shootEnemy");
 
                 }
-                // Else check if the bot needs to get close to the boss
+                // - else check if the bot needs to get close to the boss
                 if (ShallGoNearBoss())
                 {
                     customNavigationPoint_0 = commonLayer.GetClosestCoverPointGroup(interestPosition, commonLayer.coverSearchRadius);
@@ -91,11 +91,31 @@ namespace friendlyPMC.Components.Tactics
                             return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "regroupToBossFast");
                     }
                 }
-                // Otherwise, hold position
+                // - else, hold position
                 return commonLayer.HoldPositionFor(GClass761.Random(2f, 3f), "holdPositionInCover");
+
+            } 
+            else if(enemyVisible)
+            {
+            // else if can engage enemy, start fight
+                AICoreActionResultStruct<BotLogicDecision>? aicoreActionResultStruct = commonLayer.DogFight(out customNavigationPoint_0);
+                if (aicoreActionResultStruct.HasValue) 
+                    return aicoreActionResultStruct.Value;
+            // else retreat
+                else
+                {
+                    customNavigationPoint_0 = commonLayer.GetClosestCoverPoint(botPosition, commonLayer.coverSearchRadius);
+                    if (customNavigationPoint_0 != null)
+                    {
+                        if (commonLayer.GetNavDistance(customNavigationPoint_0.Position) < commonLayer.sprintDistance)
+                            return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMoving, "backOff");
+                        else
+                            return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "moveToCover");
+                    }
+                }
             }
 
-            // If the bot is not in cover, find the closest cover and move to it
+            // if the bot is not in cover, find the closest cover and move to it
             if (commonLayer.HasBoss() && commonLayer.coverType == "close")
             {
                 customNavigationPoint_0 = commonLayer.GetClosestCoverPointGroup(interestPosition, commonLayer.coverSearchRadius);
@@ -120,7 +140,7 @@ namespace friendlyPMC.Components.Tactics
                 return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "moveToCover");
             }
 
-            // fallback decision if no cover is found
+            // final fallback decision
             return commonLayer.HoldPositionFor(GClass761.Random(2f, 3f), "holdPositionInCover");
         }
 
