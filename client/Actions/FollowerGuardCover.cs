@@ -61,15 +61,11 @@ namespace friendlyPMC.Actions
                 List<CustomNavigationPoint> areaCovers = botOwner_0.BotFollower.HaveBoss ? (botOwner_0.BotFollower.BossToFollow as pitAIBossPlayer).GetAreaCovers() : new List<CustomNavigationPoint>();
 
                 // get closest attack point from the bot's position
-                CustomNavigationPoint Spot = Utils.Covers.GetClosestAttackCoverPoint(
-                    botOwner_0.Id,
+                CustomNavigationPoint Spot = Utils.Covers.GetClosestShootCover(
+                    botOwner_0,
                     botPosition,
-                    botPosition,
-                    enemySpot,
-                    areaCovers,
                     5f,
-                    150f,
-                    carePosition
+                    150f
                 );
 
                 if (Spot != null)
@@ -83,10 +79,20 @@ namespace friendlyPMC.Actions
                 _actionsQueue.Enqueue(() =>
                 {
                     // else get the next cover between the boss and the enemy
-                    CustomNavigationPoint Spot2 = Utils.Covers.GetClosestCoverPointBetween(
+                    CustomNavigationPoint Spot2 = /*Utils.Covers.GetClosestCoverPointBetween(
                         botOwner_0,
                         protectBoss ? bossPos : enemySpot,
                         enemySpot
+                    );
+                    */Utils.Covers.GetClosestShootCover(
+                        botOwner_0,
+                        protectBoss ? bossPos : botPosition,
+                        5f,
+                        150f,
+                        point =>
+                        {
+                            return Utils.Covers.IsPointBetween(point.Position, botPosition, enemySpot);
+                        }
                     );
 
                     if (Spot2 != null)
@@ -149,11 +155,7 @@ namespace friendlyPMC.Actions
                                         areaCovers,
                                         30f,
                                         5f,
-                                        carePosition,
-                                        (CustomNavigationPoint point)=>{
-                                            if(!GClass326.IsDangerPositionFarEnough(point.Position, new Vector3[]{ bossPos }, 0.5f * 0.5f)) return false;
-                                            return true;
-                                        }
+                                        carePosition
                                     );
 
                                     if (Spot5 != null)

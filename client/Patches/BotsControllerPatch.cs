@@ -282,7 +282,7 @@ namespace friendlyPMC.Patches
             // process backend result
             await Singleton<PoolManager>.Instance.LoadBundlesAndCreatePools(PoolManager.PoolsCategory.Raid, PoolManager.AssemblyType.Local, profile.GetAllPrefabPaths(false).ToArray<ResourceKey>(), JobPriority.General, null, PoolManager.DefaultCancellationToken);
 
-            Logger.LogInfo("Generated Follower Profile " + profile.Nickname + " with level " + profile.Info.Level);
+            Modules.Logger.LogInfo("Generated Follower Profile " + profile.Nickname + " with level " + profile.Info.Level);
 
             return profile;
         }
@@ -409,8 +409,8 @@ namespace friendlyPMC.Patches
             }
             catch (Exception ex)
             {
-                Logger.LogError("Failed to set squad equipment for a bot");
-                Logger.LogError(ex);
+                Modules.Logger.LogError("Failed to set squad equipment for a bot");
+                Modules.Logger.LogError(ex);
             }
 
             // gather what equipment bundles this bot needs to wait for
@@ -430,7 +430,7 @@ namespace friendlyPMC.Patches
                 }
             }
 
-            Logger.LogInfo("Fetching preset assets...");
+            Modules.Logger.LogInfo("Fetching preset assets...");
             try
             {
                 if(bundleTasks.Count > 0) 
@@ -438,12 +438,12 @@ namespace friendlyPMC.Patches
             }
             catch (Exception ex)
             {
-                Logger.LogError("Failed to use custom preset, will fall back to default loadout");
-                Logger.LogError(ex);
+                Modules.Logger.LogError("Failed to use custom preset, will fall back to default loadout");
+                Modules.Logger.LogError(ex);
             }
 
 
-            Logger.LogInfo("Preset assets fetched");
+            Modules.Logger.LogInfo("Preset assets fetched");
 
             
             foreach (var item in profiles)
@@ -472,38 +472,8 @@ namespace friendlyPMC.Patches
                         if (contained != null)
                         {
                             contained.CurrentAddress = null;
-                            
-                            // - prevent player from looting the main equipment
-                            /*if(slotType != EquipmentSlot.Pockets && !contained.Template.Unlootable)
-                            {
-                                //contained.Template.Unlootable = true;
-                                contained.Template.UnlootableFromSlot = botSlot.ID;
-                                contained.Template.UnlootableFromSide = EPlayerSideMask.All;
-                                try
-                                {
-                                    var components = AccessTools.Field(typeof(Item), "Components").GetValue(contained) as List<IItemComponent>;
-                                    components.Add(new UnlootableComponent(contained, contained.Template));
-
-                                }
-                                catch (Exception ex)
-                                {
-                                    Modules.Logger.LogError(ex.ToString());
-                                }
-                                
-                            }*/
 
                             botSlot.AddWithoutRestrictions(contained);
-
-                            /*if(slotType == EquipmentSlot.FirstPrimaryWeapon || slotType == EquipmentSlot.SecondPrimaryWeapon || slotType == EquipmentSlot.Holster || slotType == EquipmentSlot.ArmorVest || slotType == EquipmentSlot.Headwear)
-                            {
-                                foreach(var it in contained.GetAllItems())
-                                {
-                                    if(!it.IsUnremovable)
-                                    {
-                                        ItemPatch.Items.Add(it.Id);
-                                    }
-                                }
-                            }*/
 
                         }
                     }
@@ -517,34 +487,6 @@ namespace friendlyPMC.Patches
                     }
 
                 }
-                // else just prevent player from looting the main equipment
-                /*else
-                {
-                    foreach (EquipmentSlot slotType in Enum.GetValues(typeof(EquipmentSlot)))
-                    {
-                        if (slotType == EquipmentSlot.Dogtag || slotType == EquipmentSlot.SecuredContainer || slotType == EquipmentSlot.Pockets) continue;
-
-                        Slot botSlot = profile.Inventory.Equipment.GetSlot(slotType);
-                        
-                        if(botSlot.IsSpecial) continue;
-
-                        Item contained = botSlot.ContainedItem;
-                        if (contained != null && !contained.Template.Unlootable)
-                        {
-                            contained.Template.UnlootableFromSlot = botSlot.ID;
-                            contained.Template.UnlootableFromSide = EPlayerSideMask.All;
-                            try
-                            {
-                                var components = AccessTools.Field(typeof(Item), "Components").GetValue(contained) as List<IItemComponent>;
-                                components.Add(new UnlootableComponent(contained, contained.Template));
-                            }
-                            catch (Exception ex)
-                            {
-                                Modules.Logger.LogError(ex.ToString());
-                            }
-                        }
-                    }
-                }*/
 
                 // followers should use the same groupID as the player
                 profile.Info.GroupId = player.realPlayer.GroupId;
@@ -594,7 +536,7 @@ namespace friendlyPMC.Patches
 
             }
 
-            Logger.LogInfo("Return bot data");
+            Modules.Logger.LogInfo("Return follower profile data");
 
             return profiles;
 
@@ -838,8 +780,8 @@ namespace friendlyPMC.Patches
                             }
                             catch (Exception ex)
                             {
-                                Logger.LogError("Failed to add " + me.Profile.Nickname + " as ally");
-                                Logger.LogError(ex);
+                                Modules.Logger.LogError("Failed to add " + me.Profile.Nickname + " as ally");
+                                Modules.Logger.LogError(ex);
                             }
                         });
 
@@ -855,7 +797,7 @@ namespace friendlyPMC.Patches
 
                         botSpawnerClass.method_10(owner, bot, new Action<BotOwner>((BotOwner follower) =>
                         {
-                            Logger.LogInfo("Ally " + follower.Profile.Nickname + " spawned");
+                            Modules.Logger.LogInfo("Ally " + follower.Profile.Nickname + " spawned");
 
                             Utils.Utils.SetTimeout(() =>
                             {
@@ -919,7 +861,7 @@ namespace friendlyPMC.Patches
                 type = WildSpawnType.assault;
             }
 
-            Logger.LogInfo("Spawn Followers");
+            Modules.Logger.LogInfo("Spawn Followers");
 
             int memberCount = friendlyPMC.squadSize.Value;
 
@@ -972,6 +914,24 @@ namespace friendlyPMC.Patches
                             // - set what tactic this follower will have
                             if (tactic != null && tactic != availableTactics[0])
                             {
+                                // 51
+                                //@TODO : adjust these values based on bot's level
+                                if (profile.Skills.Health.Current < 2500f)
+                                    profile.Skills.Health.SetCurrent(2500f, true);
+
+                                if (profile.Skills.Vitality.Current < 2000f)
+                                    profile.Skills.Vitality.SetCurrent(2000f, true);
+
+                                if (profile.Skills.RecoilControl.Current < 4800f)
+                                    profile.Skills.RecoilControl.SetCurrent(4800f, true);
+
+                                if(profile.Skills.HeavyVests.Current < 5000f)
+                                    profile.Skills.HeavyVests.SetCurrent(5000f, true);
+
+                                if (profile.Skills.LightVests.Current < 5000f)
+                                    profile.Skills.LightVests.SetCurrent(5000f, true);
+
+
                                 if (tactic == availableTactics[3])
                                 {
                                     tactic = "Push";
@@ -985,7 +945,6 @@ namespace friendlyPMC.Patches
                                     tactic = "Marksman";
                                     // - - some cheating here, making our marskman good
                                     profile.Skills.Sniper.SetCurrent(5100f, true);
-                                    profile.Skills.RecoilControl.SetCurrent(4800f, true);
                                 }
                                 else if (tactic == availableTactics[1])
                                 {
@@ -1054,7 +1013,7 @@ namespace friendlyPMC.Patches
                                 botType = me.Profile.Info.Settings.Role;
                             }
 
-                            Logger.LogInfo("Tactic is " + tactic);
+                            Modules.Logger.LogInfo("Tactic is " + tactic);
 
                             BossPlayers.AddFollower(me, player, true, botType, tactic);
 
@@ -1066,8 +1025,8 @@ namespace friendlyPMC.Patches
                         }
                         catch (Exception ex)
                         {
-                            Logger.LogError("Failed to add " + me.Profile.Nickname + " as follower");
-                            Logger.LogError(ex);
+                            Modules.Logger.LogError("Failed to add " + me.Profile.Nickname + " as follower");
+                            Modules.Logger.LogError(ex);
                         }
                     });
 
@@ -1084,7 +1043,7 @@ namespace friendlyPMC.Patches
                     botSpawnerClass.method_10(owner, botsData, new Action<BotOwner>((BotOwner follower) =>
                     {
 
-                        Logger.LogInfo("Follower " + follower.Profile.Nickname + " spawned");
+                        Modules.Logger.LogInfo("Follower " + follower.Profile.Nickname + " spawned");
 
                         spawnedFollowers++;
 
@@ -1099,7 +1058,7 @@ namespace friendlyPMC.Patches
                 });
 
 
-                Logger.LogInfo("Trying to spawn " + profile.Nickname + " follower");
+                Modules.Logger.LogInfo("Trying to spawn " + profile.Nickname + " follower");
 
                 var _inSpawnProcess = (int)AccessTools.Field(typeof(BotSpawner), "_inSpawnProcess").GetValue(botSpawnerClass);
                 AccessTools.Field(typeof(BotSpawner), "_inSpawnProcess").SetValue(botSpawnerClass, _inSpawnProcess + 1);
@@ -1122,7 +1081,7 @@ namespace friendlyPMC.Patches
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex);
+                Modules.Logger.LogError(ex);
             }
         }
 
@@ -1161,7 +1120,7 @@ namespace friendlyPMC.Patches
                         Props.FactoryMapSett();
                     }
 
-                    Logger.LogInfo("Raid Started");
+                    Modules.Logger.LogInfo("Raid Started");
                 }
 
 
@@ -1184,7 +1143,7 @@ namespace friendlyPMC.Patches
             }
             catch (Exception e)
             {
-                Logger.LogError(e);
+                Modules.Logger.LogError(e);
             }
 
         }
@@ -1306,9 +1265,7 @@ namespace friendlyPMC.Patches
 
             LocalGameCtorPatch.Instance = null;
 
-            ItemPatch.Items.Clear();
-
-            Logger.LogInfo("Raid Ended");
+            Modules.Logger.LogInfo("Raid Ended");
 
             return true;
         }
@@ -1347,13 +1304,13 @@ namespace friendlyPMC.Patches
                         dictionary_2.Remove(key);
                     }
                 }
-                
-                Logger.LogInfo("Raid CleanUp Finished");
+
+                Modules.Logger.LogInfo("Raid CleanUp Finished");
 
             } catch (Exception ex)
             {
-                Logger.LogError("Raid CleanUp Failed");
-                Logger.LogError(ex);
+                Modules.Logger.LogError("Raid CleanUp Failed");
+                Modules.Logger.LogError(ex);
             }
 
             return true;

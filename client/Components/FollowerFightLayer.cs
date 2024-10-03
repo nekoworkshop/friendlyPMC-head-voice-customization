@@ -398,7 +398,7 @@ namespace friendlyPMC.Components
             }
 
 
-            if (!botOwner_0.Memory.HaveEnemy && !allyTactic)
+            if (!allyTactic)
             {
                 // Check if the boss is under attack
                 if (bossUnderAttack && (commonLayer.coverType == "close") && (!botOwner_0.Memory.HaveEnemy || !botOwner_0.Memory.GoalEnemy.IsVisible))
@@ -503,7 +503,6 @@ namespace friendlyPMC.Components
             // go there request during fights
             if (request != null && request.BotRequestType == BotRequestType.goToPoint && !allyTactic)
             {
-                Modules.Logger.LogInfo("COMBAT GO CHECK");
                 return new AICoreActionResultStruct<BotLogicDecision>((BotLogicDecision)CustomBotDecisions.MoveToPoint, "req:goCheck");
             }
 
@@ -513,6 +512,7 @@ namespace friendlyPMC.Components
                 (request.BotRequestType == BotRequestType.getInCover || request.BotRequestType == BotRequestType.hide)
              )
             {
+                Modules.Logger.LogInfo("Spread Out received");
                 if (botOwner_0.Memory.HaveEnemy && botOwner_0.Memory.GoalEnemy.CanShoot)
                 {
                     request.Complete();
@@ -520,6 +520,7 @@ namespace friendlyPMC.Components
                 else
                 {
                     GetCoverPoint(botOwner_0.GetPlayer.Transform.position, 50f);
+
                     if (customNavigationPoint_0 != null)
                     {
                         Utils.Utils.SetTimeout(() =>
@@ -533,8 +534,11 @@ namespace friendlyPMC.Components
                             }
 
                         }, 4000);
-
+                        Modules.Logger.LogInfo("Execute Spread Out");
                         return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "runToCover");
+                    } else
+                    {
+                        request.Complete();
                     }
                 }
             }

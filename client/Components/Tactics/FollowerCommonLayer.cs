@@ -333,7 +333,10 @@ namespace friendlyPMC.Components.Tactics
             coverType = type;
         }
 
-        /** Find a shoot positionm that is closest to the enemy but at a minimum distance and maximum from the enemy **/
+        /** 
+         * Find a shoot positionm that is closest to the enemy but at a minimum distance and maximum from the enemy 
+         * @deprecated - might get switched with GetClosestShootCover
+         * **/
         // customNavigationPoint_1
         public CustomNavigationPoint GetClosestAttackCoverPoint(Vector3 centerPosition, float minDistance = 5f, float maxDistance = 150f)
         {
@@ -360,7 +363,56 @@ namespace friendlyPMC.Components.Tactics
             botOwner_0.Memory.SetCoverPoints(customNavigationPoint_1);
             return customNavigationPoint_1;
         }
-        /** Find a shoot position between bot and enemy, that is the closest to the middle point between bot and enemy **/
+        /** Find a shoot positionm that is closest to the enemy but at a minimum distance and maximum from the enemy **/
+        // customNavigationPoint_1
+        public CustomNavigationPoint GetClosestShootCover(Vector3 centerPosition, float minDistance = 5f, float maxDistance = 150f)
+        {
+            if (coverTimer_1 > Time.time) return customNavigationPoint_1;
+
+            coverTimer_1 = 1f + Time.time;
+
+            Vector3 botPosition = botOwner_0.Transform.position;
+            Vector3 enemyPos = botOwner_0.Memory.GoalEnemy.CurrPosition;
+
+            pitAIBossPlayer boss = HasBoss() ? GetBoss() : null;
+            Vector3[] bossPosition = boss != null ? new Vector3[] { boss.realPlayer.Transform.position } : new Vector3[] { };
+
+            List<CustomNavigationPoint> areaCovers = boss != null ? boss.GetAreaCovers() : BossPlayers.GetAICovers();
+
+            customNavigationPoint_1 = Covers.GetClosestShootCover(
+                botOwner_0, 
+                centerPosition,
+                minDistance, 
+                maxDistance,
+                (cover) =>
+                {
+                    if (boss != null && !GClass326.IsDangerPositionFarEnough(cover.Position, bossPosition, 0.4f * 0.4f)) return false;
+
+                    return true;
+                });
+
+            botOwner_0.Memory.SetCoverPoints(customNavigationPoint_1);
+            return customNavigationPoint_1;
+        }
+
+        /** Find a shooting cover between bot and enemy, that is the closest to the middle point between bot and enemy **/
+        // customNavigationPoint_1
+        public CustomNavigationPoint GetApproachableCover()
+        {
+            if (coverTimer_1 > Time.time) return customNavigationPoint_1;
+
+            coverTimer_1 = 1f + Time.time;
+
+            customNavigationPoint_1 = Covers.GetApproachableCover(botOwner_0, botOwner_0.Memory.GoalEnemy.CurrPosition);
+
+            botOwner_0.Memory.SetCoverPoints(customNavigationPoint_1);
+            return customNavigationPoint_1;
+        }
+
+        /** 
+         * Find a shoot position between bot and enemy, that is the closest to the middle point between bot and enemy
+         * @deprecated - might get switched with GetApproachableCover
+         * **/
         // customNavigationPoint_1
         public CustomNavigationPoint GetApproachablePoint()
         {

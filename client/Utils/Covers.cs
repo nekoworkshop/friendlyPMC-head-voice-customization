@@ -7,6 +7,8 @@ using UnityEngine.AI;
 using UnityEngine;
 using friendlyPMC.Components;
 using friendlyPMC.Modules;
+using System.IO;
+using UnityEngine.UI;
 
 namespace friendlyPMC.Utils
 {
@@ -274,6 +276,91 @@ namespace friendlyPMC.Utils
 
             return pt;
         }
+        /** Get cover from which the bot can shoot at the enemy that is closest to the specified position and that is at min and max distance from danger and optionally that is not towards the direction of danger */
+        public static CustomNavigationPoint GetClosestShootCover(
+            BotOwner botOwner,
+            Vector3 desiredPostion,
+            float minDistance = 5f,
+            float maxDistance = 200f,
+            Func<CustomNavigationPoint, bool> eligibleCheck = null
+        )
+        {
+
+            NavMeshPath path =  new NavMeshPath();
+
+            Vector3 botPosition = botOwner.Transform.position;
+
+            Vector3 targetPosition = botOwner.Memory.GoalEnemy.CurrPosition;
+            List<Vector3> shootTarget = new List<Vector3>
+            {
+                botOwner.Memory.GoalEnemy.Person.MainParts[BodyPartType.head].Position,
+                botOwner.Memory.GoalEnemy.Person.MainParts[BodyPartType.body].Position
+            };
+
+            pitAIBossPlayer boss = botOwner.BotFollower.HaveBoss ? botOwner.BotFollower.BossToFollow as pitAIBossPlayer : null;
+            Vector3[] bossPosition = boss != null ? new Vector3[] { boss.realPlayer.Transform.position } : new Vector3[] { };
+
+            List<CustomNavigationPoint> areaPoints = boss != null ? boss.GetAreaCovers() : BossPlayers.GetAICovers();
+
+            CustomNavigationPoint pt = ClosestPoint(botOwner.Id, botPosition, desiredPostion, areaPoints,
+            (CustomNavigationPoint point) =>
+            {
+                float enemyRange = Vector3.Distance(desiredPostion, point.Position);
+                if (enemyRange > maxDistance)
+                {
+                    return false;
+                }
+
+                bool cansh = true;
+                // check if bot can shoot either the head or torso of the enemy from this position
+                foreach (var target in shootTarget)
+                {
+                    ShootPointClass shootPoint = new ShootPointClass(target, 0.8f);
+                    if (!GClass301.CanShootToTarget(shootPoint, point, LayerMaskClass.HighPolyWithTerrainMask, false))
+                    {
+                        cansh = false;
+                        break;
+                    }
+                }
+
+                if (!cansh) return false;
+
+                if (
+                    Vector3.Dot((targetPosition - botPosition).normalized, (point.Position - botPosition).normalized) > 0
+                )
+                {
+                    return false;
+                }
+
+                if (!IsNavigablePoint(botPosition, point.Position, 100f, path))
+                {
+                    return false;
+                }
+
+                if (eligibleCheck != null && !eligibleCheck(point)) return false;
+
+                return true;
+
+            }, minDistance);
+
+            return pt;
+        }
+        /** Get cover from which the bot can shoot that is closest to the middle of the distance between bot's position and specified position */
+        public static CustomNavigationPoint GetApproachableCover(BotOwner botOwner, Vector3 point, float minDistance = 5f)
+        {
+            Vector3 midpoint = Vector3.Lerp(botOwner.GetPlayer.Transform.position, point, 0.5f);
+
+            pitAIBossPlayer boss = botOwner.BotFollower.HaveBoss ? botOwner.BotFollower.BossToFollow as pitAIBossPlayer : null;
+            Vector3[] bossPosition = boss != null ? new Vector3[] { boss.realPlayer.Transform.position } : new Vector3[] { };
+
+            return GetClosestShootCover(botOwner, midpoint, minDistance, 200f, (cover) =>
+            {
+                if (boss != null && !GClass326.IsDangerPositionFarEnough(cover.Position, bossPosition, 0.7f * 0.7f)) return false;
+
+                return true;
+            });
+        }
+
         /** Get the point among the given ones that is the closest to centerPosition that meets the eligibility check **/
         public static CustomNavigationPoint ClosestPoint(
             int botOwnerId,

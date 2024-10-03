@@ -186,7 +186,7 @@ namespace friendlyPMC.Components.Tactics
 
         protected virtual void GetClosestAttackCoverPoint(Vector3 centerPosition, float minDistance = 15f)
         {
-            customNavigationPoint_0 = commonLayer.GetClosestAttackCoverPoint(centerPosition, minDistance);
+            customNavigationPoint_0 = commonLayer.GetClosestShootCover(centerPosition, minDistance);
         }
 
         protected virtual void GetClosestCoverPoint(Vector3 centerPosition, float searchRadius, float safeDistance = 5f, Func<CustomNavigationPoint, bool> extraChecks = null)
@@ -196,7 +196,7 @@ namespace friendlyPMC.Components.Tactics
 
         public virtual void GetApproachablePoint()
         {
-            customNavigationPoint_0 = commonLayer.GetApproachablePoint();
+            customNavigationPoint_0 = commonLayer.GetApproachableCover();
         }
     }
 }

@@ -17,30 +17,29 @@
 - x - dog fight seems to semi-crouch the bot, see if you can make them aim and shoot while standing
 - x - add look direction commands
 
-- x - make bots obey "regroup" call when BTR is close
-
-- test again - add "spreadout" command
-- x - make bot auto aquire enemy is he is speaking too close
-
 - x - make bot go in search mode if player is looking down at a maxim 25m distance
 - x - - should be done while in combat also
 
 - x - bots in assist mode to turn hostile if your shoot them (turning hostile can be done through BotMemoryClass > method_7)
 
-- x - keep combat layer on while bot is healing even if enemy dies
+- x - keep combat layer on while bot is healing even if enemy dies (helps prevent healing stuck bug)
 
 - x - revamp holder tactic to stop having them check for position if player is not moving and for them to stay in place if no cover is found
 - x - see bug with them not moving even when under attack - they should try to cover
 
-- x - shortcut keys for contact and status seem to revert to F13
+- x - make bot auto aquire enemy is he is speaking too close
 
+- inprogress - make bots obey "regroup" call when BTR is close
+- inprogress - alternative shoot cover finder
+- test again - add "spreadout" command
 
 -- === 3.9 === ---:
+- player level to determine if he can pick up any extra followers and how many (maximum 3, disable configuration regarding this)
+- scav karma and level to determin with how many followers can the player spawn (maxium 3) and extra pickups (maximum 2 extras)
 
 - add detection for when enemy is about to engage the player or any teamember (patch SET EnemyInfo.IsVisible and check if the enemy is a teammate and the distance is close enough for engagement)
 
 - see if we can make bot swap weapons when asked to loot (DeadBodyWork)
-- see if we can prevent questing bots from affecting followers the same way we do with looting
 
 - fix glitchy behavior of boss followers
 - goons send messages at the end of the raid

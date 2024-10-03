@@ -567,7 +567,25 @@ namespace friendlyPMC.Components
                 // on Spreadout look for a random cover
                 else if (info.phrase == EPhraseTrigger.Spreadout)
                 {
-                    this.method_1(info, 10f, 5f);
+                    Player ally = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(requester.ProfileId);
+
+                    if (botOwner_0.BotRequestController.TryStopCurrent(ally, true))
+                    {
+                        (botOwner_0.Brain.BaseBrain as FollowerBrain).BossOrdersChanged();
+
+                        FollowerTakeCover gclass = new FollowerTakeCover(ally);
+
+                        if (botOwner_0.BotsGroup.RequestsController.TryAddRequest(gclass))
+                        {
+                            gclass.AddPossibleExecutors(botOwner_0);
+                            gclass.SetGroup(botOwner_0.BotsGroup.RequestsController);
+                            if (isClose && (notBusy || !botOwner_0.Memory.GoalEnemy.IsVisible))
+                            {
+                                botOwner_0.BotTalk.TrySay(EPhraseTrigger.Going, false);
+                            }
+                        }
+                    }
+
                     return;
                 }
             }
@@ -589,6 +607,8 @@ namespace friendlyPMC.Components
                 {
                     // - make bot follow boss near
                     FollowerPatrolInstances.SetNearPatrol(botOwner_0);
+                    // - reset bot tactic
+                    (botOwner_0.Brain.BaseBrain as FollowerBrain).SetBossTactic(null);
                     // - cover boss when under attack
                     (botOwner_0.Brain.BaseBrain as FollowerBrain).bossNeedsProtection = true;
                     (botOwner_0.Brain.BaseBrain as FollowerBrain).BossOrdersChanged();
