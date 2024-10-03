@@ -1,14 +1,12 @@
 ﻿using Comfort.Common;
 using EFT;
+
 using friendlyPMC.Actions;
 using friendlyPMC.Modules;
-using friendlyPMC.Patches;
-using friendlyPMC.Utils;
+
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using static RootMotion.FinalIK.IKSolver;
-using static UnityEngine.UI.GridLayoutGroup;
 
 namespace friendlyPMC.Components
 {
@@ -321,6 +319,7 @@ namespace friendlyPMC.Components
             // remove this bot from being a follower
             Dismissed();
             BossPlayers.RemoveFollower(_owner, _boss);
+            Modules.Logger.LogInfo("Follower " + _owner.Profile.Nickname + " died");
         }
 
 

@@ -19,7 +19,7 @@
 
 - x - make bots obey "regroup" call when BTR is close
 
-- x - add "spreadout" command
+- test again - add "spreadout" command
 - x - make bot auto aquire enemy is he is speaking too close
 
 - x - make bot go in search mode if player is looking down at a maxim 25m distance
@@ -32,20 +32,15 @@
 - x - revamp holder tactic to stop having them check for position if player is not moving and for them to stay in place if no cover is found
 - x - see bug with them not moving even when under attack - they should try to cover
 
-- shortcut keys for contact and status seem to revert to F13
+- x - shortcut keys for contact and status seem to revert to F13
 
 
 -- === 3.9 === ---:
 
 - add detection for when enemy is about to engage the player or any teamember (patch SET EnemyInfo.IsVisible and check if the enemy is a teammate and the distance is close enough for engagement)
-- - this detection will affect decisions of bots in hold mode who are not already active doing something
-
-- see if we can use SAIN door checker
 
 - see if we can make bot swap weapons when asked to loot (DeadBodyWork)
 - see if we can prevent questing bots from affecting followers the same way we do with looting
-
--  when using custom equipment, take consumables from player. Detect if player does not have them and skip them. At the end of raid the consumables in the player's stash should update to the consumed ammount
 
 - fix glitchy behavior of boss followers
 - goons send messages at the end of the raid
@@ -66,7 +61,6 @@
 RELEASE NOTES (3.8):
 - removed "Player Equipment" as option for equipment for bots. When clonning player equipment people have reported to have delays in spawn. Because you can simply save your current equipment as a preset loadout - this is removed and you can use that instead. Also I encourge using custom presets that you personally made for bots because people tend to put the meds in the secure container of their own equipment, not realizing that will get deleted and ammo will be put instead for the bots to use. It will also not be there in the end when followers use the equipment you give them instead of clonning it. 
 - added a new tactic - Guard
-- bots can now be called to your position when BTR is nearby. As part of the game logic, bots hide when BTR is around so they don't get ran over. But this also makes them no longer follow you until BTR leaves the area. Now you can call them to your position to get them out of BTR radius.
 - made "Spread Out" command functional. Bot will run towards some cover when this is executed.
 - updated "Contact" command to now take into consideration any visible part of the enemy instead of just the head and torso
 - all direction commands are now functional (under ENEMY STATUS)
@@ -74,8 +68,8 @@ RELEASE NOTES (3.8):
 - "Holder" tactic has been revamp to stop bots from continously checking for where to place themselves while the player is not moving. 
 - scav followers and picked up followers will turn hostile on friendly fire
 - some improvements on the cover search logic in an effort to reduce the situations where bots end up running in a wall
-- you can no longer loot your squad's equipment
 - improved awareness
+- buffed skills for spawned followers
 - some bug fixes
 
 
@@ -92,6 +86,7 @@ REVISIT:
  - - make gun parts unremovable
  - - make armor parts unremovable
  - - make helmet parts unremovable
+ - when using custom equipment, take consumables from player. Detect if player does not have them and skip them. At the end of raid the consumables in the player's stash should update to the consumed ammount
 
 FUTURE IDEAS:
  - BirEye auto marks enemies as he sees them (enhanced Marskman)

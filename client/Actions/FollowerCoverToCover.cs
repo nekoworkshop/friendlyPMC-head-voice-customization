@@ -128,18 +128,14 @@ namespace friendlyPMC.Actions
 
                 CustomNavigationPoint cover = Covers.GetClosestCoverPoint(botOwner_0, bossPos, Props.searchRadius, 5f, (CustomNavigationPoint point) =>
                 {
+                    if (!GClass326.IsDangerPositionFarEnough(point.Position, new Vector3[] { bossPos }, 0.5f * 0.5f)) return false;
+
                     if (botOwner_0.BotsGroup.MembersCount == 1) return true;
 
                     bool isgood = true;
                     foreach (var item in _members)
                     {
                         if (item == null || item.IsDead || item.BotState != EBotState.Active || item.Id == botOwner_0.Id) continue;
-
-                        if (Vector3.Distance(point.Position, item.GetPlayer.Transform.position) < 2f)
-                        {
-                            isgood = false;
-                            break;
-                        }
                     }
                     return isgood;
                 });
