@@ -732,13 +732,13 @@ namespace friendlyPMC.Components
 
         public void GetApproachablePoint()
         {
-            customNavigationPoint_0 = commonLayer.GetApproachablePoint();
+            customNavigationPoint_0 = commonLayer.GetApproachableCover();
 
         }
         /** Find a shoot positionm that is closest to the enemy but at a minimum distance and maximum from the enemy **/
         public void GetClosestAttackCoverPoint(Vector3 centerPosition, float minDistance = 5f, float maxDistance = 150f)
         {
-            customNavigationPoint_0 = commonLayer.GetClosestAttackCoverPoint(centerPosition, minDistance, maxDistance);
+            customNavigationPoint_0 = commonLayer.GetClosestShootCover(centerPosition, minDistance, maxDistance);
         }
 
         private void GetClosestCoverPointGroup(Vector3 centerPosition, float searchRadius)

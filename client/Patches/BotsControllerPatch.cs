@@ -491,6 +491,7 @@ namespace friendlyPMC.Patches
                 // followers should use the same groupID as the player
                 profile.Info.GroupId = player.realPlayer.GroupId;
                 profile.Info.TeamId = player.Player().Profile.Info.TeamId;
+
                 // spawned followers will have a different health than the rest
                 foreach (EBodyPart part in Enum.GetValues(typeof(EBodyPart)))
                 {
@@ -533,7 +534,53 @@ namespace friendlyPMC.Patches
                     }
                 }
 
+                // adjust follower's skills based on level
+                float maxHealth = 2700f;
+                float maxVitality = 2500f;
+                float maxRecoil = 4500f;
+                float maxHeavy = 1500f;
+                float maxLight = 1500f;
+                float maxStress = 2500f;
 
+                float healthIncrement = 40f;
+                float vitalityIncrement = 30f;
+                float recoilIncrement = 50f;
+                float heavyIncrement = 20f;
+                float lightIncrement = 20f;
+
+                float stressIncrement = 20f;
+
+                int botLevel = profile.Info.Level;
+
+                // --- health
+                float scaledHealth = Utils.Utils.GetScaledValue(0f, healthIncrement, botLevel, maxHealth);
+                if (profile.Skills.Health.Current < scaledHealth)
+                    profile.Skills.Health.SetCurrent(scaledHealth, true);
+
+                // --- vitality
+                float scaledVitality = Utils.Utils.GetScaledValue(0f, vitalityIncrement, botLevel, maxVitality);
+                if (profile.Skills.Vitality.Current < scaledVitality)
+                    profile.Skills.Vitality.SetCurrent(scaledVitality, true);
+
+                // --- recoil
+                float scaledRecoil = Utils.Utils.GetScaledValue(0f, recoilIncrement, botLevel, maxRecoil);
+                if (profile.Skills.RecoilControl.Current < scaledRecoil)
+                    profile.Skills.RecoilControl.SetCurrent(scaledRecoil, true);
+
+                // --- heavy vests
+                float scaledHeavy = Utils.Utils.GetScaledValue(0f, heavyIncrement, botLevel, maxHeavy);
+                if (profile.Skills.HeavyVests.Current < scaledHeavy)
+                    profile.Skills.HeavyVests.SetCurrent(scaledHeavy, true);
+
+                // --- light vests
+                float scaledLight = Utils.Utils.GetScaledValue(0f, lightIncrement, botLevel, maxLight);
+                if (profile.Skills.LightVests.Current < scaledLight)
+                    profile.Skills.LightVests.SetCurrent(scaledLight, true);
+
+                // --- stress
+                float scaledStrees = Utils.Utils.GetScaledValue(0f, stressIncrement, botLevel, maxStress);
+                if(profile.Skills.StressResistance.Current < scaledStrees)
+                    profile.Skills.StressResistance.SetCurrent(scaledStrees, true);
             }
 
             Modules.Logger.LogInfo("Return follower profile data");
@@ -908,30 +955,14 @@ namespace friendlyPMC.Patches
                         string[] availableTactics = friendlyPMC.GetTacticOptions();
 
                         string eq = member.Value[1].Value;
+
                         // first to try see if this profile has any custom equipment
                         if (botsProfile.TryGetValue(member.Key, out Profile profile))
                         {
                             // - set what tactic this follower will have
                             if (tactic != null && tactic != availableTactics[0])
                             {
-                                // 51
-                                //@TODO : adjust these values based on bot's level
-                                if (profile.Skills.Health.Current < 2500f)
-                                    profile.Skills.Health.SetCurrent(2500f, true);
-
-                                if (profile.Skills.Vitality.Current < 2000f)
-                                    profile.Skills.Vitality.SetCurrent(2000f, true);
-
-                                if (profile.Skills.RecoilControl.Current < 4800f)
-                                    profile.Skills.RecoilControl.SetCurrent(4800f, true);
-
-                                if(profile.Skills.HeavyVests.Current < 5000f)
-                                    profile.Skills.HeavyVests.SetCurrent(5000f, true);
-
-                                if (profile.Skills.LightVests.Current < 5000f)
-                                    profile.Skills.LightVests.SetCurrent(5000f, true);
-
-
+ 
                                 if (tactic == availableTactics[3])
                                 {
                                     tactic = "Push";
@@ -943,8 +974,15 @@ namespace friendlyPMC.Patches
                                 else if (tactic == availableTactics[2])
                                 {
                                     tactic = "Marksman";
-                                    // - - some cheating here, making our marskman good
-                                    profile.Skills.Sniper.SetCurrent(5100f, true);
+                                    
+                                    // -- adjust sniper skill only for marskman
+                                    float maxSniper = 5500f;
+                                    float sniperIncrement = 102f;
+                                    int botLevel = profile.Info.Level;
+
+                                    float scaledSniper = Utils.Utils.GetScaledValue(0f, sniperIncrement, botLevel, maxSniper);
+                                    if (profile.Skills.Sniper.Current < scaledSniper)
+                                        profile.Skills.Sniper.SetCurrent(scaledSniper, true);
                                 }
                                 else if (tactic == availableTactics[1])
                                 {

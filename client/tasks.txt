@@ -68,7 +68,7 @@ RELEASE NOTES (3.8):
 - scav followers and picked up followers will turn hostile on friendly fire
 - some improvements on the cover search logic in an effort to reduce the situations where bots end up running in a wall
 - improved awareness
-- buffed skills for spawned followers
+- spawned follower's level now affects some of it's skills (PMC only)
 - some bug fixes
 
 

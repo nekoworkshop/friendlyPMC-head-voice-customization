@@ -109,5 +109,10 @@ namespace friendlyPMC.Utils
         {
             flags.Clear();
         }
+
+        public static float GetScaledValue(float baseValue, float increment, int level, float maxValue)
+        {
+            return Math.Min(baseValue + (increment * level), maxValue);
+        }
     }
 }

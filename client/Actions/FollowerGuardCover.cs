@@ -127,15 +127,11 @@ namespace friendlyPMC.Actions
                             if (protectBoss)
                             {
                                 // - get closest attack point to the boss
-                                CustomNavigationPoint Spot3 = Utils.Covers.GetClosestAttackCoverPoint(
-                                    botOwner_0.Id,
-                                    botPosition,
+                                CustomNavigationPoint Spot3 = Utils.Covers.GetClosestShootCover(
+                                    botOwner_0,
                                     bossPos,
-                                    enemySpot,
-                                    areaCovers,
                                     5f,
-                                    300f,
-                                    carePosition
+                                    90f
                                 );
                                 if (Spot3 != null)
                                 {

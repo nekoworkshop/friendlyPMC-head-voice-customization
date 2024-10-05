@@ -73,7 +73,12 @@ namespace friendlyPMC.Actions
 
             base.method_0();
 
-
+            // cancel movement if we see the enemy
+            if (botOwner_0.Memory.HaveEnemy && botOwner_0.Memory.GoalEnemy.CanShoot)
+            {
+                botOwner_0.BotRequestController.CurRequest.Complete();
+                return;
+            }
 
             if (ischecking)
             {
@@ -97,12 +102,7 @@ namespace friendlyPMC.Actions
             
             if (botOwner_0.BotRequestController.CurRequest == null) return;
 
-            // cancel movement if we see the enemy
-            if (botOwner_0.Memory.HaveEnemy && botOwner_0.Memory.GoalEnemy.IsVisible)
-            {
-                botOwner_0.BotRequestController.CurRequest.Complete();
-                return;
-            }
+            
 
             if (botOwner_0.Brain.Agent.LastReason == "req:goCheck" && !bool_0)
             {

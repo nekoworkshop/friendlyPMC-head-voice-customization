@@ -873,7 +873,7 @@ namespace friendlyPMC.Components.Tactics
             // If the enemy is a sniper and visible, try to find a cover point from which you can shoot
             if (enemyVisible)
             {
-                GetClosestAttackCoverPoint(botPosition,5,200); // Find cover close to the bot's position
+                GetClosestShootCover(botPosition,5,200); // Find cover close to the bot's position
                 
                 navpoint = customNavigationPoint_1;
 

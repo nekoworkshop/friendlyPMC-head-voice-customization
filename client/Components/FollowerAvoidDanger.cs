@@ -70,7 +70,7 @@ namespace friendlyPMC.Components
         {
             
             AICoreActionEndStruct result = base.ShallEndCurrentDecision(curDecision);
-            if(result.Value && regroupDecisions.Contains(curDecision.Reason))
+            if(result.Value && !regroupDecisions.Contains(curDecision.Reason))
             {
                 btrRegroup = false;
             }
