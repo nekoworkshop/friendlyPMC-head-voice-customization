@@ -272,13 +272,11 @@ namespace friendlyPMC.Actions
                 if (!_lastSpot.HasValue)
                 {
                     _actionsQueue.Enqueue(() => {
-                      // else get a shooting spot relative to the bot
-                        ShootPointClass shootTarget = new ShootPointClass(enemySpot, 1f);
+                        // else get a shooting spot relative to the bot
+                        if (botOwner_0.IsDead || botOwner_0.BotState != EBotState.Active || !botOwner_0.Memory.HaveEnemy) return;
+
                         _lastPosition = Utils.Covers.FindShootPosition(
-                            botOwner_0.GetPlayer.Transform.position,
-                            botOwner_0.ShootData.WeaponRootOffset,
-                            shootTarget,
-                            botOwner_0.LookSensor.Mask,
+                            botOwner_0,
                             minDist,
                             maxDist
                         );

@@ -9,6 +9,7 @@ using friendlyPMC.Components;
 using friendlyPMC.Modules;
 using System.IO;
 using UnityEngine.UI;
+using static RootMotion.FinalIK.IKSolver;
 
 namespace friendlyPMC.Utils
 {
@@ -431,20 +432,32 @@ namespace friendlyPMC.Utils
             return false;
         }
         /** Find a position from where the bot can shoot at the given target **/
-        public static Vector3? FindShootPosition(Vector3 botPosition, Vector3 botWeaponOffset, ShootPointClass shootTarget, LayerMask Mask, float minDistance, float maxRadius, Func<Vector3, bool> eligibleCheck = null)
+        public static Vector3? FindShootPosition(BotOwner botOwner,float minDistance, float maxRadius, Func<Vector3, bool> eligibleCheck = null)
         {
-            Vector3 targetPosition = shootTarget.Point;
+            Vector3 botPosition = botOwner.GetPlayer.Transform.position;
+            Vector3 botWeaponOffset = botOwner.ShootData.WeaponRootOffset;
+            LayerMask Mask = botOwner.LookSensor.Mask;
+
+            Vector3 targetPosition = botOwner.Memory.GoalEnemy.CurrPosition;
 
             NavMeshPath mesh = new NavMeshPath();
 
-            // Try to find a valid position within the sphere
-            //List<Vector3> positions = new List<Vector3>();
+            List<Vector3> shootTarget = new List<Vector3>
+            {
+                botOwner.Memory.GoalEnemy.Person.MainParts[BodyPartType.head].Position,
+                botOwner.Memory.GoalEnemy.Person.MainParts[BodyPartType.body].Position
+            };
 
-            for (int i = 0; i < 20; i++) // Adjust the number of attempts as needed
+            // Try to find a valid position within the sphere
+            List<Vector3> positions = new List<Vector3>();
+
+            for (int i = 0; i < 25; i++) // Adjust the number of attempts as needed
             {
                 Vector3 randomPosition = targetPosition + UnityEngine.Random.insideUnitSphere * maxRadius;
                 if (randomPosition == Vector3.zero) continue;
-                //if (positions.Contains(randomPosition)) continue;
+                if (positions.Contains(randomPosition)) continue;
+
+                positions.Add(randomPosition);
 
                 NavMeshHit navMeshHit;
 
@@ -457,15 +470,22 @@ namespace friendlyPMC.Utils
                 if (eligibleCheck != null && !eligibleCheck(navMeshHit.position)) continue;
 
                 // Check if the bot can shoot from the random position to the target 
-                if (
-                    // while standing
-                    GClass301.CanShootToTarget(shootTarget, navMeshHit.position + botWeaponOffset, Mask, false) ||
-                    // while sitting
-                    GClass301.CanShootToTarget(shootTarget, navMeshHit.position + (botWeaponOffset * 0.5f), Mask, false)
-                )
-                { 
-                    return navMeshHit.position;
+                bool cansh = false;
+                // check if bot can shoot either the head or torso of the enemy from this position
+                foreach (var target in shootTarget)
+                {
+                    ShootPointClass shootPoint = new ShootPointClass(target, 0.8f);
+                    if (
+                        GClass301.CanShootToTarget(shootPoint, navMeshHit.position + botWeaponOffset, Mask, false) ||
+                        GClass301.CanShootToTarget(shootPoint, navMeshHit.position + botWeaponOffset * 0.5f, Mask, false)
+                    )
+                    {
+                        cansh = true;
+                        break;
+                    }
                 }
+
+                if (cansh) return navMeshHit.position;
             }
 
             return null;

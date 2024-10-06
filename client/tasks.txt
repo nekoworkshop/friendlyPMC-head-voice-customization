@@ -1,6 +1,7 @@
 -- === 3.8 === ---:
 - x - improve run to heal
 - x - improve Assist tactic to be less aggressive
+- x - add Guard(Support) Tactic
 - x - cancel on going requests when running to heal
 - x - check for cover where to heal better
 - x - remove "player equipment" as option for equipment
@@ -16,32 +17,30 @@
 - x - dog fight seems to semi-crouch the bot, see if you can make them aim and shoot while standing
 - x - add look direction commands
 
-- x - add "spreadout" command
-- x - make bot auto aquire enemy is he is speaking too close
-
 - x - make bot go in search mode if player is looking down at a maxim 25m distance
-- - should be done while in combat also
-
-- x - revamp holder tactic to stop having them check for position if player is not moving and for them to stay in place if no cover is found
+- x - - should be done while in combat also
 
 - x - bots in assist mode to turn hostile if your shoot them (turning hostile can be done through BotMemoryClass > method_7)
 
-- x - keep combat layer on while bot is healing even if enemy dies
+- x - keep combat layer on while bot is healing even if enemy dies (helps prevent healing stuck bug)
 
-- x - make squad's equipment not lootable
+- x - revamp holder tactic to stop having them check for position if player is not moving and for them to stay in place if no cover is found
+- x - see bug with them not moving even when under attack - they should try to cover
 
-- #inprogress - make ping status read the bot's tactic from the config instead of from the logic
+- x - make bot auto aquire enemy is he is speaking too close
+
+- x - make ping status read the bot's tactic from the config instead of from the logic
 - #inprogress - enemy.Search and moveCloserToBoss needs improvements
 - #inprogress - make bots obey "regroup" call when BTR is close
 - #inprogress - add Support Tactic
 - - use BigPipe's logic regarding suppression fire
 
 -- === 3.9 === ---:
+- player level to determine if he can pick up any extra followers and how many (maximum 3, disable configuration regarding this)
+- scav karma and level to determin with how many followers can the player spawn (maxium 3) and extra pickups (maximum 2 extras)
 - add detection for when enemy is about to engage the player or any teamember (patch SET EnemyInfo.IsVisible and check if the enemy is a teammate and the distance is close enough for engagement)
-- - this detection will affect decisions of bots in hold mode who are not already active doing something
 
 - see if we can make bot swap weapons when asked to loot (DeadBodyWork)
-- see if we can prevent questing bots from affecting followers the same way we do with looting
 
 - fix glitchy behavior of boss followers
 - goons send messages at the end of the raid
@@ -71,7 +70,8 @@ RELEASE NOTES (3.8):
 - scav followers and picked up followers will turn hostile on friendly fire
 - added detection for when enemy is about to engage the player or any teamember
 - some improvements on the cover search logic in an effort to reduce the situations where bots end up running in a wall
-- you can no longer loot your squad's equipment
+- spawned follower's level now affects some of it's skills (PMC only)
+
 - improved awareness
 - bug fixes 
 

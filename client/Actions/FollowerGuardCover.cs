@@ -105,12 +105,9 @@ namespace friendlyPMC.Actions
                     _actionsQueue.Enqueue(() =>
                     {
                         // else find the next available spot from where the bot can shoot the enemy, relative to his position
-                        ShootPointClass shootTarget = new ShootPointClass(enemySpot + Vector3.up * 0.8f, 0.8f);
+                        if (botOwner_0.IsDead || botOwner_0.BotState != EBotState.Active || !botOwner_0.Memory.HaveEnemy) return;
                         _lastPosition = Utils.Covers.FindShootPosition(
-                            botOwner_0.GetPlayer.Transform.position,
-                            botOwner_0.WeaponRoot.position,
-                            shootTarget,
-                            botOwner_0.LookSensor.Mask,
+                            botOwner_0,
                             minDist,
                             maxDist
                         );

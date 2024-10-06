@@ -419,12 +419,12 @@ namespace friendlyPMC.Components.BossFollower
 
         protected void GetApproachablePoint()
         {
-            customNavigationPoint_0 = commonLayer.GetApproachablePoint();
+            customNavigationPoint_0 = commonLayer.GetApproachableCover();
         }
 
         protected void GetClosestAttackCoverPoint(Vector3 centerPosition, float minDistance = 5f)
         {
-            customNavigationPoint_0 = commonLayer.GetClosestAttackCoverPoint(centerPosition, minDistance);
+            customNavigationPoint_0 = commonLayer.GetClosestShootCover(centerPosition, minDistance);
         }
     }
 }
