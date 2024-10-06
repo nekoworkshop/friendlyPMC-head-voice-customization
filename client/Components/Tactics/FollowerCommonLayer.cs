@@ -425,14 +425,20 @@ namespace friendlyPMC.Components.Tactics
                         {
                             return false;
                         }
+                    } 
+                    else
+                    {
+                        return false;
                     }
+                    // check if the point is at a relative same height as the center position
+                    //if (Mathf.Abs(botPosition.y - point.Position.y) > 1f) return false;
 
                     return true;
                 }
                 
                 return false;
 
-            }, 10f);
+            });
 
             botOwner_0.Memory.SetCoverPoints(customNavigationPoint_2);
 
