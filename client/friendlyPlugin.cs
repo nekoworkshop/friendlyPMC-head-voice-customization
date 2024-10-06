@@ -92,7 +92,7 @@ namespace friendlyPMC
                 "tacticOptions", new string[]
                 {
                     "Default",
-                    "Guard",
+                    "Support",
                     "Marksman",
                     "Pusher",
                     "Holder",
