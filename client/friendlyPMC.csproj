@@ -205,6 +205,7 @@
     <Compile Include="Requests\FollowerOpenDoorRequest.cs" />
     <Compile Include="Requests\FollowerRegroup.cs" />
     <Compile Include="Requests\FollowerRushEnemy.cs" />
+    <Compile Include="Requests\FollowerSuppress.cs" />
     <Compile Include="Requests\FollowerTakeCover.cs" />
     <Compile Include="Requests\FollowerTakeLootRequest.cs" />
     <Compile Include="Components\AIBossPlayer.cs" />

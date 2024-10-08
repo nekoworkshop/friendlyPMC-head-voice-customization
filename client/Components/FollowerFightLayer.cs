@@ -1,5 +1,7 @@
 ﻿
+using Comfort.Common;
 using EFT;
+using EFT.InventoryLogic;
 using friendlyPMC.Components.Tactics;
 using friendlyPMC.Modules;
 using friendlyPMC.Utils;
@@ -27,6 +29,7 @@ namespace friendlyPMC.Components
 
         private float coverTimer = 0f;
         private float suppressTime = 0f;
+        protected float grSuppressTime = 0f;
 
         private bool ordersAreHold = false;
         private bool ordersAreAttack = false;
@@ -92,6 +95,7 @@ namespace friendlyPMC.Components
             commonLayer = sniperLayer.CommonLayer;
             holderLayer = new FollowerHolderLayer(bot, priority, commonLayer);
             pusherLayer = new FollowerPusherLayer(bot, priority, commonLayer);
+            // guard is support
             guardLayer = new FollowerGuard(bot,priority, commonLayer);
 
         }
@@ -144,7 +148,7 @@ namespace friendlyPMC.Components
                 sniperTactic = true;
                 (botOwner_0.Brain.BaseBrain as FollowerBrain).SetTactic("Marksman");
             }
-            else if (tactic == "guard")
+            else if (tactic == "guard" || tactic  == "support")
             {
                 guardTactic = true;
                 (botOwner_0.Brain.BaseBrain as FollowerBrain).SetTactic("Guard");
@@ -485,11 +489,30 @@ namespace friendlyPMC.Components
             }
 
             // suppression fire request
-            if (botOwner_0.Memory.HaveEnemy && request != null && request.BotRequestType == BotRequestType.suppressionFire)
+            if (request != null && request.BotRequestType == BotRequestType.suppressionFire)
             {
-                botOwner_0.BotTalk.TrySay(EPhraseTrigger.Covering, true);
-                suppressTime = Time.time + 2f;
-                return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.suppressFire, "suppressFire");
+                Modules.Logger.LogInfo("Suppression request");
+                // - guard(support) can use grenade launcher 
+                if((botOwner_0.Brain.BaseBrain as FollowerBrain)?.defaultTactic == "Guard" && grSuppressTime < Time.time)
+                {
+                    var launcherDecicion = guardLayer.CanDoSuppressRequest(new Ray(request.Requester.Transform.position, request.Requester.LookDirection));
+                    if(launcherDecicion.HasValue)
+                    {
+                        grSuppressTime = Time.time + 5f;
+                        Modules.Logger.LogInfo("Do grenadier suppression");
+                        botOwner_0.BotTalk.TrySay(EPhraseTrigger.Covering, false);
+                        return launcherDecicion.Value;
+                    }
+                }
+
+                Modules.Logger.LogInfo("Do normal suppression");
+
+                if (botOwner_0.Memory.HaveEnemy) 
+                {
+                    botOwner_0.BotTalk.TrySay(EPhraseTrigger.Covering, true);
+                    suppressTime = Time.time + 2f;
+                    return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.suppressFire, "suppressFire");
+                }
             }
 
             // throw grenade request
@@ -568,11 +591,19 @@ namespace friendlyPMC.Components
         {
             if (ordersAreHold || allyTactic || (holdTactic && !ordersAreAttack)) return holderLayer.EndHoldPosition();
 
+            if (guardTactic) return guardLayer.EndHoldPosition();
+
             return pusherLayer.EndHoldPosition();
         }
 
         public override AICoreActionEndStruct EndSuppressFire()
         {
+            if(commonLayer.CurrentDecision?.Reason == "suppressFireLauncher")
+            {
+                if (grSuppressTime > Time.time) return aICoreActionEndStruct;
+                else suppressTime = 0f;
+            }
+
             BotRequest curRequest = botOwner_0.BotRequestController.CurRequest;
             if (curRequest != null && curRequest.BotRequestType == BotRequestType.suppressionFire)
             {
@@ -585,9 +616,18 @@ namespace friendlyPMC.Components
                 }
                 return aICoreActionEndStruct_1;
             }
+
             return aICoreActionEndStruct;
         }
 
+        public override AICoreActionEndStruct EndShootFromCover()
+        {
+            if (guardTactic)
+            {
+                return guardLayer.EndShootFromCover();
+            }
+            return base.EndShootFromCover();
+        }
         public override AICoreActionEndStruct EndRunToEnemy()
         {
             return commonLayer.EndRunToEnemy();

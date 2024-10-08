@@ -9,6 +9,7 @@ using System;
 using UnityEngine;
 using System.Collections.Generic;
 using HarmonyLib;
+using EFT.InventoryLogic;
 
 namespace friendlyPMC.Components
 {
@@ -389,7 +390,7 @@ namespace friendlyPMC.Components
 
             bool shouldDefault = !BossPlayers.IsPlayerBoss(requester.ProfileId);
 
-            bool isClose = (botOwner_0.GetPlayer.Transform.position - requester.Transform.position).magnitude < 20f;
+            bool isClose = (botOwner_0.GetPlayer.Transform.position - requester.Transform.position).magnitude < 23f;
             bool notBusy = !botOwner_0.Memory.HaveEnemy;
 
             List<EPhraseTrigger> bossNoPhrase = new List<EPhraseTrigger>
@@ -526,10 +527,43 @@ namespace friendlyPMC.Components
 
                     if (isBossCommunicating)
                     {
+                        
                         pitAIBossPlayer boss = BossPlayers.Instance.GetBossPlayer(requester.ProfileId);
+
+                        bool isGrenadier = false;
+
+                        GClass396 selector = botOwner_0.WeaponManager.Selector as GClass396;
+                        if(
+                            selector != null && 
+                            selector.SecondPrimaryWeapon as Weapon != null && 
+                            (selector.SecondPrimaryWeapon as Weapon).IsGrenadeLauncher &&
+                            (botOwner_0.Brain.BaseBrain as FollowerBrain)?.defaultTactic == "Guard"
+                        )
+                        {
+                                isGrenadier = true;
+                        }
 
                         if (isClose)
                         {
+                            // - grenadiers do not need to switch enemies
+                            if(isGrenadier) 
+                            {
+                                Player playerRequester = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(requester.ProfileId);
+
+                                if (botOwner_0.BotRequestController.TryStopCurrent(playerRequester, true))
+                                {
+                                    FollowerSuppress gclass = new FollowerSuppress(requester);
+
+                                    if (botOwner_0.BotsGroup.RequestsController.TryAddRequest(gclass))
+                                    {
+                                        gclass.AddPossibleExecutors(botOwner_0);
+                                        gclass.SetGroup(botOwner_0.BotsGroup.RequestsController);
+                                    }
+                                    return;
+                                }
+
+                                return;
+                            }
                             EnemyInfo enemyInfo;
                             if (!botOwner_0.Memory.HaveEnemy)
                             {
@@ -845,7 +879,7 @@ namespace friendlyPMC.Components
                 else if (info.phrase == EPhraseTrigger.OnRepeatedContact)
                 {
                     (botOwner_0.Brain.BaseBrain as FollowerBrain).BossOrdersChanged();
-                    FollowerEnemyCheck.CheckBossReport(botOwner_0);
+                    FollowerEnemyCheck.CheckBossReport(botOwner_0); 
                 }
                 // open door request
                 else if (info.phrase == EPhraseTrigger.OpenDoor && !botOwner_0.Memory.HaveEnemy && isClose)

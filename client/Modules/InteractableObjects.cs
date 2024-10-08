@@ -479,7 +479,7 @@ namespace friendlyPMC.Modules
                             if (boss.Followers.Find(fl => fl.ProfileId == enemy.ProfileId) != null) continue;
                             bool isenemy = boss.bossGroup.IsEnemy(enemy);
 
-                            if (!enemy && boss.bossGroup.IsPlayerEnemy(enemy)) isenemy = true;
+                            if (!isenemy && boss.bossGroup.IsPlayerEnemy(enemy)) isenemy = true;
 
                             if (isenemy)
                             {

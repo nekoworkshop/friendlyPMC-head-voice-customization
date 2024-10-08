@@ -132,6 +132,11 @@ namespace friendlyPMC.Components
             _bot.Brain.BaseBrain = GetFollowerBrain(_bot, _player);
             _bot.Brain.Agent = GetFollowerAIAgent(_bot);
             _bot.BotsController.AICoreController.Activate();
+            if((_bot.Brain.BaseBrain as FollowerBrain).currentTactic == "Guard")
+            {
+                _bot.WeaponManager.Selector.Dispose();
+                _bot.WeaponManager.Selector = new GClass396(_bot);
+            }
             // let the bot talk
             _bot.BotTalk.SetSilence(0f);
             // force bot to turn off light

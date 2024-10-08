@@ -30,7 +30,7 @@
 - x - make bot auto aquire enemy is he is speaking too close
 
 - x - make ping status read the bot's tactic from the config instead of from the logic
-- #inprogress - enemy.Search and moveCloserToBoss needs improvements
+- x - enemy.Search and moveCloserToBoss needs improvements
 - #inprogress - make bots obey "regroup" call when BTR is close
 - #inprogress - add Support Tactic
 - - use BigPipe's logic regarding suppression fire

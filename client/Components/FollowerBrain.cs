@@ -27,6 +27,14 @@ namespace friendlyPMC.Components
             }
         }
 
+        public string defaultTactic
+        {
+            get
+            {
+                return _defaultTactic;
+            }
+        }
+
         protected bool _needsProtection = true;
 
         public bool bossNeedsProtection
