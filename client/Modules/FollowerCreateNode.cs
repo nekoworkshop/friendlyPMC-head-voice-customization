@@ -51,6 +51,9 @@ namespace friendlyPMC.Modules
             if(type == BotLogicDecision.dogFight)
                 return new FollowerDogFight(bot);
 
+            if (type == BotLogicDecision.suppressFire)
+                return new FollowerSuppressionFire(bot);
+
             return GClass459.CreateNode(type, bot);
         }
 

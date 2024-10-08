@@ -176,6 +176,7 @@ namespace friendlyPMC.Components.Tactics
                 if (!botOwner_0.Memory.IsInCover)
                 {
                     // - find cover to shoot from
+                    // @TODO - needs fixing, bot ends up moving somewhere in the back!
                     GetClosestAttackCoverPoint(botPosition);
 
                     if (customNavigationPoint_0 != null)
@@ -196,6 +197,7 @@ namespace friendlyPMC.Components.Tactics
                     if (botOwner_0.Memory.CurCustomCoverPoint != null && botOwner_0.Memory.CurCustomCoverPoint.CanIShootToEnemy)
                         return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.shootFromCover, "shootFromCover");
                     // - else find better spot
+                    // @TODO - needs fixing, bot ends up moving somewhere in the back!
                     else
                     {
                         bool getClose = false;
@@ -285,11 +287,12 @@ namespace friendlyPMC.Components.Tactics
             }
         }
 
-        public AICoreActionResultStruct<BotLogicDecision>? CanDoSuppressRequest(Ray rayDirection)
+        public AICoreActionResultStruct<BotLogicDecision>? CanDoGrenadierSuppressRequest(Ray rayDirection)
         {
             if(!botOwner_0.WeaponManager.Selector.CanChangeToSecondWeapons) return null;
             GClass396 selector = botOwner_0.WeaponManager.Selector as GClass396;
-            if(selector != null && selector.SecondPrimaryWeapon as Weapon != null && (selector.SecondPrimaryWeapon as Weapon).IsGrenadeLauncher)
+
+            if (selector != null && (selector.SecondPrimaryWeapon as Weapon) != null && (selector.SecondPrimaryWeapon as Weapon).IsGrenadeLauncher)
             {
                 if(botOwner_0.WeaponManager.Selector.LastEquipmentSlot != EquipmentSlot.SecondPrimaryWeapon)
                     botOwner_0.WeaponManager.Selector.TryChangeWeapon(true);
@@ -314,9 +317,10 @@ namespace friendlyPMC.Components.Tactics
                 for (int i = 0; i < numHits; i++)
                 {
                     RaycastHit hit = hits[i];
-                    if (hit.collider != null && hit.collider.gameObject != null)
+                    if (hit.collider != null)
                     {
-                        var enemy = hit.collider.gameObject.GetComponent<Player>();
+                        
+                        Player enemy = botOwner_0.ShootData.method_4(hit.collider);
                         bool isenemy = false;
                         if(enemy != null && (botOwner_0.BotsGroup.IsEnemy(enemy) || botOwner_0.BotsGroup.IsPlayerEnemy(enemy))) isenemy = true;
 

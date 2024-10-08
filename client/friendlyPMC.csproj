@@ -162,6 +162,7 @@
     <Compile Include="Actions\FollowerRunToCover.cs" />
     <Compile Include="Actions\FollowerSniperSearch.cs" />
     <Compile Include="Actions\FollowerSearch.cs" />
+    <Compile Include="Actions\FollowerSuppressionFire.cs" />
     <Compile Include="Components\BossFollower\KnightAvoidDangerLayer.cs" />
     <Compile Include="Components\BossFollower\KnightFightLayer.cs" />
     <Compile Include="Components\BossFollower\KnightWeaponMtnLayer.cs" />

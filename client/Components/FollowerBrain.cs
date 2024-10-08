@@ -1,12 +1,13 @@
 ﻿using Comfort.Common;
 using EFT;
-
+using EFT.InventoryLogic;
 using friendlyPMC.Actions;
 using friendlyPMC.Modules;
 
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using static UnityEngine.UI.GridLayoutGroup;
 
 namespace friendlyPMC.Components
 {
@@ -408,8 +409,16 @@ namespace friendlyPMC.Components
             if (fightLayer != null)
             {
                 // whatever tactic we initially set when calling AddBotFollower, that becomes the default one
-                if (_defaultTactic == null && tactic != null) _defaultTactic = tactic;
-                else if(tactic == null && _defaultTactic != null) tactic = _defaultTactic;
+                if (_defaultTactic == null && tactic != null)
+                {
+                    _defaultTactic = tactic;
+                    // - if default is Support Tactic - change the weapon selector
+                    if (_defaultTactic == "Guard" || _defaultTactic == friendlyPMC.GetTacticOptions()[1])
+                    {
+                        SetGrenadierSelector();
+                    }
+                }
+                else if (tactic == null && _defaultTactic != null) tactic = _defaultTactic;
 
                 fightLayer.SetBossFightTactic(tactic);
                 BossOrdersChanged();
@@ -427,6 +436,21 @@ namespace friendlyPMC.Components
             {
                 fightLayer.OrdersChanged();
             }
+        }
+
+        private void SetGrenadierSelector()
+        {
+            _owner.WeaponManager.Selector.Dispose();
+            _owner.WeaponManager.Selector = new GClass396(_owner);
+
+            GClass396 selector = _owner.WeaponManager.Selector as GClass396;
+
+            selector.OnActiveEquipmentSlotChanged = (Action<EquipmentSlot>)Delegate.Combine(selector.OnActiveEquipmentSlotChanged, new Action<EquipmentSlot>(_owner.WeaponManager.method_0));
+
+            selector.UpdateWeaponsList();
+            selector.TakeMainWeapon();
+
+            selector.Activate();
         }
     }
 }

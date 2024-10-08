@@ -495,7 +495,7 @@ namespace friendlyPMC.Components
                 // - guard(support) can use grenade launcher 
                 if((botOwner_0.Brain.BaseBrain as FollowerBrain)?.defaultTactic == "Guard" && grSuppressTime < Time.time)
                 {
-                    var launcherDecicion = guardLayer.CanDoSuppressRequest(new Ray(request.Requester.Transform.position, request.Requester.LookDirection));
+                    var launcherDecicion = guardLayer.CanDoGrenadierSuppressRequest(new Ray(request.Requester.Transform.position, request.Requester.LookDirection));
                     if(launcherDecicion.HasValue)
                     {
                         grSuppressTime = Time.time + 5f;
