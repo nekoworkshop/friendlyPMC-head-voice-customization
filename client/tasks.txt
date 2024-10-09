@@ -58,20 +58,18 @@
 - add "hold fire/fire at will" commands
 
 ==================================================================================
-RELEASE NOTES (3.8):
-- removed "Player Equipment" as option for equipment for bots. When clonning player equipment people have reported to have delays in spawn. Because you can simply save your current equipment as a preset loadout - this is removed and you can use that instead. Also I encourge using custom presets that you personally made for bots because people tend to put the meds in the secure container of their own equipment, not realizing that will get deleted and ammo will be put instead for the bots to use. It will also not be there in the end when followers use the equipment you give them instead of clonning it. 
-- added a new tactic - Support - main action of this tactic is ability to use secondary weapon if it's a grenade launcher when asking for fire suppress
+RELEASE NOTES (3.8) - Grenadier Squad ready, how's your throwing arm?:
+- added a new tactic - Support - with this tactic the follower will frequently provide suppersion fire, if it has grenades it will use them (SAIN does not affect them) and if has a grenade launcher as seconday weapon it will use that on its own or when asked to do suppression fire.
+- removed "Player Equipment" as option for equipment for bots. When clonning player equipment people have reported to have delays in spawn. Because you can simply save your current equipment as a preset loadout - this is removed and you can use that instead.
 - bots can now be called to your position when BTR is nearby. As part of the game logic, bots hide when BTR is around so they don't get ran over. But this also makes them no longer follow you until BTR leaves the area. Now you can call them to your position to get them out of BTR radius.
 - made "Spread Out" command functional. Bot will run towards some cover when this is executed.
 - updated "Contact" command to now take into consideration any visible part of the enemy instead of just the head and torso
-- all direction commands are now functional (under ENEMY STATUS)
-- "That Direction" has a new function. You can look at something, maximum 25 m distance,  and do the gesture. This is will make the nearest bot to go there to investigate.
+- all direction commands are now functional (under ENEMY group)
+- "That Direction" has a new function. You can look at something, maximum 25 m distance, and do the gesture. This is will make the nearest bot to go there to investigate.
 - "Holder" tactic has been revamp to stop bots from continously checking for where to place themselves while the player is not moving. 
 - scav followers and picked up followers will turn hostile on friendly fire
-- added detection for when enemy is about to engage the player or any teamember
 - some improvements on the cover search logic in an effort to reduce the situations where bots end up running in a wall
 - spawned follower's level now affects some of it's skills (PMC only)
-
 - improved awareness
 - bug fixes 
 
