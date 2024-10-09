@@ -286,7 +286,10 @@ namespace friendlyPMC.Components.Tactics
                 return new AICoreActionResultStruct<BotLogicDecision>((BotLogicDecision)CustomBotDecisions.GuardToCover, "coverBoss");
             }
         }
-
+        public AICoreActionResultStruct<BotLogicDecision> GrenadierDecision()
+        {
+            return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.suppressFire, "suppressFireLauncher");
+        }
         public AICoreActionResultStruct<BotLogicDecision>? CanDoGrenadierSuppressRequest(Ray rayDirection)
         {
             if(!botOwner_0.WeaponManager.Selector.CanChangeToSecondWeapons) return null;
@@ -338,10 +341,10 @@ namespace friendlyPMC.Components.Tactics
                 
                 foreach (Vector3 position in list_1)
                 {
-                    Singleton<BotEventHandler>.Instance.ArtilleryStart(position, 20f, delay);
+                    Singleton<BotEventHandler>.Instance.ArtilleryStart(position, 20f,delay);
                 }
 
-                return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.suppressFire, "suppressFireLauncher");
+                return GrenadierDecision();
             }
 
             

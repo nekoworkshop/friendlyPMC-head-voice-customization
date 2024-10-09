@@ -253,16 +253,11 @@ namespace friendlyPMC.Actions
             {
                 Vector3 enemySpot = botOwner_0.Memory.GoalEnemy.CurrPosition;
                 // get closest cover to the bot from where he can shoot the enemy
-                CustomNavigationPoint Spot = Utils.Covers.GetClosestAttackCoverPoint(
-                    botOwner_0.Id,
-                    botOwner_0.GetPlayer.Transform.position,
+                CustomNavigationPoint Spot = Utils.Covers.GetClosestShootCover(
+                    botOwner_0,
                     enemySpot,
-                    enemySpot,
-                    areaCovers,
                     minDist, 
-                    maxDist,
-                    carePosition,
-                    false
+                    maxDist
                 );
 
                 if (Spot != null) _lastSpot = Spot.Position;

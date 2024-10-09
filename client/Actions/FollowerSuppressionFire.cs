@@ -15,7 +15,7 @@ namespace friendlyPMC.Actions
 
         public override void Update()
         {
-            if (!botOwner_0.WeaponManager.Selector.IsWeaponReady) return;
+            //if (!botOwner_0.WeaponManager.Selector.IsWeaponReady) return;
             base.Update();
         }
     }
