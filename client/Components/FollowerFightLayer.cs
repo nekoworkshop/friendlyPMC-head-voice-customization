@@ -423,16 +423,16 @@ namespace friendlyPMC.Components
                         grSupport = true;
                         return launcherDecicion.Value;
                     }
+
+                    botOwner_0.SuppressShoot.Init(botOwner_0.Memory.GoalEnemy);
+                    (botOwner_0.Brain.BaseBrain as FollowerBrain).FakeShot(botOwner_0.Memory.GoalEnemy.CurrPosition);
                 }
 
                 Modules.Logger.LogInfo("Do normal suppression");
 
-                if (botOwner_0.Memory.HaveEnemy)
-                {
-                    botOwner_0.BotTalk.TrySay(EPhraseTrigger.Covering, true);
-                    suppressTime = Time.time + 2f;
-                    return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.suppressFire, "suppressFire");
-                }
+                botOwner_0.BotTalk.TrySay(EPhraseTrigger.Covering, false);
+                suppressTime = Time.time + 2.5f;
+                return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.suppressFire, "suppressFire");
             }
 
             // throw grenade request

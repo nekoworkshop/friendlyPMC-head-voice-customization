@@ -32,8 +32,8 @@
 - x - make ping status read the bot's tactic from the config instead of from the logic
 - x - enemy.Search and moveCloserToBoss needs improvements
 - #inprogress - make bots obey "regroup" call when BTR is close
-- #inprogress - add Support Tactic
-- - use BigPipe's logic regarding suppression fire
+- x - add Support Tactic
+- x - use BigPipe's logic regarding suppression fire
 
 -- === 3.9 === ---:
 - player level to determine if he can pick up any extra followers and how many (maximum 3, disable configuration regarding this)
