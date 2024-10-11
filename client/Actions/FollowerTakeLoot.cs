@@ -3,13 +3,10 @@ using friendlyPMC.Components;
 using friendlyPMC.Modules;
 
 using UnityEngine;
-using UnityEngine.AI;
 
 using Cysharp.Threading.Tasks;
 using System;
 
-using System.Collections;
-using System.Reflection;
 using EFT.InventoryLogic;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -106,13 +103,28 @@ namespace friendlyPMC.Actions
             try
             {
                 InventoryControllerClass inventoryControllerClass = botOwner_0.GetPlayer.InventoryControllerClass;
-
+                // order for general loot
                 List<EquipmentSlot> possibleSlots = new List<EquipmentSlot> {
                     EquipmentSlot.Backpack,
                     EquipmentSlot.TacticalVest,
                     EquipmentSlot.ArmorVest,
                     EquipmentSlot.Pockets
                 };
+                // order for special items, like grenades
+                List<EquipmentSlot> equipSlots = new List<EquipmentSlot> {
+                    EquipmentSlot.Pockets,
+                    EquipmentSlot.TacticalVest,
+                    EquipmentSlot.ArmorVest,
+                    EquipmentSlot.Backpack,
+                };
+
+
+
+                if (item is GrenadeClass)
+                {
+                    possibleSlots = equipSlots;
+                }
+
                 // find an available grid in the equipment slots to which the key can be transferred
                 ItemAddress locationForItem = FindLocationForItem(item, possibleSlots, inventoryControllerClass);
                 //  - no space left

@@ -501,31 +501,31 @@ namespace friendlyPMC.Patches
                         switch (part)
                         {
                             case EBodyPart.Head:
-                                bodyPart.Health.Minimum = 35 * friendlyPMC.heatlhMultiplier.Value;
-                                bodyPart.Health.Maximum = 35 * friendlyPMC.heatlhMultiplier.Value;
-                                bodyPart.Health.Current = 35 * friendlyPMC.heatlhMultiplier.Value;
+                                bodyPart.Health.Minimum = bodyPart.Health.Minimum * friendlyPMC.heatlhMultiplier.Value;
+                                bodyPart.Health.Maximum = bodyPart.Health.Maximum * friendlyPMC.heatlhMultiplier.Value;
+                                bodyPart.Health.Current = bodyPart.Health.Maximum * friendlyPMC.heatlhMultiplier.Value;
                                 break;
                             case EBodyPart.Chest:
-                                bodyPart.Health.Minimum = 85 * friendlyPMC.heatlhMultiplier.Value;
-                                bodyPart.Health.Maximum = 85 * friendlyPMC.heatlhMultiplier.Value;
-                                bodyPart.Health.Current = 85 * friendlyPMC.heatlhMultiplier.Value;
+                                bodyPart.Health.Minimum = bodyPart.Health.Minimum * friendlyPMC.heatlhMultiplier.Value;
+                                bodyPart.Health.Maximum = bodyPart.Health.Maximum * friendlyPMC.heatlhMultiplier.Value;
+                                bodyPart.Health.Current = bodyPart.Health.Current * friendlyPMC.heatlhMultiplier.Value;
                                 break;
                             case EBodyPart.Stomach:
-                                bodyPart.Health.Minimum = 70 * friendlyPMC.heatlhMultiplier.Value;
-                                bodyPart.Health.Maximum = 70 * friendlyPMC.heatlhMultiplier.Value;
-                                bodyPart.Health.Current = 70 * friendlyPMC.heatlhMultiplier.Value;
+                                bodyPart.Health.Minimum = bodyPart.Health.Minimum * friendlyPMC.heatlhMultiplier.Value;
+                                bodyPart.Health.Maximum = bodyPart.Health.Maximum * friendlyPMC.heatlhMultiplier.Value;
+                                bodyPart.Health.Current = bodyPart.Health.Current * friendlyPMC.heatlhMultiplier.Value;
                                 break;
                             case EBodyPart.RightArm:
                             case EBodyPart.LeftArm:
-                                bodyPart.Health.Minimum = 60 * friendlyPMC.heatlhMultiplier.Value;
-                                bodyPart.Health.Maximum = 60 * friendlyPMC.heatlhMultiplier.Value;
-                                bodyPart.Health.Current = 60 * friendlyPMC.heatlhMultiplier.Value;
+                                bodyPart.Health.Minimum = bodyPart.Health.Minimum * friendlyPMC.heatlhMultiplier.Value;
+                                bodyPart.Health.Maximum = bodyPart.Health.Maximum * friendlyPMC.heatlhMultiplier.Value;
+                                bodyPart.Health.Current = bodyPart.Health.Current * friendlyPMC.heatlhMultiplier.Value;
                                 break;
                             case EBodyPart.RightLeg:
                             case EBodyPart.LeftLeg:
-                                bodyPart.Health.Minimum = 65 * friendlyPMC.heatlhMultiplier.Value;
-                                bodyPart.Health.Maximum = 65 * friendlyPMC.heatlhMultiplier.Value;
-                                bodyPart.Health.Current = 65 * friendlyPMC.heatlhMultiplier.Value;
+                                bodyPart.Health.Minimum = bodyPart.Health.Minimum * friendlyPMC.heatlhMultiplier.Value;
+                                bodyPart.Health.Maximum = bodyPart.Health.Maximum * friendlyPMC.heatlhMultiplier.Value;
+                                bodyPart.Health.Current = bodyPart.Health.Current * friendlyPMC.heatlhMultiplier.Value;
                                 break;
 
                             default:

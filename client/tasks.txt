@@ -31,17 +31,26 @@
 
 - x - make ping status read the bot's tactic from the config instead of from the logic
 - x - enemy.Search and moveCloserToBoss needs improvements
-- #inprogress - make bots obey "regroup" call when BTR is close
+
 - x - add Support Tactic
 - x - use BigPipe's logic regarding suppression fire
 - x - attempt to fix busy hands bug
-- check if the item we gave to the bot is still in his inventory upon raid end
+
 - investigate error with swag
+- #inprogress - make bots obey "regroup" call when BTR is close
+- make pickup grenades go in pockets or vest first
+- make firstaid also do the same
 
 -- === 3.9 === ---:
 - player level to determine if he can pick up any extra followers and how many (maximum 3, disable configuration regarding this)
-- scav karma and level to determin with how many followers can the player spawn (maxium 3) and extra pickups (maximum 2 extras)
-- add detection for when enemy is about to engage the player or any teamember (patch SET EnemyInfo.IsVisible and check if the enemy is a teammate and the distance is close enough for engagement)
+- scav karma and level to determine with how many followers can the player spawn (maxium 3) and extra pickups (maximum 2 extras)
+
+- add punishment for players intentionally killing their teammates
+- - check if in combat or out of combat the kill was done
+
+- remove from player's inventory any equipment he looted from his dead teammates
+
+- add detection for when enemy ise about to engage the player or any teamember (patch SET EnemyInfo.IsVisible and check if the enemy is a teammate and the distance is close enough for engagement)
 
 - see if we can make bot swap weapons when asked to loot (DeadBodyWork)
 
@@ -49,11 +58,6 @@
 - goons send messages at the end of the raid
 
 - goons send join offer for specific maps (Woods, Shoreline, Customs, Lighthouse)
-- add new tactic Supporter (an alternative version to Marskman that also allows for push order)
-- make BigPipe fight tactic unique (Assault Supporter) 
-- make BirdEye fight tactic more unique (Enhanced Marskman)
-- make Knight fight tactic unique (Assaulter)
-- lock the new tactics under the goons challenge
 
 --- ==== 4.0.0 (final phase) ==== ---:
 - add squad management terminal
@@ -62,7 +66,7 @@
 
 ==================================================================================
 RELEASE NOTES (3.8) - Grenadier Squad ready, how's your throwing arm?:
-- added a new tactic - Support - with this tactic the follower will frequently provide suppersion fire, if it has grenades it will use them (SAIN does not affect them) and if has a grenade launcher as seconday weapon it will use that on its own or when asked to do suppression fire.
+- added a new tactic - Support - with this tactic the follower will frequently provide suppression fire. If it has grenades it will use them (SAIN does not affect them) and if has a grenade launcher as seconday weapon it will use that on its own or when asked to do suppression fire.
 - removed "Player Equipment" as option for equipment for bots. When clonning player equipment people have reported to have delays in spawn. Because you can simply save your current equipment as a preset loadout - this is removed and you can use that instead.
 - bots can now be called to your position when BTR is nearby. As part of the game logic, bots hide when BTR is around so they don't get ran over. But this also makes them no longer follow you until BTR leaves the area. Now you can call them to your position to get them out of BTR radius.
 - made "Spread Out" command functional. Bot will run towards some cover when this is executed.
