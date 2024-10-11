@@ -11,6 +11,7 @@ using System.Threading;
 using System.Timers;
 using UnityEngine;
 using UnityEngine.AI;
+using static RootMotion.FinalIK.IKSolver;
 
 namespace friendlyPMC.Components
 {
@@ -400,12 +401,11 @@ namespace friendlyPMC.Components
             }
 
             // suppression fire request
-            if (request != null && request.BotRequestType == BotRequestType.suppressionFire)
+            if (!sniperTactic && request != null && request.BotRequestType == BotRequestType.suppressionFire)
             {
                 Modules.Logger.LogInfo("Suppression request");
                 if (grSupport && grSuppressTime > Time.time)
                 {
-                    Modules.Logger.LogInfo("Is already doing grenadier");
                     return guardLayer.GrenadierDecision();
                 }
 
@@ -423,16 +423,14 @@ namespace friendlyPMC.Components
                         grSupport = true;
                         return launcherDecicion.Value;
                     }
-
-                    botOwner_0.SuppressShoot.Init(botOwner_0.Memory.GoalEnemy);
-                    (botOwner_0.Brain.BaseBrain as FollowerBrain).FakeShot(botOwner_0.Memory.GoalEnemy.CurrPosition);
                 }
 
                 Modules.Logger.LogInfo("Do normal suppression");
 
                 botOwner_0.BotTalk.TrySay(EPhraseTrigger.Covering, false);
                 suppressTime = Time.time + 2.5f;
-                return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.suppressFire, "suppressFire");
+
+                return guardLayer.method_29(false, guardLayer.method_31());
             }
 
             // throw grenade request
@@ -445,7 +443,6 @@ namespace friendlyPMC.Components
                 (request.BotRequestType == BotRequestType.getInCover || request.BotRequestType == BotRequestType.hide)
              )
             {
-                Modules.Logger.LogInfo("Spread Out received");
                 if (botOwner_0.Memory.HaveEnemy && botOwner_0.Memory.GoalEnemy.CanShoot)
                 {
                     request.Complete();
@@ -467,7 +464,7 @@ namespace friendlyPMC.Components
                             }
 
                         }, 4000);
-                        Modules.Logger.LogInfo("Execute Spread Out");
+
                         return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "runToCover");
                     }
                     else

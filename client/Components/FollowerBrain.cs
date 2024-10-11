@@ -7,7 +7,8 @@ using friendlyPMC.Modules;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using static UnityEngine.UI.GridLayoutGroup;
+
+using HandEvent = GEventArgs1;
 
 namespace friendlyPMC.Components
 {
@@ -82,6 +83,12 @@ namespace friendlyPMC.Components
 
         public event Action<BotOwner> OnDispose;
 
+        private float _busyTimer = 0f;
+
+        private const float TIME_TO_RESET_HEAL_FIRSTAID = 15f;
+        private const float TIME_TO_RESET_HEAL_STIMS = 3f;
+        private const float TIME_TO_RESET_HEAL_SURGERY = 40f;
+
         public FollowerBrain(BotOwner owner, pitAIBossPlayer boss) : base(owner)
         {
             AddLayers();
@@ -95,12 +102,75 @@ namespace friendlyPMC.Components
 
             _currentTactic = "Default";
 
-            //BotHelpers helpers = owner.GetPlayer.gameObject.AddComponent<BotHelpers>();
-            //helpers.AttachStuckWatcher(owner);
-
         }
 
-        
+        public override void ManualUpdate()
+        {
+            base.ManualUpdate();
+            try
+            {
+                var meds = _owner.Medecine;
+                if (meds != null)
+                {
+                    if (meds.Stimulators?.Using == true)
+                    {
+                        if (_busyTimer == 0f)
+                        {
+                            _busyTimer = Time.time + TIME_TO_RESET_HEAL_STIMS;
+                            return;
+                        }
+                        else if (_busyTimer < Time.time)
+                        {
+                            return;
+                        }
+                        else
+                        {
+                            HandsReset();
+                        }
+                    }
+
+                    if (meds.FirstAid?.Using == true)
+                    {
+                        if (_busyTimer == 0f)
+                        {
+                            _busyTimer = Time.time + TIME_TO_RESET_HEAL_FIRSTAID;
+                            return;
+                        }
+                        else if (_busyTimer < Time.time)
+                        {
+                            return;
+                        }
+                        else
+                        {
+                            HandsReset();
+                        }
+                    }
+
+                    if (meds.SurgicalKit?.Using == true)
+                    {
+                        if (_busyTimer == 0f)
+                        {
+                            _busyTimer = Time.time + TIME_TO_RESET_HEAL_SURGERY;
+                            return;
+                        }
+                        else if (_busyTimer < Time.time)
+                        {
+                            return;
+                        }
+                        else
+                        {
+                            HandsReset();
+                        }
+                    }
+                }
+
+                _busyTimer = 0f;
+            }
+            catch (Exception ex)
+            {
+                Modules.Logger.LogError(ex);
+            }
+        }
 
         public virtual void AddLayers()
         {
@@ -451,6 +521,27 @@ namespace friendlyPMC.Components
             selector.TakeMainWeapon();
 
             selector.Activate();
+        }
+
+        private void HandsReset()
+        {
+            Player player = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(_owner.ProfileId);
+            InventoryControllerClass inventoryController = player.InventoryControllerClass;
+            if (inventoryController == null)
+            {
+                _busyTimer = 0f;
+                return;
+            }
+            int length = inventoryController.List_0.Count;
+            if (length > 0)
+            {
+                HandEvent[] args = new HandEvent[length];
+                inventoryController.List_0.CopyTo(args);
+                foreach (HandEvent queuedEvent in args)
+                {
+                    inventoryController.RemoveActiveEvent(queuedEvent);
+                }
+            }
         }
     }
 }

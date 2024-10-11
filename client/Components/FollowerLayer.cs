@@ -145,10 +145,10 @@ namespace friendlyPMC.Components
                     heal_time = Time.time;
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.heal, "first aid");
                 }
-                if (method_11(20f))
+                if (method_11(1f))
                 {
                     GetCoverPoint(botOwner_0.GetPlayer.Transform.position, 50f);
-                    if (this.customNavigationPoint_0 != null)
+                    if (customNavigationPoint_0 != null)
                         return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "goforheal");
                 }
                 heal_time = Time.time;

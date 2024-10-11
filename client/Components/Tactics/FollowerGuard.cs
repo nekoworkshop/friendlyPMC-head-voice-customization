@@ -290,6 +290,7 @@ namespace friendlyPMC.Components.Tactics
         {
             return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.suppressFire, "suppressFireLauncher");
         }
+        /** Check if we can do grenade launcher support **/
         public AICoreActionResultStruct<BotLogicDecision>? CanDoGrenadierSuppressRequest(Ray rayDirection)
         {
             if(!botOwner_0.WeaponManager.Selector.CanChangeToSecondWeapons) return null;
@@ -338,7 +339,7 @@ namespace friendlyPMC.Components.Tactics
 
                 botOwner_0.SuppressShoot.InitToPoints(list_1, null);
                 float delay = (float)list_1.Count * 2f;
-                
+
                 foreach (Vector3 position in list_1)
                 {
                     Singleton<BotEventHandler>.Instance.ArtilleryStart(position, 20f,delay);
@@ -381,6 +382,9 @@ namespace friendlyPMC.Components.Tactics
 
         public BotLogicDecision method_31()
         {
+
+            BotRequest request = botOwner_0.BotRequestController.CurRequest;
+            if (request != null && request.BotRequestType == BotRequestType.suppressionFire) request.Complete();
             return (BotLogicDecision)CustomBotDecisions.GuardToCover;
         }
         public override AICoreActionEndStruct EndHoldPosition()

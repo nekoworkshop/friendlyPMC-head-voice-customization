@@ -34,6 +34,9 @@
 - #inprogress - make bots obey "regroup" call when BTR is close
 - x - add Support Tactic
 - x - use BigPipe's logic regarding suppression fire
+- x - attempt to fix busy hands bug
+- check if the item we gave to the bot is still in his inventory upon raid end
+- investigate error with swag
 
 -- === 3.9 === ---:
 - player level to determine if he can pick up any extra followers and how many (maximum 3, disable configuration regarding this)

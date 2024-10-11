@@ -348,7 +348,7 @@ namespace friendlyPMC.Utils
             return false;
         }
         /** Find a position from where the bot can shoot at the given target **/
-        public static Vector3? FindShootPosition(BotOwner botOwner,float minDistance, float maxRadius, Func<Vector3, bool> eligibleCheck = null)
+        public static Vector3? FindShootPosition(BotOwner botOwner,float minDistance, float maxRadius, Func<Vector3, bool> eligibleCheck = null, bool manualTarget = false)
         {
             Vector3 botPosition = botOwner.GetPlayer.Transform.position;
             Vector3 botWeaponOffset = botOwner.ShootData.WeaponRootOffset;
@@ -388,7 +388,7 @@ namespace friendlyPMC.Utils
                 // Check if the bot can shoot from the random position to the target 
                 bool cansh = false;
                 // check if bot can shoot either the head or torso of the enemy from this position
-                foreach (var target in shootTarget)
+                if(!manualTarget) foreach (var target in shootTarget)
                 {
                     ShootPointClass shootPoint = new ShootPointClass(target, 0.8f);
                     if (

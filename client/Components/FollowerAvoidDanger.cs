@@ -29,7 +29,7 @@ namespace friendlyPMC.Components
         public override bool ShallUseNow()
         {
             bool use = base.ShallUseNow();
-            if (!botOwner_0.Memory.HaveEnemy && btrRegroup)
+            if (btrRegroup)
             {
                 use = true;
             }
@@ -58,7 +58,7 @@ namespace friendlyPMC.Components
                         req.Complete();
                     }
 
-                }, 2000);
+                }, 2500);
 
                 return BotLogicDecisions.RegroupToBoss(botOwner_0);
             }
