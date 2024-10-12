@@ -118,11 +118,20 @@ namespace friendlyPMC.Actions
                     EquipmentSlot.Backpack,
                 };
 
-
-
-                if (item is GrenadeClass)
+                List<object> equipTypes = new List<object>
                 {
-                    possibleSlots = equipSlots;
+                    typeof(GrenadeClass)
+                };
+
+                foreach (var item1 in equipTypes)
+                {
+                    Type type = (Type)item1;
+
+                    if (type.IsInstanceOfType(item))
+                    {
+                        possibleSlots = equipSlots;
+                        break;
+                    }
                 }
 
                 // find an available grid in the equipment slots to which the key can be transferred

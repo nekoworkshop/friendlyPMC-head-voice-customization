@@ -581,6 +581,11 @@ namespace friendlyPMC.Patches
                 float scaledStrees = Utils.Utils.GetScaledValue(0f, stressIncrement, botLevel, maxStress);
                 if(profile.Skills.StressResistance.Current < scaledStrees)
                     profile.Skills.StressResistance.SetCurrent(scaledStrees, true);
+
+                // -- grenade launcher
+                profile.Skills.Launcher.SetCurrent(scaledRecoil, true);
+                // -- grenade throwing
+                profile.Skills.Throwing.SetCurrent(scaledRecoil, true);
             }
 
             Modules.Logger.LogInfo("Return follower profile data");

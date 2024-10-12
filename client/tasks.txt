@@ -38,8 +38,7 @@
 
 - investigate error with swag
 - #inprogress - make bots obey "regroup" call when BTR is close
-- make pickup grenades go in pockets or vest first
-- make firstaid also do the same
+- x - make pickup grenades go in pockets or vest first
 
 -- === 3.9 === ---:
 - player level to determine if he can pick up any extra followers and how many (maximum 3, disable configuration regarding this)

@@ -45,7 +45,7 @@ namespace friendlyPMC.Components
 
             BotRequest request = botOwner_0.BotRequestController.CurRequest;
 
-            if (request != null && request.BotRequestType == (BotRequestType)CustomBotRequestType.Regroup && this.botOwner_0.BewareBTR.ShallRunAway())
+            if (request != null && request.BotRequestType == (BotRequestType)CustomBotRequestType.Regroup)
             {
                 btrRegroup = true;
                 Utils.Utils.SetTimeout(() =>
