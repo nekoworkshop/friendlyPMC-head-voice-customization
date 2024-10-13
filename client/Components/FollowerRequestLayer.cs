@@ -25,6 +25,9 @@ namespace friendlyPMC.Components
             commonLayer = new FollowerCommonLayer(bot, priority);
         }
 
+        AICoreActionResultStruct<BotLogicDecision>? regroupDecision = null;
+        AICoreActionResultStruct<BotLogicDecision>?  hideDecision = null;
+
         public override string Name()
         {
             if (botOwner_0.BotRequestController.CurRequest != null)
@@ -121,10 +124,17 @@ namespace friendlyPMC.Components
             {
                 // on follow me request from the boss, just come closer to the boss or get out of hold position
                 case BotRequestType.followMe:
-
+                    regroupDecision = null;
+                    hideDecision = null;
                     return new AICoreActionResultStruct<BotLogicDecision>((BotLogicDecision)CustomBotDecisions.MoveToPoint, "req:comeHere");
 
                 case (BotRequestType)CustomBotRequestType.Regroup:
+                    hideDecision = null;
+                    if (regroupDecision.HasValue)
+                    {
+                        return regroupDecision.Value;
+                    }
+
                     Utils.Utils.SetTimeout(() =>
                     {
                         BotRequest req = botOwner_0.BotRequestController.CurRequest;
@@ -133,13 +143,18 @@ namespace friendlyPMC.Components
                         {
                             req.Complete();
                         }
-
+                        regroupDecision = null;
                     }, 2000);
-                    return BotLogicDecisions.RegroupToBoss(botOwner_0);
+
+                    regroupDecision = BotLogicDecisions.RegroupToBoss(botOwner_0);
+                    
+                    return regroupDecision.Value;
 
                 // stay in place
                 case BotRequestType.wait:
-                    if(heal_time + 30f < Time.time  && (botOwner_0.Medecine.FirstAid.Have2Do || botOwner_0.Medecine.SurgicalKit.HaveWork))
+                    hideDecision = null;
+                    regroupDecision = null;
+                    if (heal_time + 30f < Time.time  && (botOwner_0.Medecine.FirstAid.Have2Do || botOwner_0.Medecine.SurgicalKit.HaveWork))
                     {
                         heal_time = Time.time;
                         return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.heal, "heal");
@@ -149,6 +164,9 @@ namespace friendlyPMC.Components
                 // spread out requests
                 case BotRequestType.getInCover:
                 case BotRequestType.hide:
+                    regroupDecision = null;
+                    
+                    if (hideDecision.HasValue) return hideDecision.Value;
 
                     GetCoverPoint(botOwner_0.GetPlayer.Transform.position, 50f);
                     if (customNavigationPoint_0 != null)
@@ -165,7 +183,9 @@ namespace friendlyPMC.Components
 
                         }, 4000);
 
-                        return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "req:runHide");
+                        hideDecision = new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "req:runHide");
+                        return hideDecision.Value;
+
                     } else
                     {
                         request.Complete();
@@ -174,6 +194,8 @@ namespace friendlyPMC.Components
                     }
 
                 case BotRequestType.goToPoint:
+                    regroupDecision = null;
+                    hideDecision = null;
                     return new AICoreActionResultStruct<BotLogicDecision>((BotLogicDecision)CustomBotDecisions.MoveToPoint, "req:goCheck");
             }
 
@@ -185,13 +207,24 @@ namespace friendlyPMC.Components
 
         public override AICoreActionEndStruct ShallEndCurrentDecision(AICoreActionResultStruct<BotLogicDecision> curDecision)
         {
+            AICoreActionEndStruct result;
 
-            if(curDecision.Action == BotLogicDecision.goToPoint && botOwner_0.Mover.IsComeTo(0.5f, false))
+            if (curDecision.Action == BotLogicDecision.goToPoint && botOwner_0.Mover.IsComeTo(0.5f, false))
             {
-                return new AICoreActionEndStruct("point.Reached", true);
+                regroupDecision = null;
+                hideDecision = null;
+                result = new AICoreActionEndStruct("point.Reached", true);
             }
 
-            return base.ShallEndCurrentDecision(curDecision);
+            result =  base.ShallEndCurrentDecision(curDecision);
+            
+            if(result.Value)
+            {
+                regroupDecision = null;
+                hideDecision = null;
+            }
+
+            return result;
         }
 
         public override AICoreActionEndStruct EndSuppressFire()
