@@ -167,7 +167,7 @@ namespace friendlyPMC
             {
                 "memberTactic", new Dictionary<string,string>{
                     { "Name", "Squad Member {0} Tactic"},
-                    { "Description", "Set Squad member fight tactic. Default is a combination of Pusher and Holder. Pusher tries to push the enemy often. Holder will stay in place around the boss. Marksman will try to get a position from where he can shoot preferably from behind the player, at a distance and will not push even if ordered"}
+                    { "Description", "Set Squad member fight tactic. Default is a combination of Pusher and Holder. Pusher tries to push the enemy often. Holder will stay in place around the boss. Marksman will try to get a position from where he can shoot preferably from behind the player, at a distance and will not push even if ordered. Support will provide fequent suppression fire and is able to use grenades and the grenade launcher as secondary weapon"}
                 }
             },
             {
