@@ -608,6 +608,11 @@ namespace friendlyPMC.Patches
             return followerCreationTask[player.realPlayer.ProfileId];
         }
 
+        private static bool HasFika()
+        {
+            return Type.GetType("Fika.Core.Coop.GameMode.CoopGame, Fika.Core") != null;
+        }
+
         public async UniTask SpawnBossFollower(pitAIBossPlayer player, WildSpawnType boss = WildSpawnType.bossKnight, CancelToken cancelToken = null)
         {
             float dist;
@@ -1172,7 +1177,7 @@ namespace friendlyPMC.Patches
                 spawnedPlayers.Add(playerBoss);
 
                 // prefetch follower profile data
-                if (Type.GetType("Fika.Core.Coop.GameMode.CoopGame, Fika.Core") == null && playerBoss.Player().Side != EPlayerSide.Savage && friendlyPMC.squadSpawn.Value && friendlyPMC.squadSetup.Value)
+                if (playerBoss.Player().Side != EPlayerSide.Savage && friendlyPMC.squadSpawn.Value && friendlyPMC.squadSetup.Value)
                     Instance?.CreateFollowerProfiles(playerBoss);
 
                 /*if (friendlyPMC.knightSpawn.Value)
