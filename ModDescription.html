@@ -25,7 +25,7 @@
 	<li><strong>[tt]Use Squad setup[/tt]</strong> - Enable customization for each squad member
 	<ul>
 		<li><strong>[tt]Squad Member Nickname[/tt]</strong> - Set a custom nickname for the squad member. Leave blank for default</li>
-		<li><strong>[tt]Squad Member Equipment[/tt]</strong> - Set custom equipment for the squad member. You can choose between default (SPT random equipment), the user's current equipment, or user-created loadout presets that can be made on the character screen.</li>
+		<li><strong>[tt]Squad Member Equipment[/tt]</strong> - Set custom equipment for the squad member. You can choose between default (SPT random equipment) or user-created loadout presets that can be made on the character screen.</li>
 		<li><strong>[tt]Squad Member Top[/tt]</strong> - Set what the top clothes for the member should be. Leave blank for default. Only tops you've unlocked will show here</li>
 		<li><strong>[tt]Squad Member Bottom[/tt]</strong> - Set what the bottom clothes for the member should be. Leave blank for default.  Only the bottoms you've unlocked will show here</li>
 		<li><strong>[tt]Squad Member Tactic[/tt]</strong> - Set the member's fight tactic. See the Gameplay Guide &gt; Tactics for details on available tactics.</li>
@@ -70,20 +70,25 @@
 	<li><strong>Stop</strong> - Tell your followers to stop in place. Does not work during combat</li>
 	<li><strong>Suppress</strong> - Ask for suppression fire</li>
 	<li><strong>Silence</strong> - Ask them to not talk for 1 minute. This command does not work when using SAIN</li>
+	<li><strong>Spread Out</strong> - Tell your followers to find some cover</li>
 </ul>
 <p><strong>In HELP:</strong></p>
 <ul>
 	<li><strong>Need Help</strong> - Same as regroup, but only the closest follower will execute it</li>
 </ul>
+<p><strong>In CONTACT:</strong></p>
+<ul>
+	<li><strong>All directions commands (in front, left, right, on six)</strong> - Makes your followers look towards the direction you signaled, relative to your look direction. All but the "in front" can also be issued to a singal bot by looking at him.</li>
+</ul>
 <p><strong>In ENEMY:</strong></p>
 <ul>
 	<li><strong>Contact</strong> - Makes your followers look towards the direction you are looking and if you have an enemy in your visual they will pick him up. This is dependent of "Maximum scan distance" and if you can clearly see the enemy's head or torso.</li>
 </ul>
-<p><strong>In GESTURES:</strong></p>
+<p><strong>In GESTURES (these do not work while in combat, except for "That Direction" and "Come To Me"):</strong></p>
 <ul>
-	<li><strong>Come To Me</strong> - The bot you are looking (maximum 25 meters) at will come near your position</li>
-	<li><strong>That Direction</strong> - The bot closest to you, within 15 meters distance, walks towards the direction you a looking at a maximum 25 meters distance. For best results,look towards the ground, make sure your visibility is not obscured by leaves.</li>
-	<li><strong>Stop (it does not work in combat)</strong> - All bots within 15 meters distance or the one you are looking at (maximum 25 meters) will stop</li>
+	<li><strong>Come To Me</strong> - The bot you are looking (maximum 15 meters) at will come near your position</li>
+	<li><strong>That Direction</strong> - The bot closest to you, within 15 meters distance, will go towards where the player is looking at a maximum 25 meters distance.</li>
+	<li><strong>Stop</strong> - All bots within 15 meters distance will stop</li>
 </ul>
 <p><strong>A [tt]followerstome[/tt] console command that teleports all followers to your location. Needed as the AI can sometimes get stuck under stairs or simply run in place.</strong></p>
 <p>There are also commands under the quick gestures (Default Y) which become available when interaction is possible:</p>
@@ -97,7 +102,7 @@
 <p>[tab='Gameplay Guide']<br><br>Let's start by acknowledging that we are not dealing with top-tier AI here and thus your followers can end up doing stupid things or not properly engage. We cannot rely on the SAIN AI as that mod is not designed to make room for a situation where you have the player as a team leader issuing commands left and right.  You will find yourself relying on Attention and Contact commands a lot. One for getting them unstuck and back to the direction you want and the other to get them to engage as they can have eagle eye observation and also be stone-deaf and oblivious to what is going on.  <br><br>As mentioned in the Squad Commands section, you can issue commands to the entire team or individuals (starting with version 3.7). This allows for a combination where you can have some members stay in place while others follow you (issue Stop for all and then look at one and issue Follow Me to have just him follow) Some won't prioritize covering you while others will. The Stop and Come To Me gestures can be chained so you can move bots in the positions you want them. The Contact command will make them face the direction you want as you set them in place and go for the loot.<br><br><strong>Tactics Details:</strong></p>
 <ul>
 	<li><strong>[tt]Default[/tt]</strong> - A balanced tactic between hold position and push. Followers will stay around you if the enemy is too far, looking for spots to shoot from and if the enemy is close enough, and is weaker than them, they will attempt to push him.</li>
-	<li><strong>[tt]Guard[/tt]</strong> - It is similar to default, but they will attempt to put the threat down quicker, they will attempt to go in front of you if you are under fire and the best gameplay with this tactic is to fallback and let them stay in front of you during engagements.</li>
+	<li><strong>[tt]Support[/tt]</strong> - A follower with support tactic will provide frequent suppression fire, will be able to use grenades(even is SAIN disables that) and will be able to use the grenade launcher if he has it as a secondary weapon. He can use the launcher on his own or when asked to provide supression fire.</li>
 	<li><strong>[tt]Marksman[/tt]</strong> - A tactic best suited for a sniper bot as he will avoid getting close to the enemy and instead will try to look for spots to shoot from. If none are found they will just try to cover you. The marksman will not obey the push command</li>
 	<li><strong>[tt]Holder[/tt]</strong> - Bots with the Holder tactic will stand around you, mostly in cover and waiting for the enemy to come into their vision or be close enough for an ambush.</li>
 	<li><strong>[tt]Pusher[/tt]</strong> - The opposite of Holder. In Pusher mode, the bot will prioritize pushing the enemy.</li>
