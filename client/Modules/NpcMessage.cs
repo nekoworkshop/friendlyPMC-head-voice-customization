@@ -69,6 +69,9 @@ namespace friendlyPMC.Modules
                         }
                     }
                 }
+
+                Logger.LogInfo("Npc " + id + " removed from messaging");
+
                 Instance._npcs.Remove(id);
             }
         }
@@ -123,22 +126,23 @@ namespace friendlyPMC.Modules
                             mates.Add(item.Value);
                     }
                 }
-                
-            } else if (Instance._npcs.ContainsKey(id))
+
+                if (bosses.Count > 0) info = bosses.Random();
+                else if (allies.Count > 0) info = allies.Random();
+                else
+                {
+                    info = mates.Count > 0 ? mates.Random() : null;
+                    if (info != null && Instance._matesLost.Count > 0)
+                    {
+                        ((Dictionary<string, object>)((Dictionary<string, object>)info)["SquadInfo"]).Add("Partial", true);
+                        ((Dictionary<string, object>)((Dictionary<string, object>)info)["SquadInfo"]).Add("Lost", Instance._matesLost);
+                    }
+                }
+
+            } 
+            else if (Instance._npcs.ContainsKey(id))
             {
                 info = Instance._npcs[id];
-            }
-
-            if (bosses.Count > 0) info = bosses.Random();
-            else if (allies.Count > 0) info = allies.Random();
-            else
-            {
-                info = mates.Count > 0 ? mates.Random() : null;
-                if (info != null && Instance._matesLost.Count > 0)
-                {
-                    ((Dictionary<string, object>)((Dictionary<string, object>)info)["SquadInfo"]).Add("Partial", true);
-                    ((Dictionary<string, object>)((Dictionary<string, object>)info)["SquadInfo"]).Add("Lost", Instance._matesLost);
-                }
             }
 
             if (info == null) return;
@@ -169,6 +173,7 @@ namespace friendlyPMC.Modules
 
         public static void Dispose()
         {
+            if (Instance == null) return;
             Instance._npcs.Clear();
             Instance = null;
         }

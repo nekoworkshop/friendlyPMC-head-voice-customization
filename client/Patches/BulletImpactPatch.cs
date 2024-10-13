@@ -1,4 +1,6 @@
-﻿using HarmonyLib;
+﻿using friendlyPMC.Components;
+using friendlyPMC.Modules;
+using HarmonyLib;
 using SPT.Reflection.Patching;
 using System;
 using System.Collections.Generic;
@@ -26,7 +28,12 @@ namespace friendlyPMC.Patches
             {
                 if(info.Player != null)
                 {
-                    //info.CurrentPosition
+                    BossPlayers.GetFollowers().ForEach(follower =>{
+                        var brain = follower.GetBot().Brain.BaseBrain as FollowerBrain;
+                        if(brain != null) {
+                            brain.BulletFelt(info);
+                        } 
+                    });
                 }
                 return;
             }

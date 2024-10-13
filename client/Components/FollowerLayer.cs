@@ -137,15 +137,18 @@ namespace friendlyPMC.Components
             }
             else
             {
+                BotRequest request = botOwner_0.BotRequestController.CurRequest;
+                if (request != null && request.BotRequestType != BotRequestType.wait) request.Complete(); // cancel requests when needing to heal
+
                 if (botOwner_0.Memory.IsInCover)
                 {
                     heal_time = Time.time;
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.heal, "first aid");
                 }
-                if (method_11(20f))
+                if (method_11(1f))
                 {
                     GetCoverPoint(botOwner_0.GetPlayer.Transform.position, 50f);
-                    if (this.customNavigationPoint_0 != null)
+                    if (customNavigationPoint_0 != null)
                         return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "goforheal");
                 }
                 heal_time = Time.time;
@@ -220,6 +223,26 @@ namespace friendlyPMC.Components
             return base.EndAttackMoving();
         }
 
+        public override AICoreActionEndStruct EndRunToCover()
+        {
+            if(!botOwner_0.Memory.HaveEnemy) return new AICoreActionEndStruct("enemy,None", true);
+
+            if (botOwner_0.BewareGrenade.SawGrenadeSoFar(5f))
+            {
+                return new AICoreActionEndStruct("saw grenade", true);
+            }
+            if (botOwner_0.Memory.IsInCover)
+            {
+                return new AICoreActionEndStruct("InCover", true);
+            }
+            
+            if (base.method_2())
+            {
+                return new AICoreActionEndStruct("StartD", true);
+            }
+            return this.aICoreActionEndStruct_1;
+        }
+
         public override AICoreActionEndStruct ShallEndCurrentDecision(AICoreActionResultStruct<BotLogicDecision> curDecision)
         {
             if (curDecision.Action == BotLogicDecision.heal
@@ -228,7 +251,12 @@ namespace friendlyPMC.Components
                 return EndHeal();
             }
 
-            if (curDecision.Action == BotLogicDecision.runToCover && curDecision.Reason == "runToHeal")
+            if(curDecision.Action == (BotLogicDecision)CustomBotDecisions.RunToCover)
+            {
+
+            }
+
+            if (curDecision.Action == BotLogicDecision.runToCover && (curDecision.Reason == "runToHeal" || curDecision.Reason == "relocateFast"))
             {
                 return new AICoreActionEndStruct("enemy.None", true);
             }

@@ -1,10 +1,14 @@
-﻿using EFT;
+﻿using Comfort.Common;
+using EFT;
+using EFT.InventoryLogic;
 using friendlyPMC.Actions;
 using friendlyPMC.Modules;
+
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using static RootMotion.FinalIK.IKSolver;
+
+using HandEvent = GEventArgs1;
 
 namespace friendlyPMC.Components
 {
@@ -22,6 +26,14 @@ namespace friendlyPMC.Components
             get
             {
                 return _currentTactic;
+            }
+        }
+
+        public string defaultTactic
+        {
+            get
+            {
+                return _defaultTactic;
             }
         }
 
@@ -47,6 +59,11 @@ namespace friendlyPMC.Components
         private float _gotShot = 0f;
 
         private float _underFire = 0f;
+
+        private float _hitFreq = 0f;
+
+        private const float _BULLET_HEAR_DIST = 50f * 50f;
+        private const float _BULLET_IMPACT_DISPERSION = 5f * 5f;
         
         public bool WasHit
         {
@@ -64,6 +81,14 @@ namespace friendlyPMC.Components
 
         private float _lastGunshotTime = 0f;
 
+        public event Action<BotOwner> OnDispose;
+
+        private float _busyTimer = 0f;
+
+        private const float TIME_TO_RESET_HEAL_FIRSTAID = 15f;
+        private const float TIME_TO_RESET_HEAL_STIMS = 3f;
+        private const float TIME_TO_RESET_HEAL_SURGERY = 40f;
+
         public FollowerBrain(BotOwner owner, pitAIBossPlayer boss) : base(owner)
         {
             AddLayers();
@@ -78,7 +103,75 @@ namespace friendlyPMC.Components
             _currentTactic = "Default";
 
         }
-        
+
+        public override void ManualUpdate()
+        {
+            base.ManualUpdate();
+            try
+            {
+                var meds = _owner.Medecine;
+                if (meds != null)
+                {
+                    if (meds.Stimulators?.Using == true)
+                    {
+                        if (_busyTimer == 0f)
+                        {
+                            _busyTimer = Time.time + TIME_TO_RESET_HEAL_STIMS;
+                            return;
+                        }
+                        else if (_busyTimer < Time.time)
+                        {
+                            return;
+                        }
+                        else
+                        {
+                            HandsReset();
+                        }
+                    }
+
+                    if (meds.FirstAid?.Using == true)
+                    {
+                        if (_busyTimer == 0f)
+                        {
+                            _busyTimer = Time.time + TIME_TO_RESET_HEAL_FIRSTAID;
+                            return;
+                        }
+                        else if (_busyTimer < Time.time)
+                        {
+                            return;
+                        }
+                        else
+                        {
+                            HandsReset();
+                        }
+                    }
+
+                    if (meds.SurgicalKit?.Using == true)
+                    {
+                        if (_busyTimer == 0f)
+                        {
+                            _busyTimer = Time.time + TIME_TO_RESET_HEAL_SURGERY;
+                            return;
+                        }
+                        else if (_busyTimer < Time.time)
+                        {
+                            return;
+                        }
+                        else
+                        {
+                            HandsReset();
+                        }
+                    }
+                }
+
+                _busyTimer = 0f;
+            }
+            catch (Exception ex)
+            {
+                Modules.Logger.LogError(ex);
+            }
+        }
+
         public virtual void AddLayers()
         {
             // order matters for which layer get the initial priority
@@ -199,6 +292,7 @@ namespace friendlyPMC.Components
 
         public virtual void FakeShot(Vector3 direction)
         {
+            if (_owner.Memory.HaveEnemy && _owner.Memory.GoalEnemy.IsVisible) return;
             _gotShot = Time.time + 3f;
             _owner.Steering.LookToPoint(direction, CalcTurnSpeed(_owner.LookDirection, direction));
         }
@@ -244,7 +338,7 @@ namespace friendlyPMC.Components
 
                 if(wasProcessed && Time.time - _lastSoundTime > 5f ) return;
 
-                if(distance <= 10f) Utils.Enemy.MakeEnemy(_owner, enemy);
+                if(distance <= 12f) Utils.Enemy.MakeEnemy(_owner, enemy);
                 else {
                     _lastSoundTime = Time.time;
 
@@ -266,7 +360,33 @@ namespace friendlyPMC.Components
                 }
             }
         }
+        /** INSPIRED FROM SAIN - follower to feel bullets flying **/
+        public virtual void BulletFelt(EftBulletClass bullet)
+        {
+            if(_owner.Memory.HaveEnemy) return;
+            if(Time.time > _hitFreq) return;
 
+            Player shooter = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(bullet.PlayerProfileID);
+
+            if (!(_owner.EnemiesController.IsEnemy(shooter) || (bullet.Player.iPlayer != null && _owner.BotsGroup.IsEnemy(bullet.Player.iPlayer))))
+            {
+                return;
+            }
+            
+            _hitFreq = Time.time + 1f;
+            float distance = (bullet.CurrentPosition - _owner.Position).sqrMagnitude;
+
+            if(distance > _BULLET_HEAR_DIST) return;
+
+            float dispersion = distance / _BULLET_IMPACT_DISPERSION;
+
+            Vector3 random = UnityEngine.Random.onUnitSphere;
+            random.y = 0;
+            random = random.normalized * dispersion;
+            Vector3 estimatedPos = shooter.Transform.position + random;
+
+            FakeShot(estimatedPos);
+        }
         /** On Leave info about this bot should be cleared */
         public virtual void OnLeave(BotOwner _bot)
         {
@@ -278,13 +398,19 @@ namespace friendlyPMC.Components
             // remove this bot from being a follower
             Dismissed();
             BossPlayers.RemoveFollower(_owner, _boss);
+            Modules.Logger.LogInfo("Follower " + _owner.Profile.Nickname + " died");
         }
 
 
         protected virtual void OnAddEnemy(IPlayer player)
         {
-            // how does the boss get added as Enemy here ?? - fix it
-            if (player != null && player.ProfileId == _boss.Player().ProfileId)
+            // how does the boss or BTR get added as Enemy here ?? - fix it
+            if (
+                player != null && 
+                (
+                    (player.ProfileId == _boss.Player().ProfileId) || 
+                    player.Profile.Info?.Settings?.Role == WildSpawnType.shooterBTR)
+                )
             {
                 _owner.Memory.DeleteInfoAboutEnemy(player);
                 _owner.BotsGroup.RemoveEnemy(player);
@@ -315,19 +441,37 @@ namespace friendlyPMC.Components
 
         public virtual void Dismissed()
         {
+            try
+            {
+                // delete his patrol data
+                ClearFollowerPatrol();
+                // clear info about this bot
+                InteractableObjects.ClearStoredItems(_owner.ProfileId);
+                InteractableObjects.RemoveTaker(_owner);
+                NpcMessage.RemoveNpc(_owner.ProfileId);
 
-            // delete his patrol data
-            ClearFollowerPatrol();
+                OnDispose?.Invoke(_owner);
 
-            _owner.GetPlayer.HealthController.DiedEvent -= OnDead;
-            _owner.LeaveData.OnLeave -= OnLeave;
-            _owner.Memory.OnAddEnemy -= OnAddEnemy;
-            _owner.GetPlayer.BeingHitAction -= BeingHitAction;
+                if (_owner.GetPlayer != null)
+                {
+                    if (_owner.GetPlayer.HealthController != null)
+                        _owner.GetPlayer.HealthController.DiedEvent -= OnDead;
 
-            // clear info about this bot
-            InteractableObjects.ClearStoredItems(_owner.ProfileId);
-            InteractableObjects.RemoveTaker(_owner);
-            NpcMessage.RemoveNpc(_owner.ProfileId);
+                    _owner.GetPlayer.BeingHitAction -= BeingHitAction;
+                }
+                if(_owner.LeaveData != null)
+                    _owner.LeaveData.OnLeave -= OnLeave;
+
+                if(_owner.Memory != null)
+                    _owner.Memory.OnAddEnemy -= OnAddEnemy;
+
+            }
+            catch(Exception ex)
+            {
+                Modules.Logger.LogError(ex);
+            }
+
+            
         }
 
         public virtual void SetBossTactic(string tactic)
@@ -335,8 +479,16 @@ namespace friendlyPMC.Components
             if (fightLayer != null)
             {
                 // whatever tactic we initially set when calling AddBotFollower, that becomes the default one
-                if (_defaultTactic == null && tactic != null) _defaultTactic = tactic;
-                else if(tactic == null && _defaultTactic != null) tactic = _defaultTactic;
+                if (_defaultTactic == null && tactic != null)
+                {
+                    _defaultTactic = tactic;
+                    // - if default is Support Tactic - change the weapon selector
+                    if (_defaultTactic == "Guard" || _defaultTactic == friendlyPMC.GetTacticOptions()[1])
+                    {
+                        SetGrenadierSelector();
+                    }
+                }
+                else if (tactic == null && _defaultTactic != null) tactic = _defaultTactic;
 
                 fightLayer.SetBossFightTactic(tactic);
                 BossOrdersChanged();
@@ -353,6 +505,42 @@ namespace friendlyPMC.Components
             if (fightLayer != null)
             {
                 fightLayer.OrdersChanged();
+            }
+        }
+
+        private void SetGrenadierSelector()
+        {
+            _owner.WeaponManager.Selector.Dispose();
+            _owner.WeaponManager.Selector = new GClass396(_owner);
+
+            GClass396 selector = _owner.WeaponManager.Selector as GClass396;
+
+            selector.OnActiveEquipmentSlotChanged = (Action<EquipmentSlot>)Delegate.Combine(selector.OnActiveEquipmentSlotChanged, new Action<EquipmentSlot>(_owner.WeaponManager.method_0));
+
+            selector.UpdateWeaponsList();
+            selector.TakeMainWeapon();
+
+            selector.Activate();
+        }
+
+        private void HandsReset()
+        {
+            Player player = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(_owner.ProfileId);
+            InventoryControllerClass inventoryController = player.InventoryControllerClass;
+            if (inventoryController == null)
+            {
+                _busyTimer = 0f;
+                return;
+            }
+            int length = inventoryController.List_0.Count;
+            if (length > 0)
+            {
+                HandEvent[] args = new HandEvent[length];
+                inventoryController.List_0.CopyTo(args);
+                foreach (HandEvent queuedEvent in args)
+                {
+                    inventoryController.RemoveActiveEvent(queuedEvent);
+                }
             }
         }
     }

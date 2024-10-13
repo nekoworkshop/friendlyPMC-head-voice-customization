@@ -255,6 +255,26 @@ namespace friendlyPMC.Utils
                             else
                             {
                                 string tactic = (bt.Data.Brain.BaseBrain as FollowerBrain).currentTactic;
+                                switch(tactic)
+                                {
+                                    case "Guard":
+                                        tactic = friendlyPMC.GetTacticOptions()[1];
+                                    break;
+                                    case "Marksman":
+                                    tactic = friendlyPMC.GetTacticOptions()[2];
+                                    break;
+                                    case "Defend":
+                                    case "Hold":
+                                        tactic = friendlyPMC.GetTacticOptions()[4];
+                                    break;
+                                    case "Push":
+                                        tactic = friendlyPMC.GetTacticOptions()[3];
+                                    break;
+                                    default:
+                                        tactic = friendlyPMC.GetTacticOptions()[0];
+                                    break;
+
+                                }
                                 if (tactic != null)
                                 {
                                     stringBuilder.Append($" | Mode: {tactic}");

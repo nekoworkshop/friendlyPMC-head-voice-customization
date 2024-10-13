@@ -1,9 +1,6 @@
 ﻿using EFT;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using friendlyPMC.Modules;
 using UnityEngine;
 
 namespace friendlyPMC.Components.Tactics
@@ -70,23 +67,26 @@ namespace friendlyPMC.Components.Tactics
             Utils.Enemy.EnemyDistance distanceToEnemy = Utils.Enemy.Distance(botOwner_0);
             float enemiesAtLocation = 0;
             if (botOwner_0.Memory.GoalEnemy.ProfileId != null)
-                Utils.Enemy.GetEnemiesAtLocation(botOwner_0, botOwner_0.Memory.GoalEnemy.ProfileId, enemyPos);
+                enemiesAtLocation = Utils.Enemy.GetEnemiesAtLocation(botOwner_0, botOwner_0.Memory.GoalEnemy.ProfileId, enemyPos);
 
             // PUSH CASE
             if (botOwner_0.Memory.AttackImmediately || pushOrdered)
             {
                 if (
-                    // - go for it if enemy is already close
-                    distanceToEnemy == Utils.Enemy.EnemyDistance.Close ||
-                    // - go for it if enemy is just 1
-                    (enemiesAtLocation < 2) ||
-                    // - go for it if there is strength in numbers
+                    // - go for it if enemy is already close and if its low in numbers
+                    (distanceToEnemy <= Utils.Enemy.EnemyDistance.Close && enemiesAtLocation < 2) ||
+                    // - go for it if ordered
                     (pushOrdered && enemiesAtLocation < 4)
                 )
                 {
-                    BotLogicDecision pushDecision = pushOrdered ? BotLogicDecision.runToEnemy : BotLogicDecision.goToEnemy;
-                    // -- push if not visible
-                    if (!enemyVisible)
+                    BotLogicDecision pushDecision;
+                    
+                    if (pushOrdered) pushDecision = BotLogicDecision.runToEnemy;
+                    else if (distanceToEnemy <= Utils.Enemy.EnemyDistance.Close) pushDecision = BotLogicDecision.goToEnemy;
+                    else pushDecision = BotLogicDecision.runToEnemy;
+
+                    // -- push if not visible or ordered
+                    if (!enemyVisible || pushOrdered)
                         return new AICoreActionResultStruct<BotLogicDecision>(pushDecision, "pushEnemy");
                     else
                     {
@@ -431,8 +431,8 @@ namespace friendlyPMC.Components.Tactics
             }
             catch (Exception e)
             {
-                Logger.LogError("EndHoldPosition Error");
-                Logger.LogError(e);
+                Modules.Logger.LogError("EndHoldPosition Error");
+                Modules.Logger.LogError(e);
                 return new AICoreActionEndStruct("hpError", true);
             }
         }
@@ -444,12 +444,12 @@ namespace friendlyPMC.Components.Tactics
 
         public void GetClosestAttackCoverPoint(Vector3 centerPosition, float minDistance = 5f, float maxDistance = 150f)
         {
-            customNavigationPoint_0 = commonLayer.GetClosestAttackCoverPoint(centerPosition, minDistance, maxDistance);
+            customNavigationPoint_0 = commonLayer.GetClosestShootCover(centerPosition, minDistance, maxDistance);
         }
 
         public void GetApproachablePoint()
         {
-            customNavigationPoint_0 = commonLayer.GetApproachablePoint();
+            customNavigationPoint_0 = commonLayer.GetApproachableCover();
 
         }
 

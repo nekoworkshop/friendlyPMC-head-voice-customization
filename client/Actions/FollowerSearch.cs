@@ -57,9 +57,15 @@ namespace friendlyPMC.Actions
                 Vector3 enemySpot = botOwner_0.Memory.GoalEnemy.CurrPosition;
                 Vector3 botPosition = botOwner_0.GetPlayer.Transform.position;
                 // get the closet cover to the bot from where he can shoot the enemy
-                CustomNavigationPoint Spot = Utils.Covers.GetApproachableCoverPoint(
+                CustomNavigationPoint Spot = Utils.Covers.GetClosestShootCover(
                     botOwner_0,
-                    enemySpot
+                    botPosition,
+                    5f,
+                    150f,
+                    point =>
+                    {
+                        return Utils.Covers.IsPointBetween(point.Position, botPosition, enemySpot);
+                    }
                 );
 
                 if (Spot != null) _lastSpot = Spot.Position;
@@ -82,12 +88,10 @@ namespace friendlyPMC.Actions
                         {
                             _actionsQueue.Enqueue(() =>
                             {
-                                // else find a spot from where the bot can shoot the enemy, relative to his position
-                                ShootPointClass shootTarget = new ShootPointClass(enemySpot, 1f);
+                                if (botOwner_0.IsDead || botOwner_0.BotState != EBotState.Active || !botOwner_0.Memory.HaveEnemy) return;
+                                // else find the next available spot from where the bot can shoot the enemy, relative to his position
                                 _lastPosition = Utils.Covers.FindShootPosition(
-                                    botOwner_0.GetPlayer.Transform.position,
-                                    shootTarget,
-                                    botOwner_0.LookSensor.Mask,
+                                    botOwner_0,
                                     minDist,
                                     maxDist,
                                     (Vector3 position) =>
@@ -99,33 +103,46 @@ namespace friendlyPMC.Actions
                                     }
                                 );
 
-                                if (!_lastPosition.HasValue && botOwner_0.BotFollower.HaveBoss)
+                                if (!_lastPosition.HasValue)
                                 {
-                                    Vector3 bossPos = botOwner_0.BotFollower.BossToFollow.Position;
-                                    Vector3 botPos = botOwner_0.GetPlayer.Transform.position;
-                                    bool protectBoss = (botOwner_0.Brain.BaseBrain as FollowerBrain).bossNeedsProtection;
-
+                                    // find a cover closer to the enemy - this emulates search
                                     _actionsQueue.Enqueue(() =>
                                     {
-                                        // else get closest cover to the boss and cover him
-                                        CustomNavigationPoint cover = Utils.Covers.GetClosestCoverPoint(
-                                            botOwner_0.Id,
-                                            botOwner_0.GetPlayer.Transform.position,
-                                            protectBoss ? bossPos : botPos,
-                                            areaCovers,
-                                            30f,
-                                            5f,
-                                            carePosition
-                                        );
-
-                                        if (cover != null)
+                                       CustomNavigationPoint Spot3  = Utils.Covers.GetClosestCoverPoint(botOwner_0, enemySpot, 30f, 5f);
+                                        if(Spot3 != null) _lastSpot = Spot3.Position;
+                                        else if(botOwner_0.BotFollower.HaveBoss)
                                         {
-                                            _lastCover = cover.Position;
+                                            Vector3 bossPos = botOwner_0.BotFollower.BossToFollow.Position;
+                                            Vector3 botPos = botOwner_0.GetPlayer.Transform.position;
+                                            bool protectBoss = (botOwner_0.Brain.BaseBrain as FollowerBrain).bossNeedsProtection;
 
-                                        }
-                                        else
-                                        {
-                                            _lastCover = null;
+                                            _actionsQueue.Enqueue(() =>
+                                            {
+                                                // else get closest cover to the boss and cover him
+                                                CustomNavigationPoint cover = Utils.Covers.GetClosestCoverPoint(
+                                                    botOwner_0.Id,
+                                                    botOwner_0.GetPlayer.Transform.position,
+                                                    protectBoss ? bossPos : botPos,
+                                                    areaCovers,
+                                                    30f,
+                                                    5f,
+                                                    carePosition,
+                                                    (CustomNavigationPoint point)=>{
+                                                        if(!GClass326.IsDangerPositionFarEnough(point.Position, new Vector3[]{ bossPos }, 0.5f * 0.5f)) return false;
+                                                        return true;
+                                                    }
+                                                );
+
+                                                if (cover != null)
+                                                {
+                                                    _lastCover = cover.Position;
+
+                                                }
+                                                else
+                                                {
+                                                    _lastCover = null;
+                                                }
+                                            });
                                         }
                                     });
                                 }

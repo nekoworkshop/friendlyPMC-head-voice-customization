@@ -6,6 +6,8 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.AI;
 
+using friendlyPMC.Modules;
+
 namespace friendlyPMC.Utils
 {
     internal class Enemy
@@ -118,22 +120,19 @@ namespace friendlyPMC.Utils
 
         public static float GetEnemiesAtLocation(BotOwner bot, string enemyId, Vector3 position, float radius = 25f)
         {
-            string tracer = "";
             try
             {
-                tracer += "track #1\n";
                 if (!enemies.Contains(enemyId))
                 {
-                    tracer += "track #2\n";
                     Player enemy = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(enemyId);
-                    tracer += "track #3\n";
+
                     enemy.OnIPlayerDeadOrUnspawn += (IPlayer pl) =>
                     {
                         ClearEnemyLocations(enemyId);
                         enemies.Remove(enemyId);
                     };
                 }
-                tracer += "track #4\n";
+
                 Vector3 cacheKey = new Vector3(
                     Mathf.Floor(position.x / 10f) * 10f,
                     Mathf.Floor(position.y / 10f) * 10f,
@@ -141,22 +140,20 @@ namespace friendlyPMC.Utils
                 );
                 (Vector3, string) cacheKeyWithId = (cacheKey, enemyId);
 
-                tracer += "track 5\n";
 
                 lock (enemyLocationCacheLock)
                 {
-                    tracer += "track #6\n";
+
                     if (enemyLocationCache.TryGetValue(cacheKeyWithId, out CachedEnemyInfo cachedInfo))
                     {
-                        tracer += "track #7\n";
+ 
                         if (cachedInfo.CachedPosition == cacheKey)
                         {
-                            tracer += "track #8\n";
+
                             return cachedInfo.EnemyCount;
                         }
                         else
-                        {
-                            tracer += "track #9\n";
+                        { 
                             enemyLocationCache.Remove(cacheKeyWithId);
                         }
                     }
@@ -165,26 +162,24 @@ namespace friendlyPMC.Utils
                 int nr = 0;
 
                 Collider[] hits = new Collider[20];
-                tracer += "track #10\n";
+
                 int numHits = Physics.OverlapSphereNonAlloc(
                     position,
                     radius,
                     hits,
                     LayerMaskClass.PlayerMask
                 );
-                tracer += "track #11\n";
+
                 if (numHits == 0)
                 {
-                    tracer += "track #12\n";
                     lock (enemyLocationCacheLock)
                     {
-                        tracer += "track #13\n";
                         enemyLocationCache[cacheKeyWithId] = new CachedEnemyInfo(0f, position);
                     }
 
                     return 0;
                 }
-                tracer += "track #14\n";
+ 
                 for (int i = 0; i < numHits; i++)
                 {
                     var enemy = bot.ShootData.method_4(hits[i]);
@@ -200,12 +195,11 @@ namespace friendlyPMC.Utils
                         nr++;
                     }
                 }
-                tracer += "track #16\n";
+
                 float result = nr;
 
                 lock (enemyLocationCacheLock)
                 {
-                    tracer += "track #17\n";
                     enemyLocationCache[cacheKeyWithId] = new CachedEnemyInfo(result, cacheKey);
                 }
 
@@ -214,26 +208,26 @@ namespace friendlyPMC.Utils
             }
             catch (Exception ex)
             {
-                Components.Logger.LogError("GetEnemiesAtLocation Error");
-                Components.Logger.LogError(ex);
+                Modules.Logger.LogError("GetEnemiesAtLocation Error");
+                Modules.Logger.LogError(ex);
                 return 1;
             }
         }
 
-        public static EnemyInfo MakeEnemy(BotOwner bot, Player enemy)
+        public static EnemyInfo MakeEnemy(BotOwner bot, Player enemy, EBotEnemyCause cause = EBotEnemyCause.addPlayerToBoss)
         {
             BotSettingsClass groupInfo;
             bot.BotsGroup.Enemies.TryGetValue(enemy, out groupInfo);
 
             if (groupInfo == null)
             {
-                bot.BotsGroup.AddEnemy(enemy, EBotEnemyCause.addPlayerToBoss);
+                bot.BotsGroup.AddEnemy(enemy, cause);
                 bot.BotsGroup.Enemies.TryGetValue(enemy, out groupInfo);
             }
 
             if (groupInfo == null)
             {
-                groupInfo = new BotSettingsClass(enemy, bot.BotsGroup, EBotEnemyCause.addPlayerToBoss);
+                groupInfo = new BotSettingsClass(enemy, bot.BotsGroup, cause);
 
                 bot.Memory.AddEnemy(enemy, groupInfo, false);
             }
@@ -245,6 +239,10 @@ namespace friendlyPMC.Utils
             if (info == null)
             {
                 info = bot.EnemiesController.AddNew(bot.BotsGroup, enemy, groupInfo);
+
+                info.SetVisible(true);
+
+                bot.EnemiesController.SetInfo(enemy, info);
             }
 
             return info;

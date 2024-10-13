@@ -37,6 +37,10 @@
     <Reference Include="ConfigurationManager">
       <HintPath>E:\Aki-Streets\BepInEx\plugins\spt\ConfigurationManager.dll</HintPath>
     </Reference>
+    <Reference Include="ItemTemplate.Types, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\XboxGames\AKI-Streets-3.9\EscapeFromTarkov_Data\Managed\ItemTemplate.Types.dll</HintPath>
+    </Reference>
     <Reference Include="spt-custom">
       <HintPath>..\..\..\XboxGames\AKI-Streets-3.9\BepInEx\plugins\spt\spt-custom.dll</HintPath>
     </Reference>
@@ -151,10 +155,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Actions\FollowerCoverToCover.cs" />
+    <Compile Include="Actions\FollowerDogFight.cs" />
     <Compile Include="Actions\FollowerGoToEnemy.cs" />
+    <Compile Include="Actions\FollowerGuardCover.cs" />
     <Compile Include="Actions\FollowerMoveToPoint.cs" />
+    <Compile Include="Actions\FollowerRunToCover.cs" />
     <Compile Include="Actions\FollowerSniperSearch.cs" />
     <Compile Include="Actions\FollowerSearch.cs" />
+    <Compile Include="Actions\FollowerSuppressionFire.cs" />
     <Compile Include="Components\BossFollower\KnightAvoidDangerLayer.cs" />
     <Compile Include="Components\BossFollower\KnightFightLayer.cs" />
     <Compile Include="Components\BossFollower\KnightWeaponMtnLayer.cs" />
@@ -175,6 +183,7 @@
     <Compile Include="Components\FollowerDoorLayer.cs" />
     <Compile Include="Components\FollowerEnemyChooser.cs" />
     <Compile Include="Components\Tactics\FollowerCommonLayer.cs" />
+    <Compile Include="Components\Tactics\FollowerGuard.cs" />
     <Compile Include="Components\Tactics\FollowerHolderLayer.cs" />
     <Compile Include="Components\Tactics\FollowerPusherLayer.cs" />
     <Compile Include="Components\Tactics\FollowerSniperLayer.cs" />
@@ -197,6 +206,8 @@
     <Compile Include="Requests\FollowerOpenDoorRequest.cs" />
     <Compile Include="Requests\FollowerRegroup.cs" />
     <Compile Include="Requests\FollowerRushEnemy.cs" />
+    <Compile Include="Requests\FollowerSuppress.cs" />
+    <Compile Include="Requests\FollowerTakeCover.cs" />
     <Compile Include="Requests\FollowerTakeLootRequest.cs" />
     <Compile Include="Components\AIBossPlayer.cs" />
     <Compile Include="Components\BotFollowerPlayer.cs" />
@@ -206,7 +217,7 @@
     <Compile Include="Components\FollowerLootLayer.cs" />
     <Compile Include="Components\FollowerReceiver.cs" />
     <Compile Include="Components\FollowerRequestLayer.cs" />
-    <Compile Include="Components\Logger.cs" />
+    <Compile Include="Modules\Logger.cs" />
     <Compile Include="Modules\BossPlayers.cs" />
     <Compile Include="Modules\InteractableObjects.cs" />
     <Compile Include="Modules\Receivers.cs" />
@@ -221,6 +232,7 @@
     <Compile Include="Patches\PlayerPatch.cs" />
     <Compile Include="Patches\QuickPanelPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utils\BotHelpers.cs" />
     <Compile Include="Utils\BotLogicDecisions.cs" />
     <Compile Include="Utils\Covers.cs" />
     <Compile Include="Utils\Enemy.cs" />

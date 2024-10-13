@@ -37,7 +37,7 @@ namespace friendlyPMC.Modules
 
                     if (req.isNetworkError || req.isHttpError)
                     {
-                        Components.Logger.LogError($"Failed to load audio file: {req.error}"); ;
+                        Logger.LogError($"Failed to load audio file: {req.error}"); ;
                         yield break;
                     }
 
@@ -47,7 +47,7 @@ namespace friendlyPMC.Modules
             }
             else
             {
-                Components.Logger.LogError($"Audio file not found: {filePath}");
+                Logger.LogError($"Audio file not found: {filePath}");
             }
         }
 
@@ -61,7 +61,7 @@ namespace friendlyPMC.Modules
 
                     if (req.isNetworkError || req.isHttpError)
                     {
-                        Components.Logger.LogError($"Failed to load audio file: {req.error}"); ;
+                        Logger.LogError($"Failed to load audio file: {req.error}"); ;
                         yield break;
                     }
 
@@ -71,7 +71,7 @@ namespace friendlyPMC.Modules
             }
             else
             {
-                Components.Logger.LogError($"Audio file not found: {filePath}");
+                Logger.LogError($"Audio file not found: {filePath}");
             }
         }
 

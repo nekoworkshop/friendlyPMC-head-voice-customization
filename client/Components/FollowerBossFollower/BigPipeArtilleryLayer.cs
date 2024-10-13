@@ -1,5 +1,6 @@
 ﻿using EFT;
 using friendlyPMC.Components.BossFollower;
+using friendlyPMC.Modules;
 using JetBrains.Annotations;
 using System;
 using UnityEngine;
@@ -56,8 +57,8 @@ namespace friendlyPMC.Components.FollowerBossFollower
             }
             catch (Exception ex)
             {
-                Components.Logger.LogInfo("baseDecision Error: " + ex.Message);
-                Components.Logger.LogInfo("Trace: " + ex.StackTrace);
+                Modules.Logger.LogInfo("baseDecision Error: " + ex.Message);
+                Modules.Logger.LogInfo("Trace: " + ex.StackTrace);
                 return new AICoreActionResultStruct<BotLogicDecision>(HoldFor(GClass761.Random(1f, 2f)), "baseDecision.Error");
             }
 
@@ -84,8 +85,8 @@ namespace friendlyPMC.Components.FollowerBossFollower
             }
             catch (Exception ex)
             {
-                Components.Logger.LogInfo("supportDecision Error: " + ex.Message);
-                Components.Logger.LogInfo("Trace: " + ex.StackTrace);
+                Modules.Logger.LogInfo("supportDecision Error: " + ex.Message);
+                Modules.Logger.LogInfo("Trace: " + ex.StackTrace);
                 return new AICoreActionResultStruct<BotLogicDecision>(HoldFor(GClass761.Random(1f, 2f)), "supportDecision.Error");
             }
 

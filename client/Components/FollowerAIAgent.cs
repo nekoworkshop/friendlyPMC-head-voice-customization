@@ -1,10 +1,7 @@
 ﻿using HarmonyLib;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
+using friendlyPMC.Modules;
 using UnityEngine;
 
 namespace friendlyPMC.Components
@@ -31,8 +28,8 @@ namespace friendlyPMC.Components
             }
             catch (Exception ex)
             {
-                Logger.LogError("AIAgent Error");
-                Logger.LogError(ex);
+                Modules.Logger.LogError("AIAgent Error");
+                Modules.Logger.LogError(ex);
             }
         }
 

@@ -11,7 +11,6 @@ using HarmonyLib;
 using System.Collections.Generic;
 using UnityEngine;
 
-using Logger = friendlyPMC.Components.Logger;
 
 using System.Threading.Tasks;
 using System.Linq;
@@ -20,7 +19,7 @@ using EFT.Builds;
 using BepInEx.Bootstrap;
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using static UnityEngine.Experimental.Rendering.RayTracingAccelerationStructure;
+
 using friendlyPMC.Utils;
 
 namespace friendlyPMC
@@ -39,7 +38,9 @@ namespace friendlyPMC
         SniperSearch = 100,
         CoverToCover = 101,
         EnemySearch = 102,
-        MoveToPoint = 103
+        MoveToPoint = 103,
+        RunToCover = 104,
+        GuardToCover = 105
     }
 
     public enum CustomPhrases
@@ -64,9 +65,8 @@ namespace friendlyPMC
         }
     }
 
-    [BepInPlugin("xyz.pit.companion", "friendlyPMC", "3.7.0")]
+    [BepInPlugin("xyz.pit.companion", "friendlyPMC", "3.8.0")]
     [BepInDependency("xyz.drakia.bigbrain")]
-    [BepInDependency("xyz.drakia.waypoints")]
     [BepInDependency("com.Arys.UnityToolkit")]
     public class friendlyPMC : BaseUnityPlugin
     {
@@ -86,16 +86,16 @@ namespace friendlyPMC
             { "equipOptions", new string[]
                 {
                     "Default",
-                    "Player Equipment"
                 } 
             },
             {
                 "tacticOptions", new string[]
                 {
                     "Default",
+                    "Support",
                     "Marksman",
                     "Pusher",
-                    "Holder"
+                    "Holder",
                 }
             },
             { "clothesOptions", new string[]
@@ -113,7 +113,7 @@ namespace friendlyPMC
             {
                 "enemyMarker" , new Dictionary<string,string>{
                     { "Name", "Enemy Marker"},
-                    { "Description", "Show enemy position when reporting status. If disabled, the enemy marker sound will also be disabled."}
+                    { "Description", "Show enemy position when reporting status. If disabled, the enemy marker sound will also be disabled"}
                 }
             },
             {
@@ -131,7 +131,7 @@ namespace friendlyPMC
             {
                 "extraPickups",  new Dictionary<string,string>{
                     { "Name", "Maximum pickup followers"},
-                    { "Description", "Maximum followers the player can pickup during raid. This is in addition to the squad"}
+                    { "Description", "Maximum followers the player can pick up during a raid. This is in addition to the squad"}
                 }
             },
             {
@@ -154,14 +154,14 @@ namespace friendlyPMC
             },
             {
                 "enemyRemember", new Dictionary<string,string>{
-                    { "Name", "Time to forget about enemy (in sec.)"},
-                    { "Description", "Maximum time a follower will remember an enemy. This is applied only at the begining of a raid"}
+                    { "Name", "Time to forget about the enemy (in sec.)"},
+                    { "Description", "Maximum time a follower will remember an enemy. This is applied only at the beginning of a raid"}
                 }
             },
             {
                 "heatlhMultiplier", new Dictionary<string,string>{
                     { "Name", "Squad Health Multiplier"},
-                    { "Description", "Health multiplier for the followers you spawn with. This is applied per each body part. Does not apply to boss followers"}
+                    { "Description", "Health multiplier for the followers you spawn with. This is applied per each body part."}
                 }
             },
             {
@@ -179,7 +179,13 @@ namespace friendlyPMC
             {
                 "memberName", new Dictionary<string,string>{
                     { "Name", "Squad Member {0} Nickname"},
-                    { "Description", "Set a custom nickname for this squad member. Leave blank for default"}
+                    { "Description", "Set a custom nickname for this Squad member. Leave blank for default"}
+                }
+            },
+            {
+                "memberVoice", new Dictionary<string,string>{
+                    { "Name", "Squad Member {0} Voice"},
+                    { "Description", "Set a custom voice for this Squad member. Leave blank for default"}
                 }
             },
             {
@@ -210,7 +216,7 @@ namespace friendlyPMC
             {
                 "sameSideHostile", new Dictionary<string,string>{
                     { "Name", "Same PMC Side Hostile"},
-                    { "Description", "Should PMC Bots of the same side be hostile to each other (followers still remain friendly to you)"}
+                    { "Description", "Should PMC Bots of the same side be hostile to each other (followers remain friendly to you)"}
                 }
             },
             {
@@ -296,7 +302,7 @@ namespace friendlyPMC
             {
                 awaken = true;
                 Instance = this;
-                new Logger();
+                new Modules.Logger();
             }
 
             new RaidStartPatch().Enable();
@@ -305,6 +311,7 @@ namespace friendlyPMC
             new BotGroupAddEnemy().Enable();
 
             new BotMemoryAddEnemyPatch().Enable();
+            new BotMemoryDamagePatch().Enable();
             new BotGroupUsecEnemyPatch().Enable();
 
             new BotOwnerIsFolowerPatch().Enable();
@@ -340,6 +347,7 @@ namespace friendlyPMC
 
             harmony.PatchAll(typeof(LocalGameCtorPatch).Assembly);
             harmony.PatchAll(typeof(BaseLocalGameVmethod4Patch).Assembly); // spawn patch
+            harmony.PatchAll(typeof(GoalEnemyTracePatch).Assembly);
 
             ConsoleScreen.Processor.RegisterCommand("followerstome", delegate ()
             {
@@ -425,7 +433,8 @@ namespace friendlyPMC
             harmony.PatchAll(typeof(LookSensorPatch).Assembly);
             // patch hearing
             new HearingSensorPatch().Enable();
-
+            new BulletImpactPatch().Enable();
+            new PlayerSayPatch().Enable();
         }
 
         public void GetEquipmentBuilds()
@@ -497,7 +506,6 @@ namespace friendlyPMC
                 }
 
                 BuildUniformOptions();
-
             }
         }
 
@@ -505,8 +513,7 @@ namespace friendlyPMC
         {
             equipPresets = new string[]
             {
-                ((string[])optionsLang["equipOptions"])[0],
-                ((string[])optionsLang["equipOptions"])[1]
+                ((string[])optionsLang["equipOptions"])[0]
             };
 
             UniformTop = new string[] {
@@ -615,7 +622,7 @@ namespace friendlyPMC
                         string seckey = $"1.4.1.{i + 1}.2  -  -  " + String.Format(((Dictionary<string, string>)optionsLang["memberEquipment"])["Name"], i + 1);
                         string secvalue = ((string[])optionsLang["tacticOptions"])[0];
 
-                        string trdkey = $"1.4.1.{i + 1}.1  -  -  " + String.Format(((Dictionary<string, string>)optionsLang["memberName"])["Name"], i + 1);
+                        string trdkey = $"1.4.1.{i + 1}.1.1  -  -  " + String.Format(((Dictionary<string, string>)optionsLang["memberName"])["Name"], i + 1);
                         string trdvalue = "";
 
                         string frtkey = $"1.4.1.{i + 1}.3.1  -  -  " + String.Format(((Dictionary<string, string>)optionsLang["memberUniformTop"])["Name"], i + 1);
@@ -623,6 +630,9 @@ namespace friendlyPMC
 
                         string fiftkey = $"1.4.1.{i + 1}.3.2  -  -  " + String.Format(((Dictionary<string, string>)optionsLang["memberUniformBottom"])["Name"], i + 1);
                         string fiftvalue = "";
+
+                        string sixkey = $"1.4.1.{i + 1}.1.2  -  -  " + String.Format(((Dictionary<string, string>)optionsLang["memberVoice"])["Name"], i + 1);
+                        string sixvalue = "";
 
                         savedConfigValues.ExecuteForEach(saved =>
                         {
@@ -645,6 +655,10 @@ namespace friendlyPMC
                             else if (saved.Key.Key == fiftkey)
                             {
                                 fiftvalue = saved.Value;
+                            }
+                            else if (saved.Key.Key == sixkey)
+                            {
+                                sixvalue = saved.Value;
                             }
                         });
 
@@ -741,8 +755,7 @@ namespace friendlyPMC
             var presets = Utils.Equipment.CustomPresets;
 
             var updatedPresets = new string[] {
-                ((string[])optionsLang["equipOptions"])[0],
-                ((string[])optionsLang["equipOptions"])[1]
+                ((string[])optionsLang["equipOptions"])[0]
             };
 
             foreach (var item in presets)
@@ -875,7 +888,7 @@ namespace friendlyPMC
                     configurationManager.BuildSettingList();
                 });
             } catch(Exception ex) {
-                Components.Logger.LogError(ex);
+                Modules.Logger.LogError(ex);
             }
         }
 

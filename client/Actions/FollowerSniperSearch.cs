@@ -1,5 +1,6 @@
 ﻿using EFT;
 using friendlyPMC.Components;
+using friendlyPMC.Modules;
 using HarmonyLib;
 
 using System;
@@ -52,6 +53,8 @@ namespace friendlyPMC.Actions
         {
             (botOwner_0.Brain.Agent as FollowerAIAgent<BotLogicDecision>).OnUpdate += OnAgentUpdate;
             (botOwner_0.Brain.Agent as FollowerAIAgent<BotLogicDecision>).OnDispose += OnAgentDispose;
+
+            _init = true;
         }
         protected void OnAgentUpdate(AICoreActionResultStruct<BotLogicDecision> decision)
         {
@@ -84,13 +87,12 @@ namespace friendlyPMC.Actions
                     if (!_init)
                     {
                         Init();
-                        _init = true;
                     }
                 }
                 catch (Exception ex)
                 {
-                    Components.Logger.LogError("Failed to init Search");
-                    Components.Logger.LogError(ex);
+                    Modules.Logger.LogError("Failed to init Search");
+                    Modules.Logger.LogError(ex);
                 }
 
                 if (!botOwner_0.Memory.HaveEnemy) return;
@@ -179,8 +181,8 @@ namespace friendlyPMC.Actions
                 }
             } catch (Exception ex)
             {
-                Components.Logger.LogError($"{searchType} Error");
-                Components.Logger.LogError(ex);
+                Modules.Logger.LogError($"{searchType} Error");
+                Modules.Logger.LogError(ex);
             }
         }
 
@@ -221,7 +223,7 @@ namespace friendlyPMC.Actions
         {
             if (_nextShootPositionUpdateTime > Time.time) return;
 
-            _nextShootPositionUpdateTime = Time.time + 1.5f;
+            _nextShootPositionUpdateTime = Time.time + 2f;
 
             Vector3[] carePosition = new Vector3[] { };
 
@@ -251,16 +253,11 @@ namespace friendlyPMC.Actions
             {
                 Vector3 enemySpot = botOwner_0.Memory.GoalEnemy.CurrPosition;
                 // get closest cover to the bot from where he can shoot the enemy
-                CustomNavigationPoint Spot = Utils.Covers.GetClosestAttackCoverPoint(
-                    botOwner_0.Id,
-                    botOwner_0.GetPlayer.Transform.position,
+                CustomNavigationPoint Spot = Utils.Covers.GetClosestShootCover(
+                    botOwner_0,
                     enemySpot,
-                    enemySpot,
-                    areaCovers,
                     minDist, 
-                    maxDist,
-                    carePosition,
-                    false
+                    maxDist
                 );
 
                 if (Spot != null) _lastSpot = Spot.Position;
@@ -270,12 +267,11 @@ namespace friendlyPMC.Actions
                 if (!_lastSpot.HasValue)
                 {
                     _actionsQueue.Enqueue(() => {
-                      // else get a shooting spot relative to the bot
-                        ShootPointClass shootTarget = new ShootPointClass(enemySpot, 1f);
+                        // else get a shooting spot relative to the bot
+                        if (botOwner_0.IsDead || botOwner_0.BotState != EBotState.Active || !botOwner_0.Memory.HaveEnemy) return;
+
                         _lastPosition = Utils.Covers.FindShootPosition(
-                            botOwner_0.GetPlayer.Transform.position,
-                            shootTarget,
-                            botOwner_0.LookSensor.Mask,
+                            botOwner_0,
                             minDist,
                             maxDist
                         );
@@ -297,7 +293,11 @@ namespace friendlyPMC.Actions
                                     areaCovers,
                                     30f,
                                     5f,
-                                    carePosition
+                                    carePosition,
+                                    (CustomNavigationPoint point)=>{
+                                        if(!GClass326.IsDangerPositionFarEnough(point.Position, new Vector3[]{ bossPos }, 0.5f * 0.5f)) return false;
+                                        return true;
+                                    }
                                 );
 
                                 if (cover != null)

@@ -1,11 +1,6 @@
 ﻿using EFT;
 using friendlyPMC.Actions;
-using friendlyPMC.Requests;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace friendlyPMC.Modules
 {
@@ -41,11 +36,23 @@ namespace friendlyPMC.Modules
             if(type == (BotLogicDecision)CustomBotDecisions.CoverToCover)
                 return new FollowerCoverToCover(bot);
 
+            if(type == (BotLogicDecision)CustomBotDecisions.GuardToCover)
+                return new FollowerGuardCover(bot);
+
             if (type == (BotLogicDecision)CustomBotDecisions.EnemySearch)
                 return new FollowerSearch(bot);
 
             if (type == BotLogicDecision.goToEnemy)
                 return new FollowerGoToEnemy(bot);
+
+            if(type == (BotLogicDecision)CustomBotDecisions.RunToCover)
+                return new FollowerRunToCover(bot);
+
+            if(type == BotLogicDecision.dogFight)
+                return new FollowerDogFight(bot);
+
+            if (type == BotLogicDecision.suppressFire)
+                return new FollowerSuppressionFire(bot);
 
             return GClass459.CreateNode(type, bot);
         }

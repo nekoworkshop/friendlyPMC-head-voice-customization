@@ -1,0 +1,158 @@
+<p><strong>Spawn with a squad of your side, customize them, recruit others while in the raid, and command them on the battlefield.</strong></p>
+<p><strong><br></strong>This mod makes it possible to have bots follow you around and fight alongside you against enemies. You can either spawn with a squad that is customizable through the Config Manager (default F12 key) or recruit others while in a raid.<br><br>If you enjoy this mod and would like to show your appreciation you can support me at <a href="https://ko-fi.com/n00bish">Ko-Fi!</a></p>
+<p><br></p>
+<p><strong>Special Thanks to <a href="https://hub.sp-tarkov.com/user/38745-slavetothegames/">@SlavetoTheGames</a> for helping me out with testing version 3.7 and ironing out the bugs!</strong></p>
+<p><br></p>
+<p>[tabmenu]<span style="font-family:'gg mono', 'Source Code Pro', Consolas, 'Andale Mono WT', 'Andale Mono', 'Lucida Console', 'Lucida Sans Typewriter', 'DejaVu Sans Mono', 'Bitstream Vera Sans Mono', 'Liberation Mono', 'Nimbus Mono L', Monaco, 'Courier New', Courier, monospace;"><br></span></p>
+<p>[tab='Description']<span style="font-family:'gg mono', 'Source Code Pro', Consolas, 'Andale Mono WT', 'Andale Mono', 'Lucida Console', 'Lucida Sans Typewriter', 'DejaVu Sans Mono', 'Bitstream Vera Sans Mono', 'Liberation Mono', 'Nimbus Mono L', Monaco, 'Courier New', Courier, monospace;"><br></span>With the friendyPMC mod, you will be able to spawn with a predetermined number of followers that will help you during battles, listen to your commands, carry your loot, and return it at the end of the raid. Scav players can also spawn with allies, though they will be limited in what commands they follow and will not return loot. The same will be true for any follower picked up during the raid (PMC or Scav). They are considered allies, not team members. <span style="font-family:'gg mono', 'Source Code Pro', Consolas, 'Andale Mono WT', 'Andale Mono', 'Lucida Console', 'Lucida Sans Typewriter', 'DejaVu Sans Mono', 'Bitstream Vera Sans Mono', 'Liberation Mono', 'Nimbus Mono L', Monaco, 'Courier New', Courier, monospace;"><br></span>[/tab]</p>
+<p><span style="font-family:'gg mono', 'Source Code Pro', Consolas, 'Andale Mono WT', 'Andale Mono', 'Lucida Console', 'Lucida Sans Typewriter', 'DejaVu Sans Mono', 'Bitstream Vera Sans Mono', 'Liberation Mono', 'Nimbus Mono L', Monaco, 'Courier New', Courier, monospace;"></span></p>
+<p>[tab='Installation']<br><strong>There are 2 dependencies this mod relies on:</strong></p>
+<p><span></span></p>
+<ul>
+	<li><a href="https://hub.sp-tarkov.com/files/file/1219-bigbrain/">Big Brain</a></li>
+	<li><a href="https://hub.sp-tarkov.com/files/file/1976-unitytoolkit/">Unity ToolKit</a></li>
+</ul>
+<p>However, bots will have a hard time following around if you do not also have <a href="https://hub.sp-tarkov.com/files/file/1119-waypoints-expanded-navmesh/">WAYPOINTS - EXPANDED NAVMESH</a></p>
+<p><br></p>
+<p>Extract the contents of the downloaded zip and it will result in 2 folders: BepInEx and user. Simply paste them into your SPT installation directory and you are ready.[/tab]</p>
+<p class="text-center"><br></p>
+<p class="text-center">[tab='Configuration']<br><img src="https://i.ibb.co/H23r5Zn/configuration.png" alt="configuration" border="0"></p>
+<p><br></p>
+<p><br><strong>Squad Configuration:</strong></p>
+<ul>
+	<li><strong>[tt]Squad Size[/tt]</strong> - The number of squad members to spawn with</li>
+	<li><strong>[tt]Squadmate return chance after death[/tt]</strong> - Chance your followers will return the items you gave them should you die. This applies only to members you spawned with</li>
+	<li><strong>[tt]Use Squad setup[/tt]</strong> - Enable customization for each squad member
+	<ul>
+		<li><strong>[tt]Squad Member Nickname[/tt]</strong> - Set a custom nickname for the squad member. Leave blank for default</li>
+		<li><strong>[tt]Squad Member Equipment[/tt]</strong> - Set custom equipment for the squad member. You can choose between default (SPT random equipment), the user's current equipment, or user-created loadout presets that can be made on the character screen.</li>
+		<li><strong>[tt]Squad Member Top[/tt]</strong> - Set what the top clothes for the member should be. Leave blank for default. Only tops you've unlocked will show here</li>
+		<li><strong>[tt]Squad Member Bottom[/tt]</strong> - Set what the bottom clothes for the member should be. Leave blank for default.  Only the bottoms you've unlocked will show here</li>
+		<li><strong>[tt]Squad Member Tactic[/tt]</strong> - Set the member's fight tactic. See the Gameplay Guide &gt; Tactics for details on available tactics.</li>
+	</ul>
+	</li>
+	<li><strong>[tt]Maximum pickup followers[/tt]</strong> - Maximum followers the player can pick up during a raid. This is in addition to the squad</li>
+</ul>
+<p><br><strong>Miscellaneous:</strong></p>
+<ul>
+	<li><strong>[tt]Maximum scan distance[/tt]</strong> - Maximum distance to pick up any visible enemy that the player is signaling when issuing the "Contact" command</li>
+	<li><strong>[tt]Time to forget about the enemy (in sec.)[/tt]</strong> - Maximum time a follower will remember an enemy. This is applied only at the beginning of a raid</li>
+	<li><strong>[tt]Squad Health Multiplier[/tt]</strong> - Health multiplier for the followers you spawn with. This is applied to each body part.</li>
+	<li><strong>[tt]Report Status Volume[/tt]</strong> - Volume of the radio sound when triggering report status</li>
+	<li><strong>[tt]Enemy Marker[/tt]</strong> - Show enemy position when reporting status. If disabled, the enemy marker sound will also be disabled</li>
+	<li><strong>[tt]Raid End Messages[/tt]</strong> - Followers will send messages at the end of the raid based on conditions such as if all made it out or if you picked up a follower and kept him alive. Return items messages are excluded</li>
+	<li><strong>[tt]Same PMC Side Hostile[/tt]</strong> - Should PMC Bots of the same side be hostile to each other (followers remain friendly to you)</li>
+	<li><strong>[tt]BEARs speak English[/tt]</strong> - Should BEAR bots speak English or Russian</li>
+	<li><strong>[tt]PMC Arm Bands[/tt]</strong> - Should PMC bots have armbands (red for BEARs, blue for USECs) for easier identification</li>
+	<li><strong>[tt]Ping Squad[/tt]</strong> - Shortcut key for triggering the Report call if you find it too hard to use the quick gesture menu that the game offers with F1-F12 keybinding</li>
+	<li><strong>[tt]Enemy Report[/tt]</strong> - Shortcut key for triggering the Contact call if you find it too hard to use the quick gesture menu that the game offers with F1-F12 keybinding</li>
+</ul>
+<p><strong><br></strong>[/tab]</p>
+<p><br></p>
+<p>[tab='Squad Commands']</p>
+<p>The squad commands are found under the Phrase Menu of the game (Default double tap Y) and are part of groups. The mod utilizes the existing phrases as a means to issue commands to your followers. These commands can be issued to the entire squad or to an individual member of the squad by looking at them. The maximum distance for phrases to be picked up while looking at a member is 35 meters and for gestures, it is between 25 and 15 meters based on the gesture.</p>
+<p>Not all types of followers will listen to all the commands. Scav and allies have restrictions, see below the list of commands for details.</p>
+<p><br></p>
+<p><strong>Take note: These commands, the game makes them available based on what voice or side your character is. These commands will all be available for standard PMC voices. Custom voices can result in some of them not showing up.</strong></p>
+<p><strong><br></strong></p>
+<p><strong>In COMMAND:</strong></p>
+<p><br></p>
+<ul>
+	<li><strong>Follow Me</strong> - Ask a member of the same faction to follow you or if issued to your squad, tell them to resume follow</li>
+	<li><strong>Attention</strong> - A command introduced due to the glitchy behavior of Tarkov's AI to help reset your followers in case they are stuck or you want them to forget about an enemy (does not work if the enemy is still in view or too close)</li>
+	<li><strong>Regroup</strong> - Tell your followers to resume following if out of combat or come near your position if in combat</li>
+	<li><strong>Get Back</strong> - Tell your followers to follow you at a distance</li>
+	<li><strong>On Your Own</strong> - Tell your followers to follow at a distance, to no longer prioritize covering you during fights, and to switch to their initial tactic (initial tactic can be changed to "Holder" when issuing "Hold Position")</li>
+	<li><strong>Cover Me</strong> - Regroup, set them to follow you close, and make them cover you during fights</li>
+	<li><strong>Hold Position</strong> - Switch from the initial tactic to the "Holder" tactic</li>
+	<li><strong>Go Go GO</strong> - Switch back to the initial tactic</li>
+	<li><strong>Go Forward</strong> - Issue a push command to them to get closer to the enemy</li>
+	<li><strong>Stop</strong> - Tell your followers to stop in place. Does not work during combat</li>
+	<li><strong>Suppress</strong> - Ask for suppression fire</li>
+	<li><strong>Silence</strong> - Ask them to not talk for 1 minute. This command does not work when using SAIN</li>
+</ul>
+<p><strong>In HELP:</strong></p>
+<ul>
+	<li><strong>Need Help</strong> - Same as regroup, but only the closest follower will execute it</li>
+</ul>
+<p><strong>In ENEMY:</strong></p>
+<ul>
+	<li><strong>Contact</strong> - Makes your followers look towards the direction you are looking and if you have an enemy in your visual they will pick him up. This is dependent of "Maximum scan distance" and if you can clearly see the enemy's head or torso.</li>
+</ul>
+<p><strong>In GESTURES:</strong></p>
+<ul>
+	<li><strong>Come To Me</strong> - The bot you are looking (maximum 25 meters) at will come near your position</li>
+	<li><strong>That Direction</strong> - The bot closest to you, within 15 meters distance, walks towards the direction you a looking at a maximum 25 meters distance. For best results,look towards the ground, make sure your visibility is not obscured by leaves.</li>
+	<li><strong>Stop (it does not work in combat)</strong> - All bots within 15 meters distance or the one you are looking at (maximum 25 meters) will stop</li>
+</ul>
+<p><strong>A [tt]followerstome[/tt] console command that teleports all followers to your location. Needed as the AI can sometimes get stuck under stairs or simply run in place.</strong></p>
+<p>There are also commands under the quick gestures (Default Y) which become available when interaction is possible:</p>
+<ul>
+	<li><strong>Open Door</strong> - Shows up when facing a door and being close enough to it. The closest bot to you will attempt to open the door. He must be within a 20-meter distance</li>
+	<li><strong>Loot This</strong> - Shows up when looking at loot. The closest bot to you will attempt to pick up the loot. Only squad members you spawned with will return the loot at the raid end</li>
+</ul>
+<p><br>As mentioned above, scavs and allies will not listen to all the commands. The commands available for them are: regroup, follow me, stop, and attention. You can imagine them being in the permanent "On Your Own" command.</p>
+<p><br>[/tab]</p>
+<p><br></p>
+<p>[tab='Gameplay Guide']<br><br>Let's start by acknowledging that we are not dealing with top-tier AI here and thus your followers can end up doing stupid things or not properly engage. We cannot rely on the SAIN AI as that mod is not designed to make room for a situation where you have the player as a team leader issuing commands left and right.  You will find yourself relying on Attention and Contact commands a lot. One for getting them unstuck and back to the direction you want and the other to get them to engage as they can have eagle eye observation and also be stone-deaf and oblivious to what is going on.  <br><br>As mentioned in the Squad Commands section, you can issue commands to the entire team or individuals (starting with version 3.7). This allows for a combination where you can have some members stay in place while others follow you (issue Stop for all and then look at one and issue Follow Me to have just him follow) Some won't prioritize covering you while others will. The Stop and Come To Me gestures can be chained so you can move bots in the positions you want them. The Contact command will make them face the direction you want as you set them in place and go for the loot.<br><br><strong>Tactics Details:</strong></p>
+<ul>
+	<li><strong>[tt]Default[/tt]</strong> - A balanced tactic between hold position and push. Followers will stay around you if the enemy is too far, looking for spots to shoot from and if the enemy is close enough, and is weaker than them, they will attempt to push him.</li>
+	<li><strong>[tt]Guard[/tt]</strong> - It is similar to default, but they will attempt to put the threat down quicker, they will attempt to go in front of you if you are under fire and the best gameplay with this tactic is to fallback and let them stay in front of you during engagements.</li>
+	<li><strong>[tt]Marksman[/tt]</strong> - A tactic best suited for a sniper bot as he will avoid getting close to the enemy and instead will try to look for spots to shoot from. If none are found they will just try to cover you. The marksman will not obey the push command</li>
+	<li><strong>[tt]Holder[/tt]</strong> - Bots with the Holder tactic will stand around you, mostly in cover and waiting for the enemy to come into their vision or be close enough for an ambush.</li>
+	<li><strong>[tt]Pusher[/tt]</strong> - The opposite of Holder. In Pusher mode, the bot will prioritize pushing the enemy.</li>
+</ul>
+<p><strong>Dealing with Custom Loadouts:</strong></p>
+<p>You can have your bots use custom load-outs provided you have created custom equipment presets. You can create presets by pressing the save button and naming the preset in the section that is above your character's loadout section in the Character screen:</p>
+<p><br></p>
+<p><img src="https://i.ibb.co/ngHtzjj/Screenshot-2024-09-16-192411.png" alt="Screenshot-2024-09-16-192411" border="0"></p>
+<p></p>
+<p><br></p>
+<p>This will save the loadout that can be viewed in the custom presets screen:</p>
+<p><br></p>
+<p><img src="https://i.ibb.co/WxFSz1Y/Screenshot-2024-09-16-192425.png" alt="Screenshot-2024-09-16-192425" border="0"></p>
+<p><br></p>
+<p>Any custom preset saved here will also show in the equipment list for followers in the Configuration Manager:</p>
+<p><br></p>
+<p><img src="https://i.ibb.co/x6yb4XC/Screenshot-2024-09-16-192443.png" alt="Screenshot-2024-09-16-192443" border="0">[/tab]</p>
+<p><br></p>
+<p>[tab='FAQ ']<br><br><strong><span style="font-size: 12pt;">Q. What's next?</span></strong><br><br>A. There are several features still pending to be implemented in this mod and there will always be room for improvement. However, I cannot promise what will be added as it all depends on the level of effort in terms of time and skills. My background is actually in web programming so my C# skills are limited. But here are several things I plan to add, one way or another:</p>
+<p></p>
+<ul>
+	<li><strong>Hold Fire/ Fire at will</strong> - Commands that will tell your bots to no longer engage with any enemy unless you or they are being shot at.</li>
+	<li><strong>Followers to swap weapons when you give them one</strong> - Followers to swap their main weapon with the one you give them if it's better.</li>
+	<li><strong>Bringing back the Goons</strong> - The ability to spawn with the Goons will be back, but it will be in an inviting way and successfully finishing with them in a raid will unlock some special tactics for your followers.</li>
+	<li><strong>Squad Management screen</strong> - I want to get away from the Configuration Manager and have some kind of screen where you can manage your squad. Simply specifying how many to spawn with will not always be the case. You will have to pick up followers during raids and keep them alive to add more to your roster</li>
+	<li><strong>Equipment Lock</strong> - Right now you when you have your followers spawn with the custom loadout you selected it simply clones it. But this will change where it will actually take the equipment from your stash and cloning the one you are equipped with will not be possible. Thus I will add an "Equipment BioLock" to prevent the equipment from being looted by you or anyone else so you don't lose it in case they or you die.</li>
+	<li>Language options.</li>
+</ul>
+<p><strong>Q. Do my followers require ammo and meds?</strong></p>
+<p>A. They require meds. But do not put meds in the secure container. The secure container will be used for storing ammo. What ammo will be added is based on what ammo the main weapon has the bots spawn with.</p>
+<p><br></p>
+<p><strong>Q. Why won't my followers pick up the loot?</strong></p>
+<p>A. Out of combat only. They need to have the available space to put the loot and they need to have the path to reach it. Avoid dropping loot in tight spaces.</p>
+<p><br></p>
+<p><strong>Q. Why is there a delay in spawn?</strong></p>
+<p>A. Unfortunately a lot of mods hook up to the spawning process and if I try to use my own method (which I did in the past) you will start having random errors and random broken bots. I must stay within the standard spawning command and that can produce delays. This is noticeable when you select "Default" as equipment.</p>
+<p><br></p>
+<p><strong>Q. Does this work with FIKA?</strong></p>
+<p>A. Yes and No. It works in a system that has FIKA installed, but only for the host. If you have other players joining you can experience glitches and errors. There are no plans to make this mod FIKA compatible, to work in multiplayer.</p>
+<p><br></p>
+<p><strong>Q. SAIN does x, y,z - can't the followers do the same?</strong></p>
+<p>A. NO. Sain is not designed to have bots work with the player as a team at all. SAIN is not designed to take into account a cross-map moving of a bot making decisions on what to ignore, and what to engage. SAIN is focused on combat engagement and affects the bot's senses in a way that would make your followers pick up targets left and right. SAIN can put the bot in cover holding when it detects an enemy out of sight. That is not what you want your followers to do as you move around the map. So while SAIN has some effect on the followers, it's minimal.</p>
+<p><br></p>
+<p><strong>Q. Can you add this and that feature?</strong></p>
+<p>A. You can propose things, but it will all depend of the level of effort and if it makes sense to be integrated in what I am trying to achieve with this mod.</p>
+<p><br>[/tab]</p>
+<p><br></p>
+<p>[tab='Known Issues']<br>This mod had a lot of conflicts with existing bot mods and they almost all touch either the spawn behavior or the brain of the bots. Things are stable now, however, I would not rule out conflicts still happening. If you have problems, be sure to specify what other bot mods you are using in the comments.<br><br>Custom equipment can be a problem for bots you spawn with. This means equipment that comes from mods that may not be optimized for being used by bots. This can result in followers not spawning or appearing without a body and stuck in place. So avoid giving them load-outs with custom equipment.</p>
+<p><br></p>
+<p>Realism Mod can conflict with bots on the meds side. That needs to be turned off</p>
+<p><br></p>
+<p>Bots can sometimes pick up an enemy that they never saw or heard. Use the "Attention" command to reset. In some cases, you have to actually take the enemy out as they keep reacquiring him.</p>
+<p><br></p>
+<p>Bots follow in a straight line and can end up intersecting with one another. Yes, that is the navigation logic of the game and cannot be resolved.</p>
+<p><br></p>
+<p>You can have delayed spawns. This especially can happen if you have other mods that also touch the spawn behavior like Donuts and QuestingBots. When you do not select a custom loadout the bots can have a delay in spawning with you. This can range from a couple of seconds to even minutes based on your system and what else you have going on that is executing at the beginning of a raid. To resolve, use custom load-outs, see <strong>Gameplay Guide -&gt; Dealing with Custom Loadouts</strong><br><br>Avoid having lots of followers. The more followers you have the bigger the impact on performance. Unlike regular bots, who are designed to work with the zone they spawned in, your followers must be able to utilize all zones of the map as they follow you. Thus even with all the optimization, the more followers you have the more it has to work to figure out where each is and what covers are available around him.</p>
+<p><br>[/tab]</p>
+<p><br>[/tabmenu]</p>

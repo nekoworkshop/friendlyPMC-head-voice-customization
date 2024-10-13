@@ -1,7 +1,6 @@
 ﻿using EFT;
 using friendlyPMC.Components;
-using System;
-using System.Collections;
+using friendlyPMC.Modules;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -83,12 +82,12 @@ namespace friendlyPMC.Modules
 
             if (!playerBoss.IAmBoos)
             {
-                Components.Logger.LogInfo($"Could not make player {player.Profile.Nickname} as BOSS");
+                Logger.LogInfo($"Could not make player {player.Profile.Nickname} as BOSS");
                 return null;
             }
             else
             {
-                Components.Logger.LogInfo($"Made player {player.Profile.Nickname} a BOSS");
+                Logger.LogInfo($"Made player {player.Profile.Nickname} a BOSS");
             }
 
             string name = player.ProfileId;
@@ -344,9 +343,13 @@ namespace friendlyPMC.Modules
             {
                 _followers.Remove(_follower);
                 if (player.bossGroup != null)
+                {
                     player.bossGroup.RemoveAlly(bot);
 
+                }
+
                 player.RemoveFollower(bot);
+                bot.BotFollower.BossToFollow = null;
             }
         }
 
@@ -420,8 +423,6 @@ namespace friendlyPMC.Modules
             return _groupPoints;
         }
 
-
-
         public static pitAIBossPlayer GetBoss(string name)
         {
             if(Instance  == null) return null;  
@@ -439,6 +440,12 @@ namespace friendlyPMC.Modules
         {
             if (Instance == null) return new List<BotFollowerPlayer>();
             return Instance.GetBossFollowers(bossName);
+        }
+
+        public static List<BotFollowerPlayer> GetFollowers()
+        {
+            if (Instance == null) return new List<BotFollowerPlayer>();
+            return Instance._followers;
         }
 
         public static bool IsFollower(BotOwner bot, AIBossPlayer boss = null)
@@ -481,13 +488,16 @@ namespace friendlyPMC.Modules
                 player.bossGroup.AddEnemy(enemy, EBotEnemyCause.addPlayerToBoss);
             }
         }
+
         public static bool IsBossGroup(int id)
         {
+            if (Instance == null) return false;
             return Instance._botsGroup.Contains(id);
         }
 
         public static void RemoveFollower(BotOwner bot, pitAIBossPlayer player)
         {
+            if (Instance == null) return;
             Instance.RemoveBotFollower(bot, player);
         }
 

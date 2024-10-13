@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 
 using friendlyPMC.Components;
+using friendlyPMC.Modules;
 using UnityEngine.AI;
 
 
@@ -199,8 +200,8 @@ namespace friendlyPMC.Modules
             }
             catch (Exception e)
             {
-                Components.Logger.LogError("Error sending stored loot");
-                Components.Logger.LogError(e);
+                Logger.LogError("Error sending stored loot");
+                Logger.LogError(e);
             }
 
             foreach (var stack in _lootedItems)
@@ -306,8 +307,8 @@ namespace friendlyPMC.Modules
                 }
                 catch (Exception ex)
                 {
-                    Components.Logger.LogError("Could not make bot a Loot Taker");
-                    Components.Logger.LogError(ex);
+                    Logger.LogError("Could not make bot a Loot Taker");
+                    Logger.LogError(ex);
                 }
             }
 
@@ -457,7 +458,7 @@ namespace friendlyPMC.Modules
             RaycastHit[] hits = new RaycastHit[20];
             Ray visionRay = new Ray(playerPosition, playerLookDirection);
             int numHits = Physics.SphereCastNonAlloc(
-                    new Ray(playerPosition, playerLookDirection),
+                    visionRay,
                     sphereRadius,
                     hits,
                     sphereDistance,
@@ -472,22 +473,26 @@ namespace friendlyPMC.Modules
                 {
                     if (hit.collider != null && hit.collider.gameObject != null)
                     {
-                        if (
-                            GClass301.CanShootToTarget(new ShootPointClass(hit.point,1),player.PlayerBones.WeaponRoot.position,LayerMaskClass.HighPolyWithTerrainMaskAI)
-                        )
+                        var enemy = hit.collider.gameObject.GetComponent<Player>();
+                        if (enemy != null)
                         {
-                            var enemy = hit.collider.gameObject.GetComponent<Player>();
-                            if (enemy != null)
-                            {
-                                if(boss.Followers.Find(fl=>fl.ProfileId == enemy.ProfileId) != null) continue;
-                                bool isenemy = boss.bossGroup.IsEnemy(enemy);
-                            
-                                if(!enemy && boss.bossGroup.IsPlayerEnemy(enemy)) isenemy = true;
+                            if (boss.Followers.Find(fl => fl.ProfileId == enemy.ProfileId) != null) continue;
+                            bool isenemy = boss.bossGroup.IsEnemy(enemy);
 
-                                if(isenemy) 
+                            if (!isenemy && boss.bossGroup.IsPlayerEnemy(enemy)) isenemy = true;
+
+                            if (isenemy)
+                            {
+                                if (
+                                    GClass301.CanShootToTarget(new ShootPointClass(enemy.MainParts[BodyPartType.head].Position, 1), player.PlayerBones.WeaponRoot.position, LayerMaskClass.HighPolyWithTerrainMask, false) ||
+                                    GClass301.CanShootToTarget(new ShootPointClass(enemy.MainParts[BodyPartType.body].Position, 1), player.PlayerBones.WeaponRoot.position, LayerMaskClass.HighPolyWithTerrainMask, false) ||
+                                    GClass301.CanShootToTarget(new ShootPointClass(enemy.MainParts[BodyPartType.leftArm].Position, 1), player.PlayerBones.WeaponRoot.position, LayerMaskClass.HighPolyWithTerrainMask, false) ||
+                                    GClass301.CanShootToTarget(new ShootPointClass(enemy.MainParts[BodyPartType.rightArm].Position, 1), player.PlayerBones.WeaponRoot.position, LayerMaskClass.HighPolyWithTerrainMask, false) ||
+                                    GClass301.CanShootToTarget(new ShootPointClass(enemy.MainParts[BodyPartType.leftLeg].Position, 1), player.PlayerBones.WeaponRoot.position, LayerMaskClass.HighPolyWithTerrainMask, false) ||
+                                    GClass301.CanShootToTarget(new ShootPointClass(enemy.MainParts[BodyPartType.rightLeg].Position, 1), player.PlayerBones.WeaponRoot.position, LayerMaskClass.HighPolyWithTerrainMask, false)
+                                )
                                 {
                                     Instance._enemiesSeen.Add(enemy);
-                                    break;
                                 }
                             }
                         }

@@ -22,6 +22,9 @@ namespace friendlyPMC.Actions
         private bool bool_1 = false;
         private bool bool_2 = false;
 
+        private bool ischecking = false;
+        private float checkTime = 0f;
+
         private bool _init = false;
 
         private Vector3? _point;
@@ -42,6 +45,7 @@ namespace friendlyPMC.Actions
                 bool_0 = false;
                 bool_1 = false;
                 bool_2 = false;
+                ischecking = false;
             }
         }
 
@@ -52,6 +56,8 @@ namespace friendlyPMC.Actions
             bool_0 = false;
             bool_1 = false;
             bool_2 = false;
+
+            ischecking = false;
 
             (botOwner_0.Brain.Agent as FollowerAIAgent<BotLogicDecision>).OnUpdate -= OnAgentUpdate;
             (botOwner_0.Brain.Agent as FollowerAIAgent<BotLogicDecision>).OnDispose -= OnAgentDispose;
@@ -67,6 +73,27 @@ namespace friendlyPMC.Actions
 
             base.method_0();
 
+            // cancel movement if we see the enemy
+            if (botOwner_0.Memory.HaveEnemy && botOwner_0.Memory.GoalEnemy.CanShoot)
+            {
+                botOwner_0.BotRequestController.CurRequest.Complete();
+                return;
+            }
+
+            if (ischecking)
+            {
+                if (checkTime < Time.time)
+                {
+                    BotRequest r = botOwner_0.BotRequestController.CurRequest;
+                    if (r != null)
+                    {
+                        r.Complete();
+                        botOwner_0.BotRequestController.CurRequest = null;
+                    }
+                }
+                return;
+            }
+
             if (bool_2)
             {
                 return;
@@ -75,37 +102,14 @@ namespace friendlyPMC.Actions
             
             if (botOwner_0.BotRequestController.CurRequest == null) return;
 
-            // cancel movement if we see the enemy
-            if (botOwner_0.Memory.HaveEnemy && botOwner_0.Memory.GoalEnemy.IsVisible)
-            {
-                botOwner_0.BotRequestController.CurRequest.Complete();
-                return;
-            }
+            
 
             if (botOwner_0.Brain.Agent.LastReason == "req:goCheck" && !bool_0)
             {
+                FollowerGoCheck req = botOwner_0.BotRequestController.CurRequest as FollowerGoCheck;
 
-                IPlayer requester = botOwner_0.BotRequestController.CurRequest.Requester;
-                Vector3 dir02 = requester.LookDirection;
-                float forwardDistance = GClass761.Random(3f, 5f);
-
-                Vector3 forwardPosition = requester.Position + dir02.normalized * forwardDistance;
-                float lateralOffset = GClass761.RandomSing() * GClass761.Random(0.5f, 1.5f);
-                Vector3 lateralDirection = Vector3.Cross(Vector3.up, dir02).normalized;
-
-                Vector3 finalPosition = forwardPosition + lateralDirection * lateralOffset;
-
-                _point = finalPosition;
-
-                if (botOwner_0.GoToPoint(finalPosition, true, 0.5f) == NavMeshPathStatus.PathComplete)
-                {
-                    bool_0 = true;
-                }
-                else
-                {
-                    botOwner_0.BotRequestController.CurRequest.Complete();
-                    return;
-                }
+                if (req.HasPoint) bool_0 = true;
+                else req.Complete();
             }
             else if (botOwner_0.Brain.Agent.LastReason == "req:comeHere" && !bool_1)
             {
@@ -137,6 +141,7 @@ namespace friendlyPMC.Actions
 
             if (botOwner_0.Mover.IsComeTo(0.5f, false))
             {
+                ischecking = bool_0;
 
                 bool_0 = false;
                 bool_1 = false;
@@ -155,11 +160,14 @@ namespace friendlyPMC.Actions
                     var req = botOwner_0.BotRequestController.CurRequest as FollowerGoCheck;
                     var requester = req != null ? req.Requester : null;
 
-                    botOwner_0.BotRequestController.CurRequest.Complete();
-                    botOwner_0.BotRequestController.CurRequest = null;
+                   
                     // back to hold position
                     if (req != null && req.FromWait && !botOwner_0.Memory.HaveEnemy)
                     {
+                        req.Complete();
+                        botOwner_0.BotRequestController.CurRequest = null;
+
+                        ischecking = false;
                         Player playerRequester = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(requester.ProfileId);
 
                         if (botOwner_0.BotRequestController.TryStopCurrent(playerRequester, false))
@@ -173,15 +181,23 @@ namespace friendlyPMC.Actions
                                 botOwner_0.Gesture.TryGestus(EGesture.Good, true);
                             }
                         }
+                    } 
+                    else if (req != null && !ischecking)
+                    {
+                        req.Complete();
+                        botOwner_0.BotRequestController.CurRequest = null;
                     }
                 }
+
+                if (ischecking) checkTime = Time.time + GClass761.Random(2f, 4f);
 
                 return;
 
             }
             else if (float_0 < Time.time && (bool_0 || bool_1))
             {
-                if (_point.HasValue)
+                if (bool_0) _shouldSprint = false;
+                else if (_point.HasValue)
                     _shouldSprint = Utils.Utils.GetNavDistance(botOwner_0.GetPlayer.Transform.position, _point.Value) > 15f;
 
                 float_0 = Time.time + 2f;
@@ -194,7 +210,7 @@ namespace friendlyPMC.Actions
                     wasHit = true;
                 }
 
-                if(!wasHit && !botOwner_0.Memory.HaveEnemy) botOwner_0.Steering.LookToMovingDirection(30f);
+                if(!wasHit && !botOwner_0.Memory.HaveEnemy) botOwner_0.Steering.LookToMovingDirection(60f);
                 botOwner_0.Mover.Sprint(_shouldSprint && !wasHit);
             }
         }

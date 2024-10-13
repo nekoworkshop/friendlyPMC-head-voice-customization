@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using UnityEngine.AI;
 using UnityEngine;
 using friendlyPMC.Components;
+using friendlyPMC.Modules;
 using System;
-using System.Timers;
-using System.Threading.Tasks;
-using System.Threading;
 
 namespace friendlyPMC.Utils
 {
@@ -66,8 +64,8 @@ namespace friendlyPMC.Utils
                 }
                 catch (Exception ex)
                 {
-                    Components.Logger.LogError("Exception in SetTimeout");
-                    Components.Logger.LogError(ex);
+                    Modules.Logger.LogError("Exception in SetTimeout");
+                    Modules.Logger.LogError(ex);
                 }
             };
 
@@ -87,8 +85,8 @@ namespace friendlyPMC.Utils
                 }
                 catch (Exception ex)
                 {
-                    Components.Logger.LogError("Exception in SetBotTimer");
-                    Components.Logger.LogError(ex);
+                    Modules.Logger.LogError("Exception in SetBotTimer");
+                    Modules.Logger.LogError(ex);
                 }
             };
 
@@ -110,6 +108,11 @@ namespace friendlyPMC.Utils
         public static void FlagsClear()
         {
             flags.Clear();
+        }
+
+        public static float GetScaledValue(float baseValue, float increment, int level, float maxValue)
+        {
+            return Math.Min(baseValue + (increment * level), maxValue);
         }
     }
 }

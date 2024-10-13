@@ -3,13 +3,10 @@ using friendlyPMC.Components;
 using friendlyPMC.Modules;
 
 using UnityEngine;
-using UnityEngine.AI;
 
 using Cysharp.Threading.Tasks;
 using System;
 
-using System.Collections;
-using System.Reflection;
 using EFT.InventoryLogic;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -106,13 +103,37 @@ namespace friendlyPMC.Actions
             try
             {
                 InventoryControllerClass inventoryControllerClass = botOwner_0.GetPlayer.InventoryControllerClass;
-
+                // order for general loot
                 List<EquipmentSlot> possibleSlots = new List<EquipmentSlot> {
                     EquipmentSlot.Backpack,
                     EquipmentSlot.TacticalVest,
                     EquipmentSlot.ArmorVest,
                     EquipmentSlot.Pockets
                 };
+                // order for special items, like grenades
+                List<EquipmentSlot> equipSlots = new List<EquipmentSlot> {
+                    EquipmentSlot.Pockets,
+                    EquipmentSlot.TacticalVest,
+                    EquipmentSlot.ArmorVest,
+                    EquipmentSlot.Backpack,
+                };
+
+                List<object> equipTypes = new List<object>
+                {
+                    typeof(GrenadeClass)
+                };
+
+                foreach (var item1 in equipTypes)
+                {
+                    Type type = (Type)item1;
+
+                    if (type.IsInstanceOfType(item))
+                    {
+                        possibleSlots = equipSlots;
+                        break;
+                    }
+                }
+
                 // find an available grid in the equipment slots to which the key can be transferred
                 ItemAddress locationForItem = FindLocationForItem(item, possibleSlots, inventoryControllerClass);
                 //  - no space left
@@ -172,8 +193,8 @@ namespace friendlyPMC.Actions
             }
             catch (Exception e)
             {
-                Components.Logger.LogError("Failed to pickup Loot");
-                Components.Logger.LogError(e);
+                Modules.Logger.LogError("Failed to pickup Loot");
+                Modules.Logger.LogError(e);
                 ClearLoot();
             }
         }
