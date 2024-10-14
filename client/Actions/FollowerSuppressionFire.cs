@@ -99,6 +99,7 @@ namespace friendlyPMC.Actions
                     {
                         bool_1 = true;
                         botOwner_0.StopMove();
+                        botOwner_0.Steering.LookToPoint(shootPointClass.Point);
                         return;
                     }
 
