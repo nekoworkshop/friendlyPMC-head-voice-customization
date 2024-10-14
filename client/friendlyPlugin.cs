@@ -65,7 +65,7 @@ namespace friendlyPMC
         }
     }
 
-    [BepInPlugin("xyz.pit.companion", "friendlyPMC", "3.8.1")]
+    [BepInPlugin("xyz.pit.companion", "friendlyPMC", "3.9.0")]
     [BepInDependency("xyz.drakia.bigbrain")]
     [BepInDependency("com.Arys.UnityToolkit")]
     public class friendlyPMC : BaseUnityPlugin
@@ -435,6 +435,9 @@ namespace friendlyPMC
             new HearingSensorPatch().Enable();
             new BulletImpactPatch().Enable();
             new PlayerSayPatch().Enable();
+            // patch bot equipment
+            new UnlootableComponentPatch().Enable();
+            new ModRaidModdablePatch().Enable();
         }
 
         public void GetEquipmentBuilds()

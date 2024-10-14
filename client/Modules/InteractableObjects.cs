@@ -17,8 +17,9 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 
 using friendlyPMC.Components;
-using friendlyPMC.Modules;
+
 using UnityEngine.AI;
+using UnityEngine.Profiling;
 
 
 namespace friendlyPMC.Modules
@@ -40,6 +41,8 @@ namespace friendlyPMC.Modules
         private List<Item> _toSendItems;
         private Dictionary<string, Dictionary<string, object>> _followersWithLoot;
 
+        private Dictionary<string, List<string>> _followersEquipment;
+
         private bool _isBossDead = false;
 
         List<Player> _enemiesSeen;
@@ -58,10 +61,12 @@ namespace friendlyPMC.Modules
 
                 _enemiesSeen = new List<Player>();
 
+                _followersEquipment = new Dictionary<string, List<string>>();
+
             }
 
         }
-
+        /** Send items given to followers back to the player */
         private bool SendStoreItems()
         {
             GatherItems();
@@ -89,7 +94,7 @@ namespace friendlyPMC.Modules
 
             return false;
         }
-
+        /** Gather what items where given to followers and which is still alive to count */
         private void GatherItems()
         {
             var bossPlayers = BossPlayers.Instance.GetBossPlayers();
@@ -214,6 +219,8 @@ namespace friendlyPMC.Modules
             _followersWithLoot.Clear();
             _enemiesSeen.Clear();
 
+            _followersEquipment.Clear();
+
             _currDoor = null;
             _doorsToOpen.Clear();
 
@@ -238,7 +245,7 @@ namespace friendlyPMC.Modules
                 Instance = null;
             }
         }
-
+        /** Set what door the boss wants to open */
         public static void SetCurDoor(Door door)
         {
 
@@ -250,7 +257,7 @@ namespace friendlyPMC.Modules
             if (Instance == null) return null;
             return Instance._currDoor;
         }
-
+        /** Set what loot item the boss wants to be picked up */
         public static void SetCurLootItem(LootItem item)
         {
             if (Instance != null)
@@ -270,7 +277,7 @@ namespace friendlyPMC.Modules
             return (Vector3)Instance._lootPosition;
         }
 
-
+        /** Set what bot is going to pick up the loot */
         public static bool SetTaker(BotOwner bot)
         {
             if (Instance == null) return false;
@@ -334,7 +341,7 @@ namespace friendlyPMC.Modules
                 Instance._botToLoot = null;
             }
         }
-
+        /** Set what bot is going to open the door */
         public static bool SetOpener(BotOwner bot, Door door = null)
         {
             if (Instance._currDoor != null)
@@ -377,7 +384,7 @@ namespace friendlyPMC.Modules
                 Instance._lootPosition = null;
             }
         }
-
+        /** Store the item that was given to a follower */
         public static void StoreItem(BotOwner bot, Item item)
         {
             if (!Instance._lootedItems.ContainsKey(bot.ProfileId))
@@ -438,7 +445,7 @@ namespace friendlyPMC.Modules
             }
         }
 
-
+        /** Store what enemies the player might have seen during "CONTACT" phrase */
         public static void CheckSeenEnemies(IPlayer player)
         {
             Instance._closestEnemySeen = null;
@@ -483,6 +490,7 @@ namespace friendlyPMC.Modules
 
                             if (isenemy)
                             {
+                                // - we check if any part of the enemy is visible to the player
                                 if (
                                     GClass301.CanShootToTarget(new ShootPointClass(enemy.MainParts[BodyPartType.head].Position, 1), player.PlayerBones.WeaponRoot.position, LayerMaskClass.HighPolyWithTerrainMask, false) ||
                                     GClass301.CanShootToTarget(new ShootPointClass(enemy.MainParts[BodyPartType.body].Position, 1), player.PlayerBones.WeaponRoot.position, LayerMaskClass.HighPolyWithTerrainMask, false) ||
@@ -516,13 +524,13 @@ namespace friendlyPMC.Modules
                 Instance._closestEnemySeen = closest;
             }
         }
-
+        /** Get all enemies the player might have seen during "CONTACT" phrase */
         public static List<Player> GetSeenEnemies()
         {
             return Instance._enemiesSeen;
 
         }
-
+        /** Get the closest enemy the player might have seen during "CONTACT" phrase */
         public static Player GetClosestSeenEnemy()
         {
             return Instance._closestEnemySeen;
@@ -538,5 +546,80 @@ namespace friendlyPMC.Modules
             return Instance._isBossDead;
         }
 
+
+        private static void ModEquipmentStore(Slot slot, List<string> items)
+        {
+            if (slot.ContainedItem != null)
+            {
+                items.Add(slot.ContainedItem.Id);
+
+                if (slot.ContainedItem is Mod) foreach(Slot modSlot in (slot.ContainedItem as Mod).Slots)
+                {
+                    if (modSlot.ContainedItem != null) ModEquipmentStore(modSlot,items);
+                }
+            }
+        }
+        public static void StoreEquipment(Profile profile)
+        {
+            if (!Instance._followersEquipment.ContainsKey(profile.ProfileId))
+            {
+                List<string> items = new List<string>();
+                foreach (EquipmentSlot slotType in Enum.GetValues(typeof(EquipmentSlot)))
+                {
+                    if (
+                        slotType == EquipmentSlot.Dogtag || 
+                        slotType == EquipmentSlot.SecuredContainer ||
+                        slotType == EquipmentSlot.Pockets
+                    ) continue;
+
+                    Slot botSlot = profile.Inventory.Equipment.GetSlot(slotType);
+
+                    if (botSlot.IsSpecial) continue;
+
+                    Item contained = botSlot.ContainedItem;
+
+                    if (contained != null)
+                    {
+                        try
+                        {
+                            var components = AccessTools.Field(typeof(Item), "Components").GetValue(contained) as List<IItemComponent>;
+                            components.Add(new UnlootableComponent(contained, contained.Template));
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.LogError("Could not make item unlootable");
+                            Logger.LogError(ex.ToString());
+                        }
+
+                        if (slotType == EquipmentSlot.Backpack) items.Add(contained.Id);
+                        else
+                        {
+                            items.Add(contained.Id);
+                            if(contained is Weapon)
+                            {
+                                foreach (Slot slot in (contained as Weapon).Slots)
+                                {
+                                    if (slot.ContainedItem != null && !(slot.ContainedItem is MagazineClass) && !(slot.ContainedItem is BulletClass))
+                                    {
+                                        ModEquipmentStore(slot, items);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if(items.Count > 0)
+                {
+                    Instance._followersEquipment.Add(profile.ProfileId, items);
+                }
+            }
+        }
+
+
+        public static Dictionary<string, List<string>> GetStoredEquipment()
+        {
+            return Instance._followersEquipment;
+        }
     }
 }

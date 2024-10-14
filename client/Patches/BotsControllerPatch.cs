@@ -1032,6 +1032,7 @@ namespace friendlyPMC.Patches
 
             botsData.Profiles.ForEach(profile =>
             {
+                InteractableObjects.StoreEquipment(profile);
 
                 Action<BotOwner> OnActivate = new Action<BotOwner>((BotOwner owner) =>
                 {
