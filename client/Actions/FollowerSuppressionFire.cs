@@ -68,7 +68,11 @@ namespace friendlyPMC.Actions
             if (grAllowed)
             {
                 if (bool_1)
+                {
+                    botOwner_0.DoorOpener.Update();
                     gclass145_0.Update();
+                    return;
+                }
 
                 if (grSupport && grPosition.HasValue)
                 {
