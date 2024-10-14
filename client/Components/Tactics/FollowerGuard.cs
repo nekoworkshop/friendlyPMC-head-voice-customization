@@ -158,7 +158,18 @@ namespace friendlyPMC.Components.Tactics
 
             if (!botOwner_0.Memory.GoalEnemy.IsSuppressed() && goalEnemy.ShallISuppress())
             {
-                return base.method_29(true, this.method_31());
+                bool useGrenade = GClass761.Random(0f, 2f) > 1f;
+                ThrowWeapType? grenadeType = new ThrowWeapType?(ThrowWeapType.frag_grenade);
+                // - check if player is too close when using grenade
+                if (useGrenade && botOwner_0.WeaponManager.Grenades.HaveGrenadeOfType(grenadeType.Value))
+                {
+                    Vector3 playerPos = commonLayer.HasBoss() ? commonLayer.GetBoss().Player().Transform.position : botOwner_0.GetPlayer.Position;
+                    if (Vector3.Distance(playerPos, goalEnemy.CurrPosition) < 12f)
+                    {
+                        useGrenade = false;
+                    }
+                }
+                return base.method_29(useGrenade, this.method_31());
             }
 
             return null;
@@ -298,9 +309,6 @@ namespace friendlyPMC.Components.Tactics
 
             if (selector != null && (selector.SecondPrimaryWeapon as Weapon) != null && (selector.SecondPrimaryWeapon as Weapon).IsGrenadeLauncher)
             {
-                if(botOwner_0.WeaponManager.Selector.LastEquipmentSlot != EquipmentSlot.SecondPrimaryWeapon)
-                    botOwner_0.WeaponManager.Selector.TryChangeWeapon(true);
-
                 RaycastHit[] hits = new RaycastHit[20];
                 
                 float scanDistance = 120f;
@@ -316,6 +324,8 @@ namespace friendlyPMC.Components.Tactics
                     LayerMaskClass.PlayerMask
                 );
 
+                Vector3 playerPos = commonLayer.HasBoss() ? commonLayer.GetBoss().Player().Transform.position : botOwner_0.GetPlayer.Position;
+
                 List<Vector3> list_1 = new List<Vector3>();
 
                 for (int i = 0; i < numHits; i++)
@@ -330,12 +340,22 @@ namespace friendlyPMC.Components.Tactics
 
                         if (isenemy)
                         {
-                            list_1.Add(enemy.Transform.position);
+                            Vector3 enemyPos = enemy.Transform.position;
+                            // - check if enemy is far enough from the player
+                            if (!GClass326.IsDangerPositionFarEnough(playerPos, new Vector3[]
+                            {
+                                enemyPos
+                            }, 4f)) continue;
+
+                            list_1.Add(enemyPos);
                         }
                     }
                 }
 
                 if(list_1.Count < 1) return null;
+
+                if (botOwner_0.WeaponManager.Selector.LastEquipmentSlot != EquipmentSlot.SecondPrimaryWeapon)
+                    botOwner_0.WeaponManager.Selector.TryChangeWeapon(true);
 
                 botOwner_0.SuppressShoot.InitToPoints(list_1, null);
                 float delay = (float)list_1.Count * 2f;
