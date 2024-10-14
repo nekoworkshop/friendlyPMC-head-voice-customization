@@ -1,3 +1,9 @@
+-- === 3.8.1 === ---:
+- x - add position check for player when using the grenade launcher
+- #totest - add new command "Over There" that acts like "Contact" but with "ThatDirection" gesture and no voice
+- investigate possible bug with many followers spawning and ending up being hostile to each other (5 to start with)
+- add busy hands check for grenades
+
 -- === 3.9 === ---:
 - add punishment for players intentionally killing their teammates
 - - check if in combat or out of combat the kill was done

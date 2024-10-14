@@ -52,11 +52,11 @@ namespace friendlyPMC.Components
             player.HealthController.DiedEvent += OnDead;
 
             Singleton<BotEventHandler>.Instance.OnPhraseSay += PhraseSaid;
+            Singleton<BotEventHandler>.Instance.OnGestusShow += GestusShown;
 
             SetAreaCovers();
             coverCoroutine = player.StartCoroutine(UpdateCoversCoroutine());
         }
-
 
         public new void Dispose()
         {
@@ -111,6 +111,16 @@ namespace friendlyPMC.Components
                 if(info.phrase == (EPhraseTrigger)CustomPhrases.TeamStatus)
                     PingTeamates.Instance.Ping(this);
                 else if (info.phrase == EPhraseTrigger.OnRepeatedContact)
+                {
+                    InteractableObjects.CheckSeenEnemies(Player());
+                }
+            }
+        }
+        private void GestusShown(GClass453 info)
+        {
+            if(info.Player != null && info.Player.ProfileId == realPlayer.ProfileId)
+            {
+                if (info.Gesture == (EGesture)CustomGestures.OverThere)
                 {
                     InteractableObjects.CheckSeenEnemies(Player());
                 }

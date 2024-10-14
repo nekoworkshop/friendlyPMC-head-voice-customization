@@ -319,36 +319,7 @@ namespace friendlyPMC.Components
                 {
                     base.method_6(data);
                 }
-            }/*
-            // on gesture "go there", if bot has enemy, do a push
-            else if (gesture == EGesture.ThatDirection && botOwner_0.Memory.HaveEnemy)
-            {
-                if (isBossCommunicating)
-                {
-                    if (gestusDistance <= maxGestusDistance)
-                    {
-
-                        if (botOwner_0.BotRequestController.TryStopCurrent(playerRequester, false))
-                        {
-
-                            (botOwner_0.Brain.BaseBrain as FollowerBrain).BossOrdersChanged();
-
-                            FollowerRushEnemy gclass = new FollowerRushEnemy(botOwner_0, playerRequester);
-                            if (botOwner_0.BotsGroup.RequestsController.TryAddRequest(gclass))
-                            {
-                                gclass.AddPossibleExecutors(botOwner_0);
-                                gclass.SetGroup(botOwner_0.BotsGroup.RequestsController);
-                            }
-                        }
-                    }
-
-                    return;
-                }
-                else if (shouldDefault)
-                {
-                    base.method_6(data);
-                }
-            }*/
+            }
             else if (gesture == EGesture.Good)
             {
                 if (isBossCommunicating)
@@ -370,6 +341,11 @@ namespace friendlyPMC.Components
                 {
                     base.method_6(data);
                 }
+            }
+            else if(gesture == (EGesture)CustomGestures.OverThere)
+            {
+                (botOwner_0.Brain.BaseBrain as FollowerBrain).BossOrdersChanged();
+                FollowerEnemyCheck.CheckBossReport(botOwner_0);
             }
             else
             {
