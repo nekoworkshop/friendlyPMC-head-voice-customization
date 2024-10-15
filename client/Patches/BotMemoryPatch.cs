@@ -30,6 +30,12 @@ namespace friendlyPMC.Patches
             if (enemy == null || (enemy.IsAI && enemy.AIData?.BotOwner?.GetPlayer == null))
                 return true;
 
+            // prevent followers from adding teammates as an enemy on creation
+            if (enemy.IsAI && enemy.AIData.BotOwner != null && BossPlayers.WillBeFollower(enemy.AIData.BotOwner))
+            {
+                return false;
+            }
+
             var botOwner_0 = AccessTools.Field(typeof(BotMemoryClass), "botOwner_0").GetValue(__instance) as BotOwner;
 
             if (botOwner_0 == null) return true;

@@ -88,6 +88,7 @@ namespace friendlyPMC.Components
         private const float TIME_TO_RESET_HEAL_FIRSTAID = 15f;
         private const float TIME_TO_RESET_HEAL_STIMS = 3f;
         private const float TIME_TO_RESET_HEAL_SURGERY = 40f;
+        private const float TIME_TO_RESET_WEAPONS_GRENADE = 3f;
 
         public FollowerBrain(BotOwner owner, pitAIBossPlayer boss) : base(owner)
         {
@@ -161,6 +162,23 @@ namespace friendlyPMC.Components
                         {
                             HandsReset();
                         }
+                    }
+                }
+
+                if (_owner.WeaponManager.Grenades.ThrowindNow)
+                {
+                    if (_busyTimer == 0f)
+                    {
+                        _busyTimer = Time.time + TIME_TO_RESET_WEAPONS_GRENADE;
+                        return;
+                    }
+                    else if (_busyTimer < Time.time)
+                    {
+                        return;
+                    }
+                    else
+                    {
+                        HandsReset();
                     }
                 }
 

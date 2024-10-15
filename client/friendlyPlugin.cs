@@ -45,7 +45,13 @@ namespace friendlyPMC
 
     public enum CustomPhrases
     {
-        TeamStatus = 200
+        TeamStatus = 200,
+        OverThere = 201,
+    }
+
+    public enum CustomGestures
+    {
+        OverThere = 201,
     }
 
     public class FollowerUtils
@@ -76,7 +82,7 @@ namespace friendlyPMC
 
         public static Dictionary<GameObject, HashSet<Material>> objectsMaterials = new Dictionary<GameObject, HashSet<Material>>();
 
-        private static Dictionary<string, object> optionsLang = new Dictionary<string, object>
+        public static Dictionary<string, object> optionsLang = new Dictionary<string, object>
         {
             { "baseSettings", "Base Settings" },
             { "miscSettings", "Miscellaneous" },
@@ -86,7 +92,7 @@ namespace friendlyPMC
             { "equipOptions", new string[]
                 {
                     "Default",
-                } 
+                }
             },
             {
                 "tacticOptions", new string[]
@@ -104,7 +110,7 @@ namespace friendlyPMC
                     "Player"
                 }
             },
-            {  
+            {
                 "statusSound" , new Dictionary<string,string>{
                     { "Name", "Report Status Volume"},
                     { "Description", "Volume of the radio sound when triggering report status"}
@@ -244,6 +250,14 @@ namespace friendlyPMC
                     { "Name", "Enemy Report" },
                     { "Description", "Shortcut key for triggering the Contact call" }
                 }
+            },
+            {
+                "gestures", new Dictionary<string,string>
+                {
+                    { "OverThere", "Over There" },
+                    { "TeamStatus", "Status Report" },
+                    { "OnRepeatedContact", "Contact" }
+                }
             }
         };
 
@@ -338,11 +352,6 @@ namespace friendlyPMC
             new AIDataContructPatch().Enable();
             new AIBossPlayerPatch().Enable();
 
-            new QuickPanelPatch().Enable();
-            new GestureMenuPatch().Enable();
-            new GestureMenuAvailablePhrasesPatch().Enable();
-            new EPhraseTriggerPatch().Enable();
-
             var harmony = new Harmony("xyz.pit.companion");
 
             harmony.PatchAll(typeof(LocalGameCtorPatch).Assembly);
@@ -425,7 +434,15 @@ namespace friendlyPMC
             ConfigSet();
 
             harmony.PatchAll(typeof(ConfigurationManagerPatch).Assembly);
-            
+
+            new QuickPanelPatch().Enable();
+
+            new GestureMenuPatch().Enable();
+            new GestureMenuAvailablePhrasesPatch().Enable();
+            new EPhraseTriggerPatch().Enable();
+
+            //new FirearmControllerGesturePatch().Enable();
+
             // patch sain in regards to Squad 
             SAINPatch.PatchSAINIfInstalled(harmony);
             // some error catchers here - they do not seem related to this mod

@@ -7,10 +7,12 @@ using System.Collections.Generic;
 
 using System.Reflection;
 using EFT;
+using UnityEngine;
+using Comfort.Common;
 
 namespace friendlyPMC.Patches
 {
-
+    // Add new prhases to the menu
     internal class GestureMenuPatch : ModulePatch
     {
         protected override MethodBase GetTargetMethod()
@@ -25,24 +27,36 @@ namespace friendlyPMC.Patches
 
             list_0.ForEach(item =>
             {
-                if(item.gameObject.name == "ENEMY")
+                if (item.gameObject.name == "ENEMY")
                 {
-                    GesturesMenu.Class2965 @class = new GesturesMenu.Class2965();
-                    @class.gesturesMenu_0 = __instance;
-                    @class.isSituational = false; 
-                    GestureBaseItem gestureBaseItem = item.CreateNewPhrase(EPhraseTrigger.OnRepeatedContact, @class.isSituational);
-                    gestureBaseItem.OnPointerClicked.Subscribe(new Action<GestureBaseItem.GStruct399>(@class.method_0));
-                    list_1.Add(gestureBaseItem);
+                    List<EPhraseTrigger> enemyPhrases = new List<EPhraseTrigger> { EPhraseTrigger.OnRepeatedContact, (EPhraseTrigger)CustomPhrases.OverThere };
+
+                    enemyPhrases.ForEach(phrase =>
+                    {
+                        GesturesMenu.Class2965 @class = new GesturesMenu.Class2965();
+                        @class.gesturesMenu_0 = __instance;
+                        @class.isSituational = false;
+                        GestureBaseItem gestureBaseItem = item.CreateNewPhrase(phrase, @class.isSituational);
+                        gestureBaseItem.OnPointerClicked.Subscribe(new Action<GestureBaseItem.GStruct399>(@class.method_0));
+                        list_1.Add(gestureBaseItem);
+                    });
                 }
 
-                else if(item.gameObject.name == "TEAM STATUS")
+                else if (item.gameObject.name == "TEAM STATUS")
                 {
-                    GesturesMenu.Class2965 @class = new GesturesMenu.Class2965();
-                    @class.gesturesMenu_0 = __instance;
-                    @class.isSituational = false;
-                    GestureBaseItem gestureBaseItem = item.CreateNewPhrase((EPhraseTrigger)CustomPhrases.TeamStatus, @class.isSituational);
-                    gestureBaseItem.OnPointerClicked.Subscribe(new Action<GestureBaseItem.GStruct399>(@class.method_0));
-                    list_1.Add(gestureBaseItem);
+                    List<CustomPhrases> statusPhrases = new List<CustomPhrases> { CustomPhrases.TeamStatus};
+
+                    statusPhrases.ForEach(phrase =>
+                    {
+                        GesturesMenu.Class2965 @class = new GesturesMenu.Class2965();
+                        @class.gesturesMenu_0 = __instance;
+                        @class.isSituational = false;
+                        GestureBaseItem gestureBaseItem = item.CreateNewPhrase((EPhraseTrigger)phrase, @class.isSituational);
+                        gestureBaseItem.OnPointerClicked.Subscribe(new Action<GestureBaseItem.GStruct399>(@class.method_0));
+                        list_1.Add(gestureBaseItem);
+                    });
+
+                    
                 }
             });
         }
@@ -59,10 +73,11 @@ namespace friendlyPMC.Patches
         {
             var hashSet_1 = (HashSet<EPhraseTrigger>)AccessTools.Field(typeof(GesturesMenu), "hashSet_1").GetValue(__instance);
             hashSet_1.Add((EPhraseTrigger)CustomPhrases.TeamStatus);
+            hashSet_1.Add((EPhraseTrigger)CustomPhrases.OverThere);
         }
     }
 
-    
+    // patch to return friendly name for the new phrases
     internal class EPhraseTriggerPatch : ModulePatch
     {
         protected override MethodBase GetTargetMethod()
@@ -76,11 +91,17 @@ namespace friendlyPMC.Patches
             {
                 if (trigger == EPhraseTrigger.OnRepeatedContact)
                 {
-                    __result = "Contact";
+                    __result = ((Dictionary<string, string>)friendlyPMC.optionsLang["gestures"])["OnRepeatedContact"];
                     return false;
-                } else if (trigger == (EPhraseTrigger)CustomPhrases.TeamStatus)
+                }
+                else if (trigger == (EPhraseTrigger)CustomPhrases.TeamStatus)
                 {
-                    __result = "Status Report";
+                    __result = ((Dictionary<string, string>)friendlyPMC.optionsLang["gestures"])["TeamStatus"];
+                    return false;
+                }
+                else if (trigger == (EPhraseTrigger)CustomPhrases.OverThere)
+                {
+                    __result = ((Dictionary<string, string>)friendlyPMC.optionsLang["gestures"])["OverThere"];
                     return false;
                 }
             }

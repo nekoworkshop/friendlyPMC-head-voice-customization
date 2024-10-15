@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using friendlyPMC.Components;
 using EFT.UI;
 using UnityEngine;
+using Comfort.Common;
 
 namespace friendlyPMC.Patches
 {
@@ -82,7 +83,28 @@ namespace friendlyPMC.Patches
         {
             return AccessTools.Method(typeof(Player), "Say");
         }
- 
+
+        [HarmonyPriority(Priority.First)]
+        [PatchPrefix]
+        private static bool PatchPrefix(Player __instance, EPhraseTrigger @event, bool demand = false, float delay = 0f, ETagStatus mask = (ETagStatus)0, int probability = 100, bool aggressive = false)
+        {
+            if(@event == (EPhraseTrigger)CustomPhrases.OverThere)
+            {
+                if (__instance.HandsController is Player.FirearmController)
+                {
+                    (__instance.HandsController as Player.FirearmController).CurrentOperation.ShowGesture(EGesture.ThatDirection);
+
+                    if (Singleton<BotEventHandler>.Instantiated)
+                    {
+                        Singleton<BotEventHandler>.Instance.ShowGesture(__instance, (EGesture)CustomGestures.OverThere);
+                    }
+                }
+
+                return false;
+            }
+            return true;
+        }
+
         [PatchPostfix]
         private static void PatchPostfix(Player __instance)
         {

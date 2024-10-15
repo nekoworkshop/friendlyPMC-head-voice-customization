@@ -44,6 +44,12 @@ namespace friendlyPMC.Patches
             {
                 return true;
             }
+            // prevent followers from adding teammates as an enemy on creation
+            if (person.IsAI && person.AIData.BotOwner != null && BossPlayers.WillBeFollower(person.AIData.BotOwner))
+            {
+                __result = false;
+                return false;
+            }
 
             var plBoss = BossPlayers.GetBoss(person.ProfileId);
             var isgroup = BossPlayers.IsBossGroup(__instance.Id);
@@ -130,6 +136,12 @@ namespace friendlyPMC.Patches
                     __result = false;
                     return false;
                 }
+            }
+            // prevent followers from adding teammates as an enemy on creation
+            if (player.IsAI && player.AIData.BotOwner != null && BossPlayers.WillBeFollower(player.AIData.BotOwner))
+            {
+                __result = false;
+                return false;
             }
 
             var _initialBotMindSettings = AccessTools.Field(typeof(BotsGroup), "_initialBotMindSettings").GetValue(__instance) as BotGlobalsMindSettings;

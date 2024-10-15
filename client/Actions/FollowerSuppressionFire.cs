@@ -68,7 +68,11 @@ namespace friendlyPMC.Actions
             if (grAllowed)
             {
                 if (bool_1)
+                {
+                    botOwner_0.DoorOpener.Update();
                     gclass145_0.Update();
+                    return;
+                }
 
                 if (grSupport && grPosition.HasValue)
                 {
@@ -99,6 +103,7 @@ namespace friendlyPMC.Actions
                     {
                         bool_1 = true;
                         botOwner_0.StopMove();
+                        botOwner_0.Steering.LookToPoint(shootPointClass.Point);
                         return;
                     }
 
