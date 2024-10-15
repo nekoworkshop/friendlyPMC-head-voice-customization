@@ -70,7 +70,7 @@ namespace friendlyPMC.Patches
             return groupPoint.CorePointInGame;
         }
 
-        private BotsGroup GetPlayerGroup(pitAIBossPlayer player, BotOwner bt, BotZone zn)
+        private BotsGroup GetPlayerGroup(pitAIBossPlayer player, BotOwner bt, BotZone zn, int groupSize = 0)
         {
             if(player.bossGroup != null) return player.bossGroup;
 
@@ -140,7 +140,10 @@ namespace friendlyPMC.Patches
                 {
                     list.Add(item2);
                 }
+                
                 botsGroup = new BotsGroupPlayer(zn, botGame, bt, list, deadBodiesController, allPlayers, player);
+                if(groupSize != 0) botsGroup.TargetMembersCount = groupSize;
+
                 if (_freeForAll)
                 {
                     spawnGroups.AddNoKey(botsGroup, zn);
@@ -166,7 +169,9 @@ namespace friendlyPMC.Patches
                 {
                     list.Add(item2);
                 }
+
                 botsGroup = new BotsGroupPlayer(zn, botGame, bt, list, deadBodiesController, allPlayers, player);
+                if (groupSize != 0) botsGroup.TargetMembersCount = groupSize;
 
                 if (_freeForAll)
                 {
@@ -1019,7 +1024,7 @@ namespace friendlyPMC.Patches
 
             Func<BotOwner, BotZone, BotsGroup> GroupAction = new Func<BotOwner, BotZone, BotsGroup>((BotOwner bt, BotZone zn) =>
             {
-                return GetPlayerGroup(player, bt, zn);
+                return GetPlayerGroup(player, bt, zn,memberCount);
             });
 
             
@@ -1047,6 +1052,7 @@ namespace friendlyPMC.Patches
                         try
                         {
                             me.Memory.DeleteInfoAboutEnemy(player.Player()); // prevent attack of player on spawn
+
                             me.GetPlayer.ActiveHealthController.RestoreFullHealth(); // ensure bot has full health
 
                             string tactic = null;

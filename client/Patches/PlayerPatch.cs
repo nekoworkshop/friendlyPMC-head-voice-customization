@@ -84,6 +84,7 @@ namespace friendlyPMC.Patches
             return AccessTools.Method(typeof(Player), "Say");
         }
 
+        [HarmonyPriority(Priority.First)]
         [PatchPrefix]
         private static bool PatchPrefix(Player __instance, EPhraseTrigger @event, bool demand = false, float delay = 0f, ETagStatus mask = (ETagStatus)0, int probability = 100, bool aggressive = false)
         {

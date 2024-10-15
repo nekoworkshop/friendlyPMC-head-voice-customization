@@ -345,6 +345,10 @@ namespace friendlyPMC.Components
             else if(gesture == (EGesture)CustomGestures.OverThere)
             {
                 (botOwner_0.Brain.BaseBrain as FollowerBrain).BossOrdersChanged();
+                if(!botOwner_0.Memory.HaveEnemy)
+                {
+                    botOwner_0.BotTalk.SetSilence(2f);
+                }
                 FollowerEnemyCheck.CheckBossReport(botOwner_0);
             }
             else
