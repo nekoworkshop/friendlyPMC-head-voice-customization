@@ -5,6 +5,13 @@
 - x - investigate possible bug with many followers spawning and ending up being hostile to each other (5 to start with)
 - x - add busy hands check for grenades
 
+- x - ping team and over there needs to be silent from the enemy's perspective
+
+- fix suppfire looking in the opposite direction
+
+- x - track AIAgent Error made from GetDecision
+- x - debug more the UpdateLook error
+
 -- === 3.9 === ---:
 - add punishment for players intentionally killing their teammates
 - - check if in combat or out of combat the kill was done

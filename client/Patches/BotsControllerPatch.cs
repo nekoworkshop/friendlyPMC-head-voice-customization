@@ -1319,6 +1319,8 @@ namespace friendlyPMC.Patches
 
             LocalGameCtorPatch.Instance = null;
 
+            LookSensorPatch.FlushSwitches();
+
             Modules.Logger.LogInfo("Raid Ended");
 
             return true;

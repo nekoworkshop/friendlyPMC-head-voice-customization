@@ -7,6 +7,7 @@ using System.Reflection;
 using UnityEngine;
 
 using friendlyPMC.Modules;
+using System.Collections.Generic;
 
 namespace friendlyPMC.Patches
 {
@@ -14,32 +15,75 @@ namespace friendlyPMC.Patches
     [HarmonyPatch("GInterface10.AIPeriodicUpdate")]
     internal class LookSensorPatch
     {
+        private static Dictionary<string,float> _switch = new Dictionary<string, float>();
+
         [HarmonyPrefix]
         static bool Prefix(LookSensor __instance)
         {
-            // @TODO : figure out out why _weaponRootTransform is null
             try
             {
-                BifacialTransform _weaponRootTransform = AccessTools.Field(typeof(LookSensor), "_weaponRootTransform").GetValue(__instance) as BifacialTransform;
-
-                if (_weaponRootTransform == null)
+                BotOwner botOwner = AccessTools.Field(typeof(LookSensor), "_botOwner").GetValue(__instance) as BotOwner;
+                // we are only interested in followers
+                if (!BossPlayers.IsFollower(botOwner))
                 {
-                    BotOwner botOwner = AccessTools.Field(typeof(LookSensor), "_botOwner").GetValue(__instance) as BotOwner;
-                    if (botOwner.Fireport != null)
+                    __instance.UpdateLook();
+                    return false;
+                }
+
+                BifacialTransform _weaponRootTransform = AccessTools.Field(typeof(LookSensor), "_weaponRootTransform").GetValue(__instance) as BifacialTransform;
+                
+                if(_switch.ContainsKey(botOwner.ProfileId))
+                {
+                    if(Time.time - _switch[botOwner.ProfileId] < 3f)
+                    {
+                        __instance.UpdateLook();
+                        return false;
+                    }
+                    // reset to original weapon root
+                    try
                     {
                         AccessTools.Field(typeof(LookSensor), "_weaponRootTransform").SetValue(__instance, botOwner.Fireport);
+                        _switch.Remove(botOwner.ProfileId);
+                    } catch
+                    {
                     }
                 }
 
-                if (_weaponRootTransform == null) return false;
+                try
+                {
+                    // attempt to see if the weapon root is good
+                    Vector3 _weaponRootPoint = _weaponRootTransform.position;
+                }
+                catch
+                {
+                    // attempt to reset it if there is an issue
+                    try
+                    {
+                        Vector3 checkpoint = botOwner.Fireport.position; // check
+                        AccessTools.Field(typeof(LookSensor), "_weaponRootTransform").SetValue(__instance, botOwner.Fireport);
+                    }
+                    catch
+                    {
+                        // - else switch to alternative weapon root
+                        AccessTools.Field(typeof(LookSensor), "_weaponRootTransform").SetValue(__instance, botOwner.WeaponRoot);
+                        _switch[botOwner.ProfileId] = Time.time;
+                    }
+                }
 
                 __instance.UpdateLook();
+
             } catch(Exception ex) {
-                Modules.Logger.LogInfo("AIPeriodicUpdate Error");
+                Modules.Logger.LogInfo("LookSensor AIPeriodicUpdate Error");
                 Modules.Logger.LogInfo(ex.StackTrace);
             }
 
             return false;
+        }
+   
+
+        public static void FlushSwitches()
+        {
+            _switch.Clear();
         }
     }
 

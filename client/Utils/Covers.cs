@@ -348,13 +348,15 @@ namespace friendlyPMC.Utils
             return false;
         }
         /** Find a position from where the bot can shoot at the given target **/
-        public static Vector3? FindShootPosition(BotOwner botOwner,float minDistance, float maxRadius, Func<Vector3, bool> eligibleCheck = null, bool manualTarget = false)
+        public static Vector3? FindShootPosition(BotOwner botOwner,float minDistance, float maxRadius, Func<Vector3, bool> eligibleCheck = null, Vector3? manualTarget = null)
         {
             Vector3 botPosition = botOwner.GetPlayer.Transform.position;
             Vector3 botWeaponOffset = botOwner.ShootData.WeaponRootOffset;
             LayerMask Mask = botOwner.LookSensor.Mask;
 
             Vector3 targetPosition = botOwner.Memory.GoalEnemy.CurrPosition;
+
+            if(manualTarget.HasValue) targetPosition = manualTarget.Value;
 
             NavMeshPath mesh = new NavMeshPath();
 
@@ -383,23 +385,28 @@ namespace friendlyPMC.Utils
 
                 if (!IsNavigablePoint(botPosition, navMeshHit.position, 150f, mesh)) continue;
 
-                if (eligibleCheck != null && !eligibleCheck(navMeshHit.position)) continue;
-
                 // Check if the bot can shoot from the random position to the target 
                 bool cansh = false;
                 // check if bot can shoot either the head or torso of the enemy from this position
-                if(!manualTarget) foreach (var target in shootTarget)
+                if (manualTarget == null || eligibleCheck == null)
                 {
-                    ShootPointClass shootPoint = new ShootPointClass(target, 0.8f);
-                    if (
-                        GClass301.CanShootToTarget(shootPoint, navMeshHit.position + botWeaponOffset, Mask, false) ||
-                        GClass301.CanShootToTarget(shootPoint, navMeshHit.position + botWeaponOffset * 0.5f, Mask, false)
-                    )
+                    if (eligibleCheck != null && !eligibleCheck(navMeshHit.position)) continue;
+
+                    foreach (var target in shootTarget)
                     {
-                        cansh = true;
-                        break;
+                        ShootPointClass shootPoint = new ShootPointClass(target, 0.8f);
+                        if (
+                            GClass301.CanShootToTarget(shootPoint, navMeshHit.position + botWeaponOffset, Mask, false) ||
+                            GClass301.CanShootToTarget(shootPoint, navMeshHit.position + botWeaponOffset * 0.5f, Mask, false)
+                        )
+                        {
+                            cansh = true;
+                            break;
+                        }
                     }
                 }
+                // when manual target is set, eligibleCheck becomes the one that determine if the position is good for shooting or not
+                else cansh = eligibleCheck(navMeshHit.position);
 
                 if (cansh) return navMeshHit.position;
             }

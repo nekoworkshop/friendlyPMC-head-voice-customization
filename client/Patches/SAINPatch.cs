@@ -21,6 +21,9 @@ namespace friendlyPMC.Patches
         private static Type squadType = null;
         private static Type SAINEnableClass = null;
 
+        private static Type enemyTalk = null;
+        private static Type GroupClass = null;
+
         public static void PatchSAINIfInstalled(Harmony harmony)
         {
             if (IsSAINInstalled())
@@ -35,7 +38,17 @@ namespace friendlyPMC.Patches
                 {
                     SAINEnableClass = Type.GetType("SAIN.SAINEnableClass, SAIN");
                 }
+                
+                if (enemyTalk != null)
+                {
+                    enemyTalk = Type.GetType("SAIN.SAINComponent.Classes.Talk.EnemyTalk, SAIN");
 
+                }
+
+                if(GroupClass != null)
+                {
+                    GroupClass = Type.GetType("SAIN.SAINComponent.Classes.Talk.GroupTalk, SAIN");
+                }
 
                 if (squadType != null)
                 {
@@ -46,6 +59,16 @@ namespace friendlyPMC.Patches
                 if(SAINEnableClass !=null)
                 {
                     harmony.Patch(AccessTools.Method(SAINEnableClass, "isBotExcluded"), new HarmonyMethod(typeof(SAINPatch), nameof(PatchisBotExcluded)));
+                }
+
+                if(enemyTalk != null)
+                {
+                    harmony.Patch(AccessTools.Method(enemyTalk, "playerTalked"), new HarmonyMethod(typeof(SAINPatch).GetMethod(nameof(PatchPlayerTalked), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance)));
+                }
+
+                if (GroupClass != null)
+                {
+                    harmony.Patch(AccessTools.Method(GroupClass, "EnemyConversation"), new HarmonyMethod(typeof(SAINPatch).GetMethod(nameof(PatchPlayerTalked), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance)));
                 }
 
                 if (squadType != null && SAINEnableClass != null)
@@ -143,6 +166,17 @@ namespace friendlyPMC.Patches
                 __result = true;
                 return false;
             }
+            return true;
+        }
+
+        [HarmonyPrefix]
+        private static bool PatchPlayerTalked(EPhraseTrigger phrase, ETagStatus mask, Player player)
+        {
+            if(phrase == (EPhraseTrigger)CustomPhrases.TeamStatus || phrase == (EPhraseTrigger)CustomPhrases.OverThere)
+            {
+                return false;
+            }
+
             return true;
         }
     }

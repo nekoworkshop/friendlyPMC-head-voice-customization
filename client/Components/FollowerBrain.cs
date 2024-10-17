@@ -21,6 +21,7 @@ namespace friendlyPMC.Components
         protected string _currentTactic = null;
         protected string _defaultTactic = null;
 
+
         public string currentTactic
         {
             get
@@ -88,7 +89,10 @@ namespace friendlyPMC.Components
         private const float TIME_TO_RESET_HEAL_FIRSTAID = 15f;
         private const float TIME_TO_RESET_HEAL_STIMS = 3f;
         private const float TIME_TO_RESET_HEAL_SURGERY = 40f;
-        private const float TIME_TO_RESET_WEAPONS_GRENADE = 3f;
+        private const float TIME_TO_RESET_WEAPONS_GRENADE = 5f;
+        private const float TIME_TO_RESET_WEAPONS_SWAP = 3f;
+
+        private bool GRENADE_THROWING = false;
 
         public FollowerBrain(BotOwner owner, pitAIBossPlayer boss) : base(owner)
         {
@@ -100,6 +104,8 @@ namespace friendlyPMC.Components
             owner.LeaveData.OnLeave += OnLeave;
             owner.Memory.OnAddEnemy += OnAddEnemy;
             owner.GetPlayer.BeingHitAction += BeingHitAction;
+
+            owner.WeaponManager.Grenades.OnGrenadeThrowStart += OnThrow;
 
             _currentTactic = "Default";
 
@@ -165,7 +171,7 @@ namespace friendlyPMC.Components
                     }
                 }
 
-                if (_owner.WeaponManager.Grenades.ThrowindNow)
+                if (_owner.WeaponManager.Grenades.ThrowindNow || GRENADE_THROWING)
                 {
                     if (_busyTimer == 0f)
                     {
@@ -182,7 +188,25 @@ namespace friendlyPMC.Components
                     }
                 }
 
+                if (_owner.WeaponManager.Selector.IsChanging)
+                {
+                    if (_busyTimer == 0f)
+                    {
+                        _busyTimer = Time.time + TIME_TO_RESET_WEAPONS_SWAP;
+                        return;
+                    }
+                    else if (_busyTimer < Time.time)
+                    {
+                        return;
+                    }
+                    else
+                    {
+                        HandsReset();
+                    }
+                }
+
                 _busyTimer = 0f;
+                GRENADE_THROWING = false;
             }
             catch (Exception ex)
             {
@@ -418,8 +442,11 @@ namespace friendlyPMC.Components
             BossPlayers.RemoveFollower(_owner, _boss);
             Modules.Logger.LogInfo("Follower " + _owner.Profile.Nickname + " died");
         }
-
-
+         
+        protected virtual void OnThrow()
+        {
+            GRENADE_THROWING = true;
+        }
         protected virtual void OnAddEnemy(IPlayer player)
         {
             // how does the boss or BTR get added as Enemy here ?? - fix it
@@ -483,6 +510,9 @@ namespace friendlyPMC.Components
                 if(_owner.Memory != null)
                     _owner.Memory.OnAddEnemy -= OnAddEnemy;
 
+                if(_owner.WeaponManager != null && _owner.WeaponManager.Grenades != null)
+                    _owner.WeaponManager.Grenades.OnGrenadeThrowStart -= OnThrow;
+
             }
             catch(Exception ex)
             {
@@ -541,7 +571,7 @@ namespace friendlyPMC.Components
             selector.Activate();
         }
 
-        private void HandsReset()
+        public void HandsReset()
         {
             Player player = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(_owner.ProfileId);
             InventoryControllerClass inventoryController = player.InventoryControllerClass;
