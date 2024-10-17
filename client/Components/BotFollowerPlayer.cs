@@ -253,6 +253,14 @@ namespace friendlyPMC.Components
             // ensure bot has enough ammo
             AddExtraAmmo();
 
+
+            // - take on the new vision values
+            _bot.LookSensor.UpdateLook();
+
+            // - ensure weapon is in auto mode
+            if (_bot.WeaponManager.ShootController.Item != null && _bot.WeaponManager.ShootController.Item.WeapFireType.Contains(Weapon.EFireMode.fullauto))
+                _bot.WeaponManager.ShootController.ChangeFireMode(Weapon.EFireMode.fullauto);
+
             Modules.Logger.LogInfo($"Bot {_bot.Profile.Nickname} is now a follower of {_player.Player().Profile.Nickname}");
         }
 
@@ -347,12 +355,6 @@ namespace friendlyPMC.Components
 
             settings.FileSettings.Core.CanGrenade = true;
             settings.FileSettings.Core.CanRun = true;
-            /*settings.FileSettings.Core.VisibleAngle = 160;
-            settings.FileSettings.Core.VisibleDistance = 185;
-            settings.FileSettings.Core.GainSightCoef = 0.05f;
-            settings.FileSettings.Core.ScatteringPerMeter = 0.045f;
-            settings.FileSettings.Core.ScatteringClosePerMeter = 0.12f;
-            settings.FileSettings.Core.HearingSense = 0.8f;*/
 
             settings.FileSettings.Cover.CHECK_CLOSEST_FRIEND = true;
 
@@ -362,11 +364,11 @@ namespace friendlyPMC.Components
 
 
             settings.FileSettings.Look.CAN_USE_LIGHT = true;
-            settings.FileSettings.Look.FULL_SECTOR_VIEW = true; // seems this makes them aware of everything around them
-            settings.FileSettings.Look.NIGHT_VISION_ON = 75.0f;
-            settings.FileSettings.Look.NIGHT_VISION_OFF = 125.0f;
-            settings.FileSettings.Look.NIGHT_VISION_DIST = 125.0f;
-            settings.FileSettings.Look.VISIBLE_ANG_NIGHTVISION = 90.0f;
+            //settings.FileSettings.Look.FULL_SECTOR_VIEW = true; // seems this makes them aware of everything around them
+            settings.FileSettings.Look.NIGHT_VISION_ON = 100.0f;
+            settings.FileSettings.Look.NIGHT_VISION_OFF = 110.0f;
+            settings.FileSettings.Look.NIGHT_VISION_DIST = 120.0f;
+            settings.FileSettings.Look.VISIBLE_ANG_NIGHTVISION = 120.0f;
             settings.FileSettings.Look.LOOK_THROUGH_PERIOD_BY_HIT = 5f;
             settings.FileSettings.Look.LightOnVisionDistance = 40.0f;
             settings.FileSettings.Look.VISIBLE_ANG_LIGHT = 30.0f;
@@ -374,7 +376,7 @@ namespace friendlyPMC.Components
             settings.FileSettings.Look.GOAL_TO_FULL_DISSAPEAR = 0.25f;
             settings.FileSettings.Look.GOAL_TO_FULL_DISSAPEAR_GREEN = 0.15f;
             settings.FileSettings.Look.GOAL_TO_FULL_DISSAPEAR_SHOOT = 0.01f;
-            //settings.FileSettings.Look.LOOK_THROUGH_GRASS = true;
+            settings.FileSettings.Look.LOOK_THROUGH_GRASS = true;
             settings.FileSettings.Look.MAX_VISION_GRASS_METERS = 1.0f;
             settings.FileSettings.Look.MAX_VISION_GRASS_METERS_OPT = 1.0f;
             settings.FileSettings.Look.MAX_VISION_GRASS_METERS_FLARE = 4.0f;
