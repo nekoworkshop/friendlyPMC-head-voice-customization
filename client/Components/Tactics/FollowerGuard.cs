@@ -126,7 +126,7 @@ namespace friendlyPMC.Components.Tactics
         {
             if (list_1.Count > 0)
             {
-                botOwner_0.SuppressShoot.InitToPoints(list_1.ToList<Vector3>(), null);
+                botOwner_0.SuppressShoot.InitToPoints(list_1, null);
                 float delay = (float)list_1.Count * 2f;
                 foreach (Vector3 position in list_1)
                 {
@@ -257,6 +257,7 @@ namespace friendlyPMC.Components.Tactics
                     GetClosestAttackCoverPoint(enemyPos);
                     if (customNavigationPoint_0 != null)
                     {
+                        bool withSuppr = GClass761.Random(0f, 1f) > 0.5f;
                         return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMoving, "getInCloseSlow");
                     }
 
@@ -326,17 +327,35 @@ namespace friendlyPMC.Components.Tactics
 
                 Vector3 playerPos = commonLayer.HasBoss() ? commonLayer.GetBoss().Player().Transform.position : botOwner_0.GetPlayer.Position;
 
-                List<Vector3> list_1 = new List<Vector3>();
+                List<Vector3> list_2 = new List<Vector3>();
 
                 for (int i = 0; i < numHits; i++)
                 {
                     RaycastHit hit = hits[i];
-                    if (hit.collider != null)
+                    if (hit.collider != null && hit.collider.gameObject != null)
                     {
-                        
-                        Player enemy = botOwner_0.ShootData.method_4(hit.collider);
+
+                        var enemy = hit.collider.gameObject.GetComponent<Player>();
+
                         bool isenemy = false;
-                        if(enemy != null && (botOwner_0.BotsGroup.IsEnemy(enemy) || botOwner_0.BotsGroup.IsPlayerEnemy(enemy))) isenemy = true;
+
+                        if (enemy != null)
+                        {
+                            if(commonLayer.HasBoss())
+                            {
+                                pitAIBossPlayer boss = commonLayer.GetBoss();
+                                if (boss.Followers.Find(fl => fl.ProfileId == enemy.ProfileId) != null) continue;
+
+                                isenemy = boss.bossGroup.IsEnemy(enemy);
+
+                                if (!isenemy && boss.bossGroup.IsPlayerEnemy(enemy)) isenemy = true;
+                            }
+                            else if(botOwner_0.BotsGroup.IsEnemy(enemy) || botOwner_0.BotsGroup.IsPlayerEnemy(enemy))
+                            {
+                                isenemy = true;
+                            }
+                            
+                        }
 
                         if (isenemy)
                         {
@@ -347,20 +366,20 @@ namespace friendlyPMC.Components.Tactics
                                 enemyPos
                             }, 4f)) continue;
 
-                            list_1.Add(enemyPos);
+                            list_2.Add(enemyPos);
                         }
                     }
                 }
 
-                if(list_1.Count < 1) return null;
+                if(list_2.Count < 1) return null;
 
                 if (botOwner_0.WeaponManager.Selector.LastEquipmentSlot != EquipmentSlot.SecondPrimaryWeapon)
                     botOwner_0.WeaponManager.Selector.TryChangeWeapon(true);
 
-                botOwner_0.SuppressShoot.InitToPoints(list_1, null);
-                float delay = (float)list_1.Count * 2f;
+                botOwner_0.SuppressShoot.InitToPoints(list_2, null);
+                float delay = (float)list_2.Count * 2f;
 
-                foreach (Vector3 position in list_1)
+                foreach (Vector3 position in list_2)
                 {
                     Singleton<BotEventHandler>.Instance.ArtilleryStart(position, 20f,delay);
                 }

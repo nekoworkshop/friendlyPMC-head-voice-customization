@@ -88,7 +88,8 @@ namespace friendlyPMC.Components
         private const float TIME_TO_RESET_HEAL_FIRSTAID = 15f;
         private const float TIME_TO_RESET_HEAL_STIMS = 3f;
         private const float TIME_TO_RESET_HEAL_SURGERY = 40f;
-        private const float TIME_TO_RESET_WEAPONS_GRENADE = 3f;
+        private const float TIME_TO_RESET_WEAPONS_GRENADE = 5f;
+        private const float TIME_TO_RESET_WEAPONS_SWAP = 3f;
 
         public FollowerBrain(BotOwner owner, pitAIBossPlayer boss) : base(owner)
         {
@@ -170,6 +171,23 @@ namespace friendlyPMC.Components
                     if (_busyTimer == 0f)
                     {
                         _busyTimer = Time.time + TIME_TO_RESET_WEAPONS_GRENADE;
+                        return;
+                    }
+                    else if (_busyTimer < Time.time)
+                    {
+                        return;
+                    }
+                    else
+                    {
+                        HandsReset();
+                    }
+                }
+
+                if (_owner.WeaponManager.Selector.IsChanging)
+                {
+                    if (_busyTimer == 0f)
+                    {
+                        _busyTimer = Time.time + TIME_TO_RESET_WEAPONS_SWAP;
                         return;
                     }
                     else if (_busyTimer < Time.time)
@@ -541,7 +559,7 @@ namespace friendlyPMC.Components
             selector.Activate();
         }
 
-        private void HandsReset()
+        public void HandsReset()
         {
             Player player = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(_owner.ProfileId);
             InventoryControllerClass inventoryController = player.InventoryControllerClass;

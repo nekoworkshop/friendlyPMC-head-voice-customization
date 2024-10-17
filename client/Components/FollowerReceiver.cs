@@ -554,16 +554,6 @@ namespace friendlyPMC.Components
                             else
                             {
                                 enemyInfo = botOwner_0.Memory.GoalEnemy;
-                                BotOwner newEnemy = boss.ClosestEnemy();
-
-                                if (newEnemy != null && (enemyInfo == null || (botOwner_0.GetPlayer.Transform.position - enemyInfo.Person.Transform.position).magnitude > 20f))
-                                {
-                                    BotSettingsClass botSettingsClass = new BotSettingsClass(Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(newEnemy.ProfileId), boss.bossGroup, EBotEnemyCause.callForHelp1);
-
-                                    botOwner_0.Memory.AddEnemy(newEnemy, botSettingsClass, false);
-
-                                    enemyInfo = botOwner_0.Memory.GoalEnemy;
-                                }
                             }
 
                             if (enemyInfo != null)

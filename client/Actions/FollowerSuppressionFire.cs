@@ -62,32 +62,58 @@ namespace friendlyPMC.Actions
 
         public override void Update()
         {
-            if (!botOwner_0.WeaponManager.Selector.IsWeaponReady) return;
+            if (grSupport && !botOwner_0.WeaponManager.Selector.IsWeaponReady) return;
 
-            // our system that handles doing grenade launcher supression fire
+            if (bool_1)
+            {   
+                gclass145_0.Update();
+                return;
+            }
+
+            // our system that handles doing supression fire
             if (grAllowed)
             {
-                if (bool_1)
-                {
-                    botOwner_0.DoorOpener.Update();
-                    gclass145_0.Update();
-                    return;
-                }
+                botOwner_0.DoorOpener.Update();
 
-                if (grSupport && grPosition.HasValue)
+                if (grPosition.HasValue)
                 {
-                    botOwner_0.DoorOpener.Update();
-
-                    if(bool_1 && botOwner_0.GoToSomePointData.IsCome())
+                    
+                    if (bool_1 && botOwner_0.GoToSomePointData.IsCome())
                     {
                         botOwner_0.StopMove();
+                        if(grTarget.HasValue) botOwner_0.Steering.LookToPoint(grTarget.Value);
+                        gclass145_0.Update();
                         bool_1 = true;
+                    } else
+                    {
+                        botOwner_0.GoToSomePointData.UpdateToGo(true);
                     }
 
                     return;
                 }
 
                 var lastDecision = botOwner_0.Brain.Agent.LastResult();
+                
+                // can suppress from place
+                if(lastDecision.Reason == "SupFire")
+                {
+                    bool_1 = true;
+                    Vector3? target = botOwner_0.SuppressShoot.GetPoint();
+                    if (target.HasValue) botOwner_0.Steering.LookToPoint(target.Value);
+                    return;
+                }
+
+                // has spot to suppress from
+                if (botOwner_0.SuppressShoot.PointToSuppressFrom != null)
+                {
+                    grPosition = botOwner_0.SuppressShoot.PointToSuppressFrom.Position;
+                    botOwner_0.GoToSomePointData.SetPoint(grPosition.Value);
+                    Vector3? trg = botOwner_0.SuppressShoot.GetPoint();
+                    grTarget = trg;
+                    if (trg.HasValue) botOwner_0.Steering.LookToPoint(trg.Value);
+                    botOwner_0.GoToSomePointData.UpdateToGo(true);
+                    return;
+                }
 
                 if (lastDecision.Reason == "suppressFireLauncher")
                 {
@@ -95,11 +121,13 @@ namespace friendlyPMC.Actions
                 }
 
                 Vector3? point = botOwner_0.SuppressShoot.GetPoint();
-                if (point.HasValue && grSupport)
-                {
-                    ShootPointClass shootPointClass = new ShootPointClass(point.Value + BotOwner.STAY_HEIGHT, 0.7f);
 
-                    if (GClass301.CanShootToTarget(shootPointClass, this.botOwner_0.WeaponRoot.position, this.botOwner_0.LookSensor.Mask, false))
+                // need to find a spot to suppress from
+                if (point.HasValue)
+                {
+                    ShootPointClass shootPointClass = new ShootPointClass(point.Value, 1f);
+
+                    if (GClass301.CanShootToTarget(shootPointClass, botOwner_0.WeaponRoot.position, botOwner_0.LookSensor.Mask, false))
                     {
                         bool_1 = true;
                         botOwner_0.StopMove();
@@ -107,21 +135,24 @@ namespace friendlyPMC.Actions
                         return;
                     }
 
-                    Vector3? firePosition = Utils.Covers.FindShootPosition(botOwner_0, 5f, 50f, position =>
+                    Vector3? firePosition = Utils.Covers.FindShootPosition(botOwner_0, 12f, 70f, position =>
                     {
-                        if (GClass301.CanShootToTarget(shootPointClass, position + this.botOwner_0.WeaponRoot.position, this.botOwner_0.LookSensor.Mask, false))
+                        if (GClass301.CanShootToTarget(shootPointClass, position + botOwner_0.WeaponRoot.position, botOwner_0.LookSensor.Mask, false))
                         {
                             return true;
                         }
+                        
                         return false;
-                    },true);
+
+                    }, shootPointClass.Point);
 
                     if (firePosition.HasValue)
                     {
                         grPosition = firePosition;
-                        grTarget = point;
+                        grTarget = shootPointClass.Point;
                         botOwner_0.GoToSomePointData.SetPoint(grPosition.Value);
-                        botOwner_0.Steering.LookToPoint(grTarget.Value);
+                        botOwner_0.Steering.LookToPoint(shootPointClass.Point);
+                        botOwner_0.GoToSomePointData.UpdateToGo(true);
                         return;
                     }
                 }
