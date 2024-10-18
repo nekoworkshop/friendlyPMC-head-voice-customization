@@ -469,7 +469,7 @@ namespace friendlyPMC.Components
             if (!allyTactic && bossUnderAttack && (commonLayer.coverType == "close") && (!botOwner_0.Memory.HaveEnemy || !botOwner_0.Memory.GoalEnemy.IsVisible))
             {
                 // - switch the bot's enemy to the one attacking the boss
-                var closestEnemy = GetBoss()?.ClosestEnemy();
+                BotOwner closestEnemy = HasBoss()  ? GetBoss().ClosestEnemy() : null;
                 if (closestEnemy != null)
                 {
                     GetBoss().PrioritizeEnemy(botOwner_0, closestEnemy);
@@ -491,7 +491,6 @@ namespace friendlyPMC.Components
                         {
                             return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMoving, "protectBossSlow");
                         }
-
                     }
                     else
                     {
