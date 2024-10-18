@@ -29,12 +29,10 @@ namespace friendlyPMC.Patches
                     __instance.UpdateLook();
                     return false;
                 }
-
-                BifacialTransform _weaponRootTransform = AccessTools.Field(typeof(LookSensor), "_weaponRootTransform").GetValue(__instance) as BifacialTransform;
                 
                 if(_switch.ContainsKey(botOwner.ProfileId))
                 {
-                    if(Time.time - _switch[botOwner.ProfileId] < 3f)
+                    if(Time.time - _switch[botOwner.ProfileId] < 0.5f)
                     {
                         __instance.UpdateLook();
                         return false;
@@ -48,6 +46,8 @@ namespace friendlyPMC.Patches
                     {
                     }
                 }
+                
+                BifacialTransform _weaponRootTransform = AccessTools.Field(typeof(LookSensor), "_weaponRootTransform").GetValue(__instance) as BifacialTransform;
 
                 try
                 {

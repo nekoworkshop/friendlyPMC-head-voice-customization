@@ -385,7 +385,7 @@ namespace friendlyPMC.Components
             wantsToHeal = false;
 
             AIBossPlayerLogic gclass363_0 = HasBoss() ? GetBoss().GetBossLogic() : null;
-            bossUnderAttack = gclass363_0 != null && gclass363_0.IsHitted;
+            bossUnderAttack = gclass363_0 != null ? gclass363_0.IsHitted : false;
 
             // Check if the bot has received the regroup command
             if (ordersAreReqroup && GetNavDistance(bossPosition) > commonLayer.regroupMinDistance && (!botOwner_0.Memory.HaveEnemy || !botOwner_0.Memory.GoalEnemy.IsVisible))
@@ -411,7 +411,7 @@ namespace friendlyPMC.Components
                     AICoreActionResultStruct<BotLogicDecision>? launcherDecicion = guardLayer.CanDoGrenadierSuppressRequest(new Ray(request.Requester.Transform.position, request.Requester.LookDirection));
                     if (launcherDecicion.HasValue)
                     {
-                        grSuppressTime = Time.time + 10f;
+                        grSuppressTime = Time.time + 5f;
                         botOwner_0.BotTalk.TrySay(EPhraseTrigger.Covering, false);
                         grSupport = true;
                         return launcherDecicion.Value;
@@ -478,6 +478,7 @@ namespace friendlyPMC.Components
                 if (guardTactic)
                 {
                     customNavigationPoint_0 = closestEnemy == null ? null : Covers.GetClosestCoverPointBetween(botOwner_0, bossPosition, closestEnemy.GetPlayer.Transform.position);
+
                     if (customNavigationPoint_0 != null)
                     {
                         botOwner_0.Memory.SetCoverPoints(customNavigationPoint_0);
@@ -558,7 +559,7 @@ namespace friendlyPMC.Components
                 return new AICoreActionResultStruct<BotLogicDecision>((BotLogicDecision)CustomBotDecisions.MoveToPoint, "req:goCheck");
             }
 
-            if (botOwner_0.Memory.GoalEnemy.Owner.IsRole(WildSpawnType.marksman))
+            if (botOwner_0.Memory.HaveEnemy && botOwner_0.Memory.GoalEnemy.Owner.IsRole(WildSpawnType.marksman))
                 return commonLayer.MarksManFight(out customNavigationPoint_0);
 
             // ally tactic will make the bot always fight in hold mode

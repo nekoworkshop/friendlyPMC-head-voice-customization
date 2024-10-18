@@ -1,13 +1,13 @@
 -- === 3.8.1 === ---:
 - x - add position check for player when using the grenade launcher
-- #totest - add new command "Over There" that acts like "Contact" but with "ThatDirection" gesture and no voice
-- - needs confirmation that enemy is not hearing the command
+- x - add new command "Over There" that acts like "Contact" but with "ThatDirection" gesture and no voice
+- x - needs confirmation that enemy is not hearing the command
 - x - investigate possible bug with many followers spawning and ending up being hostile to each other (5 to start with)
 - x - add busy hands check for grenades
 
 - x - ping team and over there needs to be silent from the enemy's perspective
 
-- fix suppfire looking in the opposite direction
+- x - fix suppfire looking in the opposite direction
 
 - x - track AIAgent Error made from GetDecision
 - x - debug more the UpdateLook error

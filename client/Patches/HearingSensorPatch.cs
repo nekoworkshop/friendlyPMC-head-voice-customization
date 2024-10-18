@@ -74,7 +74,13 @@ namespace friendlyPMC.Patches
             // only followers will react to over there
             if (@event == (EPhraseTrigger)CustomPhrases.OverThere)
             {
-                if(!__instance.HandsController.IsInInteractionStrictCheck())
+                pitAIBossPlayer boss = BossPlayers.GetBoss(__instance.ProfileId);
+                if (boss != null)
+                {
+                    InteractableObjects.CheckSeenEnemies(boss.Player());
+                }
+
+                if (!__instance.HandsController.IsInInteractionStrictCheck())
                 {
                     if (__instance.HandsController is Player.FirearmController)
                     {
@@ -90,7 +96,6 @@ namespace friendlyPMC.Patches
 
                             receiver.Value.GestusShown(data);
                         }
-
 
                     } else if (__instance.HandsIsEmpty)
                     {
