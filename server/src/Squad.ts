@@ -49,6 +49,8 @@ import { LocaleService } from "@spt/services/LocaleService";
 import { IBots } from "@spt/models/spt/bots/IBots";
 import { DatabaseService } from "@spt/services/DatabaseService";
 
+import {squad_customization} from "../config/customization.json"
+
 class friendlyPMC {
 	config = {
 		sameSideHostile: false,
@@ -442,6 +444,27 @@ class friendlyPMC {
 								}
 							}
 							const customization = databaseService.getCustomization();
+						
+							// AS head and voice patch
+							// Find matching customization entry based on member nickname.
+							const squadMemberCustomization = squad_customization.find((p) => p.name === custom.Nickname);
+
+							if (squadMemberCustomization){
+								// Assign custom voice, assuming the what you see on the character screen is the voice id
+								custom.Voice = squadMemberCustomization.voice;
+
+							    // Find matching head 
+								const matchingHead = Object.values(customization).find((item: any) => item._props.Name === squadMemberCustomization.head);
+
+								if (matchingHead){
+									profile.Customization.Head = matchingHead._name;
+								}else{
+									console.log("No matching head found for:" + squadMemberCustomization.head);
+								}
+
+							}else{
+								console.log("No matching squad member customization config found for:" + custom.Nickname);
+							}
 
 							if (custom.Voice && customization[custom.Voice]) {
 								profile.Info.Voice = customization[custom.Voice]._name;
