@@ -1,21 +1,7 @@
--- === 3.8.1 === ---:
-- x - add position check for player when using the grenade launcher
-- x - add new command "Over There" that acts like "Contact" but with "ThatDirection" gesture and no voice
-- x - needs confirmation that enemy is not hearing the command
-- x - investigate possible bug with many followers spawning and ending up being hostile to each other (5 to start with)
-- x - add busy hands check for grenades
-
-- x - ping team and over there needs to be silent from the enemy's perspective
-
-- x - fix suppfire looking in the opposite direction
-
-- x - track AIAgent Error made from GetDecision
-- x - debug more the UpdateLook error
-
 -- === 3.9 === ---:
-- add punishment for players intentionally killing their teammates
-- - check if in combat or out of combat the kill was done
-- remove from player's inventory any equipment he looted from his dead teammates
+- x - remove from player's inventory any equipment he looted from his dead teammates
+- bot to signal teammate down
+- "On Your Own" be enhanced where the followers will form a partol perimeter around the player with configurable distance
 
 - player level to determine if he can pick up any extra followers and how many (maximum 3, disable configuration regarding this)
 - scav karma and level to determine with how many followers can the player spawn (maxium 3) and extra pickups (maximum 2 extras)
@@ -31,6 +17,9 @@
 
 - goons send join offer for specific maps (Woods, Shoreline, Customs, Lighthouse)
 
+- add punishment for players intentionally killing their teammates
+- - check if in combat or out of combat the kill was done
+
 --- ==== 4.0.0 (final phase) ==== ---:
 - add squad management terminal
 - after profile create, have 1 bot send a request to become a teamember for the player
@@ -38,7 +27,9 @@
 
 ==================================================================================
 RELEASE NOTES (3.9) 
-
+- you can no longer loot spawned followers equipment This does not apply to consumables like magazines, ammo, meds, etc.
+- "On Your Own" will now make followers patrol around the player with a configurable distance when out of combat. In order for this to work they must not be told to hold position.
+- followers will react to teammate going down
 
 ==================================================================================
 NOTES:

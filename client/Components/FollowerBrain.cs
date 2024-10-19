@@ -213,10 +213,9 @@ namespace friendlyPMC.Components
                 Modules.Logger.LogError(ex);
             }
         }
-
+        /** Add the brain layers for the follower bot. Order matter in terms of the initial priority */
         public virtual void AddLayers()
         {
-            // order matters for which layer get the initial priority
             // - follow
             FollowerLayer followLayer = new FollowerLayer(_owner, 50);
             method_0(1, followLayer, true);

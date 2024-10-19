@@ -633,6 +633,7 @@ namespace friendlyPMC.Modules
 
         public static Dictionary<string, List<string>> GetStoredEquipment()
         {
+            if(Instance == null) return new Dictionary<string, List<string>>();
             return Instance._followersEquipment;
         }
     }
