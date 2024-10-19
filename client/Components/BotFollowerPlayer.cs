@@ -48,7 +48,7 @@ namespace friendlyPMC.Components
 
             _IsSquadMate = isSquad;
 
-            settingModif = new GClass528(1.2f, 1.2f, 1f, 1.2f, 1f, 1f, 1f, 1f, 1f);
+            settingModif = new GClass528(1.2f, 1.2f, 1f, 1.1f, 1f, 1f, 1f, 1f, 1f);
 
             NpcMessage.AddNpc(bot, isSquad);
 
@@ -228,11 +228,17 @@ namespace friendlyPMC.Components
                 _player.bossGroup.AddMember(_bot, false);
             }
 
-            // apply some of settings modifier
+            // apply the settings modifier
             _bot.Settings.Current._hearingDistCoef = settingModif.HearingDistCoef;
             _bot.Settings.Current._precicingSpeedCoef = settingModif.PrecicingSpeedCoef;
             _bot.Settings.Current._accuratySpeedCoef = settingModif.AccuratySpeedCoef;
             _bot.Settings.Current._scatteringCoef = settingModif.ScatteringCoef;
+            _bot.Settings.Current._visibleDistCoef = settingModif.VisibleDistCoef;
+            _bot.Settings.Current._layChanceDangerCoef = settingModif.LayChanceDangerCoef;
+            _bot.Settings.Current._priorityScatteringCoef = settingModif.PriorityScatteringCoef;
+            _bot.Settings.Current._gainSightCoef = settingModif.GainSightCoef;
+            _bot.Settings.Current._triggerDownDelay = settingModif.TriggerDownDelay;
+
 
             // force  reset enemy state
             Utils.Utils.SetTimeout(() =>
@@ -246,12 +252,16 @@ namespace friendlyPMC.Components
                 // TURN OFF THE FLASHLIGHT!
                 if (_bot.BotLight != null && _bot.BotLight.IsEnable)
                 {
-                    _bot.BotLight.TurnOff(false, true);
+                    _bot.BotLight.TurnOff(false, false);
                 }
             }, 300);
 
             // ensure bot has enough ammo
             AddExtraAmmo();
+
+            // - ensure weapon is in auto mode
+            if (_bot.WeaponManager.ShootController.Item != null && _bot.WeaponManager.ShootController.Item.WeapFireType.Contains(Weapon.EFireMode.fullauto))
+                _bot.WeaponManager.ShootController.ChangeFireMode(Weapon.EFireMode.fullauto);
 
             Modules.Logger.LogInfo($"Bot {_bot.Profile.Nickname} is now a follower of {_player.Player().Profile.Nickname}");
         }
@@ -347,12 +357,6 @@ namespace friendlyPMC.Components
 
             settings.FileSettings.Core.CanGrenade = true;
             settings.FileSettings.Core.CanRun = true;
-            /*settings.FileSettings.Core.VisibleAngle = 160;
-            settings.FileSettings.Core.VisibleDistance = 185;
-            settings.FileSettings.Core.GainSightCoef = 0.05f;
-            settings.FileSettings.Core.ScatteringPerMeter = 0.045f;
-            settings.FileSettings.Core.ScatteringClosePerMeter = 0.12f;
-            settings.FileSettings.Core.HearingSense = 0.8f;*/
 
             settings.FileSettings.Cover.CHECK_CLOSEST_FRIEND = true;
 
@@ -362,15 +366,17 @@ namespace friendlyPMC.Components
 
 
             settings.FileSettings.Look.CAN_USE_LIGHT = true;
-            settings.FileSettings.Look.FULL_SECTOR_VIEW = true; // seems this makes them aware of everything around them
-            settings.FileSettings.Look.NIGHT_VISION_ON = 75.0f;
-            settings.FileSettings.Look.NIGHT_VISION_OFF = 125.0f;
-            settings.FileSettings.Look.NIGHT_VISION_DIST = 125.0f;
-            settings.FileSettings.Look.VISIBLE_ANG_NIGHTVISION = 90.0f;
+            //settings.FileSettings.Look.FULL_SECTOR_VIEW = true; // seems this makes them aware of everything around them
+            settings.FileSettings.Look.NIGHT_VISION_ON = 100.0f;
+            settings.FileSettings.Look.NIGHT_VISION_OFF = 110.0f;
+            settings.FileSettings.Look.NIGHT_VISION_DIST = 160.0f;
+            settings.FileSettings.Look.VISIBLE_ANG_NIGHTVISION = 120f;
             settings.FileSettings.Look.LOOK_THROUGH_PERIOD_BY_HIT = 5f;
             settings.FileSettings.Look.LightOnVisionDistance = 40.0f;
-            settings.FileSettings.Look.VISIBLE_ANG_LIGHT = 30.0f;
-            settings.FileSettings.Look.VISIBLE_DISNACE_WITH_LIGHT = 50.0f;
+            
+            settings.FileSettings.Look.VISIBLE_ANG_LIGHT = 45.0f;
+            settings.FileSettings.Look.VISIBLE_DISNACE_WITH_LIGHT = 65.0f;
+
             settings.FileSettings.Look.GOAL_TO_FULL_DISSAPEAR = 0.25f;
             settings.FileSettings.Look.GOAL_TO_FULL_DISSAPEAR_GREEN = 0.15f;
             settings.FileSettings.Look.GOAL_TO_FULL_DISSAPEAR_SHOOT = 0.01f;
@@ -389,8 +395,10 @@ namespace friendlyPMC.Components
             settings.FileSettings.Cover.SIT_DOWN_WHEN_HOLDING = true;
 
             bot.Settings = settings;
+            
             bot.ENEMY_LOOK_AT_ME = Mathf.Cos(settings.FileSettings.Mind.ENEMY_LOOK_AT_ME_ANG * 0.017453292f);
             bot.GetPlayer.ActiveHealthController.SetDamageCoeff(settings.FileSettings.Core.DamageCoeff);
+
             // - friendly bot never gets tired
             bot.GetPlayer.Physical.Stamina.ForceMode = true;
             bot.GetPlayer.Physical.HandsStamina.ForceMode = true;
@@ -400,6 +408,13 @@ namespace friendlyPMC.Components
             bot.GetPlayer.Profile.Info.TeamId = _player.realPlayer.Profile.Info.TeamId;
 
             bot.Tactic.AggressionCoef = 1f;
+
+            // - take on the new vision values
+            AccessTools.Field(typeof(LookSensor), "VISIBLE_ANGLE").SetValue(bot.LookSensor, Mathf.Cos(settings.FileSettings.Core.VisibleAngle * 0.017453292f));
+            AccessTools.Field(typeof(LookSensor), "VISIBLE_ANGLE_LIGHT").SetValue(bot.LookSensor, Mathf.Cos(settings.FileSettings.Look.VISIBLE_ANG_LIGHT * 0.017453292f));
+            AccessTools.Field(typeof(LookSensor), "VISIBLE_ANGLE_NIGHTVISION").SetValue(bot.LookSensor, Mathf.Cos(settings.FileSettings.Look.VISIBLE_ANG_NIGHTVISION * 0.017453292f));
+
+            _bot.LookSensor.UpdateLook();
 
         }
 

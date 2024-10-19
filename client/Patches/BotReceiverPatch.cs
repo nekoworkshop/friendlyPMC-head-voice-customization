@@ -70,10 +70,20 @@ namespace friendlyPMC.Patches
         [PatchPrefix]
         private static bool PatchPrefix(BotReceiver __instance, BotEventHandler.GClass599 info)
         {
+            
+            
 
             BotOwner botOwner = (BotOwner)AccessTools.Field(typeof(BotReceiver), "botOwner_0").GetValue(__instance);
             if (botOwner != null)
             {
+                
+                if(
+                    !BossPlayers.IsFollower(botOwner) &&
+                    (info.phrase == (EPhraseTrigger)CustomPhrases.TeamStatus || info.phrase == (EPhraseTrigger)CustomPhrases.OverThere)
+                ) {
+                    return false;
+                }
+
                 // on cooperation, starting following the boss player
                 if (info.phrase == EPhraseTrigger.Cooperation || info.phrase == EPhraseTrigger.FollowMe)
                 {

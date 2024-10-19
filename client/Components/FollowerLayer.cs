@@ -1,4 +1,5 @@
 ﻿using EFT;
+using EFT.InventoryLogic;
 using friendlyPMC.Modules;
 using System;
 using System.Collections.Generic;
@@ -15,6 +16,8 @@ namespace friendlyPMC.Components
 
         protected float heal_time = 0f;
 
+        protected bool _triedToSwitchToMain = false;
+
         public FollowerLayer(BotOwner bot, int priority) : base(bot, priority)
         {
             float_2 = Time.time + 60f;
@@ -23,10 +26,17 @@ namespace friendlyPMC.Components
         {
             botOwner_0.PriorityAxeTarget.FindTarget();
             var brain = botOwner_0.Brain.BaseBrain as FollowerBrain;
-            
-            if (brain != null && brain.UnderFire && !botOwner_0.Memory.HaveEnemy) return true;
 
-            return HasBoss() && !InteractableObjects.IsTaker(botOwner_0) && !InteractableObjects.IsOpener(botOwner_0);
+            bool shouldUse = false; ;
+
+            if (brain != null && brain.UnderFire && !botOwner_0.Memory.HaveEnemy) 
+                shouldUse = true;
+            else 
+                shouldUse = HasBoss() && !InteractableObjects.IsTaker(botOwner_0) && !InteractableObjects.IsOpener(botOwner_0);
+
+            if(!shouldUse) _triedToSwitchToMain = false;
+
+            return shouldUse;
         }
 
         public override string Name()
@@ -115,6 +125,13 @@ namespace friendlyPMC.Components
                 }
 
                 PatrolWay way = botOwner_0.PatrollingData.Way;
+
+                // switch to main weapon when out of combat - useful for bots that have launchers as secondary weapon
+                if (!_triedToSwitchToMain && botOwner_0.WeaponManager.Selector.LastEquipmentSlot != EquipmentSlot.FirstPrimaryWeapon)
+                {
+                    botOwner_0.WeaponManager.Selector.TryChangeToMain();
+                    _triedToSwitchToMain = true;
+                }
 
 
                 if (HasBoss())

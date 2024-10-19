@@ -77,5 +77,10 @@ namespace friendlyPMC.Modules
             if (followerReceivers.TryGetValue(id, out FollowerReceiver receiver)) return receiver;
             return null;
         }
+
+        public static Dictionary<string, FollowerReceiver> GetReceivers()
+        {
+            return followerReceivers;
+        }
     }
 }

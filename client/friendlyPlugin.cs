@@ -21,6 +21,7 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 
 using friendlyPMC.Utils;
+using friendlyPMC.Components;
 
 namespace friendlyPMC
 {
@@ -419,6 +420,7 @@ namespace friendlyPMC
                     {
                         if (follower != null && follower.GetBot().HealthController.IsAlive)
                         {
+                            (follower.GetBot().Brain.BaseBrain as FollowerBrain).HandsReset();
                             follower.GetBot().WeaponManager.Selector.TakePrevWeapon();
                         }
                     }
@@ -451,7 +453,7 @@ namespace friendlyPMC
             // patch hearing
             new HearingSensorPatch().Enable();
             new BulletImpactPatch().Enable();
-            new PlayerSayPatch().Enable();
+            harmony.PatchAll(typeof(PlayerSayPatch).Assembly);
             // patch bot equipment
             new UnlootableComponentPatch().Enable();
             new ModRaidModdablePatch().Enable();

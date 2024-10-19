@@ -333,12 +333,6 @@ namespace friendlyPMC.Components
             Vector3 botPosition = botOwner_0.GetPlayer.Transform.position;
             Vector3 bossPosition = HasBoss() ? GetBoss().Position : botPosition;
 
-            // accept requests only from the boss
-            if (request != null && (botOwner_0.BotFollower.BossToFollow == null || request.Requester.ProfileId != botOwner_0.BotFollower.BossToFollow.Player().ProfileId))
-            {
-                request = null;
-            }
-
             if (request != null && request.BotRequestType == BotRequestType.wait)
             {
                 ordersAreHold = true;
@@ -391,19 +385,19 @@ namespace friendlyPMC.Components
             wantsToHeal = false;
 
             AIBossPlayerLogic gclass363_0 = HasBoss() ? GetBoss().GetBossLogic() : null;
-            bossUnderAttack = gclass363_0 != null && gclass363_0.IsHitted;
+            bossUnderAttack = gclass363_0 != null ? gclass363_0.IsHitted : false;
 
             // Check if the bot has received the regroup command
             if (ordersAreReqroup && GetNavDistance(bossPosition) > commonLayer.regroupMinDistance && (!botOwner_0.Memory.HaveEnemy || !botOwner_0.Memory.GoalEnemy.IsVisible))
             {
                 aicoreActionResultStruct = commonLayer.GetCloserToBoss(out customNavigationPoint_0);
-                return (AICoreActionResultStruct<BotLogicDecision>)aicoreActionResultStruct;
+                if (aicoreActionResultStruct != null)
+                    return (AICoreActionResultStruct<BotLogicDecision>)aicoreActionResultStruct;
             }
 
             // suppression fire request
             if (!sniperTactic && request != null && request.BotRequestType == BotRequestType.suppressionFire)
             {
-                Modules.Logger.LogInfo("Suppression request");
                 if (grSupport && grSuppressTime > Time.time)
                 {
                     return guardLayer.GrenadierDecision();
@@ -414,18 +408,15 @@ namespace friendlyPMC.Components
                 // - guard(support) can use grenade launcher 
                 if ((botOwner_0.Brain.BaseBrain as FollowerBrain)?.defaultTactic == "Guard" && grSuppressTime < Time.time)
                 {
-                    var launcherDecicion = guardLayer.CanDoGrenadierSuppressRequest(new Ray(request.Requester.Transform.position, request.Requester.LookDirection));
+                    AICoreActionResultStruct<BotLogicDecision>? launcherDecicion = guardLayer.CanDoGrenadierSuppressRequest(new Ray(request.Requester.Transform.position, request.Requester.LookDirection));
                     if (launcherDecicion.HasValue)
                     {
-                        grSuppressTime = Time.time + 10f;
-                        Modules.Logger.LogInfo("Do grenadier suppression");
+                        grSuppressTime = Time.time + 5f;
                         botOwner_0.BotTalk.TrySay(EPhraseTrigger.Covering, false);
                         grSupport = true;
                         return launcherDecicion.Value;
                     }
                 }
-
-                Modules.Logger.LogInfo("Do normal suppression");
 
                 botOwner_0.BotTalk.TrySay(EPhraseTrigger.Covering, false);
                 suppressTime = Time.time + 2.5f;
@@ -441,7 +432,7 @@ namespace friendlyPMC.Components
             if (
                 request != null &&
                 (request.BotRequestType == BotRequestType.getInCover || request.BotRequestType == BotRequestType.hide)
-             )
+            )
             {
                 if (botOwner_0.Memory.HaveEnemy && botOwner_0.Memory.GoalEnemy.CanShoot)
                 {
@@ -449,7 +440,7 @@ namespace friendlyPMC.Components
                 }
                 else
                 {
-                    GetCoverPoint(botOwner_0.GetPlayer.Transform.position, 50f);
+                    GetCoverPoint(botPosition, 50f);
 
                     if (customNavigationPoint_0 != null)
                     {
@@ -478,15 +469,16 @@ namespace friendlyPMC.Components
             if (!allyTactic && bossUnderAttack && (commonLayer.coverType == "close") && (!botOwner_0.Memory.HaveEnemy || !botOwner_0.Memory.GoalEnemy.IsVisible))
             {
                 // - switch the bot's enemy to the one attacking the boss
-                var closestEnemy = GetBoss().ClosestEnemy();
+                BotOwner closestEnemy = HasBoss()  ? GetBoss().ClosestEnemy() : null;
                 if (closestEnemy != null)
                 {
                     GetBoss().PrioritizeEnemy(botOwner_0, closestEnemy);
                 }
-                // - guard tries to get in front of the boss
+                // - guard(support) tries to get in front of the boss
                 if (guardTactic)
                 {
-                    customNavigationPoint_0 = Utils.Covers.GetClosestCoverPointBetween(botOwner_0, GetBoss().realPlayer.Transform.position, closestEnemy.GetPlayer.Transform.position);
+                    customNavigationPoint_0 = closestEnemy == null ? null : Covers.GetClosestCoverPointBetween(botOwner_0, bossPosition, closestEnemy.GetPlayer.Transform.position);
+
                     if (customNavigationPoint_0 != null)
                     {
                         botOwner_0.Memory.SetCoverPoints(customNavigationPoint_0);
@@ -499,11 +491,10 @@ namespace friendlyPMC.Components
                         {
                             return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMoving, "protectBossSlow");
                         }
-
                     }
                     else
                     {
-                        GetClosestCoverPoint(GetBoss().realPlayer.Transform.position, bossInnerRadius);
+                        GetClosestCoverPoint(bossPosition, bossInnerRadius);
 
                         if (customNavigationPoint_0 != null)
                         {
@@ -567,7 +558,7 @@ namespace friendlyPMC.Components
                 return new AICoreActionResultStruct<BotLogicDecision>((BotLogicDecision)CustomBotDecisions.MoveToPoint, "req:goCheck");
             }
 
-            if (botOwner_0.Memory.GoalEnemy.Owner.IsRole(WildSpawnType.marksman))
+            if (botOwner_0.Memory.HaveEnemy && botOwner_0.Memory.GoalEnemy.Owner.IsRole(WildSpawnType.marksman))
                 return commonLayer.MarksManFight(out customNavigationPoint_0);
 
             // ally tactic will make the bot always fight in hold mode
