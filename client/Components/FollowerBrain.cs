@@ -257,6 +257,39 @@ namespace friendlyPMC.Components
 
         protected virtual void OnDead(EDamageType damageType)
         {
+            // on follower dead, the closest follower to him will react
+            if(BossPlayers.IsFollower(_owner))
+            {
+                pitAIBossPlayer boss = _owner.BotFollower.BossToFollow as pitAIBossPlayer;
+                if (boss != null)
+                {
+                    BotOwner flw = null;
+                    float dist = Mathf.Infinity;
+                    foreach (var item in BossPlayers.GetFollowersByBoss(boss.Player().ProfileId))
+                    {
+                        if(!item.IsBot(_owner))
+                        {
+                            BotOwner bt = item.GetBot();
+                            if (!bt.IsDead && bt.BotState == EBotState.Active)
+                            {
+                                float d = (bt.Position - _owner.Position).sqrMagnitude;
+                                if (d < dist)
+                                {
+                                    dist = d;
+                                    flw = bt;
+                                }
+                            }
+                        }
+                    }
+
+                    if (flw != null && dist < 30 * 30)
+                    {
+                        flw.BotTalk.TrySay(EPhraseTrigger.OnFriendlyDown, true);
+                    }
+                }
+
+            }
+
             OnKilled();
 
         }
