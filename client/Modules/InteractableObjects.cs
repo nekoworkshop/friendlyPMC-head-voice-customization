@@ -596,9 +596,26 @@ namespace friendlyPMC.Modules
                             {
                                 foreach (Slot slot in (contained as Weapon).Slots)
                                 {
+                                    if (slot.Locked) continue;
                                     if (slot.ContainedItem != null && !(slot.ContainedItem is MagazineClass) && !(slot.ContainedItem is BulletClass))
                                     {
                                         ModEquipmentStore(slot, items);
+                                    }
+                                }
+                            } else if(slotType == EquipmentSlot.Headwear || slotType == EquipmentSlot.TacticalVest || slotType == EquipmentSlot.ArmorVest)
+                            {
+                                if(contained is LootItemClass)
+                                {
+                                    foreach (Slot slot in (contained as LootItemClass).Slots)
+                                    {
+                                        if (slot.Locked) continue;
+
+                                        if (slot.ContainedItem != null && !contained.IsUnremovable)
+                                        {
+                                            items.Add(slot.ContainedItem.Id);
+                                            slot.Locked = true;
+                                            // KEY : Equipped locked slot and locked slot
+                                        }
                                     }
                                 }
                             }

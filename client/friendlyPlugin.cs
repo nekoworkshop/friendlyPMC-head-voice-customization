@@ -457,6 +457,7 @@ namespace friendlyPMC
             // patch bot equipment
             new UnlootableComponentPatch().Enable();
             new ModRaidModdablePatch().Enable();
+            new ItemSpecificationPanelPatch().Enable();
         }
 
         public void GetEquipmentBuilds()
