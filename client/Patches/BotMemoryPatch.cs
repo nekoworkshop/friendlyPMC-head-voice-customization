@@ -186,18 +186,4 @@ namespace friendlyPMC.Patches
             }
         }
     }
-
-    [HarmonyPatch(typeof(BotMemoryClass), "GoalEnemy", MethodType.Setter)]
-    public static class GoalEnemyTracePatch
-    {
-        public static void Postfix(BotMemoryClass __instance, EnemyInfo value)
-        {
-            var botOwner_0 = AccessTools.Field(typeof(BotMemoryClass), "botOwner_0").GetValue(__instance) as BotOwner;
-
-            if(BotMemoryDamagePatch.removedBots.Contains(botOwner_0))
-            {
-                if (value == null) Modules.Logger.LogTrace("cannot set enemy");
-            }
-        }
-    }
 }

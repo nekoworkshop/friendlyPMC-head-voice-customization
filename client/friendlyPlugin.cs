@@ -357,7 +357,6 @@ namespace friendlyPMC
 
             harmony.PatchAll(typeof(LocalGameCtorPatch).Assembly);
             harmony.PatchAll(typeof(BaseLocalGameVmethod4Patch).Assembly); // spawn patch
-            harmony.PatchAll(typeof(GoalEnemyTracePatch).Assembly);
 
             ConsoleScreen.Processor.RegisterCommand("followerstome", delegate ()
             {
@@ -453,7 +452,8 @@ namespace friendlyPMC
             // patch hearing
             new HearingSensorPatch().Enable();
             new BulletImpactPatch().Enable();
-            harmony.PatchAll(typeof(PlayerSayPatch).Assembly);
+            new PlayerSayPatch().Enable();
+            new GamePlayerOwnerPatch().Enable();
             // patch bot equipment
             new UnlootableComponentPatch().Enable();
             new ModRaidModdablePatch().Enable();
