@@ -8,9 +8,6 @@ using System;
 using System.Reflection;
 using System.Collections.Generic;
 using friendlyPMC.Components;
-using EFT.UI;
-using UnityEngine;
-using Comfort.Common;
 
 namespace friendlyPMC.Patches
 {
@@ -72,6 +69,73 @@ namespace friendlyPMC.Patches
         {
             if (__instance.Player() == null || __instance.Player().IsAI) return true;
             return false;
+        }
+    }
+    // we handle firing TeamStatus and OverThere commands inside PlayPhraseOrGesture so that the enemy does not hear them
+    internal class GamePlayerOwnerPatch : ModulePatch
+    {
+        protected override MethodBase GetTargetMethod()
+        {
+            return AccessTools.Method(typeof(GamePlayerOwner), "PlayPhraseOrGesture");
+        }
+
+        [PatchPrefix]
+        private static bool PatchPrefix(GamePlayerOwner __instance, int actionId, bool aggressive)
+        {
+
+            if ((EPhraseTrigger)actionId == (EPhraseTrigger)CustomPhrases.TeamStatus)
+            {
+                pitAIBossPlayer boss = BossPlayers.GetBoss(__instance.Player.ProfileId);
+                if (boss != null)
+                {
+                    BotEventHandler.GClass599 info = new BotEventHandler.GClass599
+                    {
+                        phrase = (EPhraseTrigger)CustomPhrases.TeamStatus,
+                        PlayerRequester = __instance.Player
+                    };
+
+                    boss.PhraseSaid(info);
+                }
+                return false;
+
+            } 
+            else if ((EPhraseTrigger)actionId == (EPhraseTrigger)CustomPhrases.OverThere)
+            {
+                pitAIBossPlayer boss = BossPlayers.GetBoss(__instance.Player.ProfileId);
+                if (boss != null)
+                {
+                    InteractableObjects.CheckSeenEnemies(boss.Player());
+                }
+
+                if (!__instance.Player.HandsController.IsInInteractionStrictCheck())
+                {
+                    if (__instance.Player.HandsController is Player.FirearmController)
+                    {
+                        (__instance.Player.HandsController as Player.FirearmController).CurrentOperation.ShowGesture(EGesture.ThatDirection);
+
+                        foreach (var receiver in Receivers.GetReceivers())
+                        {
+                            GClass453 data = new GClass453
+                            {
+                                Gesture = (EGesture)CustomGestures.OverThere,
+                                Player = __instance.Player
+                            };
+
+                            receiver.Value.GestusShown(data);
+                        }
+
+                    }
+                    else if (__instance.Player.HandsIsEmpty)
+                    {
+                        __instance.Player.HandsController.ShowGesture(EGesture.ThatDirection);
+                    }
+                }
+
+
+                return false;
+            }
+
+            return true;
         }
     }
 }

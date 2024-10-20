@@ -43,73 +43,17 @@ namespace friendlyPMC.Patches
         }
     }
 
-    [HarmonyPatch(typeof(Player))]
-    [HarmonyPatch("Say")]
-    internal class PlayerSayPatch
+    internal class PlayerSayPatch : ModulePatch
     {
         private static float reported = 0f;
         private static float freq = 0;
-
-        // Patching Player.Say to prevent enemy from hearing team status and over there
-        [HarmonyPrefix]
-        [HarmonyPriority(Priority.First)]
-        private static bool PatchPrefix(Player __instance, EPhraseTrigger @event, bool demand = false, float delay = 0f, ETagStatus mask = (ETagStatus)0, int probability = 100, bool aggressive = false)
+        protected override MethodBase GetTargetMethod()
         {
-            // only players can say "team status"
-            if (@event == (EPhraseTrigger)CustomPhrases.TeamStatus)
-            {
-                pitAIBossPlayer boss = BossPlayers.GetBoss(__instance.ProfileId);
-                if (boss != null)
-                {
-                    BotEventHandler.GClass599 info = new BotEventHandler.GClass599
-                    {
-                        phrase = @event,
-                        PlayerRequester = __instance
-                    };
-
-                    boss.PhraseSaid(info);
-                }
-                return false;
-            }
-            // only followers will react to over there
-            if (@event == (EPhraseTrigger)CustomPhrases.OverThere)
-            {
-                pitAIBossPlayer boss = BossPlayers.GetBoss(__instance.ProfileId);
-                if (boss != null)
-                {
-                    InteractableObjects.CheckSeenEnemies(boss.Player());
-                }
-
-                if (!__instance.HandsController.IsInInteractionStrictCheck())
-                {
-                    if (__instance.HandsController is Player.FirearmController)
-                    {
-                        (__instance.HandsController as Player.FirearmController).CurrentOperation.ShowGesture(EGesture.ThatDirection);
-
-                        foreach (var receiver in Receivers.GetReceivers())
-                        {
-                            GClass453 data = new GClass453
-                            {
-                                Gesture = (EGesture)CustomGestures.OverThere,
-                                Player = __instance
-                            };
-
-                            receiver.Value.GestusShown(data);
-                        }
-
-                    } else if (__instance.HandsIsEmpty)
-                    {
-                        __instance.HandsController.ShowGesture(EGesture.ThatDirection);
-                    }
-                }
-                
-
-                return false;
-            }
-            return true;
+            return AccessTools.Method(typeof(Player), "Say");
         }
-        // Patching Player.Say to make followers turn towards the enemy when they talk
-        [HarmonyPostfix]
+
+        // Patch Player.Say to make followers turn towards the enemy when they talk
+        [PatchPostfix]
         private static void PatchPostfix(Player __instance)
         {
             if (Time.time < reported || Time.time < freq) return;
