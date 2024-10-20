@@ -7,9 +7,6 @@ using UnityEngine.AI;
 using UnityEngine;
 using friendlyPMC.Components;
 using friendlyPMC.Modules;
-using System.IO;
-using UnityEngine.UI;
-using static RootMotion.FinalIK.IKSolver;
 
 namespace friendlyPMC.Utils
 {
@@ -51,54 +48,6 @@ namespace friendlyPMC.Utils
                 return true;
 
             }, safeDistance);
-
-            return pt;
-        }
-        /**
-         *  (V2) Get closest cover point for the bot to given to the position, within the search radius and at a min distance from danger 
-         */
-        public static CustomNavigationPoint GetClosestCoverPoint(
-            int botOwnerId,
-            Vector3 botPosition,
-            Vector3 centerPosition,
-            List<CustomNavigationPoint> areaPoints,
-            float searchRadius, 
-            float safeDistance = 5f,
-            Vector3[] dangerPositions = null,
-            Func<CustomNavigationPoint, bool>extraChecks = null
-        )
-        {
-            NavMeshPath navMeshPath = new NavMeshPath();
-
-            CustomNavigationPoint pt = ClosestPoint(botOwnerId, botPosition, centerPosition, areaPoints, 
-            (CustomNavigationPoint point) =>
-            {
-                // cover too far
-                if (Vector3.Distance(point.Position, centerPosition) > searchRadius) return false;
-
-                navMeshPath.ClearCorners();
-                bool result = NavMesh.CalculatePath(centerPosition, point.Position, -1, navMeshPath);
-
-                if (result && navMeshPath.status == NavMeshPathStatus.PathComplete)
-                {
-                    float dist = navMeshPath.CalculatePathLength();
-                    // cover far to reach
-                    if (dist > searchRadius)
-                    {
-                        return false;
-                    }
-                }
-                // no nav mesh to it
-                else
-                {
-                    return false;
-                }
-                // did not pass extra checks
-                if (extraChecks != null && !extraChecks(point)) return false;
-
-                return true;
-
-            }, safeDistance, dangerPositions);
 
             return pt;
         }

@@ -28,21 +28,6 @@ namespace friendlyPMC.Actions
 
             _nextShootPositionUpdateTime = Time.time + 2f;
 
-            Vector3[] carePosition = new Vector3[] { };
-
-            foreach (var item in botOwner_0.EnemiesController.EnemyInfos)
-            {
-                try
-                {
-                    carePosition = carePosition.AddItem(item.Value.CurrPosition).ToArray();
-                }
-                catch
-                {
-                }
-            }
-
-            List<CustomNavigationPoint> areaCovers = botOwner_0.BotFollower.HaveBoss ? (botOwner_0.BotFollower.BossToFollow as pitAIBossPlayer).GetAreaCovers() : new List<CustomNavigationPoint>();
-
             if (!botOwner_0.Memory.HaveEnemy)
             {
                 _lastTarget = null;
@@ -120,13 +105,10 @@ namespace friendlyPMC.Actions
                                             {
                                                 // else get closest cover to the boss and cover him
                                                 CustomNavigationPoint cover = Utils.Covers.GetClosestCoverPoint(
-                                                    botOwner_0.Id,
-                                                    botOwner_0.GetPlayer.Transform.position,
+                                                    botOwner_0,
                                                     protectBoss ? bossPos : botPos,
-                                                    areaCovers,
                                                     30f,
                                                     5f,
-                                                    carePosition,
                                                     (CustomNavigationPoint point)=>{
                                                         if(!GClass326.IsDangerPositionFarEnough(point.Position, new Vector3[]{ bossPos }, 0.5f * 0.5f)) return false;
                                                         return true;

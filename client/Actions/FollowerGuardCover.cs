@@ -28,8 +28,6 @@ namespace friendlyPMC.Actions
 
             _nextShootPositionUpdateTime = Time.time + 3f;
 
-            Vector3[] carePosition = new Vector3[] { };
-
             if (!botOwner_0.Memory.HaveEnemy)
             {
                 _lastTarget = null;
@@ -46,19 +44,6 @@ namespace friendlyPMC.Actions
                 Vector3 bossPos = botOwner_0.BotFollower.BossToFollow.Player().Transform.position;
                 Vector3 botPosition = botOwner_0.GetPlayer.Transform.position;
                 bool protectBoss = (botOwner_0.Brain.BaseBrain as FollowerBrain).bossNeedsProtection;
-
-                foreach (var item in botOwner_0.EnemiesController.EnemyInfos)
-                {
-                    try
-                    {
-                        carePosition = carePosition.AddItem(item.Value.CurrPosition).ToArray();
-                    }
-                    catch
-                    {
-                    }
-                }
-
-                List<CustomNavigationPoint> areaCovers = botOwner_0.BotFollower.HaveBoss ? (botOwner_0.BotFollower.BossToFollow as pitAIBossPlayer).GetAreaCovers() : new List<CustomNavigationPoint>();
 
                 // get closest attack point from the bot's position
                 CustomNavigationPoint Spot = Utils.Covers.GetClosestShootCover(
@@ -142,13 +127,10 @@ namespace friendlyPMC.Actions
                                 _actionsQueue.Enqueue(() =>
                                 {
                                     CustomNavigationPoint Spot5 = Utils.Covers.GetClosestCoverPoint(
-                                        botOwner_0.Id,
-                                        botOwner_0.GetPlayer.Transform.position,
+                                        botOwner_0,
                                         bossPos,
-                                        areaCovers,
                                         30f,
-                                        5f,
-                                        carePosition
+                                        5f
                                     );
 
                                     if (Spot5 != null)
@@ -164,13 +146,10 @@ namespace friendlyPMC.Actions
                             {
                                 // else get closest cover
                                 CustomNavigationPoint Spot4 = Utils.Covers.GetClosestCoverPoint(
-                                    botOwner_0.Id,
-                                    botOwner_0.GetPlayer.Transform.position,
+                                    botOwner_0,
                                     botPosition,
-                                    areaCovers,
                                     30f,
-                                    5f,
-                                    carePosition
+                                    5f
                                 );
 
                                 if (Spot4 != null)
