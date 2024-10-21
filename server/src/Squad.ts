@@ -454,32 +454,37 @@ class friendlyPMC {
 								// Load the localized strings so we can look up the voice name
 								const localeData = this.LocaleService.getLocaleDb();
 
-								// Look up the voice id from the locale DB.
+								// Find potential locale keys of the voices from the locale DB.
 								const localeKeys = Object.keys(localeData).filter(key => localeData[key] === squadMemberCustomization.voice);
 
-								// Assuming the voice locale key is in the form of `${itemId} Name`
+								// Assuming the voice locale key is in the form of `${itemId} Name`,
+								// trim the key to get the potential voice Id.
 								const voiceIds = localeKeys.map(key => key.slice(0, -5));
 
+								// Filter the Voice Id candidates by verifying they are actually pointing at voices
+								// This is needed since the voice may share the same string as something else, such as "G36"
 								const voiceId = voiceIds.find(id => (Object.values(customization).find((item: any) => item._parent === "5fc100cf95572123ae738483" && item._id === id)))
 
+								//Assign voice
 								if (voiceId) {
 									profile.Info.Voice = voiceId;
-									console.log("Current voice: " + JSON.stringify(voiceId));
+									console.log("[FriendlyPMC] Voice assigned to squadmate: " + JSON.stringify(voiceId));
 								} else {
-									console.log("No matching voice found for:" + squadMemberCustomization.voice);
+									console.log("[FriendlyPMC] No matching voice found for:" + squadMemberCustomization.voice);
 								}
 
-								// Assign matching head
-								// Assuming head names are not localized
+								// Assign head
+								// Assuming head names are not localized. What you see in-game is the Id.
 								const matchingHead = Object.values(customization).find((item: any) => item._props.Name === squadMemberCustomization.head);
 								if (matchingHead) {
 									profile.Customization.Head = matchingHead._name;
+									console.log("[FriendlyPMC] Head assigned to squadmate: " + JSON.stringify(matchingHead._name));
 								} else {
-									console.log("No matching head found for:" + squadMemberCustomization.head);
+									console.log("[FriendlyPMC] No matching head found for:" + squadMemberCustomization.head);
 								}
 
 							} else {
-								console.log("No matching squad member customization config found for:" + custom.Nickname);
+								console.log("[FriendlyPMC] No matching squad member customization config found for:" + custom.Nickname);
 
 								// Apply English Bear voice if applicable
 								if (pmcProfile.Info.Side.toLowerCase() == "bear") profile.Info.Voice = custom?.English ? `Bear_${randomUtil.getInt(1, 2)}_Eng` : `Bear_${randomUtil.getInt(1, 3)}`;
