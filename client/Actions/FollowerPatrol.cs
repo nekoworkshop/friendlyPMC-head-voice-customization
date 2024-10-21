@@ -131,22 +131,21 @@ namespace friendlyPMC.Actions
                 bool flag2;
                 bool flag;
                 float num;
-                
+                // check if we are in range of the boss
+                float_3 = Time.time + GClass761.Random(1f, 2f);
                 if (following)
                 {
                     flag2 = true;
                     num = distance;
-                    flag = (flag2 = (num < reachDist)) != bool_1;
-                    bool_1 = flag2;
                     float_3 = Time.time + GClass761.Random(1f, 2f);
                 }
                 else
                 {
-                    float_3 = Time.time + GClass761.Random(1f, 2f);
                     num = Mathf.Abs((bool_0 ? vector3_0 : (leaderPosition - botOwner_0.Position)).magnitude);
-                    flag = (flag2 = (num < reachDist)) != bool_1;
-                    bool_1 = flag2;
                 }
+
+                flag = (flag2 = (num < reachDist)) != bool_1;
+                bool_1 = flag2;
 
                 // we are in range of the boss
                 if (flag2)
@@ -278,8 +277,9 @@ namespace friendlyPMC.Actions
 
                 float num = Mathf.Abs((bool_0 ? vector3_0 : (leaderPosition - botOwner_0.Position)).magnitude);
                 bool flag2;
-                flag2 = (num < reachDist);
+                flag2 = num < reachDist;
 
+                // - boss might or not move, but bot is out range - keep moving
                 if(flag2)
                 {
                     Follow(true,num);
@@ -323,13 +323,13 @@ namespace friendlyPMC.Actions
             }
 
             // roam around the boss
-            // - wait in checkpoint if we are there
+            // - wait in checkpoint if bot is there
             if (float_6 > Time.time)
             {
                 bool_6 = false;
                 return;
             }
-            // - if we are not moving to a checkpoint wait to reach it
+            // - if bot is moving to a checkpoint wait to reach it
             if (bool_6)
             {
                 if (botOwner_0.Mover.IsComeTo(botOwner_0.Settings.FileSettings.Move.REACH_DIST, true))
@@ -357,7 +357,6 @@ namespace friendlyPMC.Actions
                     bool_6 = true;
                     return;
                 }
-                else continue;
             }
 
         }
