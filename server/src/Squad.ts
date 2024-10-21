@@ -49,7 +49,7 @@ import { LocaleService } from "@spt/services/LocaleService";
 import { IBots } from "@spt/models/spt/bots/IBots";
 import { DatabaseService } from "@spt/services/DatabaseService";
 
-import {squad_customization} from "../config/customization.json"
+import { squad_customization } from "../config/customization.json"
 
 class friendlyPMC {
 	config = {
@@ -69,44 +69,44 @@ class friendlyPMC {
 
 	lang_en = {
 		//prettier-ignore
-		"returnItems" : [
-            "Here is your stuff. Uhm, anything in there for me? ", 
-            "Got your things right here.", 
-            "Here is everything you gave me. So... we are splitting this, right?", 
-            "Here, this is everything you gave me.\nAnything in there for me?", "Here you go my friend, all the stuff you gave me.", "I got your stuff right here. Anything in there you can spare?"
-        ],
+		"returnItems": [
+			"Here is your stuff. Uhm, anything in there for me? ",
+			"Got your things right here.",
+			"Here is everything you gave me. So... we are splitting this, right?",
+			"Here, this is everything you gave me.\nAnything in there for me?", "Here you go my friend, all the stuff you gave me.", "I got your stuff right here. Anything in there you can spare?"
+		],
 		//prettier-ignore
-		"returnItemsDeath" : [
-            "Don't worry boss, we managed to get out.\n I have what you gave me right here. I could not get your equipment though, the jackals where already on it.",
-            "We where able to get out of there. Here is everything you gave me. I hope your stuff is insured, that I could not get.",
-        ],
+		"returnItemsDeath": [
+			"Don't worry boss, we managed to get out.\n I have what you gave me right here. I could not get your equipment though, the jackals where already on it.",
+			"We where able to get out of there. Here is everything you gave me. I hope your stuff is insured, that I could not get.",
+		],
 		//prettier-ignore
 		teamEscaped: [
-            "Nice!\nWe managed to get out.",
-            "And that's a wrap! We made it boss.",
-            "When the last man hit the extract, it was like clockwork—everyone's safe",
-            "We coordinated perfectly, and now the whole crew's out and ready to gear up again"
-        ],
+			"Nice!\nWe managed to get out.",
+			"And that's a wrap! We made it boss.",
+			"When the last man hit the extract, it was like clockwork—everyone's safe",
+			"We coordinated perfectly, and now the whole crew's out and ready to gear up again"
+		],
 		//prettier-ignore
-		teamSomeEscaped : [
-            "Well it's a shame about {0}, but at least the rest of us made it.",
-            "A few of us got clipped, but I'm glad some managed to get out alive"
-        ],
+		teamSomeEscaped: [
+			"Well it's a shame about {0}, but at least the rest of us made it.",
+			"A few of us got clipped, but I'm glad some managed to get out alive"
+		],
 		//prettier-ignore
 		friendlyEscaped: [
-            "Glad we made it.\nThanks for letting me tag along.",
-            "Whew, glad I found you.\nI didn't know if I was going to make it. Thanks!",
-            "Not the best outcome, losing some teammates, but I'm glad I at least got out",
-            "Thanks for the help. I'm hauling my fallen teammates' gear back; it's the least I can do."
-        ],
+			"Glad we made it.\nThanks for letting me tag along.",
+			"Whew, glad I found you.\nI didn't know if I was going to make it. Thanks!",
+			"Not the best outcome, losing some teammates, but I'm glad I at least got out",
+			"Thanks for the help. I'm hauling my fallen teammates' gear back; it's the least I can do."
+		],
 		//prettier-ignore
-		allyBossEscaped : [
-            "Nice run!\n You did good rookie, you did good.",
-            "Not bad, not bad at all. Let's dot it again sometime rookie.",
-            "You the man!\n... neah, you are right, I am the man. But you did ok too rookie.",
-            "Was there even a doubt? They never stood a chance.\nDrinks are on me boys, the rookie is paying!",
-            "Come on, come on, try to keep up will ya? We got rookie here doing site scenes."
-        ],
+		allyBossEscaped: [
+			"Nice run!\n You did good rookie, you did good.",
+			"Not bad, not bad at all. Let's dot it again sometime rookie.",
+			"You the man!\n... neah, you are right, I am the man. But you did ok too rookie.",
+			"Was there even a doubt? They never stood a chance.\nDrinks are on me boys, the rookie is paying!",
+			"Come on, come on, try to keep up will ya? We got rookie here doing site scenes."
+		],
 	};
 
 	Logger: ILogger;
@@ -444,31 +444,46 @@ class friendlyPMC {
 								}
 							}
 							const customization = databaseService.getCustomization();
-						
+
 							// AS head and voice patch
 							// Find matching customization entry based on member nickname.
 							const squadMemberCustomization = squad_customization.find((p) => p.name === custom.Nickname);
 
-							if (squadMemberCustomization){
-								// Assign custom voice, assuming the what you see on the character screen is the voice id
-								custom.Voice = squadMemberCustomization.voice;
+							if (squadMemberCustomization) {
 
-							    // Find matching head 
+								// Load the localized strings so we can look up the voice name
+								const localeData = this.LocaleService.getLocaleDb();
+
+								// Look up the voice id from the locale DB.
+								const localeKeys = Object.keys(localeData).filter(key => localeData[key] === squadMemberCustomization.voice);
+
+								// Assuming the voice locale key is in the form of `${itemId} Name`
+								const voiceIds = localeKeys.map(key => key.slice(0, -5));
+
+								const voiceId = voiceIds.find(id => (Object.values(customization).find((item: any) => item._parent === "5fc100cf95572123ae738483" && item._id === id)))
+
+								if (voiceId) {
+									profile.Info.Voice = voiceId;
+									console.log("Current voice: " + JSON.stringify(voiceId));
+								} else {
+									console.log("No matching voice found for:" + squadMemberCustomization.voice);
+								}
+
+								// Assign matching head
+								// Assuming head names are not localized
 								const matchingHead = Object.values(customization).find((item: any) => item._props.Name === squadMemberCustomization.head);
-
-								if (matchingHead){
+								if (matchingHead) {
 									profile.Customization.Head = matchingHead._name;
-								}else{
+								} else {
 									console.log("No matching head found for:" + squadMemberCustomization.head);
 								}
 
-							}else{
+							} else {
 								console.log("No matching squad member customization config found for:" + custom.Nickname);
-							}
 
-							if (custom.Voice && customization[custom.Voice]) {
-								profile.Info.Voice = customization[custom.Voice]._name;
-							} else if (pmcProfile.Info.Side.toLowerCase() == "bear") profile.Info.Voice = custom?.English ? `Bear_${randomUtil.getInt(1, 2)}_Eng` : `Bear_${randomUtil.getInt(1, 3)}`;
+								// Apply English Bear voice if applicable
+								if (pmcProfile.Info.Side.toLowerCase() == "bear") profile.Info.Voice = custom?.English ? `Bear_${randomUtil.getInt(1, 2)}_Eng` : `Bear_${randomUtil.getInt(1, 3)}`;
+							}
 						});
 					}
 
