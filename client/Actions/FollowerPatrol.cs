@@ -1,45 +1,58 @@
 ﻿using EFT;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 using UnityEngine.AI;
 using UnityEngine;
 using friendlyPMC.Modules;
 using friendlyPMC.Components;
+using TMPro;
 
 namespace friendlyPMC.Actions
 {
     internal class FollowerPatrol : GClass361
     {
 
-        private readonly Player player_0;
+        protected readonly Player player_0;
 
-        private readonly pitAIBossPlayer boss_0;
+        protected readonly pitAIBossPlayer boss_0;
 
+        /** holder for how frequent show the distance between bots and the boss be checked  **/
         private float float_3;
-
+        /** holder for how frequent move around the boss when standing still  **/
         private float float_4;
-
+        /** last position the bot registered to move to **/
         private Vector3 vector3_0;
-
+        /** flag to tell the bot to no longer move once in cover **/
         private bool bool_0;
-
+        /** helper for checking if bot is in range of the boss **/
         private bool bool_1;
+        /** helper for checking if bot is currently stationary at a checkpoint **/
+        private float float_6;
+        private float float_7;
+        /** helper for checking if bot is currently moving to a checkpoint **/
+        private bool bool_6;
 
-        private CustomNavigationPoint lastCoverPoint;
-        private bool nocover = false;
+        protected float reachDist = 10f;
+
+        protected bool sprinting = false;
+
+        protected bool shouldPatrol = false;
+
+        private Vector3? leaderLastPosition = null;
+        private Vector3? leaderLastCamp = null;
+
+        private float float_5 = 0f;
+        private bool bool_2 = false;
+
+        protected CustomNavigationPoint lastCoverPoint;
+        protected bool nocover = false;
 
         public bool IsInited { get; set; }
 
-        private float reachDist = 10f;
-
-        private bool sprinting = false;
-
         private bool wasHit = false;
 
-        protected bool _init = false;
+        private bool _init = false;
 
         protected BotLogicDecision Action = (BotLogicDecision)CustomBotDecisions.SniperSearch;
 
@@ -75,6 +88,11 @@ namespace friendlyPMC.Actions
                 bool_0 = false;
                 bool_1 = false;
                 float_4 = 0f;
+
+                bool_2 = false;
+                bool_6 = false;
+                float_6 = 0f;
+                float_7 = 0f;
             }
         }
 
@@ -87,8 +105,7 @@ namespace friendlyPMC.Actions
 
         public void Update()
         {
-            var brain = botOwner_0.Brain.BaseBrain as FollowerBrain;
-
+            FollowerBrain brain = botOwner_0.Brain.BaseBrain as FollowerBrain;
 
             // let the bot turn to the direction he was hit from
             if (brain != null && brain.WasHit)
@@ -96,20 +113,42 @@ namespace friendlyPMC.Actions
                 wasHit = true;
             }
 
+
             if (!_init) Init();
 
             botOwner_0.DoorOpener.Update();
 
-            if (this.float_3 < Time.time)
+            if(!shouldPatrol) Follow();
+            else Patrol();
+        }
+        /** Boss following logic  **/
+        protected virtual void Follow(bool following = false, float distance = 0f)
+        {
+            if (float_3 < Time.time)
             {
-
                 Vector3 leaderPosition = player_0.Transform.position;
-                
-                this.float_3 = Time.time + GClass761.Random(1f, 2f);
-                float num = Mathf.Abs((this.bool_0 ? this.vector3_0 : (leaderPosition - this.botOwner_0.Position)).magnitude);
+
                 bool flag2;
-                bool flag = (flag2 = (num < reachDist)) != this.bool_1;
-                this.bool_1 = flag2;
+                bool flag;
+                float num;
+                
+                if (following)
+                {
+                    flag2 = true;
+                    num = distance;
+                    flag = (flag2 = (num < reachDist)) != bool_1;
+                    bool_1 = flag2;
+                    float_3 = Time.time + GClass761.Random(1f, 2f);
+                }
+                else
+                {
+                    float_3 = Time.time + GClass761.Random(1f, 2f);
+                    num = Mathf.Abs((bool_0 ? vector3_0 : (leaderPosition - botOwner_0.Position)).magnitude);
+                    flag = (flag2 = (num < reachDist)) != bool_1;
+                    bool_1 = flag2;
+                }
+
+                // we are in range of the boss
                 if (flag2)
                 {
                     if (sprinting)
@@ -117,19 +156,19 @@ namespace friendlyPMC.Actions
                         botOwner_0.Mover.Sprint(false, false);
                         sprinting = false;
                     }
-                    
-                    if (this.bool_0)
+
+                    if (bool_0)
                     {
-                        this.botOwner_0.StopMove();
+                        botOwner_0.StopMove();
                         return;
                     }
 
-                    if (this.float_4 < Time.time || flag)
+                    if (float_4 < Time.time || flag)
                     {
-                        this.float_4 = Time.time + 8f;
+                        float_4 = Time.time + 8f;
 
                         CustomNavigationPoint nearPoint = null;
-
+                        // check if we can find a cover point near the boss to hide and wait
                         if (lastCoverPoint == null && !nocover)
                         {
                             List<CustomNavigationPoint> coverPoints = boss_0.GetAreaCovers();
@@ -148,7 +187,7 @@ namespace friendlyPMC.Actions
                                 }
                             });
 
-                            CustomNavigationPoint cover = availCover.Count > 0 ?  availCover.GetRandomItem() : null;
+                            CustomNavigationPoint cover = availCover.Count > 0 ? availCover.GetRandomItem() : null;
                             if (cover != null)
                             {
                                 nearPoint = cover;
@@ -163,13 +202,14 @@ namespace friendlyPMC.Actions
                             botOwner_0.Memory.SetCoverPoints(nearPoint);
                             if (!wasHit) botOwner_0.Steering.LookToMovingDirection();
 
+
                             var status = botOwner_0.Mover.GoToPoint(nearPoint, true, true);
                             if (status == NavMeshPathStatus.PathComplete)
                             {
                                 return;
                             }
                         }
-
+                        // no cover found, we will just roam around the boss
                         nocover = true;
                         float minR = Mathf.Min(1f, reachDist * 0.19f);
                         float maxR = Mathf.Min(5f, reachDist * 0.65f);
@@ -184,6 +224,13 @@ namespace friendlyPMC.Actions
                             bool_0 = true;
                             return;
                         }
+                        
+                        if (sprinting)
+                        {
+                            botOwner_0.Mover.Sprint(false, false);
+                            sprinting = false;
+                        }
+
                         if (botOwner_0.GoToPoint(navMeshHit.position, true, -1f, false, true, true, false) != NavMeshPathStatus.PathComplete)
                         {
                             if (!wasHit) botOwner_0.Steering.LookToMovingDirection();
@@ -194,14 +241,15 @@ namespace friendlyPMC.Actions
                         }
                     }
                 }
+                // out of range of the boss
                 else
                 {
                     lastCoverPoint = null;
                     nocover = false;
                     method_0(leaderPosition);
                     bool val = num > 15f;
-                    
-                    if(val && !sprinting)
+
+                    if (val && !sprinting)
                         botOwner_0.Mover.Sprint(true, false);
                     else if (!val && sprinting) botOwner_0.Mover.Sprint(false, false);
 
@@ -210,46 +258,156 @@ namespace friendlyPMC.Actions
             }
         }
 
-        public void method_0(Vector3 leaderPosition)
+        /** Patrol around the boss logic  **/
+        protected virtual void Patrol()
         {
-            this.bool_0 = false;
+            if (float_5 > Time.time)
+            {
+                Follow();
+            }
+
+            // check if leader is still moving
+            Vector3 playerPosition = player_0.Transform.position;
+            if (!bool_2)
+            {
+                Vector3 leaderPosition = new Vector3(
+                    Mathf.Floor(playerPosition.x / 3f) * 3f,
+                    Mathf.Floor(playerPosition.y / 3f) * 3f,
+                    Mathf.Floor(playerPosition.z / 3f) * 3f
+                );
+
+                float num = Mathf.Abs((bool_0 ? vector3_0 : (leaderPosition - botOwner_0.Position)).magnitude);
+                bool flag2;
+                flag2 = (num < reachDist);
+
+                if(flag2)
+                {
+                    Follow(true,num);
+                    float_5 = Time.time + 5f;
+                    return;
+                }
+
+
+                if (leaderLastPosition != leaderPosition)
+                {
+                    leaderLastPosition = leaderPosition;
+                    Follow(true, num);
+                    float_5 = Time.time + 5f;
+                    return;
+                }
+                // - check if leader is camping
+                bool_2 = true;
+            }
+
+            if (!bool_2) return;
+            // frequency on which to check if the leader is camping or moving
+            if (float_7 > Time.time) return;
+            float_7 = Time.time + 1.5f;
+
+            float campRadius = 30f;
+            float perimeterRadius = 70f;
+
+            Vector3 bossPosition = new Vector3(
+                Mathf.Floor(playerPosition.x / campRadius) * campRadius,
+                Mathf.Floor(playerPosition.y / campRadius) * campRadius,
+                Mathf.Floor(playerPosition.z / campRadius) * campRadius
+            );
+            // check if leader is out of camping
+            if (leaderLastCamp.HasValue && bossPosition != leaderLastCamp)
+            {
+                leaderLastCamp = null;
+                Follow();
+                bool_2 = false;
+                float_5 = Time.time + 5f;
+                return;
+            }
+
+            // roam around the boss
+            // - wait in checkpoint if we are there
+            if (float_6 > Time.time)
+            {
+                bool_6 = false;
+                return;
+            }
+            // - if we are not moving to a checkpoint wait to reach it
+            if (bool_6)
+            {
+                if (botOwner_0.Mover.IsComeTo(botOwner_0.Settings.FileSettings.Move.REACH_DIST, true))
+                {
+                    botOwner_0.StopMove();
+                    if (!wasHit) botOwner_0.LookData.SetLookPointByHearing(null);
+                    float_6 = Time.time + GClass761.Random(4f, 8f);
+                }
+                return;
+            }
+
+            // - select a checkpoint to move to
+            for (int i = 0; i <30; i++)
+            {
+                Vector3 randomPosition = bossPosition + UnityEngine.Random.insideUnitSphere * perimeterRadius;
+
+                NavMeshHit navMeshHit;
+                if (!NavMesh.SamplePosition(randomPosition, out navMeshHit, 10f, -1)) continue;
+
+                if (botOwner_0.GoToPoint(navMeshHit.position, true, -1f, false, true, true, false) == NavMeshPathStatus.PathComplete)
+                {
+                    if (!wasHit) botOwner_0.Steering.LookToMovingDirection();
+                    botOwner_0.Mover.Sprint(false, false);
+                    botOwner_0.Mover.SetTargetMoveSpeed(0.5f);
+                    bool_6 = true;
+                    return;
+                }
+                else continue;
+            }
+
+        }
+        /** Find closest nav or cover point to the leader's position **/
+        protected void method_0(Vector3 leaderPosition)
+        {
+            bool_0 = false;
             NavMeshHit navMeshHit;
 
-            
+            if (method_1(leaderPosition) == NavMeshPathStatus.PathComplete)
+            {
+                bool_0 = false;
+            }
+            else if (NavMesh.SamplePosition(leaderPosition, out navMeshHit, 2f, -1) && method_1(leaderPosition) != NavMeshPathStatus.PathComplete)
+            {
+                bool_0 = true;
+            }
 
-            if (this.method_1(leaderPosition) == NavMeshPathStatus.PathComplete)
+            if (bool_0)
             {
-                this.bool_0 = false;
-            }
-            else if (NavMesh.SamplePosition(leaderPosition, out navMeshHit, 2f, -1) && this.method_1(leaderPosition) != NavMeshPathStatus.PathComplete)
-            {
-                this.bool_0 = true;
-            }
-            if (this.bool_0)
-            {
-                CustomNavigationPoint freeClosePoint = this.botOwner_0.Covers.GetFreeClosePoint(leaderPosition, 0f, false);
+                CustomNavigationPoint freeClosePoint = botOwner_0.Covers.GetFreeClosePoint(leaderPosition, 0f, false);
                 if (freeClosePoint != null)
                 {
-                    this.bool_0 = true;
-                    this.method_1(freeClosePoint.Position);
+                    bool_0 = true;
+                    method_1(freeClosePoint.Position);
                 }
             }
         }
-
-        public NavMeshPathStatus method_1(Vector3 v)
+        /** Check if given position can be moved to, and move to it **/
+        protected NavMeshPathStatus method_1(Vector3 v)
         {
-            NavMeshPathStatus navMeshPathStatus = this.botOwner_0.GoToPoint(v, true, -1f, false, true, true, false);
+            NavMeshPathStatus navMeshPathStatus = botOwner_0.GoToPoint(v, true, -1f, false, true, true, false);
             if (navMeshPathStatus == NavMeshPathStatus.PathComplete)
             {
                 if (!wasHit) botOwner_0.Steering.LookToMovingDirection();
-                this.vector3_0 = v;
+                // store the last position we moved to
+                vector3_0 = v;
             }
             return navMeshPathStatus;
         }
-
+        /** Set the distance to the leader to check for **/
         public void SetReachDist(float dist)
         {
             reachDist = dist;    
+        }
+
+
+        public void PatrolAround(bool state = false)
+        {
+            shouldPatrol = state;
         }
     }
 

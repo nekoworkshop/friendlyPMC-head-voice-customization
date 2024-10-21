@@ -611,6 +611,7 @@ namespace friendlyPMC.Components
                 {
                     // - make bot follow boss near
                     FollowerPatrolInstances.SetNearPatrol(botOwner_0);
+                    FollowerPatrolInstances.GetPatrol(botOwner_0).PatrolAround(false);
                     // - reset bot tactic
                     (botOwner_0.Brain.BaseBrain as FollowerBrain).SetBossTactic(null);
                     // - cover boss when under attack
@@ -676,7 +677,10 @@ namespace friendlyPMC.Components
                 // on Follow Me reset to follower patrol
                 else if (info.phrase == EPhraseTrigger.FollowMe && (botLookedAt == null || botLookedAt.ProfileId == botOwner_0.ProfileId))
                 {
-                    if(botOwner_0.Memory.HaveEnemy)
+                    
+                    FollowerPatrolInstances.GetPatrol(botOwner_0).PatrolAround(false);
+
+                    if (botOwner_0.Memory.HaveEnemy)
                     {
                         botOwner_0.Gesture.TryGestus(EGesture.Bad, true);
                         botOwner_0.BotTalk.TrySay(EPhraseTrigger.DontKnow, false);
@@ -1017,7 +1021,9 @@ namespace friendlyPMC.Components
                 {
                     (botOwner_0.Brain.BaseBrain as FollowerBrain).bossNeedsProtection = false;
                     (botOwner_0.Brain.BaseBrain as FollowerBrain).SetBossTactic(null);
+
                     FollowerPatrolInstances.SetFarPatrol(botOwner_0);
+                    FollowerPatrolInstances.GetPatrol(botOwner_0).PatrolAround(true);
 
                     Player alivePlayerByProfileID = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(requester.ProfileId);
 
@@ -1025,6 +1031,7 @@ namespace friendlyPMC.Components
                         botOwner_0.BotRequestController.TryStopCurrent(alivePlayerByProfileID, false);
 
                     if (isClose) botOwner_0.BotTalk.TrySay(EPhraseTrigger.Roger, true);
+
                 } 
                 else if (info.phrase == EPhraseTrigger.InTheFront)
                 {
