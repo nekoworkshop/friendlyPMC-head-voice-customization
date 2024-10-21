@@ -143,8 +143,6 @@ namespace friendlyPMC.Utils
                 botMap.ForEach(DrawBotGUI);
                 if(friendlyPMC.enemyMarker.Value) botMap.ForEach(DrawEnemyMarkerGUI);
             }
-
-            //guiUpdate = false;
         }
 
         private void DrawBotGUI(BotData bt)
@@ -178,15 +176,15 @@ namespace friendlyPMC.Utils
 
                         if (!bt.Data.HealthController.IsAlive)
                         {
-                            stringBuilder.Append(": Dead");
+                            stringBuilder.Append(": "+ friendlyPMC.optionsLang.botStatus["Dead"]);
                         }
                         else if(bt.Data.Memory.HaveEnemy)
                         {
                             if(bt.Data.Memory.GoalEnemy.IsVisible || bt.Data.Memory.GoalEnemy.PersonalLastSeenTime < 5f)
                             {
-                                stringBuilder.Append(": In Combat");
+                                stringBuilder.Append(": " + friendlyPMC.optionsLang.botStatus["Engaged"]);
                             } else {
-                                stringBuilder.Append(": Enemy Detected");
+                                stringBuilder.Append(": " + friendlyPMC.optionsLang.botStatus["Alerted"]);
                             }
                         }
 
@@ -246,11 +244,11 @@ namespace friendlyPMC.Utils
 
                             if (decision.Action == BotLogicDecision.heal)
                             {
-                                stringBuilder.Append($" | Healing");
+                                stringBuilder.Append($" | " + friendlyPMC.optionsLang.botStatus["Heal"]);
                             }
                             else if (decision.Reason == "runToHeal" || decision.Reason == "goforheal")
                             {
-                                stringBuilder.Append($" | Want to Heal");
+                                stringBuilder.Append($" | " + friendlyPMC.optionsLang.botStatus["WantToHeal"]);
                             }
                             else
                             {

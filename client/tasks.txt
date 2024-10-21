@@ -2,20 +2,16 @@
 - x - remove from player's inventory any equipment he looted from his dead teammates
 - x - bot to signal teammate down
 
-- #inprogress - "On Your Own" be enhanced where the followers will form a partol perimeter around the player with configurable distance
+- #inprogress - "On Your Own" to be enhanced where the followers will form a partol perimeter around the player with configurable distance
+
+- #inprogress - prepare the stage for working with different languages (to add German and Romanian)
 
 - fix glitchy behavior of boss followers
 - goons send messages at the end of the raid
 
 - goons send join offer for specific maps (Woods, Shoreline, Customs, Lighthouse)
 
-- add punishment for players intentionally killing their teammates
-- - check if in combat or out of combat the kill was done
-
-- player level to determine if he can pick up any extra followers and how many (maximum 3, disable configuration regarding this)
-- scav karma and level to determine with how many followers can the player spawn (maxium 3) and extra pickups (maximum 2 extras)
-
-- add detection for when enemy ise about to engage the player or any teamember (patch SET EnemyInfo.IsVisible and check if the enemy is a teammate and the distance is close enough for engagement)
+- add detection for when enemy is about to engage the player or any teamember (patch SET EnemyInfo.IsVisible and check if the enemy is a teammate and the distance is close enough for engagement)
 
 - see if we can make bot swap weapons when asked to loot (DeadBodyWork)
 
@@ -24,13 +20,21 @@
 --- ==== 4.0.0 (final phase) ==== ---:
 - add squad management terminal
 - after profile create, have 1 bot send a request to become a teamember for the player
+
+- add punishment for players intentionally killing their teammates
+- - check if in combat or out of combat the kill was done
+
+- player level to determine if he can pick up any extra followers and how many (maximum 3, disable configuration regarding this)
+- scav karma and level to determine with how many followers can the player spawn (maxium 3) and extra pickups (maximum 2 extras)
+
 - add "hold fire/fire at will" commands
 
 ==================================================================================
 RELEASE NOTES (3.9) 
 - you can no longer loot spawned followers equipment This does not apply to consumables like magazines, ammo, meds, etc.
-- "On Your Own" will now make followers patrol around the player with a configurable distance when out of combat. In order for this to work they must not be told to hold position.
+- "On Your Own" will now make followers patrol around the player with a configurable distance when out of combat. In order for this to work they must not be told to hold position. "Follow Me" can get them out of the patrol mode while still retaining the other settings that "On Your Own" has.
 - followers will react to teammate going down
+- the mod can now work with different languages. It will based on the language you set for your game. There only 3 languages avalabile for now : English, Russian, German, Romanian. You can look into user/mods/friendlyPMC/lang and add more language jsons there (ping me with the file and I will add it to the mod)
 
 ==================================================================================
 NOTES:

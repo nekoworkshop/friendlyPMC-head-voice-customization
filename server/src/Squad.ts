@@ -105,6 +105,115 @@ class friendlyPMC {
             "Was there even a doubt? They never stood a chance.\nDrinks are on me boys, the rookie is paying!",
             "Come on, come on, try to keep up will ya? We got rookie here doing site scenes."
         ],
+
+		baseSettings: "Base Settings",
+		miscSettings: "Miscellaneous",
+		testSettings: "Testing",
+		raidSettings: "Raid Settings",
+		equipOptions: ["Default"],
+		tacticOptions: ["Default", "Support", "Marksman", "Pusher", "Holder"],
+		clothesOptions: ["Default", "Player"],
+		statusSound: {
+			Name: "Report Status Volume",
+			Description: "Volume of the radio sound when triggering report status",
+		},
+		enemyMarker: {
+			Name: "Enemy Marker",
+			Description: "Show enemy position when reporting status. If disabled, the enemy marker sound will also be disabled",
+		},
+		squadSpawn: {
+			Name: "Squad Spawn",
+			Description: "Set the volume of the report status sound",
+		},
+		squadSize: {
+			Name: "Squad size",
+			Description: "Number of followers to spawn with",
+		},
+		extraPickups: {
+			Name: "Maximum pickup followers",
+			Description: "Maximum followers the player can pick up during a raid. This is in addition to the squad",
+		},
+		returnChanceDeath: {
+			Name: "Squadmate return chance after death",
+			Description: "Chance your followers will return the items you gave them should you die. This applies only to members you spawned with",
+		},
+		squadSetup: {
+			Name: "Use Squad setup",
+			Description: "Use specific setup for your squad",
+		},
+		scanDistance: {
+			Name: "Maximum scan distance",
+			Description: "Maximum distance to pick up any visible enemy that the player is signaling when issuing 'Contact' phrase",
+		},
+		enemyRemember: {
+			Name: "Time to forget about the enemy (in sec.)",
+			Description: "Maximum time a follower will remember an enemy. This is applied only at the beginning of a raid",
+		},
+		healthMultiplier: {
+			Name: "Squad Health Multiplier",
+			Description: "Health multiplier for the followers you spawn with. This is applied per each body part.",
+		},
+		memberTactic: {
+			Name: "Squad Member {0} Tactic",
+			Description: "Set Squad member fight tactic. Default is a combination of Pusher and Holder. Pusher tries to push the enemy often. Holder will stay in place around the boss. Marksman will try to get a position from where he can shoot preferably from behind the player, at a distance and will not push even if ordered. Support will provide frequent suppression fire and is able to use grenades and the grenade launcher as secondary weapon",
+		},
+		memberEquipment: {
+			Name: "Squad Member {0} Equipment",
+			Description: "Set Squad member equipment. You can choose between default (which is SPT random equipment), user's current equipment or user created presets (recommended if using a tactic different than default)",
+		},
+		memberName: {
+			Name: "Squad Member {0} Nickname",
+			Description: "Set a custom nickname for this Squad member. Leave blank for default",
+		},
+		memberUniformTop: {
+			Name: "Squad Member {0} Top",
+			Description: "Set what the top clothes for this member should be. Leave blank for default",
+		},
+		memberUniformBottom: {
+			Name: "Squad Member {0} Bottom",
+			Description: "Set what the pants for this member should be. Leave blank for default",
+		},
+		equipmentLock: {
+			Name: "Lock Squad Equipment",
+			Description: "Locks the equipment of the squad members. This is useful if you want to use your own equipment presets and do not wish to lose the equipment if you or them die. Consumables are excluded.",
+		},
+		npcSendMessage: {
+			Name: "Raid End Messages",
+			Description: "Followers will send message at the end of the raid based on conditions such as if all made it out or if you picked up a follower and kept him alive. Return items messages are excluded",
+		},
+		sameSideHostile: {
+			Name: "Same PMC Side Hostile",
+			Description: "Should PMC Bots of the same side be hostile to each other (followers remain friendly to you)",
+		},
+		pmcArmbands: {
+			Name: "PMC Arm Bands",
+			Description: "Should PMC bots have armbands (red for BEARs, blue for USECs)",
+		},
+		englishBear: {
+			Name: "BEARs speak English",
+			Description: "Should BEAR bots speak English or Russian",
+		},
+		pingSquad: {
+			Name: "Ping Squad",
+			Description: "Shortcut key for triggering the Report call",
+		},
+		enemyContact: {
+			Name: "Enemy Report",
+			Description: "Shortcut key for triggering the Contact call",
+		},
+		gestures: {
+			OverThere: "Over There",
+			TeamStatus: "Status Report",
+			OnRepeatedContact: "Contact",
+		},
+
+		botStatus: {
+			Dead: "Dead",
+			Engaged: "In Combat",
+			Alerted: "Enemy Detected",
+			Heal: "Healing",
+			WantToHeal: "Wants to heal",
+		},
 	};
 
 	Logger: ILogger;
@@ -227,18 +336,16 @@ class friendlyPMC {
 			[
 				new RouteAction("/singleplayer/returnitems", (url: string, info: any, sessionID: string, output: string): any => {
 					const member = <IUserDialogInfo>info.member;
-
-					if (this.LocaleService.getDesiredGameLocale()) {
-						let lang = this.LocaleService.getDesiredGameLocale();
-						try {
-							if (lang && fs.existsSync(`${__dirname}/../lang/${lang}.json`)) {
-								this.lang = require(`../lang/${lang}.json`);
-							}
-						} catch (e) {
-							this.Logger.error("friendlyPMC: bad language file for " + lang + " - falling back to en");
-							console.error(e);
-							this.lang = this.lang_en;
+					const lang = this.LocaleService.getDesiredGameLocale();
+					try {
+						if (lang && fs.existsSync(`${__dirname}/../lang/${lang}.json`)) {
+							const lg = require(`../lang/${lang}.json`);
+							this.lang = Object.assign(this.lang_en, lg);
 						}
+					} catch (e) {
+						this.Logger.error("friendlyPMC: bad language file for " + lang + " - falling back to en");
+						console.error(e);
+						this.lang = this.lang_en;
 					}
 
 					const details: ISendMessageDetails = {
@@ -452,6 +559,10 @@ class friendlyPMC {
 					const res = httpResponseUtil.getBody(conditionPromises);
 
 					return res;
+				}),
+
+				new RouteAction("/singleplayer/pitlang", (url: string, info: any, sessionID: string, output: string): any => {
+					return httpResponseUtil.noBody(this.lang);
 				}),
 			],
 			"custom-static-friendly-pmc"

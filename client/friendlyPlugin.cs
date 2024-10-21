@@ -23,6 +23,10 @@ using Cysharp.Threading.Tasks;
 using friendlyPMC.Utils;
 using friendlyPMC.Components;
 
+using SPT.Common.Http;
+
+using SPT.Common.Utils;
+
 namespace friendlyPMC
 {
 
@@ -72,6 +76,57 @@ namespace friendlyPMC
         }
     }
 
+    public class LanguageOptions
+    {
+        public string baseSettings { get; set; }
+        public string miscSettings { get; set; }
+        public string testSettings { get; set; }
+        public string raidSettings { get; set; }
+        public string[] equipOptions { get; set; }
+        public string[] tacticOptions { get; set; }
+        public string[] clothesOptions { get; set; }
+
+        public Dictionary<string, string> statusSound { get; set; }
+        public Dictionary<string, string> enemyMarker { get; set; }
+        public Dictionary<string, string> squadSpawn { get; set; }
+        public Dictionary<string, string> squadSize { get; set; }
+        public Dictionary<string, string> extraPickups { get; set; }
+        public Dictionary<string, string> returnChanceDeath { get; set; }
+        public Dictionary<string, string> squadSetup { get; set; }
+        public Dictionary<string, string> scanDistance { get; set; }
+        public Dictionary<string, string> enemyRemember { get; set; }
+        public Dictionary<string, string> healthMultiplier { get; set; }
+
+        public Dictionary<string, string> memberTactic { get; set; }
+        public Dictionary<string, string> memberEquipment { get; set; }
+        public Dictionary<string, string> memberName { get; set; }
+        public Dictionary<string, string> memberVoice { get; set; }
+        public Dictionary<string, string> memberUniformTop { get; set; }
+        public Dictionary<string, string> memberUniformBottom { get; set; }
+
+        public Dictionary<string, string> equipmentLock { get; set; }
+        public Dictionary<string, string> npcSendMessage { get; set; }
+
+        public Dictionary<string, string> sameSideHostile { get; set; }
+        public Dictionary<string, string> pmcArmbands { get; set; }
+        public Dictionary<string, string> englishBear { get; set; }
+
+        public Dictionary<string, string> pingSquad { get; set; }
+        public Dictionary<string, string> enemyContact { get; set; }
+
+        public Dictionary<string, string> gestures { get; set; }
+
+        public Dictionary<string, string> botStatus { get; set; }
+
+        // used only by BE
+        public string[] returnItems { get; set; }
+        public string[] returnItemsDeath { get; set; }
+        public string[] teamEscaped { get; set; }
+        public string[] teamSomeEscaped { get; set; }
+        public string[] friendlyEscaped { get; set; }
+        public string[] allyBossEscaped { get; set; }
+    }
+
     [BepInPlugin("xyz.pit.companion", "friendlyPMC", "3.9.0")]
     [BepInDependency("xyz.drakia.bigbrain")]
     [BepInDependency("com.Arys.UnityToolkit")]
@@ -83,184 +138,7 @@ namespace friendlyPMC
 
         public static Dictionary<GameObject, HashSet<Material>> objectsMaterials = new Dictionary<GameObject, HashSet<Material>>();
 
-        public static Dictionary<string, object> optionsLang = new Dictionary<string, object>
-        {
-            { "baseSettings", "Base Settings" },
-            { "miscSettings", "Miscellaneous" },
-            { "testSettings", "Testing"},
-            { "raidSettings", "Raid Settings"},
-
-            { "equipOptions", new string[]
-                {
-                    "Default",
-                }
-            },
-            {
-                "tacticOptions", new string[]
-                {
-                    "Default",
-                    "Support",
-                    "Marksman",
-                    "Pusher",
-                    "Holder",
-                }
-            },
-            { "clothesOptions", new string[]
-                {
-                    "Default",
-                    "Player"
-                }
-            },
-            {
-                "statusSound" , new Dictionary<string,string>{
-                    { "Name", "Report Status Volume"},
-                    { "Description", "Volume of the radio sound when triggering report status"}
-                }
-            },
-            {
-                "enemyMarker" , new Dictionary<string,string>{
-                    { "Name", "Enemy Marker"},
-                    { "Description", "Show enemy position when reporting status. If disabled, the enemy marker sound will also be disabled"}
-                }
-            },
-            {
-                "squadSpawn", new Dictionary<string,string>{
-                    { "Name", "Squad Spawn"},
-                    { "Description", "Set the volume of the report status sound"}
-                }
-            },
-            {
-                "squadSize", new Dictionary<string,string>{
-                    { "Name", "Squad size"},
-                    { "Description", "Number of followers to spawn with"}
-                }
-            },
-            {
-                "extraPickups",  new Dictionary<string,string>{
-                    { "Name", "Maximum pickup followers"},
-                    { "Description", "Maximum followers the player can pick up during a raid. This is in addition to the squad"}
-                }
-            },
-            {
-                "returnChanceDeath", new Dictionary<string,string>{
-                    { "Name", "Squadmate return chance after death"},
-                    { "Description", "Chance your followers will return the items you gave them should you die. This applies only to members you spawned with"}
-                }
-            },
-            {
-                "squadSetup", new Dictionary<string,string>{
-                    { "Name", "Use Squad setup"},
-                    { "Description", "Use specific setup for your squad"}
-                }
-            },
-            {
-                "scanDistance", new Dictionary<string,string>{
-                    { "Name", "Maximum scan distance"},
-                    { "Description", "Maximum distance to pick up any visible enemy that the player is signaling when issuing 'Contact' phrase"}
-                }
-            },
-            {
-                "enemyRemember", new Dictionary<string,string>{
-                    { "Name", "Time to forget about the enemy (in sec.)"},
-                    { "Description", "Maximum time a follower will remember an enemy. This is applied only at the beginning of a raid"}
-                }
-            },
-            {
-                "heatlhMultiplier", new Dictionary<string,string>{
-                    { "Name", "Squad Health Multiplier"},
-                    { "Description", "Health multiplier for the followers you spawn with. This is applied per each body part."}
-                }
-            },
-            {
-                "memberTactic", new Dictionary<string,string>{
-                    { "Name", "Squad Member {0} Tactic"},
-                    { "Description", "Set Squad member fight tactic. Default is a combination of Pusher and Holder. Pusher tries to push the enemy often. Holder will stay in place around the boss. Marksman will try to get a position from where he can shoot preferably from behind the player, at a distance and will not push even if ordered. Support will provide fequent suppression fire and is able to use grenades and the grenade launcher as secondary weapon"}
-                }
-            },
-            {
-                "memberEquipment", new Dictionary<string,string>{
-                    { "Name", "Squad Member {0} Equipment"},
-                    { "Description", "Set Squad member equipment. You can choose between default (which is SPT random equipment), user's current equipment or user created presets (recommended if using a tactic different than default"}
-                }
-            },
-            {
-                "memberName", new Dictionary<string,string>{
-                    { "Name", "Squad Member {0} Nickname"},
-                    { "Description", "Set a custom nickname for this Squad member. Leave blank for default"}
-                }
-            },
-            {
-                "memberVoice", new Dictionary<string,string>{
-                    { "Name", "Squad Member {0} Voice"},
-                    { "Description", "Set a custom voice for this Squad member. Leave blank for default"}
-                }
-            },
-            {
-                "memberUniformTop", new Dictionary<string,string>{
-                    { "Name", "Squad Member {0} Top"},
-                    { "Description", "Set what the top clothes for this member should be. Leave blank for default"}
-                }
-            },
-            {
-                "memberUniformBottom", new Dictionary<string,string>{
-                    { "Name", "Squad Member {0} Bottom"},
-                    { "Description", "Set what the pants for this member should be. Leave blank for default"}
-                }
-            },
-            {
-                "equipmentLock", new Dictionary<string,string>{
-                    { "Name", "Lock Squad Equipment"},
-                    { "Description", "Locks the equipment of the squad members. This is useful if you want to use your own equipment presets and do not wish to loose the equipment if you or them die. Consumables are excluded."}
-                }
-            },
-            {
-                "npcSendMessage", new Dictionary<string,string>{
-                    { "Name", "Raid End Messages"},
-                    { "Description", "Followers will send message at the end of the raid based on conditions such as if all made it out or if you picked up a follower and kept him alive. Return items messages are excluded"}
-                }
-            },
-
-            {
-                "sameSideHostile", new Dictionary<string,string>{
-                    { "Name", "Same PMC Side Hostile"},
-                    { "Description", "Should PMC Bots of the same side be hostile to each other (followers remain friendly to you)"}
-                }
-            },
-            {
-                "pmcArmbands", new Dictionary<string,string>{
-                    { "Name", "PMC Arm Bands"},
-                    { "Description", "Should PMC bots have armbands (red for BEARs, blue for USECs)"}
-                }
-            },
-            {
-                "englishBear", new Dictionary<string,string>{
-                    { "Name", "BEARs speak English"},
-                    { "Description", "Should BEAR bots speak English or Russian"}
-                }
-            },
-            {
-                "pingSquad" , new Dictionary<string,string>
-                {
-                    { "Name", "Ping Squad" },
-                    { "Description", "Shortcut key for triggering the Report call" }
-                }
-            },
-            {
-                "enemyContact" , new Dictionary<string,string>
-                {
-                    { "Name", "Enemy Report" },
-                    { "Description", "Shortcut key for triggering the Contact call" }
-                }
-            },
-            {
-                "gestures", new Dictionary<string,string>
-                {
-                    { "OverThere", "Over There" },
-                    { "TeamStatus", "Status Report" },
-                    { "OnRepeatedContact", "Contact" }
-                }
-            }
-        };
+        public static LanguageOptions optionsLang;
 
         public static ConfigEntry<bool> squadSpawn;
         public static ConfigEntry<int> squadSize;
@@ -353,6 +231,12 @@ namespace friendlyPMC
             new AIDataContructPatch().Enable();
             new AIBossPlayerPatch().Enable();
 
+            new QuickPanelPatch().Enable();
+
+            new GestureMenuPatch().Enable();
+            new GestureMenuAvailablePhrasesPatch().Enable();
+            new EPhraseTriggerPatch().Enable();
+
             var harmony = new Harmony("xyz.pit.companion");
 
             harmony.PatchAll(typeof(LocalGameCtorPatch).Assembly);
@@ -427,22 +311,17 @@ namespace friendlyPMC
 
             });
 
+            // set configuration manager
             configurationManager = Chainloader.PluginInfos
             .Values
             .FirstOrDefault(x => x.Instance.GetType().Name == "ConfigurationManager")
             ?.Instance as ConfigurationManager.ConfigurationManager;
-
+            // - get config language
+            GetLanguage();
+            // - set config
             ConfigSet();
 
             harmony.PatchAll(typeof(ConfigurationManagerPatch).Assembly);
-
-            new QuickPanelPatch().Enable();
-
-            new GestureMenuPatch().Enable();
-            new GestureMenuAvailablePhrasesPatch().Enable();
-            new EPhraseTriggerPatch().Enable();
-
-            //new FirearmControllerGesturePatch().Enable();
 
             // patch sain in regards to Squad 
             SAINPatch.PatchSAINIfInstalled(harmony);
@@ -458,6 +337,17 @@ namespace friendlyPMC
             new UnlootableComponentPatch().Enable();
             new ModRaidModdablePatch().Enable();
             new ItemSpecificationPanelPatch().Enable();
+        }
+
+
+        private void GetLanguage()
+        {
+            string json = RequestHandler.GetJson("/singleplayer/pitlang");
+            
+
+            var language = Json.Deserialize<LanguageOptions>(json);
+
+            optionsLang = language;
         }
 
         public void GetEquipmentBuilds()
@@ -498,12 +388,12 @@ namespace friendlyPMC
                 }
 
                 UniformTop = new string[] {
-                    ((string[])optionsLang["clothesOptions"])[0],
-                    ((string[])optionsLang["clothesOptions"])[1]
+                    optionsLang.clothesOptions[0],
+                    optionsLang.clothesOptions[1]
                 };
                 UniformBottom = new string[] {
-                    ((string[])optionsLang["clothesOptions"])[0],
-                    ((string[])optionsLang["clothesOptions"])[1]
+                    optionsLang.clothesOptions[0],
+                    optionsLang.clothesOptions[1]
                 };
 
                 UniformTopPair.Clear();
@@ -534,18 +424,19 @@ namespace friendlyPMC
 
         private void ConfigSet()
         {
+            Modules.Logger.LogInfo("trace 1");
             equipPresets = new string[]
             {
-                ((string[])optionsLang["equipOptions"])[0]
+                optionsLang.equipOptions[0]
             };
 
             UniformTop = new string[] {
-                ((string[])optionsLang["clothesOptions"])[0],
-                ((string[])optionsLang["clothesOptions"])[1]
+                optionsLang.clothesOptions[0],
+                optionsLang.clothesOptions[1]
             };
             UniformBottom = new string[] {
-                ((string[])optionsLang["clothesOptions"])[0],
-                ((string[])optionsLang["clothesOptions"])[1]
+                optionsLang.clothesOptions[0],
+                optionsLang.clothesOptions[1]
             };
 
             Config.SaveOnConfigSet = false;
@@ -561,45 +452,46 @@ namespace friendlyPMC
 
 
             squadSpawn = Config.Bind(
-                (string)optionsLang["baseSettings"], "1 " + ((Dictionary<string, string>)optionsLang["squadSpawn"])["Name"], 
+                optionsLang.baseSettings, "1 " + optionsLang.squadSpawn["Name"], 
                 true, 
-                new ConfigDescription(((Dictionary<string, string>)optionsLang["squadSpawn"])["Description"])
+                new ConfigDescription(optionsLang.squadSpawn["Description"])
             );
+
             squadSize = Config.Bind(
-                (string)optionsLang["baseSettings"], 
-                "1.2  -  " + ((Dictionary<string, string>)optionsLang["squadSize"])["Name"], 
+                optionsLang.baseSettings, 
+                "1.2  -  " + optionsLang.squadSize["Name"], 
                 2, 
-                new ConfigDescription(((Dictionary<string, string>)optionsLang["squadSize"])["Description"], new AcceptableValueRange<int>(1, 30))
+                new ConfigDescription(optionsLang.squadSize["Description"], new AcceptableValueRange<int>(1, 30))
             );
 
-            returnChanceDeath = Config.Bind((string)optionsLang["baseSettings"], "1.3  -  " + ((Dictionary<string, string>)optionsLang["returnChanceDeath"])["Name"], 50, new ConfigDescription(((Dictionary<string, string>)optionsLang["returnChanceDeath"])["Description"], new AcceptableValueRange<int>(1, 100)));
+            returnChanceDeath = Config.Bind(optionsLang.baseSettings, "1.3  -  " + optionsLang.returnChanceDeath["Name"], 50, new ConfigDescription(optionsLang.returnChanceDeath["Description"], new AcceptableValueRange<int>(1, 100)));
 
-            squadSetup = Config.Bind((string)optionsLang["baseSettings"], "1.4  -  " + ((Dictionary<string, string>)optionsLang["squadSetup"])["Name"], false, new ConfigDescription(((Dictionary<string, string>)optionsLang["squadSetup"])["Description"]));
+            squadSetup = Config.Bind(optionsLang.baseSettings, "1.4  -  " + optionsLang.squadSetup["Name"], false, new ConfigDescription(optionsLang.squadSpawn["Description"]));
 
-            extraPickups = Config.Bind((string)optionsLang["baseSettings"], "2 " + ((Dictionary<string, string>)optionsLang["extraPickups"])["Name"], 1, new ConfigDescription(((Dictionary<string, string>)optionsLang["extraPickups"])["Description"], new AcceptableValueRange<int>(0, 30)));
+            extraPickups = Config.Bind(optionsLang.baseSettings, "2 " + optionsLang.extraPickups["Name"], 1, new ConfigDescription(optionsLang.extraPickups["Description"], new AcceptableValueRange<int>(0, 30)));
 
-            scanDistance = Config.Bind((string)optionsLang["miscSettings"], "1 " + ((Dictionary<string, string>)optionsLang["scanDistance"])["Name"], 140, new ConfigDescription(((Dictionary<string, string>)optionsLang["scanDistance"])["Description"], new AcceptableValueRange<int>(50, 300)));
+            scanDistance = Config.Bind(optionsLang.miscSettings, "1 " + optionsLang.scanDistance["Name"], 140, new ConfigDescription(optionsLang.scanDistance["Description"], new AcceptableValueRange<int>(50, 300)));
 
-            enemyRemember = Config.Bind((string)optionsLang["miscSettings"], "2 " + ((Dictionary<string, string>)optionsLang["enemyRemember"])["Name"], 20, new ConfigDescription(((Dictionary<string, string>)optionsLang["enemyRemember"])["Description"], new AcceptableValueRange<int>(5, 60)));
+            enemyRemember = Config.Bind(optionsLang.miscSettings, "2 " + optionsLang.enemyRemember["Name"], 20, new ConfigDescription(optionsLang.enemyRemember["Description"], new AcceptableValueRange<int>(5, 60)));
 
-            heatlhMultiplier = Config.Bind((string)optionsLang["miscSettings"], "3 " + ((Dictionary<string, string>)optionsLang["heatlhMultiplier"])["Name"], 1f, new ConfigDescription(((Dictionary<string, string>)optionsLang["heatlhMultiplier"])["Description"], new AcceptableValueRange<float>(1, 5)));
+            heatlhMultiplier = Config.Bind(optionsLang.miscSettings, "3 " + optionsLang.healthMultiplier["Name"], 1f, new ConfigDescription(optionsLang.healthMultiplier["Description"], new AcceptableValueRange<float>(1, 5)));
 
-            statusSound = Config.Bind((string)optionsLang["miscSettings"], "4 " + ((Dictionary<string, string>)optionsLang["statusSound"])["Name"], 100, new ConfigDescription(((Dictionary<string, string>)optionsLang["statusSound"])["Description"], new AcceptableValueRange<int>(0, 100)));
+            statusSound = Config.Bind(optionsLang.miscSettings, "4 " + optionsLang.statusSound["Name"], 100, new ConfigDescription(optionsLang.statusSound["Description"], new AcceptableValueRange<int>(0, 100)));
             
-            enemyMarker = Config.Bind((string)optionsLang["miscSettings"], "5 " + ((Dictionary<string, string>)optionsLang["enemyMarker"])["Name"], true, new ConfigDescription(((Dictionary<string, string>)optionsLang["enemyMarker"])["Description"]));
+            enemyMarker = Config.Bind(optionsLang.miscSettings, "5 " + optionsLang.enemyMarker["Name"], true, new ConfigDescription(optionsLang.enemyMarker["Description"]));
 
-            npcSendMessage = Config.Bind((string)optionsLang["miscSettings"], "6 " + ((Dictionary<string, string>)optionsLang["npcSendMessage"])["Name"], true, new ConfigDescription(((Dictionary<string, string>)optionsLang["npcSendMessage"])["Description"]));
+            npcSendMessage = Config.Bind(optionsLang.miscSettings, "6 " + optionsLang.npcSendMessage["Name"], true, new ConfigDescription(optionsLang.npcSendMessage["Description"]));
 
-            sameSideHostile = Config.Bind((string)optionsLang["miscSettings"], "7 " + ((Dictionary<string, string>)optionsLang["sameSideHostile"])["Name"], false, new ConfigDescription(((Dictionary<string, string>)optionsLang["sameSideHostile"])["Description"]));
+            sameSideHostile = Config.Bind(optionsLang.miscSettings, "7 " + optionsLang.sameSideHostile["Name"], false, new ConfigDescription(optionsLang.sameSideHostile["Description"]));
 
-            pmcArmbands = Config.Bind((string)optionsLang["miscSettings"], "8 " + ((Dictionary<string, string>)optionsLang["pmcArmbands"])["Name"], true, new ConfigDescription(((Dictionary<string, string>)optionsLang["pmcArmbands"])["Description"]));
+            pmcArmbands = Config.Bind(optionsLang.miscSettings, "8 " + optionsLang.pmcArmbands["Name"], true, new ConfigDescription(optionsLang.pmcArmbands["Description"]));
 
-            englishBear = Config.Bind((string)optionsLang["miscSettings"], "8 " + ((Dictionary<string, string>)optionsLang["englishBear"])["Name"], true, new ConfigDescription(((Dictionary<string, string>)optionsLang["englishBear"])["Description"]));
+            englishBear = Config.Bind(optionsLang.miscSettings, "8 " + optionsLang.englishBear["Name"], true, new ConfigDescription(optionsLang.englishBear["Description"]));
 
 
-            pingKey = Config.Bind((string)optionsLang["miscSettings"], "9.1 " + ((Dictionary<string, string>)optionsLang["pingSquad"])["Name"], new KeyboardShortcut(KeyCode.None), new ConfigDescription(((Dictionary<string, string>)optionsLang["pingSquad"])["Description"]));
+            pingKey = Config.Bind(optionsLang.miscSettings, "9.1 " + optionsLang.pingSquad["Name"], new KeyboardShortcut(KeyCode.None), new ConfigDescription(optionsLang.pingSquad["Description"]));
 
-            contactKey = Config.Bind((string)optionsLang["miscSettings"], "9.2 " + ((Dictionary<string, string>)optionsLang["enemyContact"])["Name"], new KeyboardShortcut(KeyCode.None), new ConfigDescription(((Dictionary<string, string>)optionsLang["enemyContact"])["Description"]));
+            contactKey = Config.Bind(optionsLang.miscSettings, "9.2 " + optionsLang.enemyContact["Name"], new KeyboardShortcut(KeyCode.None), new ConfigDescription(optionsLang.enemyContact["Description"]));
 
             //knightSpawn = Config.Bind((string)optionsLang["testSettings"], "1 Spawn with The Goons", false, new ConfigDescription("Experimental: Spawn with the goons squad. This works in combination with your own squad. Take note that a boss and his followers do not accept the same commands as your squad"));
 
@@ -617,8 +509,8 @@ namespace friendlyPMC
                 if (
                     args.ChangedSetting.Definition == squadSize.Definition ||
                     args.ChangedSetting.Definition == squadSetup.Definition ||
-                    args.ChangedSetting.Definition.Key.Contains(((Dictionary<string, string>)optionsLang["squadSize"])["Name"]) ||
-                    args.ChangedSetting.Definition.Key.Contains(((Dictionary<string, string>)optionsLang["squadSetup"])["Name"])
+                    args.ChangedSetting.Definition.Key.Contains(optionsLang.squadSize["Name"]) ||
+                    args.ChangedSetting.Definition.Key.Contains(optionsLang.squadSetup["Name"])
                 )
                 {
                     RefreshManager().Forget();
@@ -639,23 +531,20 @@ namespace friendlyPMC
 
                     if (!squadMembers.ContainsKey(i))
                     {
-                        string key = $"1.4.1.{i + 1}.4  -  -  " + String.Format(((Dictionary<string, string>)optionsLang["memberTactic"])["Name"],i+1);
-                        string value = ((string[])optionsLang["tacticOptions"])[0];
+                        string key = $"1.4.1.{i + 1}.4  -  -  " + String.Format(optionsLang.memberTactic["Name"],i+1);
+                        string value = optionsLang.tacticOptions[0];
 
-                        string seckey = $"1.4.1.{i + 1}.2  -  -  " + String.Format(((Dictionary<string, string>)optionsLang["memberEquipment"])["Name"], i + 1);
-                        string secvalue = ((string[])optionsLang["tacticOptions"])[0];
+                        string seckey = $"1.4.1.{i + 1}.2  -  -  " + String.Format(optionsLang.memberEquipment["Name"], i + 1);
+                        string secvalue = optionsLang.equipOptions[0];
 
-                        string trdkey = $"1.4.1.{i + 1}.1.1  -  -  " + String.Format(((Dictionary<string, string>)optionsLang["memberName"])["Name"], i + 1);
+                        string trdkey = $"1.4.1.{i + 1}.1.1  -  -  " + String.Format(optionsLang.memberName["Name"], i + 1);
                         string trdvalue = "";
 
-                        string frtkey = $"1.4.1.{i + 1}.3.1  -  -  " + String.Format(((Dictionary<string, string>)optionsLang["memberUniformTop"])["Name"], i + 1);
+                        string frtkey = $"1.4.1.{i + 1}.3.1  -  -  " + String.Format(optionsLang.memberUniformTop["Name"], i + 1);
                         string frtvalue = "";
 
-                        string fiftkey = $"1.4.1.{i + 1}.3.2  -  -  " + String.Format(((Dictionary<string, string>)optionsLang["memberUniformBottom"])["Name"], i + 1);
+                        string fiftkey = $"1.4.1.{i + 1}.3.2  -  -  " + String.Format(optionsLang.memberUniformBottom["Name"], i + 1);
                         string fiftvalue = "";
-
-                        string sixkey = $"1.4.1.{i + 1}.1.2  -  -  " + String.Format(((Dictionary<string, string>)optionsLang["memberVoice"])["Name"], i + 1);
-                        string sixvalue = "";
 
                         savedConfigValues.ExecuteForEach(saved =>
                         {
@@ -679,30 +568,26 @@ namespace friendlyPMC
                             {
                                 fiftvalue = saved.Value;
                             }
-                            else if (saved.Key.Key == sixkey)
-                            {
-                                sixvalue = saved.Value;
-                            }
                         });
 
                         List<ConfigEntry<string>> configEntries = new List<ConfigEntry<string>>
                         {
                             Config.Bind(
-                                (string)optionsLang["baseSettings"],
+                                optionsLang.baseSettings,
                                 key,
                                 value,
-                                new ConfigDescription(((Dictionary<string, string>)optionsLang["memberTactic"])["Description"],
-                                    new AcceptableValueList<string>((string[])optionsLang["tacticOptions"])
+                                new ConfigDescription(optionsLang.memberTactic["Description"],
+                                    new AcceptableValueList<string>(optionsLang.tacticOptions)
                                 )
                             ),
                             EquipmentOptions(seckey,secvalue),
                             UniformOptions(frtkey,frtvalue,"top",true),
                             UniformOptions(fiftkey,fiftvalue,"bottom",true),
                             Config.Bind(
-                                (string)optionsLang["baseSettings"],
+                                optionsLang.baseSettings,
                                 trdkey,
                                 trdvalue,
-                                new ConfigDescription(((Dictionary<string, string>)optionsLang["memberName"])["Description"])
+                                new ConfigDescription(optionsLang.memberName["Description"])
                             )
                         };
 
@@ -763,10 +648,10 @@ namespace friendlyPMC
             }
 
             ConfigEntry<string> entry = Config.Bind(
-                (string)optionsLang["baseSettings"],
+                optionsLang.baseSettings,
                 name,
                 value,
-                new ConfigDescription(((Dictionary<string, string>)optionsLang["memberEquipment"])["Description"], new AcceptableValueList<string>(list))
+                new ConfigDescription(optionsLang.memberEquipment["Description"], new AcceptableValueList<string>(list))
              );
 
             return entry;
@@ -778,7 +663,7 @@ namespace friendlyPMC
             var presets = Utils.Equipment.CustomPresets;
 
             var updatedPresets = new string[] {
-                ((string[])optionsLang["equipOptions"])[0]
+                optionsLang.equipOptions[0]
             };
 
             foreach (var item in presets)
@@ -825,7 +710,7 @@ namespace friendlyPMC
 
                         if(!equipPresets.Contains(value))
                         {
-                            value = ((string[])optionsLang["equipOptions"])[0];
+                            value = optionsLang.equipOptions[0];
                         }
 
                         Config.Remove(entry.Definition);
@@ -835,7 +720,6 @@ namespace friendlyPMC
                 }
             }
         }
-
 
         private ConfigEntry<string> UniformOptions(string name, string value, string bodyPart = "top", bool addval = false)
         {
@@ -849,11 +733,17 @@ namespace friendlyPMC
                 else value = list[0];
             }
 
+            string description;
+            if(bodyPart == "top")
+                description = optionsLang.memberUniformTop["Description"];
+            else 
+                description = optionsLang.memberUniformBottom["Description"];
+
             ConfigEntry<string> entry = Config.Bind(
-                (string)optionsLang["baseSettings"],
+                optionsLang.baseSettings,
                 name,
                 value,
-                new ConfigDescription(((Dictionary<string, string>)optionsLang[bodyPart == "top" ? "memberUniformTop" : "memberUniformBottom"])["Description"], new AcceptableValueList<string>(list))
+                new ConfigDescription(description, new AcceptableValueList<string>(list))
              );
 
             return entry;
@@ -941,7 +831,7 @@ namespace friendlyPMC
 
         public static string[] GetTacticOptions()
         {
-            return (string[])optionsLang["tacticOptions"];
+            return optionsLang.tacticOptions;
         }
 
 

@@ -1,0 +1,110 @@
+{
+    "baseSettings": "Grundlegende Einstellungen",
+    "miscSettings": "Verschiedenes",
+    "testSettings": "Testen",
+    "raidSettings": "Raid-Einstellungen",
+    "equipOptions": ["Standard"],
+    "tacticOptions": ["Standard", "Unterstützung", "Scharfschütze", "Angreifer", "Halter"],
+    "clothesOptions": ["Standard", "Spieler"],
+    "statusSound": {
+        "Name": "Lautstärke des Statusberichts",
+        "Description": "Lautstärke des Radiosounds beim Auslösen des Statusberichts"
+    },
+    "enemyMarker": {
+        "Name": "Feindmarkierung",
+        "Description": "Zeige die Position des Feindes beim Berichten des Status. Wenn deaktiviert, wird auch der Geräusch der Feindmarkierung deaktiviert."
+    },
+    "squadSpawn": {
+        "Name": "Erscheinen des Squads",
+        "Description": "Lautstärke des Statusberichts einstellen"
+    },
+    "squadSize": {
+        "Name": "Größe des Squads",
+        "Description": "Anzahl der Folgespieler, die mit Ihnen erscheinen"
+    },
+    "extraPickups": {
+        "Name": "Maximale aufgelesene Folgespieler",
+        "Description": "Maximale Anzahl an Folgespielern, die der Spieler während eines Raids aufsammeln kann. Dies ist zusätzlich zum Squad."
+    },
+    "returnChanceDeath": {
+        "Name": "Chance der Rückkehr von Squadmitgliedern nach dem Tod",
+        "Description": "Chance, dass Ihre Folgespieler die Gegenstände zurückbringen, die Sie ihnen gegeben haben, wenn Sie sterben. Dies gilt nur für Mitglieder, mit denen Sie erschienen sind."
+    },
+    "squadSetup": {
+        "Name": "Squad-Setup verwenden",
+        "Description": "Spezifisches Setup für Ihr Squad verwenden."
+    },
+    "scanDistance": {
+        "Name": "Maximale Scandistanz",
+        "Description": "Maximale Distanz, um einen sichtbaren Feind zu erfassen, den der Spieler signalisiert, wenn er den Befehl 'Kontakt' gibt."
+    },
+    "enemyRemember": {
+        "Name": "Zeit, um den Feind zu vergessen (in Sekunden)",
+        "Description": "Maximale Zeit, die ein Folgespieler einen Feind erinnert. Dies gilt nur zu Beginn eines Raids."
+    },
+    "healthMultiplier": {
+        "Name": "Gesundheitsmultiplikator des Squads",
+        "Description": "Gesundheitsmultiplikator für die Folgespieler, die mit Ihnen erscheinen. Dies gilt für jedes Körperteil."
+    },
+    "memberTactic": {
+        "Name": "Taktik des Squadmitglieds {0}",
+        "Description": "Taktik des Kampfs für das Squadmitglied festlegen. Standard ist eine Kombination aus Angreifer und Halter. Angreifer versucht, den Feind oft anzugreifen. Halter bleibt in der Nähe des Chefs. Scharfschütze versucht, eine Position zu finden, von der aus er idealerweise aus dem Hintergrund auf den Spieler schießen kann, und wird nicht angreifen, auch wenn es befohlen wird. Unterstützung bietet häufigen Unterdrückungsfeuer und kann Granaten sowie den Granatwerfer als Sekundärwaffe verwenden."
+    },
+    "memberEquipment": {
+        "Name": "Ausrüstung des Squadmitglieds {0}",
+        "Description": "Ausrüstung für das Squadmitglied festlegen. Sie können zwischen Standard (zufällige SPT-Ausrüstung), der aktuellen Ausrüstung des Benutzers oder benutzergenerierten Voreinstellungen wählen (empfohlen, wenn Sie eine andere Taktik als die Standardtaktik verwenden)."
+    },
+    "memberName": {
+        "Name": "Spitzname des Squadmitglieds {0}",
+        "Description": "Individuellen Spitznamen für dieses Squadmitglied festlegen. Leer lassen für Standard."
+    },
+    "memberUniformTop": {
+        "Name": "Obere Kleidung des Squadmitglieds {0}",
+        "Description": "Festlegen, welche Oberbekleidung dieses Mitglied tragen soll. Leer lassen für Standard."
+    },
+    "memberUniformBottom": {
+        "Name": "Untere Kleidung des Squadmitglieds {0}",
+        "Description": "Festlegen, welche Hosen dieses Mitglied tragen soll. Leer lassen für Standard."
+    },
+    "equipmentLock": {
+        "Name": "Ausrüstung des Squads sperren",
+        "Description": "Sperrt die Ausrüstung der Squadmitglieder. Dies ist nützlich, wenn Sie Ihre eigenen Ausrüstungsvoreinstellungen verwenden möchten und nicht möchten, dass die Ausrüstung verloren geht, wenn Sie oder sie sterben. Verbrauchsmaterialien sind ausgeschlossen."
+    },
+    "npcSendMessage": {
+        "Name": "Nachrichten am Ende des Raids",
+        "Description": "Folgespieler senden am Ende des Raids basierend auf Bedingungen wie ob alle rausgekommen sind oder ob Sie einen Folgespieler aufgenommen und ihn am Leben gehalten haben, eine Nachricht. Rückmeldungen zu Gegenständen sind ausgeschlossen."
+    },
+    "sameSideHostile": {
+        "Name": "Feindliche Bots der gleichen PMC-Seite",
+        "Description": "Sollten die PMC-Bots derselben Seite feindlich zueinander sein (Folgespieler bleiben freundlich zu Ihnen)."
+    },
+    "pmcArmbands": {
+        "Name": "PMC-Armbinden",
+        "Description": "Sollten die PMC-Bots Armbinden tragen (rot für BEARs, blau für USECs)."
+    },
+    "englishBear": {
+        "Name": "BEAR sprechen Englisch",
+        "Description": "Sollten die BEAR-Bots Englisch oder Russisch sprechen."
+    },
+    "pingSquad": {
+        "Name": "Ping Squad",
+        "Description": "Schnelltaste zum Auslösen des Berichts."
+    },
+    "enemyContact": {
+        "Name": "Feindbericht",
+        "Description": "Schnelltaste zum Auslösen des Kontakts."
+    },
+    "gestures": {
+        "OverThere": "Dort",
+        "TeamStatus": "Statusbericht",
+        "OnRepeatedContact": "Kontakt"
+    },
+    "botStatus": {
+        "Dead": "Tot",
+        "Engaged": "Im Kampf",
+        "Alerted": "Feind erkannt",
+        "Heal": "Heilen",
+        "WantToHeal": "Möchte heilen"
+    }
+}
+  

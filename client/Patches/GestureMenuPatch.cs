@@ -91,17 +91,17 @@ namespace friendlyPMC.Patches
             {
                 if (trigger == EPhraseTrigger.OnRepeatedContact)
                 {
-                    __result = ((Dictionary<string, string>)friendlyPMC.optionsLang["gestures"])["OnRepeatedContact"];
+                    __result = friendlyPMC.optionsLang.gestures["OnRepeatedContact"];
                     return false;
                 }
                 else if (trigger == (EPhraseTrigger)CustomPhrases.TeamStatus)
                 {
-                    __result = ((Dictionary<string, string>)friendlyPMC.optionsLang["gestures"])["TeamStatus"];
+                    __result = friendlyPMC.optionsLang.gestures["TeamStatus"];
                     return false;
                 }
                 else if (trigger == (EPhraseTrigger)CustomPhrases.OverThere)
                 {
-                    __result = ((Dictionary<string, string>)friendlyPMC.optionsLang["gestures"])["OverThere"];
+                    __result = friendlyPMC.optionsLang.gestures["OverThere"];
                     return false;
                 }
             }
