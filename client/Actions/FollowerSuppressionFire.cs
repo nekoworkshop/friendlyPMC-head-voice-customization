@@ -12,8 +12,6 @@ namespace friendlyPMC.Actions
     // GClass224 enhancement
     internal class FollowerSuppressionFire : GClass224
     {
-
-        private float float_0;
         private readonly GClass145 gclass145_0;
 
         private bool _init = false;
@@ -62,6 +60,8 @@ namespace friendlyPMC.Actions
 
         public override void Update()
         {
+            if (!_init) Init();
+
             if (grSupport && !botOwner_0.WeaponManager.Selector.IsWeaponReady) return;
 
             if (bool_1)
