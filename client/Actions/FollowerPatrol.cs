@@ -6,7 +6,6 @@ using UnityEngine.AI;
 using UnityEngine;
 using friendlyPMC.Modules;
 using friendlyPMC.Components;
-using TMPro;
 
 namespace friendlyPMC.Actions
 {
@@ -18,18 +17,18 @@ namespace friendlyPMC.Actions
         protected readonly pitAIBossPlayer boss_0;
 
         /** holder for how frequent show the distance between bots and the boss be checked  **/
-        private float float_3;
+        private float float_3 = 0f;
         /** holder for how frequent move around the boss when standing still  **/
-        private float float_4;
+        private float float_4 = 0f;
         /** last position the bot registered to move to **/
         private Vector3 vector3_0;
         /** flag to tell the bot to no longer move once in cover **/
-        private bool bool_0;
+        private bool bool_0 = false;
         /** helper for checking if bot is in range of the boss **/
-        private bool bool_1;
+        private bool bool_1 = false;
         /** helper for checking if bot is currently stationary at a checkpoint **/
-        private float float_6;
-        private float float_7;
+        private float float_6 = 0f;
+        private float float_7 = 0f;
         /** helper for checking if bot is currently moving to a checkpoint **/
         private bool bool_6;
 
@@ -91,8 +90,14 @@ namespace friendlyPMC.Actions
 
                 bool_2 = false;
                 bool_6 = false;
+                float_3 = 0f;
+                float_4 = 0f;
                 float_6 = 0f;
                 float_7 = 0f;
+                float_5 = 0f;
+
+                lastCoverPoint = null;
+                nocover = false;
             }
         }
 
@@ -135,7 +140,6 @@ namespace friendlyPMC.Actions
                 float_3 = Time.time + GClass761.Random(1f, 2f);
                 if (following)
                 {
-                    flag2 = true;
                     num = distance;
                     float_3 = Time.time + GClass761.Random(1f, 2f);
                 }
@@ -267,6 +271,7 @@ namespace friendlyPMC.Actions
 
             // check if leader is still moving
             Vector3 playerPosition = player_0.Transform.position;
+            Vector3 botPosition = botOwner_0.GetPlayer.Transform.position;
             if (!bool_2)
             {
                 Vector3 leaderPosition = new Vector3(
@@ -275,12 +280,12 @@ namespace friendlyPMC.Actions
                     Mathf.Floor(playerPosition.z / 3f) * 3f
                 );
 
-                float num = Mathf.Abs((bool_0 ? vector3_0 : (leaderPosition - botOwner_0.Position)).magnitude);
+                float num = Mathf.Abs((bool_0 ? vector3_0 : (leaderPosition - botPosition)).magnitude);
                 bool flag2;
                 flag2 = num < reachDist;
 
                 // - boss might or not move, but bot is out range - keep moving
-                if(flag2)
+                if(!flag2)
                 {
                     Follow(true,num);
                     float_5 = Time.time + 5f;
@@ -288,18 +293,22 @@ namespace friendlyPMC.Actions
                 }
 
 
-                if (leaderLastPosition != leaderPosition)
+                if (leaderLastPosition.HasValue && leaderLastPosition != leaderPosition)
                 {
                     leaderLastPosition = leaderPosition;
                     Follow(true, num);
                     float_5 = Time.time + 5f;
                     return;
                 }
+                else
+                    leaderLastPosition = leaderPosition;
+
                 // - check if leader is camping
                 bool_2 = true;
             }
 
             if (!bool_2) return;
+
             // frequency on which to check if the leader is camping or moving
             if (float_7 > Time.time) return;
             float_7 = Time.time + 1.5f;
@@ -316,10 +325,14 @@ namespace friendlyPMC.Actions
             if (leaderLastCamp.HasValue && bossPosition != leaderLastCamp)
             {
                 leaderLastCamp = null;
-                Follow();
                 bool_2 = false;
                 float_5 = Time.time + 5f;
+                botOwner_0.Mover.SetTargetMoveSpeed(1f);
+                Follow();
                 return;
+            } else
+            {
+                leaderLastCamp = bossPosition;
             }
 
             // roam around the boss
@@ -332,16 +345,34 @@ namespace friendlyPMC.Actions
             // - if bot is moving to a checkpoint wait to reach it
             if (bool_6)
             {
-                if (botOwner_0.Mover.IsComeTo(botOwner_0.Settings.FileSettings.Move.REACH_DIST, true))
+                if (botOwner_0.Mover.IsComeTo(botOwner_0.Settings.FileSettings.Move.REACH_DIST, false))
                 {
                     botOwner_0.StopMove();
                     if (!wasHit) botOwner_0.LookData.SetLookPointByHearing(null);
-                    float_6 = Time.time + GClass761.Random(4f, 8f);
+                    float_6 = Time.time + GClass761.Random(6f, 10f);
                 }
                 return;
             }
 
             // - select a checkpoint to move to
+            
+            List<Vector3> carePositions = new List<Vector3> { playerPosition };
+
+            pitAIBossPlayer boss = BossPlayers.GetBoss(player_0.ProfileId);
+
+            if(boss == null)
+            {
+                carePositions.Add(botPosition);
+            } else
+            {
+                foreach (BotOwner follower in boss.Followers)
+                {
+                    carePositions.Add(follower.GetPlayer.Transform.position);
+                }
+            }
+
+            Vector3[] finalcarePositions = carePositions.ToArray();
+            // - get a valid position to move to, must be reachable and far enough from other teammates
             for (int i = 0; i <30; i++)
             {
                 Vector3 randomPosition = bossPosition + UnityEngine.Random.insideUnitSphere * perimeterRadius;
@@ -349,11 +380,14 @@ namespace friendlyPMC.Actions
                 NavMeshHit navMeshHit;
                 if (!NavMesh.SamplePosition(randomPosition, out navMeshHit, 10f, -1)) continue;
 
+                if (!GClass326.IsDangerPositionFarEnough(navMeshHit.position, finalcarePositions, 2f * 2f)) continue;
+
                 if (botOwner_0.GoToPoint(navMeshHit.position, true, -1f, false, true, true, false) == NavMeshPathStatus.PathComplete)
                 {
-                    if (!wasHit) botOwner_0.Steering.LookToMovingDirection();
+                    
                     botOwner_0.Mover.Sprint(false, false);
                     botOwner_0.Mover.SetTargetMoveSpeed(0.5f);
+                    if (!wasHit) botOwner_0.Steering.LookToPathDestPoint();
                     bool_6 = true;
                     return;
                 }
@@ -407,6 +441,15 @@ namespace friendlyPMC.Actions
         public void PatrolAround(bool state = false)
         {
             shouldPatrol = state;
+
+            if(state == false)
+            {
+                bool_6 = false;
+                float_6 = 0f;
+                float_5 = 0f;
+                bool_2 = false;
+                float_7 = 0f;
+            }
         }
     }
 

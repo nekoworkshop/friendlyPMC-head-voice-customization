@@ -492,15 +492,6 @@ namespace friendlyPMC
             pingKey = Config.Bind(optionsLang.miscSettings, "9.1 " + optionsLang.pingSquad["Name"], new KeyboardShortcut(KeyCode.None), new ConfigDescription(optionsLang.pingSquad["Description"]));
 
             contactKey = Config.Bind(optionsLang.miscSettings, "9.2 " + optionsLang.enemyContact["Name"], new KeyboardShortcut(KeyCode.None), new ConfigDescription(optionsLang.enemyContact["Description"]));
-
-            //knightSpawn = Config.Bind((string)optionsLang["testSettings"], "1 Spawn with The Goons", false, new ConfigDescription("Experimental: Spawn with the goons squad. This works in combination with your own squad. Take note that a boss and his followers do not accept the same commands as your squad"));
-
-            //justKnightSpawn = Config.Bind((string)optionsLang["testSettings"], "1.1  -  Spawn with Knight", true, new ConfigDescription("Experimental: Only when Spawn with The Goons is active"));
-
-            //bigPipeSpawn = Config.Bind((string)optionsLang["testSettings"], "1.2  -  Spawn with BigPipe", true, new ConfigDescription("Experimental: Only when Spawn with The Goons is active"));
-
-            //birdEyeSpawn = Config.Bind((string)optionsLang["testSettings"], "1.3  -  Spawn with BirdEye", true, new ConfigDescription("Experimental: Only when Spawn with The Goons is active"));
-
             
             ConfigSquadMembersSet();
 
