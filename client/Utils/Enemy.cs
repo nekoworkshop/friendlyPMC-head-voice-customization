@@ -118,7 +118,7 @@ namespace friendlyPMC.Utils
             return Utils.GetNavDistance(botPosition, enemyPosition, navMesh);
         }
 
-        public static float GetEnemiesAtLocation(BotOwner bot, string enemyId, Vector3 position, float radius = 25f)
+        public static float GetEnemiesAtLocation(BotOwner bot, string enemyId, Vector3 position, float radius = 30f)
         {
             try
             {
@@ -265,6 +265,22 @@ namespace friendlyPMC.Utils
         {
             enemyLocationCache.Clear();
             enemies.Clear();
+        }
+
+        public static bool IsClosestEnemy(BotOwner botOwner_0)
+        {
+            bool result = true;
+            EnemyInfo enemyInfo = botOwner_0.Memory.GoalEnemy;
+            foreach (EnemyInfo enemy in botOwner_0.EnemiesController.EnemyInfos.Values)
+            {
+                if (enemy.Distance < enemyInfo.Distance)
+                {
+                    result = false;
+                    break;
+                }
+            }
+
+            return result;
         }
     }
 }

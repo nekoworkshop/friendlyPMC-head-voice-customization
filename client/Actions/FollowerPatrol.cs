@@ -355,7 +355,6 @@ namespace friendlyPMC.Actions
             }
 
             // - select a checkpoint to move to
-            
             List<Vector3> carePositions = new List<Vector3> { playerPosition };
 
             pitAIBossPlayer boss = BossPlayers.GetBoss(player_0.ProfileId);

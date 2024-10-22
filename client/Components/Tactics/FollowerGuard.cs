@@ -38,14 +38,17 @@ namespace friendlyPMC.Components.Tactics
         }
 
         public FollowerCommonLayer CommonLayer { get { return commonLayer; } }
-        public FollowerGuard(BotOwner bot, int priority, FollowerCommonLayer commonLayer = null) : base(bot, priority)
+
+        protected FollowerPusherLayer PusherLayer = null;
+        public FollowerGuard(BotOwner bot, int priority, FollowerPusherLayer pusherLayer = null) : base(bot, priority)
         {
-            if (commonLayer != null)
+            if (pusherLayer != null)
             {
-                this.commonLayer = commonLayer;
+                commonLayer = pusherLayer.CommonLayer;
                 existingCommon = true;
+                PusherLayer = pusherLayer;
             }
-            else this.commonLayer = new FollowerCommonLayer(bot, priority);
+            else commonLayer = new FollowerCommonLayer(bot, priority);
 
             gclass396_0 = botOwner_0.WeaponManager.Selector as GClass396;
         }
@@ -252,7 +255,7 @@ namespace friendlyPMC.Components.Tactics
 
                 // - approach enemy if close enough
                 if (
-                    Enemy.Distance(botOwner_0) <= Enemy.EnemyDistance.Close && Enemy.GetEnemiesAtLocation(botOwner_0, botOwner_0.Memory.GoalEnemy.ProfileId, enemyPos) < 3)
+                    Enemy.Distance(botOwner_0) <= Enemy.EnemyDistance.Close && Enemy.GetEnemiesAtLocation(botOwner_0, botOwner_0.Memory.GoalEnemy.ProfileId, enemyPos) < 4)
                 {
                     GetClosestAttackCoverPoint(enemyPos);
                     if (customNavigationPoint_0 != null)
@@ -261,7 +264,9 @@ namespace friendlyPMC.Components.Tactics
                         return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMoving, "getInCloseSlow");
                     }
 
-                    return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.goToEnemy, "pushEnemy");
+                    if(PusherLayer != null)
+                        return PusherLayer.EngageEnemy(true);
+                    else return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.goToEnemy, "pushEnemy");
                 } 
                 else if (Enemy.Distance(botOwner_0) == Enemy.EnemyDistance.Mid)
                 {

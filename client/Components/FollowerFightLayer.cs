@@ -99,7 +99,7 @@ namespace friendlyPMC.Components
             holderLayer = new FollowerHolderLayer(bot, priority, commonLayer);
             pusherLayer = new FollowerPusherLayer(bot, priority, commonLayer);
             // guard is support
-            guardLayer = new FollowerGuard(bot,priority, commonLayer);
+            guardLayer = new FollowerGuard(bot,priority, PusherLayer);
 
         }
         public override void OnActivate()
