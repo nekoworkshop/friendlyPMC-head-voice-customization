@@ -424,7 +424,6 @@ namespace friendlyPMC
 
         private void ConfigSet()
         {
-            Modules.Logger.LogInfo("trace 1");
             equipPresets = new string[]
             {
                 optionsLang.equipOptions[0]
