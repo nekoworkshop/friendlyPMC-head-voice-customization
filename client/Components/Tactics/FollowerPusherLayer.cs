@@ -85,6 +85,12 @@ namespace friendlyPMC.Components.Tactics
                     else if (distanceToEnemy <= Utils.Enemy.EnemyDistance.Close) pushDecision = BotLogicDecision.goToEnemy;
                     else pushDecision = BotLogicDecision.runToEnemy;
 
+                    // - check if the current enemy is the closest and do a slow approach if not
+                    if(!Utils.Enemy.IsClosestEnemy(botOwner_0))
+                    {
+                        pushDecision = BotLogicDecision.goToEnemy;
+                    }
+
                     // -- push if not visible or ordered
                     if (!enemyVisible || pushOrdered)
                         return new AICoreActionResultStruct<BotLogicDecision>(pushDecision, "pushEnemy");
