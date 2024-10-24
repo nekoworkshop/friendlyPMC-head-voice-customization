@@ -86,10 +86,6 @@ namespace friendlyPMC.Components
                 {
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.peaceLook, "PeaceLook");
                 }
-                /*if (botOwner_0.SecondWeaponData.HaveActions())
-                {
-                    return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.watchSecondWeapon, "Look2ndWeap");
-                }*/
 
                 if (!HasBoss())
                 {
@@ -101,10 +97,6 @@ namespace friendlyPMC.Components
                     {
                         return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.eatDrink, "EatDrinkDat");
                     }
-                    /*if (botOwner_0.SecondWeaponData.HaveActions())
-                    {
-                        return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.watchSecondWeapon, "Look2ndWeap");
-                    }*/
                     if (botOwner_0.Gesture.HaveRequest())
                     {
                         return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.gesture, "Gesture");
@@ -133,23 +125,23 @@ namespace friendlyPMC.Components
                     _triedToSwitchToMain = true;
                 }
 
+                if ((float)botOwner_0.WeaponManager.Reload.BulletCount / (float)botOwner_0.WeaponManager.Reload.MaxBulletCount < 0.6f && float_2 < Time.time)
+                {
+                    float_2 = Time.time + 30f;
+                    botOwner_0.WeaponManager.Reload.TryReload();
+                }
 
                 if (HasBoss())
                 {
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.followerPatrol, "BossFollow");
                 }
 
-
-                if ((float)botOwner_0.WeaponManager.Reload.BulletCount / (float)botOwner_0.WeaponManager.Reload.MaxBulletCount < 0.6f && float_2 < Time.time)
-                {
-                    float_2 = Time.time + 30f;
-                    botOwner_0.WeaponManager.Reload.TryReload();
-                }
                 if (way != null && way.PatrolType == PatrolType.reserved && botOwner_0.Settings.FileSettings.Patrol.CAN_CHOOSE_RESERV)
                 {
                     botOwner_0.PatrollingData.ComeToPoint();
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.alternativePatrol, "RESER");
                 }
+
                 return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.simplePatrol, "Basic");
             }
             else

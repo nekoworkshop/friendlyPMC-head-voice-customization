@@ -51,9 +51,16 @@ namespace friendlyPMC.Actions
 
         private bool wasHit = false;
 
-        private bool _init = false;
+        private bool init = false;
 
         protected BotLogicDecision Action = (BotLogicDecision)CustomBotDecisions.SniperSearch;
+
+        private float patrolRadius;
+
+        private bool doPeacefulActions = false;
+        private bool doPeaceLook = false;
+        private bool doPeaceHardAim = false;
+        private bool doSecondWpnWatch = false;
 
         public BotOwner botOwner {
             get
@@ -69,6 +76,8 @@ namespace friendlyPMC.Actions
             boss_0 = player;
 
             IsInited = true;
+
+            patrolRadius = friendlyPMC.patrolRadius.Value;
         }
 
         private void Init()
@@ -76,7 +85,7 @@ namespace friendlyPMC.Actions
             (botOwner_0.Brain.Agent as FollowerAIAgent<BotLogicDecision>).OnUpdate += OnAgentUpdate;
             (botOwner_0.Brain.Agent as FollowerAIAgent<BotLogicDecision>).OnDispose += OnAgentDispose;
 
-            _init = true;
+            init = true;
         }
         private void OnAgentUpdate(AICoreActionResultStruct<BotLogicDecision> decision)
         {
@@ -98,6 +107,11 @@ namespace friendlyPMC.Actions
 
                 lastCoverPoint = null;
                 nocover = false;
+
+                doPeacefulActions = false;
+                doPeaceLook = false;
+                doPeaceHardAim = false;
+                doSecondWpnWatch = false;
             }
         }
 
@@ -105,7 +119,7 @@ namespace friendlyPMC.Actions
         {
             (botOwner_0.Brain.Agent as FollowerAIAgent<BotLogicDecision>).OnUpdate -= OnAgentUpdate;
             (botOwner_0.Brain.Agent as FollowerAIAgent<BotLogicDecision>).OnDispose -= OnAgentDispose;
-            _init = false;
+            init = false;
         }
 
         public void Update()
@@ -119,7 +133,7 @@ namespace friendlyPMC.Actions
             }
 
 
-            if (!_init) Init();
+            if (!init) Init();
 
             botOwner_0.DoorOpener.Update();
 
@@ -314,7 +328,7 @@ namespace friendlyPMC.Actions
             float_7 = Time.time + 1.5f;
 
             float campRadius = 30f;
-            float perimeterRadius = 70f;
+            float perimeterRadius = patrolRadius;
 
             Vector3 bossPosition = new Vector3(
                 Mathf.Floor(playerPosition.x / campRadius) * campRadius,
@@ -339,6 +353,23 @@ namespace friendlyPMC.Actions
             // - wait in checkpoint if bot is there
             if (float_6 > Time.time)
             {
+                if (doPeacefulActions)
+                {
+                    botOwner_0.PeacefulActions.UpdateAction();
+                }
+                else if (doPeaceLook)
+                {
+                    botOwner_0.PeaceLook.ManualUpdate();
+                }
+                else if (doPeaceHardAim)
+                {
+                    botOwner_0.PeaceHardAim.ManualUpdate();
+                }
+                else if (doSecondWpnWatch)
+                {
+                    botOwner_0.SecondWeaponData.ManualUpdate();
+                }
+
                 bool_6 = false;
                 return;
             }
@@ -351,6 +382,7 @@ namespace friendlyPMC.Actions
                     if (!wasHit) botOwner_0.LookData.SetLookPointByHearing(null);
                     float_6 = Time.time + GClass761.Random(6f, 10f);
                 }
+
                 return;
             }
 
@@ -386,8 +418,34 @@ namespace friendlyPMC.Actions
                     
                     botOwner_0.Mover.Sprint(false, false);
                     botOwner_0.Mover.SetTargetMoveSpeed(0.5f);
-                    if (!wasHit) botOwner_0.Steering.LookToPathDestPoint();
+                    if (!wasHit) botOwner_0.Steering.LookToPoint(navMeshHit.position + Vector3.up * 1.5f);
+
+                    doPeacefulActions = false;
+                    doPeaceLook = false;
+                    doPeaceHardAim = false;
+                    doSecondWpnWatch = false;
+
+
+                    bool hasActions = botOwner_0.PeacefulActions.HaveActions();
+                    bool hasLook = botOwner_0.PeaceLook.HaveActions();
+                    bool hasHardAim = botOwner_0.PeaceHardAim.HaveActions();
+                    bool hasSecondWpnWatch = botOwner_0.SecondWeaponData.HaveActions();
+
+                    // decide which peaceful action to do by randomly selecting one from the available
+                    if (hasActions && UnityEngine.Random.value > 0.5f)
+                        doPeacefulActions = true;    
+
+                    if(!doPeacefulActions && hasLook && UnityEngine.Random.value > 0.5f)
+                        doPeaceLook = true;
+                
+                    if(!doPeacefulActions && !doPeaceLook && hasHardAim && UnityEngine.Random.value > 0.5f)
+                        doPeaceHardAim = true;
+
+                    if (!doPeacefulActions && !doPeaceLook && !doPeaceHardAim && hasSecondWpnWatch && UnityEngine.Random.value > 0.5f)
+                        doSecondWpnWatch = true;
+
                     bool_6 = true;
+
                     return;
                 }
             }

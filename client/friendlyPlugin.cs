@@ -118,6 +118,8 @@ namespace friendlyPMC
 
         public Dictionary<string, string> botStatus { get; set; }
 
+        public Dictionary<string, string> patrolRadius { get; set; }
+
         // used only by BE
         public string[] returnItems { get; set; }
         public string[] returnItemsDeath { get; set; }
@@ -168,6 +170,8 @@ namespace friendlyPMC
         public static ConfigEntry<bool> bigPipeSpawn;
         public static ConfigEntry<bool> birdEyeSpawn;
         public static ConfigEntry<bool> justKnightSpawn;
+
+        public static ConfigEntry<int> patrolRadius;
 
 
         public static ConfigEntry<KeyboardShortcut> pingKey;
@@ -471,26 +475,28 @@ namespace friendlyPMC
 
             scanDistance = Config.Bind(optionsLang.miscSettings, "1 " + optionsLang.scanDistance["Name"], 140, new ConfigDescription(optionsLang.scanDistance["Description"], new AcceptableValueRange<int>(50, 300)));
 
-            enemyRemember = Config.Bind(optionsLang.miscSettings, "2 " + optionsLang.enemyRemember["Name"], 20, new ConfigDescription(optionsLang.enemyRemember["Description"], new AcceptableValueRange<int>(5, 60)));
+            patrolRadius = Config.Bind(optionsLang.miscSettings, "2 " + optionsLang.patrolRadius["Name"], 50, new ConfigDescription(optionsLang.patrolRadius["Description"], new AcceptableValueRange<int>(30, 100)));
 
-            heatlhMultiplier = Config.Bind(optionsLang.miscSettings, "3 " + optionsLang.healthMultiplier["Name"], 1f, new ConfigDescription(optionsLang.healthMultiplier["Description"], new AcceptableValueRange<float>(1, 5)));
+            enemyRemember = Config.Bind(optionsLang.miscSettings, "3 " + optionsLang.enemyRemember["Name"], 20, new ConfigDescription(optionsLang.enemyRemember["Description"], new AcceptableValueRange<int>(5, 60)));
 
-            statusSound = Config.Bind(optionsLang.miscSettings, "4 " + optionsLang.statusSound["Name"], 100, new ConfigDescription(optionsLang.statusSound["Description"], new AcceptableValueRange<int>(0, 100)));
+            heatlhMultiplier = Config.Bind(optionsLang.miscSettings, "4 " + optionsLang.healthMultiplier["Name"], 1f, new ConfigDescription(optionsLang.healthMultiplier["Description"], new AcceptableValueRange<float>(1, 5)));
+
+            statusSound = Config.Bind(optionsLang.miscSettings, "5 " + optionsLang.statusSound["Name"], 100, new ConfigDescription(optionsLang.statusSound["Description"], new AcceptableValueRange<int>(0, 100)));
             
-            enemyMarker = Config.Bind(optionsLang.miscSettings, "5 " + optionsLang.enemyMarker["Name"], true, new ConfigDescription(optionsLang.enemyMarker["Description"]));
+            enemyMarker = Config.Bind(optionsLang.miscSettings, "6 " + optionsLang.enemyMarker["Name"], true, new ConfigDescription(optionsLang.enemyMarker["Description"]));
 
-            npcSendMessage = Config.Bind(optionsLang.miscSettings, "6 " + optionsLang.npcSendMessage["Name"], true, new ConfigDescription(optionsLang.npcSendMessage["Description"]));
+            npcSendMessage = Config.Bind(optionsLang.miscSettings, "7 " + optionsLang.npcSendMessage["Name"], true, new ConfigDescription(optionsLang.npcSendMessage["Description"]));
 
-            sameSideHostile = Config.Bind(optionsLang.miscSettings, "7 " + optionsLang.sameSideHostile["Name"], false, new ConfigDescription(optionsLang.sameSideHostile["Description"]));
+            sameSideHostile = Config.Bind(optionsLang.miscSettings, "8 " + optionsLang.sameSideHostile["Name"], false, new ConfigDescription(optionsLang.sameSideHostile["Description"]));
 
-            pmcArmbands = Config.Bind(optionsLang.miscSettings, "8 " + optionsLang.pmcArmbands["Name"], true, new ConfigDescription(optionsLang.pmcArmbands["Description"]));
+            pmcArmbands = Config.Bind(optionsLang.miscSettings, "9 " + optionsLang.pmcArmbands["Name"], true, new ConfigDescription(optionsLang.pmcArmbands["Description"]));
 
-            englishBear = Config.Bind(optionsLang.miscSettings, "8 " + optionsLang.englishBear["Name"], true, new ConfigDescription(optionsLang.englishBear["Description"]));
+            englishBear = Config.Bind(optionsLang.miscSettings, "10 " + optionsLang.englishBear["Name"], true, new ConfigDescription(optionsLang.englishBear["Description"]));
 
 
-            pingKey = Config.Bind(optionsLang.miscSettings, "9.1 " + optionsLang.pingSquad["Name"], new KeyboardShortcut(KeyCode.None), new ConfigDescription(optionsLang.pingSquad["Description"]));
+            pingKey = Config.Bind(optionsLang.miscSettings, "11.1 " + optionsLang.pingSquad["Name"], new KeyboardShortcut(KeyCode.None), new ConfigDescription(optionsLang.pingSquad["Description"]));
 
-            contactKey = Config.Bind(optionsLang.miscSettings, "9.2 " + optionsLang.enemyContact["Name"], new KeyboardShortcut(KeyCode.None), new ConfigDescription(optionsLang.enemyContact["Description"]));
+            contactKey = Config.Bind(optionsLang.miscSettings, "11.2 " + optionsLang.enemyContact["Name"], new KeyboardShortcut(KeyCode.None), new ConfigDescription(optionsLang.enemyContact["Description"]));
             
             ConfigSquadMembersSet();
 
