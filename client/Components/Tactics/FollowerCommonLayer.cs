@@ -639,6 +639,8 @@ namespace friendlyPMC.Components.Tactics
         {
             navpoint = null;
 
+            if (botOwner_0.Medecine == null) return null;
+
             Vector3 botPosition = botOwner_0.GetPlayer.Transform.position;
             // damaged and has healers
             if (botOwner_0.Medecine.Stimulators.Using)
@@ -649,8 +651,8 @@ namespace friendlyPMC.Components.Tactics
             // Check if the bot needs to heal
             if  (heal_block_time < Time.time && (botOwner_0.Medecine.FirstAid.Have2Do || botOwner_0.Medecine.SurgicalKit.HaveWork))
             {
-                float lastSeen = Time.time - botOwner_0.Memory.GoalEnemy.PersonalLastSeenTime;
-                if (!botOwner_0.Memory.GoalEnemy.IsVisible && lastSeen > 3f)
+                float lastSeen = botOwner_0.Memory.HaveEnemy ? Time.time - botOwner_0.Memory.GoalEnemy.PersonalLastSeenTime : 0f;
+                if (!botOwner_0.Memory.HaveEnemy || (!botOwner_0.Memory.GoalEnemy.IsVisible && lastSeen > 3f))
                 {
                     // - close to the enemy, but safe enough to apply meds
                     if (botOwner_0.Memory.IsInCover && Enemy.DistanceProxy(botOwner_0, botPosition) > Enemy.ProxyDistance.VeryClose)

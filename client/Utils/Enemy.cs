@@ -55,6 +55,7 @@ namespace friendlyPMC.Utils
 
         public static ProxyDistance DistanceProxy(BotOwner bot, Vector3 position)
         {
+            if(!bot.Memory.HaveEnemy) return ProxyDistance.Far;
             Vector3 enemyPosition = bot.Memory.GoalEnemy.CurrPosition;
 
             float distance = Vector3.Distance(position, enemyPosition);
