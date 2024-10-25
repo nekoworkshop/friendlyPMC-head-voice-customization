@@ -174,7 +174,10 @@ namespace friendlyPMC.Patches
             // clear BTR as anemy to the group
             foreach (var item in Enemies)
             {
-                if(item.Value.Player?.Profile?.Info?.Settings?.Role == WildSpawnType.shooterBTR)
+                if(
+                    item.Value.Player?.Profile?.Info?.Settings?.Role == WildSpawnType.shooterBTR ||
+                    item.Value.Player?.Profile?.Info?.Settings?.Role == WildSpawnType.peacefullZryachiyEvent
+                )
                 {
                     RemoveEnemy(item.Value.Player,item.Value.Cause);
                     break;
@@ -182,7 +185,8 @@ namespace friendlyPMC.Patches
             }
 
             initialBot.Settings.FileSettings.Mind.FRIENDLY_BOT_TYPES = new WildSpawnType[] {
-                WildSpawnType.shooterBTR
+                WildSpawnType.shooterBTR,
+                WildSpawnType.peacefullZryachiyEvent
             };
         }
     }

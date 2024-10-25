@@ -116,97 +116,23 @@ namespace friendlyPMC.Components
             base.ManualUpdate();
             try
             {
+                if (CheckIfBusy()) return;
+
                 var meds = _owner.Medecine;
                 if (meds != null)
                 {
-                    if (meds.Stimulators?.Using == true)
-                    {
-                        if (_busyTimer == 0f)
-                        {
-                            _busyTimer = Time.time + TIME_TO_RESET_HEAL_STIMS;
-                            return;
-                        }
-                        else if (_busyTimer < Time.time)
-                        {
-                            return;
-                        }
-                        else
-                        {
-                            HandsReset();
-                        }
-                    }
-
-                    if (meds.FirstAid?.Using == true)
-                    {
-                        if (_busyTimer == 0f)
-                        {
-                            _busyTimer = Time.time + TIME_TO_RESET_HEAL_FIRSTAID;
-                            return;
-                        }
-                        else if (_busyTimer < Time.time)
-                        {
-                            return;
-                        }
-                        else
-                        {
-                            HandsReset();
-                        }
-                    }
-
-                    if (meds.SurgicalKit?.Using == true)
-                    {
-                        if (_busyTimer == 0f)
-                        {
-                            _busyTimer = Time.time + TIME_TO_RESET_HEAL_SURGERY;
-                            return;
-                        }
-                        else if (_busyTimer < Time.time)
-                        {
-                            return;
-                        }
-                        else
-                        {
-                            HandsReset();
-                        }
-                    }
+                    if (CheckActionBusy(meds.Stimulators?.Using == true, TIME_TO_RESET_HEAL_STIMS)) return;
+                    if (CheckActionBusy(meds.FirstAid?.Using == true, TIME_TO_RESET_HEAL_FIRSTAID)) return;
+                    if (CheckActionBusy(meds.SurgicalKit?.Using == true, TIME_TO_RESET_HEAL_SURGERY)) return;
                 }
 
-                if (_owner.WeaponManager.Grenades.ThrowindNow || GRENADE_THROWING)
-                {
-                    if (_busyTimer == 0f)
-                    {
-                        _busyTimer = Time.time + TIME_TO_RESET_WEAPONS_GRENADE;
-                        return;
-                    }
-                    else if (_busyTimer < Time.time)
-                    {
-                        return;
-                    }
-                    else
-                    {
-                        HandsReset();
-                    }
-                }
+                if (CheckActionBusy(_owner.WeaponManager.Grenades.ThrowindNow || GRENADE_THROWING, TIME_TO_RESET_WEAPONS_GRENADE))
+                    return;
 
-                if (_owner.WeaponManager.Selector.IsChanging)
-                {
-                    if (_busyTimer == 0f)
-                    {
-                        _busyTimer = Time.time + TIME_TO_RESET_WEAPONS_SWAP;
-                        return;
-                    }
-                    else if (_busyTimer < Time.time)
-                    {
-                        return;
-                    }
-                    else
-                    {
-                        HandsReset();
-                    }
-                }
+                if (CheckActionBusy(_owner.WeaponManager.Selector.IsChanging, TIME_TO_RESET_WEAPONS_SWAP))
+                    return;
 
-                _busyTimer = 0f;
-                GRENADE_THROWING = false;
+                ResetBusyState();
             }
             catch (Exception ex)
             {
@@ -214,6 +140,39 @@ namespace friendlyPMC.Components
             }
         }
 
+        private bool CheckActionBusy(bool isActionActive, float resetTime)
+        {
+            if (isActionActive)
+            {
+                if (_busyTimer == 0f)
+                {
+                    _busyTimer = Time.time + resetTime;
+                    return true; // Hands are busy
+                }
+                else if (_busyTimer > Time.time)
+                {
+                    return true; // Hands are still busy, timer not finished
+                }
+                else
+                {
+                    HandsReset();
+                }
+            }
+            return false; // Hands not busy
+        }
+
+        private bool CheckIfBusy()
+        {
+            // Optionally, return if there's an overarching busy state, such as multiple actions queued.
+            return _busyTimer > 0f && _busyTimer > Time.time;
+        }
+
+        private void ResetBusyState()
+        {
+            _busyTimer = 0f;
+            GRENADE_THROWING = false;
+        }
+        /** Add the brain layers for the follower bot. Order matter in terms of the initial priority */
         public virtual void AddLayers()
         {
             // order matters for which layer get the initial priority
@@ -258,6 +217,37 @@ namespace friendlyPMC.Components
 
         protected virtual void OnDead(EDamageType damageType)
         {
+            // on follower dead, the closest follower to him will react
+            try
+            {
+                BotOwner flw = null;
+                float dist = Mathf.Infinity;
+                if (_boss != null && _boss.realPlayer != null) foreach (var item in BossPlayers.GetFollowersByBoss(_boss.realPlayer.ProfileId))
+                    {
+                        if (!item.IsBot(_owner))
+                        {
+                            BotOwner bt = item.GetBot();
+                            if (!bt.IsDead && bt.BotState == EBotState.Active)
+                            {
+                                float d = (bt.Position - _owner.Position).sqrMagnitude;
+                                if (d < dist)
+                                {
+                                    dist = d;
+                                    flw = bt;
+                                }
+                            }
+                        }
+                    }
+
+                if (flw != null && dist < 30f * 30f)
+                {
+                    flw.BotTalk.TrySay(EPhraseTrigger.OnFriendlyDown, false);
+                }
+            } catch (Exception ex)
+            {
+                Modules.Logger.LogError(ex);
+            }
+
             OnKilled();
 
         }
@@ -453,8 +443,9 @@ namespace friendlyPMC.Components
             if (
                 player != null && 
                 (
-                    (player.ProfileId == _boss.Player().ProfileId) || 
-                    player.Profile.Info?.Settings?.Role == WildSpawnType.shooterBTR)
+                    (
+                        player.ProfileId == _boss.Player().ProfileId)
+                    )
                 )
             {
                 _owner.Memory.DeleteInfoAboutEnemy(player);

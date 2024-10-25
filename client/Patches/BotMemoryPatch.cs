@@ -59,7 +59,7 @@ namespace friendlyPMC.Patches
             {
                 return false;
             }
-            if (isfollower && enemy.Profile.Info.Settings.Role == WildSpawnType.shooterBTR) return false;
+            if (isfollower && (enemy.Profile.Info.Settings.Role == WildSpawnType.shooterBTR || enemy.Profile.Info.Settings.Role == WildSpawnType.peacefullZryachiyEvent)) return false;
             // prevent followers from adding teammates as an enemy
             if (isfollower && botOwner_0.BotFollower.HaveBoss)
             {
@@ -92,7 +92,7 @@ namespace friendlyPMC.Patches
             {
                 var botOwner_0 = AccessTools.Field(typeof(BotMemoryClass), "botOwner_0").GetValue(__instance) as BotOwner;
 
-                if (botOwner_0.IsRole(WildSpawnType.shooterBTR)) return;
+                if (botOwner_0.IsRole(WildSpawnType.shooterBTR) || botOwner_0.IsRole(WildSpawnType.peacefullZryachiyEvent)) return;
 
                 if (botOwner_0.EnemiesController.EnemyInfos.ContainsKey(enemy))
                 {

@@ -15,6 +15,7 @@ using BepInEx.Bootstrap;
 
 using GridClassEx = GClass2516;
 using GridCacheClass = GClass1401;
+using static EFT.SpeedTree.TreeWind;
 
 namespace friendlyPMC.Components
 {
@@ -193,7 +194,10 @@ namespace friendlyPMC.Components
                     // remove BTR as an enemy for the player group
                     foreach (var item in _player.bossGroup.Enemies)
                     {
-                        if (item.Value.Player.Profile.Info.Settings.Role == WildSpawnType.shooterBTR)
+                        if (
+                            item.Value.Player.Profile.Info.Settings.Role == WildSpawnType.shooterBTR ||
+                            item.Value.Player.Profile.Info.Settings.Role == WildSpawnType.peacefullZryachiyEvent
+                        )
                         {
                             _player.bossGroup.RemoveEnemy(item.Value.Player);
                             break;
@@ -211,7 +215,10 @@ namespace friendlyPMC.Components
                 // do enemy clearing
                 foreach (var item in _bot.EnemiesController.EnemyInfos)
                 {
-                    if (item.Value.Person?.Profile?.Info?.Settings?.Role == WildSpawnType.shooterBTR)
+                    if (
+                        item.Value.Person?.Profile?.Info?.Settings?.Role == WildSpawnType.shooterBTR ||
+                        item.Value.Person?.Profile?.Info?.Settings?.Role == WildSpawnType.peacefullZryachiyEvent
+                    )
                     {
                         _bot.Memory.DeleteInfoAboutEnemy(item.Value.Person);
                         break;
@@ -341,7 +348,8 @@ namespace friendlyPMC.Components
             settings.FileSettings.Mind.WARN_BOT_TYPES = new WildSpawnType[] { };
             settings.FileSettings.Mind.REVENGE_BOT_TYPES = new WildSpawnType[] { };
             settings.FileSettings.Mind.FRIENDLY_BOT_TYPES = new WildSpawnType[] {
-                WildSpawnType.shooterBTR
+                WildSpawnType.shooterBTR,
+                WildSpawnType.peacefullZryachiyEvent
             };
 
             settings.FileSettings.Patrol.PICKUP_ITEMS_TO_BACKPACK_OR_CONTAINER = true;
@@ -363,6 +371,8 @@ namespace friendlyPMC.Components
             settings.FileSettings.Aiming.COEF_IF_MOVE = 2f;
             settings.FileSettings.Aiming.MAX_AIM_TIME = 1.5f;
             settings.FileSettings.Aiming.SHPERE_FRIENDY_FIRE_SIZE = 0.5f;
+            settings.FileSettings.Aiming.AIMING_TYPE = 6; // the head is a priority
+            settings.FileSettings.Aiming.ANY_PART_SHOOT_TIME = 5f; // what is this, what does it do?
 
 
             settings.FileSettings.Look.CAN_USE_LIGHT = true;
