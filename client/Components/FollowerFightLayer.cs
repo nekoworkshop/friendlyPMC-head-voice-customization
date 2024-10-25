@@ -254,40 +254,21 @@ namespace friendlyPMC.Components
             return engage;
         }
 
-        public AICoreActionResultStruct<BotLogicDecision> DecideTactic()
+
+        public AICoreActionResultStruct<BotLogicDecision> DefaultTactic()
         {
             Vector3 interestPosition = HasBoss() ? GetBoss().Position : botOwner_0.GetPlayer.Transform.position;
 
-            if(commonLayer.coverType == "far")
+            if (commonLayer.coverType == "far")
             {
                 interestPosition = botOwner_0.GetPlayer.Transform.position;
-            }
-
-            if(guardTactic)
-            {
-
-                if (ordersAreAttack) return EngageEnemy(true);
-
-                if (commonLayer.coverType == "far")
-                {
-                    if (Utils.Enemy.Distance(botOwner_0) <= Utils.Enemy.EnemyDistance.Mid)
-                    {
-                        return EngageEnemy();
-                    }
-                    else
-                    {
-                        return pusherLayer.EnemySearch();
-                    }
-                }
-
-                return GuardTactic();
             }
 
             if (allyTactic)
             {
                 if (botOwner_0.Memory.AttackImmediately && commonLayer.IsEnemyLowThreat())
                 {
-                    if(Enemy.Distance(botOwner_0) <= Enemy.EnemyDistance.Mid)
+                    if (Enemy.Distance(botOwner_0) <= Enemy.EnemyDistance.Mid)
                         return EngageEnemy();
                     else
                         return pusherLayer.EnemySearch();
@@ -318,11 +299,46 @@ namespace friendlyPMC.Components
             }
             else
             {
-                if(Enemy.Distance(botOwner_0) >= Enemy.EnemyDistance.Mid || !botOwner_0.Memory.AttackImmediately)
+                if (Enemy.Distance(botOwner_0) >= Enemy.EnemyDistance.Mid || !botOwner_0.Memory.AttackImmediately)
                     return new AICoreActionResultStruct<BotLogicDecision>((BotLogicDecision)CustomBotDecisions.GuardToCover, "coverBoss");
-                else 
+                else
                     return pusherLayer.EnemySearch();
             }
+        }
+
+        public AICoreActionResultStruct<BotLogicDecision> DecideTactic()
+        {
+            if (guardTactic)
+            {
+                if (ordersAreAttack) return EngageEnemy(true);
+
+                if (commonLayer.coverType == "far")
+                {
+                    if (Enemy.Distance(botOwner_0) <= Enemy.EnemyDistance.Mid)
+                    {
+                        return EngageEnemy();
+                    }
+                    else
+                    {
+                        return pusherLayer.EnemySearch();
+                    }
+                }
+
+                return GuardTactic();
+            }
+
+            AICoreActionResultStruct < BotLogicDecision > defaultDecision = DefaultTactic();
+
+            if (!guardTactic && !sniperTactic)
+            {
+                // borrow the auto suppression from guard layer
+                if (!botOwner_0.Memory.GoalEnemy.IsSuppressed() && botOwner_0.Memory.GoalEnemy.ShallISuppress())
+                {
+                    return guardLayer.method_29(false, defaultDecision.Action);
+                }
+            }
+
+            return defaultDecision;
         }
 
         public override AICoreActionResultStruct<BotLogicDecision> GetDecision()
