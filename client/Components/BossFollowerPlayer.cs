@@ -73,7 +73,10 @@ namespace friendlyPMC.Components
             {
                 bot.Settings.FileSettings.Mind.ENEMY_BOT_TYPES = new WildSpawnType[] { };
                 bot.Settings.FileSettings.Mind.WARN_BOT_TYPES = new WildSpawnType[] { };
-                bot.Settings.FileSettings.Mind.FRIENDLY_BOT_TYPES = new WildSpawnType[] { WildSpawnType.shooterBTR };
+                bot.Settings.FileSettings.Mind.FRIENDLY_BOT_TYPES = new WildSpawnType[] { 
+                    WildSpawnType.shooterBTR,
+                    WildSpawnType.peacefullZryachiyEvent
+                };
 
                 foreach (WildSpawnType botType in Enum.GetValues(typeof(WildSpawnType)))
                 {
@@ -100,7 +103,7 @@ namespace friendlyPMC.Components
                         }
                         continue;
                     } 
-                    else if(botType != WildSpawnType.shooterBTR)
+                    else if(botType != WildSpawnType.shooterBTR && botType != WildSpawnType.peacefullZryachiyEvent)
                     {
                         bot.Settings.FileSettings.Mind.ENEMY_BOT_TYPES = bot.Settings.FileSettings.Mind.ENEMY_BOT_TYPES.AddItem(botType).ToArray();
                     }
@@ -116,7 +119,7 @@ namespace friendlyPMC.Components
                             bot.Settings.FileSettings.Mind.FRIENDLY_BOT_TYPES = bot.Settings.FileSettings.Mind.FRIENDLY_BOT_TYPES.AddItem(botType).ToArray();
                             bot.Settings.FileSettings.Mind.WARN_BOT_TYPES = bot.Settings.FileSettings.Mind.WARN_BOT_TYPES.AddItem(botType).ToArray();
                         }
-                        else if (botType != WildSpawnType.shooterBTR)
+                        else if (botType != WildSpawnType.shooterBTR && botType != WildSpawnType.peacefullZryachiyEvent)
                         {
                             bot.Settings.FileSettings.Mind.ENEMY_BOT_TYPES = bot.Settings.FileSettings.Mind.ENEMY_BOT_TYPES.AddItem(botType).ToArray();
                         }
