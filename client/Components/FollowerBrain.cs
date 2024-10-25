@@ -430,7 +430,6 @@ namespace friendlyPMC.Components
             // remove this bot from being a follower
             Dismissed();
             BossPlayers.RemoveFollower(_owner, _boss);
-            Modules.Logger.LogInfo("Follower " + _owner.Profile.Nickname + " died");
         }
          
         protected virtual void OnThrow()
