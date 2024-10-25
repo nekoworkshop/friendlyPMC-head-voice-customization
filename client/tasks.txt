@@ -2,18 +2,19 @@
 - x - remove from player's inventory any equipment he looted from his dead teammates
 - x - bot to signal teammate down
 
-- #inprogress - "On Your Own" to be enhanced where the followers will form a partol perimeter around the player with configurable distance
+- x - "On Your Own" to be enhanced where the followers will form a partol perimeter around the player with configurable distance
 
-- #inprogress - prepare the stage for working with different languages (to add German and Romanian)
+- x - prepare the stage for working with different languages
+
+- assist tactic should also do supression on it's own and also use grenades
+
+- see if we can make bot swap weapons when asked to loot (DeadBodyWork)
+- - this should also allow bot to put that weapon as seconday (in case of support without a grenade launcher)
 
 - fix glitchy behavior of boss followers
 - goons send messages at the end of the raid
 
 - goons send join offer for specific maps (Woods, Shoreline, Customs, Lighthouse)
-
-- add detection for when enemy is about to engage the player or any teamember (patch SET EnemyInfo.IsVisible and check if the enemy is a teammate and the distance is close enough for engagement)
-
-- see if we can make bot swap weapons when asked to loot (DeadBodyWork)
 
 - see if bot's kills can count as player's kill
 
