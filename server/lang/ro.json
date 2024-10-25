@@ -75,6 +75,10 @@
         "Name": "Distanța maximă de scanare",
         "Description": "Distanța maximă pentru a captura orice dușman vizibil pe care jucătorul îl semnalizează când emite fraza 'Contact'."
     },
+    "patrolRadius" : {
+        "Name": "Raza de patrulare",
+        "Description": "Raza în care insoțitorii vor patrula în jurul jucătorului."
+    },
     "enemyRemember": {
         "Name": "Timpul de uitare a dușmanului (în secunde)",
         "Description": "Timpul maxim în care un urmăritor își va aminti un dușman. Aceasta se aplică doar la începutul unui raid."

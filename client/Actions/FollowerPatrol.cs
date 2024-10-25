@@ -382,6 +382,7 @@ namespace friendlyPMC.Actions
                     if (!wasHit) botOwner_0.LookData.SetLookPointByHearing(null);
                     float_6 = Time.time + GClass761.Random(6f, 10f);
                 }
+                else if (!wasHit) botOwner.Steering.LookToMovingDirection();
 
                 return;
             }

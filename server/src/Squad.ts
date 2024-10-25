@@ -145,6 +145,10 @@ class friendlyPMC {
 			Name: "Maximum scan distance",
 			Description: "Maximum distance to pick up any visible enemy that the player is signaling when issuing 'Contact' phrase",
 		},
+		patrolRadius: {
+			Name: "Patrol Radius",
+			Description: "Maximum distance from the player the followers will patrol around",
+		},
 		enemyRemember: {
 			Name: "Time to forget about the enemy (in sec.)",
 			Description: "Maximum time a follower will remember an enemy. This is applied only at the beginning of a raid",

@@ -38,6 +38,10 @@
         "Name": "Maximale Scandistanz",
         "Description": "Maximale Distanz, um einen sichtbaren Feind zu erfassen, den der Spieler signalisiert, wenn er den Befehl 'Kontakt' gibt."
     },
+    "patrolRadius" : {
+        "Name": "Patrouillenradius",
+        "Description": "Radius, in dem die Folgespieler um den Spieler patrouillieren."
+    },
     "enemyRemember": {
         "Name": "Zeit, um den Feind zu vergessen (in Sekunden)",
         "Description": "Maximale Zeit, die ein Folgespieler einen Feind erinnert. Dies gilt nur zu Beginn eines Raids."
