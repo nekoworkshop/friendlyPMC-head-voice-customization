@@ -2,11 +2,13 @@
 - x - remove from player's inventory any equipment he looted from his dead teammates
 - x - bot to signal teammate down
 
-- x - "On Your Own" to be enhanced where the followers will form a partol perimeter around the player with configurable distance
+- x - "On Your Own" to be enhanced where the followers will form a partol perimeter around the player with configurable distance ?
 
 - x - prepare the stage for working with different languages
 
-- assist tactic should also do supression on it's own and also use grenades
+- x - assist tactic should also do supression on it's own and also use grenades
+
+- plan a way for bot to determine if the player is in combat or if the enemy is shooting his weapon nearby
 
 - see if we can make bot swap weapons when asked to loot (DeadBodyWork)
 - - this should also allow bot to put that weapon as seconday (in case of support without a grenade launcher)
@@ -33,7 +35,7 @@
 ==================================================================================
 RELEASE NOTES (3.9) 
 - you can no longer loot spawned followers equipment This does not apply to consumables like magazines, ammo, meds, etc.
-- "On Your Own" will now make followers patrol around the player with a configurable distance when out of combat. In order for this to work they must not be told to hold position. "Follow Me" can get them out of the patrol mode while still retaining the other settings that "On Your Own" has.
+- "On Your Own" will now make followers patrol around the player with a configurable distance when out of combat. In order for this to work they must not be told to hold position and be out of combat. "Follow Me" can get them out of the patrol mode while still retaining the other settings that "On Your Own" has.
 - followers will react to teammate going down
 - the mod can now work with different languages. It will based on the language you set for your game. There only 3 languages avalabile for now : English, Russian, German, Romanian. You can look into user/mods/friendlyPMC/lang and add more language jsons there (ping me with the file and I will add it to the mod)
 

@@ -329,12 +329,25 @@ namespace friendlyPMC.Components
 
             AICoreActionResultStruct < BotLogicDecision > defaultDecision = DefaultTactic();
 
-            if (!guardTactic && !sniperTactic)
+            if (!guardTactic && !sniperTactic && botOwner_0.Memory.HaveEnemy)
             {
                 // borrow the auto suppression from guard layer
                 if (!botOwner_0.Memory.GoalEnemy.IsSuppressed() && botOwner_0.Memory.GoalEnemy.ShallISuppress())
                 {
-                    return guardLayer.method_29(false, defaultDecision.Action);
+
+                    bool useGrenade = GClass761.Random(0f, 2f) > 1f;
+                    ThrowWeapType? grenadeType = new ThrowWeapType?(ThrowWeapType.frag_grenade);
+                    // - check if player is too close when using grenade
+                    if (useGrenade && botOwner_0.WeaponManager.Grenades.HaveGrenadeOfType(grenadeType.Value))
+                    {
+                        Vector3 playerPos = commonLayer.HasBoss() ? commonLayer.GetBoss().Player().Transform.position : botOwner_0.GetPlayer.Position;
+                        if (Vector3.Distance(playerPos, botOwner_0.Memory.GoalEnemy.CurrPosition) < 12f)
+                        {
+                            useGrenade = false;
+                        }
+                    }
+
+                    return guardLayer.method_29(useGrenade, defaultDecision.Action);
                 }
             }
 

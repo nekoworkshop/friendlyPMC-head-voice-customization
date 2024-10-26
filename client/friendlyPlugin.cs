@@ -129,7 +129,7 @@ namespace friendlyPMC
         public string[] allyBossEscaped { get; set; }
     }
 
-    [BepInPlugin("xyz.pit.companion", "friendlyPMC", "3.9.0")]
+    [BepInPlugin("xyz.pit.friendlypmc", "friendlyPMC", "3.9.0")]
     [BepInDependency("xyz.drakia.bigbrain")]
     [BepInDependency("com.Arys.UnityToolkit")]
     public class friendlyPMC : BaseUnityPlugin
@@ -241,7 +241,7 @@ namespace friendlyPMC
             new GestureMenuAvailablePhrasesPatch().Enable();
             new EPhraseTriggerPatch().Enable();
 
-            var harmony = new Harmony("xyz.pit.companion");
+            var harmony = new Harmony("xyz.pit.friendlypmc");
 
             harmony.PatchAll(typeof(LocalGameCtorPatch).Assembly);
             harmony.PatchAll(typeof(BaseLocalGameVmethod4Patch).Assembly); // spawn patch

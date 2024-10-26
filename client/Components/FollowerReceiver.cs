@@ -270,7 +270,6 @@ namespace friendlyPMC.Components
                                 holdit.AddPossibleExecutors(botOwner_0);
                                 holdit.SetGroup(botOwner_0.BotsGroup.RequestsController);
 
-                                botOwner_0.BotTalk.TrySay(EPhraseTrigger.Roger, false);
                                 botOwner_0.Gesture.TryGestus(EGesture.Good, false);
                             }
                         }
@@ -300,6 +299,7 @@ namespace friendlyPMC.Components
 
                         FollowerGoCheck gclass = new FollowerGoCheck(data.Player, goThere ? BotRequestType.goToPoint :  BotRequestType.followMe,hadHold);
 
+                        if(!botOwner_0.BotTalk.IsSilenced) botOwner_0.BotTalk.SetSilence(2f);
 
                         if (
                             botOwner_0.BotRequestController.TryStopCurrent(playerRequester, false) &&
@@ -345,9 +345,9 @@ namespace friendlyPMC.Components
             else if(gesture == (EGesture)CustomGestures.OverThere)
             {
                 (botOwner_0.Brain.BaseBrain as FollowerBrain).BossOrdersChanged();
-                if(!botOwner_0.Memory.HaveEnemy)
+                if(!botOwner_0.Memory.HaveEnemy && !botOwner_0.BotTalk.IsSilenced)
                 {
-                    botOwner_0.BotTalk.SetSilence(2f);
+                    botOwner_0.BotTalk.SetSilence(5f);
                 }
                 FollowerEnemyCheck.CheckBossReport(botOwner_0);
             }
@@ -1022,12 +1022,18 @@ namespace friendlyPMC.Components
                     (botOwner_0.Brain.BaseBrain as FollowerBrain).bossNeedsProtection = false;
                     (botOwner_0.Brain.BaseBrain as FollowerBrain).SetBossTactic(null);
 
-                    FollowerPatrolInstances.SetFarPatrol(botOwner_0);
-                    FollowerPatrolInstances.GetPatrol(botOwner_0).PatrolAround(true);
+                    bool hadHold = botOwner_0.BotRequestController.CurRequest?.BotRequestType == BotRequestType.wait;
+
+                    if (!botOwner_0.Memory.HaveEnemy)
+                    {
+                        FollowerPatrolInstances.SetFarPatrol(botOwner_0);
+                        if(!hadHold)
+                            FollowerPatrolInstances.GetPatrol(botOwner_0).PatrolAround(true);
+                    }
 
                     Player alivePlayerByProfileID = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(requester.ProfileId);
 
-                    if (botOwner_0.BotRequestController.CurRequest != null && botOwner_0.BotRequestController.CurRequest.BotRequestType != BotRequestType.wait)
+                    if (botOwner_0.BotRequestController.CurRequest != null && !hadHold)
                         botOwner_0.BotRequestController.TryStopCurrent(alivePlayerByProfileID, false);
 
                     if (isClose) botOwner_0.BotTalk.TrySay(EPhraseTrigger.Roger, true);
