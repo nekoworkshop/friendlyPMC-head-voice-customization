@@ -1,151 +1,120 @@
 {
+	"returnItems": ["Iată lucrurile tale. Uhm, există ceva acolo pentru mine?", "Am lucrurile tale chiar aici.", "Iată tot ce mi-ai dat. Așa că... împărțim asta, nu?", "Uite, acestea sunt toate lucrurile pe care mi le-ai dat.\nExistă ceva acolo pentru mine?", "Iată, prietene, toate lucrurile pe care mi le-ai dat.", "Am lucrurile tale chiar aici. Există ceva ce poți să-mi dai?"],
+	"returnItemsDeath": ["Nu-ți face griji, șefu', am reușit să ieșim.\n Am ce mi-ai dat aici. Totuși, nu am putut să iau echipamentul tău, jackalii erau deja pe el.", "Am reușit să ieșim de acolo. Iată tot ce mi-ai dat. Sper că lucrurile tale sunt asigurate, că nu am putut să le iau."],
+	"teamEscaped": ["Super!\nAm reușit să ieșim.", "Și asta a fost! Am reușit, șefu'.", "Când ultimul om a ajuns la extracție, a fost ca un ceas— toată lumea este în siguranță.", "Ne-am coordonat perfect și acum toată echipa este afară și gata să se echipeze din nou."],
+	"teamSomeEscaped": ["Ei bine, e păcat de {0}, dar măcar restul dintre noi am reușit.", "Câțiva dintre noi au fost loviți, dar sunt bucuros că unii au reușit să iasă în viață."],
+	"friendlyEscaped": ["Mă bucur că am reușit.\nMulțumesc că m-ai lăsat să te însoțesc.", "Uf, mă bucur că te-am găsit.\nNu știam dacă voi reuși. Mulțumesc!", "Nu este cel mai bun rezultat, pierzând câțiva colegi, dar mă bucur că măcar am ieșit.", "Mulțumesc pentru ajutor. Îmi car echipamentul colegilor căzuți înapoi; măcar atât pot să fac."],
+	"allyBossEscaped": ["A fost o rundă bună!\nTe-ai descurcat bine, rookie, te-ai descurcat bine.", "Nu e rău, deloc. Să o facem din nou cândva, rookie.", "Ești tare!\n... neah, ai dreptate, eu sunt tare. Dar ai făcut bine și tu, rookie.", "A fost vreo îndoială? Nu aveau nicio șansă.\nBăieți, băuturile sunt din partea mea, rookie-ul plătește!", "Hai, hai, încearcă să ții pasul, bine? Avem rookie-ul aici admirând peisajul."],
 
-    "returnItems": [
-        "Iată lucrurile tale. Uhm, există ceva acolo pentru mine?",
-        "Am lucrurile tale chiar aici.",
-        "Iată tot ce mi-ai dat. Așa că... împărțim asta, nu?",
-        "Uite, acestea sunt toate lucrurile pe care mi le-ai dat.\nExistă ceva acolo pentru mine?",
-        "Iată, prietene, toate lucrurile pe care mi le-ai dat.",
-        "Am lucrurile tale chiar aici. Există ceva ce poți să-mi dai?"
-    ],
-    "returnItemsDeath": [
-        "Nu-ți face griji, șefu', am reușit să ieșim.\n Am ce mi-ai dat aici. Totuși, nu am putut să iau echipamentul tău, jackalii erau deja pe el.",
-        "Am reușit să ieșim de acolo. Iată tot ce mi-ai dat. Sper că lucrurile tale sunt asigurate, că nu am putut să le iau."
-    ],
-    "teamEscaped": [
-        "Super!\nAm reușit să ieșim.",
-        "Și asta a fost! Am reușit, șefu'.",
-        "Când ultimul om a ajuns la extracție, a fost ca un ceas— toată lumea este în siguranță.",
-        "Ne-am coordonat perfect și acum toată echipa este afară și gata să se echipeze din nou."
-    ],
-    "teamSomeEscaped": [
-        "Ei bine, e păcat de {0}, dar măcar restul dintre noi am reușit.",
-        "Câțiva dintre noi au fost loviți, dar sunt bucuros că unii au reușit să iasă în viață."
-    ],
-    "friendlyEscaped": [
-        "Mă bucur că am reușit.\nMulțumesc că m-ai lăsat să te însoțesc.",
-        "Uf, mă bucur că te-am găsit.\nNu știam dacă voi reuși. Mulțumesc!",
-        "Nu este cel mai bun rezultat, pierzând câțiva colegi, dar mă bucur că măcar am ieșit.",
-        "Mulțumesc pentru ajutor. Îmi car echipamentul colegilor căzuți înapoi; măcar atât pot să fac."
-    ],
-    "allyBossEscaped": [
-        "A fost o rundă bună!\nTe-ai descurcat bine, rookie, te-ai descurcat bine.",
-        "Nu e rău, deloc. Să o facem din nou cândva, rookie.",
-        "Ești tare!\n... neah, ai dreptate, eu sunt tare. Dar ai făcut bine și tu, rookie.",
-        "A fost vreo îndoială? Nu aveau nicio șansă.\nBăieți, băuturile sunt din partea mea, rookie-ul plătește!",
-        "Hai, hai, încearcă să ții pasul, bine? Avem rookie-ul aici admirând peisajul."
-    ],
-
-    "baseSettings": "Setări de bază",
-    "miscSettings": "Diverse",
-    "testSettings": "Testare",
-    "raidSettings": "Setări raid",
-    "equipOptions": ["Implicit"],
-    "tacticOptions": ["Implicit", "Suport", "Lunetist", "Atacator", "Apărător"],
-    "clothesOptions": ["Implicit", "Jucător"],
-    "statusSound": {
-        "Name": "Volumul raportului de stare",
-        "Description": "Volumul sunetului radio atunci când se declanșează raportul de stare"
-    },
-    "enemyMarker": {
-        "Name": "Marcaj dușman",
-        "Description": "Arată poziția dușmanului atunci când se raportează starea. Dacă este dezactivat, sunetul marcajului dușmanului va fi de asemenea dezactivat."
-    },
-    "squadSpawn": {
-        "Name": "Apărutul echipei",
-        "Description": "Setați volumul sunetului raportului de stare"
-    },
-    "squadSize": {
-        "Name": "Dimensiunea echipei",
-        "Description": "Numărul de însoțitori care apar cu tine"
-    },
-    "extraPickups": {
-        "Name": "Numărul maxim de însoțitori ridicați",
-        "Description": "Numărul maxim de însoțitori pe care jucătorul îi poate ridica în timpul unui raid. Acest lucru este în plus față de echipă."
-    },
-    "returnChanceDeath": {
-        "Name": "Șansa de întoarcere a lucrurilor de catre membrii echipei după moarte",
-        "Description": "Șansa ca însoțitorii tăi să returneze obiectele pe care le-ai dat dacă mori. Aceasta se aplică doar membrilor cu care ai apărut."
-    },
-    "squadSetup": {
-        "Name": "Utilizați configurația echipei",
-        "Description": "Utilizați o configurație specifică pentru echipa dvs."
-    },
-    "scanDistance": {
-        "Name": "Distanța maximă de scanare",
-        "Description": "Distanța maximă pentru a captura orice dușman vizibil pe care jucătorul îl semnalizează când emite fraza 'Contact'."
-    },
-    "patrolRadius" : {
-        "Name": "Raza de patrulare",
-        "Description": "Raza în care insoțitorii vor patrula în jurul jucătorului."
-    },
-    "enemyRemember": {
-        "Name": "Timpul de uitare a dușmanului (în secunde)",
-        "Description": "Timpul maxim în care un urmăritor își va aminti un dușman. Aceasta se aplică doar la începutul unui raid."
-    },
-    "healthMultiplier": {
-        "Name": "Înmulțitorul de sănătate al echipei",
-        "Description": "Înmulțitorul de sănătate pentru însoțitorii cu care apari. Aceasta se aplică pentru fiecare parte a corpului."
-    },
-    "memberTactic": {
-        "Name": "Tactica membrului {0} al echipei",
-        "Description": "Setați tactica de luptă a membrului echipei. Implicit, este o combinație între atacator și apărător. Atacatorul încearcă să atace frecvent dușmanul. Apărătorul va rămâne pe loc în jurul liderului. Lunetistul va încerca să obțină o poziție din care poate trage, de preferat din spatele jucătorului, la distanță și nu va ataca, chiar dacă este ordonat. Suportul va oferi foc de supresie frecvent și este capabil să folosească grenadele și lansatorul de grenade ca armă secundară."
-    },
-    "memberEquipment": {
-        "Name": "Echipamentul membrului {0} al echipei",
-        "Description": "Setați echipamentul membrului echipei. Puteți alege între implicit (care este echipamentul aleatoriu SPT), echipamentul curent al utilizatorului sau presetările create de utilizator (recomandat dacă folosiți o tactică diferită de implicit)."
-    },
-    "memberName": {
-        "Name": "Porecla membrului {0} al echipei",
-        "Description": "Setați un poreclă personalizată pentru acest membru al echipei. Lăsați liber pentru implicit."
-    },
-    "memberUniformTop": {
-        "Name": "Îmbrăcăminte superioară a membrului {0} al echipei",
-        "Description": "Setați ce îmbrăcăminte superioară ar trebui să poarte acest membru. Lăsați liber pentru implicit."
-    },
-    "memberUniformBottom": {
-        "Name": "Îmbrăcăminte inferioară a membrului {0} al echipei",
-        "Description": "Setați ce pantaloni ar trebui să poarte acest membru. Lăsați liber pentru implicit."
-    },
-    "equipmentLock": {
-        "Name": "Blochează echipamentul echipei",
-        "Description": "Blochează echipamentul membrilor echipei. Acest lucru este util dacă doriți să utilizați presetările proprii de echipament și nu doriți să pierdeți echipamentul dacă tu sau ei mor. Consumabilele sunt excluse."
-    },
-    "npcSendMessage": {
-        "Name": "Mesaje la sfârșitul raidului",
-        "Description": "Însoțitorii vor trimite un mesaj la sfârșitul raidului pe baza condițiilor, cum ar fi dacă toți au ieșit sau dacă ai ridicat un însoțitor și l-ai ținut în viață. Mesajele de returnare a obiectelor sunt excluse."
-    },
-    "sameSideHostile": {
-        "Name": "Hostil între boții PMC de aceeași parte",
-        "Description": "Boții PMC de aceeași parte să fie ostili unul față de celălalt (însoțitorii rămân prietenoși cu tine)."
-    },
-    "pmcArmbands": {
-      "Name": "Brățări PMC",
-      "Description": "Boții PMC să aibă brățări (roșii pentru BEARs, albastre pentru USECs)."
-    },
-    "englishBear": {
-        "Name": "BEARs vorbesc engleză",
-        "Description": "Toti boții BEAR să vorbească engleză sau rusă."
-    },
-    "pingSquad": {
-        "Name": "Ping Squad",
-        "Description": "Tasta rapidă pentru a declanșa apelul de raport."
-    },
-    "enemyContact": {
-        "Name": "Raport dușman",
-        "Description": "Tasta rapidă pentru a declanșa apelul de contact."
-    },
-    "gestures": {
-        "OverThere": "Acolo",
-        "TeamStatus": "Raport de stare",
-        "OnRepeatedContact": "Contact"
-    },
-    "botStatus": {
-        "Dead": "Mort",
-        "Engaged": "În luptă",
-        "Alerted": "Dușman detectat",
-        "Heal": "Se vindecă",
-        "WantToHeal": "Vrea să se vindece"
-    }
+	"baseSettings": "Setări de bază",
+	"miscSettings": "Diverse",
+	"testSettings": "Testare",
+	"raidSettings": "Setări raid",
+	"equipOptions": ["Implicit"],
+	"tacticOptions": ["Implicit", "Suport", "Lunetist", "Atacator", "Apărător"],
+	"clothesOptions": ["Implicit", "Jucător"],
+	"statusSound": {
+		"Name": "Volumul raportului de stare",
+		"Description": "Volumul sunetului radio atunci când se declanșează raportul de stare"
+	},
+	"enemyMarker": {
+		"Name": "Marcaj dușman",
+		"Description": "Arată poziția dușmanului atunci când se raportează starea. Dacă este dezactivat, sunetul marcajului dușmanului va fi de asemenea dezactivat."
+	},
+	"squadSpawn": {
+		"Name": "Apărutul echipei",
+		"Description": "Setați volumul sunetului raportului de stare"
+	},
+	"squadSize": {
+		"Name": "Dimensiunea echipei",
+		"Description": "Numărul de însoțitori care apar cu tine"
+	},
+	"extraPickups": {
+		"Name": "Numărul maxim de însoțitori ridicați",
+		"Description": "Numărul maxim de însoțitori pe care jucătorul îi poate ridica în timpul unui raid. Acest lucru este în plus față de echipă."
+	},
+	"returnChanceDeath": {
+		"Name": "Șansa de întoarcere a lucrurilor de catre membrii echipei după moarte",
+		"Description": "Șansa ca însoțitorii tăi să returneze obiectele pe care le-ai dat dacă mori. Aceasta se aplică doar membrilor cu care ai apărut."
+	},
+	"squadSetup": {
+		"Name": "Utilizați configurația echipei",
+		"Description": "Utilizați o configurație specifică pentru echipa dvs."
+	},
+	"scanDistance": {
+		"Name": "Distanța maximă de scanare",
+		"Description": "Distanța maximă pentru a captura orice dușman vizibil pe care jucătorul îl semnalizează când emite fraza 'Contact'."
+	},
+	"patrolRadius": {
+		"Name": "Raza de patrulare",
+		"Description": "Raza în care insoțitorii vor patrula în jurul jucătorului."
+	},
+	"enemyRemember": {
+		"Name": "Timpul de uitare a dușmanului (în secunde)",
+		"Description": "Timpul maxim în care un urmăritor își va aminti un dușman. Aceasta se aplică doar la începutul unui raid."
+	},
+	"healthMultiplier": {
+		"Name": "Înmulțitorul de sănătate al echipei",
+		"Description": "Înmulțitorul de sănătate pentru însoțitorii cu care apari. Aceasta se aplică pentru fiecare parte a corpului."
+	},
+	"memberTactic": {
+		"Name": "Tactica membrului {0} al echipei",
+		"Description": "Setați tactica de luptă a membrului echipei. Implicit, este o combinație între atacator și apărător. Atacatorul încearcă să atace frecvent dușmanul. Apărătorul va rămâne pe loc în jurul liderului. Lunetistul va încerca să obțină o poziție din care poate trage, de preferat din spatele jucătorului, la distanță și nu va ataca, chiar dacă este ordonat. Suportul va oferi foc de supresie frecvent și este capabil să folosească grenadele și lansatorul de grenade ca armă secundară."
+	},
+	"memberEquipment": {
+		"Name": "Echipamentul membrului {0} al echipei",
+		"Description": "Setați echipamentul membrului echipei. Puteți alege între implicit (care este echipamentul aleatoriu SPT), echipamentul curent al utilizatorului sau presetările create de utilizator (recomandat dacă folosiți o tactică diferită de implicit)."
+	},
+	"memberName": {
+		"Name": "Porecla membrului {0} al echipei",
+		"Description": "Setați un poreclă personalizată pentru acest membru al echipei. Lăsați liber pentru implicit."
+	},
+	"memberUniformTop": {
+		"Name": "Îmbrăcăminte superioară a membrului {0} al echipei",
+		"Description": "Setați ce îmbrăcăminte superioară ar trebui să poarte acest membru. Lăsați liber pentru implicit."
+	},
+	"memberUniformBottom": {
+		"Name": "Îmbrăcăminte inferioară a membrului {0} al echipei",
+		"Description": "Setați ce pantaloni ar trebui să poarte acest membru. Lăsați liber pentru implicit."
+	},
+	"equipmentLock": {
+		"Name": "Blochează echipamentul echipei",
+		"Description": "Blochează echipamentul membrilor echipei. Acest lucru este util dacă doriți să utilizați presetările proprii de echipament și nu doriți să pierdeți echipamentul dacă tu sau ei mor. Consumabilele sunt excluse."
+	},
+	"npcSendMessage": {
+		"Name": "Mesaje la sfârșitul raidului",
+		"Description": "Însoțitorii vor trimite un mesaj la sfârșitul raidului pe baza condițiilor, cum ar fi dacă toți au ieșit sau dacă ai ridicat un însoțitor și l-ai ținut în viață. Mesajele de returnare a obiectelor sunt excluse."
+	},
+	"sameSideHostile": {
+		"Name": "Hostil între boții PMC de aceeași parte",
+		"Description": "Boții PMC de aceeași parte să fie ostili unul față de celălalt (însoțitorii rămân prietenoși cu tine)."
+	},
+	"pmcArmbands": {
+		"Name": "Brățări PMC",
+		"Description": "Boții PMC să aibă brățări (roșii pentru BEARs, albastre pentru USECs)."
+	},
+	"englishBear": {
+		"Name": "BEARs vorbesc engleză",
+		"Description": "Toti boții BEAR să vorbească engleză sau rusă."
+	},
+	"pingSquad": {
+		"Name": "Stare raport",
+		"Description": "Tasta rapidă pentru a declanșa apelul de raport."
+	},
+	"enemyContact": {
+		"Name": "Raport dușman",
+		"Description": "Tasta rapidă pentru a declanșa apelul de contact."
+	},
+	"gestures": {
+		"OverThere": "Acolo",
+		"TeamStatus": "Stare raport",
+		"OnRepeatedContact": "Contact"
+	},
+	"botStatus": {
+		"Dead": "Mort",
+		"Engaged": "În luptă",
+		"Alerted": "Dușman detectat",
+		"Heal": "Se vindecă",
+		"WantToHeal": "Vrea să se vindece"
+	}
 }
-  

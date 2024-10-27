@@ -250,6 +250,18 @@ class friendlyPMC {
 
 		this.lang = this.lang_en;
 
+		const lang = "ro"; //this.LocaleService.getDesiredGameLocale();
+		try {
+			if (lang && fs.existsSync(`${__dirname}/../lang/${lang}.json`)) {
+				const lg = require(`../lang/${lang}.json`);
+				this.lang = Object.assign(this.lang_en, lg);
+			}
+		} catch (e) {
+			this.Logger.error("friendlyPMC: bad language file for " + lang + " - falling back to en");
+			console.error(e);
+			this.lang = this.lang_en;
+		}
+
 		// patch getPmcDifficultySettings as that is where we actually make the bots be friendly
 		this.getPmcDifficultySettings = this.getPmcDifficultySettings.bind(this);
 		container.afterResolution(
@@ -340,17 +352,6 @@ class friendlyPMC {
 			[
 				new RouteAction("/singleplayer/returnitems", (url: string, info: any, sessionID: string, output: string): any => {
 					const member = <IUserDialogInfo>info.member;
-					const lang = this.LocaleService.getDesiredGameLocale();
-					try {
-						if (lang && fs.existsSync(`${__dirname}/../lang/${lang}.json`)) {
-							const lg = require(`../lang/${lang}.json`);
-							this.lang = Object.assign(this.lang_en, lg);
-						}
-					} catch (e) {
-						this.Logger.error("friendlyPMC: bad language file for " + lang + " - falling back to en");
-						console.error(e);
-						this.lang = this.lang_en;
-					}
 
 					const details: ISendMessageDetails = {
 						recipientId: sessionID,

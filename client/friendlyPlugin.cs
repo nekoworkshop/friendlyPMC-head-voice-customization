@@ -533,7 +533,7 @@ namespace friendlyPMC
                         string seckey = $"1.4.1.{i + 1}.2  -  -  " + String.Format(optionsLang.memberEquipment["Name"], i + 1);
                         string secvalue = optionsLang.equipOptions[0];
 
-                        string trdkey = $"1.4.1.{i + 1}.1.1  -  -  " + String.Format(optionsLang.memberName["Name"], i + 1);
+                        string trdkey = $"1.4.1.{i + 1}.1  -  -  " + String.Format(optionsLang.memberName["Name"], i + 1);
                         string trdvalue = "";
 
                         string frtkey = $"1.4.1.{i + 1}.3.1  -  -  " + String.Format(optionsLang.memberUniformTop["Name"], i + 1);
