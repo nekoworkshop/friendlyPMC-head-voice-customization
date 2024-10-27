@@ -111,7 +111,7 @@ class friendlyPMC {
 		testSettings: "Testing",
 		raidSettings: "Raid Settings",
 		equipOptions: ["Default"],
-		tacticOptions: ["Default", "Support", "Marksman", "Pusher", "Holder"],
+		tacticOptions: ["Default", "Support", "Marksman", "Pusher", "Holder", "Assist"],
 		clothesOptions: ["Default", "Player"],
 		statusSound: {
 			Name: "Report Status Volume",
@@ -247,20 +247,6 @@ class friendlyPMC {
 		this.Logger = container.resolve("WinstonLogger");
 		this.mailSendService = container.resolve("MailSendService");
 		this.LocaleService = container.resolve("LocaleService");
-
-		this.lang = this.lang_en;
-
-		const lang = "ro"; //this.LocaleService.getDesiredGameLocale();
-		try {
-			if (lang && fs.existsSync(`${__dirname}/../lang/${lang}.json`)) {
-				const lg = require(`../lang/${lang}.json`);
-				this.lang = Object.assign(this.lang_en, lg);
-			}
-		} catch (e) {
-			this.Logger.error("friendlyPMC: bad language file for " + lang + " - falling back to en");
-			console.error(e);
-			this.lang = this.lang_en;
-		}
 
 		// patch getPmcDifficultySettings as that is where we actually make the bots be friendly
 		this.getPmcDifficultySettings = this.getPmcDifficultySettings.bind(this);
@@ -584,7 +570,19 @@ class friendlyPMC {
 		const databaseServer = container.resolve<DatabaseServer>("DatabaseServer");
 		const tables = databaseServer.getTables();
 
-		const globals = tables.globals;
+		this.lang = this.lang_en;
+
+		const lang = this.LocaleService.getDesiredGameLocale();
+		try {
+			if (lang && fs.existsSync(`${__dirname}/../lang/${lang}.json`)) {
+				const lg = require(`../lang/${lang}.json`);
+				this.lang = Object.assign(this.lang_en, lg);
+			}
+		} catch (e) {
+			this.Logger.error("friendlyPMC: bad language file for " + lang + " - falling back to en");
+			console.error(e);
+			this.lang = this.lang_en;
+		}
 
 		// same side hostile is being changed elsewhere - do this to avoid unwanted outcome
 		PMCBOT.chanceSameSideIsHostilePercent = -1;

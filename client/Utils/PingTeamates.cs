@@ -268,6 +268,9 @@ namespace friendlyPMC.Utils
                                     case "Push":
                                         tactic = friendlyPMC.GetTacticOptions()[3];
                                     break;
+                                    case "Assist":
+                                        tactic = friendlyPMC.GetTacticOptions()[5];
+                                    break;
                                     default:
                                         tactic = friendlyPMC.GetTacticOptions()[0];
                                     break;
@@ -275,7 +278,7 @@ namespace friendlyPMC.Utils
                                 }
                                 if (tactic != null)
                                 {
-                                    stringBuilder.Append($" | Mode: {tactic}");
+                                    stringBuilder.Append($" | MD: {tactic}");
                                 }
                             }
                         }

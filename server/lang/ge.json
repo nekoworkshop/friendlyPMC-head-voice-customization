@@ -4,7 +4,7 @@
     "testSettings": "Testen",
     "raidSettings": "Raid-Einstellungen",
     "equipOptions": ["Standard"],
-    "tacticOptions": ["Standard", "Unterstützung", "Scharfschütze", "Angreifer", "Halter"],
+    "tacticOptions": ["Standard", "Unterstützung", "Scharfschütze", "Angreifer", "Halter","Helfen"],
     "clothesOptions": ["Standard", "Spieler"],
     "statusSound": {
         "Name": "Lautstärke des Statusberichts",

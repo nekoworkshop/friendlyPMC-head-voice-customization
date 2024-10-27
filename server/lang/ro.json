@@ -11,7 +11,7 @@
 	"testSettings": "Testare",
 	"raidSettings": "Setări raid",
 	"equipOptions": ["Implicit"],
-	"tacticOptions": ["Implicit", "Suport", "Lunetist", "Atacator", "Apărător"],
+	"tacticOptions": ["Implicit", "Suport", "Lunetist", "Atacator", "Apărător","Asist"],
 	"clothesOptions": ["Implicit", "Jucător"],
 	"statusSound": {
 		"Name": "Volumul raportului de stare",

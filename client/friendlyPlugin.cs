@@ -455,48 +455,48 @@ namespace friendlyPMC
 
 
             squadSpawn = Config.Bind(
-                optionsLang.baseSettings, "1 " + optionsLang.squadSpawn["Name"], 
+                "I " + optionsLang.baseSettings, "1 " + optionsLang.squadSpawn["Name"], 
                 true, 
-                new ConfigDescription(optionsLang.squadSpawn["Description"])
+                new ConfigDescription(optionsLang.squadSpawn["Description"], null, new ConfigurationManagerAttributes { Order = -100 })
             );
 
             squadSize = Config.Bind(
-                optionsLang.baseSettings, 
+                "I " + optionsLang.baseSettings, 
                 "1.2  -  " + optionsLang.squadSize["Name"], 
                 2, 
-                new ConfigDescription(optionsLang.squadSize["Description"], new AcceptableValueRange<int>(1, 30))
+                new ConfigDescription(optionsLang.squadSize["Description"], new AcceptableValueRange<int>(1, 30), new ConfigurationManagerAttributes { Order = -200 })
             );
 
-            returnChanceDeath = Config.Bind(optionsLang.baseSettings, "1.3  -  " + optionsLang.returnChanceDeath["Name"], 50, new ConfigDescription(optionsLang.returnChanceDeath["Description"], new AcceptableValueRange<int>(1, 100)));
+            returnChanceDeath = Config.Bind("I " + optionsLang.baseSettings, "1.3  -  " + optionsLang.returnChanceDeath["Name"], 50, new ConfigDescription(optionsLang.returnChanceDeath["Description"], new AcceptableValueRange<int>(1, 100), new ConfigurationManagerAttributes { Order = -300 }));
 
-            squadSetup = Config.Bind(optionsLang.baseSettings, "1.4  -  " + optionsLang.squadSetup["Name"], false, new ConfigDescription(optionsLang.squadSpawn["Description"]));
+            squadSetup = Config.Bind("I " + optionsLang.baseSettings, "1.4  -  " + optionsLang.squadSetup["Name"], false, new ConfigDescription(optionsLang.squadSpawn["Description"],null, new ConfigurationManagerAttributes { Order = -400 }));
 
-            extraPickups = Config.Bind(optionsLang.baseSettings, "2 " + optionsLang.extraPickups["Name"], 1, new ConfigDescription(optionsLang.extraPickups["Description"], new AcceptableValueRange<int>(0, 30)));
+            extraPickups = Config.Bind("I " + optionsLang.baseSettings, "2 " + optionsLang.extraPickups["Name"], 1, new ConfigDescription(optionsLang.extraPickups["Description"], new AcceptableValueRange<int>(0, 30),null, new ConfigurationManagerAttributes { Order = -500 }));
 
-            scanDistance = Config.Bind(optionsLang.miscSettings, "1 " + optionsLang.scanDistance["Name"], 140, new ConfigDescription(optionsLang.scanDistance["Description"], new AcceptableValueRange<int>(50, 300)));
+            scanDistance = Config.Bind("II " + optionsLang.miscSettings, "1 " + optionsLang.scanDistance["Name"], 140, new ConfigDescription(optionsLang.scanDistance["Description"], new AcceptableValueRange<int>(50, 300), new ConfigurationManagerAttributes { Order = -100 }));
 
-            patrolRadius = Config.Bind(optionsLang.miscSettings, "2 " + optionsLang.patrolRadius["Name"], 50, new ConfigDescription(optionsLang.patrolRadius["Description"], new AcceptableValueRange<int>(30, 100)));
+            patrolRadius = Config.Bind("II " + optionsLang.miscSettings, "2 " + optionsLang.patrolRadius["Name"], 50, new ConfigDescription(optionsLang.patrolRadius["Description"], new AcceptableValueRange<int>(30, 100), new ConfigurationManagerAttributes { Order = -200 }));
 
-            enemyRemember = Config.Bind(optionsLang.miscSettings, "3 " + optionsLang.enemyRemember["Name"], 20, new ConfigDescription(optionsLang.enemyRemember["Description"], new AcceptableValueRange<int>(5, 60)));
+            enemyRemember = Config.Bind("II " + optionsLang.miscSettings, "3 " + optionsLang.enemyRemember["Name"], 20, new ConfigDescription(optionsLang.enemyRemember["Description"], new AcceptableValueRange<int>(5, 60), new ConfigurationManagerAttributes { Order = -300 }));
 
-            heatlhMultiplier = Config.Bind(optionsLang.miscSettings, "4 " + optionsLang.healthMultiplier["Name"], 1f, new ConfigDescription(optionsLang.healthMultiplier["Description"], new AcceptableValueRange<float>(1, 5)));
+            heatlhMultiplier = Config.Bind("II " + optionsLang.miscSettings, "4 " + optionsLang.healthMultiplier["Name"], 1f, new ConfigDescription(optionsLang.healthMultiplier["Description"], new AcceptableValueRange<float>(1, 5), new ConfigurationManagerAttributes { Order = -400 }));
 
-            statusSound = Config.Bind(optionsLang.miscSettings, "5 " + optionsLang.statusSound["Name"], 100, new ConfigDescription(optionsLang.statusSound["Description"], new AcceptableValueRange<int>(0, 100)));
+            statusSound = Config.Bind("II " + optionsLang.miscSettings, "5 " + optionsLang.statusSound["Name"], 100, new ConfigDescription(optionsLang.statusSound["Description"], new AcceptableValueRange<int>(0, 100), new ConfigurationManagerAttributes { Order = -500 }));
             
-            enemyMarker = Config.Bind(optionsLang.miscSettings, "6 " + optionsLang.enemyMarker["Name"], true, new ConfigDescription(optionsLang.enemyMarker["Description"]));
+            enemyMarker = Config.Bind("II " + optionsLang.miscSettings, "6 " + optionsLang.enemyMarker["Name"], true, new ConfigDescription(optionsLang.enemyMarker["Description"],null, new ConfigurationManagerAttributes { Order = -600 }));
 
-            npcSendMessage = Config.Bind(optionsLang.miscSettings, "7 " + optionsLang.npcSendMessage["Name"], true, new ConfigDescription(optionsLang.npcSendMessage["Description"]));
+            npcSendMessage = Config.Bind("II " + optionsLang.miscSettings, "7 " + optionsLang.npcSendMessage["Name"], true, new ConfigDescription(optionsLang.npcSendMessage["Description"],null, new ConfigurationManagerAttributes { Order = -700 }));
 
-            sameSideHostile = Config.Bind(optionsLang.miscSettings, "8 " + optionsLang.sameSideHostile["Name"], false, new ConfigDescription(optionsLang.sameSideHostile["Description"]));
+            sameSideHostile = Config.Bind("II " + optionsLang.miscSettings, "8 " + optionsLang.sameSideHostile["Name"], false, new ConfigDescription(optionsLang.sameSideHostile["Description"],null, new ConfigurationManagerAttributes { Order = -800 }));
 
-            pmcArmbands = Config.Bind(optionsLang.miscSettings, "9 " + optionsLang.pmcArmbands["Name"], true, new ConfigDescription(optionsLang.pmcArmbands["Description"]));
+            pmcArmbands = Config.Bind("II " + optionsLang.miscSettings, "9 " + optionsLang.pmcArmbands["Name"], true, new ConfigDescription(optionsLang.pmcArmbands["Description"],null, new ConfigurationManagerAttributes { Order = -900 }));
 
-            englishBear = Config.Bind(optionsLang.miscSettings, "10 " + optionsLang.englishBear["Name"], true, new ConfigDescription(optionsLang.englishBear["Description"]));
+            englishBear = Config.Bind("II " + optionsLang.miscSettings, "10 " + optionsLang.englishBear["Name"], true, new ConfigDescription(optionsLang.englishBear["Description"],null, new ConfigurationManagerAttributes { Order = -1000 }));
 
 
-            pingKey = Config.Bind(optionsLang.miscSettings, "11.1 " + optionsLang.pingSquad["Name"], new KeyboardShortcut(KeyCode.None), new ConfigDescription(optionsLang.pingSquad["Description"]));
+            pingKey = Config.Bind("II " + optionsLang.miscSettings, "11.1 " + optionsLang.pingSquad["Name"], new KeyboardShortcut(KeyCode.None), new ConfigDescription(optionsLang.pingSquad["Description"],null, new ConfigurationManagerAttributes { Order = -1101 }));
 
-            contactKey = Config.Bind(optionsLang.miscSettings, "11.2 " + optionsLang.enemyContact["Name"], new KeyboardShortcut(KeyCode.None), new ConfigDescription(optionsLang.enemyContact["Description"]));
+            contactKey = Config.Bind("II " + optionsLang.miscSettings, "11.2 " + optionsLang.enemyContact["Name"], new KeyboardShortcut(KeyCode.None), new ConfigDescription(optionsLang.enemyContact["Description"],null, new ConfigurationManagerAttributes { Order = -1102 }));
             
             ConfigSquadMembersSet();
 
@@ -566,24 +566,34 @@ namespace friendlyPMC
                             }
                         });
 
+                        List<string> tactics = new List<string>();
+                        for (int j = 0; j < optionsLang.tacticOptions.Length - 1; j++)
+                        {
+                            tactics.Add(optionsLang.tacticOptions[j]);
+                        }
+
+
                         List<ConfigEntry<string>> configEntries = new List<ConfigEntry<string>>
                         {
                             Config.Bind(
-                                optionsLang.baseSettings,
+                                "I " +optionsLang.baseSettings,
                                 key,
                                 value,
                                 new ConfigDescription(optionsLang.memberTactic["Description"],
-                                    new AcceptableValueList<string>(optionsLang.tacticOptions)
+                                    new AcceptableValueList<string>(tactics.ToArray()),
+                                    new ConfigurationManagerAttributes { Order = -400 + ((i + 1) * -1) }
                                 )
                             ),
-                            EquipmentOptions(seckey,secvalue),
-                            UniformOptions(frtkey,frtvalue,"top",true),
-                            UniformOptions(fiftkey,fiftvalue,"bottom",true),
+                            EquipmentOptions(seckey,secvalue,-400 + ((i + 1) * -1)),
+                            UniformOptions(frtkey,frtvalue,"top",true,-400 + ((i + 1) * -1)),
+                            UniformOptions(fiftkey,fiftvalue,"bottom",true,-400 + ((i + 1) * -1)),
                             Config.Bind(
-                                optionsLang.baseSettings,
+                                "I " +optionsLang.baseSettings,
                                 trdkey,
                                 trdvalue,
-                                new ConfigDescription(optionsLang.memberName["Description"])
+                                new ConfigDescription(optionsLang.memberName["Description"],null,
+                                new ConfigurationManagerAttributes { Order = -400 + ((i + 1) * -1) }
+                                )
                             )
                         };
 
@@ -633,7 +643,7 @@ namespace friendlyPMC
             savedConfigValues.Clear();
         }
 
-        private ConfigEntry<string> EquipmentOptions(string name, string value)
+        private ConfigEntry<string> EquipmentOptions(string name, string value, int order = 0)
         {
 
             string[] list = equipPresets;
@@ -644,10 +654,13 @@ namespace friendlyPMC
             }
 
             ConfigEntry<string> entry = Config.Bind(
-                optionsLang.baseSettings,
+                "I " + optionsLang.baseSettings,
                 name,
                 value,
-                new ConfigDescription(optionsLang.memberEquipment["Description"], new AcceptableValueList<string>(list))
+                new ConfigDescription(optionsLang.memberEquipment["Description"], 
+                new AcceptableValueList<string>(list),
+                new ConfigurationManagerAttributes { Order = order }
+                )
              );
 
             return entry;
@@ -694,7 +707,7 @@ namespace friendlyPMC
             {
 
                 equipPresets = updatedPresets;
-
+                int i = 0;
                 foreach (var member in squadMembers)
                 {
                     var entry = member.Value[1];
@@ -711,13 +724,14 @@ namespace friendlyPMC
 
                         Config.Remove(entry.Definition);
 
-                        member.Value[1] = EquipmentOptions(name, value);
+                        member.Value[1] = EquipmentOptions(name, value, -400 + ((i + 1) * -1));
                     }
+                    i++;
                 }
             }
         }
 
-        private ConfigEntry<string> UniformOptions(string name, string value, string bodyPart = "top", bool addval = false)
+        private ConfigEntry<string> UniformOptions(string name, string value, string bodyPart = "top", bool addval = false, int order = 0)
         {
             string[] list;
             if (bodyPart == "top") list = UniformTop.ToArray();
@@ -736,10 +750,10 @@ namespace friendlyPMC
                 description = optionsLang.memberUniformBottom["Description"];
 
             ConfigEntry<string> entry = Config.Bind(
-                optionsLang.baseSettings,
+                "I " + optionsLang.baseSettings,
                 name,
                 value,
-                new ConfigDescription(description, new AcceptableValueList<string>(list))
+                new ConfigDescription(description, new AcceptableValueList<string>(list), new ConfigurationManagerAttributes { Order = order })
              );
 
             return entry;
@@ -748,6 +762,7 @@ namespace friendlyPMC
 
         private void BuildUniformOptions()
         {
+            int i = 0;
             foreach (var member in squadMembers)
             {
                 var entryTop = member.Value[2];
@@ -760,7 +775,7 @@ namespace friendlyPMC
 
                     Config.Remove(entryTop.Definition);
 
-                    member.Value[2] = UniformOptions(name, value);
+                    member.Value[2] = UniformOptions(name, value,"top",false, -400 + ((i + 1) * -1));
                 }
 
                 if (Config.TryGetEntry<string>(entryBottom.Definition, out var ex))
@@ -770,8 +785,10 @@ namespace friendlyPMC
 
                     Config.Remove(entryBottom.Definition);
 
-                    member.Value[3] = UniformOptions(name, value,"bottom");
+                    member.Value[3] = UniformOptions(name, value,"bottom",false, -400 + ((i + 1) * -1));
                 }
+
+                i++;
             }
         }
 
