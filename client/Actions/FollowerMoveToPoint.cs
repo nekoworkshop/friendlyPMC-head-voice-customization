@@ -102,7 +102,6 @@ namespace friendlyPMC.Actions
             
             if (botOwner_0.BotRequestController.CurRequest == null) return;
 
-            
 
             if (botOwner_0.Brain.Agent.LastReason == "req:goCheck" && !bool_0)
             {
@@ -173,6 +172,8 @@ namespace friendlyPMC.Actions
                         if (botOwner_0.BotRequestController.TryStopCurrent(playerRequester, false))
                         {
                             FollowerHold holdit = new FollowerHold(playerRequester);
+
+                            if (!botOwner_0.BotTalk.IsSilenced) botOwner_0.BotTalk.SetSilence(2f);
 
                             if (botOwner_0.BotsGroup.RequestsController.TryAddRequest(holdit))
                             {

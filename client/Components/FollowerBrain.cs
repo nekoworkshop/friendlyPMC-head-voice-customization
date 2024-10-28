@@ -337,20 +337,25 @@ namespace friendlyPMC.Components
             // on gun shot if there is a line of sight, turn immmediately
             if((type == AISoundType.silencedGun || type == AISoundType.gun) && !WasHit) 
             {
-                if(distance <= 20f) Utils.Enemy.MakeEnemy(_owner, enemy);
-                else if(
-                    GClass301.CanShootToTarget(new ShootPointClass(_owner.GetPlayer.MainParts[BodyPartType.head].Position,1f),enemy.PlayerBones.WeaponRoot.position,_owner.LookSensor.Mask) ||
-                    GClass301.CanShootToTarget(new ShootPointClass(_owner.GetPlayer.MainParts[BodyPartType.head].Position,1f), enemy.PlayerBones.WeaponRoot.position, _owner.LookSensor.Mask)
-                ) {
-                    Vector3 shootdir = position - _owner.GetPlayer.Transform.position;
+                Vector3 shootdir = position - _owner.GetPlayer.Transform.position;
 
-                    if (shootdir.sqrMagnitude < 1f)
-                    {
-                        shootdir = shootdir.normalized;
-                    }
-                    
-                    shootdir *= 20f; // ensure the bot will not look down at the ground
+                if (shootdir.sqrMagnitude < 1f)
+                {
+                    shootdir = shootdir.normalized;
+                }
 
+                shootdir *= 20f; // ensure the bot will not look down at the ground
+
+                if (distance <= 20f)
+                {
+                    FakeShot(shootdir);
+                    Utils.Enemy.MakeEnemy(_owner, enemy);
+                }
+                else if (
+                    GClass301.CanShootToTarget(new ShootPointClass(_owner.GetPlayer.MainParts[BodyPartType.head].Position, 1f), enemy.PlayerBones.WeaponRoot.position, _owner.LookSensor.Mask) ||
+                    GClass301.CanShootToTarget(new ShootPointClass(_owner.GetPlayer.MainParts[BodyPartType.head].Position, 1f), enemy.PlayerBones.WeaponRoot.position, _owner.LookSensor.Mask)
+                )
+                {
                     FakeShot(shootdir);
                     _lastGunshotTime = Time.time;
                     return;
@@ -360,33 +365,39 @@ namespace friendlyPMC.Components
             else if(type == AISoundType.step) 
             {
                  Vector3 positionZone = new Vector3(
-                    Mathf.Floor(position.x / 18f) * 18f,
-                    Mathf.Floor(position.y / 18f) * 18f,
-                    Mathf.Floor(position.z / 18f) * 18f
+                    Mathf.Floor(position.x / 12f) * 12f,
+                    Mathf.Floor(position.y / 12f) * 12f,
+                    Mathf.Floor(position.z / 12f) * 12f
                 );
 
                 bool wasProcessed = processedSoundPositions.Contains(positionZone);
 
                 if(wasProcessed && Time.time - _lastSoundTime > 5f ) return;
 
-                if(distance <= 12f) Utils.Enemy.MakeEnemy(_owner, enemy);
-                else {
+                Vector3 dir = position - _owner.GetPlayer.Transform.position;
+
+                if (dir.sqrMagnitude < 1f)
+                {
+                    dir = dir.normalized;
+                }
+
+                dir *= 20f; // ensure the bot will not look down at the ground
+
+                if (!wasProcessed)
+                {
+                    processedSoundPositions.Add(positionZone);
+                    if (processedSoundPositions.Count > 20) processedSoundPositions.RemoveAt(0);
+                }
+
+                if (distance <= 12f)
+                {
+                    FakeShot(dir);
+                    Utils.Enemy.MakeEnemy(_owner, enemy);
+                }
+                else
+                {
                     _lastSoundTime = Time.time;
 
-                    Vector3 dir = position - _owner.GetPlayer.Transform.position;
-
-                    if (dir.sqrMagnitude < 1f)
-                    {
-                        dir = dir.normalized;
-                    }
-                    
-                    dir *= 20f; // ensure the bot will not look down at the ground
-
-                    if(!wasProcessed) {
-                        processedSoundPositions.Add(positionZone);
-                        if(processedSoundPositions.Count > 20) processedSoundPositions.RemoveAt(0);
-                    }
-                    
                     FakeShot(dir);
                 }
             }
@@ -419,20 +430,19 @@ namespace friendlyPMC.Components
             FakeShot(estimatedPos);
         }
         /** On Leave info about this bot should be cleared */
-        public virtual void OnLeave(BotOwner _bot)
+        private void OnLeave(BotOwner _bot)
         {
             OnKilled();
         }
         /** On Death info about this bot should be cleared */
-        protected void OnKilled()
+        protected virtual void OnKilled()
         {
             // remove this bot from being a follower
             Dismissed();
             BossPlayers.RemoveFollower(_owner, _boss);
-            Modules.Logger.LogInfo("Follower " + _owner.Profile.Nickname + " died");
         }
          
-        protected virtual void OnThrow()
+        private void OnThrow()
         {
             GRENADE_THROWING = true;
         }

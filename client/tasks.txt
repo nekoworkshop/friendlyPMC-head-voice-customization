@@ -8,9 +8,7 @@
 
 - x - assist tactic should also do supression on it's own and also use grenades
 
-- plan a way for bot to determine if the player is in combat or if the enemy is shooting his weapon nearby
-- - patch IsVisible to check if any teammate has become visible in a 22m radius around an enemy
-- - check SAIN for more hearing checks
+- more improvement on awareness
 
 - see if we can make bot swap weapons when asked to loot (DeadBodyWork)
 - - this should also allow bot to put that weapon as seconday (in case of support without a grenade launcher)

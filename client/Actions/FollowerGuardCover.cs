@@ -64,12 +64,7 @@ namespace friendlyPMC.Actions
                 _actionsQueue.Enqueue(() =>
                 {
                     // else get the next cover between the bot and the enemy
-                    CustomNavigationPoint Spot2 = /*Utils.Covers.GetClosestCoverPointBetween(
-                        botOwner_0,
-                        protectBoss ? bossPos : enemySpot,
-                        enemySpot
-                    );
-                    */Utils.Covers.GetClosestShootCover(
+                    CustomNavigationPoint Spot2 = Utils.Covers.GetClosestShootCover(
                         botOwner_0,
                         protectBoss ? bossPos : botPosition,
                         5f,
