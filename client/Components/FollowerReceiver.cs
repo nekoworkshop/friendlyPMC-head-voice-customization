@@ -923,6 +923,12 @@ namespace friendlyPMC.Components
                         return;
                     }
 
+                    if((botOwner_0.Brain.BaseBrain as FollowerBrain).UnderFire)
+                    {
+                        botOwner_0.BotTalk.TrySay(EPhraseTrigger.DontKnow, false);
+                        return;
+                    }
+
                     LootItem item = InteractableObjects.GetCurLootItem();
                     if (item != null)
                     {

@@ -261,7 +261,7 @@ namespace friendlyPMC.Components
                 else
                 {
                     BotSettingsClass botSettingsClass = new BotSettingsClass(Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(enemy.ProfileId), bossGroup, EBotEnemyCause.addPlayerToBoss);
-
+                    botSettingsClass.EnemyLastPosition = enemy.Position;
                     follower.Memory.AddEnemy(enemy, botSettingsClass, false);
                    
                     if (!follower.Memory.HaveEnemy)
@@ -422,10 +422,6 @@ namespace friendlyPMC.Components
             _player.BeingHitAction -= OnHit;
         }
 
-        public override void SetPatrolMode()
-        {
-
-        }
 
     }
 }

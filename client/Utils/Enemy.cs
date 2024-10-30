@@ -229,6 +229,7 @@ namespace friendlyPMC.Utils
             if (groupInfo == null)
             {
                 groupInfo = new BotSettingsClass(enemy, bot.BotsGroup, cause);
+                groupInfo.EnemyLastPosition = enemy.Transform.position;
 
                 bot.Memory.AddEnemy(enemy, groupInfo, false);
             }
@@ -239,9 +240,8 @@ namespace friendlyPMC.Utils
 
             if (info == null)
             {
+                groupInfo.EnemyLastPosition = enemy.Transform.position;
                 info = bot.EnemiesController.AddNew(bot.BotsGroup, enemy, groupInfo);
-
-                info.SetVisible(true);
 
                 bot.EnemiesController.SetInfo(enemy, info);
             }

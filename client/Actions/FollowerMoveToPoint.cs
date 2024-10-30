@@ -190,7 +190,7 @@ namespace friendlyPMC.Actions
                     }
                 }
 
-                if (ischecking) checkTime = Time.time + GClass761.Random(2f, 4f);
+                if (ischecking) checkTime = Time.time + GClass761.Random(4f, 6f);
 
                 return;
 
