@@ -52,6 +52,7 @@ import { DatabaseService } from "@spt/services/DatabaseService";
 class friendlyPMC {
 	config = {
 		sameSideHostile: false,
+		badGuy: false,
 		armbands: true,
 		englishBear: true,
 	};
@@ -188,6 +189,10 @@ class friendlyPMC {
 		sameSideHostile: {
 			Name: "Same PMC Side Hostile",
 			Description: "Should PMC Bots of the same side be hostile to each other (followers remain friendly to you)",
+		},
+		badGuy: {
+			Name: "Bad Guy",
+			Description: "Should the player be hostile to all PMC bots, regardless of faction",
 		},
 		pmcArmbands: {
 			Name: "PMC Arm Bands",
@@ -427,10 +432,13 @@ class friendlyPMC {
 
 					return httpResponseUtil.emptyResponse();
 				}),
-				new RouteAction("/client/raid/pitconfig", (url: string, info: { Config: { sameSideHostile: boolean; englishBear: boolean; pmcArmbands: boolean } }, sessionID: string, output: string): any => {
+				new RouteAction("/client/raid/pitconfig", (url: string, info: { Config: { sameSideHostile: boolean; badGuy: boolean; englishBear: boolean; pmcArmbands: boolean } }, sessionID: string, output: string): any => {
 					this.config.armbands = info.Config.pmcArmbands;
+
 					this.config.sameSideHostile = info.Config.sameSideHostile;
+					this.config.badGuy = info.Config.badGuy;
 					this.config.englishBear = info.Config.englishBear;
+
 					this.Logger.logWithColor("friendlyPMC: Setting Server Config as " + JSON.stringify(info), LogTextColor.BLUE);
 
 					if (this.config.armbands) {
@@ -613,6 +621,7 @@ class friendlyPMC {
 		};
 
 		let is_hostile = this.config.sameSideHostile || false;
+		const is_bad_guy = this.config.badGuy || false;
 		pmcType = pmcType.toLowerCase();
 
 		// force the friendly mind here as some mods may overwrite things
@@ -624,10 +633,10 @@ class friendlyPMC {
 				DEFAULT_BEAR_BEHAVIOUR: !is_hostile && (pmcType == "bear" || pmcType == "sptbear" || pmcType == "pmcbear") ? "Ignore" : "Attack",
 				DEFAULT_SAVAGE_BEHAVIOUR: "Attack",
 				DEFAULT_USEC_BEHAVIOUR: !is_hostile && (pmcType == "usec" || pmcType == "sptusec" || pmcType == "pmcusec") ? "Ignore" : "Attack",
-				CAN_RECIVE_PLAYER_REQUESTS: !is_hostile,
-				CAN_RECEIVE_PLAYER_REQUESTS: !is_hostile,
-				CAN_RECEIVE_PLAYER_REQUESTS_USEC: !is_hostile,
-				CAN_RECEIVE_PLAYER_REQUESTS_BEAR: !is_hostile,
+				CAN_RECIVE_PLAYER_REQUESTS: !is_hostile && !is_bad_guy,
+				CAN_RECEIVE_PLAYER_REQUESTS: !is_hostile && !is_bad_guy,
+				CAN_RECEIVE_PLAYER_REQUESTS_USEC: !is_hostile && !is_bad_guy,
+				CAN_RECEIVE_PLAYER_REQUESTS_BEAR: !is_hostile && !is_bad_guy,
 			});
 
 			const Core: { [key: string]: any } = {};
@@ -665,7 +674,7 @@ class friendlyPMC {
 			}
 			// ensure these settings are set last as they are not dependent of "is_hostile" flag
 			Object.assign(diff.Mind, {
-				ENEMY_BY_GROUPS_PMC_PLAYERS: is_hostile,
+				ENEMY_BY_GROUPS_PMC_PLAYERS: is_hostile || is_bad_guy,
 				CAN_RECEIVE_PLAYER_REQUESTS_SAVAGE: false,
 			});
 		} else if (pmcType == "assault") {

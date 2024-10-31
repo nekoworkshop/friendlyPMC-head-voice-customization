@@ -18,8 +18,6 @@ namespace friendlyPMC.Patches
         {
             return AccessTools.Method(typeof(Class266), "SendRaidSettings");
         }
-        // do not let OfferBot run, we have our own method for adding followers to the player
-        // somehow this is not fired in pitAIBossPlayer
         [PatchPostfix]
         private static void PatchPostfix(Class266 __instance, RaidSettings settings)
         {
@@ -33,9 +31,12 @@ namespace friendlyPMC.Patches
                 Config = new Dictionary<string, bool>
                 {
                     { "sameSideHostile", friendlyPMC.sameSideHostile.Value },
+                    { "badGuy", friendlyPMC.badGuy.Value },
                     { "pmcArmbands", friendlyPMC.pmcArmbands.Value },
                     { "englishBear", friendlyPMC.englishBear.Value }
                 }
+
+                
             }.ToJson(_defaultJsonConverters));
         }
     }

@@ -108,6 +108,7 @@ namespace friendlyPMC
         public Dictionary<string, string> npcSendMessage { get; set; }
 
         public Dictionary<string, string> sameSideHostile { get; set; }
+        public Dictionary<string, string> badGuy { get; set; }
         public Dictionary<string, string> pmcArmbands { get; set; }
         public Dictionary<string, string> englishBear { get; set; }
 
@@ -163,6 +164,8 @@ namespace friendlyPMC
         public static ConfigEntry<bool> npcSendMessage;
 
         public static ConfigEntry<bool> sameSideHostile;
+        public static ConfigEntry<bool> badGuy;
+
         public static ConfigEntry<bool> pmcArmbands;
         public static ConfigEntry<bool> englishBear;
 
@@ -489,9 +492,11 @@ namespace friendlyPMC
 
             sameSideHostile = Config.Bind("II " + optionsLang.miscSettings, "8 " + optionsLang.sameSideHostile["Name"], false, new ConfigDescription(optionsLang.sameSideHostile["Description"],null, new ConfigurationManagerAttributes { Order = -800 }));
 
-            pmcArmbands = Config.Bind("II " + optionsLang.miscSettings, "9 " + optionsLang.pmcArmbands["Name"], true, new ConfigDescription(optionsLang.pmcArmbands["Description"],null, new ConfigurationManagerAttributes { Order = -900 }));
+            badGuy = Config.Bind("II " + optionsLang.miscSettings, "9 " + optionsLang.badGuy["Name"], false, new ConfigDescription(optionsLang.badGuy["Description"], null, new ConfigurationManagerAttributes { Order = -900 }));
 
-            englishBear = Config.Bind("II " + optionsLang.miscSettings, "10 " + optionsLang.englishBear["Name"], true, new ConfigDescription(optionsLang.englishBear["Description"],null, new ConfigurationManagerAttributes { Order = -1000 }));
+            pmcArmbands = Config.Bind("II " + optionsLang.miscSettings, "10 " + optionsLang.pmcArmbands["Name"], true, new ConfigDescription(optionsLang.pmcArmbands["Description"],null, new ConfigurationManagerAttributes { Order = -1000 }));
+
+            englishBear = Config.Bind("II " + optionsLang.miscSettings, "11 " + optionsLang.englishBear["Name"], true, new ConfigDescription(optionsLang.englishBear["Description"],null, new ConfigurationManagerAttributes { Order = -1100 }));
 
 
             pingKey = Config.Bind("II " + optionsLang.miscSettings, "11.1 " + optionsLang.pingSquad["Name"], new KeyboardShortcut(KeyCode.None), new ConfigDescription(optionsLang.pingSquad["Description"],null, new ConfigurationManagerAttributes { Order = -1101 }));

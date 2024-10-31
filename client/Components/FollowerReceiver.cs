@@ -185,9 +185,7 @@ namespace friendlyPMC.Components
             };
             List<EGesture> bossBusyIgnore = new List<EGesture>
             {
-                EGesture.Stop,
-                EGesture.ComeToMe,
-                EGesture.ThatDirection
+
             };
 
             List<EGesture> allyNoGesture = new List<EGesture> {
@@ -205,6 +203,7 @@ namespace friendlyPMC.Components
                 if (botOwner_0.IsRole(role))
                 {
                     isFollowerBoss = true;
+                    isAssisting = false;
                     break;
                 }
             }

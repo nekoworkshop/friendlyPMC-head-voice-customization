@@ -10,15 +10,23 @@
 
 - more improvement on awareness
 
-- see if we can make bot swap weapons when asked to loot (DeadBodyWork)
-- - this should also allow bot to put that weapon as seconday (in case of support without a grenade launcher)
+- add "Bad Guy" setting
 
 - fix glitchy behavior of boss followers
+- - not turning hostile when player accidentally shoots them
+- - the "Bad Guy" setting should be active when running with bosses
+- - not having a "good" brain when no longer being a follower
+
 - goons send messages at the end of the raid
+- - send message if player died
+- - send message if player shot them and they killed him
+- - send message if player shot them and he killed them
+- - send message based on who survived the raid
 
 - goons send join offer for specific maps (Woods, Shoreline, Customs, Lighthouse)
 
-- see if bot's kills can count as player's kill
+- see if we can make bot swap weapons when asked to loot (DeadBodyWork)
+- - this should also allow bot to put that weapon as seconday (in case of support without a grenade launcher)
 
 --- ==== 4.0.0 (final phase) ==== ---:
 - add squad management terminal
@@ -36,8 +44,8 @@
 RELEASE NOTES (3.9) 
 - you can no longer loot spawned followers equipment This does not apply to consumables like magazines, ammo, meds, etc.
 - "On Your Own" will now make followers patrol around the player with a configurable distance when out of combat. In order for this to work they must not be told to hold position and be out of combat. "Follow Me" can get them out of the patrol mode while still retaining the other settings that "On Your Own" has.
-- followers will react to teammate going down
-- the mod can now work with different languages. It will based on the language you set for your game. There only 3 languages avalabile for now : English, Russian, German, Romanian. You can look into user/mods/friendlyPMC/lang and add more language jsons there (ping me with the file and I will add it to the mod)
+- the mod can now work with different languages. It will based on the language you set for your game. There only 3 languages avalabile for now : English, Russian, German, Romanian. You can look into user/mods/friendlyPMC/lang and add more language jsons there (PM me with the file and I will add it to the mod)
+- added "Bad Guy" setting. This will make the player hostile to all factions.
 
 ==================================================================================
 NOTES:

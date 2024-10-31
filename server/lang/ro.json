@@ -29,6 +29,10 @@
 		"Name": "Dimensiunea echipei",
 		"Description": "Numărul de însoțitori care apar cu tine"
 	},
+    "badGuy": {
+        "Name": "Inamic",
+        "Description": "Ar trebui ca jucătorul să fie ostil tuturor bot-urilor PMC, indiferent de facțiune"
+    },    
 	"extraPickups": {
 		"Name": "Numărul maxim de însoțitori ridicați",
 		"Description": "Numărul maxim de însoțitori pe care jucătorul îi poate ridica în timpul unui raid. Acest lucru este în plus față de echipă."

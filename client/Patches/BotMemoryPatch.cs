@@ -158,10 +158,9 @@ namespace friendlyPMC.Patches
 
                 BotZone zone = botOwner_0.BotsGroup.BotZone;
 
-                BossPlayers.Instance.GetFollower(botOwner_0).Dismiss();
-
                 BossPlayers.RemoveFollower(botOwner_0, boss);
 
+                BossPlayers.Instance.GetFollower(botOwner_0).Dismiss();
 
                 // make a group to add this bot to as things do not work otherwise
                 var deadBodiesController = AccessTools.Field(typeof(BotSpawner), "_deadBodiesController").GetValue(botOwner_0.BotsController.BotSpawner) as DeadBodiesController;

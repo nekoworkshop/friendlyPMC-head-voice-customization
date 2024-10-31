@@ -70,7 +70,7 @@ namespace friendlyPMC.Patches
             return groupPoint.CorePointInGame;
         }
 
-        private BotsGroup GetPlayerGroup(pitAIBossPlayer player, BotOwner bt, BotZone zn, int groupSize = 0)
+        private BotsGroup GetPlayerGroup(pitAIBossPlayer player, BotOwner bt, BotZone zn, int groupSize = 0, bool badGuyGroup = false)
         {
             if(player.bossGroup != null) return player.bossGroup;
 
@@ -88,7 +88,7 @@ namespace friendlyPMC.Patches
             WildSpawnType sptUsec = WildSpawnType.pmcUSEC;
 
             WildSpawnType roleh;
-            bool sameSideHostile;
+            bool sameSideHostile = badGuyGroup;
 
             if (player.realPlayer.Side == EPlayerSide.Bear)
             {
@@ -103,7 +103,7 @@ namespace friendlyPMC.Patches
                 roleh = WildSpawnType.assault;
             }
 
-            GetSameSideHostile(roleh, player.realPlayer.Side, out sameSideHostile);
+            if(!badGuyGroup) GetSameSideHostile(roleh, player.realPlayer.Side, out sameSideHostile);
 
             EPlayerSide side = player.realPlayer.Side;
 
@@ -641,37 +641,9 @@ namespace friendlyPMC.Patches
 
             if (boss == WildSpawnType.bossKnight)
             {
+                //bossFollowers.Add(new IProfileData(side, WildSpawnType.followerBigPipe, BotDifficulty.hard, 0f, @params));
+                //bossFollowers.Add(new IProfileData(side, WildSpawnType.followerBirdEye, BotDifficulty.impossible, 0f, @params));
 
-                Utils.Utils.FlagSet("withKnight", true);
-
-                if (friendlyPMC.bigPipeSpawn.Value)
-                {
-                    bossFollowers.Add(new IProfileData(side, WildSpawnType.followerBigPipe, BotDifficulty.hard, 0f, @params));
-                    Utils.Utils.FlagSet("withBigPipe", true);
-                }
-
-                if (friendlyPMC.birdEyeSpawn.Value)
-                {
-                    bossFollowers.Add(new IProfileData(side, WildSpawnType.followerBirdEye, BotDifficulty.impossible, 0f, @params));
-                    Utils.Utils.FlagSet("withBirdEye", true);
-                }
-                
-                if(friendlyPMC.birdEyeSpawn.Value && friendlyPMC.birdEyeSpawn.Value)
-                {
-                    Utils.Utils.FlagSet("withGoons", true);
-                }
-
-            } else
-            {
-                if(boss == WildSpawnType.followerBigPipe)
-                {
-                    Utils.Utils.FlagSet("withBigPipe", true);
-                }
-
-                if (boss == WildSpawnType.followerBirdEye)
-                {
-                    Utils.Utils.FlagSet("withBirdEye", true);
-                }
             }
 
             BotCreationDataClass bot = await BotCreationDataClass.Create(botData, botCreator, 1, botSpawnerClass);
@@ -745,6 +717,7 @@ namespace friendlyPMC.Patches
                 profile.Info.GroupId = player.realPlayer.GroupId;
                 profile.Info.TeamId = player.Player().Profile.Info.TeamId;
 
+                // profile adjustment for each boss
                 if (botRole == WildSpawnType.followerBirdEye)
                 {
                     profile.Skills.BotSoundGoef.SetCurrent(3100f, true);
@@ -762,6 +735,36 @@ namespace friendlyPMC.Patches
                     profile.Skills.RecoilControl.SetCurrent(4800f, true);
                     profile.Skills.Assault.SetCurrent(5000f, true);
                 }
+                // - common
+                float maxVitality = 2500f;
+                float maxHeavy = 1500f;
+                float maxLight = 1500f;
+                float maxStress = 2500f;
+
+                float vitalityIncrement = 30f;
+                float heavyIncrement = 20f;
+                float lightIncrement = 20f;
+
+                float stressIncrement = 20f;
+                // --- vitality
+                float scaledVitality = Utils.Utils.GetScaledValue(0f, vitalityIncrement, profile.Info.Level, maxVitality);
+                if (profile.Skills.Vitality.Current < scaledVitality)
+                    profile.Skills.Vitality.SetCurrent(scaledVitality, true);
+
+                // --- heavy vests
+                float scaledHeavy = Utils.Utils.GetScaledValue(0f, heavyIncrement, profile.Info.Level, maxHeavy);
+                if (profile.Skills.HeavyVests.Current < scaledHeavy)
+                    profile.Skills.HeavyVests.SetCurrent(scaledHeavy, true);
+
+                // --- light vests
+                float scaledLight = Utils.Utils.GetScaledValue(0f, lightIncrement, profile.Info.Level, maxLight);
+                if (profile.Skills.LightVests.Current < scaledLight)
+                    profile.Skills.LightVests.SetCurrent(scaledLight, true);
+
+                // --- stress
+                float scaledStrees = Utils.Utils.GetScaledValue(0f, stressIncrement, profile.Info.Level, maxStress);
+                if (profile.Skills.StressResistance.Current < scaledStrees)
+                    profile.Skills.StressResistance.SetCurrent(scaledStrees, true);
 
 
                 spanwers.Add(() => {
@@ -872,7 +875,7 @@ namespace friendlyPMC.Patches
 
                     Func<BotOwner, BotZone, BotsGroup> GroupAction = new Func<BotOwner, BotZone, BotsGroup>((BotOwner bt, BotZone zn) =>
                     {
-                        return GetPlayerGroup(player, bt, zn);
+                        return GetPlayerGroup(player, bt, zn,0,true);
                     });
 
                     ActivateBotFollower(
@@ -1186,15 +1189,6 @@ namespace friendlyPMC.Patches
                 // prefetch follower profile data
                 if (playerBoss.Player().Side != EPlayerSide.Savage && friendlyPMC.squadSpawn.Value && friendlyPMC.squadSetup.Value)
                     Instance?.CreateFollowerProfiles(playerBoss);
-
-                /*if (friendlyPMC.knightSpawn.Value)
-                {
-                    if (friendlyPMC.justKnightSpawn.Value || friendlyPMC.birdEyeSpawn.Value || friendlyPMC.bigPipeSpawn.Value)
-                    {
-                        Controller.BotSpawner.SetBlockedRoles(new string[] { "bossKnight", "followerBirdEye", "followerBigPipe" });
-                    }
-
-                }*/
             }
             catch (Exception e)
             {
@@ -1257,8 +1251,10 @@ namespace friendlyPMC.Patches
             }
 
             /*if (friendlyPMC.knightSpawn.Value)
-            {
-                Logger.LogInfo("Start Boss Ally Spawn");
+            {*/
+                Modules.Logger.LogInfo("Start Boss Ally Spawn");
+                
+                BotsControllerPatch.Controller.BotSpawner.SetBlockedRoles(new string[] { "bossKnight", "followerBirdEye", "followerBigPipe" });
 
                 UniTask.WhenAll(squadSpawners).ContinueWith(() =>
                 {
@@ -1268,19 +1264,19 @@ namespace friendlyPMC.Patches
                         {
                             BotsControllerPatch.Instance.SpawnBossFollower(playerBoss).Forget();
                         }
-                        catch (Exception e) 
-                        {  
-                            Logger.LogError("Failed to spawn Boss Ally");
-                            Logger.LogError(e);
+                        catch (Exception e)
+                        {
+                            Modules.Logger.LogError("Failed to spawn Boss Ally");
+                            Modules.Logger.LogError(e);
                         }
                     });
 
                 }).Forget();
-            }
+            /*}
             else
-            {*/
+            {
                 UniTask.WhenAll(squadSpawners).Forget();
-            //}
+            }*/
         }
     }
 

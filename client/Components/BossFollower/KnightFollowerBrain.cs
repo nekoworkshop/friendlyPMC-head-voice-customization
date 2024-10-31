@@ -23,8 +23,8 @@ namespace friendlyPMC.Components.BossFollower
             KnightWeaponMtnLayer layer2 = new KnightWeaponMtnLayer(_owner, 78);
             base.method_0(4, layer2, true);
             // fight logic
-            this.gclass65_0_1 = new KnightFightLayer(_owner, 65);
-            base.method_0(1, this.gclass65_0_1, true);
+            gclass65_0_1 = new KnightFightLayer(_owner, 65);
+            base.method_0(1, gclass65_0_1, true);
             // - item taker
             FollowerLootLayer layer9 = new FollowerLootLayer(_owner, 40);
             method_0(5, layer9, true);
@@ -37,7 +37,7 @@ namespace friendlyPMC.Components.BossFollower
 
         public void ForceRecalcShootPos()
         {
-            this.gclass65_0_1.ForceRecalcShootPos();
+            gclass65_0_1.ForceRecalcShootPos();
         }
 
         public override void BossOrdersChanged()

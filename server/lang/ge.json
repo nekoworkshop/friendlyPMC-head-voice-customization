@@ -82,6 +82,11 @@
         "Name": "Feindliche Bots der gleichen PMC-Seite",
         "Description": "Sollten die PMC-Bots derselben Seite feindlich zueinander sein (Folgespieler bleiben freundlich zu Ihnen)."
     },
+    "badGuy": {
+        "Name": "Böser",
+        "Description": "Sollte der Spieler gegenüber allen PMC-Bots, unabhängig von der Fraktion, feindlich eingestellt sein"
+    },
+    
     "pmcArmbands": {
         "Name": "PMC-Armbinden",
         "Description": "Sollten die PMC-Bots Armbinden tragen (rot für BEARs, blau für USECs)."
