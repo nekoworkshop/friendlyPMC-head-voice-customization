@@ -9,7 +9,7 @@ using friendlyPMC.Components;
 
 namespace friendlyPMC.Actions
 {
-    internal class FollowerPatrol : GClass361
+    public class FollowerPatrol : GClass361
     {
 
         protected readonly Player player_0;

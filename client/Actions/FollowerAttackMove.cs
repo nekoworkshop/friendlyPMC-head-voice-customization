@@ -1,10 +1,8 @@
 ﻿using EFT;
-using System.Threading;
-using UnityEngine;
 
 namespace friendlyPMC.Actions
 {
-    internal class FollowerAttackMove : GClass162
+    public class FollowerAttackMove : GClass162
     {
 
         public FollowerAttackMove(BotOwner bot) : base(bot)

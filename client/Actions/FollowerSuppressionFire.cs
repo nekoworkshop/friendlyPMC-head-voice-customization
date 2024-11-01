@@ -6,7 +6,7 @@ using UnityEngine;
 namespace friendlyPMC.Actions
 {
     // GClass224 enhancement
-    internal class FollowerSuppressionFire : GClass224
+    public class FollowerSuppressionFire : GClass224
     {
         private readonly GClass145 gclass145_0;
 

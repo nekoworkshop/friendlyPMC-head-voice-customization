@@ -778,7 +778,7 @@ namespace friendlyPMC.Patches
 
             if (boss == WildSpawnType.bossKnight)
             {
-                bossAlly = await GetBossProfile(WildSpawnType.bossKnight);
+                bossAlly = await GetBossProfile(WildSpawnType.followerBigPipe);
                 //bossFollowers.Add(new IProfileData(side, WildSpawnType.followerBigPipe, BotDifficulty.hard, 0f, @params));
                 //bossFollowers.Add(new IProfileData(side, WildSpawnType.followerBirdEye, BotDifficulty.impossible, 0f, @params));
 
@@ -795,6 +795,9 @@ namespace friendlyPMC.Patches
 
             bossAlly.Profiles.ForEach(profile =>
             {
+                
+                InteractableObjects.StoreEquipment(profile);
+
                 // normalize boss followers health
                 foreach (EBodyPart part in Enum.GetValues(typeof(EBodyPart)))
                 {

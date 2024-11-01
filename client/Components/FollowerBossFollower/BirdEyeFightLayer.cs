@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace friendlyPMC.Components.FollowerBossFollower
 {
-    internal class BirdEyeFightLayer : GClass61
+    public class BirdEyeFightLayer : GClass61
     {
         private FollowerSniperLayer followerSniperLayer;
         private FollowerCommonLayer followerCommonLayer;

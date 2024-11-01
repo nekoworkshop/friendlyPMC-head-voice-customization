@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace friendlyPMC.Components.Tactics
 {
-    internal class FollowerPusherLayer : GClass47
+    public class FollowerPusherLayer : GClass47
     {
         private FollowerCommonLayer commonLayer;
 

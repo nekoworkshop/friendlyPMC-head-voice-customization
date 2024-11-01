@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace friendlyPMC.Components.FollowerBossFollower
 {
-    internal class BirdEyeFollowerBrain : FollowerBrain
+    public class BirdEyeFollowerBrain : FollowerBrain
     {
 
         protected BirdEyeFightLayer fightLayer;
@@ -20,21 +20,24 @@ namespace friendlyPMC.Components.FollowerBossFollower
         public override void AddLayers()
         {
             // order matters for which layer get the initial priority
-            // - follow
+            // follow
             BossFollowLayer followLayer = new BossFollowLayer(_owner, 50);
             method_0(1, followLayer, true);
+            // requests
+            FollowerRequestLayer layer4 = new FollowerRequestLayer(_owner, 55);
+            method_0(2, layer4, true);
             // avoid danger
             KnightAvoidDangerLayer layer = new KnightAvoidDangerLayer(_owner, 80);
-            base.method_0(2, layer, true);
+            base.method_0(3, layer, true);
             // weapon maintenance during combat
             KnightWeaponMtnLayer layer2 = new KnightWeaponMtnLayer(_owner, 78);
-            base.method_0(3, layer2, true);
+            base.method_0(4, layer2, true);
             // sniper fight
             fightLayer = new BirdEyeFightLayer(_owner, 55);
-            method_0(4, fightLayer, true);
+            method_0(5, fightLayer, true);
             // - item taker
             FollowerLootLayer layer7 = new FollowerLootLayer(_owner, 40);
-            method_0(5, layer7, true);
+            method_0(6, layer7, true);
         }
 
         public override string ShortName()

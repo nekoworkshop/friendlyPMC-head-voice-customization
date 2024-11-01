@@ -3,7 +3,7 @@ using HarmonyLib;
 
 namespace friendlyPMC.Actions
 {
-    internal class FollowerDogFight : GClass160
+    public class FollowerDogFight : GClass160
     {
         private GClass141 gclass136_1;
         public FollowerDogFight(BotOwner bot) : base(bot) {

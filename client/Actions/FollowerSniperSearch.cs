@@ -11,7 +11,7 @@ using UnityEngine;
 
 namespace friendlyPMC.Actions
 {
-    internal class FollowerSniperSearch : GClass159
+    public class FollowerSniperSearch : GClass159
     {
         private Vector3? spotPosition;
 

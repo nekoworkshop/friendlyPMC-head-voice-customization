@@ -7,7 +7,7 @@ using UnityEngine.AI;
 
 namespace friendlyPMC.Actions
 {
-    internal class FollowerOpenDoor : BaseNodeAbstractClass
+    public class FollowerOpenDoor : BaseNodeAbstractClass
     {
 
         private bool bool_0;

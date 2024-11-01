@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace friendlyPMC.Components
 {
-    internal class pitAIBossPlayer : AIBossPlayer
+    public class pitAIBossPlayer : AIBossPlayer
     {
         private AIBossPlayerLogic aBossLogic;
 
@@ -348,7 +348,7 @@ namespace friendlyPMC.Components
             bot.BotFollower.BossFindAction();
         }
     }
-    internal class AIBossPlayerLogic : GClass362
+    public class AIBossPlayerLogic : GClass362
     {
         private Player _player;
         private pitAIBossPlayer _aiplayer;

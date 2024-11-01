@@ -14,7 +14,7 @@ using EFT.InventoryLogic;
 namespace friendlyPMC.Components
 {
 
-    internal class FollowerReceiver : BotReceiver
+    public class FollowerReceiver : BotReceiver
     {
 
         private static float closestTime = 0f;
@@ -30,7 +30,7 @@ namespace friendlyPMC.Components
             Receivers.AddReceiver(owner.ProfileId, this);
         }
 
-        private static Player IsRequesterLookingAtSomeone(Player requester, float magnitude = 27f)
+        protected static Player IsRequesterLookingAtSomeone(Player requester, float magnitude = 27f)
         {
             if(lookedAtPlayer != null && lookedAtTime > Time.time) return lookedAtPlayer;
 
@@ -76,13 +76,13 @@ namespace friendlyPMC.Components
             return lookedAtPlayer;
         }
 
-        private static bool IsRequesterLookingAt(BotOwner bot, Player requester, float distance = 27f)
+        protected static bool IsRequesterLookingAt(BotOwner bot, Player requester, float distance = 27f)
         {
             Player at = IsRequesterLookingAtSomeone(requester,distance);
             return at != null && at.ProfileId == bot.ProfileId;
         }
 
-        private static bool IsClosestBot(BotOwner bot, IPlayer requester)
+        protected static bool IsClosestBot(BotOwner bot, IPlayer requester)
         {
 
             if (closestTime > Time.time)

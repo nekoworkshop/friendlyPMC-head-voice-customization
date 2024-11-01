@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace friendlyPMC.Actions
 {
-    internal class FollowerHoldPosition : GClass221
+    public class FollowerHoldPosition : GClass221
     {
         private float timer = 0f;
         public FollowerHoldPosition (BotOwner bot) : base(bot) { }

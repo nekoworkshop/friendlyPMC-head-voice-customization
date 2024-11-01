@@ -53,7 +53,7 @@ namespace friendlyPMC.Components.FollowerBossFollower
 
             try
             {
-                baseDecision = base.KnightFight();
+                baseDecision = KnightFight();
             }
             catch (Exception ex)
             {
@@ -65,6 +65,7 @@ namespace friendlyPMC.Components.FollowerBossFollower
             if (
                 baseDecision.Reason == "regroupToBossFast" || 
                 baseDecision.Reason == "regroupToBoss" ||
+                baseDecision.Reason == "pushEnemy" ||
                 (commonLayer.OrderHasChangedRecently && request != null && request.BotRequestType == BotRequestType.attackClose) ||
                 botOwner_0.Memory.GoalEnemy.Owner.IsRole(WildSpawnType.marksman) ||
                 baseDecision.Action == BotLogicDecision.shootFromPlace

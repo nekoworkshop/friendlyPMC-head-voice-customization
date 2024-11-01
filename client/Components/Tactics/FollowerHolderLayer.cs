@@ -6,7 +6,7 @@ using UnityEngine;
 namespace friendlyPMC.Components.Tactics
 {
     /** This class is not meant to be used directly as a brain layer, but within one **/
-    internal class FollowerHolderLayer : GClass47
+    public class FollowerHolderLayer : GClass47
     {
         private FollowerCommonLayer commonLayer;
 

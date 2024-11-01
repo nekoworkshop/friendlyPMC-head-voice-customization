@@ -6,15 +6,9 @@ using friendlyPMC.Modules;
 using HarmonyLib;
 using JetBrains.Annotations;
 
-using System;
 using System.Collections.Generic;
 
 using System.Reflection;
-using System.Threading.Tasks;
-using UnityEngine;
-using System.Diagnostics;
-using Sirenix.Serialization.Utilities;
-using static WindowsManager;
 
 namespace friendlyPMC.Patches
 {
@@ -117,7 +111,6 @@ namespace friendlyPMC.Patches
 
     internal class BotMemoryDamagePatch : ModulePatch
     {
-        public static List<BotOwner> removedBots = new List<BotOwner>();
         protected override MethodBase GetTargetMethod()
         {
             return AccessTools.Method(typeof(BotMemoryClass), "method_7");
@@ -158,9 +151,10 @@ namespace friendlyPMC.Patches
 
                 BotZone zone = botOwner_0.BotsGroup.BotZone;
 
-                BossPlayers.RemoveFollower(botOwner_0, boss);
 
                 BossPlayers.Instance.GetFollower(botOwner_0).Dismiss();
+
+                BossPlayers.RemoveFollower(botOwner_0, boss);
 
                 // make a group to add this bot to as things do not work otherwise
                 var deadBodiesController = AccessTools.Field(typeof(BotSpawner), "_deadBodiesController").GetValue(botOwner_0.BotsController.BotSpawner) as DeadBodiesController;
@@ -178,9 +172,7 @@ namespace friendlyPMC.Patches
 
                 Player enemy = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(damageInfo.Player.iPlayer.ProfileId);
 
-                removedBots.Add(botOwner_0);
-
-                Utils.Enemy.MakeEnemy(botOwner_0, enemy, EBotEnemyCause.checkAddTODO);
+                Utils.Enemy.MakeEnemy(botOwner_0, enemy, EBotEnemyCause.initCauseEnemy);
 
             }
         }

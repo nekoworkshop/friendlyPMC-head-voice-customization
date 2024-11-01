@@ -5,7 +5,7 @@ using System;
 using UnityEngine;
 namespace friendlyPMC.Actions
 {
-    internal class FollowerEnemyCheck
+    public class FollowerEnemyCheck
     {
 
         public static void CheckBossReport(BotOwner bot)

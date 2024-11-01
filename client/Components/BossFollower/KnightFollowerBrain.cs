@@ -2,9 +2,8 @@
 
 namespace friendlyPMC.Components.BossFollower
 {
-    internal class KnightFollowerBrain : FollowerBrain
+    public class KnightFollowerBrain : FollowerBrain
     {
-
         KnightFightLayer gclass65_0_1;
         public KnightFollowerBrain(BotOwner owner, pitAIBossPlayer boss) : base(owner, boss)
         {
@@ -15,7 +14,10 @@ namespace friendlyPMC.Components.BossFollower
         {
             // follow layer
             BossFollowLayer layer6 = new BossFollowLayer(_owner, 50);
-            base.method_0(2, layer6, true);
+            base.method_0(1, layer6, true);
+            // requests
+            FollowerRequestLayer layer4 = new FollowerRequestLayer(_owner, 55);
+            method_0(2, layer4, true);
             // avoid danger
             KnightAvoidDangerLayer layer = new KnightAvoidDangerLayer(_owner, 80);
             base.method_0(3, layer, true);
@@ -24,10 +26,10 @@ namespace friendlyPMC.Components.BossFollower
             base.method_0(4, layer2, true);
             // fight logic
             gclass65_0_1 = new KnightFightLayer(_owner, 65);
-            base.method_0(1, gclass65_0_1, true);
-            // - item taker
+            base.method_0(5, gclass65_0_1, true);
+            // item taker
             FollowerLootLayer layer9 = new FollowerLootLayer(_owner, 40);
-            method_0(5, layer9, true);
+            method_0(6, layer9, true);
         }
 
         public override string ShortName()

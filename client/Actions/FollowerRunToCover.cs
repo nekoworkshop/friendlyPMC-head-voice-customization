@@ -1,13 +1,8 @@
 ﻿using EFT;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace friendlyPMC.Actions
 {
-    internal class FollowerRunToCover : GClass180
+    public class FollowerRunToCover : GClass180
     {
         public FollowerRunToCover(BotOwner bot) : base(bot)
         {

@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace friendlyPMC.Actions
 {
-    internal class FollowerCoverToCover : GClass159
+    public class FollowerCoverToCover : GClass159
     {
         private Vector3? _coverTarget;
         private Vector3? coverPosition;

@@ -12,7 +12,7 @@ using HandEvent = GEventArgs1;
 
 namespace friendlyPMC.Components
 {
-    internal class FollowerBrain : BaseBrain
+    public class FollowerBrain : BaseBrain
     {
         FollowerFightLayer fightLayer;
 
@@ -346,9 +346,10 @@ namespace friendlyPMC.Components
 
                 shootdir *= 20f; // ensure the bot will not look down at the ground
 
-                if (distance <= 20f)
+                if (distance <= 35f)
                 {
                     FakeShot(shootdir);
+                    if(distance <= 20f)
                     Utils.Enemy.MakeEnemy(_owner, enemy);
                 }
                 else if (

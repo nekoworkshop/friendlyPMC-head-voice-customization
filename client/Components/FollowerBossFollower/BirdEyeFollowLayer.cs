@@ -4,7 +4,7 @@ using friendlyPMC.Components.BossFollower;
 
 namespace friendlyPMC.Components.FollowerBossFollower
 {
-    internal class BirdEyeFollowLayer: BossFollowLayer
+    public class BirdEyeFollowLayer: BossFollowLayer
     {
         public BirdEyeFollowLayer(BotOwner bot, int priority) : base(bot, priority)
         {

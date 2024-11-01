@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace friendlyPMC.Actions
 {
-    internal class FollowerGoToPoint : GClass173
+    public class FollowerGoToPoint : GClass173
     {
         private bool _shouldSprint = true;
 

@@ -332,6 +332,7 @@ namespace friendlyPMC
             harmony.PatchAll(typeof(LookSensorPatch).Assembly);
             // patch hearing
             new HearingSensorPatch().Enable();
+            new FootstepSoundPatch().Enable();
             new BulletImpactPatch().Enable();
             new PlayerSayPatch().Enable();
             new GamePlayerOwnerPatch().Enable();

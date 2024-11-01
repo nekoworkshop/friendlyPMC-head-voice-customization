@@ -11,7 +11,7 @@ using static RootMotion.FinalIK.IKSolver;
 namespace friendlyPMC.Components.Tactics
 {
     /** This class is not meant to be used directly as a brain layer, but within one **/
-    internal class FollowerCommonLayer : BaseLogicLayerSimpleAbstractClass
+    public class FollowerCommonLayer : BaseLogicLayerSimpleAbstractClass
     {
 
         private CustomNavigationPoint customNavigationPoint_0;

@@ -5,7 +5,7 @@ using System.Collections.Generic;
 namespace friendlyPMC.Modules
 {
     // replication of GClass459
-    internal class FollowerCreateNode
+    public class FollowerCreateNode
     {
 
         public static GClass134 CreateNode(BotLogicDecision type, BotOwner bot)

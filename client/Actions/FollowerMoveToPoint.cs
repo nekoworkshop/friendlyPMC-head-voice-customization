@@ -12,7 +12,7 @@ using Comfort.Common;
 
 namespace friendlyPMC.Actions
 {
-    internal class FollowerMoveToPoint: GClass173
+    public class FollowerMoveToPoint: GClass173
     {
         private bool _shouldSprint = true;
 

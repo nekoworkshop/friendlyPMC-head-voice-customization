@@ -14,7 +14,7 @@ using friendlyPMC.Modules;
 
 namespace friendlyPMC.Components
 {
-    internal class BossFollowerPlayer : BotFollowerPlayer
+    public class BossFollowerPlayer : BotFollowerPlayer
     {
 
         public BossFollowerPlayer(BotOwner bot, pitAIBossPlayer player, WildSpawnType bossRole) : base(bot, player, false, bossRole) {
@@ -40,6 +40,8 @@ namespace friendlyPMC.Components
             settingModif.AccuratySpeedCoef = 1.35f;
             settingModif.ScatteringCoef = 1.7f;
 
+            settingModif.VisibleDistCoef = 1.2f;
+
             bot.Settings.FileSettings.Look.FULL_SECTOR_VIEW = true;
 
             base.SetFollowerSettings(bot);
@@ -56,11 +58,7 @@ namespace friendlyPMC.Components
                 bot.Settings.FileSettings.Aiming.SCATTERING_DIST_MODIF = 0.2f;
                 bot.Settings.FileSettings.Aiming.COEF_FROM_COVER = 1f;
                 bot.Settings.FileSettings.Aiming.HARD_AIM = 0.9f;
-                // bird eye, aim for the head
-                bot.Settings.FileSettings.Aiming.AIMING_TYPE = 6;
             }
-            
-            bot.Settings.FileSettings.Aiming.AIMING_TYPE = 3;
 
             EPlayerSide side = _player.Player().Side;
 

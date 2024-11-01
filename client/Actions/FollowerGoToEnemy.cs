@@ -8,7 +8,7 @@ using UnityEngine.AI;
 namespace friendlyPMC.Actions
 {
 
-    internal class FollowerGoToEnemy : GClass162
+    public class FollowerGoToEnemy : GClass162
     {
         private bool shouldSprint = false;
 

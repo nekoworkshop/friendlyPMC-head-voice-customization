@@ -11,7 +11,7 @@ using UnityEngine;
 
 namespace friendlyPMC.Actions
 {
-    internal class FollowerGuardCover : FollowerSniperSearch
+    public class FollowerGuardCover : FollowerSniperSearch
     {
         public FollowerGuardCover(BotOwner owner)
         : base(owner)

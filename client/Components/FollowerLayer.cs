@@ -8,7 +8,7 @@ using UnityEngine;
 namespace friendlyPMC.Components
 {
     // GClass103 is a generic follower layer
-    internal class FollowerLayer : GClass103
+    public class FollowerLayer : GClass103
     {
         protected float float_2;
 

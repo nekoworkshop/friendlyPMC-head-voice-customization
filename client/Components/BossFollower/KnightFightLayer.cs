@@ -32,11 +32,13 @@ namespace friendlyPMC.Components.BossFollower
 
         protected FollowerCommonLayer commonLayer;
         protected FollowerPusherLayer pusherLayer;
+        protected FollowerGuard guardLayer;
 
         public KnightFightLayer(BotOwner bot, int priority) : base(bot, priority)
         {
             pusherLayer = new FollowerPusherLayer(bot, priority);
             commonLayer = pusherLayer.CommonLayer;
+            guardLayer = new FollowerGuard(bot, priority,pusherLayer);
         }
         public override void OnActivate()
         {
@@ -345,8 +347,18 @@ namespace friendlyPMC.Components.BossFollower
 
             if (baseDecision.HasValue) return baseDecision.Value;
 
+            bool useGrenade = GClass761.Random(0f, 2f) > 1f;
+            
+            AICoreActionResultStruct<BotLogicDecision> decision = guardLayer.method_29(useGrenade,BotLogicDecision.debugGrenade);
+
+            if(decision.Action != BotLogicDecision.debugGrenade)
+            {
+                return decision;
+            }
+
             AICoreActionResultStruct<BotLogicDecision> push = pusherLayer.EngageEnemy();
             customNavigationPoint_0 = pusherLayer.NavigationPoint;
+
             return push;
         }
 

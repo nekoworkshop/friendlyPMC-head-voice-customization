@@ -17,7 +17,7 @@ using friendlyPMC.Requests;
 
 namespace friendlyPMC.Actions
 {
-    internal class FollowerTakeLoot : BaseNodeAbstractClass
+    public class FollowerTakeLoot : BaseNodeAbstractClass
     {
         private BotFollowerPlayer _follower;
 

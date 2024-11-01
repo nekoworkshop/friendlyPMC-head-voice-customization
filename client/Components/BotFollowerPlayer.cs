@@ -15,11 +15,10 @@ using BepInEx.Bootstrap;
 
 using GridClassEx = GClass2516;
 using GridCacheClass = GClass1401;
-using static EFT.SpeedTree.TreeWind;
 
 namespace friendlyPMC.Components
 {
-    internal class BotFollowerPlayer
+    public class BotFollowerPlayer
     {
         protected BotOwner _bot;
         protected pitAIBossPlayer _player;
@@ -49,7 +48,7 @@ namespace friendlyPMC.Components
 
             _IsSquadMate = isSquad;
 
-            settingModif = new GClass528(1.2f, 1.2f, 1f, 1.1f, 1f, 1f, 1f, 1f, 1f);
+            settingModif = new GClass528(1.2f, 1.2f, 1f, 1.1f, 1f, 1f, 1.2f, 1f, 1f);
 
             NpcMessage.AddNpc(bot, isSquad);
 
