@@ -9,8 +9,12 @@
 - x - assist tactic should also do supression on it's own and also use grenades
 
 - more improvement on awareness
+- - better checks for enemy voice (if it a battle voice - auto aquire target)
+- - check for bush sounds
+- - increase hearing volume
+- - check for gunshots and auto aquire target if close enough
 
-- add "Bad Guy" setting
+- x - add "Bad Guy" setting
 
 - fix glitchy behavior of boss followers
 - - not turning hostile when player accidentally shoots them

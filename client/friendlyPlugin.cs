@@ -169,11 +169,6 @@ namespace friendlyPMC
         public static ConfigEntry<bool> pmcArmbands;
         public static ConfigEntry<bool> englishBear;
 
-        public static ConfigEntry<bool> knightSpawn;
-        public static ConfigEntry<bool> bigPipeSpawn;
-        public static ConfigEntry<bool> birdEyeSpawn;
-        public static ConfigEntry<bool> justKnightSpawn;
-
         public static ConfigEntry<int> patrolRadius;
 
 

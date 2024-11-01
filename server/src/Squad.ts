@@ -48,6 +48,8 @@ import { LocaleService } from "@spt/services/LocaleService";
 
 import { IBots } from "@spt/models/spt/bots/IBots";
 import { DatabaseService } from "@spt/services/DatabaseService";
+import { ConfigServer } from "@spt/servers/ConfigServer";
+import { ConfigTypes } from "@spt/models/enums/ConfigTypes";
 
 class friendlyPMC {
 	config = {
@@ -336,6 +338,21 @@ class friendlyPMC {
 		const botController = container.resolve<BotController>("BotController");
 		const profileHelper = container.resolve<ProfileHelper>("ProfileHelper");
 
+		const configServer = container.resolve<ConfigServer>("ConfigServer");
+
+		const PMCBOT: IPmcConfig = configServer.getConfig(ConfigTypes.PMC);
+
+		const PMCBOTVALUES = {
+			isUsec: PMCBOT.isUsec,
+			convertIntoPmcChance: {},
+		};
+
+		for (let k in PMCBOT.convertIntoPmcChance) {
+			PMCBOTVALUES.convertIntoPmcChance[k] = {};
+			PMCBOTVALUES.convertIntoPmcChance[k].min = 0;
+			PMCBOTVALUES.convertIntoPmcChance[k].max = 0;
+		}
+
 		const databaseService = container.resolve<DatabaseService>("DatabaseService");
 
 		staticRouterModService.registerStaticRouter(
@@ -560,6 +577,23 @@ class friendlyPMC {
 					return res;
 				}),
 
+				new RouteAction("/client/game/bot/preventpmcgenerate", (url: string, info: { State: boolean }, sessionID: string, output: string): any => {
+					if (info.State) {
+						PMCBOT.isUsec = 0;
+						for (let k in PMCBOT.convertIntoPmcChance) {
+							PMCBOT.convertIntoPmcChance[k].min = 0;
+							PMCBOT.convertIntoPmcChance[k].max = 0;
+						}
+					} else {
+						PMCBOT.isUsec = PMCBOTVALUES.isUsec;
+						for (let k in PMCBOT.convertIntoPmcChance) {
+							PMCBOT.convertIntoPmcChance[k].min = PMCBOTVALUES.convertIntoPmcChance[k].min;
+							PMCBOT.convertIntoPmcChance[k].max = PMCBOTVALUES.convertIntoPmcChance[k].max;
+						}
+					}
+
+					return httpResponseUtil.emptyResponse();
+				}),
 				new RouteAction("/singleplayer/pitlang", (url: string, info: any, sessionID: string, output: string): any => {
 					return httpResponseUtil.noBody(this.lang);
 				}),
@@ -630,9 +664,9 @@ class friendlyPMC {
 				DEFAULT_ENEMY_BEAR: pmcType == "usec" || pmcType == "sptusec" || pmcType == "pmcusec" || is_hostile,
 				DEFAULT_ENEMY_SAVAGE: true,
 				DEFAULT_ENEMY_USEC: pmcType == "bear" || pmcType == "sptbear" || pmcType == "pmcbear" || is_hostile,
-				DEFAULT_BEAR_BEHAVIOUR: !is_hostile && (pmcType == "bear" || pmcType == "sptbear" || pmcType == "pmcbear") ? "Ignore" : "Attack",
+				DEFAULT_BEAR_BEHAVIOUR: !is_bad_guy && !is_hostile && (pmcType == "bear" || pmcType == "sptbear" || pmcType == "pmcbear") ? "Ignore" : "Attack",
 				DEFAULT_SAVAGE_BEHAVIOUR: "Attack",
-				DEFAULT_USEC_BEHAVIOUR: !is_hostile && (pmcType == "usec" || pmcType == "sptusec" || pmcType == "pmcusec") ? "Ignore" : "Attack",
+				DEFAULT_USEC_BEHAVIOUR: !is_bad_guy && !is_hostile && (pmcType == "usec" || pmcType == "sptusec" || pmcType == "pmcusec") ? "Ignore" : "Attack",
 				CAN_RECIVE_PLAYER_REQUESTS: !is_hostile && !is_bad_guy,
 				CAN_RECEIVE_PLAYER_REQUESTS: !is_hostile && !is_bad_guy,
 				CAN_RECEIVE_PLAYER_REQUESTS_USEC: !is_hostile && !is_bad_guy,
