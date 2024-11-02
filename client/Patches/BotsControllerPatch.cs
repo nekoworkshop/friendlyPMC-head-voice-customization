@@ -991,7 +991,7 @@ namespace friendlyPMC.Patches
 
                             Utils.Utils.SetTimeout(() =>
                             {
-                                follower.BotTalk.TrySay(EPhraseTrigger.Ready, false);
+                                follower.BotTalk.TrySay(EPhraseTrigger.Ready, true);
                             }, 2000);
 
                         }), true, stopWatch);

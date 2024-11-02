@@ -146,7 +146,7 @@ namespace friendlyPMC.Components.Tactics
 
                 if (customNavigationPoint_0 != null && coverTimer < Time.time)
                 {
-                    return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.goToCoverPoint, "reposition");
+                    return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMoving, "reposition");
                 }
                 // -- fallback #1, just wait
                 if (holdTimer < Time.time)

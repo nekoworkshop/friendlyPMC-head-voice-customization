@@ -14,6 +14,8 @@
 - - increase hearing volume
 - - check for gunshots and auto aquire target if close enough
 
+- revamp the search action where we manually check the best spot for a shooting position rather than just doing a random pick
+
 - x - add "Bad Guy" setting
 
 - fix glitchy behavior of boss followers
