@@ -14,10 +14,6 @@ import { Difficulty, IBotType } from "@spt/models/eft/common/tables/IBotType";
 
 import { LogTextColor } from "@spt/models/spt/logging/LogTextColor";
 
-import { ILocations } from "@spt/models/spt/server/ILocations";
-
-import { openZonesMap } from "./AOZExports";
-
 import { ITraderConfig } from "@spt/models/spt/config/ITraderConfig";
 import { TraderHelper } from "@spt/helpers/TraderHelper";
 import { Traders } from "@spt/models/enums/Traders";
@@ -632,11 +628,11 @@ class friendlyPMC {
 		this.Bots = Bots;
 
 		// open all zones to the bots
-		const locations: ILocations = tables.locations;
+		/* const locations: ILocations = tables.locations;
 		for (const altLocation in openZonesMap) {
 			locations[altLocation].base.OpenZones = openZonesMap[altLocation].join(",");
 			this.Logger.info(`Opened ${locations[altLocation].base.OpenZones} for bots in ${locations[altLocation].base.Name} location`);
-		}
+		} */
 
 		this.botsTable = tables.bots;
 

@@ -72,7 +72,7 @@ namespace friendlyPMC.Patches
                 
                 float distance = Vector3.Distance(bot.GetPlayer.Transform.position, position);
 
-                bool shouldReact = distance < power;
+                bool shouldReact = distance <= power;
 
                 if(!shouldReact) continue;
 

@@ -10,7 +10,7 @@ namespace friendlyPMC.Components
     // GClass103 is a generic follower layer
     public class FollowerLayer : GClass103
     {
-        protected float float_2;
+        protected float float_2 = 0f;
 
         protected CustomNavigationPoint customNavigationPoint_0;
 
@@ -18,9 +18,14 @@ namespace friendlyPMC.Components
 
         protected bool _triedToSwitchToMain = false;
 
+        protected bool _triedFillMagazines = false;
+
+        protected float float_3 = 0f;
+
         public FollowerLayer(BotOwner bot, int priority) : base(bot, priority)
         {
             float_2 = Time.time + 60f;
+            float_3 = Time.time + 60f;
         }
         public override bool ShallUseNow()
         {
@@ -34,7 +39,11 @@ namespace friendlyPMC.Components
             else 
                 shouldUse = HasBoss() && !InteractableObjects.IsTaker(botOwner_0) && !InteractableObjects.IsOpener(botOwner_0);
 
-            if(!shouldUse) _triedToSwitchToMain = false;
+            if (!shouldUse)
+            {
+                _triedToSwitchToMain = false;
+                _triedFillMagazines = false;
+            }
 
             return shouldUse;
         }
@@ -129,6 +138,13 @@ namespace friendlyPMC.Components
                 {
                     float_2 = Time.time + 30f;
                     botOwner_0.WeaponManager.Reload.TryReload();
+                }
+
+                if(!_triedFillMagazines && float_3 < Time.time)
+                {
+                    botOwner_0.WeaponManager.Reload.TryFillMagazines();
+                    _triedFillMagazines = true;
+                    float_3 = Time.time + 30f;
                 }
 
                 if (HasBoss())

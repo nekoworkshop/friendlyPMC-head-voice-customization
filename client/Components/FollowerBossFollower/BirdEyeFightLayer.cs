@@ -102,7 +102,7 @@ namespace friendlyPMC.Components.FollowerBossFollower
                 )
                 {
 
-                    if (!botOwner_0.Memory.HaveEnemy || !botOwner_0.Memory.GoalEnemy.IsVisible)
+                    if (!botOwner_0.Memory.HaveEnemy || !botOwner_0.Memory.GoalEnemy.IsVisible || !botOwner_0.Memory.GoalEnemy.CanShoot)
                     {
                         return followerCommonLayer.GetCloserToBoss(out customNavigationPoint_0);
                     }

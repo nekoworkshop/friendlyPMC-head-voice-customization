@@ -778,7 +778,7 @@ namespace friendlyPMC.Patches
 
             if (boss == WildSpawnType.bossKnight)
             {
-                bossAlly = await GetBossProfile(WildSpawnType.followerBigPipe);
+                bossAlly = await GetBossProfile(WildSpawnType.followerBirdEye);
                 //bossFollowers.Add(new IProfileData(side, WildSpawnType.followerBigPipe, BotDifficulty.hard, 0f, @params));
                 //bossFollowers.Add(new IProfileData(side, WildSpawnType.followerBirdEye, BotDifficulty.impossible, 0f, @params));
 
