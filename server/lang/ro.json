@@ -31,7 +31,7 @@
 	},
     "badGuy": {
         "Name": "Inamic",
-        "Description": "Ar trebui ca jucătorul să fie ostil tuturor bot-urilor PMC, indiferent de facțiune"
+        "Description": "Ar trebui ca jucătorul să fie ostil tuturor boților PMC, indiferent de facțiune"
     },    
 	"extraPickups": {
 		"Name": "Numărul maxim de însoțitori ridicați",
