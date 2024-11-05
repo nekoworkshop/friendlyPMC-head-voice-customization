@@ -8,9 +8,9 @@
     "friendlypmc-knight-competition declinePlayerMessage": "",
     "friendlypmc-knight-competition changeQuestMessageText": "",
     "friendlypmc-knight-competition note": "Both you and Knight will have to survive the raid per each map",
-    "friendlypmc-knight-competition-1" : "Eliminate 5 PMCs on Woods while teamed up with Knight",
-    "friendlypmc-knight-competition-2" : "Eliminate 5 PMCs on Shoreline while teamed up with Knight",
-    "friendlypmc-knight-competition-3" : "Eliminate 5 PMCs on Lighthouse while teamed up with Knight",
+    "friendlypmc-knight-competition-1" : "Eliminate 5 PMCs on Lighthouse while teamed up with Knight",
+    "friendlypmc-knight-competition-2" : "Eliminate 5 PMCs on Woods while teamed up with Knight",
+    "friendlypmc-knight-competition-3" : "Eliminate 5 PMCs on Shoreline while teamed up with Knight",
     "friendlypmc-knight-competition-4" : "Eliminate 5 PMCs on Customs while teamed up with Knight",
     "friendlypmc-knight-competition-fail" : "You and Knight must not die or leave the raid while the task is active (Status: KIA, Left the Action, MIA, Ran Through)"
 }

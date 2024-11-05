@@ -249,11 +249,12 @@ namespace friendlyPMC
             new GestureMenuAvailablePhrasesPatch().Enable();
             new EPhraseTriggerPatch().Enable();
 
+            new ConditionCounterPatch().Enable();
+
             var harmony = new Harmony("xyz.pit.friendlypmc");
 
             harmony.PatchAll(typeof(LocalGameCtorPatch).Assembly);
             harmony.PatchAll(typeof(BaseLocalGameVmethod4Patch).Assembly); // spawn patch
-            QuestControllerPatch.ApplyPatch(harmony);
 
             ConsoleScreen.Processor.RegisterCommand("followerstome", delegate ()
             {
