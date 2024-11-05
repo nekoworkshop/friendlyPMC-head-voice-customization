@@ -142,7 +142,7 @@ namespace friendlyPMC.Patches
             var brain = botOwner_0.Brain.BaseBrain as FollowerBrain;
             if (brain == null) return;
 
-            if (brain.currentTactic == "Assist")
+            if (brain.currentTactic == "Assist" && !botOwner_0.IsRole(WildSpawnType.bossKnight))
             {
                 var boss = botOwner_0.BotFollower.BossToFollow as pitAIBossPlayer;
                 if (boss == null) return;

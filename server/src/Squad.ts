@@ -14,11 +14,6 @@ import { Difficulty, IBotType } from "@spt/models/eft/common/tables/IBotType";
 
 import { LogTextColor } from "@spt/models/spt/logging/LogTextColor";
 
-import { ITraderConfig } from "@spt/models/spt/config/ITraderConfig";
-import { TraderHelper } from "@spt/helpers/TraderHelper";
-import { Traders } from "@spt/models/enums/Traders";
-import { SetFreemanTrader } from "./Trader";
-
 import { ImageRouter } from "@spt/routers/ImageRouter";
 import type { PostSptModLoader } from "@spt/loaders/PostSptModLoader";
 
@@ -47,6 +42,15 @@ import { DatabaseService } from "@spt/services/DatabaseService";
 import { ConfigServer } from "@spt/servers/ConfigServer";
 import { ConfigTypes } from "@spt/models/enums/ConfigTypes";
 
+import { ITraderConfig } from "@spt/models/spt/config/ITraderConfig";
+
+import { KnightTrader } from "./Trader";
+
+import { IRagfairConfig } from "@spt/models/spt/config/IRagfairConfig";
+import { TraderHelper as Helper } from "./TraderHelper";
+import { PreSptModLoader } from "@spt/loaders/PreSptModLoader";
+import { JsonUtil } from "@spt/utils/JsonUtil";
+
 class friendlyPMC {
 	config = {
 		sameSideHostile: false,
@@ -55,14 +59,7 @@ class friendlyPMC {
 		englishBear: true,
 	};
 
-	lang = {
-		returnItems: <string[]>[],
-		returnItemsDeath: <string[]>[],
-		teamEscaped: <string[]>[],
-		teamSomeEscaped: <string[]>[],
-		friendlyEscaped: <string[]>[],
-		allyBossEscaped: <string[]>[],
-	};
+	lang: { [key: string]: any } = {};
 
 	lang_en = {
 		//prettier-ignore
@@ -229,6 +226,8 @@ class friendlyPMC {
 	LocaleService: LocaleService;
 	randomUtil: RandomUtil;
 
+	knightTrader: KnightTrader;
+
 	private _StringFormat(str: string, ...values: string[]) {
 		return str.replace(/\{(\d+)\}/g, function (match, number) {
 			return typeof values[number] != "undefined" && values[number] !== null ? values[number] : match;
@@ -238,10 +237,6 @@ class friendlyPMC {
 	originalgetPmcDifficultySettings: BotDifficultyHelper["getPmcDifficultySettings"];
 	originalgetBotDifficulty: BotController["getBotDifficulty"];
 
-	originalGetTraderById: TraderHelper["getTraderById"];
-
-	originalGetValidTraderIdByEnumValue: TraderHelper["getValidTraderIdByEnumValue"];
-
 	originalGenerateBot: BotGenerator["generateBot"];
 
 	botsTable: IBots;
@@ -250,6 +245,14 @@ class friendlyPMC {
 		this.Logger = container.resolve("WinstonLogger");
 		this.mailSendService = container.resolve("MailSendService");
 		this.LocaleService = container.resolve("LocaleService");
+
+		const configServer = container.resolve<ConfigServer>("ConfigServer");
+		const databaseService = container.resolve<DatabaseService>("DatabaseService");
+		const preSptModLoader: PreSptModLoader = container.resolve<PreSptModLoader>("PreSptModLoader");
+		const imageRouter: ImageRouter = container.resolve("ImageRouter");
+		const traderConfig: ITraderConfig = configServer.getConfig<ITraderConfig>(ConfigTypes.TRADER);
+		const ragfairConfig = configServer.getConfig<IRagfairConfig>(ConfigTypes.RAGFAIR);
+		const jsonUtil: JsonUtil = container.resolve<JsonUtil>("JsonUtil");
 
 		// patch getPmcDifficultySettings as that is where we actually make the bots be friendly
 		this.getPmcDifficultySettings = this.getPmcDifficultySettings.bind(this);
@@ -277,33 +280,7 @@ class friendlyPMC {
 			},
 			{ frequency: "Always" }
 		);
-
-		this.getTraderById = this.getTraderById.bind(this);
-		container.afterResolution(
-			"TraderHelper",
-			(_t, result: TraderHelper) => {
-				if (!this.originalGetTraderById) {
-					this.originalGetTraderById = result.getTraderById.bind(result);
-				}
-
-				result.getTraderById = this.getTraderById;
-			},
-			{ frequency: "Always" }
-		);
-
-		this.getValidTraderIdByEnumValue = this.getValidTraderIdByEnumValue.bind(this);
-		container.afterResolution(
-			"TraderHelper",
-			(_t, result: TraderHelper) => {
-				if (!this.originalGetValidTraderIdByEnumValue) {
-					this.originalGetValidTraderIdByEnumValue = result.getValidTraderIdByEnumValue.bind(result);
-				}
-
-				result.getValidTraderIdByEnumValue = this.getValidTraderIdByEnumValue;
-			},
-			{ frequency: "Always" }
-		);
-
+		// patch generateBot so that the Goons have meds
 		this.generateBot = this.generateBot.bind(this);
 		container.afterResolution(
 			"BotGenerator",
@@ -317,13 +294,6 @@ class friendlyPMC {
 			{ frequency: "Always" }
 		);
 
-		const imageRouter: ImageRouter = container.resolve("ImageRouter");
-		const modLoader: PostSptModLoader = container.resolve("PostSptModLoader");
-
-		const folder = path.basename(path.dirname(__dirname));
-
-		imageRouter.addRoute("/files/trader/avatar/general", `${modLoader.getModPath(folder)}/avatar/general.jpg`);
-
 		// add a new router for handling items being given from the squad members
 		const staticRouterModService = container.resolve<StaticRouterModService>("StaticRouterModService");
 		const httpResponseUtil = container.resolve<HttpResponseUtil>("HttpResponseUtil");
@@ -333,8 +303,6 @@ class friendlyPMC {
 		const botGenerator = container.resolve<BotGenerator>("BotGenerator");
 		const botController = container.resolve<BotController>("BotController");
 		const profileHelper = container.resolve<ProfileHelper>("ProfileHelper");
-
-		const configServer = container.resolve<ConfigServer>("ConfigServer");
 
 		const PMCBOT: IPmcConfig = configServer.getConfig(ConfigTypes.PMC);
 
@@ -348,8 +316,6 @@ class friendlyPMC {
 			PMCBOTVALUES.convertIntoPmcChance[k].min = 0;
 			PMCBOTVALUES.convertIntoPmcChance[k].max = 0;
 		}
-
-		const databaseService = container.resolve<DatabaseService>("DatabaseService");
 
 		staticRouterModService.registerStaticRouter(
 			"friendlyPMC",
@@ -596,16 +562,20 @@ class friendlyPMC {
 			],
 			"custom-static-friendly-pmc"
 		);
+
+		const folder = path.basename(path.dirname(__dirname));
+		this.knightTrader = new KnightTrader(folder, preSptModLoader, imageRouter, traderConfig, ragfairConfig, jsonUtil);
 	}
 
 	postDBLoad(container: DependencyContainer) {
-		const configServer: any = container.resolve("ConfigServer");
+		const configServer = container.resolve<ConfigServer>("ConfigServer");
 
-		const Bots: IBotConfig = configServer.getConfig("spt-bot");
-		const PMCBOT: IPmcConfig = configServer.getConfig("spt-pmc");
-		const Traders: ITraderConfig = configServer.getConfig("spt-trader");
+		const Bots = configServer.getConfig<IBotConfig>(ConfigTypes.BOT);
+		const PMCBOT = configServer.getConfig<IPmcConfig>(ConfigTypes.PMC);
 
 		const databaseServer = container.resolve<DatabaseServer>("DatabaseServer");
+		const databaseService = container.resolve<DatabaseService>("DatabaseService");
+
 		const tables = databaseServer.getTables();
 
 		this.lang = this.lang_en;
@@ -627,16 +597,9 @@ class friendlyPMC {
 
 		this.Bots = Bots;
 
-		// open all zones to the bots
-		/* const locations: ILocations = tables.locations;
-		for (const altLocation in openZonesMap) {
-			locations[altLocation].base.OpenZones = openZonesMap[altLocation].join(",");
-			this.Logger.info(`Opened ${locations[altLocation].base.OpenZones} for bots in ${locations[altLocation].base.Name} location`);
-		} */
-
 		this.botsTable = tables.bots;
 
-		SetFreemanTrader(tables, Traders);
+		this.knightTrader.AddToDb(tables);
 	}
 
 	private _makeFriendlyOrHostile(diff: Difficulty, pmcType: string) {
@@ -740,25 +703,6 @@ class friendlyPMC {
 		return this._makeFriendlyOrHostile(result, type);
 	}
 
-	getTraderById(traderId: string): Traders {
-		if (traderId == "friendlypmc-return-loot") {
-			return "FRIENDLYPMC" as any;
-		}
-
-		const result = this.originalGetTraderById(traderId);
-
-		return result;
-	}
-
-	getValidTraderIdByEnumValue(traderEnumValue: Traders): string {
-		if ((traderEnumValue as any) == "FRIENDLYPMC") {
-			return "friendlypmc-return-loot";
-		}
-		const result = this.originalGetValidTraderIdByEnumValue(traderEnumValue);
-
-		return result;
-	}
-
 	generateBot(sessionId: string, bot: IBotBase, botJsonTemplate: IBotType, botGenerationDetails: BotGenerationDetails) {
 		const role = botGenerationDetails.role.toLowerCase();
 		if (role == "followerbirdeye" || role == "followerbigpipe" || role == "bossknight") {
@@ -767,8 +711,6 @@ class friendlyPMC {
 				"1": 2,
 				"2": 6,
 			};
-
-			this.Logger.info("FriendlyPMC:  Patching bot generation for " + role);
 		}
 
 		const result = this.originalGenerateBot(sessionId, bot, botJsonTemplate, botGenerationDetails);

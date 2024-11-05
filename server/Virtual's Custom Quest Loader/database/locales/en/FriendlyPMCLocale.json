@@ -1,0 +1,16 @@
+{
+    "friendlypmc-knight-competition name": "Who let the dogs out?",
+    "friendlypmc-knight-competition description": "What's up fish? I see you working your way to the top, shooting, looting, reaping and tearing. But do you actually have what it takes to run with the big dogs? Let's find out. How about you and me teamup and do a couple of runs, a little competition, see who can stack the most. You in?",
+    "friendlypmc-knight-competition startedMessageText": "",
+    "friendlypmc-knight-competition successMessageText": "You the man!... Neah, you are right, I am the man. But you did good rookie. Listen, from now on - give me a shout when you wanna teamup and let these tourists know what's what. And since you did this good, the boys will be joining us. Get ready for some real fun now!\n (You now have Knight as your friend which you can request to join you in raids. He will be joined by BigPipe and BirdEye. Note that they will not spawn if you have Squad Spawn enabled and they are only available for PMC).",
+    "friendlypmc-knight-competition failMessageText": "Come on man, I have faith in you. Let's do this, let's show them what you are made of.",
+    "friendlypmc-knight-competition acceptPlayerMessage": "",
+    "friendlypmc-knight-competition declinePlayerMessage": "",
+    "friendlypmc-knight-competition changeQuestMessageText": "",
+    "friendlypmc-knight-competition note": "Both you and Knight will have to survive the raid per each map",
+    "friendlypmc-knight-competition-1" : "Eliminate 5 PMCs on Woods while teamed up with Knight",
+    "friendlypmc-knight-competition-2" : "Eliminate 5 PMCs on Shoreline while teamed up with Knight",
+    "friendlypmc-knight-competition-3" : "Eliminate 5 PMCs on Lighthouse while teamed up with Knight",
+    "friendlypmc-knight-competition-4" : "Eliminate 5 PMCs on Customs while teamed up with Knight",
+    "friendlypmc-knight-competition-fail" : "You and Knight must not die or leave the raid while the task is active (Status: KIA, Left the Action, MIA, Ran Through)"
+}

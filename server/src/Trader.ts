@@ -1,111 +1,38 @@
-import { TraderServiceType } from "@spt/models/enums/TraderServiceType";
+import { TraderHelper as Helper } from "./TraderHelper";
+
+import { PreSptModLoader } from "@spt/loaders/PreSptModLoader";
+import { ImageRouter } from "@spt/routers/ImageRouter";
 import { ITraderConfig } from "@spt/models/spt/config/ITraderConfig";
+import { Traders } from "@spt/models/enums/Traders";
+import { IRagfairConfig } from "@spt/models/spt/config/IRagfairConfig";
 import { IDatabaseTables } from "@spt/models/spt/server/IDatabaseTables";
+import { JsonUtil } from "@spt/utils/JsonUtil";
+import { ITraderAssort, ITraderBase } from "@spt/models/eft/common/tables/ITrader";
 
-export function SetFreemanTrader(Tables: IDatabaseTables, Traders: ITraderConfig) {
-	const traders = Tables.traders;
+import traderBase = require("../traderKnight/base.json");
+import traderAssort = require("../traderKnight/assort.json");
+import traderQuests = require("../traderKnight/quests.json");
 
-	const trdid = "friendlypmc-return-loot";
+export class KnightTrader {
+	traderHelper: Helper;
 
-	// add special trader for delivering items back
-	traders[trdid] = {
-		//@ts-ignore
-		assort: {
-			barter_scheme: {},
-			items: [],
-			loyal_level_items: {},
-		},
-		base: {
-			_id: trdid,
-			availableInRaid: true,
-			avatar: "/files/trader/avatar/general.jpg",
-			balance_dol: 0,
-			balance_eur: 0,
-			balance_rub: 7000000,
-			buyer_up: false,
-			currency: "RUB",
-			customization_seller: false,
-			discount: 0,
-			discount_end: 0,
-			gridHeight: 120,
-			insurance: {
-				availability: false,
-				excluded_category: [],
-				max_return_hour: 0,
-				max_storage_time: 48,
-				min_payment: 0,
-				min_return_hour: 0,
-			},
-			items_buy: {
-				category: [],
-				id_list: [],
-			},
-			items_buy_prohibited: {
-				category: [null],
-				id_list: ["64d0b40fbe2eed70e254e2d4"],
-			},
-			location: "БТР",
-			loyaltyLevels: [
-				{
-					buy_price_coef: 0,
-					exchange_price_coef: 0,
-					heal_price_coef: 0,
-					insurance_price_coef: 0,
-					minLevel: 1,
-					minSalesSum: 0,
-					minStanding: 0,
-					repair_price_coef: 0,
-				},
-			],
-			medic: false,
-			name: "Alex Freeman",
-			nextResupply: 1703691958,
-			nickname: "sarge",
-			repair: {
-				availability: false,
-				currency: "5449016a4bdc2d6f028b456f",
-				currency_coefficient: 1,
-				excluded_category: [],
-				excluded_id_list: [],
-				quality: 0,
-			},
-			sell_category: [],
-			//@ts-ignore
-			sell_modifier_for_prohibited_items: 0,
-			surname: "Freeman",
-			unlockedByDefault: false,
-		},
-		dialogue: {
-			itemsDelivered: ["657399489b19e826a721d75c 0", "657399489b19e826a721d75c 1", "657399489b19e826a721d75c 2"],
-		},
-		questassort: {
-			started: {},
-			success: {},
-			fail: {},
-		},
-		services: [
-			{
-				serviceType: TraderServiceType.BTR_ITEMS_DELIVERY,
-			},
-		],
-	};
+	constructor(modName: string, preSptModLoader: PreSptModLoader, imageRouter: ImageRouter, private traderConfig: ITraderConfig, private ragfairConfig: IRagfairConfig, private jsonUtil: JsonUtil) {
+		this.traderHelper = new Helper();
 
-	Traders.updateTime.push({
-		//@ts-ignore
-		_name: "FRIENDLYPMC",
-		traderId: trdid,
-		seconds: {
-			min: 3000,
-			max: 7500,
-		},
-	});
+		this.traderHelper.registerProfileImage(traderBase, modName, preSptModLoader, imageRouter);
+		this.traderHelper.setTraderUpdateTime(this.traderConfig, traderBase, 3600, 7200);
 
-	const locales = Object.values(Tables.locales.global) as Record<string, string>[];
-	for (const locale of locales) {
-		locale[`${trdid} FullName`] = "Alex Freeman";
-		locale[`${trdid} FirstName`] = "Alex";
-		locale[`${trdid} Nickname`] = "Sarge";
-		locale[`${trdid} Location`] = "БТР";
-		locale[`${trdid} Description`] = "";
+		Traders[traderBase._id] = traderBase._id;
+		this.ragfairConfig.traders[traderBase._id] = false;
+	}
+
+	AddToDb(tables: IDatabaseTables) {
+		tables.traders[traderBase._id] = {
+			assort: this.jsonUtil.deserialize(this.jsonUtil.serialize(traderAssort)) as ITraderAssort, // assorts are the 'offers' trader sells, can be a single item (e.g. carton of milk) or multiple items as a collection (e.g. a gun)
+			base: this.jsonUtil.deserialize(this.jsonUtil.serialize(traderBase)) as ITraderBase, // Deserialise/serialise creates a copy of the json and allows us to cast it as an ITraderBase
+			questassort: this.jsonUtil.deserialize(this.jsonUtil.serialize(traderQuests)), // questassort is empty as trader has no assorts unlocked by quests
+		};
+
+		this.traderHelper.addTraderToLocales(traderBase, tables, traderBase.name, traderBase._id, traderBase.nickname, traderBase.location, "Commander of the Goons squad");
 	}
 }

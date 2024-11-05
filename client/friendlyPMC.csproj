@@ -197,6 +197,7 @@
     <Compile Include="Patches\HearingSensorPatch.cs" />
     <Compile Include="Patches\ItemPatch.cs" />
     <Compile Include="Patches\LookSensorPatch.cs" />
+    <Compile Include="Patches\QuestControllerPatch.cs" />
     <Compile Include="Patches\RaidStartPatch.cs" />
     <Compile Include="Patches\SAINPatch.cs" />
     <Compile Include="Requests\FollowerGoCheck.cs" />

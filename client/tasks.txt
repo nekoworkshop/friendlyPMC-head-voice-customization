@@ -52,6 +52,7 @@ RELEASE NOTES (3.9)
 - "On Your Own" will now make followers patrol around the player with a configurable distance when out of combat. In order for this to work they must not be told to hold position and be out of combat. "Follow Me" can get them out of the patrol mode while still retaining the other settings that "On Your Own" has.
 - the mod can now work with different languages. It will based on the language you set for your game. There only 3 languages avalabile for now : English, Russian, German, Romanian. You can look into user/mods/friendlyPMC/lang and add more language jsons there (PM me with the file and I will add it to the mod)
 - added "Bad Guy" setting. This will make the player hostile to all factions.
+- Virtual's Custom Quest Loader is now a dependency
 
 ==================================================================================
 NOTES:

@@ -1,10 +1,16 @@
-﻿using EFT;
+﻿using System.Collections.Generic;
+using EFT;
 
 namespace friendlyPMC.Components.BossFollower
 {
     public class KnightFollowerBrain : FollowerBrain
     {
         KnightFightLayer gclass65_0_1;
+
+        private List<string> _quests = new List<string>{
+            "friendlypmc-knight-competition"
+        };
+
         public KnightFollowerBrain(BotOwner owner, pitAIBossPlayer boss) : base(owner, boss)
         {
             _currentTactic = "Assist";
@@ -40,6 +46,18 @@ namespace friendlyPMC.Components.BossFollower
         public void ForceRecalcShootPos()
         {
             gclass65_0_1.ForceRecalcShootPos();
+        }
+
+        protected override void OnDead(EDamageType damageType)
+        {
+            base.OnDead(damageType);
+
+            if(_boss == null)  return;
+
+            _boss.realPlayer.AbstractQuestControllerClass.Quests.ExecuteForEach(quest=>{
+                if(_quests.Contains(quest.Template.Id) && quest.QuestStatus == EFT.Quests.EQuestStatus.Started)
+                    quest.SetStatus(EFT.Quests.EQuestStatus.Fail,true,false);
+            });
         }
 
         public override void BossOrdersChanged()

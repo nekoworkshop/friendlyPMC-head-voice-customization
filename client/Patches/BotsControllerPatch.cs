@@ -1403,7 +1403,7 @@ namespace friendlyPMC.Patches
                 }).Forget();
 
             } 
-            else 
+            else if(Utils.Utils.FlagGet("spawnKnight"))
             {
                 Modules.Logger.LogInfo("Start Boss Ally Spawn");
                 

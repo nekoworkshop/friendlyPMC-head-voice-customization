@@ -190,6 +190,16 @@ namespace friendlyPMC
         private static Dictionary<ConfigDefinition, string> savedConfigValues;
 
         private List<CancellationTokenSource> refreshTokens = new List<CancellationTokenSource>();
+
+        public static Dictionary<string,List<string>> Quests = new Dictionary<string, List<string>>{
+            {
+                "Knight",
+                new List<string> {
+                    "friendlypmc-knight-competition"
+                }
+            }  
+        };
+
         private void Awake()
         {
 
@@ -243,6 +253,7 @@ namespace friendlyPMC
 
             harmony.PatchAll(typeof(LocalGameCtorPatch).Assembly);
             harmony.PatchAll(typeof(BaseLocalGameVmethod4Patch).Assembly); // spawn patch
+            QuestControllerPatch.ApplyPatch(harmony);
 
             ConsoleScreen.Processor.RegisterCommand("followerstome", delegate ()
             {
