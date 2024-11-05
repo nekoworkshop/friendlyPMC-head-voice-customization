@@ -1,0 +1,16 @@
+{
+    "friendlypmc-knight-competition name": "Cine a lăsat câinii liberi?",
+    "friendlypmc-knight-competition description": "Ce faci, rookie? Te văd cum te îndrepți spre vârf, tragi, jefuiești, faci ravagii. Dar ai cu adevărat ce-ți trebuie să alergi alături de câinii cei mari? Hai să vedem. Ce zici de o echipă cu mine, facem câteva raid-uri împreună, o mică competiție, să vedem cine poate aduna mai mult. Te bagi?",
+    "friendlypmc-knight-competition startedMessageText": "",
+    "friendlypmc-knight-competition successMessageText": "Ești tare!... Neah, ai dreptate, eu sunt tare. Dar ai făcut bine, rookie. Ascultă, de acum înainte - dă-mi de știre când vrei să facem echipă și să le arătăm acestor turiști cum stă treaba. Băieții încă sunt puțin sceptici despre tine, dar tu și eu îi vom face să te placă!\n (Acum îl ai pe Knight ca prieten pe care îl poți solicita să te însoțească în raid-uri. Reține că el nu va apărea dacă ai activat Apărutul Echipei și este disponibil doar pentru PMC)",
+    "friendlypmc-knight-competition failMessageText": "Hai, omule, am încredere în tine. Hai să facem asta, hai să le arătăm din ce ești făcut.",
+    "friendlypmc-knight-competition acceptPlayerMessage": "",
+    "friendlypmc-knight-competition declinePlayerMessage": "",
+    "friendlypmc-knight-competition changeQuestMessageText": "",
+    "friendlypmc-knight-competition note": "Atât tu, cât și Knight, trebuie să supraviețuiți raidului pe fiecare hartă.",
+    "friendlypmc-knight-competition-1": "Elimină 5 PMC-uri pe Lighthouse în timp ce ești în echipă cu Knight",
+    "friendlypmc-knight-competition-2": "Elimină 5 PMC-uri pe Woods în timp ce ești în echipă cu Knight",
+    "friendlypmc-knight-competition-3": "Elimină 5 PMC-uri pe Shoreline în timp ce ești în echipă cu Knight",
+    "friendlypmc-knight-competition-4": "Elimină 5 PMC-uri pe Customs în timp ce ești în echipă cu Knight",
+    "friendlypmc-knight-competition-fail": "Tu și Knight nu trebuie să muriți sau să părăsiți raid-ul cât timp sarcina este activă (Status: KIA, Părăsit Acțiunea, MIA, Fugă)"
+}

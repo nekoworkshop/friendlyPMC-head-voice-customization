@@ -445,6 +445,8 @@ namespace friendlyPMC.Components
                     botOwner_0.Memory.DeleteInfoAboutEnemy(botOwner_0.Memory.GoalEnemy.Person);
                     botOwner_0.Memory.GoalEnemy = null;
                 }
+                // reset hands in case they are stuck
+                (botOwner_0.Brain.BaseBrain as FollowerBrain).HandsReset();
 
                 return;
             }

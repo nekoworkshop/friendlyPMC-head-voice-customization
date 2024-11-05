@@ -1,0 +1,16 @@
+{
+    "friendlypmc-knight-competition name": "Кто выпустил собак?",
+    "friendlypmc-knight-competition description": "Как дела, новичок? Вижу, как ты карабкаешься наверх, стреляешь, грабишь, наводишь шороху. Но есть ли у тебя на самом деле то, что нужно, чтобы бегать с большими псами? Давай проверим. Как насчет команды со мной? Сделаем несколько рейдов вместе, немного соревнования, посмотрим, кто соберет больше. Ты в деле?",
+    "friendlypmc-knight-competition startedMessageText": "",
+    "friendlypmc-knight-competition successMessageText": "Ты хорош!... Неа, прав ты, я тут главный. Но ты справился отлично, новичок. Слушай, с этого момента – дай знать, если хочешь объединиться и показать этим туристам, как тут всё устроено. Ребята пока скептически к тебе относятся, но мы с тобой заставим их тебя полюбить!\n (Теперь у тебя есть друг Knight, которого можно звать с собой в рейды. Учти, он не появится, если включен командный спавн, и доступен только для PMC.)",
+    "friendlypmc-knight-competition failMessageText": "Давай, чувак, я в тебя верю. Пойдем, покажем им, из чего ты сделан.",
+    "friendlypmc-knight-competition acceptPlayerMessage": "",
+    "friendlypmc-knight-competition declinePlayerMessage": "",
+    "friendlypmc-knight-competition changeQuestMessageText": "",
+    "friendlypmc-knight-competition note": "И ты, и Knight должны выжить в рейде на каждой карте.",
+    "friendlypmc-knight-competition-1": "Уничтожь 5 PMC на Лайтхаусе, будучи в команде с Knight",
+    "friendlypmc-knight-competition-2": "Уничтожь 5 PMC на Вудс, будучи в команде с Knight",
+    "friendlypmc-knight-competition-3": "Уничтожь 5 PMC на Шорлайне, будучи в команде с Knight",
+    "friendlypmc-knight-competition-4": "Уничтожь 5 PMC на Кастомс, будучи в команде с Knight",
+    "friendlypmc-knight-competition-fail": "Вы с Knight не должны погибнуть или покинуть рейд, пока задание активно (Статус: KIA, Оставил задание, MIA, Быстрый выход)"
+}

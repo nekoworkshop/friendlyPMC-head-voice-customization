@@ -14,22 +14,20 @@
 - - increase hearing volume
 - - check for gunshots and auto aquire target if close enough
 
-- revamp the search action where we manually check the best spot for a shooting position rather than just doing a random pick
+- x - revamp the search action where we manually check the best spot for a shooting position rather than just doing a random pick
 
 - x - add "Bad Guy" setting
 
 - fix glitchy behavior of boss followers
 - - not turning hostile when player accidentally shoots them
-- - the "Bad Guy" setting should be active when running with bosses
+- x - the "Bad Guy" setting should be active when running with bosses
 - - not having a "good" brain when no longer being a follower
 
-- goons send messages at the end of the raid
-- - send message if player died
-- - send message if player shot them and they killed him
-- - send message if player shot them and he killed them
-- - send message based on who survived the raid
-
-- goons send join offer for specific maps (Woods, Shoreline, Customs, Lighthouse)
+- #inprogress - The Goons Quests:
+- x - add a quest to unlock Knight as a friend
+- - when surviving a raid with Knight, increase good standing with him
+- - see if we can mark quest as inactive when not having knight as a friend
+- - upon starting the first quest, the Goons are no longer hostile towards the player
 
 - see if we can make bot swap weapons when asked to loot (DeadBodyWork)
 - - this should also allow bot to put that weapon as seconday (in case of support without a grenade launcher)

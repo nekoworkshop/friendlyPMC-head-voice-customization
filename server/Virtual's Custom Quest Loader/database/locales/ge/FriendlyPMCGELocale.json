@@ -1,0 +1,16 @@
+{
+    "friendlypmc-knight-competition name": "Wer hat die Hunde losgelassen?",
+    "friendlypmc-knight-competition description": "Was geht, rookie? Ich sehe, wie du dich an die Spitze kämpfst, schießt, plünderst und Chaos anrichtest. Aber hast du wirklich das Zeug, um mit den großen Hunden zu laufen? Lass uns das herausfinden. Was sagst du zu einem Team mit mir? Machen wir ein paar Raids zusammen, ein kleiner Wettbewerb, um zu sehen, wer am meisten sammeln kann. Bist du dabei?",
+    "friendlypmc-knight-competition startedMessageText": "",
+    "friendlypmc-knight-competition successMessageText": "Du bist gut!... Na ja, stimmt, ich bin der Beste. Aber du hast es gut gemacht, rookie. Hör zu, von jetzt an - sag Bescheid, wenn du im Team spielen willst, und wir zeigen diesen Touristen, wie der Hase läuft. Die Jungs sind noch etwas skeptisch bei dir, aber du und ich, wir werden sie dazu bringen, dich zu mögen!\n (Du hast jetzt Knight als Freund, den du für Raids anfordern kannst. Beachte, dass er nicht erscheint, wenn Team-Spawn aktiviert ist und nur für PMC verfügbar ist.)",
+    "friendlypmc-knight-competition failMessageText": "Komm schon, Mann, ich hab Vertrauen in dich. Lass uns das durchziehen und ihnen zeigen, woraus du gemacht bist.",
+    "friendlypmc-knight-competition acceptPlayerMessage": "",
+    "friendlypmc-knight-competition declinePlayerMessage": "",
+    "friendlypmc-knight-competition changeQuestMessageText": "",
+    "friendlypmc-knight-competition note": "Sowohl du als auch Knight müssen den Raid auf jeder Karte überleben.",
+    "friendlypmc-knight-competition-1": "Eliminiere 5 PMCs auf Lighthouse, während du im Team mit Knight bist",
+    "friendlypmc-knight-competition-2": "Eliminiere 5 PMCs auf Woods, während du im Team mit Knight bist",
+    "friendlypmc-knight-competition-3": "Eliminiere 5 PMCs auf Shoreline, während du im Team mit Knight bist",
+    "friendlypmc-knight-competition-4": "Eliminiere 5 PMCs auf Customs, während du im Team mit Knight bist",
+    "friendlypmc-knight-competition-fail": "Du und Knight dürft nicht sterben oder den Raid verlassen, solange die Aufgabe aktiv ist (Status: KIA, Aktion verlassen, MIA, Durchgelaufen)"
+}
