@@ -1,4 +1,4 @@
-import { DependencyContainer, inject } from "tsyringe";
+import { DependencyContainer, inject, Lifecycle } from "tsyringe";
 import fs from "fs";
 import { DatabaseServer } from "@spt/servers/DatabaseServer";
 
@@ -15,7 +15,6 @@ import { Difficulty, IBotType } from "@spt/models/eft/common/tables/IBotType";
 import { LogTextColor } from "@spt/models/spt/logging/LogTextColor";
 
 import { ImageRouter } from "@spt/routers/ImageRouter";
-import type { PostSptModLoader } from "@spt/loaders/PostSptModLoader";
 
 import { MailSendService } from "@spt/services/MailSendService";
 
@@ -24,7 +23,13 @@ import type { StaticRouterModService } from "@spt/services/mod/staticRouter/Stat
 import path from "path";
 import { RouteAction } from "@spt/di/Router";
 import { HttpResponseUtil } from "@spt/utils/HttpResponseUtil";
+
 import { IUserDialogInfo } from "@spt/models/eft/profile/ISptProfile";
+
+import { DialogueController } from "@spt/controllers/DialogueController";
+import { DialogueCallbacks } from "@spt/callbacks/DialogueCallbacks";
+
+import { MatchCallbacks } from "@spt/callbacks/MatchCallbacks";
 
 import { RandomUtil } from "@spt/utils/RandomUtil";
 import { BotGenerator } from "@spt/generators/BotGenerator";
@@ -47,9 +52,14 @@ import { ITraderConfig } from "@spt/models/spt/config/ITraderConfig";
 import { KnightTrader } from "./Trader";
 
 import { IRagfairConfig } from "@spt/models/spt/config/IRagfairConfig";
-import { TraderHelper as Helper } from "./TraderHelper";
+
 import { PreSptModLoader } from "@spt/loaders/PreSptModLoader";
 import { JsonUtil } from "@spt/utils/JsonUtil";
+
+import { KnightChatBot } from "./KnightChat";
+import { IGetBodyResponseData } from "@spt/models/eft/httpResponse/IGetBodyResponseData";
+import { NotificationSendHelper } from "@spt/helpers/NotificationSendHelper";
+import { IGetFriendListDataResponse } from "@spt/models/eft/dialog/IGetFriendListDataResponse";
 
 class friendlyPMC {
 	config = {
@@ -97,9 +107,7 @@ class friendlyPMC {
 		allyBossEscaped : [
             "Nice run!\n You did good rookie, you did good.",
             "Not bad, not bad at all. Let's dot it again sometime rookie.",
-            "You the man!\n... neah, you are right, I am the man. But you did ok too rookie.",
-            "Was there even a doubt? They never stood a chance.\nDrinks are on me boys, the rookie is paying!",
-            "Come on, come on, try to keep up will ya? We got rookie here doing site scenes."
+            "Was there even a doubt? They never stood a chance."
         ],
 
 		baseSettings: "Base Settings",
@@ -223,8 +231,10 @@ class friendlyPMC {
 	Logger: ILogger;
 	Bots: IBotConfig;
 	mailSendService: MailSendService;
+	notificationSendHelper: NotificationSendHelper;
 	LocaleService: LocaleService;
 	randomUtil: RandomUtil;
+	matchCallbacks: MatchCallbacks;
 
 	knightTrader: KnightTrader;
 
@@ -244,7 +254,9 @@ class friendlyPMC {
 	preSptLoad(container: DependencyContainer) {
 		this.Logger = container.resolve("WinstonLogger");
 		this.mailSendService = container.resolve("MailSendService");
+		this.notificationSendHelper = container.resolve("NotificationSendHelper");
 		this.LocaleService = container.resolve("LocaleService");
+		this.matchCallbacks = container.resolve("MatchCallbacks");
 
 		const configServer = container.resolve<ConfigServer>("ConfigServer");
 		const databaseService = container.resolve<DatabaseService>("DatabaseService");
@@ -253,6 +265,18 @@ class friendlyPMC {
 		const traderConfig: ITraderConfig = configServer.getConfig<ITraderConfig>(ConfigTypes.TRADER);
 		const ragfairConfig = configServer.getConfig<IRagfairConfig>(ConfigTypes.RAGFAIR);
 		const jsonUtil: JsonUtil = container.resolve<JsonUtil>("JsonUtil");
+
+		const botGenerator = container.resolve<BotGenerator>("BotGenerator");
+		const botController = container.resolve<BotController>("BotController");
+		const profileHelper = container.resolve<ProfileHelper>("ProfileHelper");
+
+		const dialogueController = container.resolve<DialogueController>("DialogueController");
+		const dialogueCallbacks = container.resolve<DialogueCallbacks>("DialogueCallbacks");
+
+		const staticRouterModService = container.resolve<StaticRouterModService>("StaticRouterModService");
+		const httpResponseUtil = container.resolve<HttpResponseUtil>("HttpResponseUtil");
+		const randomUtil = container.resolve<RandomUtil>("RandomUtil");
+		this.randomUtil = randomUtil;
 
 		// patch getPmcDifficultySettings as that is where we actually make the bots be friendly
 		this.getPmcDifficultySettings = this.getPmcDifficultySettings.bind(this);
@@ -295,15 +319,6 @@ class friendlyPMC {
 		);
 
 		// add a new router for handling items being given from the squad members
-		const staticRouterModService = container.resolve<StaticRouterModService>("StaticRouterModService");
-		const httpResponseUtil = container.resolve<HttpResponseUtil>("HttpResponseUtil");
-		const randomUtil = container.resolve<RandomUtil>("RandomUtil");
-		this.randomUtil = randomUtil;
-
-		const botGenerator = container.resolve<BotGenerator>("BotGenerator");
-		const botController = container.resolve<BotController>("BotController");
-		const profileHelper = container.resolve<ProfileHelper>("ProfileHelper");
-
 		const PMCBOT: IPmcConfig = configServer.getConfig(ConfigTypes.PMC);
 
 		const PMCBOTVALUES = {
@@ -375,7 +390,7 @@ class friendlyPMC {
 					const member: IUserDialogInfo & {
 						SquadInfo: {
 							Mate: boolean;
-							AllyBoss: boolean;
+							AllyBoss?: string;
 							Partial?: boolean;
 							Lost?: string[];
 						};
@@ -383,8 +398,12 @@ class friendlyPMC {
 
 					let lostMembers = "";
 					let message = this.lang.friendlyEscaped;
+
+					let isKnightBoss = false;
+
 					if (member.SquadInfo.AllyBoss) {
 						message = this.lang.allyBossEscaped;
+						isKnightBoss = member.SquadInfo.AllyBoss == "bossKnight";
 					} else if (member.SquadInfo.Mate) {
 						message = this.lang.teamEscaped;
 						if (member.SquadInfo.Partial) {
@@ -407,7 +426,17 @@ class friendlyPMC {
 
 					let notice = this._StringFormat(randomUtil.getArrayValue(message), lostMembers);
 
-					this.mailSendService["notificationSendHelper"].sendMessageToPlayer(sessionID, member, notice, MessageType.USER_MESSAGE);
+					if (isKnightBoss) {
+						this.mailSendService.sendMessageToPlayer({
+							recipientId: sessionID,
+							sender: MessageType.NPC_TRADER,
+							//@ts-ignore
+							trader: "friendlypmc-knight",
+							messageText: notice,
+						});
+					} else {
+						this.mailSendService["notificationSendHelper"].sendMessageToPlayer(sessionID, member, notice, MessageType.USER_MESSAGE);
+					}
 
 					return httpResponseUtil.emptyResponse();
 				}),
@@ -559,6 +588,35 @@ class friendlyPMC {
 				new RouteAction("/singleplayer/pitlang", (url: string, info: any, sessionID: string, output: string): any => {
 					return httpResponseUtil.noBody(this.lang);
 				}),
+				new RouteAction("/client/match/group/invite/send", async (url: string, info: any, sessionID: string, output: string): Promise<IGetBodyResponseData<string>> => {
+					const aid = info.to;
+					dialogueController.getFriendList(sessionID).Friends.forEach(friend => {
+						if (friend.aid == aid && friend._id == "bossKnight") {
+							const bot = container.resolve<KnightChatBot>("KnightChatBot");
+							setTimeout(() => {
+								bot.acceptInvite(sessionID);
+							}, 2000);
+						}
+					});
+					return this.matchCallbacks.sendGroupInvite(url, info, sessionID);
+				}),
+				new RouteAction("/client/friend/list", async (url: string, info: any, sessionID: string, output: string): Promise<IGetBodyResponseData<IGetFriendListDataResponse>> => {
+					const list = dialogueController.getFriendList(sessionID);
+
+					const profile = profileHelper.getPmcProfile(sessionID);
+
+					// check if player has completed the first quest from Knight to decide if he will appear in the friend list
+					let hasKnightQuest = false;
+					profile.Quests.forEach(quest => {
+						if (quest.qid == "friendlypmc-knight-competition" && quest.status == 4) {
+							hasKnightQuest = true;
+						}
+					});
+					if (!hasKnightQuest) {
+						list.Friends = list.Friends.filter(friend => friend._id != "bossKnight");
+					}
+					return httpResponseUtil.getBody(list);
+				}),
 			],
 			"custom-static-friendly-pmc"
 		);
@@ -574,7 +632,6 @@ class friendlyPMC {
 		const PMCBOT = configServer.getConfig<IPmcConfig>(ConfigTypes.PMC);
 
 		const databaseServer = container.resolve<DatabaseServer>("DatabaseServer");
-		const databaseService = container.resolve<DatabaseService>("DatabaseService");
 
 		const tables = databaseServer.getTables();
 
@@ -600,6 +657,11 @@ class friendlyPMC {
 		this.botsTable = tables.bots;
 
 		this.knightTrader.AddToDb(tables);
+
+		container.register<KnightChatBot>("KnightChatBot", KnightChatBot, {
+			lifecycle: Lifecycle.Singleton,
+		});
+		container.resolve<DialogueController>("DialogueController").registerChatBot(container.resolve<KnightChatBot>("KnightChatBot"));
 	}
 
 	private _makeFriendlyOrHostile(diff: Difficulty, pmcType: string) {

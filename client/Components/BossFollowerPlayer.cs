@@ -11,6 +11,7 @@ using friendlyPMC.Actions;
 
 using System.Linq;
 using friendlyPMC.Modules;
+using System.Collections.Generic;
 
 namespace friendlyPMC.Components
 {
@@ -20,7 +21,15 @@ namespace friendlyPMC.Components
         public BossFollowerPlayer(BotOwner bot, pitAIBossPlayer player, WildSpawnType bossRole) : base(bot, player, false, bossRole) {
 
             NpcMessage.RemoveNpc(bot.ProfileId);
-            NpcMessage.AddNpc(bot, false, true);
+
+            List<WildSpawnType> bossRoles = new List<WildSpawnType> {
+                WildSpawnType.bossKnight,
+                WildSpawnType.followerBigPipe,
+                WildSpawnType.followerBirdEye
+            };
+            // when questing with bosses, there will not be any messages from them
+            if(!bossRoles.Contains(bossRole) || !Utils.Utils.FlagGet("questGoons"))
+                NpcMessage.AddNpc(bot, false, true);
         }
 
         public override void Init()

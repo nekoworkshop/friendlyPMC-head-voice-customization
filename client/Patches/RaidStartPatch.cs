@@ -41,7 +41,9 @@ namespace friendlyPMC.Patches
                                     if(item.Key == "Knight")
                                     {
                                         Utils.Utils.FlagSet("spawnKnight", true);
+                                        Utils.Utils.FlagSet("questGoons", true);
                                         // - when running with bosses, we are always the bad guy
+                                        Utils.Utils.FlagSet("isBadGuy",true);
                                         badGuy = true;
                                     }
                                 }

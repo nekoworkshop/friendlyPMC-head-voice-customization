@@ -217,12 +217,12 @@ namespace friendlyPMC.Actions
                         {
                             lastCoverPoint = nearPoint;
                             botOwner_0.Memory.SetCoverPoints(nearPoint);
-                            if (!wasHit) botOwner_0.Steering.LookToMovingDirection();
 
 
                             var status = botOwner_0.Mover.GoToPoint(nearPoint, true, true);
                             if (status == NavMeshPathStatus.PathComplete)
                             {
+                                if (!wasHit) botOwner_0.Steering.LookToMovingDirection();
                                 return;
                             }
                         }
@@ -250,12 +250,10 @@ namespace friendlyPMC.Actions
 
                         if (botOwner_0.GoToPoint(navMeshHit.position, true, -1f, false, true, true, false) != NavMeshPathStatus.PathComplete)
                         {
-                            if (!wasHit) botOwner_0.Steering.LookToMovingDirection();
-
                             botOwner_0.StopMove();
                             bool_0 = true;
                             return;
-                        }
+                        } else if (!wasHit) botOwner_0.Steering.LookToMovingDirection();
                     }
                 }
                 // out of range of the boss

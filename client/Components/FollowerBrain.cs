@@ -366,9 +366,9 @@ namespace friendlyPMC.Components
             else if(type == AISoundType.step) 
             {
                  Vector3 positionZone = new Vector3(
-                    Mathf.Floor(position.x / 12f) * 12f,
-                    Mathf.Floor(position.y / 12f) * 12f,
-                    Mathf.Floor(position.z / 12f) * 12f
+                    Mathf.Floor(position.x / 8f) * 8f,
+                    Mathf.Floor(position.y / 8f) * 8f,
+                    Mathf.Floor(position.z / 8f) * 8f
                 );
 
                 bool wasProcessed = processedSoundPositions.Contains(positionZone);

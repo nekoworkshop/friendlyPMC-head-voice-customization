@@ -56,7 +56,7 @@ namespace friendlyPMC.Patches
         public static void Patch(Player __instance, BetterSource ___NestedStepSoundSource)
         {
             float volume = __instance.MovementContext.CovertMovementVolumeBySpeed * __instance.method_49();
-            float range = ___NestedStepSoundSource.MaxDistance * 0.75f;
+            float range = ___NestedStepSoundSource.MaxDistance * 0.85f;
 
             if(BossPlayers.IsPlayerBoss(__instance.ProfileId)) return;
 
@@ -69,7 +69,9 @@ namespace friendlyPMC.Patches
                 Vector3 position = __instance.Transform.position;  
 
                 float power = range * volume;
-                
+
+                power = Mathf.Min(25f, power);
+
                 float distance = Vector3.Distance(bot.GetPlayer.Transform.position, position);
 
                 bool shouldReact = distance <= power;
@@ -125,7 +127,7 @@ namespace friendlyPMC.Patches
 
                 if (brain == null || brain.WasHit || bot.Memory.HaveEnemy || bot.BotsGroup == null) return;
                 if (
-                    bot.HearingSensor.method_6(__instance.Transform.position, 40f, out var distance) &&
+                    bot.HearingSensor.method_6(__instance.Transform.position, 50f, out var distance) &&
                     (bot.EnemiesController.IsEnemy(__instance) || bot.BotsGroup.IsEnemy(__instance))
                 )
                 {

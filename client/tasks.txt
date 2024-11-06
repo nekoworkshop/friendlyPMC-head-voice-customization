@@ -8,10 +8,10 @@
 
 - x - assist tactic should also do supression on it's own and also use grenades
 
-- more improvement on awareness
+- #inprogress - more improvement on awareness
 - - better checks for enemy voice (if it a battle voice - auto aquire target)
 - - check for bush sounds
-- - increase hearing volume
+- x - increase hearing volume
 - - check for gunshots and auto aquire target if close enough
 
 - x - revamp the search action where we manually check the best spot for a shooting position rather than just doing a random pick
@@ -25,9 +25,12 @@
 
 - #inprogress - The Goons Quests:
 - x - add a quest to unlock Knight as a friend
-- - when surviving a raid with Knight, increase good standing with him
-- - see if we can mark quest as inactive when not having knight as a friend
 - - upon starting the first quest, the Goons are no longer hostile towards the player
+- - make it possible for Knight to appear as a friend once the quest is completed
+- - hook into client/profile/view to have Knight show as "the other user" in the profile
+- x - when surviving a raid with Knight, increase good standing with him (only after the first quest is completed)
+- - make Knight standing go down whenever the player aggros the Goons (but not below 0.1)  (only after the first quest is completed)
+- - see if we can mark quest as inactive when not having knight as a friend
 
 - see if we can make bot swap weapons when asked to loot (DeadBodyWork)
 - - this should also allow bot to put that weapon as seconday (in case of support without a grenade launcher)

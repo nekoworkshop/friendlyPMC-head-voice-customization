@@ -201,7 +201,7 @@ namespace friendlyPMC.Patches
         {
             isHostile = false;
 
-            if(friendlyPMC.badGuy.Value)
+            if(friendlyPMC.badGuy.Value || Utils.Utils.FlagGet("isBadGuy"))
             {
                 isHostile = true;
                 return;
@@ -1448,6 +1448,16 @@ namespace friendlyPMC.Patches
         [PatchPrefix]
         private static bool PatchPrefix(BotsController __instance)
         {
+            try
+            {
+                BossStandingSave(__instance);
+            }
+            catch (Exception ex)
+            {
+                Modules.Logger.LogError("Failed to save boss standing");
+                Modules.Logger.LogError(ex);
+            }
+
             InteractableObjects.Dispose();
             NpcMessage.Dispose();
 
@@ -1481,6 +1491,51 @@ namespace friendlyPMC.Patches
             Modules.Logger.LogInfo("Raid Ended");
 
             return true;
+        }
+        /** On raid end, increase standing with Knight trader if we have Knight as follower **/
+        private static void BossStandingSave(BotsController controller)
+        {
+            
+            pitAIBossPlayer boss = null;
+            controller.Players.ExecuteForEach(new Action<IPlayer>(player => {
+                if (boss == null)
+                {
+                    boss = BossPlayers.GetBoss(player.ProfileId);
+                }
+            }));
+
+            if (boss == null) return;
+
+            Profile profile = boss.realPlayer.Profile;
+
+            bool knightIncrease = false;
+            profile.QuestsData.ForEach(quest =>
+            {
+
+                foreach (var item in friendlyPMC.Quests)
+                {
+                    // allow Knight standing to increase only after we complete the first quest
+                    if (item.Key == "Knight" && quest.Id == item.Value[0] && quest.Status == EFT.Quests.EQuestStatus.Success)
+                    {
+                        knightIncrease = true;
+                        break;
+                    }
+                }
+
+            });
+
+            if (boss.realPlayer.Profile.TryGetTraderInfo("friendlypmc-knight", out var traderInfo))
+            {
+                foreach (var follower in BossPlayers.GetFollowersByBoss(profile.ProfileId))
+                {
+                    if (follower.GetBot().IsRole(WildSpawnType.bossKnight) && knightIncrease)
+                    {
+                        double standing = boss.realPlayer.Profile.GetTraderStanding("friendlypmc-knight");
+                        if (standing < 2)
+                            traderInfo.SetStanding(Math.Min(2, standing + 0.01));
+                    };
+                }
+            }
         }
     }
 

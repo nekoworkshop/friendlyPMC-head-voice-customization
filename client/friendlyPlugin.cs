@@ -194,6 +194,7 @@ namespace friendlyPMC
         public static Dictionary<string,List<string>> Quests = new Dictionary<string, List<string>>{
             {
                 "Knight",
+                // order is important
                 new List<string> {
                     "friendlypmc-knight-competition"
                 }
