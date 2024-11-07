@@ -70,8 +70,6 @@ namespace friendlyPMC.Modules
                     }
                 }
 
-                Logger.LogInfo("Npc " + id + " removed from messaging");
-
                 Instance._npcs.Remove(id);
             }
         }
