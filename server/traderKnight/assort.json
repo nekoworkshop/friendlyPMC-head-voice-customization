@@ -2,6 +2,7 @@
     "barter_scheme": {},
     "items": [],
     "loyal_level_items": {
-        "friendlypmc-knight-competition-quest" : 1
+        "friendlypmc-knight-competition-quest" : 1,
+        "friendlypmc-knight-my-land-quest" : 1
     }
 }

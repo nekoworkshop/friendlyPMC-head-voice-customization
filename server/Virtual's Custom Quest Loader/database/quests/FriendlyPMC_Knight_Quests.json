@@ -328,7 +328,7 @@
                     "status": [
                         4
                     ],
-                    "target": "friendlypmc-knight=competition",
+                    "target": "friendlypmc-knight-competition",
                     "visibilityConditions": []
                 }
             ],

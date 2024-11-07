@@ -60,6 +60,7 @@ import { KnightChatBot } from "./KnightChat";
 import { IGetBodyResponseData } from "@spt/models/eft/httpResponse/IGetBodyResponseData";
 import { NotificationSendHelper } from "@spt/helpers/NotificationSendHelper";
 import { IGetFriendListDataResponse } from "@spt/models/eft/dialog/IGetFriendListDataResponse";
+import { IMatchGroupStatusResponse } from "@spt/models/eft/match/IMatchGroupStatusResponse";
 
 class friendlyPMC {
 	config = {
@@ -616,6 +617,22 @@ class friendlyPMC {
 						list.Friends = list.Friends.filter(friend => friend._id != "bossKnight");
 					}
 					return httpResponseUtil.getBody(list);
+				}),
+				new RouteAction("/client/match/raid/ready", async (url: string, info: any, sessionID: string, output: string): Promise<IGetBodyResponseData<boolean>> => {
+					return httpResponseUtil.getBody(true);
+				}),
+				new RouteAction("/client/match/group/status", async (url: string, info: any, sessionID: string, output: string): Promise<IGetBodyResponseData<IMatchGroupStatusResponse>> => {
+					const players = [];
+					dialogueController.getFriendList(sessionID).Friends.forEach(friend => {
+						if (friend._id == "bossKnight") {
+							const bot = container.resolve<KnightChatBot>("KnightChatBot");
+							if (bot.isInGroup) {
+								players.push(Object.assign({ isReady: true, isLeader: false }, bot.getChatBot()));
+							}
+						}
+					});
+
+					return httpResponseUtil.getBody({ players: players, maxPveCountExceeded: false });
 				}),
 			],
 			"custom-static-friendly-pmc"

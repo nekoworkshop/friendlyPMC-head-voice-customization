@@ -8,13 +8,20 @@ import { inject, injectable } from "tsyringe";
 
 import { NotificationEventType } from "@spt/models/enums/NotificationEventType";
 import { IWsChatMessageReceived } from "@spt/models/eft/ws/IWsChatMessageReceived";
+
+import { IWsNotificationEvent } from "@spt/models/eft/ws/IWsNotificationEvent";
+import { IGroupCharacter } from "@spt/models/eft/match/IGroupCharacter";
+
 import { Message } from "@spt/models/eft/profile/ISptProfile";
 import { MessageType } from "@spt/models/enums/MessageType";
 import { HashUtil } from "@spt/utils/HashUtil";
+import { ProfileHelper } from "@spt/helpers/ProfileHelper";
+
+interface IWsGroupMatchInviteAccept extends IWsNotificationEvent, IGroupCharacter {}
 
 @injectable()
 export class KnightChatBot implements IDialogueChatBot {
-	public constructor(@inject("PrimaryLogger") private logger: ILogger, @inject("MailSendService") private mailSendService: MailSendService, @inject("NotificationSendHelper") private notificationSendHelper: NotificationSendHelper, @inject("HashUtil") private hashUtil: HashUtil) {
+	public constructor(@inject("PrimaryLogger") private logger: ILogger, @inject("MailSendService") private mailSendService: MailSendService, @inject("ProfileHelper") private profileHelper: ProfileHelper, @inject("NotificationSendHelper") private notificationSendHelper: NotificationSendHelper, @inject("HashUtil") private hashUtil: HashUtil) {
 		this.logger = logger;
 		this.mailSendService = mailSendService;
 		this.notificationSendHelper = notificationSendHelper;
@@ -24,6 +31,8 @@ export class KnightChatBot implements IDialogueChatBot {
 		joinRaid: ["Join me", "Party up", "Join", "Team up"],
 		giveWeapon: ["Take ", "Use "],
 	};
+
+	isInGroup = false;
 
 	getChatBot() {
 		return {
@@ -54,7 +63,10 @@ export class KnightChatBot implements IDialogueChatBot {
 	}
 
 	public acceptInvite(sessionId: string) {
-		const dialog = this.notificationSendHelper["getDialog"](sessionId, MessageType.USER_MESSAGE, this.getChatBot());
+		const profile = this.getChatBot();
+		const dialog = this.notificationSendHelper["getDialog"](sessionId, MessageType.USER_MESSAGE, profile);
+
+		const userProfile = this.profileHelper.getPmcProfile(sessionId);
 
 		dialog.new += 1;
 		const message: Message = {
@@ -69,11 +81,18 @@ export class KnightChatBot implements IDialogueChatBot {
 		};
 		dialog.messages.push(message);
 
-		const notification: IWsChatMessageReceived = {
+		this.isInGroup = true;
+
+		const notification: IWsGroupMatchInviteAccept = {
 			type: NotificationEventType.GROUP_MATCH_INVITE_ACCEPT,
 			eventId: message._id,
-			dialogId: message.uid,
-			message: message,
+			Info: Object.assign(profile.Info, {
+				Level: userProfile.Info.Level,
+			}),
+			_id: profile._id,
+			aid: profile.aid,
+			isLeader: false,
+			isReady: true,
 		};
 		this.notificationSendHelper.sendMessage(sessionId, notification);
 	}

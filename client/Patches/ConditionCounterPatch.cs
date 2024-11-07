@@ -8,6 +8,7 @@ using SPT.Reflection.Patching;
 using System.Collections.Generic;
 
 using System.Reflection;
+using UnityEngine;
 
 namespace friendlyPMC.Patches
 {
@@ -28,6 +29,7 @@ namespace friendlyPMC.Patches
                 return true;
             }
             string ProfileId = GamePlayerOwner.MyPlayer.ProfileId;
+            Player player = GamePlayerOwner.MyPlayer;
 
             if (BossPlayers.Instance == null || !BossPlayers.IsPlayerBoss(ProfileId))
             {
@@ -35,14 +37,7 @@ namespace friendlyPMC.Patches
             }
 
             // Knight quests require Knight as teammate
-            List<string> knightKillConditions = new List<string> {
-                "friendlypmc-knight-competition-1",
-                "friendlypmc-knight-competition-2",
-                "friendlypmc-knight-competition-3",
-                "friendlypmc-knight-competition-4"
-            };
-
-            if (knightKillConditions.Contains(counter.Id))
+            if (friendlyPMC.QuestsConditions["Knight"].Contains(counter.Id))
             {
                 var followers = BossPlayers.GetFollowersByBoss(ProfileId);
                 if (followers == null || followers.Count == 0)
@@ -53,9 +48,11 @@ namespace friendlyPMC.Patches
                 bool hasKnight = false;
                 foreach (var follower in followers)
                 {
+                    BotOwner bot = follower.GetBot();
                     if (follower.GetBot().IsRole(WildSpawnType.bossKnight))
                     {
-                        hasKnight = true;
+                        if(Vector3.Distance(bot.GetPlayer.Transform.position, player.Transform.position) < 80)
+                            hasKnight = true;
                         break;
                     }
                 }

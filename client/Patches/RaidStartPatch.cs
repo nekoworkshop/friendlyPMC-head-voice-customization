@@ -77,8 +77,6 @@ namespace friendlyPMC.Patches
 
             var _defaultJsonConverters = Traverse.Create(converterClass).Field<JsonConverter[]>("Converters").Value;
 
-            Modules.Logger.LogInfo("settings.LocationId " + settings.LocationId);
-
             RequestHandler.PutJson("/client/raid/pitconfig", new
             {
                 Config = new Dictionary<string, bool>
@@ -89,8 +87,19 @@ namespace friendlyPMC.Patches
                     { "englishBear", friendlyPMC.englishBear.Value }
                 }
 
-                
             }.ToJson(_defaultJsonConverters));
+        }
+    }
+
+    /** Patch adding Knight to raid group to prevent the game from going switching to online matching **/
+    [HarmonyPatch(typeof(GClass3188<RaidSettings>))]
+    [HarmonyPatch("method_38")]
+    public class GClass3188Method38Patch
+    {
+        static void  Postfix(MatchmakerPlayerControllerClass __instance, GClass1219 player)
+        {
+            if(player != __instance.CurrentPlayer)
+            __instance.GroupPlayers.Remove(player);
         }
     }
 }

@@ -220,6 +220,19 @@ namespace friendlyPMC
             }
         };
 
+        public static Dictionary<string,List<string>> QuestsConditions = new Dictionary<string, List<string>>{
+            {
+                "Knight",
+                new List<string> {
+                    "friendlypmc-knight-competition-1",
+                    "friendlypmc-knight-competition-2",
+                    "friendlypmc-knight-competition-3",
+                    "friendlypmc-knight-competition-4",
+                    "friendlypmc-knight-my-land-kill"
+                }
+            }
+        };
+
         private void Awake()
         {
 
@@ -229,8 +242,6 @@ namespace friendlyPMC
                 Instance = this;
                 new Modules.Logger();
             }
-
-            new RaidStartPatch().Enable();
 
             new BotGroupIsPlayerEnemy().Enable();
             new BotGroupAddEnemy().Enable();
@@ -270,6 +281,7 @@ namespace friendlyPMC
             new EPhraseTriggerPatch().Enable();
 
             new ConditionCounterPatch().Enable();
+            new NotificationReceivedPatch().Enable();
 
             var harmony = new Harmony("xyz.pit.friendlypmc");
 
@@ -372,6 +384,10 @@ namespace friendlyPMC
             new UnlootableComponentPatch().Enable();
             new ModRaidModdablePatch().Enable();
             new ItemSpecificationPanelPatch().Enable();
+
+            // raid patches
+            new RaidStartPatch().Enable();
+            harmony.PatchAll(typeof(GClass3188Method38Patch).Assembly);
         }
 
 

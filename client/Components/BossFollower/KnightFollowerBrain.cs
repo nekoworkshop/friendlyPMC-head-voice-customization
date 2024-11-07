@@ -57,6 +57,7 @@ namespace friendlyPMC.Components.BossFollower
                 {
                     if(quest.Template.Id == id && quest.QuestStatus == EFT.Quests.EQuestStatus.Started)
                     {
+                        if(Utils.Utils.FlagGet("questGoons"))
                         quest.SetStatus(EFT.Quests.EQuestStatus.Fail,true,false);
                     }
                 }
