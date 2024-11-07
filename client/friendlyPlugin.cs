@@ -196,9 +196,28 @@ namespace friendlyPMC
                 "Knight",
                 // order is important
                 new List<string> {
-                    "friendlypmc-knight-competition"
+                    "friendlypmc-knight-competition",
+                    "friendlypmc-knight-my-land"
                 }
             }  
+        };
+
+        public static Dictionary<string,List<string>> QuestsLocations = new Dictionary<string, List<string>>{
+            {
+                "friendlypmc-knight-competition",
+                new List<string> {
+                    "lighthouse",
+                    "bigmap",
+                    "shoreline",
+                    "woods"
+                }
+            },
+            {
+                "friendlypmc-knight-my-land",
+                new List<string> {
+                    "bigmap"
+                }
+            }
         };
 
         private void Awake()

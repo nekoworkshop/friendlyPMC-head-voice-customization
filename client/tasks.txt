@@ -7,6 +7,7 @@
 - x - prepare the stage for working with different languages
 
 - x - assist tactic should also do supression on it's own and also use grenades
+- - goons can do supression (no grenades) while using the "Assist" tactic
 
 - #inprogress - more improvement on awareness
 - - better checks for enemy voice (if it a battle voice - auto aquire target)
@@ -26,9 +27,10 @@
 - #inprogress - The Goons Quests:
 - x - add a quest to unlock Knight as a friend
 - - upon starting the first quest, the Goons are no longer hostile towards the player
-- - make it possible for Knight to appear as a friend once the quest is completed
+- x - make it possible for Knight to appear as a friend once the quest is completed
 - - hook into client/profile/view to have Knight show as "the other user" in the profile
-- x - when surviving a raid with Knight, increase good standing with him (only after the first quest is completed)
+- x - when surviving a raid with Knight, increase good standing with him [+0.02] (only after the first quest is completed)
+- at 0.5 standing, Knight no longer turns hostile on accidental shots, but killing him will give a penalty of 0.2 standing
 - - make Knight standing go down whenever the player aggros the Goons (but not below 0.1)  (only after the first quest is completed)
 - - see if we can mark quest as inactive when not having knight as a friend
 

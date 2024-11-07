@@ -12,5 +12,17 @@
     "friendlypmc-knight-competition-2" : "Eliminate 5 PMCs on Woods while teamed up with Knight",
     "friendlypmc-knight-competition-3" : "Eliminate 5 PMCs on Shoreline while teamed up with Knight",
     "friendlypmc-knight-competition-4" : "Eliminate 5 PMCs on Customs while teamed up with Knight",
-    "friendlypmc-knight-competition-fail" : "You and Knight must not die or leave the raid while the task is active (Status: KIA, Left the Action, MIA, Ran Through)"
+    "friendlypmc-knight-competition-fail" : "You and Knight must not die or leave the raid while the task is active (Status: KIA, Left the Action, MIA, Ran Through)",
+
+    "friendlypmc-knight-my-land name" : "My Land",
+    "friendlypmc-knight-my-land description" : "Yo! You know what I don't like? Roachers in my house. We go on a trip and these roaches immediately move in. Be a pal and lend a hand in cleaning them out.",
+    "friendlypmc-knight-my-land startedMessageText" : "",
+    "friendlypmc-knight-my-land successMessageText" : "Now that's a cleanup!",
+    "friendlypmc-knight-my-land failMessageText" : "What are you doing man? Is the job too much for you?",
+    "friendlypmc-knight-my-land acceptPlayerMessage" : "",
+    "friendlypmc-knight-my-land declinePlayerMessage" : "",
+    "friendlypmc-knight-my-land changeQuestMessageText" : "",
+    "friendlypmc-knight-my-land note" : "Both you and Knight must survive the raid",
+    "friendlypmc-knight-my-land-1" : "Help Knight eliminate 10 targets around the Scav Base on Customs",
+    "friendlypmc-knight-my-land-fail" : "You and Knight must not die or leave the raid while the task is active (Status: KIA, Left the Action, MIA, Ran Through)"
 }

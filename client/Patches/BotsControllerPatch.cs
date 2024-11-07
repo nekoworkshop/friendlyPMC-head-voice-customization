@@ -23,8 +23,7 @@ using System.Linq;
 using IProfileData = GClass592;
 using ProfileEndPoint = ProfileEndpointFactoryAbstractClass;
 using BotCreator = GClass814;
-using UnityEngine.UI;
-using System.Security.Policy;
+
 using System.Threading.Tasks;
 using SPT.Common.Http;
 using Newtonsoft.Json;

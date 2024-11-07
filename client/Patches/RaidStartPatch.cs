@@ -23,7 +23,7 @@ namespace friendlyPMC.Patches
             bool badGuy = friendlyPMC.badGuy.Value;
             Profile profile = __instance.GetProfileBySide(ESideType.Pmc);
 
-            // patch raid settings to determine if user can spawn with a boss
+            // patch raid settings to determine if user can spawn with a boss do to questing
             profile.QuestsData.ForEach(quest=>{
 
                 foreach (var item in friendlyPMC.Quests)
@@ -33,24 +33,35 @@ namespace friendlyPMC.Patches
                     {
                         if(item1 == quest.Id)
                         {
-
                             if(quest.Status == EFT.Quests.EQuestStatus.Started)
                             {
-                                if (!friendlyPMC.squadSpawn.Value)
+                                bool isGoonQuest = true;
+
+                                if(friendlyPMC.QuestsLocations.TryGetValue(quest.Id, out List<string> locations))
                                 {
-                                    if(item.Key == "Knight")
+                                    isGoonQuest = false;
+                                    if(locations.Contains(settings.LocationId.ToLower()))
                                     {
-                                        Utils.Utils.FlagSet("spawnKnight", true);
-                                        Utils.Utils.FlagSet("questGoons", true);
-                                        // - when running with bosses, we are always the bad guy
-                                        Utils.Utils.FlagSet("isBadGuy",true);
-                                        badGuy = true;
+                                        isGoonQuest = true;
                                     }
                                 }
-                            }
+                                //Modules.Logger.LogInfo("settings.LocationId" + settings.LocationId);
+                                if (!friendlyPMC.squadSpawn.Value && isGoonQuest)
+                                {
+                                    Utils.Utils.FlagSet("questGoons", true);
+                                    // - when doing Goons quests, we are always bad guys
+                                    Utils.Utils.FlagSet("isBadGuy",true);
+                                    badGuy = true;
+                                    
+                                    if(item.Key == "Knight")
+                                    {
+                                        Utils.Utils.FlagSet("spawnKnight", true);  
+                                    }
 
-                            found = true;
-                            break;
+                                    found = true;
+                                    break;
+                                }
+                            }   
                         }
                     }
                     if(found)
@@ -65,6 +76,8 @@ namespace friendlyPMC.Patches
                 .First(t => t.GetField("Converters", BindingFlags.Static | BindingFlags.Public) != null);
 
             var _defaultJsonConverters = Traverse.Create(converterClass).Field<JsonConverter[]>("Converters").Value;
+
+            Modules.Logger.LogInfo("settings.LocationId " + settings.LocationId);
 
             RequestHandler.PutJson("/client/raid/pitconfig", new
             {

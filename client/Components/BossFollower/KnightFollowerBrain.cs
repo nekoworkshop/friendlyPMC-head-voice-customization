@@ -7,10 +7,6 @@ namespace friendlyPMC.Components.BossFollower
     {
         KnightFightLayer gclass65_0_1;
 
-        private List<string> _quests = new List<string>{
-            "friendlypmc-knight-competition"
-        };
-
         public KnightFollowerBrain(BotOwner owner, pitAIBossPlayer boss) : base(owner, boss)
         {
             _currentTactic = "Assist";
@@ -54,9 +50,16 @@ namespace friendlyPMC.Components.BossFollower
 
             if(_boss == null)  return;
 
+            
+
             _boss.realPlayer.AbstractQuestControllerClass.Quests.ExecuteForEach(quest=>{
-                if(_quests.Contains(quest.Template.Id) && quest.QuestStatus == EFT.Quests.EQuestStatus.Started)
-                    quest.SetStatus(EFT.Quests.EQuestStatus.Fail,true,false);
+                foreach( var id in friendlyPMC.Quests["Knight"])
+                {
+                    if(quest.Template.Id == id && quest.QuestStatus == EFT.Quests.EQuestStatus.Started)
+                    {
+                        quest.SetStatus(EFT.Quests.EQuestStatus.Fail,true,false);
+                    }
+                }
             });
         }
 
