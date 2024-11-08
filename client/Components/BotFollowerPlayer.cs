@@ -15,6 +15,8 @@ using BepInEx.Bootstrap;
 
 using GridClassEx = GClass2516;
 using GridCacheClass = GClass1401;
+using DrakiaXYZ.BigBrain.Brains;
+using System.Reflection;
 
 namespace friendlyPMC.Components
 {
@@ -586,6 +588,19 @@ namespace friendlyPMC.Components
                 _bot.Receiver = new BotReceiver(_bot);
                 _bot.Receiver.Init();
 
+                // ensure the brain manager of BigBrain is also cleared of the bot
+                FieldInfo privateField = AccessTools.Field(typeof(BrainManager), "_instance");
+                BrainManager brainManager = privateField.GetValue(null) as BrainManager;
+                if(brainManager != null)
+                {
+                    FieldInfo activatedBotsField = AccessTools.Field(typeof(BrainManager), "ActivatedBots");
+                    Dictionary<IPlayer, BotOwner> activatedBots = activatedBotsField.GetValue(brainManager) as Dictionary<IPlayer, BotOwner>;
+                    if (activatedBots != null && activatedBots.ContainsKey(_bot.GetPlayer))
+                    {
+                        activatedBots.Remove(_bot.GetPlayer);
+                    }
+                }
+                
                 // put back old brain
                 _bot.Brain = new StandartBotBrain(_bot);
                 _bot.Brain.Activate();
