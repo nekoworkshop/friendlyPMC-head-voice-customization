@@ -1,4 +1,53 @@
 {
+    "returnItems" : [
+        "Hier sind deine Sachen. Ähm, ist da was für mich dabei?", 
+        "Hier sind deine Sachen.", 
+        "Hier ist alles, was du mir gegeben hast. Also... teilen wir das, oder?",
+        "Hier, das ist alles, was du mir gegeben hast.\nIst da was für mich dabei?", 
+        "Hier, mein Freund, alles, was du mir gegeben hast.", 
+        "Ich habe deine Sachen hier. Ist da was, was du entbehren kannst?"
+    ],
+    "returnItemsDeath" : [
+        "Keine Sorge, Boss, wir haben es rausgeschafft.\n Ich habe, was du mir gegeben hast, hier. Deine Ausrüstung konnte ich jedoch nicht retten; die Aasgeier waren schon dran.",
+        "Wir konnten entkommen. Hier ist alles, was du mir gegeben hast. Ich hoffe, deine Sachen sind versichert; mehr konnte ich nicht holen."
+    ],
+    "teamEscaped": [
+        "Super!\nWir haben es rausgeschafft.",
+        "Und das war’s! Wir haben es geschafft, Boss.",
+        "Als der Letzte den Extrakt erreicht hat, war es wie am Schnürchen—alle sind sicher.",
+        "Perfekt koordiniert, und jetzt ist die ganze Crew draußen und bereit für die nächste Runde."
+    ],
+    "teamSomeEscaped" : [
+        "Schade um {0}, aber wenigstens haben es die anderen geschafft.",
+        "Ein paar von uns haben es nicht geschafft, aber zum Glück konnten einige lebend entkommen."
+    ],
+    "friendlyEscaped": [
+        "Gut, dass wir es geschafft haben.\nDanke, dass ich mitkommen durfte.",
+        "Puh, gut, dass ich dich gefunden habe.\nIch wusste nicht, ob ich es schaffe. Danke!",
+        "Kein ideales Ende, einige Teammitglieder verloren, aber wenigstens habe ich es rausgeschafft.",
+        "Danke für die Hilfe. Ich bringe die Ausrüstung meiner gefallenen Teamkameraden zurück; das ist das Mindeste, was ich tun kann."
+    ],
+    "allyBossEscaped" : [
+        "Guter Lauf!\nDu hast dich gut geschlagen, Rookie, wirklich gut.",
+        "Nicht schlecht, gar nicht schlecht. Lass uns das irgendwann wiederholen, Rookie.",
+        "Gab es überhaupt Zweifel? Die hatten nie eine Chance."
+    ],
+    
+    "chatCommands" : {
+        "joinRaid": ["Komm dazu", "Schließ dich an", "Mitkommen", "Team bilden"],
+        "giveWeapon": ["Nimm ", "Verwende "]
+    },
+    "chatHelp": { 
+        "joinRaid": "Ich kann dich bei einem Raid begleiten, sag einfach {0}. Wenn du BirdEye und BigPipe freigeschaltet hast, kannst du 'alle' hinzufügen, um sie ebenfalls einzuladen.", 
+        "joinAll" : ["alle"],
+        "giveWeapon": "Du kannst mir ein Waffenset geben, das ich nutzen soll. Sag einfach {0} und den Namen des Presets."
+    },
+    "chatResponses": {
+        "help": "Hier ist, was ich kann:"
+    },
+
+
+    
     "baseSettings": "Grundlegende Einstellungen",
     "miscSettings": "Verschiedenes",
     "testSettings": "Testen",

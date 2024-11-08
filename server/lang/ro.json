@@ -6,6 +6,21 @@
 	"friendlyEscaped": ["Mă bucur că am reușit.\nMulțumesc că m-ai lăsat să te însoțesc.", "Uf, mă bucur că te-am găsit.\nNu știam dacă voi reuși. Mulțumesc!", "Nu este cel mai bun rezultat, pierzând câțiva colegi, dar mă bucur că măcar am ieșit.", "Mulțumesc pentru ajutor. Îmi car echipamentul colegilor căzuți înapoi; măcar atât pot să fac."],
 	"allyBossEscaped": ["A fost o rundă bună!\nTe-ai descurcat bine, rookie, te-ai descurcat bine.", "Nu e rău, deloc. Să o facem din nou cândva, rookie.", "Ești tare!\n... neah, ai dreptate, eu sunt tare. Dar ai făcut bine și tu, rookie.", "A fost vreo îndoială? Nu aveau nicio șansă.\nBăieți, băuturile sunt din partea mea, rookie-ul plătește!", "Hai, hai, încearcă să ții pasul, bine? Avem rookie-ul aici admirând peisajul."],
 
+    "chatCommands" : {
+        "joinRaid": ["Vino cu mine", "Hai în echipă", "Alătură-te", "Echipează-te", "Vino cu mine", "Hai in echipa", "Alatura-te", "Echipeaza-te"],
+        "giveWeapon": ["Ia ", "Folosește ","Foloseste "]
+    },
+    "chatHelp": { 
+        "joinRaid": "Pot să mă alătur într-un raid, doar spune {0}. Dacă i-ai deblocat pe BirdEye și BigPipe, poți adăuga 'toți' pentru a-i invita și pe ei.", 
+        "joinAll" : ["toti", "toți"],
+        "giveWeapon": "Îmi poți da un set de arme de folosit, doar spune {0} și numele presetului."
+    },
+    "chatResponses": {
+        "help": "Iată ce pot face:",
+        "joinRaid": ["Sunt pregătit, hai să mergem!","Să-i dăm bice!","Fără risc, fără câștig!","Hai să o facem!","E timpul să dăm drumul la muzică!","Mă bag!","Hai să dăm startul!","Încarcă și dă-i bătaie!","Ne vedem acolo!"]
+    },
+
+
 	"baseSettings": "Setări de bază",
 	"miscSettings": "Diverse",
 	"testSettings": "Testare",

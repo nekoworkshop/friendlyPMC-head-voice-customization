@@ -16,20 +16,47 @@ import { Message } from "@spt/models/eft/profile/ISptProfile";
 import { MessageType } from "@spt/models/enums/MessageType";
 import { HashUtil } from "@spt/utils/HashUtil";
 import { ProfileHelper } from "@spt/helpers/ProfileHelper";
+import { RandomUtil } from "@spt/utils/RandomUtil";
 
 interface IWsGroupMatchInviteAccept extends IWsNotificationEvent, IGroupCharacter {}
 
 @injectable()
 export class KnightChatBot implements IDialogueChatBot {
-	public constructor(@inject("PrimaryLogger") private logger: ILogger, @inject("MailSendService") private mailSendService: MailSendService, @inject("ProfileHelper") private profileHelper: ProfileHelper, @inject("NotificationSendHelper") private notificationSendHelper: NotificationSendHelper, @inject("HashUtil") private hashUtil: HashUtil) {
-		this.logger = logger;
+	private _StringFormat(str: string, ...values: string[]) {
+		return str.replace(/\{(\d+)\}/g, function (match, number) {
+			return typeof values[number] != "undefined" && values[number] !== null ? values[number] : match;
+		});
+	}
+
+	public constructor(@inject("MailSendService") private mailSendService: MailSendService, @inject("ProfileHelper") private profileHelper: ProfileHelper, @inject("NotificationSendHelper") private notificationSendHelper: NotificationSendHelper, @inject("HashUtil") private hashUtil: HashUtil, @inject("RandomUtil") private randUtil: RandomUtil) {
 		this.mailSendService = mailSendService;
 		this.notificationSendHelper = notificationSendHelper;
 	}
 
+	public SetLang(lang: { [key: string]: any }) {
+		this.chatCommands.joinRaid = lang.chatCommands.joinRaid;
+		this.chatCommands.giveWeapon = lang.chatCommands.giveWeapon;
+		this.chatCommands.joinAll = lang.chatCommands.joinAll;
+
+		this.chatHelp.joinRaid = this._StringFormat(lang.chatHelp.joinRaid, "'" + this.chatCommands.joinRaid.join("' or '") + "'");
+		this.chatHelp.giveWeapon = this._StringFormat(lang.chatHelp.giveWeapon, "'" + this.chatCommands.giveWeapon.join("' or '") + "'");
+
+		this.chatResponses.joinRaid = lang.chatHelp.joinAll;
+	}
+
 	chatCommands = {
-		joinRaid: ["Join me", "Party up", "Join", "Team up"],
-		giveWeapon: ["Take ", "Use "],
+		joinRaid: <string[]>[],
+		joinAll: <string[]>[],
+		giveWeapon: <string[]>[],
+	};
+	chatHelp = {
+		joinRaid: "",
+		giveWeapon: "",
+	};
+	chatResponses = {
+		help: "",
+		joinRaid: [""],
+		giveWeapon: "",
 	};
 
 	isInGroup = false;
@@ -53,10 +80,18 @@ export class KnightChatBot implements IDialogueChatBot {
 			setTimeout(() => {
 				this.mailSendService.sendUserMessageToPlayer(sessionId, this.getChatBot(), "Here is what I can do:");
 				setTimeout(() => {
-					let message = "I can join you in a raid, just say '" + this.chatCommands["joinRaid"].join("' or '") + "'.";
-					message += "\n\nYou can give me a weapon kit to use, just say '" + this.chatCommands["giveWeapon"].join(" or ") + "' and the preset name.";
+					let message = this.chatHelp.joinRaid;
+					//message += "\n\n" + this.chatHelp.giveWeapon;
 					this.mailSendService.sendUserMessageToPlayer(sessionId, this.getChatBot(), message);
 				}, 1000);
+			}, 1000);
+			return request.dialogId;
+		}
+
+		// check if request is a command by seeing if the text starts with a registered command
+		if (this.chatCommands.joinRaid.some(command => request.text.startsWith(command))) {
+			setTimeout(() => {
+				this.acceptInvite(sessionId);
 			}, 1000);
 			return request.dialogId;
 		}
@@ -64,28 +99,12 @@ export class KnightChatBot implements IDialogueChatBot {
 
 	public acceptInvite(sessionId: string) {
 		const profile = this.getChatBot();
-		const dialog = this.notificationSendHelper["getDialog"](sessionId, MessageType.USER_MESSAGE, profile);
 
 		const userProfile = this.profileHelper.getPmcProfile(sessionId);
 
-		dialog.new += 1;
-		const message: Message = {
-			_id: this.hashUtil.generate(),
-			uid: dialog._id,
-			type: MessageType.USER_MESSAGE,
-			dt: Math.round(Date.now() / 1000),
-			text: `Right on! I'm ready for whatever!`,
-			hasRewards: undefined,
-			rewardCollected: undefined,
-			items: undefined,
-		};
-		dialog.messages.push(message);
-
-		this.isInGroup = true;
-
 		const notification: IWsGroupMatchInviteAccept = {
 			type: NotificationEventType.GROUP_MATCH_INVITE_ACCEPT,
-			eventId: message._id,
+			eventId: this.hashUtil.generate(),
 			Info: Object.assign(profile.Info, {
 				Level: userProfile.Info.Level,
 			}),
@@ -95,5 +114,9 @@ export class KnightChatBot implements IDialogueChatBot {
 			isReady: true,
 		};
 		this.notificationSendHelper.sendMessage(sessionId, notification);
+
+		setTimeout(() => {
+			this.mailSendService.sendUserMessageToPlayer(sessionId, this.getChatBot(), this.randUtil.getArrayValue(this.chatResponses.joinRaid));
+		}, 1000);
 	}
 }

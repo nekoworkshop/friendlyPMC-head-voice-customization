@@ -72,163 +72,6 @@ class friendlyPMC {
 
 	lang: { [key: string]: any } = {};
 
-	lang_en = {
-		//prettier-ignore
-		"returnItems" : [
-            "Here is your stuff. Uhm, anything in there for me? ", 
-            "Got your things right here.", 
-            "Here is everything you gave me. So... we are splitting this, right?", 
-            "Here, this is everything you gave me.\nAnything in there for me?", "Here you go my friend, all the stuff you gave me.", "I got your stuff right here. Anything in there you can spare?"
-        ],
-		//prettier-ignore
-		"returnItemsDeath" : [
-            "Don't worry boss, we managed to get out.\n I have what you gave me right here. I could not get your equipment though, the jackals where already on it.",
-            "We where able to get out of there. Here is everything you gave me. I hope your stuff is insured, that I could not get.",
-        ],
-		//prettier-ignore
-		teamEscaped: [
-            "Nice!\nWe managed to get out.",
-            "And that's a wrap! We made it boss.",
-            "When the last man hit the extract, it was like clockwork—everyone's safe",
-            "We coordinated perfectly, and now the whole crew's out and ready to gear up again"
-        ],
-		//prettier-ignore
-		teamSomeEscaped : [
-            "Well it's a shame about {0}, but at least the rest of us made it.",
-            "A few of us got clipped, but I'm glad some managed to get out alive"
-        ],
-		//prettier-ignore
-		friendlyEscaped: [
-            "Glad we made it.\nThanks for letting me tag along.",
-            "Whew, glad I found you.\nI didn't know if I was going to make it. Thanks!",
-            "Not the best outcome, losing some teammates, but I'm glad I at least got out",
-            "Thanks for the help. I'm hauling my fallen teammates' gear back; it's the least I can do."
-        ],
-		//prettier-ignore
-		allyBossEscaped : [
-            "Nice run!\n You did good rookie, you did good.",
-            "Not bad, not bad at all. Let's dot it again sometime rookie.",
-            "Was there even a doubt? They never stood a chance."
-        ],
-
-		baseSettings: "Base Settings",
-		miscSettings: "Miscellaneous",
-		testSettings: "Testing",
-		raidSettings: "Raid Settings",
-		equipOptions: ["Default"],
-		tacticOptions: ["Default", "Support", "Marksman", "Pusher", "Holder", "Assist"],
-		clothesOptions: ["Default", "Player"],
-		statusSound: {
-			Name: "Report Status Volume",
-			Description: "Volume of the radio sound when triggering report status",
-		},
-		enemyMarker: {
-			Name: "Enemy Marker",
-			Description: "Show enemy position when reporting status. If disabled, the enemy marker sound will also be disabled",
-		},
-		squadSpawn: {
-			Name: "Squad Spawn",
-			Description: "Set the volume of the report status sound",
-		},
-		squadSize: {
-			Name: "Squad size",
-			Description: "Number of followers to spawn with",
-		},
-		extraPickups: {
-			Name: "Maximum pickup followers",
-			Description: "Maximum followers the player can pick up during a raid. This is in addition to the squad",
-		},
-		returnChanceDeath: {
-			Name: "Squadmate return chance after death",
-			Description: "Chance your followers will return the items you gave them should you die. This applies only to members you spawned with",
-		},
-		squadSetup: {
-			Name: "Use Squad setup",
-			Description: "Use specific setup for your squad",
-		},
-		scanDistance: {
-			Name: "Maximum scan distance",
-			Description: "Maximum distance to pick up any visible enemy that the player is signaling when issuing 'Contact' phrase",
-		},
-		patrolRadius: {
-			Name: "Patrol Radius",
-			Description: "Maximum distance from the player the followers will patrol around",
-		},
-		enemyRemember: {
-			Name: "Time to forget about the enemy (in sec.)",
-			Description: "Maximum time a follower will remember an enemy. This is applied only at the beginning of a raid",
-		},
-		healthMultiplier: {
-			Name: "Squad Health Multiplier",
-			Description: "Health multiplier for the followers you spawn with. This is applied per each body part.",
-		},
-		memberTactic: {
-			Name: "Squad Member {0} Tactic",
-			Description: "Set Squad member fight tactic. Default is a combination of Pusher and Holder. Pusher tries to push the enemy often. Holder will stay in place around the boss. Marksman will try to get a position from where he can shoot preferably from behind the player, at a distance and will not push even if ordered. Support will provide frequent suppression fire and is able to use grenades and the grenade launcher as secondary weapon",
-		},
-		memberEquipment: {
-			Name: "Squad Member {0} Equipment",
-			Description: "Set Squad member equipment. You can choose between default (which is SPT random equipment), user's current equipment or user created presets (recommended if using a tactic different than default)",
-		},
-		memberName: {
-			Name: "Squad Member {0} Nickname",
-			Description: "Set a custom nickname for this Squad member. Leave blank for default",
-		},
-		memberUniformTop: {
-			Name: "Squad Member {0} Top",
-			Description: "Set what the top clothes for this member should be. Leave blank for default",
-		},
-		memberUniformBottom: {
-			Name: "Squad Member {0} Bottom",
-			Description: "Set what the pants for this member should be. Leave blank for default",
-		},
-		equipmentLock: {
-			Name: "Lock Squad Equipment",
-			Description: "Locks the equipment of the squad members. This is useful if you want to use your own equipment presets and do not wish to lose the equipment if you or them die. Consumables are excluded.",
-		},
-		npcSendMessage: {
-			Name: "Raid End Messages",
-			Description: "Followers will send message at the end of the raid based on conditions such as if all made it out or if you picked up a follower and kept him alive. Return items messages are excluded",
-		},
-		sameSideHostile: {
-			Name: "Same PMC Side Hostile",
-			Description: "Should PMC Bots of the same side be hostile to each other (followers remain friendly to you)",
-		},
-		badGuy: {
-			Name: "Bad Guy",
-			Description: "Should the player be hostile to all PMC bots, regardless of faction",
-		},
-		pmcArmbands: {
-			Name: "PMC Arm Bands",
-			Description: "Should PMC bots have armbands (red for BEARs, blue for USECs)",
-		},
-		englishBear: {
-			Name: "BEARs speak English",
-			Description: "Should BEAR bots speak English or Russian",
-		},
-		pingSquad: {
-			Name: "Ping Squad",
-			Description: "Shortcut key for triggering the Report call",
-		},
-		enemyContact: {
-			Name: "Enemy Report",
-			Description: "Shortcut key for triggering the Contact call",
-		},
-		gestures: {
-			OverThere: "Over There",
-			TeamStatus: "Status Report",
-			OnRepeatedContact: "Contact",
-		},
-
-		botStatus: {
-			Dead: "Dead",
-			Engaged: "In Combat",
-			Alerted: "Enemy Detected",
-			Heal: "Healing",
-			WantToHeal: "Wants to heal",
-		},
-	};
-
 	Logger: ILogger;
 	Bots: IBotConfig;
 	mailSendService: MailSendService;
@@ -652,18 +495,24 @@ class friendlyPMC {
 
 		const tables = databaseServer.getTables();
 
-		this.lang = this.lang_en;
+		try {
+			if (fs.existsSync(`${__dirname}/../lang/en.json`)) {
+				const lg = require(`../lang/en.json`);
+				this.lang = lg;
+			}
+		} catch (e) {
+			console.error(e);
+		}
 
 		const lang = this.LocaleService.getDesiredGameLocale();
 		try {
 			if (lang && fs.existsSync(`${__dirname}/../lang/${lang}.json`)) {
 				const lg = require(`../lang/${lang}.json`);
-				this.lang = Object.assign(this.lang_en, lg);
+				this.lang = Object.assign(this.lang, lg);
 			}
 		} catch (e) {
 			this.Logger.error("friendlyPMC: bad language file for " + lang + " - falling back to en");
 			console.error(e);
-			this.lang = this.lang_en;
 		}
 
 		// same side hostile is being changed elsewhere - do this to avoid unwanted outcome
@@ -678,7 +527,11 @@ class friendlyPMC {
 		container.register<KnightChatBot>("KnightChatBot", KnightChatBot, {
 			lifecycle: Lifecycle.Singleton,
 		});
-		container.resolve<DialogueController>("DialogueController").registerChatBot(container.resolve<KnightChatBot>("KnightChatBot"));
+
+		const knightBot = container.resolve<KnightChatBot>("KnightChatBot");
+		knightBot.SetLang(this.lang);
+
+		container.resolve<DialogueController>("DialogueController").registerChatBot(knightBot);
 	}
 
 	private _makeFriendlyOrHostile(diff: Difficulty, pmcType: string) {
