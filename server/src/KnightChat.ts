@@ -34,20 +34,17 @@ export class KnightChatBot implements IDialogueChatBot {
 	}
 
 	public SetLang(lang: { [key: string]: any }) {
-		this.chatCommands.joinRaid = lang.chatCommands.joinRaid;
-		this.chatCommands.giveWeapon = lang.chatCommands.giveWeapon;
-		this.chatCommands.joinAll = lang.chatCommands.joinAll;
-
 		this.chatHelp.joinRaid = this._StringFormat(lang.chatHelp.joinRaid, "'" + this.chatCommands.joinRaid.join("' or '") + "'");
 		this.chatHelp.giveWeapon = this._StringFormat(lang.chatHelp.giveWeapon, "'" + this.chatCommands.giveWeapon.join("' or '") + "'");
 
-		this.chatResponses.joinRaid = lang.chatHelp.joinAll;
+		this.chatResponses.giveWeapon = lang.chatResponses.giveWeapon;
+		this.chatResponses.joinRaid = lang.chatResponses.joinRaid;
+		this.chatResponses.help = lang.chatResponses.help;
 	}
 
-	chatCommands = {
-		joinRaid: <string[]>[],
-		joinAll: <string[]>[],
-		giveWeapon: <string[]>[],
+	"chatCommands" = {
+		joinRaid: ["/join", "/teamup"],
+		giveWeapon: ["/take", "/use "],
 	};
 	chatHelp = {
 		joinRaid: "",
@@ -78,7 +75,7 @@ export class KnightChatBot implements IDialogueChatBot {
 	public handleMessage(sessionId: string, request: ISendMessageRequest): string {
 		if (request.text == "/help") {
 			setTimeout(() => {
-				this.mailSendService.sendUserMessageToPlayer(sessionId, this.getChatBot(), "Here is what I can do:");
+				this.mailSendService.sendUserMessageToPlayer(sessionId, this.getChatBot(), this.chatResponses.help);
 				setTimeout(() => {
 					let message = this.chatHelp.joinRaid;
 					//message += "\n\n" + this.chatHelp.giveWeapon;
@@ -116,7 +113,8 @@ export class KnightChatBot implements IDialogueChatBot {
 		this.notificationSendHelper.sendMessage(sessionId, notification);
 
 		setTimeout(() => {
-			this.mailSendService.sendUserMessageToPlayer(sessionId, this.getChatBot(), this.randUtil.getArrayValue(this.chatResponses.joinRaid));
+			let message = this.randUtil.getArrayValue(this.chatResponses.joinRaid);
+			this.mailSendService.sendUserMessageToPlayer(sessionId, this.getChatBot(), message);
 		}, 1000);
 	}
 }

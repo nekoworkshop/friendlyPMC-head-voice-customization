@@ -387,7 +387,8 @@ namespace friendlyPMC
 
             // raid patches
             new RaidStartPatch().Enable();
-            harmony.PatchAll(typeof(GClass3188Method38Patch).Assembly);
+            new MainMenuControllerPatch().Enable();
+            new MainMenuController74Patch().Enable();
         }
 
 

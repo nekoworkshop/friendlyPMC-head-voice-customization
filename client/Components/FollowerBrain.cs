@@ -89,7 +89,7 @@ namespace friendlyPMC.Components
         private const float TIME_TO_RESET_HEAL_FIRSTAID = 15f;
         private const float TIME_TO_RESET_HEAL_STIMS = 3f;
         private const float TIME_TO_RESET_HEAL_SURGERY = 40f;
-        private const float TIME_TO_RESET_WEAPONS_GRENADE = 5f;
+        private const float TIME_TO_RESET_WEAPONS_GRENADE = 3f;
         private const float TIME_TO_RESET_WEAPONS_SWAP = 3f;
 
         private bool GRENADE_THROWING = false;
@@ -446,6 +446,7 @@ namespace friendlyPMC.Components
         private void OnThrow()
         {
             GRENADE_THROWING = true;
+            _busyTimer = 0f;
         }
         protected virtual void OnAddEnemy(IPlayer player)
         {

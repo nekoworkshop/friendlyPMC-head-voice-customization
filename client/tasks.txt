@@ -7,7 +7,8 @@
 - x - prepare the stage for working with different languages
 
 - x - assist tactic should also do supression on it's own and also use grenades
-- - goons can do supression (no grenades) while using the "Assist" tactic
+- x - goons can do supression (no grenades) while using the "Assist" tactic
+- - investigate the hands stuck after throwing a grenade bug further
 
 - #inprogress - more improvement on awareness
 - - better checks for enemy voice (if it a battle voice - auto aquire target)
@@ -22,7 +23,11 @@
 - fix glitchy behavior of boss followers
 - - not turning hostile when player accidentally shoots them
 - x - the "Bad Guy" setting should be active when running with bosses
-- - not having a "good" brain when no longer being a follower
+- x - not having a "good" brain when no longer being a follower
+
+- x - see what other screens need patching after having Knight join the group
+- on disband group, spawn flags need to be reset
+- /join commands should create group just like invite does
 
 - #inprogress - The Goons Quests:
 - x - add a quest to unlock Knight as a friend
@@ -30,7 +35,7 @@
 - x - make it possible for Knight to appear as a friend once the quest is completed
 - - hook into client/profile/view to have Knight show as "the other user" in the profile
 - x - when surviving a raid with Knight, increase good standing with him [+0.02] (only after the first quest is completed)
-- at 0.5 standing, Knight no longer turns hostile on accidental shots, but killing him will give a penalty of 0.2 standing
+- at 0.5 standing, Knight no longer turns hostile on accidental shots, but killing him will give a penalty of 0.05 standing
 - - make Knight standing go down whenever the player aggros the Goons (but not below 0.1)  (only after the first quest is completed)
 - - see if we can mark quest as inactive when not having knight as a friend
 

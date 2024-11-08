@@ -36,14 +36,9 @@
         "Not bad, not bad at all. Let's dot it again sometime rookie.",
         "Was there even a doubt? They never stood a chance."
     ],
-
-    "chatCommands": {
-        "joinRaid": ["Join me", "Party up", "Join", "Team up"],
-        "giveWeapon": ["Take ", "Use "]
-    },
+    
     "chatHelp": {
         "joinRaid": "I can join you in a raid, just say {0}. If you unlocked BirdEye and BigPipe, you can add 'all' to these commands to invite them too.",
-        "joinAll": ["all"],
         "giveWeapon": "You can give me a weapon kit to use, just say {0} and the preset name."
     },
     "chatResponses": {

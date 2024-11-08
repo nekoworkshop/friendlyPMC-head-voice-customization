@@ -1,4 +1,5 @@
 ﻿using EFT;
+using EFT.UI.Matchmaker;
 using HarmonyLib;
 using Newtonsoft.Json;
 using SPT.Common.Http;
@@ -21,6 +22,8 @@ namespace friendlyPMC.Patches
         {
 
             bool badGuy = friendlyPMC.badGuy.Value;
+            if (Utils.Utils.FlagGet("spawnKnight")) badGuy = true;
+
             Profile profile = __instance.GetProfileBySide(ESideType.Pmc);
 
             // patch raid settings to determine if user can spawn with a boss do to questing
@@ -91,15 +94,70 @@ namespace friendlyPMC.Patches
         }
     }
 
-    /** Patch adding Knight to raid group to prevent the game from going switching to online matching **/
-    [HarmonyPatch(typeof(GClass3188<RaidSettings>))]
-    [HarmonyPatch("method_38")]
-    public class GClass3188Method38Patch
+    /** Patch having a raid group to prevent the game from going switching to online matching when starting a game **/
+    internal class MainMenuControllerPatch : ModulePatch
     {
-        static void  Postfix(MatchmakerPlayerControllerClass __instance, GClass1219 player)
+        private static List<GClass1219> RemovedPlayers = new List<GClass1219>();
+
+        protected override MethodBase GetTargetMethod()
         {
-            if(player != __instance.CurrentPlayer)
-            __instance.GroupPlayers.Remove(player);
+            return AccessTools.Method(typeof(MainMenuController), "method_44");
+        }
+
+        // ensure group is empty before moving to the next screen
+        [PatchPrefix]
+        private static void PatchPrefix(MainMenuController __instance)
+        {
+            MatchmakerPlayerControllerClass matchmakerPlayerControllerClass = AccessTools.Field(typeof(MainMenuController), "matchmakerPlayerControllerClass").GetValue(__instance) as MatchmakerPlayerControllerClass;
+
+            RemovedPlayers.Clear();
+
+            GClass1219 currentPlayer = matchmakerPlayerControllerClass.CurrentPlayer;
+            foreach (var player in matchmakerPlayerControllerClass.GroupPlayers)
+            {
+                if (player != currentPlayer)
+                {
+                    RemovedPlayers.Add(player);
+                }
+            }
+
+            RemovedPlayers.ForEach(player => matchmakerPlayerControllerClass.GroupPlayers.Remove(player));
+
+            RaidSettings raidSettings_0 = AccessTools.Field(typeof(MainMenuController), "raidSettings_0").GetValue(__instance) as RaidSettings;
+            raidSettings_0.RaidMode = ERaidMode.Local;
+        }
+
+        // add removed players back to the group
+        [PatchPostfix]
+        private static void PatchPostfix(MainMenuController __instance)
+        {
+            MatchmakerPlayerControllerClass matchmakerPlayerControllerClass = AccessTools.Field(typeof(MainMenuController), "matchmakerPlayerControllerClass").GetValue(__instance) as MatchmakerPlayerControllerClass;
+
+            // Add back all players that were removed in the prefix
+            foreach (var player in RemovedPlayers)
+            {
+                matchmakerPlayerControllerClass.GroupPlayers.Add(player);
+            }
+
+            // Clear the removed players list after restoring
+            RemovedPlayers.Clear();
         }
     }
+    /** Patch having a raid group to prevent the game from going switching to online matching when pressing "Ready" in the raid settings screen **/
+    internal class MainMenuController74Patch : ModulePatch
+    {
+        protected override MethodBase GetTargetMethod()
+        {
+            return AccessTools.Method(typeof(MainMenuController), "method_75");
+        }
+
+        // ensure RaidMode is local
+        [PatchPrefix]
+        private static void PatchPrefix(MainMenuController __instance)
+        {
+            RaidSettings raidSettings_0 = AccessTools.Field(typeof(MainMenuController), "raidSettings_0").GetValue(__instance) as RaidSettings;
+            raidSettings_0.RaidMode = ERaidMode.Local;
+        }
+    }
+
 }

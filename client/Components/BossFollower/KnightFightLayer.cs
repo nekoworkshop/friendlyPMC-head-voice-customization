@@ -223,6 +223,17 @@ namespace friendlyPMC.Components.BossFollower
                     request.Complete();
                 }
             }
+            // player requested a suppression fire
+
+            if (request != null && request.BotRequestType == BotRequestType.suppressionFire)
+            {
+                AICoreActionResultStruct<BotLogicDecision> decision = guardLayer.method_29(false, BotLogicDecision.debugGrenade);
+
+                if (decision.Action != BotLogicDecision.debugGrenade)
+                {
+                    return decision;
+                }
+            }
 
             // do not pursue a marksman
             if (botOwner_0.Memory.GoalEnemy.Owner.IsRole(WildSpawnType.marksman))

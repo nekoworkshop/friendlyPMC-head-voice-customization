@@ -33,13 +33,9 @@
         "Gab es überhaupt Zweifel? Die hatten nie eine Chance."
     ],
     
-    "chatCommands" : {
-        "joinRaid": ["Komm dazu", "Schließ dich an", "Mitkommen", "Team bilden"],
-        "giveWeapon": ["Nimm ", "Verwende "]
-    },
+
     "chatHelp": { 
         "joinRaid": "Ich kann dich bei einem Raid begleiten, sag einfach {0}. Wenn du BirdEye und BigPipe freigeschaltet hast, kannst du 'alle' hinzufügen, um sie ebenfalls einzuladen.", 
-        "joinAll" : ["alle"],
         "giveWeapon": "Du kannst mir ein Waffenset geben, das ich nutzen soll. Sag einfach {0} und den Namen des Presets."
     },
     "chatResponses": {
