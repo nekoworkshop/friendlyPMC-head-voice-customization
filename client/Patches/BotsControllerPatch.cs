@@ -560,6 +560,7 @@ namespace friendlyPMC.Patches
                 float maxHeavy = 1500f;
                 float maxLight = 1500f;
                 float maxStress = 2500f;
+                float maxPerception = 4000f;
 
                 float healthIncrement = 40f;
                 float vitalityIncrement = 30f;
@@ -568,6 +569,7 @@ namespace friendlyPMC.Patches
                 float lightIncrement = 20f;
 
                 float stressIncrement = 20f;
+                float perceptionIncrement = 40f;
 
                 int botLevel = profile.Info.Level;
 
@@ -600,6 +602,11 @@ namespace friendlyPMC.Patches
                 float scaledStrees = Utils.Utils.GetScaledValue(0f, stressIncrement, botLevel, maxStress);
                 if(profile.Skills.StressResistance.Current < scaledStrees)
                     profile.Skills.StressResistance.SetCurrent(scaledStrees, true);
+
+                // --- perception
+                float scaledPerception = Utils.Utils.GetScaledValue(0f, perceptionIncrement, profile.Info.Level, maxPerception);
+                if (profile.Skills.Perception.Current < scaledPerception)
+                    profile.Skills.Perception.SetCurrent(scaledPerception, true);
 
                 // -- grenade launcher
                 profile.Skills.Launcher.SetCurrent(scaledRecoil, true);
@@ -861,19 +868,28 @@ namespace friendlyPMC.Patches
                 }
                 // - common
                 float maxVitality = 2500f;
+                float maxHealth = 4000f;
                 float maxHeavy = 1500f;
                 float maxLight = 1500f;
-                float maxStress = 2500f;
+                float maxStress = 3000f;
+                float maxPerception = 4000f;
 
                 float vitalityIncrement = 30f;
+                float healthIncrement = 100f;
                 float heavyIncrement = 20f;
                 float lightIncrement = 20f;
 
                 float stressIncrement = 20f;
+                float perceptionIncrement = 50f;
                 // --- vitality
                 float scaledVitality = Utils.Utils.GetScaledValue(0f, vitalityIncrement, profile.Info.Level, maxVitality);
                 if (profile.Skills.Vitality.Current < scaledVitality)
                     profile.Skills.Vitality.SetCurrent(scaledVitality, true);
+
+                // --- health
+                float scaledHealth = Utils.Utils.GetScaledValue(0f, healthIncrement, profile.Info.Level, maxHealth);
+                if (profile.Skills.Health.Current < scaledHealth)
+                    profile.Skills.Health.SetCurrent(scaledHealth, true);
 
                 // --- heavy vests
                 float scaledHeavy = Utils.Utils.GetScaledValue(0f, heavyIncrement, profile.Info.Level, maxHeavy);
@@ -890,6 +906,10 @@ namespace friendlyPMC.Patches
                 if (profile.Skills.StressResistance.Current < scaledStrees)
                     profile.Skills.StressResistance.SetCurrent(scaledStrees, true);
 
+                // --- perception
+                float scaledPerception = Utils.Utils.GetScaledValue(0f, perceptionIncrement, profile.Info.Level, maxPerception);
+                if (profile.Skills.Perception.Current < scaledPerception)
+                    profile.Skills.Perception.SetCurrent(scaledPerception, true);
 
                 spanwers.Add(() => {
                     Stopwatch stopWatch = new Stopwatch();

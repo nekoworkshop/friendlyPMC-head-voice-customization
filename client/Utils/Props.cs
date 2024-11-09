@@ -105,7 +105,7 @@ namespace friendlyPMC.Utils
             {
                 "Knight",
                 new List<string> {
-                    "friendlypmc-knight-my-land-kill"
+                    "friendlypmc-knight-my-land-1"
                 }
             }
         };

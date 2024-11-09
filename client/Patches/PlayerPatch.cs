@@ -8,6 +8,9 @@ using System;
 using System.Reflection;
 using System.Collections.Generic;
 using friendlyPMC.Components;
+using Comfort.Common;
+using EFT.InventoryLogic;
+using UnityEngine;
 
 namespace friendlyPMC.Patches
 {
@@ -71,7 +74,7 @@ namespace friendlyPMC.Patches
             return false;
         }
     }
-    // we handle firing TeamStatus and OverThere commands inside PlayPhraseOrGesture so that the enemy does not hear them
+    /** Handle firing TeamStatus and OverThere commands inside PlayPhraseOrGesture so that the enemy does not hear them **/
     internal class GamePlayerOwnerPatch : ModulePatch
     {
         protected override MethodBase GetTargetMethod()
@@ -136,6 +139,84 @@ namespace friendlyPMC.Patches
             }
 
             return true;
+        }
+    }
+    /** Check who killed a bot to see if we count it for a knight kill quest **/
+    internal class PlayerKilledPatch : ModulePatch
+    {
+        protected override MethodBase GetTargetMethod()
+        {
+            return AccessTools.Method(typeof(Player), "OnBeenKilledByAggressor");
+        }
+
+        [PatchPrefix]
+        private static void PatchPrefix(Player __instance, IPlayer aggressor, DamageInfo damageInfo, EBodyPart bodyPart, EDamageType lethalDamageType)
+        {
+            Player alivePlayerByProfileID = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(aggressor.ProfileId);
+			if (alivePlayerByProfileID == null || aggressor == null || aggressor.Profile == null || aggressor.Profile.Info == null || aggressor.Profile.Info.Settings == null)
+			{
+				return;
+			}
+            
+            if (!Singleton<AbstractGame>.Instantiated) return;
+            if (GamePlayerOwner.MyPlayer.HealthController == null || !GamePlayerOwner.MyPlayer.HealthController.IsAlive)
+            {
+                return;
+            }
+            string ProfileId = GamePlayerOwner.MyPlayer.ProfileId;
+            Player player = GamePlayerOwner.MyPlayer;
+
+            if (BossPlayers.Instance == null || !BossPlayers.IsPlayerBoss(ProfileId))
+            {
+                return;
+            }
+            
+            bool knightKiller = false;
+            bool pipeKiller = false;
+            bool birdEyeKiller = false;
+            if(aggressor.Profile.Info.Settings.Role == WildSpawnType.bossKnight)
+            {
+                knightKiller = true;
+            }
+
+            if(!knightKiller) return;
+
+            List<string> list = new List<string>();
+            Item weapon2 = damageInfo.Weapon;
+            
+            list.Add("Any");
+
+            if(__instance.Side == EPlayerSide.Usec)
+            {
+                list.Add("Usec");
+                list.Add("AnyPmc");
+            } 
+            else if(__instance.Side == EPlayerSide.Bear)
+            {
+                list.Add("Bear");
+                list.Add("AnyPmc");
+            } 
+            else if(__instance.Side == EPlayerSide.Savage)
+            {
+                list.Add("Savage");
+                list.Add("Bot");
+            }
+
+    
+            string locationId = player.Location;
+            float distance = Vector3.Distance(aggressor.Position, __instance.Position);
+
+            if(knightKiller) Utils.Utils.FlagSet("knightKiller",true);
+            else if(pipeKiller) Utils.Utils.FlagSet("pipeKiller",true);
+            else if(birdEyeKiller) Utils.Utils.FlagSet("birdEyeKiller",true);
+
+            list.ForEach(target=>{
+                player.AbstractQuestControllerClass.CheckKillConditionCounter(target,__instance.ProfileId,new List<string>{},weapon2,bodyPart,locationId,distance,__instance.Profile.Info.Settings.Role.ToStringNoBox<WildSpawnType>(),__instance.CurrentHour,__instance.HealthController.BodyPartEffects,__instance.HealthController.BodyPartEffects,__instance.TriggerZones,new string[]{});
+            });
+
+            Utils.Utils.FlagSet("knightKiller",false);
+            Utils.Utils.FlagSet("pipeKiller",false);
+            Utils.Utils.FlagSet("birdEyeKiller",false);
         }
     }
 }

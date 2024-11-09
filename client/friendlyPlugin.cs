@@ -238,8 +238,6 @@ namespace friendlyPMC
             new GestureMenuAvailablePhrasesPatch().Enable();
             new EPhraseTriggerPatch().Enable();
 
-            new ConditionCounterPatch().Enable();
-
             var harmony = new Harmony("xyz.pit.friendlypmc");
 
             harmony.PatchAll(typeof(LocalGameCtorPatch).Assembly);
@@ -347,6 +345,9 @@ namespace friendlyPMC
             new MainMenuControllerPatch().Enable();
             new MainMenuController74Patch().Enable();
             harmony.PatchAll(typeof(SendInvitePatch).Assembly);
+
+            new PlayerKilledPatch().Enable();
+            new ConditionCounterPatch().Enable();
         }
 
 
