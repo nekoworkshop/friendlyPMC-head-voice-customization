@@ -10,7 +10,7 @@ using friendlyPMC.Modules;
 
 namespace friendlyPMC.Utils
 {
-    internal class Covers
+    public class Covers
     {
 
         /**

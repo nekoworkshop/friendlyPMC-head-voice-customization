@@ -38,7 +38,7 @@
     ],
     
     "chatHelp": {
-        "joinRaid": "I can join you in a raid, just say {0}. If you unlocked BirdEye and BigPipe, you can add 'all' to these commands to invite them too.",
+        "joinRaid": "I can join you in a raid, use the 'INVITE TO GROUP' command to get me to join you. If you have unlocked BirdEye and BigPipe they can join too. But no extras - being crowded is not my thing.",
         "giveWeapon": "You can give me a weapon kit to use, just say {0} and the preset name."
     },
     "chatResponses": {

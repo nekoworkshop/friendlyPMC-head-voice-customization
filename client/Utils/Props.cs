@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace friendlyPMC.Utils
 {
-    internal class Props
+    public class Props
     {
         private static float _def_coverSearchRadius = 80f;
         private static float _def_sprintDistance = 15f;
@@ -60,5 +60,54 @@ namespace friendlyPMC.Utils
 
         }
 
+
+        public static Dictionary<string, List<string>> Quests = new Dictionary<string, List<string>>{
+            {
+                "Knight",
+                // order is important
+                new List<string> {
+                    "friendlypmc-knight-competition",
+                    "friendlypmc-knight-my-land"
+                }
+            }
+        };
+
+        public static Dictionary<string, List<string>> QuestsLocations = new Dictionary<string, List<string>>{
+            {
+                "friendlypmc-knight-competition",
+                new List<string> {
+                    "lighthouse",
+                    "bigmap",
+                    "shoreline",
+                    "woods"
+                }
+            },
+            {
+                "friendlypmc-knight-my-land",
+                new List<string> {
+                    "bigmap"
+                }
+            }
+        };
+
+        public static Dictionary<string, List<string>> QuestsTeamConditions = new Dictionary<string, List<string>>{
+            {
+                "Knight",
+                new List<string> {
+                    "friendlypmc-knight-competition-1",
+                    "friendlypmc-knight-competition-2",
+                    "friendlypmc-knight-competition-3",
+                    "friendlypmc-knight-competition-4",
+                }
+            }
+        };
+        public static Dictionary<string, List<string>> QuestsKillConditions = new Dictionary<string, List<string>>{
+            {
+                "Knight",
+                new List<string> {
+                    "friendlypmc-knight-my-land-kill"
+                }
+            }
+        };
     }
 }

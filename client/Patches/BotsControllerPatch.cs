@@ -1511,7 +1511,7 @@ namespace friendlyPMC.Patches
             profile.QuestsData.ForEach(quest =>
             {
 
-                foreach (var item in friendlyPMC.Quests)
+                foreach (var item in Utils.Props.Quests)
                 {
                     // allow Knight standing to increase only after we complete the first quest
                     if (item.Key == "Knight" && quest.Id == item.Value[0] && quest.Status == EFT.Quests.EQuestStatus.Success)

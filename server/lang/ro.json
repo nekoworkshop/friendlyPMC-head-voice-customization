@@ -7,7 +7,7 @@
 	"allyBossEscaped": ["A fost o rundă bună!\nTe-ai descurcat bine, rookie, te-ai descurcat bine.", "Nu e rău, deloc. Să o facem din nou cândva, rookie.", "Ești tare!\n... neah, ai dreptate, eu sunt tare. Dar ai făcut bine și tu, rookie.", "A fost vreo îndoială? Nu aveau nicio șansă.\nBăieți, băuturile sunt din partea mea, rookie-ul plătește!", "Hai, hai, încearcă să ții pasul, bine? Avem rookie-ul aici admirând peisajul."],
 
     "chatHelp": { 
-        "joinRaid": "Pot să mă alătur într-un raid, doar spune {0}. Dacă i-ai deblocat pe BirdEye și BigPipe, poți adăuga 'toți' pentru a-i invita și pe ei.", 
+        "joinRaid": "Pot să mă alătur ție într-un raid, folosește comanda 'INVITĂ ÎN GRUP' pentru a mă alătura. Dacă i-ai deblocat pe BirdEye și BigPipe, și ei se pot alătura. Dar fără extra - nu-mi place aglomerația.", 
         "giveWeapon": "Îmi poți da un set de arme de folosit, doar spune {0} și numele presetului."
     },
     "chatResponses": {

@@ -191,48 +191,6 @@ namespace friendlyPMC
 
         private List<CancellationTokenSource> refreshTokens = new List<CancellationTokenSource>();
 
-        public static Dictionary<string,List<string>> Quests = new Dictionary<string, List<string>>{
-            {
-                "Knight",
-                // order is important
-                new List<string> {
-                    "friendlypmc-knight-competition",
-                    "friendlypmc-knight-my-land"
-                }
-            }  
-        };
-
-        public static Dictionary<string,List<string>> QuestsLocations = new Dictionary<string, List<string>>{
-            {
-                "friendlypmc-knight-competition",
-                new List<string> {
-                    "lighthouse",
-                    "bigmap",
-                    "shoreline",
-                    "woods"
-                }
-            },
-            {
-                "friendlypmc-knight-my-land",
-                new List<string> {
-                    "bigmap"
-                }
-            }
-        };
-
-        public static Dictionary<string,List<string>> QuestsConditions = new Dictionary<string, List<string>>{
-            {
-                "Knight",
-                new List<string> {
-                    "friendlypmc-knight-competition-1",
-                    "friendlypmc-knight-competition-2",
-                    "friendlypmc-knight-competition-3",
-                    "friendlypmc-knight-competition-4",
-                    "friendlypmc-knight-my-land-kill"
-                }
-            }
-        };
-
         private void Awake()
         {
 
@@ -281,7 +239,6 @@ namespace friendlyPMC
             new EPhraseTriggerPatch().Enable();
 
             new ConditionCounterPatch().Enable();
-            new NotificationReceivedPatch().Enable();
 
             var harmony = new Harmony("xyz.pit.friendlypmc");
 
@@ -389,6 +346,7 @@ namespace friendlyPMC
             new RaidStartPatch().Enable();
             new MainMenuControllerPatch().Enable();
             new MainMenuController74Patch().Enable();
+            harmony.PatchAll(typeof(SendInvitePatch).Assembly);
         }
 
 

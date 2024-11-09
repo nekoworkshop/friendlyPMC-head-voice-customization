@@ -13,7 +13,7 @@ using friendlyPMC.Components;
 
 namespace friendlyPMC.Patches
 {
-
+    /** If BOT is getting hit by a player BOSS of which it is a follower of, do not turn hostile **/
     internal class BotOwnerDamagePatch : ModulePatch
     {
         protected override MethodBase GetTargetMethod()
@@ -21,7 +21,7 @@ namespace friendlyPMC.Patches
             return AccessTools.Method(typeof(BotOwner), "method_9");
 
         }
-        /** if BOT is getting hit by a player BOSS of which it is a follower of, do not turn hostile **/
+        
         [PatchPrefix]
         private static bool PatchPrefix(BotOwner __instance, DamageInfo damageInfo, EBodyPart bodyType, float damageReducedByArmor)
         {
@@ -46,7 +46,7 @@ namespace friendlyPMC.Patches
             return true;
         }
     }
-
+    /** Skip checking bot's role if we have made this bot a follower of a boss player **/
     internal class BotOwnerIsFolowerPatch : ModulePatch
     {
         protected override MethodBase GetTargetMethod()
@@ -54,7 +54,7 @@ namespace friendlyPMC.Patches
             return AccessTools.Method(typeof(BotOwner), "IsFollower");
 
         }
-        /** Skip checking bot's role if we have made this bot a follower of a boss player **/
+        
         [PatchPrefix]
         private static bool PatchPrefix(BotOwner __instance, ref bool __result)
         {   
@@ -67,7 +67,7 @@ namespace friendlyPMC.Patches
             return true;
         }
     }
-
+    /** Patch on botOwner UpdateManual to allow us to execute custom code **/
     internal class BotOwnerManualUpdatePatch : ModulePatch
     {
 
@@ -76,7 +76,7 @@ namespace friendlyPMC.Patches
         {
             return AccessTools.Method(typeof(BotOwner), "UpdateManual");
         }
-        /** Patch on botOwner UpdateManual to allow us to execute custom code **/
+       
         [PatchPostfix]
         private static void PatchPostfix(BotOwner __instance)
         {
@@ -103,7 +103,7 @@ namespace friendlyPMC.Patches
             }
         }
     }
-
+    /** Fix having followers be enemy of same side just because their roles where under ENEMY_BOT_TYPES **/
     internal class BotOwnerActivatePatch : ModulePatch
     {
         protected override MethodBase GetTargetMethod()
@@ -111,7 +111,7 @@ namespace friendlyPMC.Patches
             return AccessTools.Method(typeof(BotOwner), "method_10");
 
         }
-        /** Fix having followers be enemy of same side just because their roles where under ENEMY_BOT_TYPES **/
+        
         [PatchPostfix]
         private static void PatchPostfix(BotOwner __instance)
         {

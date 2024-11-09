@@ -56,16 +56,16 @@ export class KnightChatBot implements IDialogueChatBot {
 		giveWeapon: "",
 	};
 
-	isInGroup = false;
+	currentGroup: string[] = [];
 
 	getChatBot() {
 		return {
 			_id: "bossKnight",
 			aid: 1113579,
 			Info: {
-				Level: 1,
-				MemberCategory: MemberCategory.TRADER,
-				SelectedMemberCategory: MemberCategory.TRADER,
+				Level: 99,
+				MemberCategory: MemberCategory.SHERPA,
+				SelectedMemberCategory: MemberCategory.SHERPA,
 				Nickname: "Knight",
 				Side: "Usec",
 			},
@@ -85,26 +85,16 @@ export class KnightChatBot implements IDialogueChatBot {
 			return request.dialogId;
 		}
 
-		// check if request is a command by seeing if the text starts with a registered command
-		if (this.chatCommands.joinRaid.some(command => request.text.startsWith(command))) {
-			setTimeout(() => {
-				this.acceptInvite(sessionId);
-			}, 1000);
-			return request.dialogId;
-		}
+		return request.dialogId;
 	}
 
 	public acceptInvite(sessionId: string) {
 		const profile = this.getChatBot();
 
-		const userProfile = this.profileHelper.getPmcProfile(sessionId);
-
 		const notification: IWsGroupMatchInviteAccept = {
 			type: NotificationEventType.GROUP_MATCH_INVITE_ACCEPT,
 			eventId: this.hashUtil.generate(),
-			Info: Object.assign(profile.Info, {
-				Level: userProfile.Info.Level,
-			}),
+			Info: profile.Info,
 			_id: profile._id,
 			aid: profile.aid,
 			isLeader: false,
@@ -114,7 +104,13 @@ export class KnightChatBot implements IDialogueChatBot {
 
 		setTimeout(() => {
 			let message = this.randUtil.getArrayValue(this.chatResponses.joinRaid);
-			this.mailSendService.sendUserMessageToPlayer(sessionId, this.getChatBot(), message);
+			this.mailSendService.sendMessageToPlayer({
+				recipientId: sessionId,
+				sender: MessageType.NPC_TRADER,
+				//@ts-ignore
+				trader: "friendlypmc-knight",
+				messageText: message,
+			});
 		}, 1000);
 	}
 }

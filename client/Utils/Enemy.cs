@@ -10,7 +10,7 @@ using friendlyPMC.Modules;
 
 namespace friendlyPMC.Utils
 {
-    internal class Enemy
+    public class Enemy
     {
         private struct CachedEnemyInfo
         {

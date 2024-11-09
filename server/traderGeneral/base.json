@@ -1,0 +1,80 @@
+{
+    "_id": "friendlypmc-general",
+    "working": true,
+    "availableInRaid": false,
+    "avatar": "/files/trader/avatar/general.jpg",
+    "balance_dol": 0,
+    "balance_eur": 10000000,
+    "balance_rub": 0,
+    "buyer_up": false,
+    "currency": "EUR",
+    "customization_seller": false,
+    "discount": 0,
+    "discount_end": 0,
+    "gridHeight": 120,
+    "insurance": {
+        "availability": false,
+        "excluded_category": [],
+        "max_return_hour": 0,
+        "max_storage_time": 48,
+        "min_payment": 0,
+        "min_return_hour": 0
+    },
+    "items_buy": {
+        "category": [
+        "5448fe124bdc2da5018b4567",
+        "5422acb9af1c889c16000029",
+        "5485a8684bdc2da71d8b4567",
+        "5448ecbe4bdc2d60728b4568",
+        "57864a3d24597754843f8721",
+        "57864ee62459775490116fc1",
+        "57864a66245977548f04a81f",
+        "5c164d2286f774194c5e69fa",
+        "5447e0e74bdc2d3c308b4567",
+        "57bef4c42459772e8d35a53b"
+        ],
+        "id_list": []
+    },
+    "items_buy_prohibited": {
+        "category": [],
+        "id_list": [
+        "62e910aaf957f2915e0a5e36",
+        "64d0b40fbe2eed70e254e2d4",
+        "65ddcc9cfa85b9f17d0dfb07",
+        "65ca457b4aafb5d7fc0dcb5d",
+        "660312cc4d6cdfa6f500c703",
+        "660bbc98c38b837877075e4a",
+        "660bc341c38b837877075e4c",
+        "6638a5474e92f038531e210e"
+        ]
+    },
+    "location": "БТР",
+    "loyaltyLevels": [
+        {
+            "buy_price_coef": 0,
+            "exchange_price_coef": 0,
+            "heal_price_coef": 0,
+            "insurance_price_coef": 0,
+            "minLevel": 1,
+            "minSalesSum": 0,
+            "minStanding": 0,
+            "repair_price_coef": 0
+        }
+    ],
+    "medic": false,
+    "name": "General Jonas",
+    "nextResupply": 1703691958,
+    "nickname": "General",
+    "repair": {
+        "availability": false,
+        "currency": "5449016a4bdc2d6f028b456f",
+        "currency_coefficient": 1,
+        "excluded_category": [],
+        "excluded_id_list": [],
+        "quality": 0
+    },
+    "sell_category": [],
+    "sell_modifier_for_prohibited_items": 0,
+    "surname": "",
+    "unlockedByDefault": true
+}

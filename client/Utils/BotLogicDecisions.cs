@@ -5,7 +5,7 @@ using UnityEngine.AI;
 
 namespace friendlyPMC.Utils
 {
-    internal class BotLogicDecisions
+    public class BotLogicDecisions
     {
         public static readonly float sprintDistance = 15f;
         public static AICoreActionResultStruct<BotLogicDecision> RegroupToBoss(BotOwner bot)

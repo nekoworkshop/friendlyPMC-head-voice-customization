@@ -4,7 +4,7 @@ using HarmonyLib;
 using Newtonsoft.Json;
 using SPT.Common.Http;
 using SPT.Reflection.Patching;
-
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -20,8 +20,20 @@ namespace friendlyPMC.Patches
         [PatchPostfix]
         private static void PatchPostfix(Class266 __instance, RaidSettings settings)
         {
-
             bool badGuy = friendlyPMC.badGuy.Value;
+            
+            if(MainMenuControllerPatch.GroupPlayers != null)
+            {
+                foreach (var player in MainMenuControllerPatch.GroupPlayers)
+                {
+                    if(player.Id == "bossKnight")
+                    {
+                        Utils.Utils.FlagSet("spawnKnight", true);
+                    }
+                }
+            }
+
+            
             if (Utils.Utils.FlagGet("spawnKnight")) badGuy = true;
 
             Profile profile = __instance.GetProfileBySide(ESideType.Pmc);
@@ -29,7 +41,7 @@ namespace friendlyPMC.Patches
             // patch raid settings to determine if user can spawn with a boss do to questing
             profile.QuestsData.ForEach(quest=>{
 
-                foreach (var item in friendlyPMC.Quests)
+                foreach (var item in Utils.Props.Quests)
                 {
                     bool found = false;
                     foreach (var item1 in item.Value)
@@ -40,7 +52,7 @@ namespace friendlyPMC.Patches
                             {
                                 bool isGoonQuest = true;
 
-                                if(friendlyPMC.QuestsLocations.TryGetValue(quest.Id, out List<string> locations))
+                                if(Utils.Props.QuestsLocations.TryGetValue(quest.Id, out List<string> locations))
                                 {
                                     isGoonQuest = false;
                                     if(locations.Contains(settings.LocationId.ToLower()))
@@ -99,6 +111,8 @@ namespace friendlyPMC.Patches
     {
         private static List<GClass1219> RemovedPlayers = new List<GClass1219>();
 
+        public static GClass3384<GClass1219> GroupPlayers { get; private set; }
+
         protected override MethodBase GetTargetMethod()
         {
             return AccessTools.Method(typeof(MainMenuController), "method_44");
@@ -141,6 +155,7 @@ namespace friendlyPMC.Patches
 
             // Clear the removed players list after restoring
             RemovedPlayers.Clear();
+            GroupPlayers = matchmakerPlayerControllerClass.GroupPlayers;
         }
     }
     /** Patch having a raid group to prevent the game from going switching to online matching when pressing "Ready" in the raid settings screen **/

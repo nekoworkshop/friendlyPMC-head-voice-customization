@@ -53,7 +53,7 @@ namespace friendlyPMC.Components.BossFollower
             
 
             _boss.realPlayer.AbstractQuestControllerClass.Quests.ExecuteForEach(quest=>{
-                foreach( var id in friendlyPMC.Quests["Knight"])
+                foreach( var id in Utils.Props.Quests["Knight"])
                 {
                     if(quest.Template.Id == id && quest.QuestStatus == EFT.Quests.EQuestStatus.Started)
                     {

@@ -1,11 +1,8 @@
 import { PreSptModLoader } from "@spt/loaders/PreSptModLoader";
-import { ITraderBase, ITraderAssort } from "@spt/models/eft/common/tables/ITrader";
+import { ITraderAssort } from "@spt/models/eft/common/tables/ITrader";
 import { ITraderConfig, UpdateTime } from "@spt/models/spt/config/ITraderConfig";
 import { IDatabaseTables } from "@spt/models/spt/server/IDatabaseTables";
 import { ImageRouter } from "@spt/routers/ImageRouter";
-import { JsonUtil } from "@spt/utils/JsonUtil";
-
-import { ITraderUnlockRequirement } from "@spt/models/eft/hideout/IQteData";
 
 export class TraderHelper {
 	/**

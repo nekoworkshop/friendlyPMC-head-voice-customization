@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace friendlyPMC.Utils
 {
-    internal class BotHelpers : MonoBehaviour
+    public class BotHelpers : MonoBehaviour
     {
         private Coroutine watchCoroutine;
 

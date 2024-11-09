@@ -11,7 +11,7 @@
 - - investigate the hands stuck after throwing a grenade bug further
 
 - #inprogress - more improvement on awareness
-- - better checks for enemy voice (if it a battle voice - auto aquire target)
+- - better checks for enemy voice (if it is a battle voice - auto aquire target)
 - - check for bush sounds
 - x - increase hearing volume
 - - check for gunshots and auto aquire target if close enough
@@ -22,12 +22,12 @@
 
 - fix glitchy behavior of boss followers
 - - not turning hostile when player accidentally shoots them
+- - - see if we can use BotOwnerDamagePatch again 
 - x - the "Bad Guy" setting should be active when running with bosses
 - x - not having a "good" brain when no longer being a follower
 
 - x - see what other screens need patching after having Knight join the group
-- on disband group, spawn flags need to be reset
-- /join commands should create group just like invite does
+- x - on disband group, spawn flags need to be reset
 
 - #inprogress - The Goons Quests:
 - x - add a quest to unlock Knight as a friend
@@ -37,7 +37,7 @@
 - x - when surviving a raid with Knight, increase good standing with him [+0.02] (only after the first quest is completed)
 - at 0.5 standing, Knight no longer turns hostile on accidental shots, but killing him will give a penalty of 0.05 standing
 - - make Knight standing go down whenever the player aggros the Goons (but not below 0.1)  (only after the first quest is completed)
-- - see if we can mark quest as inactive when not having knight as a friend
+- - hook into Player.OnBeenKilledByAggressor to count kills made by Knight as a way to progress kill quests
 
 - see if we can make bot swap weapons when asked to loot (DeadBodyWork)
 - - this should also allow bot to put that weapon as seconday (in case of support without a grenade launcher)
@@ -61,6 +61,7 @@ RELEASE NOTES (3.9)
 - the mod can now work with different languages. It will based on the language you set for your game. There only 3 languages avalabile for now : English, Russian, German, Romanian. You can look into user/mods/friendlyPMC/lang and add more language jsons there (PM me with the file and I will add it to the mod)
 - added "Bad Guy" setting. This will make the player hostile to all factions.
 - Virtual's Custom Quest Loader is now a dependency
+- new quests added to unlock Knight as a friend (he will appear as a trader) and in unlocking the full Goons squad
 
 ==================================================================================
 NOTES:

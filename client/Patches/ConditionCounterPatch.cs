@@ -36,8 +36,14 @@ namespace friendlyPMC.Patches
                 return true;
             }
 
+            // Knight quests require Knight to kill
+            if (Utils.Props.QuestsKillConditions["Knight"].Contains(counter.Id))
+            {
+                return false;
+            }
+
             // Knight quests require Knight as teammate
-            if (friendlyPMC.QuestsConditions["Knight"].Contains(counter.Id))
+            if (Utils.Props.QuestsTeamConditions["Knight"].Contains(counter.Id))
             {
                 var followers = BossPlayers.GetFollowersByBoss(ProfileId);
                 if (followers == null || followers.Count == 0)

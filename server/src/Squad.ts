@@ -49,7 +49,7 @@ import { ConfigTypes } from "@spt/models/enums/ConfigTypes";
 
 import { ITraderConfig } from "@spt/models/spt/config/ITraderConfig";
 
-import { KnightTrader } from "./Trader";
+import { KnightTrader, GeneralTrader } from "./Trader";
 
 import { IRagfairConfig } from "@spt/models/spt/config/IRagfairConfig";
 
@@ -81,6 +81,7 @@ class friendlyPMC {
 	matchCallbacks: MatchCallbacks;
 
 	knightTrader: KnightTrader;
+	generalTrader: GeneralTrader;
 
 	private _StringFormat(str: string, ...values: string[]) {
 		return str.replace(/\{(\d+)\}/g, function (match, number) {
@@ -175,6 +176,8 @@ class friendlyPMC {
 			PMCBOTVALUES.convertIntoPmcChance[k].min = 0;
 			PMCBOTVALUES.convertIntoPmcChance[k].max = 0;
 		}
+
+		let groupStatus = null;
 
 		staticRouterModService.registerStaticRouter(
 			"friendlyPMC",
@@ -435,7 +438,7 @@ class friendlyPMC {
 				new RouteAction("/client/match/group/invite/send", async (url: string, info: any, sessionID: string, output: string): Promise<IGetBodyResponseData<string>> => {
 					const aid = info.to;
 					dialogueController.getFriendList(sessionID).Friends.forEach(friend => {
-						if (friend.aid == aid && friend._id == "bossKnight") {
+						if (friend.aid == aid) {
 							const bot = container.resolve<KnightChatBot>("KnightChatBot");
 							setTimeout(() => {
 								bot.acceptInvite(sessionID);
@@ -464,18 +467,14 @@ class friendlyPMC {
 				new RouteAction("/client/match/raid/ready", async (url: string, info: any, sessionID: string, output: string): Promise<IGetBodyResponseData<boolean>> => {
 					return httpResponseUtil.getBody(true);
 				}),
-				new RouteAction("/client/match/group/status", async (url: string, info: any, sessionID: string, output: string): Promise<IGetBodyResponseData<IMatchGroupStatusResponse>> => {
-					const players = [];
-					dialogueController.getFriendList(sessionID).Friends.forEach(friend => {
-						if (friend._id == "bossKnight") {
-							const bot = container.resolve<KnightChatBot>("KnightChatBot");
-							if (bot.isInGroup) {
-								players.push(Object.assign({ isReady: true, isLeader: false }, bot.getChatBot()));
-							}
-						}
+				new RouteAction("/client/match/group/pitstatus", async (url: string, info: { Players: string[] }, sessionID: string, output: string) => {
+					clearTimeout(groupStatus);
+					groupStatus = setTimeout(() => {
+						const bot = container.resolve<KnightChatBot>("KnightChatBot");
+						bot.currentGroup = info.Players;
 					});
 
-					return httpResponseUtil.getBody({ players: players, maxPveCountExceeded: false });
+					return httpResponseUtil.emptyResponse();
 				}),
 			],
 			"custom-static-friendly-pmc"
@@ -483,6 +482,7 @@ class friendlyPMC {
 
 		const folder = path.basename(path.dirname(__dirname));
 		this.knightTrader = new KnightTrader(folder, preSptModLoader, imageRouter, traderConfig, ragfairConfig, jsonUtil);
+		this.generalTrader = new GeneralTrader(folder, preSptModLoader, imageRouter, traderConfig, ragfairConfig, jsonUtil);
 	}
 
 	postDBLoad(container: DependencyContainer) {
@@ -523,6 +523,7 @@ class friendlyPMC {
 		this.botsTable = tables.bots;
 
 		this.knightTrader.AddToDb(tables);
+		this.generalTrader.AddToDb(tables);
 
 		container.register<KnightChatBot>("KnightChatBot", KnightChatBot, {
 			lifecycle: Lifecycle.Singleton,

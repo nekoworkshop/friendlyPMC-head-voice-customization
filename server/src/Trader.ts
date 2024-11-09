@@ -9,30 +9,97 @@ import { IDatabaseTables } from "@spt/models/spt/server/IDatabaseTables";
 import { JsonUtil } from "@spt/utils/JsonUtil";
 import { ITraderAssort, ITraderBase } from "@spt/models/eft/common/tables/ITrader";
 
-import traderBase = require("../traderKnight/base.json");
-import traderAssort = require("../traderKnight/assort.json");
-import traderQuests = require("../traderKnight/quests.json");
-
-export class KnightTrader {
+export abstract class TraderBase {
 	traderHelper: Helper;
 
-	constructor(modName: string, preSptModLoader: PreSptModLoader, imageRouter: ImageRouter, private traderConfig: ITraderConfig, private ragfairConfig: IRagfairConfig, private jsonUtil: JsonUtil) {
+	abstract traderDescription: string;
+
+	private traderFiles: {
+		base: string;
+		assort: string;
+		quests: string;
+	};
+
+	private traderBase: ITraderBase;
+	private traderAssort: ITraderAssort;
+	private traderQuests: Record<string, Record<string, string>>;
+
+	constructor(
+		modName: string,
+		trader: {
+			base: string;
+			assort: string;
+			quests: string;
+		},
+		preSptModLoader: PreSptModLoader,
+		imageRouter: ImageRouter,
+		private traderConfig: ITraderConfig,
+		private ragfairConfig: IRagfairConfig,
+		private jsonUtil: JsonUtil
+	) {
 		this.traderHelper = new Helper();
+		this.traderFiles = trader;
+		this.OnConstruct(modName, preSptModLoader, imageRouter);
+	}
 
-		this.traderHelper.registerProfileImage(traderBase, modName, preSptModLoader, imageRouter);
-		this.traderHelper.setTraderUpdateTime(this.traderConfig, traderBase, 3600, 7200);
+	private OnConstruct(modName: string, preSptModLoader: PreSptModLoader, imageRouter: ImageRouter) {
+		this.traderBase = require(this.traderFiles.base);
+		this.traderAssort = require(this.traderFiles.assort);
+		this.traderQuests = require(this.traderFiles.quests);
 
-		Traders[traderBase._id] = traderBase._id;
-		this.ragfairConfig.traders[traderBase._id] = false;
+		this.traderHelper.registerProfileImage(this.traderBase, modName, preSptModLoader, imageRouter);
+		this.traderHelper.setTraderUpdateTime(this.traderConfig, this.traderBase, 3600, 7200);
+
+		Traders[this.traderBase._id] = this.traderBase._id;
+		this.ragfairConfig.traders[this.traderBase._id] = false;
 	}
 
 	AddToDb(tables: IDatabaseTables) {
-		tables.traders[traderBase._id] = {
-			assort: this.jsonUtil.deserialize(this.jsonUtil.serialize(traderAssort)) as ITraderAssort, // assorts are the 'offers' trader sells, can be a single item (e.g. carton of milk) or multiple items as a collection (e.g. a gun)
-			base: this.jsonUtil.deserialize(this.jsonUtil.serialize(traderBase)) as ITraderBase, // Deserialise/serialise creates a copy of the json and allows us to cast it as an ITraderBase
-			questassort: this.jsonUtil.deserialize(this.jsonUtil.serialize(traderQuests)), // questassort is empty as trader has no assorts unlocked by quests
+		tables.traders[this.traderBase._id] = {
+			assort: this.jsonUtil.deserialize(this.jsonUtil.serialize(this.traderAssort)) as ITraderAssort, // assorts are the 'offers' trader sells, can be a single item (e.g. carton of milk) or multiple items as a collection (e.g. a gun)
+			base: this.jsonUtil.deserialize(this.jsonUtil.serialize(this.traderBase)) as ITraderBase, // Deserialise/serialise creates a copy of the json and allows us to cast it as an ITraderBase
+			questassort: this.jsonUtil.deserialize(this.jsonUtil.serialize(this.traderQuests)), // questassort is empty as trader has no assorts unlocked by quests
 		};
 
-		this.traderHelper.addTraderToLocales(traderBase, tables, traderBase.name, traderBase._id, traderBase.nickname, traderBase.location, "Commander of the Goons squad");
+		this.traderHelper.addTraderToLocales(this.traderBase, tables, this.traderBase.name, this.traderBase._id, this.traderBase.nickname, this.traderBase.location, this.traderDescription);
+	}
+}
+
+export class KnightTrader extends TraderBase {
+	traderDescription = "Commander of the Goons squad";
+
+	constructor(modName: string, preSptModLoader: PreSptModLoader, imageRouter: ImageRouter, traderConfig: ITraderConfig, ragfairConfig: IRagfairConfig, jsonUtil: JsonUtil) {
+		super(
+			modName,
+			{
+				base: "../traderKnight/base.json",
+				assort: "../traderKnight/assort.json",
+				quests: "../traderKnight/quests.json",
+			},
+			preSptModLoader,
+			imageRouter,
+			traderConfig,
+			ragfairConfig,
+			jsonUtil
+		);
+	}
+}
+
+export class GeneralTrader extends TraderBase {
+	traderDescription = "General Jonas Creed";
+	constructor(modName: string, preSptModLoader: PreSptModLoader, imageRouter: ImageRouter, traderConfig: ITraderConfig, ragfairConfig: IRagfairConfig, jsonUtil: JsonUtil) {
+		super(
+			modName,
+			{
+				base: "../traderGeneral/base.json",
+				assort: "../traderGeneral/assort.json",
+				quests: "../traderGeneral/quests.json",
+			},
+			preSptModLoader,
+			imageRouter,
+			traderConfig,
+			ragfairConfig,
+			jsonUtil
+		);
 	}
 }

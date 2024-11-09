@@ -8,7 +8,7 @@ using System;
 
 namespace friendlyPMC.Utils
 {
-    internal class Utils
+    public class Utils
     {
         
         private static Dictionary<string,bool> flags = new Dictionary<string,bool>();
