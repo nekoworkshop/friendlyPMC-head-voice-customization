@@ -67,7 +67,8 @@ namespace friendlyPMC.Utils
                 // order is important
                 new List<string> {
                     "friendlypmc-knight-competition",
-                    "friendlypmc-knight-my-land"
+                    "friendlypmc-knight-my-land",
+                    "friendlypmc-knight-thieves"
                 }
             }
         };
@@ -81,10 +82,19 @@ namespace friendlyPMC.Utils
                     "shoreline",
                     "woods"
                 }
+                
             },
             {
                 "friendlypmc-knight-my-land",
                 new List<string> {
+                    "bigmap"
+                }
+            },
+            {
+                "friendlypmc-knight-thieves",
+                new List<string> {
+                    "tarkovStreets",
+                    "interchange",
                     "bigmap"
                 }
             }
@@ -98,6 +108,12 @@ namespace friendlyPMC.Utils
                     "friendlypmc-knight-competition-2",
                     "friendlypmc-knight-competition-3",
                     "friendlypmc-knight-competition-4",
+                    "friendlypmc-knight-thieves-4",
+                    "friendlypmc-knight-thieves-5",
+                    "friendlypmc-knight-thieves-6",
+                    "friendlypmc-knight-thieves-7",
+                    "friendlypmc-knight-thieves-8",
+                    "friendlypmc-knight-thieves-9"
                 }
             }
         };

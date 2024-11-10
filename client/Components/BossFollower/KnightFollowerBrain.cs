@@ -55,7 +55,7 @@ namespace friendlyPMC.Components.BossFollower
             _boss.realPlayer.AbstractQuestControllerClass.Quests.ExecuteForEach(quest=>{
                 foreach( var id in Utils.Props.Quests["Knight"])
                 {
-                    if(quest.Template.Id == id && quest.QuestStatus == EFT.Quests.EQuestStatus.Started)
+                    if(quest.Template.Id == id && (quest.QuestStatus == EFT.Quests.EQuestStatus.Started || quest.QuestStatus == EFT.Quests.EQuestStatus.AvailableForFinish))
                     {
                         if(Utils.Utils.FlagGet("questGoons"))
                         quest.SetStatus(EFT.Quests.EQuestStatus.Fail,true,false);

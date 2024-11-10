@@ -3,6 +3,7 @@
     },
     "success": {
         "friendlypmc-knight-competition-quest" : "friendlypmc-knight-competition",
-        "friendlypmc-knight-my-land-quest" : "friendlypmc-knight-my-land"
+        "friendlypmc-knight-my-land-quest" : "friendlypmc-knight-my-land",
+        "friendlypmc-knight-thieves-quest" : "friendlypmc-knight-thieves"
     }
 }

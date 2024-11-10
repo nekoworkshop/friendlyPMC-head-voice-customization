@@ -98,12 +98,13 @@ namespace friendlyPMC.Patches
 
             RequestHandler.PutJson("/client/raid/pitconfig", new
             {
-                Config = new Dictionary<string, bool>
+                Config = new Dictionary<string, object>
                 {
                     { "sameSideHostile", friendlyPMC.sameSideHostile.Value },
                     { "badGuy", badGuy },
                     { "pmcArmbands", friendlyPMC.pmcArmbands.Value },
-                    { "englishBear", friendlyPMC.englishBear.Value }
+                    { "englishBear", friendlyPMC.englishBear.Value },
+                    { "location", settings.LocationId }
                 }
 
             }.ToJson(_defaultJsonConverters));

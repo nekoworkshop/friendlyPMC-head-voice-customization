@@ -8,7 +8,7 @@
 
 - x - assist tactic should also do supression on it's own and also use grenades
 - x - goons can do supression (no grenades) while using the "Assist" tactic
-- - investigate the hands stuck after throwing a grenade bug further
+- x - investigate the hands stuck after throwing a grenade bug further
 
 - #inprogress - more improvement on awareness
 - - better checks for enemy voice (if it is a battle voice - auto aquire target)
@@ -29,7 +29,7 @@
 - x - see what other screens need patching after having Knight join the group
 - x - on disband group, spawn flags need to be reset
 
-- #inprogress - The Goons Quests:
+- #inprogress - The Goons Quests (phase 1):
 - x - add a quest to unlock Knight as a friend
 - - upon starting the first quest, the Goons are no longer hostile towards the player
 - x - make it possible for Knight to appear as a friend once the quest is completed
@@ -37,17 +37,18 @@
 - x - when surviving a raid with Knight, increase good standing with him [+0.02] (only after the first quest is completed)
 - at 0.5 standing, Knight no longer turns hostile on accidental shots, but killing him will give a penalty of 0.05 standing
 - - make Knight standing go down whenever the player aggros the Goons (but not below 0.1)  (only after the first quest is completed)
-- - hook into Player.OnBeenKilledByAggressor to count kills made by Knight as a way to progress kill quests
+- x - hook into Player.OnBeenKilledByAggressor to count kills made by Knight as a way to progress kill quests
 
 - see if we can make bot swap weapons when asked to loot (DeadBodyWork)
 - - this should also allow bot to put that weapon as seconday (in case of support without a grenade launcher)
 
---- ==== 4.0.0 (final phase) ==== ---:
-- add squad management terminal
-- after profile create, have 1 bot send a request to become a teamember for the player
+--- ==== 4.0.0 (final phase - The General && full Goons Quests) ==== ---:
 
-- add punishment for players intentionally killing their teammates
-- - check if in combat or out of combat the kill was done
+- "The General" quests will unlock followers
+- - when these quests are active enforce same side faction to not be hostile
+- - penalize player for killing same side faction members
+- - if player completes the first quest with both followers alive, choose one to become a teammate
+
 
 - player level to determine if he can pick up any extra followers and how many (maximum 3, disable configuration regarding this)
 - scav karma and level to determine with how many followers can the player spawn (maxium 3) and extra pickups (maximum 2 extras)

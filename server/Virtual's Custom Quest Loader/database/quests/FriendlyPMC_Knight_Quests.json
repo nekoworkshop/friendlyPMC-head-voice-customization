@@ -452,5 +452,545 @@
 		"successMessageText": "friendlypmc-knight-my-land successMessageText",
 		"traderId": "friendlypmc-knight",
 		"type": "Elimination"
-	}
+	},
+    "friendlypmc-knight-thieves" : {
+        "QuestName": "My Land",
+		"_id": "friendlypmc-knight-thieves",
+		"acceptPlayerMessage": "friendlypmc-knight-thieves acceptPlayerMessage",
+		"canShowNotificationsInGame": true,
+		"changeQuestMessageText": "friendlypmc-knight-thieves changeQuestMessageText",
+		"completePlayerMessage": "friendlypmc-knight-thieves completePlayerMessage",
+		"conditions": {
+			"AvailableForStart": [
+				{
+					"compareMethod": ">=",
+					"conditionType": "Level",
+					"dynamicLocale": false,
+					"globalQuestCounterId": "",
+					"id": "friendlypmc-knight-thieves-req-1",
+					"index": 0,
+					"parentId": "",
+					"value": 20,
+					"visibilityConditions": []
+				},
+				{
+					"availableAfter": 0,
+					"conditionType": "Quest",
+					"dispersion": 0,
+					"dynamicLocale": false,
+					"globalQuestCounterId": "",
+					"id": "friendlypmc-knight-thieves-req-2",
+					"index": 0,
+					"parentId": "",
+					"status": [4],
+					"target": "friendlypmc-knight-my-land",
+					"visibilityConditions": []
+				}
+			],
+			"AvailableForFinish": [
+				{
+                    "conditionType": "FindItem",
+                    "countInRaid": false,
+                    "dogtagLevel": 0,
+                    "dynamicLocale": false,
+                    "globalQuestCounterId": "",
+                    "id": "friendlypmc-knight-thieves-1",
+                    "index": 0,
+                    "isEncoded": false,
+                    "maxDurability": 100,
+                    "minDurability": 0,
+                    "onlyFoundInRaid": true,
+                    "parentId": "",
+                    "target": [
+                      "5c94bbff86f7747ee735c08f"
+                    ],
+                    "value": 3,
+                    "visibilityConditions": []
+                },
+                {
+                    "conditionType": "HandoverItem",
+                    "dogtagLevel": 0,
+                    "dynamicLocale": false,
+                    "globalQuestCounterId": "",
+                    "id": "friendlypmc-knight-thieves-11",
+                    "index": 1,
+                    "isEncoded": false,
+                    "maxDurability": 100,
+                    "minDurability": 0,
+                    "onlyFoundInRaid": true,
+                    "parentId": "",
+                    "target": [
+                      "5c94bbff86f7747ee735c08f"
+                    ],
+                    "value": 3,
+                    "visibilityConditions": []
+                },
+                {
+                    "conditionType": "FindItem",
+                    "countInRaid": false,
+                    "dogtagLevel": 0,
+                    "dynamicLocale": false,
+                    "globalQuestCounterId": "",
+                    "id": "friendlypmc-knight-thieves-2",
+                    "index": 2,
+                    "isEncoded": false,
+                    "maxDurability": 100,
+                    "minDurability": 0,
+                    "onlyFoundInRaid": true,
+                    "parentId": "",
+                    "target": [
+                      "5c12613b86f7743bbe2c3f76"
+                    ],
+                    "value": 2,
+                    "visibilityConditions": []
+                },
+                {
+                    "conditionType": "HandoverItem",
+                    "dogtagLevel": 0,
+                    "dynamicLocale": false,
+                    "globalQuestCounterId": "",
+                    "id": "friendlypmc-knight-thieves-21",
+                    "index": 3,
+                    "isEncoded": false,
+                    "maxDurability": 100,
+                    "minDurability": 0,
+                    "onlyFoundInRaid": true,
+                    "parentId": "",
+                    "target": [
+                      "5c12613b86f7743bbe2c3f76"
+                    ],
+                    "value": 2,
+                    "visibilityConditions": []
+                },
+                {
+                    "conditionType": "FindItem",
+                    "countInRaid": false,
+                    "dogtagLevel": 0,
+                    "dynamicLocale": false,
+                    "globalQuestCounterId": "",
+                    "id": "friendlypmc-knight-thieves-3",
+                    "index": 4,
+                    "isEncoded": false,
+                    "maxDurability": 100,
+                    "minDurability": 0,
+                    "onlyFoundInRaid": true,
+                    "parentId": "",
+                    "target": [
+                      "62a0a16d0b9d3c46de5b6e97"
+                    ],
+                    "value": 2,
+                    "visibilityConditions": []
+                },
+                {
+                    "conditionType": "HandoverItem",
+                    "dogtagLevel": 0,
+                    "dynamicLocale": false,
+                    "globalQuestCounterId": "",
+                    "id": "friendlypmc-knight-thieves-31",
+                    "index": 5,
+                    "isEncoded": false,
+                    "maxDurability": 100,
+                    "minDurability": 0,
+                    "onlyFoundInRaid": true,
+                    "parentId": "",
+                    "target": [
+                      "62a0a16d0b9d3c46de5b6e97"
+                    ],
+                    "value": 2,
+                    "visibilityConditions": []
+                },
+                {
+					"completeInSeconds": 0,
+					"conditionType": "CounterCreator",
+					"counter": {
+						"conditions": [
+							{
+								"bodyPart": [],
+								"compareMethod": ">=",
+								"conditionType": "Kills",
+								"daytime": {
+									"from": 0,
+									"to": 0
+								},
+								"distance": {
+									"compareMethod": ">=",
+									"value": 0
+								},
+								"dynamicLocale": false,
+								"enemyEquipmentExclusive": [],
+								"enemyEquipmentInclusive": [],
+								"enemyHealthEffects": [],
+								"id": "friendlypmc-knight-thieves-4-kill",
+								"resetOnSessionEnd": false,
+								"savageRole": [],
+								"target": "AnyPmc",
+								"value": 1,
+								"weapon": [],
+								"weaponCaliber": [],
+								"weaponModsExclusive": [],
+								"weaponModsInclusive": []
+							},
+							{
+								"conditionType": "Location",
+								"dynamicLocale": false,
+								"id": "friendlypmc-knight-thieves-41-location",
+								"target": ["bigmap"]
+							}
+						],
+						"id": "friendlypmc-knight-thieves-4-kill-cond"
+					},
+					"doNotResetIfCounterCompleted": false,
+					"dynamicLocale": false,
+					"globalQuestCounterId": "",
+					"id": "friendlypmc-knight-thieves-4",
+					"index": 6,
+					"oneSessionOnly": false,
+					"parentId": "",
+					"type": "Elimination",
+					"value": 5,
+					"visibilityConditions": []
+				},
+                {
+					"completeInSeconds": 0,
+					"conditionType": "CounterCreator",
+					"counter": {
+						"conditions": [
+							{
+								"bodyPart": [],
+								"compareMethod": ">=",
+								"conditionType": "Kills",
+								"daytime": {
+									"from": 0,
+									"to": 0
+								},
+								"distance": {
+									"compareMethod": ">=",
+									"value": 0
+								},
+								"dynamicLocale": false,
+								"enemyEquipmentExclusive": [],
+								"enemyEquipmentInclusive": [],
+								"enemyHealthEffects": [],
+								"id": "friendlypmc-knight-thieves-5-kill",
+								"resetOnSessionEnd": false,
+								"savageRole": [],
+								"target": "Savage",
+								"value": 1,
+								"weapon": [],
+								"weaponCaliber": [],
+								"weaponModsExclusive": [],
+								"weaponModsInclusive": []
+							},
+							{
+								"conditionType": "Location",
+								"dynamicLocale": false,
+								"id": "friendlypmc-knight-thieves-51-location",
+								"target": ["bigmap"]
+							}
+						],
+						"id": "friendlypmc-knight-thieves-5-kill-cond"
+					},
+					"doNotResetIfCounterCompleted": false,
+					"dynamicLocale": false,
+					"globalQuestCounterId": "",
+					"id": "friendlypmc-knight-thieves-5",
+					"index": 7,
+					"oneSessionOnly": false,
+					"parentId": "",
+					"type": "Elimination",
+					"value": 5,
+					"visibilityConditions": []
+				},
+                {
+					"completeInSeconds": 0,
+					"conditionType": "CounterCreator",
+					"counter": {
+						"conditions": [
+							{
+								"bodyPart": [],
+								"compareMethod": ">=",
+								"conditionType": "Kills",
+								"daytime": {
+									"from": 0,
+									"to": 0
+								},
+								"distance": {
+									"compareMethod": ">=",
+									"value": 0
+								},
+								"dynamicLocale": false,
+								"enemyEquipmentExclusive": [],
+								"enemyEquipmentInclusive": [],
+								"enemyHealthEffects": [],
+								"id": "friendlypmc-knight-thieves-6-kill",
+								"resetOnSessionEnd": false,
+								"savageRole": [],
+								"target": "AnyPmc",
+								"value": 1,
+								"weapon": [],
+								"weaponCaliber": [],
+								"weaponModsExclusive": [],
+								"weaponModsInclusive": []
+							},
+							{
+								"conditionType": "Location",
+								"dynamicLocale": false,
+								"id": "friendlypmc-knight-thieves-61-location",
+								"target": ["TarkovStreets"]
+							}
+						],
+						"id": "friendlypmc-knight-thieves-6-kill-cond"
+					},
+					"doNotResetIfCounterCompleted": false,
+					"dynamicLocale": false,
+					"globalQuestCounterId": "",
+					"id": "friendlypmc-knight-thieves-6",
+					"index": 8,
+					"oneSessionOnly": false,
+					"parentId": "",
+					"type": "Elimination",
+					"value": 5,
+					"visibilityConditions": []
+				},
+                {
+					"completeInSeconds": 0,
+					"conditionType": "CounterCreator",
+					"counter": {
+						"conditions": [
+							{
+								"bodyPart": [],
+								"compareMethod": ">=",
+								"conditionType": "Kills",
+								"daytime": {
+									"from": 0,
+									"to": 0
+								},
+								"distance": {
+									"compareMethod": ">=",
+									"value": 0
+								},
+								"dynamicLocale": false,
+								"enemyEquipmentExclusive": [],
+								"enemyEquipmentInclusive": [],
+								"enemyHealthEffects": [],
+								"id": "friendlypmc-knight-thieves-7-kill",
+								"resetOnSessionEnd": false,
+								"savageRole": [],
+								"target": "Savage",
+								"value": 1,
+								"weapon": [],
+								"weaponCaliber": [],
+								"weaponModsExclusive": [],
+								"weaponModsInclusive": []
+							},
+							{
+								"conditionType": "Location",
+								"dynamicLocale": false,
+								"id": "friendlypmc-knight-thieves-71-location",
+								"target": ["TarkovStreets"]
+							}
+						],
+						"id": "friendlypmc-knight-thieves-7-kill-cond"
+					},
+					"doNotResetIfCounterCompleted": false,
+					"dynamicLocale": false,
+					"globalQuestCounterId": "",
+					"id": "friendlypmc-knight-thieves-7",
+					"index": 9,
+					"oneSessionOnly": false,
+					"parentId": "",
+					"type": "Elimination",
+					"value": 5,
+					"visibilityConditions": []
+				},
+                {
+					"completeInSeconds": 0,
+					"conditionType": "CounterCreator",
+					"counter": {
+						"conditions": [
+							{
+								"bodyPart": [],
+								"compareMethod": ">=",
+								"conditionType": "Kills",
+								"daytime": {
+									"from": 0,
+									"to": 0
+								},
+								"distance": {
+									"compareMethod": ">=",
+									"value": 0
+								},
+								"dynamicLocale": false,
+								"enemyEquipmentExclusive": [],
+								"enemyEquipmentInclusive": [],
+								"enemyHealthEffects": [],
+								"id": "friendlypmc-knight-thieves-8-kill",
+								"resetOnSessionEnd": false,
+								"savageRole": [],
+								"target": "AnyPmc",
+								"value": 1,
+								"weapon": [],
+								"weaponCaliber": [],
+								"weaponModsExclusive": [],
+								"weaponModsInclusive": []
+							},
+							{
+								"conditionType": "Location",
+								"dynamicLocale": false,
+								"id": "friendlypmc-knight-thieves-81-location",
+								"target": ["Interchange"]
+							}
+						],
+						"id": "friendlypmc-knight-thieves-8-kill-cond"
+					},
+					"doNotResetIfCounterCompleted": false,
+					"dynamicLocale": false,
+					"globalQuestCounterId": "",
+					"id": "friendlypmc-knight-thieves-8",
+					"index": 10,
+					"oneSessionOnly": false,
+					"parentId": "",
+					"type": "Elimination",
+					"value": 5,
+					"visibilityConditions": []
+				},
+                {
+					"completeInSeconds": 0,
+					"conditionType": "CounterCreator",
+					"counter": {
+						"conditions": [
+							{
+								"bodyPart": [],
+								"compareMethod": ">=",
+								"conditionType": "Kills",
+								"daytime": {
+									"from": 0,
+									"to": 0
+								},
+								"distance": {
+									"compareMethod": ">=",
+									"value": 0
+								},
+								"dynamicLocale": false,
+								"enemyEquipmentExclusive": [],
+								"enemyEquipmentInclusive": [],
+								"enemyHealthEffects": [],
+								"id": "friendlypmc-knight-thieves-9-kill",
+								"resetOnSessionEnd": false,
+								"savageRole": [],
+								"target": "Savage",
+								"value": 1,
+								"weapon": [],
+								"weaponCaliber": [],
+								"weaponModsExclusive": [],
+								"weaponModsInclusive": []
+							},
+							{
+								"conditionType": "Location",
+								"dynamicLocale": false,
+								"id": "friendlypmc-knight-thieves-91-location",
+								"target": ["Interchange"]
+							}
+						],
+						"id": "friendlypmc-knight-thieves-9-kill-cond"
+					},
+					"doNotResetIfCounterCompleted": false,
+					"dynamicLocale": false,
+					"globalQuestCounterId": "",
+					"id": "friendlypmc-knight-thieves-9",
+					"index": 11,
+					"oneSessionOnly": false,
+					"parentId": "",
+					"type": "Elimination",
+					"value": 5,
+					"visibilityConditions": []
+				}
+			],
+			"Fail": [
+				{
+					"completeInSeconds": 0,
+					"conditionType": "CounterCreator",
+					"counter": {
+						"conditions": [
+							{
+								"conditionType": "ExitStatus",
+								"dynamicLocale": false,
+								"id": "friendlypmc-knight-thieves-fail-1",
+								"status": ["Killed", "Left", "MissingInAction"]
+							},
+							{
+								"conditionType": "Location",
+								"dynamicLocale": false,
+								"id": "friendlypmc-knight-thieves-fail-2",
+								"target": ["TarkovStreets","RezervBase","Interchange"]
+							}
+						],
+						"id": "friendlypmc-knight-thieves-fail-cond"
+					},
+					"doNotResetIfCounterCompleted": false,
+					"dynamicLocale": false,
+					"globalQuestCounterId": "",
+					"id": "friendlypmc-knight-thieves-fail",
+					"index": 0,
+					"oneSessionOnly": false,
+					"parentId": "",
+					"type": "Completion",
+					"value": 1,
+					"visibilityConditions": []
+				}
+			]
+		},
+		"declinePlayerMessage": "friendlypmc-knight-thieves declinePlayerMessage",
+		"description": "friendlypmc-knight-thieves description",
+		"failMessageText": "friendlypmc-knight-thieves failMessageText",
+		"image": "/files/quest/icon/KnightThieves.jpg",
+		"instantComplete": false,
+		"isKey": false,
+		"location": "any",
+		"name": "friendlypmc-knight-thieves name",
+		"note": "friendlypmc-knight-thieves note",
+		"restartable": true,
+		"rewards": {
+			"Fail": [],
+			"Started": [],
+			"Success": [
+				{
+					"id": "friendlypmc-knight-thieves-reward-1",
+					"index": 0,
+					"type": "Experience",
+					"value": "35000"
+				},
+				{
+					"id": "friendlypmc-knight-thieves-reward-2",
+					"index": 1,
+					"target": "friendlypmc-knight",
+					"type": "TraderStanding",
+					"value": "0.2"
+				},
+                {
+                    "findInRaid": true,
+                    "id": "friendlypmc-knight-thieves-reward-3",
+                    "index": 2,
+                    "items": [
+                      {
+                        "_id": "5f92a7bce6193c45012ab7f4",
+                        "_tpl": "5696686a4bdc2da3298b456a",
+                        "upd": {
+                          "StackObjectsCount": 4000
+                        }
+                      }
+                    ],
+                    "target": "5f92a7bce6193c45012ab7f4",
+                    "type": "Item",
+                    "value": "4000"
+                }
+			]
+		},
+		"secretQuest": false,
+		"side": "Pmc",
+		"startedMessageText": "friendlypmc-knight-thieves startedMessageText",
+		"successMessageText": "friendlypmc-knight-thieves successMessageText",
+		"traderId": "friendlypmc-knight",
+		"type": "PickUp"
+    }
 }

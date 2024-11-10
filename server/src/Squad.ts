@@ -84,6 +84,8 @@ class friendlyPMC {
 	knightTrader: KnightTrader;
 	generalTrader: GeneralTrader;
 
+	profileHelper: ProfileHelper;
+
 	private _StringFormat(str: string, ...values: string[]) {
 		return str.replace(/\{(\d+)\}/g, function (match, number) {
 			return typeof values[number] != "undefined" && values[number] !== null ? values[number] : match;
@@ -96,6 +98,8 @@ class friendlyPMC {
 	originalGenerateBot: BotGenerator["generateBot"];
 
 	botsTable: IBots;
+
+	raidLocation: string;
 
 	preSptLoad(container: DependencyContainer) {
 		this.Logger = container.resolve("WinstonLogger");
@@ -114,10 +118,11 @@ class friendlyPMC {
 
 		const botGenerator = container.resolve<BotGenerator>("BotGenerator");
 		const botController = container.resolve<BotController>("BotController");
+
 		const profileHelper = container.resolve<ProfileHelper>("ProfileHelper");
+		this.profileHelper = profileHelper;
 
 		const dialogueController = container.resolve<DialogueController>("DialogueController");
-		const dialogueCallbacks = container.resolve<DialogueCallbacks>("DialogueCallbacks");
 
 		const staticRouterModService = container.resolve<StaticRouterModService>("StaticRouterModService");
 		const httpResponseUtil = container.resolve<HttpResponseUtil>("HttpResponseUtil");
@@ -288,12 +293,14 @@ class friendlyPMC {
 
 					return httpResponseUtil.emptyResponse();
 				}),
-				new RouteAction("/client/raid/pitconfig", (url: string, info: { Config: { sameSideHostile: boolean; badGuy: boolean; englishBear: boolean; pmcArmbands: boolean } }, sessionID: string, output: string): any => {
+				new RouteAction("/client/raid/pitconfig", (url: string, info: { Config: { sameSideHostile: boolean; badGuy: boolean; englishBear: boolean; pmcArmbands: boolean; location: string } }, sessionID: string, output: string): any => {
 					this.config.armbands = info.Config.pmcArmbands;
 
 					this.config.sameSideHostile = info.Config.sameSideHostile;
 					this.config.badGuy = info.Config.badGuy;
 					this.config.englishBear = info.Config.englishBear;
+
+					this.raidLocation = info.Config.location;
 
 					this.Logger.logWithColor("friendlyPMC: Setting Server Config as " + JSON.stringify(info), LogTextColor.WHITE);
 
@@ -651,6 +658,8 @@ class friendlyPMC {
 		return this._makeFriendlyOrHostile(result, type);
 	}
 
+	private _keytimes = 0;
+
 	generateBot(sessionId: string, bot: IBotBase, botJsonTemplate: IBotType, botGenerationDetails: BotGenerationDetails) {
 		const role = botGenerationDetails.role.toLowerCase();
 		if (role == "followerbirdeye" || role == "followerbigpipe" || role == "bossknight") {
@@ -660,6 +669,23 @@ class friendlyPMC {
 				"2": 6,
 			};
 		}
+
+		const userProfile = this.profileHelper.getFullProfile(sessionId);
+
+		userProfile.characters.pmc.Quests.forEach(quest => {
+			// Add keycard to Scavs if we are doing the theives quest
+			if (role == "assault" && ["tarkovstreets", "bigmap", "interchange"].includes(this.raidLocation.toLowerCase())) {
+				if (quest.qid == "friendlypmc-knight-thieves" && quest.status == 2 && this._keytimes < 3) {
+					botJsonTemplate.inventory.items.Pockets[ItemTpl.KEYCARD_TERRAGROUP_LABS_ACCESS] = 2;
+					botJsonTemplate.inventory.items.Backpack[ItemTpl.KEYCARD_TERRAGROUP_LABS_ACCESS] = 2;
+					botJsonTemplate.inventory.items.TacticalVest[ItemTpl.KEYCARD_TERRAGROUP_LABS_ACCESS] = 2;
+
+					botJsonTemplate.inventory.items.Backpack[ItemTpl.INFO_INTELLIGENCE_FOLDER] = 2;
+					botJsonTemplate.inventory.items.Pockets[ItemTpl.INFO_MILITARY_FLASH_DRIVE] = 2;
+					this._keytimes++;
+				}
+			}
+		});
 
 		const result = this.originalGenerateBot(sessionId, bot, botJsonTemplate, botGenerationDetails);
 
