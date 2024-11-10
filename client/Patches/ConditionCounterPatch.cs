@@ -56,7 +56,7 @@ namespace friendlyPMC.Patches
                     BotOwner bot = follower.GetBot();
                     if (follower.GetBot().IsRole(WildSpawnType.bossKnight))
                     {
-                        if(Vector3.Distance(bot.GetPlayer.Transform.position, player.Transform.position) < 80)
+                        if(Vector3.Distance(bot.GetPlayer.Transform.position, player.Transform.position) <= 80)
                             hasKnight = true;
                         break;
                     }
@@ -68,6 +68,11 @@ namespace friendlyPMC.Patches
                 }
 
                 return false;
+            }
+            // Knight quests that require the player to kill
+            if (Utils.Props.QuestsKillConditions["Player"].Contains(counter.Id))
+            {
+                return !Utils.Utils.FlagGet("knightKiller") && !Utils.Utils.FlagGet("pipeKiller") && !Utils.Utils.FlagGet("birdEyeKiller");
             }
 
             // Knight quests that require Knight as teammate

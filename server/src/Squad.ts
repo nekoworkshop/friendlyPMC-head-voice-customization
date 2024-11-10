@@ -99,7 +99,8 @@ class friendlyPMC {
 
 	botsTable: IBots;
 
-	raidLocation: string;
+	private _questItems = [ItemTpl.KEYCARD_TERRAGROUP_LABS_ACCESS, ItemTpl.INFO_INTELLIGENCE_FOLDER, ItemTpl.INFO_MILITARY_FLASH_DRIVE];
+	private _spawnQuestItems: { [key: string]: number } = {};
 
 	preSptLoad(container: DependencyContainer) {
 		this.Logger = container.resolve("WinstonLogger");
@@ -300,8 +301,6 @@ class friendlyPMC {
 					this.config.badGuy = info.Config.badGuy;
 					this.config.englishBear = info.Config.englishBear;
 
-					this.raidLocation = info.Config.location;
-
 					this.Logger.logWithColor("friendlyPMC: Setting Server Config as " + JSON.stringify(info), LogTextColor.WHITE);
 
 					if (this.config.armbands) {
@@ -345,6 +344,16 @@ class friendlyPMC {
 							Bear_3: 1,
 						};
 					}
+
+					const userProfile = this.profileHelper.getPmcProfile(sessionID);
+
+					this._questItems.forEach(item => {
+						userProfile.Inventory.items.forEach(invItem => {
+							if (invItem._tpl === item) {
+								this._spawnQuestItems[item]++;
+							}
+						});
+					});
 
 					return httpResponseUtil.emptyResponse();
 				}),
@@ -658,10 +667,9 @@ class friendlyPMC {
 		return this._makeFriendlyOrHostile(result, type);
 	}
 
-	private _keytimes = 0;
-
 	generateBot(sessionId: string, bot: IBotBase, botJsonTemplate: IBotType, botGenerationDetails: BotGenerationDetails) {
 		const role = botGenerationDetails.role.toLowerCase();
+		// ensure goons have high chance of meds
 		if (role == "followerbirdeye" || role == "followerbigpipe" || role == "bossknight") {
 			botJsonTemplate.generation.items.healing.weights = {
 				"0": 0,
@@ -671,18 +679,21 @@ class friendlyPMC {
 		}
 
 		const userProfile = this.profileHelper.getFullProfile(sessionId);
-
 		userProfile.characters.pmc.Quests.forEach(quest => {
-			// Add keycard to Scavs if we are doing the theives quest
-			if (role == "assault" && ["tarkovstreets", "bigmap", "interchange"].includes(this.raidLocation.toLowerCase())) {
-				if (quest.qid == "friendlypmc-knight-thieves" && quest.status == 2 && this._keytimes < 3) {
-					botJsonTemplate.inventory.items.Pockets[ItemTpl.KEYCARD_TERRAGROUP_LABS_ACCESS] = 2;
-					botJsonTemplate.inventory.items.Backpack[ItemTpl.KEYCARD_TERRAGROUP_LABS_ACCESS] = 2;
-					botJsonTemplate.inventory.items.TacticalVest[ItemTpl.KEYCARD_TERRAGROUP_LABS_ACCESS] = 2;
-
-					botJsonTemplate.inventory.items.Backpack[ItemTpl.INFO_INTELLIGENCE_FOLDER] = 2;
-					botJsonTemplate.inventory.items.Pockets[ItemTpl.INFO_MILITARY_FLASH_DRIVE] = 2;
-					this._keytimes++;
+			// Add quest items to Scavs if we are doing the thieves quest
+			if (role == "assault" && ["tarkovstreets", "bigmap", "interchange"].includes(userProfile.inraid.location.toLowerCase())) {
+				if (quest.qid == "friendlypmc-knight-thieves" && quest.status == 2) {
+					if (this._spawnQuestItems[ItemTpl.KEYCARD_TERRAGROUP_LABS_ACCESS] < 3) {
+						botJsonTemplate.inventory.items.Pockets[ItemTpl.KEYCARD_TERRAGROUP_LABS_ACCESS] = 500;
+						botJsonTemplate.inventory.items.TacticalVest[ItemTpl.KEYCARD_TERRAGROUP_LABS_ACCESS] = 500;
+						this._spawnQuestItems[ItemTpl.KEYCARD_TERRAGROUP_LABS_ACCESS]++;
+					} else if (this._spawnQuestItems[ItemTpl.INFO_INTELLIGENCE_FOLDER] < 2) {
+						botJsonTemplate.inventory.items.Backpack[ItemTpl.INFO_INTELLIGENCE_FOLDER] = 500;
+						this._spawnQuestItems[ItemTpl.INFO_INTELLIGENCE_FOLDER]++;
+					} else if (this._spawnQuestItems[ItemTpl.INFO_MILITARY_FLASH_DRIVE] < 2) {
+						botJsonTemplate.inventory.items.Backpack[ItemTpl.INFO_MILITARY_FLASH_DRIVE] = 500;
+						this._spawnQuestItems[ItemTpl.INFO_MILITARY_FLASH_DRIVE]++;
+					}
 				}
 			}
 		});
