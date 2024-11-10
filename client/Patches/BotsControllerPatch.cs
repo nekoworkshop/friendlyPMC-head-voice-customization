@@ -27,6 +27,8 @@ using BotCreator = GClass814;
 using System.Threading.Tasks;
 using SPT.Common.Http;
 using Newtonsoft.Json;
+using EFT.Game.Spawning;
+using System.Timers;
 
 namespace friendlyPMC.Patches
 {
@@ -634,9 +636,9 @@ namespace friendlyPMC.Patches
             return followerCreationTask[player.realPlayer.ProfileId];
         }
 
-        public void PreFetchBossProfiles(pitAIBossPlayer player)
+        public Task<BotCreationDataClass> PreFetchBossProfiles(pitAIBossPlayer player, WildSpawnType? type = null)
         {
-            if (Controller == null) return;
+            if (Controller == null) return null;
 
             EPlayerSide side = player.Player().Side;
 
@@ -648,6 +650,11 @@ namespace friendlyPMC.Patches
             BotSpawnParams @params = new BotSpawnParams();
             @params.ShallBeGroup = new ShallBeGroupParams(true, false, 4);
 
+            if(type.HasValue)
+            {
+                IProfileData botData = new IProfileData(side, type.Value, BotDifficulty.hard, 0f, @params);
+                return BotCreationDataClass.Create(botData, botCreator, 1, botSpawnerClass);
+            }
             
 
             foreach (var boss in bosses)
@@ -657,16 +664,18 @@ namespace friendlyPMC.Patches
                 bossCreationTask[boss] = BotCreationDataClass.Create(botData, botCreator, 1, botSpawnerClass);
             }
 
+            return null;
+
         }
 
-        private Task<BotCreationDataClass> GetBossProfile(WildSpawnType boss)
+        private Task<BotCreationDataClass> GetBossProfile(pitAIBossPlayer player,WildSpawnType boss)
         {
             if (bossCreationTask.ContainsKey(boss))
             {
                 return bossCreationTask[boss];
             }
 
-            return null;
+            return PreFetchBossProfiles(player, WildSpawnType.bossKnight);
         }
 
         public void PreFetchScavProfiles(pitAIBossPlayer player)
@@ -698,7 +707,7 @@ namespace friendlyPMC.Patches
             return null;
         }
 
-        public void PreFetchPMCProfiles(pitAIBossPlayer player)
+        public Task<BotCreationDataClass> PreFetchPMCProfiles(pitAIBossPlayer player)
         {
             EPlayerSide side = player.Player().Side;;
 
@@ -727,6 +736,8 @@ namespace friendlyPMC.Patches
             IProfileData data = new IProfileData(side, type, BotDifficulty.hard, 0f, @params);
 
             pmcCreationTask[player.realPlayer.ProfileId] = BotCreationDataClass.Create(data, botCreator, memberCount, botSpawnerClass);
+
+            return pmcCreationTask[player.realPlayer.ProfileId];
         }
 
         public Task<BotCreationDataClass> GetPMCProfiles(pitAIBossPlayer player)
@@ -736,7 +747,7 @@ namespace friendlyPMC.Patches
                 return pmcCreationTask[player.realPlayer.ProfileId];
             }
 
-            return null;
+            return PreFetchPMCProfiles(player);
         }
 
         public static void PreventPMCConvert(bool state)
@@ -784,7 +795,8 @@ namespace friendlyPMC.Patches
 
             if (boss == WildSpawnType.bossKnight)
             {
-                bossAlly = await GetBossProfile(WildSpawnType.bossKnight);
+                bossAlly = await GetBossProfile(player,WildSpawnType.bossKnight);
+
                 //bossFollowers.Add(new IProfileData(side, WildSpawnType.followerBigPipe, BotDifficulty.hard, 0f, @params));
                 //bossFollowers.Add(new IProfileData(side, WildSpawnType.followerBirdEye, BotDifficulty.impossible, 0f, @params));
 
@@ -1343,12 +1355,16 @@ namespace friendlyPMC.Patches
                 if (playerBoss.Player().Side != EPlayerSide.Savage)
                 {
                     if (!friendlyPMC.squadSpawn.Value)
-                        Instance?.PreFetchBossProfiles(playerBoss);
+                    {
+                        if(!HasFika()) Instance?.PreFetchBossProfiles(playerBoss);
 
+                    }
                     else if (friendlyPMC.squadSetup.Value)
                     {
-                        if(friendlyPMC.squadMembers.Count < 1) 
-                            Instance?.PreFetchPMCProfiles(playerBoss);
+                        if (friendlyPMC.squadMembers.Count < 1)
+                        {
+                            if(!HasFika()) Instance?.PreFetchPMCProfiles(playerBoss);
+                        }
                         else
                             Instance?.CreateFollowerProfiles(playerBoss);
                     }
@@ -1365,7 +1381,27 @@ namespace friendlyPMC.Patches
 
         }
     }
-    
+
+    [HarmonyPatch(typeof(BossSpawnerClass), "method_2")]
+    internal class BossSpawnerClassPatch
+    {
+        public static bool Prefix(Task __result,BotCreationDataClass creationData, BossLocationSpawn wave, BotSpawnParams spawnParams, int followersCount, BotZone botZone, List<ISpawnPoint> openedPositions)
+        {
+            if (BotsControllerPatch.Controller != null)
+            {
+                // Your custom logic here
+                GClass592 data = new GClass592(EPlayerSide.Savage, wave.BossType, wave.BossDif, wave.Time, spawnParams);
+                if (!BotsControllerPatch.Controller.BotSpawner.CanSpawnRole(data))
+                {
+                    __result = null;
+                    return false;
+                }
+            }
+
+            return true;
+        }
+    }
+
     [HarmonyPatch(typeof(LocalGame),MethodType.Constructor)]
     internal class LocalGameCtorPatch
     {

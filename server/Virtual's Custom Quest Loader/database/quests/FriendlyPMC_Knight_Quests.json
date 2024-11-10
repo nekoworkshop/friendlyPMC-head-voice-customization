@@ -1,460 +1,456 @@
 {
-    "friendlypmc-knight-competition": {
-        "QuestName": "Who let the dogs out?",
-        "_id": "friendlypmc-knight-competition",
-        "acceptPlayerMessage": "friendlypmc-knight-competition acceptPlayerMessage",
-        "canShowNotificationsInGame": true,
-        "changeQuestMessageText": "friendlypmc-knight-competition changeQuestMessageText",
-        "completePlayerMessage": "friendlypmc-knight-competition completePlayerMessage",
-        "conditions": {
-            "AvailableForStart": [
-                {
-                    "compareMethod": ">=",
-                    "conditionType": "Level",
-                    "dynamicLocale": false,
-                    "globalQuestCounterId": "",
-                    "id": "friendlypmc-knight-competition-req",
-                    "index": 0,
-                    "parentId": "",
-                    "value": 20,
-                    "visibilityConditions": []
-                }
-            ],
-            "AvailableForFinish": [
-                {
-                    "completeInSeconds": 0,
-                    "conditionType": "CounterCreator",
-                    "counter": {
-                        "conditions": [
-                            {
-                                "bodyPart": [],
-                                "compareMethod": ">=",
-                                "conditionType": "Kills",
-                                "daytime": {
-                                    "from": 0,
-                                    "to": 0
-                                },
-                                "distance": {
-                                    "compareMethod": ">=",
-                                    "value": 0
-                                },
-                                "dynamicLocale": false,
-                                "enemyEquipmentExclusive": [],
-                                "enemyEquipmentInclusive": [],
-                                "enemyHealthEffects": [],
-                                "id": "friendlypmc-knight-competition-1-kill",
-                                "resetOnSessionEnd": false,
-                                "savageRole": [],
-                                "target": "AnyPmc",
-                                "value": 1,
-                                "weapon": [],
-                                "weaponCaliber": [],
-                                "weaponModsExclusive": [],
-                                "weaponModsInclusive": []
-                            },
-                            {
-                                "conditionType": "Location",
-                                "dynamicLocale": false,
-                                "id": "friendlypmc-knight-competition-1-location",
-                                "target": ["Lighthouse"]
-                            }
-                        ],
-                        "id": "friendlypmc-knight-competition-1-cond"
-                    },
-                    "doNotResetIfCounterCompleted": false,
-                    "dynamicLocale": false,
-                    "globalQuestCounterId": "",
-                    "id": "friendlypmc-knight-competition-1",
-                    "index": 0,
-                    "oneSessionOnly": false,
-                    "parentId": "",
-                    "type": "Elimination",
-                    "value": 5,
-                    "visibilityConditions": []
-                },
-                {
-                    "completeInSeconds": 0,
-                    "conditionType": "CounterCreator",
-                    "counter": {
-                        "conditions": [
-                            {
-                                "bodyPart": [],
-                                "compareMethod": ">=",
-                                "conditionType": "Kills",
-                                "daytime": {
-                                    "from": 0,
-                                    "to": 0
-                                },
-                                "distance": {
-                                    "compareMethod": ">=",
-                                    "value": 0
-                                },
-                                "dynamicLocale": false,
-                                "enemyEquipmentExclusive": [],
-                                "enemyEquipmentInclusive": [],
-                                "enemyHealthEffects": [],
-                                "id": "friendlypmc-knight-competition-2-kill",
-                                "resetOnSessionEnd": false,
-                                "savageRole": [],
-                                "target": "AnyPmc",
-                                "value": 1,
-                                "weapon": [],
-                                "weaponCaliber": [],
-                                "weaponModsExclusive": [],
-                                "weaponModsInclusive": []
-                            },
-                            {
-                                "conditionType": "Location",
-                                "dynamicLocale": false,
-                                "id": "friendlypmc-knight-competition-2-location",
-                                "target": ["Woods"]
-                            }
-                        ],
-                        "id": "friendlypmc-knight-competition-2-cond"
-                    },
-                    "doNotResetIfCounterCompleted": false,
-                    "dynamicLocale": false,
-                    "globalQuestCounterId": "",
-                    "id": "friendlypmc-knight-competition-2",
-                    "index": 1,
-                    "oneSessionOnly": false,
-                    "parentId": "",
-                    "type": "Elimination",
-                    "value": 5,
-                    "visibilityConditions": []
-                },
-                {
-                    "completeInSeconds": 0,
-                    "conditionType": "CounterCreator",
-                    "counter": {
-                        "conditions": [
-                            {
-                                "bodyPart": [],
-                                "compareMethod": ">=",
-                                "conditionType": "Kills",
-                                "daytime": {
-                                    "from": 0,
-                                    "to": 0
-                                },
-                                "distance": {
-                                    "compareMethod": ">=",
-                                    "value": 0
-                                },
-                                "dynamicLocale": false,
-                                "enemyEquipmentExclusive": [],
-                                "enemyEquipmentInclusive": [],
-                                "enemyHealthEffects": [],
-                                "id": "friendlypmc-knight-competition-3-kill",
-                                "resetOnSessionEnd": false,
-                                "savageRole": [],
-                                "target": "AnyPmc",
-                                "value": 1,
-                                "weapon": [],
-                                "weaponCaliber": [],
-                                "weaponModsExclusive": [],
-                                "weaponModsInclusive": []
-                            },
-                            {
-                                "conditionType": "Location",
-                                "dynamicLocale": false,
-                                "id": "friendlypmc-knight-competition-3-location",
-                                "target": ["Shoreline"]
-                            }
-                        ],
-                        "id": "friendlypmc-knight-competition-3-cond"
-                    },
-                    "doNotResetIfCounterCompleted": false,
-                    "dynamicLocale": false,
-                    "globalQuestCounterId": "",
-                    "id": "friendlypmc-knight-competition-3",
-                    "index": 2,
-                    "oneSessionOnly": false,
-                    "parentId": "",
-                    "type": "Elimination",
-                    "value": 5,
-                    "visibilityConditions": []
-                },
-                {
-                    "completeInSeconds": 0,
-                    "conditionType": "CounterCreator",
-                    "counter": {
-                        "conditions": [
-                            {
-                                "bodyPart": [],
-                                "compareMethod": ">=",
-                                "conditionType": "Kills",
-                                "daytime": {
-                                    "from": 0,
-                                    "to": 0
-                                },
-                                "distance": {
-                                    "compareMethod": ">=",
-                                    "value": 0
-                                },
-                                "dynamicLocale": false,
-                                "enemyEquipmentExclusive": [],
-                                "enemyEquipmentInclusive": [],
-                                "enemyHealthEffects": [],
-                                "id": "friendlypmc-knight-competition-4-kill",
-                                "resetOnSessionEnd": false,
-                                "savageRole": [],
-                                "target": "AnyPmc",
-                                "value": 1,
-                                "weapon": [],
-                                "weaponCaliber": [],
-                                "weaponModsExclusive": [],
-                                "weaponModsInclusive": []
-                            },
-                            {
-                                "conditionType": "Location",
-                                "dynamicLocale": false,
-                                "id": "friendlypmc-knight-competition-4-location",
-                                "target": ["bigmap"]
-                            }
-                        ],
-                        "id": "friendlypmc-knight-competition-4-cond"
-                    },
-                    "doNotResetIfCounterCompleted": false,
-                    "dynamicLocale": false,
-                    "globalQuestCounterId": "",
-                    "id": "friendlypmc-knight-competition-4",
-                    "index": 3,
-                    "oneSessionOnly": false,
-                    "parentId": "",
-                    "type": "Elimination",
-                    "value": 5,
-                    "visibilityConditions": []
-                }
-            ],
-            "Fail": [
-                {
-                    "completeInSeconds": 0,
-                    "conditionType": "CounterCreator",
-                    "counter": {
-                        "conditions": [
-                            {
-                                "conditionType": "ExitStatus",
-                                "dynamicLocale": false,
-                                "id": "friendlypmc-knight-competition-fail-1",
-                                "status": ["Killed", "Left", "MissingInAction"]
-                            },
-                            {
-                                "conditionType": "Location",
-                                "dynamicLocale": false,
-                                "id": "friendlypmc-knight-competition-fail-2",
-                                "target": ["Shoreline", "bigmap", "Lighthouse", "Woods"]
-                            }
-                        ],
-                        "id": "friendlypmc-knight-competition-fail-cond"
-                    },
-                    "doNotResetIfCounterCompleted": false,
-                    "dynamicLocale": false,
-                    "globalQuestCounterId": "",
-                    "id": "friendlypmc-knight-competition-fail",
-                    "index": 0,
-                    "oneSessionOnly": false,
-                    "parentId": "",
-                    "type": "Completion",
-                    "value": 1,
-                    "visibilityConditions": []
-                }
-            ]
-        },
-        "declinePlayerMessage": "friendlypmc-knight-competition declinePlayerMessage",
-        "description": "friendlypmc-knight-competition description",
-        "failMessageText": "friendlypmc-knight-competition failMessageText",
-        "image": "/files/quest/icon/KnightCompetitionQuest.jpg",
-        "instantComplete": false,
-        "isKey": false,
-        "location": "any",
-        "name": "friendlypmc-knight-competition name",
-        "note": "friendlypmc-knight-competition note",
-        "restartable": true,
-        "rewards": {
-            "Fail": [],
-            "Started": [],
-            "Success": [
-                {
+	"friendlypmc-knight-competition": {
+		"QuestName": "Who let the dogs out?",
+		"_id": "friendlypmc-knight-competition",
+		"acceptPlayerMessage": "friendlypmc-knight-competition acceptPlayerMessage",
+		"canShowNotificationsInGame": true,
+		"changeQuestMessageText": "friendlypmc-knight-competition changeQuestMessageText",
+		"completePlayerMessage": "friendlypmc-knight-competition completePlayerMessage",
+		"conditions": {
+			"AvailableForStart": [
+				{
+					"compareMethod": ">=",
+					"conditionType": "Level",
+					"dynamicLocale": false,
+					"globalQuestCounterId": "",
+					"id": "friendlypmc-knight-competition-req",
+					"index": 0,
+					"parentId": "",
+					"value": 20,
+					"visibilityConditions": []
+				}
+			],
+			"AvailableForFinish": [
+				{
+					"completeInSeconds": 0,
+					"conditionType": "CounterCreator",
+					"counter": {
+						"conditions": [
+							{
+								"bodyPart": [],
+								"compareMethod": ">=",
+								"conditionType": "Kills",
+								"daytime": {
+									"from": 0,
+									"to": 0
+								},
+								"distance": {
+									"compareMethod": ">=",
+									"value": 0
+								},
+								"dynamicLocale": false,
+								"enemyEquipmentExclusive": [],
+								"enemyEquipmentInclusive": [],
+								"enemyHealthEffects": [],
+								"id": "friendlypmc-knight-competition-1-kill",
+								"resetOnSessionEnd": false,
+								"savageRole": [],
+								"target": "AnyPmc",
+								"value": 1,
+								"weapon": [],
+								"weaponCaliber": [],
+								"weaponModsExclusive": [],
+								"weaponModsInclusive": []
+							},
+							{
+								"conditionType": "Location",
+								"dynamicLocale": false,
+								"id": "friendlypmc-knight-competition-1-location",
+								"target": ["Lighthouse"]
+							}
+						],
+						"id": "friendlypmc-knight-competition-1-cond"
+					},
+					"doNotResetIfCounterCompleted": false,
+					"dynamicLocale": false,
+					"globalQuestCounterId": "",
+					"id": "friendlypmc-knight-competition-1",
+					"index": 0,
+					"oneSessionOnly": false,
+					"parentId": "",
+					"type": "Elimination",
+					"value": 5,
+					"visibilityConditions": []
+				},
+				{
+					"completeInSeconds": 0,
+					"conditionType": "CounterCreator",
+					"counter": {
+						"conditions": [
+							{
+								"bodyPart": [],
+								"compareMethod": ">=",
+								"conditionType": "Kills",
+								"daytime": {
+									"from": 0,
+									"to": 0
+								},
+								"distance": {
+									"compareMethod": ">=",
+									"value": 0
+								},
+								"dynamicLocale": false,
+								"enemyEquipmentExclusive": [],
+								"enemyEquipmentInclusive": [],
+								"enemyHealthEffects": [],
+								"id": "friendlypmc-knight-competition-2-kill",
+								"resetOnSessionEnd": false,
+								"savageRole": [],
+								"target": "AnyPmc",
+								"value": 1,
+								"weapon": [],
+								"weaponCaliber": [],
+								"weaponModsExclusive": [],
+								"weaponModsInclusive": []
+							},
+							{
+								"conditionType": "Location",
+								"dynamicLocale": false,
+								"id": "friendlypmc-knight-competition-2-location",
+								"target": ["Woods"]
+							}
+						],
+						"id": "friendlypmc-knight-competition-2-cond"
+					},
+					"doNotResetIfCounterCompleted": false,
+					"dynamicLocale": false,
+					"globalQuestCounterId": "",
+					"id": "friendlypmc-knight-competition-2",
+					"index": 1,
+					"oneSessionOnly": false,
+					"parentId": "",
+					"type": "Elimination",
+					"value": 5,
+					"visibilityConditions": []
+				},
+				{
+					"completeInSeconds": 0,
+					"conditionType": "CounterCreator",
+					"counter": {
+						"conditions": [
+							{
+								"bodyPart": [],
+								"compareMethod": ">=",
+								"conditionType": "Kills",
+								"daytime": {
+									"from": 0,
+									"to": 0
+								},
+								"distance": {
+									"compareMethod": ">=",
+									"value": 0
+								},
+								"dynamicLocale": false,
+								"enemyEquipmentExclusive": [],
+								"enemyEquipmentInclusive": [],
+								"enemyHealthEffects": [],
+								"id": "friendlypmc-knight-competition-3-kill",
+								"resetOnSessionEnd": false,
+								"savageRole": [],
+								"target": "AnyPmc",
+								"value": 1,
+								"weapon": [],
+								"weaponCaliber": [],
+								"weaponModsExclusive": [],
+								"weaponModsInclusive": []
+							},
+							{
+								"conditionType": "Location",
+								"dynamicLocale": false,
+								"id": "friendlypmc-knight-competition-3-location",
+								"target": ["Shoreline"]
+							}
+						],
+						"id": "friendlypmc-knight-competition-3-cond"
+					},
+					"doNotResetIfCounterCompleted": false,
+					"dynamicLocale": false,
+					"globalQuestCounterId": "",
+					"id": "friendlypmc-knight-competition-3",
+					"index": 2,
+					"oneSessionOnly": false,
+					"parentId": "",
+					"type": "Elimination",
+					"value": 5,
+					"visibilityConditions": []
+				},
+				{
+					"completeInSeconds": 0,
+					"conditionType": "CounterCreator",
+					"counter": {
+						"conditions": [
+							{
+								"bodyPart": [],
+								"compareMethod": ">=",
+								"conditionType": "Kills",
+								"daytime": {
+									"from": 0,
+									"to": 0
+								},
+								"distance": {
+									"compareMethod": ">=",
+									"value": 0
+								},
+								"dynamicLocale": false,
+								"enemyEquipmentExclusive": [],
+								"enemyEquipmentInclusive": [],
+								"enemyHealthEffects": [],
+								"id": "friendlypmc-knight-competition-4-kill",
+								"resetOnSessionEnd": false,
+								"savageRole": [],
+								"target": "AnyPmc",
+								"value": 1,
+								"weapon": [],
+								"weaponCaliber": [],
+								"weaponModsExclusive": [],
+								"weaponModsInclusive": []
+							},
+							{
+								"conditionType": "Location",
+								"dynamicLocale": false,
+								"id": "friendlypmc-knight-competition-4-location",
+								"target": ["bigmap"]
+							}
+						],
+						"id": "friendlypmc-knight-competition-4-cond"
+					},
+					"doNotResetIfCounterCompleted": false,
+					"dynamicLocale": false,
+					"globalQuestCounterId": "",
+					"id": "friendlypmc-knight-competition-4",
+					"index": 3,
+					"oneSessionOnly": false,
+					"parentId": "",
+					"type": "Elimination",
+					"value": 5,
+					"visibilityConditions": []
+				}
+			],
+			"Fail": [
+				{
+					"completeInSeconds": 0,
+					"conditionType": "CounterCreator",
+					"counter": {
+						"conditions": [
+							{
+								"conditionType": "ExitStatus",
+								"dynamicLocale": false,
+								"id": "friendlypmc-knight-competition-fail-1",
+								"status": ["Killed", "Left", "MissingInAction"]
+							},
+							{
+								"conditionType": "Location",
+								"dynamicLocale": false,
+								"id": "friendlypmc-knight-competition-fail-2",
+								"target": ["Shoreline", "bigmap", "Lighthouse", "Woods"]
+							}
+						],
+						"id": "friendlypmc-knight-competition-fail-cond"
+					},
+					"doNotResetIfCounterCompleted": false,
+					"dynamicLocale": false,
+					"globalQuestCounterId": "",
+					"id": "friendlypmc-knight-competition-fail",
+					"index": 0,
+					"oneSessionOnly": false,
+					"parentId": "",
+					"type": "Completion",
+					"value": 1,
+					"visibilityConditions": []
+				}
+			]
+		},
+		"declinePlayerMessage": "friendlypmc-knight-competition declinePlayerMessage",
+		"description": "friendlypmc-knight-competition description",
+		"failMessageText": "friendlypmc-knight-competition failMessageText",
+		"image": "/files/quest/icon/KnightCompetitionQuest.jpg",
+		"instantComplete": false,
+		"isKey": false,
+		"location": "any",
+		"name": "friendlypmc-knight-competition name",
+		"note": "friendlypmc-knight-competition note",
+		"restartable": true,
+		"rewards": {
+			"Fail": [],
+			"Started": [],
+			"Success": [
+				{
 					"id": "friendlypmc-knight-competition-reward-1",
 					"index": 0,
 					"type": "Experience",
 					"value": "32500"
 				},
-                {
-                    "id": "friendlypmc-knight-competition-reward-2",
-                    "index": 1,
-                    "target": "friendlypmc-knight",
-                    "type": "TraderStanding",
-                    "value": "0.05"
-                }
-            ]
-        },
-        "secretQuest": false,
-        "side": "Pmc",
-        "startedMessageText": "friendlypmc-knight-competition startedMessageText",
-        "successMessageText": "friendlypmc-knight-competition successMessageText",
-        "traderId": "friendlypmc-knight",
-        "type": "Elimination"
-    },
-    "friendlypmc-knight-my-land" : {
-        "QuestName": "My Land",
-        "_id": "friendlypmc-knight-my-land",
-        "acceptPlayerMessage": "friendlypmc-knight-my-land acceptPlayerMessage",
-        "canShowNotificationsInGame": true,
-        "changeQuestMessageText": "friendlypmc-knight-my-land changeQuestMessageText",
-        "completePlayerMessage": "friendlypmc-knight-my-land completePlayerMessage",
-        "conditions": {
-            "AvailableForStart": [
-                {
-                    "compareMethod": ">=",
-                    "conditionType": "Level",
-                    "dynamicLocale": false,
-                    "globalQuestCounterId": "",
-                    "id": "friendlypmc-knight-my-land-req-1",
-                    "index": 0,
-                    "parentId": "",
-                    "value": 20,
-                    "visibilityConditions": []
-                },
-                {
-                    "availableAfter": 0,
-                    "conditionType": "Quest",
-                    "dispersion": 0,
-                    "dynamicLocale": false,
-                    "globalQuestCounterId": "",
-                    "id": "friendlypmc-knight-my-land-req-2",
-                    "index": 0,
-                    "parentId": "",
-                    "status": [
-                        4
-                    ],
-                    "target": "friendlypmc-knight-competition",
-                    "visibilityConditions": []
-                }
-            ],
-            "AvailableForFinish": [
-                {
-                    "completeInSeconds": 0,
-                    "conditionType": "CounterCreator",
-                    "counter": {
-                        "conditions": [
-                            {
-                                "conditionType": "InZone",
-                                "dynamicLocale": false,
-                                "id": "friendlypmc-knight-my-land-location",
-                                "zoneIds": [
-                                    "prapor_27_1"
-                                ]
-                            },
-                            {
-                                "bodyPart": [],
-                                "compareMethod": ">=",
-                                "conditionType": "Kills",
-                                "daytime": {
-                                    "from": 0,
-                                    "to": 0
-                                },
-                                "distance": {
-                                    "compareMethod": ">=",
-                                    "value": 0
-                                },
-                                "dynamicLocale": false,
-                                "enemyEquipmentExclusive": [],
-                                "enemyEquipmentInclusive": [],
-                                "enemyHealthEffects": [],
-                                "id": "friendlypmc-knight-my-land-kill",
-                                "resetOnSessionEnd": false,
-                                "savageRole": [],
-                                "target": "Any",
-                                "value": 1,
-                                "weapon": [],
-                                "weaponCaliber": [],
-                                "weaponModsExclusive": [],
-                                "weaponModsInclusive": []
-                            }
-                        ],
-                        "id": "friendlypmc-knight-my-land-cond"
-                    },
-                    "doNotResetIfCounterCompleted": false,
-                    "dynamicLocale": false,
-                    "globalQuestCounterId": "",
-                    "id": "friendlypmc-knight-my-land-1",
-                    "index": 0,
-                    "oneSessionOnly": false,
-                    "parentId": "",
-                    "type": "Elimination",
-                    "value": 10,
-                    "visibilityConditions": []
-                }
-            ],
-            "Fail": [
-                {
-                    "completeInSeconds": 0,
-                    "conditionType": "CounterCreator",
-                    "counter": {
-                        "conditions": [
-                            {
-                                "conditionType": "ExitStatus",
-                                "dynamicLocale": false,
-                                "id": "friendlypmc-knight-my-land-fail-1",
-                                "status": ["Killed", "Left", "MissingInAction"]
-                            },
-                            {
-                                "conditionType": "Location",
-                                "dynamicLocale": false,
-                                "id": "friendlypmc-knight-my-land-fail-2",
-                                "target": ["bigmap"]
-                            }
-                        ],
-                        "id": "friendlypmc-knight-my-land-fail-cond"
-                    },
-                    "doNotResetIfCounterCompleted": false,
-                    "dynamicLocale": false,
-                    "globalQuestCounterId": "",
-                    "id": "friendlypmc-knight-my-land-fail",
-                    "index": 0,
-                    "oneSessionOnly": false,
-                    "parentId": "",
-                    "type": "Completion",
-                    "value": 1,
-                    "visibilityConditions": []
-                }
-            ]
-        },
-        "declinePlayerMessage": "friendlypmc-knight-my-land declinePlayerMessage",
-        "description": "friendlypmc-knight-my-land description",
-        "failMessageText": "friendlypmc-knight-my-land failMessageText",
-        "image": "/files/quest/icon/KnightCompetitionQuest.jpg",
-        "instantComplete": false,
-        "isKey": false,
-        "location": "56f40101d2720b2a4d8b45d6",
-        "name": "friendlypmc-knight-my-land name",
-        "note": "friendlypmc-knight-my-land note",
-        "restartable": true,
-        "rewards": {
-            "Fail": [],
-            "Started": [],
-            "Success": [
-                {
+				{
+					"id": "friendlypmc-knight-competition-reward-2",
+					"index": 1,
+					"target": "friendlypmc-knight",
+					"type": "TraderStanding",
+					"value": "0.05"
+				}
+			]
+		},
+		"secretQuest": false,
+		"side": "Pmc",
+		"startedMessageText": "friendlypmc-knight-competition startedMessageText",
+		"successMessageText": "friendlypmc-knight-competition successMessageText",
+		"traderId": "friendlypmc-knight",
+		"type": "Elimination"
+	},
+	"friendlypmc-knight-my-land": {
+		"QuestName": "My Land",
+		"_id": "friendlypmc-knight-my-land",
+		"acceptPlayerMessage": "friendlypmc-knight-my-land acceptPlayerMessage",
+		"canShowNotificationsInGame": true,
+		"changeQuestMessageText": "friendlypmc-knight-my-land changeQuestMessageText",
+		"completePlayerMessage": "friendlypmc-knight-my-land completePlayerMessage",
+		"conditions": {
+			"AvailableForStart": [
+				{
+					"compareMethod": ">=",
+					"conditionType": "Level",
+					"dynamicLocale": false,
+					"globalQuestCounterId": "",
+					"id": "friendlypmc-knight-my-land-req-1",
+					"index": 0,
+					"parentId": "",
+					"value": 20,
+					"visibilityConditions": []
+				},
+				{
+					"availableAfter": 0,
+					"conditionType": "Quest",
+					"dispersion": 0,
+					"dynamicLocale": false,
+					"globalQuestCounterId": "",
+					"id": "friendlypmc-knight-my-land-req-2",
+					"index": 0,
+					"parentId": "",
+					"status": [4],
+					"target": "friendlypmc-knight-competition",
+					"visibilityConditions": []
+				}
+			],
+			"AvailableForFinish": [
+				{
+					"completeInSeconds": 0,
+					"conditionType": "CounterCreator",
+					"counter": {
+						"conditions": [
+							{
+								"conditionType": "InZone",
+								"dynamicLocale": false,
+								"id": "friendlypmc-knight-my-land-location",
+								"zoneIds": ["prapor_27_1"]
+							},
+							{
+								"bodyPart": [],
+								"compareMethod": ">=",
+								"conditionType": "Kills",
+								"daytime": {
+									"from": 0,
+									"to": 0
+								},
+								"distance": {
+									"compareMethod": ">=",
+									"value": 0
+								},
+								"dynamicLocale": false,
+								"enemyEquipmentExclusive": [],
+								"enemyEquipmentInclusive": [],
+								"enemyHealthEffects": [],
+								"id": "friendlypmc-knight-my-land-kill",
+								"resetOnSessionEnd": false,
+								"savageRole": [],
+								"target": "Any",
+								"value": 1,
+								"weapon": [],
+								"weaponCaliber": [],
+								"weaponModsExclusive": [],
+								"weaponModsInclusive": []
+							}
+						],
+						"id": "friendlypmc-knight-my-land-cond"
+					},
+					"doNotResetIfCounterCompleted": false,
+					"dynamicLocale": false,
+					"globalQuestCounterId": "",
+					"id": "friendlypmc-knight-my-land-1",
+					"index": 0,
+					"oneSessionOnly": false,
+					"parentId": "",
+					"type": "Elimination",
+					"value": 8,
+					"visibilityConditions": []
+				}
+			],
+			"Fail": [
+				{
+					"completeInSeconds": 0,
+					"conditionType": "CounterCreator",
+					"counter": {
+						"conditions": [
+							{
+								"conditionType": "ExitStatus",
+								"dynamicLocale": false,
+								"id": "friendlypmc-knight-my-land-fail-1",
+								"status": ["Killed", "Left", "MissingInAction"]
+							},
+							{
+								"conditionType": "Location",
+								"dynamicLocale": false,
+								"id": "friendlypmc-knight-my-land-fail-2",
+								"target": ["bigmap"]
+							}
+						],
+						"id": "friendlypmc-knight-my-land-fail-cond"
+					},
+					"doNotResetIfCounterCompleted": false,
+					"dynamicLocale": false,
+					"globalQuestCounterId": "",
+					"id": "friendlypmc-knight-my-land-fail",
+					"index": 0,
+					"oneSessionOnly": false,
+					"parentId": "",
+					"type": "Completion",
+					"value": 1,
+					"visibilityConditions": []
+				}
+			]
+		},
+		"declinePlayerMessage": "friendlypmc-knight-my-land declinePlayerMessage",
+		"description": "friendlypmc-knight-my-land description",
+		"failMessageText": "friendlypmc-knight-my-land failMessageText",
+		"image": "/files/quest/icon/KnightCompetitionQuest.jpg",
+		"instantComplete": false,
+		"isKey": false,
+		"location": "56f40101d2720b2a4d8b45d6",
+		"name": "friendlypmc-knight-my-land name",
+		"note": "friendlypmc-knight-my-land note",
+		"restartable": true,
+		"rewards": {
+			"Fail": [],
+			"Started": [],
+			"Success": [
+				{
 					"id": "friendlypmc-knight-my-land-reward-1",
 					"index": 0,
 					"type": "Experience",
 					"value": "24000"
 				},
-                {
-                    "id": "friendlypmc-knight-my-land-reward-2",
-                    "index": 1,
-                    "target": "friendlypmc-knight",
-                    "type": "TraderStanding",
-                    "value": "0.1"
-                }
-            ]
-        },
-        "secretQuest": false,
-        "side": "Pmc",
-        "startedMessageText": "friendlypmc-knight-my-land startedMessageText",
-        "successMessageText": "friendlypmc-knight-my-land successMessageText",
-        "traderId": "friendlypmc-knight",
-        "type": "Elimination"
-    }
+				{
+					"id": "friendlypmc-knight-my-land-reward-2",
+					"index": 1,
+					"target": "friendlypmc-knight",
+					"type": "TraderStanding",
+					"value": "0.1"
+				}
+			]
+		},
+		"secretQuest": false,
+		"side": "Pmc",
+		"startedMessageText": "friendlypmc-knight-my-land startedMessageText",
+		"successMessageText": "friendlypmc-knight-my-land successMessageText",
+		"traderId": "friendlypmc-knight",
+		"type": "Elimination"
+	}
 }

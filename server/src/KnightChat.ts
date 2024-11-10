@@ -12,7 +12,7 @@ import { IWsChatMessageReceived } from "@spt/models/eft/ws/IWsChatMessageReceive
 import { IWsNotificationEvent } from "@spt/models/eft/ws/IWsNotificationEvent";
 import { IGroupCharacter } from "@spt/models/eft/match/IGroupCharacter";
 
-import { Message } from "@spt/models/eft/profile/ISptProfile";
+import { IUserDialogInfo, Message } from "@spt/models/eft/profile/ISptProfile";
 import { MessageType } from "@spt/models/enums/MessageType";
 import { HashUtil } from "@spt/utils/HashUtil";
 import { ProfileHelper } from "@spt/helpers/ProfileHelper";
@@ -58,7 +58,7 @@ export class KnightChatBot implements IDialogueChatBot {
 
 	currentGroup: string[] = [];
 
-	getChatBot() {
+	getChatBot(): IUserDialogInfo {
 		return {
 			_id: "bossKnight",
 			aid: 1113579,

@@ -61,6 +61,7 @@ import { IGetBodyResponseData } from "@spt/models/eft/httpResponse/IGetBodyRespo
 import { NotificationSendHelper } from "@spt/helpers/NotificationSendHelper";
 import { IGetFriendListDataResponse } from "@spt/models/eft/dialog/IGetFriendListDataResponse";
 import { IMatchGroupStatusResponse } from "@spt/models/eft/match/IMatchGroupStatusResponse";
+import { ItemTpl } from "@spt/models/enums/ItemTpl";
 
 class friendlyPMC {
 	config = {
@@ -294,18 +295,14 @@ class friendlyPMC {
 					this.config.badGuy = info.Config.badGuy;
 					this.config.englishBear = info.Config.englishBear;
 
-					this.Logger.logWithColor("friendlyPMC: Setting Server Config as " + JSON.stringify(info), LogTextColor.BLUE);
+					this.Logger.logWithColor("friendlyPMC: Setting Server Config as " + JSON.stringify(info), LogTextColor.WHITE);
 
 					if (this.config.armbands) {
-						this.Logger.logWithColor("friendlyPMC: Adding Armbands to bots...", LogTextColor.BLUE);
+						this.Logger.logWithColor("friendlyPMC: Adding Armbands to bots...", LogTextColor.WHITE);
 
 						const armbandColors: Record<string, string> = {
-							blue: "5b3f3af486f774679e752c1f",
-							green: "5b3f3b0186f774021a2afef7",
-							red: "5b3f3ade86f7746b6b790d8e",
-							white: "5b3f16c486f7747c327f55f7",
-							yellow: "5b3f3b0e86f7746752107cda",
-							purple: "5f9949d869e2777a0e779ba5",
+							blue: ItemTpl.ARMBAND_BLUE,
+							red: ItemTpl.ARMBAND_RED,
 						};
 
 						for (const botType in this.botsTable.types) {
@@ -351,7 +348,7 @@ class friendlyPMC {
 
 					const custom = info.Custom;
 
-					console.log("Follower Options " + JSON.stringify(info.Custom));
+					this.Logger.logWithColor("friendlyPMC: Follower Options - " + JSON.stringify(info.Custom), LogTextColor.WHITE);
 
 					const conditionPromises: IBotBase[] = [];
 
@@ -377,12 +374,23 @@ class friendlyPMC {
 						);
 
 						const botRole = botGenerationDetails.isPmc
-							? pmcProfile.Info.Side // Use side to get usec.json or bear.json when bot will be PMC
+							? pmcProfile.Info.Side // use side to get usec.json or bear.json when bot will be PMC
 							: botGenerationDetails.role;
 						const botJsonTemplateClone = botController["cloner"].clone(botController["botHelper"].getBotTemplate(botRole));
 
 						botGenerationDetails.botRelativeLevelDeltaMax = 5;
 						botGenerationDetails.botRelativeLevelDeltaMin = 5;
+
+						// FIKA is not always spawning ARM bands for followers
+						if (this.config.armbands) {
+							botJsonTemplateClone.chances.equipment.ArmBand = 100;
+
+							if (pmcProfile.Info.Side.toLowerCase() == "bear") {
+								botJsonTemplateClone.inventory.equipment.ArmBand[ItemTpl.ARMBAND_RED] = 1;
+							} else {
+								botJsonTemplateClone.inventory.equipment.ArmBand[ItemTpl.ARMBAND_BLUE] = 1;
+							}
+						}
 
 						const bot = botGenerator["generateBot"](sessionID, preparedBotBase, botJsonTemplateClone, botGenerationDetails);
 
@@ -437,18 +445,25 @@ class friendlyPMC {
 				}),
 				new RouteAction("/client/match/group/invite/send", async (url: string, info: any, sessionID: string, output: string): Promise<IGetBodyResponseData<string>> => {
 					const aid = info.to;
-					dialogueController.getFriendList(sessionID).Friends.forEach(friend => {
-						if (friend.aid == aid) {
-							const bot = container.resolve<KnightChatBot>("KnightChatBot");
-							setTimeout(() => {
-								bot.acceptInvite(sessionID);
-							}, 2000);
-						}
-					});
+
+					// Knight should accept the invite
+					const knightFriend = container.resolve<KnightChatBot>("KnightChatBot");
+
+					if (aid == knightFriend.getChatBot().aid) {
+						setTimeout(() => {
+							knightFriend.acceptInvite(sessionID);
+						}, 2000);
+					}
 					return this.matchCallbacks.sendGroupInvite(url, info, sessionID);
 				}),
 				new RouteAction("/client/friend/list", async (url: string, info: any, sessionID: string, output: string): Promise<IGetBodyResponseData<IGetFriendListDataResponse>> => {
 					const list = dialogueController.getFriendList(sessionID);
+					const knightFriend = container.resolve<KnightChatBot>("KnightChatBot");
+					// Fika is removing Knight from the friend list, so we need to add him back
+					let friend = knightFriend.getChatBot();
+					if (list.Friends.findIndex(f => f.aid == friend.aid) == -1) {
+						list.Friends.push(friend);
+					}
 
 					const profile = profileHelper.getPmcProfile(sessionID);
 
@@ -470,8 +485,8 @@ class friendlyPMC {
 				new RouteAction("/client/match/group/pitstatus", async (url: string, info: { Players: string[] }, sessionID: string, output: string) => {
 					clearTimeout(groupStatus);
 					groupStatus = setTimeout(() => {
-						const bot = container.resolve<KnightChatBot>("KnightChatBot");
-						bot.currentGroup = info.Players;
+						const knightFriend = container.resolve<KnightChatBot>("KnightChatBot");
+						knightFriend.currentGroup = info.Players;
 					});
 
 					return httpResponseUtil.emptyResponse();

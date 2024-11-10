@@ -13,6 +13,10 @@ namespace friendlyPMC.Patches
 {
     internal class RaidStartPatch : ModulePatch
     {
+        public static bool HasFika()
+        {
+            return Type.GetType("Fika.Core.Coop.GameMode.CoopGame, Fika.Core") != null;
+        }
         protected override MethodBase GetTargetMethod()
         {
             return AccessTools.Method(typeof(Class266), "SendRaidSettings");
@@ -138,7 +142,7 @@ namespace friendlyPMC.Patches
             RemovedPlayers.ForEach(player => matchmakerPlayerControllerClass.GroupPlayers.Remove(player));
 
             RaidSettings raidSettings_0 = AccessTools.Field(typeof(MainMenuController), "raidSettings_0").GetValue(__instance) as RaidSettings;
-            raidSettings_0.RaidMode = ERaidMode.Local;
+            if(!RaidStartPatch.HasFika()) raidSettings_0.RaidMode = ERaidMode.Local;
         }
 
         // add removed players back to the group
@@ -171,7 +175,7 @@ namespace friendlyPMC.Patches
         private static void PatchPrefix(MainMenuController __instance)
         {
             RaidSettings raidSettings_0 = AccessTools.Field(typeof(MainMenuController), "raidSettings_0").GetValue(__instance) as RaidSettings;
-            raidSettings_0.RaidMode = ERaidMode.Local;
+            if(!RaidStartPatch.HasFika())raidSettings_0.RaidMode = ERaidMode.Local;
         }
     }
 
