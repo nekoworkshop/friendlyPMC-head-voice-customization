@@ -166,7 +166,7 @@ namespace friendlyPMC.Patches
             string ProfileId = GamePlayerOwner.MyPlayer.ProfileId;
             Player player = GamePlayerOwner.MyPlayer;
 
-            if (BossPlayers.Instance == null || BossPlayers.IsPlayerBoss(ProfileId))
+            if (BossPlayers.Instance == null || !BossPlayers.IsPlayerBoss(ProfileId))
             {
                 return;
             }

@@ -75,7 +75,7 @@ namespace friendlyPMC.Patches
                 return !Utils.Utils.FlagGet("knightKiller") && !Utils.Utils.FlagGet("pipeKiller") && !Utils.Utils.FlagGet("birdEyeKiller");
             }
 
-            // Knight quests that require Knight as teammate
+            // Knight quests that require Knight as teammate - player or knight can kill
             if (Utils.Props.QuestsTeamConditions["Knight"].Contains(counter.Id))
             {
                 if (followers == null || followers.Count == 0)

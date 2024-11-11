@@ -99,7 +99,18 @@ class friendlyPMC {
 
 	botsTable: IBots;
 
-	private _questItems = [ItemTpl.KEYCARD_TERRAGROUP_LABS_ACCESS, ItemTpl.INFO_INTELLIGENCE_FOLDER, ItemTpl.INFO_MILITARY_FLASH_DRIVE];
+	private _questItems = {
+		"friendlypmc-knight-thieves-11": [ItemTpl.KEYCARD_TERRAGROUP_LABS_ACCESS, 3],
+		"friendlypmc-knight-thieves-21": [ItemTpl.INFO_MILITARY_FLASH_DRIVE, 2],
+		"friendlypmc-knight-thieves-31": [ItemTpl.INFO_INTELLIGENCE_FOLDER, 2],
+	};
+
+	private _questLocations = {
+		"friendlypmc-knight-thieves-11": ["tarkovstreets", "bigmap", "interchange"],
+		"friendlypmc-knight-thieves-21": ["tarkovstreets", "bigmap", "interchange"],
+		"friendlypmc-knight-thieves-31": ["tarkovstreets", "bigmap", "interchange"],
+	};
+
 	private _spawnQuestItems: { [key: string]: number } = {};
 
 	preSptLoad(container: DependencyContainer) {
@@ -347,10 +358,15 @@ class friendlyPMC {
 
 					const userProfile = this.profileHelper.getPmcProfile(sessionID);
 
-					this._questItems.forEach(item => {
+					Object.keys(this._questItems).forEach(condition => {
+						const value = this._questItems[condition];
+
+						if (condition in userProfile.TaskConditionCounters == false) return;
+
+						this._spawnQuestItems[value[0]] = userProfile.TaskConditionCounters[condition].value || 0;
 						userProfile.Inventory.items.forEach(invItem => {
-							if (invItem._tpl === item) {
-								this._spawnQuestItems[item]++;
+							if (invItem._tpl === value[0]) {
+								this._spawnQuestItems[value[0]]++;
 							}
 						});
 					});
@@ -678,21 +694,24 @@ class friendlyPMC {
 			};
 		}
 
+		// add quest items to Scavs if we are doing the thieves quest
 		const userProfile = this.profileHelper.getFullProfile(sessionId);
-		userProfile.characters.pmc.Quests.forEach(quest => {
-			// Add quest items to Scavs if we are doing the thieves quest
-			if (role == "assault" && ["tarkovstreets", "bigmap", "interchange"].includes(userProfile.inraid.location.toLowerCase())) {
-				if (quest.qid == "friendlypmc-knight-thieves" && quest.status == 2) {
-					if (this._spawnQuestItems[ItemTpl.KEYCARD_TERRAGROUP_LABS_ACCESS] < 3) {
-						botJsonTemplate.inventory.items.Pockets[ItemTpl.KEYCARD_TERRAGROUP_LABS_ACCESS] = 500;
-						botJsonTemplate.inventory.items.TacticalVest[ItemTpl.KEYCARD_TERRAGROUP_LABS_ACCESS] = 500;
-						this._spawnQuestItems[ItemTpl.KEYCARD_TERRAGROUP_LABS_ACCESS]++;
-					} else if (this._spawnQuestItems[ItemTpl.INFO_INTELLIGENCE_FOLDER] < 2) {
-						botJsonTemplate.inventory.items.Backpack[ItemTpl.INFO_INTELLIGENCE_FOLDER] = 500;
-						this._spawnQuestItems[ItemTpl.INFO_INTELLIGENCE_FOLDER]++;
-					} else if (this._spawnQuestItems[ItemTpl.INFO_MILITARY_FLASH_DRIVE] < 2) {
-						botJsonTemplate.inventory.items.Backpack[ItemTpl.INFO_MILITARY_FLASH_DRIVE] = 500;
-						this._spawnQuestItems[ItemTpl.INFO_MILITARY_FLASH_DRIVE]++;
+		Object.keys(this._questLocations).forEach(condition => {
+			if (condition in userProfile.characters.pmc.TaskConditionCounters == false) return;
+			if (this._questLocations[condition].includes(userProfile.inraid.location.toLowerCase())) {
+				if (this._spawnQuestItems[this._questItems[condition][0]] < this._questItems[condition][1]) {
+					if (this._questItems[condition][0] == ItemTpl.KEYCARD_TERRAGROUP_LABS_ACCESS) {
+						botJsonTemplate.inventory.items.Pockets[this._questItems[condition][0]] = 500;
+
+						botJsonTemplate.chances.equipment.TacticalVest = 100;
+						botJsonTemplate.inventory.items.TacticalVest[this._questItems[condition][0]] = 500;
+
+						this._spawnQuestItems[this._questItems[condition][0]]++;
+					} else if (this._questItems[condition][0] == ItemTpl.INFO_INTELLIGENCE_FOLDER || this._questItems[condition][0] == ItemTpl.INFO_MILITARY_FLASH_DRIVE) {
+						botJsonTemplate.chances.equipment.Backpack = 100;
+						botJsonTemplate.inventory.items.Backpack[this._questItems[condition][0]] = 500;
+
+						this._spawnQuestItems[this._questItems[condition][0]]++;
 					}
 				}
 			}

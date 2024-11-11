@@ -1008,9 +1008,16 @@ namespace friendlyPMC.Components
                         botOwner_0.BotTalk.TrySay(EPhraseTrigger.GoodWork, true);
                     }
 
-                    (botOwner_0.Brain.BaseBrain as FollowerBrain).BossOrdersChanged();
-
                     Player alivePlayerByProfileID = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(requester.ProfileId);
+
+                    float proximity = (botOwner_0.GetPlayer.Transform.position - requester.Transform.position).magnitude;
+
+                    if(proximity > 15f)
+                    {
+                        (botOwner_0.Brain.BaseBrain as FollowerBrain).BossOrdersChanged();
+                    } else {
+                        return;
+                    }
 
                     if (botOwner_0.BotRequestController.TryStopCurrent(alivePlayerByProfileID, true))
                     {
