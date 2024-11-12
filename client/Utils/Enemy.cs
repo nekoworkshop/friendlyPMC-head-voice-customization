@@ -229,8 +229,6 @@ namespace friendlyPMC.Utils
             if (groupInfo == null)
             {
                 groupInfo = new BotSettingsClass(enemy, bot.BotsGroup, cause);
-                groupInfo.EnemyLastPosition = enemy.Transform.position;
-                groupInfo.EnemyLastSeenTimeSense = Time.time;
 
                 bot.Memory.AddEnemy(enemy, groupInfo, false);
             }
@@ -248,8 +246,6 @@ namespace friendlyPMC.Utils
             }
 
             info.IgnoreUntilAggression = false;
-            
-            info.Distance = Vector3.Distance(bot.GetPlayer.Transform.position, enemy.Transform.position);
 
             return info;
 

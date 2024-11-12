@@ -620,10 +620,11 @@ namespace friendlyPMC.Components
                 // - make bot see the player as an aggresor
                 if (warnPlayer)
                 {
-                    _bot.Settings.FileSettings.Mind.DEFAULT_USEC_BEHAVIOUR = EWarnBehaviour.Attack;
-                    _bot.Settings.FileSettings.Mind.DEFAULT_BEAR_BEHAVIOUR = EWarnBehaviour.Attack;
-                    _bot.Settings.FileSettings.Mind.DEFAULT_SAVAGE_BEHAVIOUR = EWarnBehaviour.Attack;
+                    _bot.Settings.FileSettings.Mind.DEFAULT_USEC_BEHAVIOUR = _player.realPlayer.Side == EPlayerSide.Usec ? EWarnBehaviour.Warn : EWarnBehaviour.Attack;
+                    _bot.Settings.FileSettings.Mind.DEFAULT_BEAR_BEHAVIOUR = _player.realPlayer.Side == EPlayerSide.Bear ? EWarnBehaviour.Warn : EWarnBehaviour.Attack;
+                    _bot.Settings.FileSettings.Mind.DEFAULT_SAVAGE_BEHAVIOUR = _player.realPlayer.Side == EPlayerSide.Savage ? EWarnBehaviour.Warn : EWarnBehaviour.Attack;
                     _bot.Settings.FileSettings.Mind.ENEMY_BY_GROUPS_PMC_PLAYERS = true;
+                    _bot.Settings.FileSettings.Mind.ENEMY_BY_GROUPS_SAVAGE_PLAYERS = true;
                     _bot.Memory.IsPeace = false;
                 }
 
@@ -642,6 +643,11 @@ namespace friendlyPMC.Components
                 BotsGroup group = new BotsGroup(zone, _bot.BotsController.BotGame, _bot, list, deadBodiesController, allPlayers, false);
                 _bot.BotsGroup = group;
                 botsGroupField.SetValue(_bot.Memory, group);
+                
+                if(warnPlayer) {
+                    group.AddEnemyGroupIfAllowed(_player.bossGroup.Name,_player.realPlayer.Side);
+                }
+
                 // - ensure the brain manager of BigBrain is also cleared of the bot
                 try
                 {
