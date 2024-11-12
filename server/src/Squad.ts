@@ -62,6 +62,7 @@ import { NotificationSendHelper } from "@spt/helpers/NotificationSendHelper";
 import { IGetFriendListDataResponse } from "@spt/models/eft/dialog/IGetFriendListDataResponse";
 import { IMatchGroupStatusResponse } from "@spt/models/eft/match/IMatchGroupStatusResponse";
 import { ItemTpl } from "@spt/models/enums/ItemTpl";
+import { objectCopy } from "./Utils";
 
 class friendlyPMC {
 	config = {
@@ -100,15 +101,18 @@ class friendlyPMC {
 	botsTable: IBots;
 
 	private _questItems = {
-		"friendlypmc-knight-thieves-11": [ItemTpl.KEYCARD_TERRAGROUP_LABS_ACCESS, 3],
-		"friendlypmc-knight-thieves-21": [ItemTpl.INFO_MILITARY_FLASH_DRIVE, 2],
-		"friendlypmc-knight-thieves-31": [ItemTpl.INFO_INTELLIGENCE_FOLDER, 2],
+		"friendlypmc-knight-thieves-11": ["5d2bafbc86f77425243e8c3f", 3],
+		"friendlypmc-knight-thieves-21": ["5f4eab8b86f77431c626f1a4", 2],
 	};
 
 	private _questLocations = {
-		"friendlypmc-knight-thieves-11": ["tarkovstreets", "bigmap", "interchange"],
-		"friendlypmc-knight-thieves-21": ["tarkovstreets", "bigmap", "interchange"],
-		"friendlypmc-knight-thieves-31": ["tarkovstreets", "bigmap", "interchange"],
+		"friendlypmc-knight-thieves-11": ["tarkovstreets", "interchange"],
+		"friendlypmc-knight-thieves-21": ["tarkovstreets", "interchange"],
+	};
+
+	private _pitItems = {
+		"5d2bafbc86f77425243e8c3f": ItemTpl.KEYCARD_TERRAGROUP_LABS_ACCESS,
+		"5f4eab8b86f77431c626f1a4": ItemTpl.INFO_INTELLIGENCE_FOLDER,
 	};
 
 	private _spawnQuestItems: { [key: string]: number } = {};
@@ -580,6 +584,11 @@ class friendlyPMC {
 		knightBot.SetLang(this.lang);
 
 		container.resolve<DialogueController>("DialogueController").registerChatBot(knightBot);
+
+		Object.keys(this._pitItems).forEach(id => {
+			tables.templates.items[id] = objectCopy(tables.templates.items[this._pitItems[id]]);
+			tables.templates.items[id]._props.QuestItem = true;
+		});
 	}
 
 	private _makeFriendlyOrHostile(diff: Difficulty, pmcType: string) {
@@ -696,18 +705,22 @@ class friendlyPMC {
 
 		// add quest items to Scavs if we are doing the thieves quest
 		const userProfile = this.profileHelper.getFullProfile(sessionId);
+
+		const pitItems = Object.keys(this._pitItems);
 		Object.keys(this._questLocations).forEach(condition => {
 			if (condition in userProfile.characters.pmc.TaskConditionCounters == false) return;
 			if (this._questLocations[condition].includes(userProfile.inraid.location.toLowerCase())) {
 				if (this._spawnQuestItems[this._questItems[condition][0]] < this._questItems[condition][1]) {
-					if (this._questItems[condition][0] == ItemTpl.KEYCARD_TERRAGROUP_LABS_ACCESS) {
+					// special keycard
+					if (this._questItems[condition][0] == pitItems[0]) {
 						botJsonTemplate.inventory.items.Pockets[this._questItems[condition][0]] = 500;
 
 						botJsonTemplate.chances.equipment.TacticalVest = 100;
 						botJsonTemplate.inventory.items.TacticalVest[this._questItems[condition][0]] = 500;
 
 						this._spawnQuestItems[this._questItems[condition][0]]++;
-					} else if (this._questItems[condition][0] == ItemTpl.INFO_INTELLIGENCE_FOLDER || this._questItems[condition][0] == ItemTpl.INFO_MILITARY_FLASH_DRIVE) {
+						// special intelligence folder
+					} else if (this._questItems[condition][0] == pitItems[1]) {
 						botJsonTemplate.chances.equipment.Backpack = 100;
 						botJsonTemplate.inventory.items.Backpack[this._questItems[condition][0]] = 500;
 

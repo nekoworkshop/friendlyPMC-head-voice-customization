@@ -104,12 +104,7 @@ namespace friendlyPMC.Utils
             {
                 "Knight",
                 new List<string> {
-                    "friendlypmc-knight-thieves-4",
-                    "friendlypmc-knight-thieves-5",
-                    "friendlypmc-knight-thieves-6",
-                    "friendlypmc-knight-thieves-7",
-                    "friendlypmc-knight-thieves-8",
-                    "friendlypmc-knight-thieves-9"
+                    
                 }
             }
         };
@@ -125,8 +120,7 @@ namespace friendlyPMC.Utils
                 new List<string> {
                     "friendlypmc-knight-competition-1",
                     "friendlypmc-knight-competition-2",
-                    "friendlypmc-knight-competition-3",
-                    "friendlypmc-knight-competition-4"
+                    "friendlypmc-knight-competition-3"
                 }
             }
         };

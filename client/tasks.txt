@@ -38,6 +38,7 @@
 - at 0.5 standing, Knight no longer turns hostile on accidental shots, but killing him will give a penalty of 0.05 standing
 - - make Knight standing go down whenever the player aggros the Goons (but not below 0.1)  (only after the first quest is completed)
 - x - hook into Player.OnBeenKilledByAggressor to count kills made by Knight as a way to progress kill quests
+- - duplicate items needed for the "theieves" quest in order to mark them as quest items. Specify in the quest description that these items will be found on scavs.
 
 - see if we can make bot swap weapons when asked to loot (DeadBodyWork)
 - - this should also allow bot to put that weapon as seconday (in case of support without a grenade launcher)
