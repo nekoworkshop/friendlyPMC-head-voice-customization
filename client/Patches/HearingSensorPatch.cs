@@ -134,9 +134,12 @@ namespace friendlyPMC.Patches
                     if (distance < 25f)
                     {
                         if (!reportEnemy) bot.BotsGroup.ReportAboutEnemy(__instance, EEnemyPartVisibleType.visible);
-                        Utils.Enemy.MakeEnemy(bot, __instance);
+                        EnemyInfo info = Utils.Enemy.MakeEnemy(bot, __instance);
+                        
                         reported = Time.time + 3f;
                         reportEnemy = true;
+
+                        info?.SetVisible(true);
                     }
                     else if (distance <= 40f)
                     {

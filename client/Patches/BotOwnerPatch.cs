@@ -13,39 +13,6 @@ using friendlyPMC.Components;
 
 namespace friendlyPMC.Patches
 {
-    /** If BOT is getting hit by a player BOSS of which it is a follower of, do not turn hostile **/
-    internal class BotOwnerDamagePatch : ModulePatch
-    {
-        protected override MethodBase GetTargetMethod()
-        {
-            return AccessTools.Method(typeof(BotOwner), "method_9");
-
-        }
-        
-        [PatchPrefix]
-        private static bool PatchPrefix(BotOwner __instance, DamageInfo damageInfo, EBodyPart bodyType, float damageReducedByArmor)
-        {
-            if (__instance != null && __instance.BotFollower != null && __instance.BotFollower.HaveBoss && BossPlayers.IsFollower(__instance) && damageInfo.Player != null)
-            {
-
-                AIBossPlayer player = BossPlayers.Instance.GetBossPlayer(damageInfo.Player.iPlayer.ProfileId);
-
-                if (player != null && BossPlayers.IsFollower(__instance, player))
-                {
-                    // - yell "friendly fire"
-                    __instance.BotTalk.TrySay(EPhraseTrigger.FriendlyFire);
-
-                    __instance.StandBy.GetHit();
-                    __instance.BotPersonalStats.GetHit(damageInfo, bodyType);
-                    __instance.Memory.GetHit(damageInfo);
-
-                    return false;
-                }
-            }
-
-            return true;
-        }
-    }
     /** Skip checking bot's role if we have made this bot a follower of a boss player **/
     internal class BotOwnerIsFolowerPatch : ModulePatch
     {

@@ -230,6 +230,7 @@ namespace friendlyPMC.Utils
             {
                 groupInfo = new BotSettingsClass(enemy, bot.BotsGroup, cause);
                 groupInfo.EnemyLastPosition = enemy.Transform.position;
+                groupInfo.EnemyLastSeenTimeSense = Time.time;
 
                 bot.Memory.AddEnemy(enemy, groupInfo, false);
             }
@@ -245,6 +246,10 @@ namespace friendlyPMC.Utils
 
                 bot.EnemiesController.SetInfo(enemy, info);
             }
+
+            info.IgnoreUntilAggression = false;
+            
+            info.Distance = Vector3.Distance(bot.GetPlayer.Transform.position, enemy.Transform.position);
 
             return info;
 

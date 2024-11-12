@@ -17,6 +17,7 @@ using GridClassEx = GClass2516;
 using GridCacheClass = GClass1401;
 using DrakiaXYZ.BigBrain.Brains;
 using System.Reflection;
+using static EFT.SpeedTree.TreeWind;
 
 namespace friendlyPMC.Components
 {
@@ -122,7 +123,7 @@ namespace friendlyPMC.Components
             }
             _bot.Brain.Agent.Dispose();
             if (baseBrain != null) baseBrain.Dispose();
-            _bot.BotsController.AICoreController.Stop();
+            _bot.BotState = EBotState.NonActive;
             _bot.Receiver.Dispose();
 
             // add special follower settings
@@ -133,7 +134,7 @@ namespace friendlyPMC.Components
             // add the new follower brain
             _bot.Brain.BaseBrain = GetFollowerBrain(_bot, _player);
             _bot.Brain.Agent = GetFollowerAIAgent(_bot);
-            _bot.BotsController.AICoreController.Activate();
+            _bot.BotState = EBotState.Active;
             // let the bot talk
             _bot.BotTalk.SetSilence(0f);
             // force bot to turn off light
@@ -560,7 +561,7 @@ namespace friendlyPMC.Components
             return _player;
         }
         
-        public virtual void Dismiss()
+        public virtual void Dismiss(bool warnPlayer = false)
         {
             if (_bot == null) return;
             try
@@ -574,38 +575,105 @@ namespace friendlyPMC.Components
 
                 if (_bot.IsDead || _bot.BotState != EBotState.Active) return;
 
-                _bot.Brain.Dispose();
+                _bot.BotState = EBotState.NonActive;
 
-                _bot.BotsController.AICoreController.Stop();
+                // disable all follower related brain activity
+                var baseBrain = _bot.Brain.BaseBrain;
+                // - guess work because we cannot access the private property dictionary_0 where the layers are, but no brain has 20 layers, usually it's 10
+                for (int i = 1; i < 20; i++)
+                {
+                    try
+                    {
+                        if (baseBrain != null) baseBrain.method_3(i);
+                    }
+                    catch (Exception)
+                    {
 
-                // put back old settings
+                    }
+                }
+                // - ensure bot no longer follows the player
+                if (_bot.BotFollower.HaveBoss)
+                {
+                    _bot.BotFollower.BossToFollow.RemoveFollower(_bot);
+                    _bot.BotFollower.BossToFollow = null;
+                }
+                // - bot might have request going on, dispose it
+                if (_bot.BotRequestController.CurRequest != null)
+                {
+                    _bot.BotRequestController.CurRequest.Complete();
+                }
+                // - dispose follower specific agents
+                if(_bot.Brain.Agent is FollowerAIAgent<BotLogicDecision>)
+                {
+                    (_bot.Brain.Agent as FollowerAIAgent<BotLogicDecision>).Dispose();
+                } else 
+                    _bot.Brain.Agent.Dispose();
+
+                if (baseBrain != null) baseBrain.Dispose();
+
+                // - put back old settings
                 _bot.Settings = _OldSettings;
                 _bot.Profile.Info.GroupId = _OldGroupID;
                 _bot.ENEMY_LOOK_AT_ME = Mathf.Cos(_OldSettings.FileSettings.Mind.ENEMY_LOOK_AT_ME_ANG * 0.017453292f);
                 _bot.GetPlayer.ActiveHealthController.SetDamageCoeff(_OldSettings.FileSettings.Core.DamageCoeff);
+                
+                // - make bot see the player as an aggresor
+                if (warnPlayer)
+                {
+                    _bot.Settings.FileSettings.Mind.DEFAULT_USEC_BEHAVIOUR = EWarnBehaviour.Attack;
+                    _bot.Settings.FileSettings.Mind.DEFAULT_BEAR_BEHAVIOUR = EWarnBehaviour.Attack;
+                    _bot.Settings.FileSettings.Mind.DEFAULT_SAVAGE_BEHAVIOUR = EWarnBehaviour.Attack;
+                    _bot.Settings.FileSettings.Mind.ENEMY_BY_GROUPS_PMC_PLAYERS = true;
+                    _bot.Memory.IsPeace = false;
+                }
 
-                // put back old receiver
+                // - bot needs a new group
+                var botsGroupField = AccessTools.Field(typeof(BotMemoryClass), "botsGroup_0");
+                var deadBodiesController = AccessTools.Field(typeof(BotSpawner), "_deadBodiesController").GetValue(_bot.BotsController.BotSpawner) as DeadBodiesController;
+                var allPlayers = AccessTools.Field(typeof(BotSpawner), "_allPlayers").GetValue(_bot.BotsController.BotSpawner) as List<Player>;
+
+                List<BotOwner> list = new List<BotOwner>();
+                foreach (BotOwner item in _bot.BotsController.BotSpawner.method_4(_bot))
+                {
+                    list.Add(item);
+                }
+
+                BotZone zone = _bot.BotsController.BotSpawner.GetClosestZone(_bot.GetPlayer.Transform.position,out var zoneDist);
+                BotsGroup group = new BotsGroup(zone, _bot.BotsController.BotGame, _bot, list, deadBodiesController, allPlayers, false);
+                _bot.BotsGroup = group;
+                botsGroupField.SetValue(_bot.Memory, group);
+                // - ensure the brain manager of BigBrain is also cleared of the bot
+                try
+                {
+                    FieldInfo privateField = AccessTools.Field(typeof(BrainManager), "_instance");
+                    BrainManager brainManager = privateField.GetValue(null) as BrainManager;
+                    if (brainManager != null)
+                    {
+                        FieldInfo activatedBotsField = AccessTools.Field(typeof(BrainManager), "ActivatedBots"); // - future update 
+                        if (activatedBotsField != null)
+                        {
+                            Dictionary<IPlayer, BotOwner> activatedBots = activatedBotsField.GetValue(brainManager) as Dictionary<IPlayer, BotOwner>;
+                            if (activatedBots != null && activatedBots.ContainsKey(_bot.GetPlayer))
+                            {
+                                activatedBots.Remove(_bot.GetPlayer);
+                            }
+                        }
+                    }
+                } catch { }
+
+                // - add the old brain (harcoded to followerBoar)
+                _bot.Brain.BaseBrain = new GClass269(_bot, false);
+                // - add old agent back
+                string name = _bot.name + " " + _botRole.ToString();
+                _bot.Brain.Agent = new FollowerAIAgent<BotLogicDecision>(_bot.BotsController.AICoreController, _bot.Brain.BaseBrain, GClass459.ActionsList(_bot), _bot.gameObject, name, new Func<BotLogicDecision, GClass134>((BotLogicDecision decision)=>
+                {
+                    return GClass459.CreateNode(decision, _bot);
+                }));
+                // - put back old receiver
                 _bot.Receiver = new BotReceiver(_bot);
                 _bot.Receiver.Init();
 
-                // ensure the brain manager of BigBrain is also cleared of the bot
-                FieldInfo privateField = AccessTools.Field(typeof(BrainManager), "_instance");
-                BrainManager brainManager = privateField.GetValue(null) as BrainManager;
-                if(brainManager != null)
-                {
-                    FieldInfo activatedBotsField = AccessTools.Field(typeof(BrainManager), "ActivatedBots");
-                    Dictionary<IPlayer, BotOwner> activatedBots = activatedBotsField.GetValue(brainManager) as Dictionary<IPlayer, BotOwner>;
-                    if (activatedBots != null && activatedBots.ContainsKey(_bot.GetPlayer))
-                    {
-                        activatedBots.Remove(_bot.GetPlayer);
-                    }
-                }
-                
-                // put back old brain
-                _bot.Brain = new StandartBotBrain(_bot);
-                _bot.Brain.Activate();
-
-                _bot.BotsController.AICoreController.Activate();
+                _bot.BotState = EBotState.Active;
 
                 _bot.GetPlayer.Physical.Stamina.ForceMode = false;
                 _bot.GetPlayer.Physical.HandsStamina.ForceMode = false;

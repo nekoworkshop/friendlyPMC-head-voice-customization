@@ -349,8 +349,10 @@ namespace friendlyPMC.Components
                 if (distance <= 35f)
                 {
                     FakeShot(shootdir);
-                    if(distance <= 20f)
-                    Utils.Enemy.MakeEnemy(_owner, enemy);
+                    if(distance <= 20f) {
+                        EnemyInfo enInfo = Utils.Enemy.MakeEnemy(_owner, enemy);
+                        enInfo?.SetVisible(true);
+                    }
                 }
                 else if (
                     GClass301.CanShootToTarget(new ShootPointClass(_owner.GetPlayer.MainParts[BodyPartType.head].Position, 1f), enemy.PlayerBones.WeaponRoot.position, _owner.LookSensor.Mask) ||
@@ -393,7 +395,8 @@ namespace friendlyPMC.Components
                 if (distance <= 12f)
                 {
                     FakeShot(dir);
-                    Utils.Enemy.MakeEnemy(_owner, enemy);
+                    EnemyInfo enInfo = Utils.Enemy.MakeEnemy(_owner, enemy);
+                    enInfo?.SetVisible(true);
                 }
                 else
                 {
@@ -450,7 +453,7 @@ namespace friendlyPMC.Components
         }
         protected virtual void OnAddEnemy(IPlayer player)
         {
-            // how does the boss or BTR get added as Enemy here ?? - fix it
+            // how does the boss get added as Enemy here ?? - fix it
             if (
                 player != null && 
                 (
@@ -514,7 +517,6 @@ namespace friendlyPMC.Components
 
                 if(_owner.WeaponManager != null && _owner.WeaponManager.Grenades != null)
                     _owner.WeaponManager.Grenades.OnGrenadeThrowStart -= OnThrow;
-
             }
             catch(Exception ex)
             {

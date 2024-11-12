@@ -32,7 +32,6 @@ namespace friendlyPMC.Components
                 Modules.Logger.LogError(ex);
             }
         }
-
         public new void Dispose()
         {
             base.Dispose();

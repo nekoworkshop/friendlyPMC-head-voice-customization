@@ -1089,5 +1089,9 @@ namespace friendlyPMC.Components
             }
         }
 
+        public new void Dispose()
+        {
+            Destroy();
+        }
     }
 }
