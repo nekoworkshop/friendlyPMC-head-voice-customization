@@ -31,7 +31,7 @@ import { DialogueCallbacks } from "@spt/callbacks/DialogueCallbacks";
 
 import { MatchCallbacks } from "@spt/callbacks/MatchCallbacks";
 
-import { RandomUtil } from "@spt/utils/RandomUtil";
+import { ProbabilityObjectArray, RandomUtil } from "@spt/utils/RandomUtil";
 import { BotGenerator } from "@spt/generators/BotGenerator";
 import { IBotBase } from "@spt/models/eft/common/tables/IBotBase";
 import { BotGenerationDetails } from "@spt/models/spt/bots/BotGenerationDetails";
@@ -60,9 +60,13 @@ import { KnightChatBot } from "./KnightChat";
 import { IGetBodyResponseData } from "@spt/models/eft/httpResponse/IGetBodyResponseData";
 import { NotificationSendHelper } from "@spt/helpers/NotificationSendHelper";
 import { IGetFriendListDataResponse } from "@spt/models/eft/dialog/IGetFriendListDataResponse";
-import { IMatchGroupStatusResponse } from "@spt/models/eft/match/IMatchGroupStatusResponse";
 import { ItemTpl } from "@spt/models/enums/ItemTpl";
-import { objectCopy } from "./Utils";
+
+import { ImporterUtil } from "@spt/utils/ImporterUtil";
+
+import { PitQuestItemEventRouter, Quests } from "./Quests";
+import { QuestItemEventRouter } from "@spt/routers/item_events/QuestItemEventRouter";
+import { IPmcData } from "@spt/models/eft/common/IPmcData";
 
 class friendlyPMC {
 	config = {
@@ -81,11 +85,16 @@ class friendlyPMC {
 	LocaleService: LocaleService;
 	randomUtil: RandomUtil;
 	matchCallbacks: MatchCallbacks;
+	preSptModLoader: PreSptModLoader;
 
 	knightTrader: KnightTrader;
 	generalTrader: GeneralTrader;
 
 	profileHelper: ProfileHelper;
+
+	databaseService: DatabaseService;
+
+	questItemEvent: PitQuestItemEventRouter;
 
 	private _StringFormat(str: string, ...values: string[]) {
 		return str.replace(/\{(\d+)\}/g, function (match, number) {
@@ -93,29 +102,14 @@ class friendlyPMC {
 		});
 	}
 
-	originalgetPmcDifficultySettings: BotDifficultyHelper["getPmcDifficultySettings"];
-	originalgetBotDifficulty: BotController["getBotDifficulty"];
-
-	originalGenerateBot: BotGenerator["generateBot"];
-
 	botsTable: IBots;
 
-	private _questItems = {
-		"friendlypmc-knight-thieves-11": ["5d2bafbc86f77425243e8c3f", 3],
-		"friendlypmc-knight-thieves-21": ["5f4eab8b86f77431c626f1a4", 2],
-	};
+	mydb: { [key: string]: any };
+	myDBFolder = "";
 
-	private _questLocations = {
-		"friendlypmc-knight-thieves-11": ["tarkovstreets", "interchange"],
-		"friendlypmc-knight-thieves-21": ["tarkovstreets", "interchange"],
-	};
+	modFolderName: string;
 
-	private _pitItems = {
-		"5d2bafbc86f77425243e8c3f": ItemTpl.KEYCARD_TERRAGROUP_LABS_ACCESS,
-		"5f4eab8b86f77431c626f1a4": ItemTpl.INFO_INTELLIGENCE_FOLDER,
-	};
-
-	private _spawnQuestItems: { [key: string]: number } = {};
+	private _raidLocation: string;
 
 	preSptLoad(container: DependencyContainer) {
 		this.Logger = container.resolve("WinstonLogger");
@@ -125,8 +119,13 @@ class friendlyPMC {
 		this.matchCallbacks = container.resolve("MatchCallbacks");
 
 		const configServer = container.resolve<ConfigServer>("ConfigServer");
+
 		const databaseService = container.resolve<DatabaseService>("DatabaseService");
+		this.databaseService = databaseService;
+
 		const preSptModLoader: PreSptModLoader = container.resolve<PreSptModLoader>("PreSptModLoader");
+		this.preSptModLoader = preSptModLoader;
+
 		const imageRouter: ImageRouter = container.resolve("ImageRouter");
 		const traderConfig: ITraderConfig = configServer.getConfig<ITraderConfig>(ConfigTypes.TRADER);
 		const ragfairConfig = configServer.getConfig<IRagfairConfig>(ConfigTypes.RAGFAIR);
@@ -143,6 +142,7 @@ class friendlyPMC {
 		const staticRouterModService = container.resolve<StaticRouterModService>("StaticRouterModService");
 		const httpResponseUtil = container.resolve<HttpResponseUtil>("HttpResponseUtil");
 		const randomUtil = container.resolve<RandomUtil>("RandomUtil");
+
 		this.randomUtil = randomUtil;
 
 		// patch getPmcDifficultySettings as that is where we actually make the bots be friendly
@@ -185,7 +185,19 @@ class friendlyPMC {
 			{ frequency: "Always" }
 		);
 
-		// add a new router for handling items being given from the squad members
+		this.handleItemEvent = this.handleItemEvent.bind(this);
+		container.afterResolution(
+			"QuestItemEventRouter",
+			(_t, result: QuestItemEventRouter) => {
+				if (!this.originalHandleItemEvent) {
+					this.originalHandleItemEvent = result.handleItemEvent.bind(result);
+
+					result.handleItemEvent = this.handleItemEvent;
+				}
+			},
+			{ frequency: "Always" }
+		);
+
 		const PMCBOT: IPmcConfig = configServer.getConfig(ConfigTypes.PMC);
 
 		const PMCBOTVALUES = {
@@ -199,7 +211,7 @@ class friendlyPMC {
 			PMCBOTVALUES.convertIntoPmcChance[k].max = 0;
 		}
 
-		let groupStatus = null;
+		let groupStatus: { [key: string]: any } = {};
 
 		staticRouterModService.registerStaticRouter(
 			"friendlyPMC",
@@ -360,20 +372,8 @@ class friendlyPMC {
 						};
 					}
 
-					const userProfile = this.profileHelper.getPmcProfile(sessionID);
-
-					Object.keys(this._questItems).forEach(condition => {
-						const value = this._questItems[condition];
-
-						if (condition in userProfile.TaskConditionCounters == false) return;
-
-						this._spawnQuestItems[value[0]] = userProfile.TaskConditionCounters[condition].value || 0;
-						userProfile.Inventory.items.forEach(invItem => {
-							if (invItem._tpl === value[0]) {
-								this._spawnQuestItems[value[0]]++;
-							}
-						});
-					});
+					const pmc = this.profileHelper.getPmcProfile(sessionID);
+					this.questItemEvent.UpdateQuestProgress(pmc, info.Config);
 
 					return httpResponseUtil.emptyResponse();
 				}),
@@ -519,8 +519,8 @@ class friendlyPMC {
 					return httpResponseUtil.getBody(true);
 				}),
 				new RouteAction("/client/match/group/pitstatus", async (url: string, info: { Players: string[] }, sessionID: string, output: string) => {
-					clearTimeout(groupStatus);
-					groupStatus = setTimeout(() => {
+					clearTimeout(groupStatus[sessionID]);
+					groupStatus[sessionID] = setTimeout(() => {
 						const knightFriend = container.resolve<KnightChatBot>("KnightChatBot");
 						knightFriend.currentGroup = info.Players;
 					});
@@ -531,7 +531,11 @@ class friendlyPMC {
 			"custom-static-friendly-pmc"
 		);
 
+		container.register<PitQuestItemEventRouter>("PitQuestItemEventRouter", { useClass: PitQuestItemEventRouter }, { lifecycle: Lifecycle.Singleton });
+		this.questItemEvent = container.resolve<PitQuestItemEventRouter>("PitQuestItemEventRouter");
+
 		const folder = path.basename(path.dirname(__dirname));
+		this.modFolderName = folder;
 		this.knightTrader = new KnightTrader(folder, preSptModLoader, imageRouter, traderConfig, ragfairConfig, jsonUtil);
 		this.generalTrader = new GeneralTrader(folder, preSptModLoader, imageRouter, traderConfig, ragfairConfig, jsonUtil);
 	}
@@ -543,6 +547,7 @@ class friendlyPMC {
 		const PMCBOT = configServer.getConfig<IPmcConfig>(ConfigTypes.PMC);
 
 		const databaseServer = container.resolve<DatabaseServer>("DatabaseServer");
+		const databaseImporter = container.resolve<ImporterUtil>("ImporterUtil");
 
 		const tables = databaseServer.getTables();
 
@@ -573,9 +578,40 @@ class friendlyPMC {
 
 		this.botsTable = tables.bots;
 
+		this.myDBFolder = `${this.preSptModLoader.getModPath(this.modFolderName)}database/`;
+		this.mydb = databaseImporter.loadRecursive(this.myDBFolder);
+		this.questItemEvent.ModDB(this.mydb, this.myDBFolder);
+
+		// add new items to the database
+		for (let item of this.mydb.pit_items.items) {
+			tables.templates.items[item._id] = item;
+			let handbook = this.mydb.pit_items.handbook.find((i: any) => i.Id == item._id);
+			tables.templates.handbook.Items.push(handbook);
+			if (this.mydb.pit_items.locales) {
+				let lang = this.mydb.pit_items.locales.find((i: any) => i.Id == item._id);
+				if (lang.Clone) {
+					const locales = Object.values(tables.locales.global) as Record<string, string>[];
+					for (const locale of locales) {
+						locale[`${item._id} Name`] = locale[lang.Clone + " Name"];
+						locale[`${item._id} ShortName`] = locale[lang.Clone + " ShortName"];
+						locale[`${item._id} Description`] = locale[lang.Clone + " Description"];
+					}
+				}
+			}
+		}
+		for (const preset in this.mydb.globals.ItemPresets) {
+			tables.globals.ItemPresets[preset] = this.mydb.globals.ItemPresets[preset];
+			const locales = Object.values(tables.locales.global) as Record<string, string>[];
+			for (const locale of locales) {
+				locale[preset] = "";
+			}
+		}
+
+		// add new traders to the database
 		this.knightTrader.AddToDb(tables);
 		this.generalTrader.AddToDb(tables);
 
+		// add new chat bots to the database
 		container.register<KnightChatBot>("KnightChatBot", KnightChatBot, {
 			lifecycle: Lifecycle.Singleton,
 		});
@@ -584,11 +620,6 @@ class friendlyPMC {
 		knightBot.SetLang(this.lang);
 
 		container.resolve<DialogueController>("DialogueController").registerChatBot(knightBot);
-
-		Object.keys(this._pitItems).forEach(id => {
-			tables.templates.items[id] = objectCopy(tables.templates.items[this._pitItems[id]]);
-			tables.templates.items[id]._props.QuestItem = true;
-		});
 	}
 
 	private _makeFriendlyOrHostile(diff: Difficulty, pmcType: string) {
@@ -679,12 +710,15 @@ class friendlyPMC {
 		return diff;
 	}
 
+	originalgetPmcDifficultySettings: BotDifficultyHelper["getPmcDifficultySettings"];
 	/** Overwrite get difficulity method to patch the friendly/hostile settings */
 	getPmcDifficultySettings(pmcType: "bear" | "usec", difficulty: string, usecType: string, bearType: string): any {
 		const result = this.originalgetPmcDifficultySettings(pmcType, difficulty, usecType, bearType);
 
 		return this._makeFriendlyOrHostile(result, pmcType);
 	}
+
+	originalgetBotDifficulty: BotController["getBotDifficulty"];
 	/** Overwrite get difficulity method to patch the friendly/hostile settings */
 	getBotDifficulty(type: string, difficulty: string): any {
 		let result = this.originalgetBotDifficulty(type, difficulty);
@@ -692,6 +726,7 @@ class friendlyPMC {
 		return this._makeFriendlyOrHostile(result, type);
 	}
 
+	originalGenerateBot: BotGenerator["generateBot"];
 	generateBot(sessionId: string, bot: IBotBase, botJsonTemplate: IBotType, botGenerationDetails: BotGenerationDetails) {
 		const role = botGenerationDetails.role.toLowerCase();
 		// ensure goons have high chance of meds
@@ -703,36 +738,15 @@ class friendlyPMC {
 			};
 		}
 
-		// add quest items to Scavs if we are doing the thieves quest
-		const userProfile = this.profileHelper.getFullProfile(sessionId);
-
-		const pitItems = Object.keys(this._pitItems);
-		Object.keys(this._questLocations).forEach(condition => {
-			if (condition in userProfile.characters.pmc.TaskConditionCounters == false) return;
-			if (this._questLocations[condition].includes(userProfile.inraid.location.toLowerCase())) {
-				if (this._spawnQuestItems[this._questItems[condition][0]] < this._questItems[condition][1]) {
-					// special keycard
-					if (this._questItems[condition][0] == pitItems[0]) {
-						botJsonTemplate.inventory.items.Pockets[this._questItems[condition][0]] = 500;
-
-						botJsonTemplate.chances.equipment.TacticalVest = 100;
-						botJsonTemplate.inventory.items.TacticalVest[this._questItems[condition][0]] = 500;
-
-						this._spawnQuestItems[this._questItems[condition][0]]++;
-						// special intelligence folder
-					} else if (this._questItems[condition][0] == pitItems[1]) {
-						botJsonTemplate.chances.equipment.Backpack = 100;
-						botJsonTemplate.inventory.items.Backpack[this._questItems[condition][0]] = 500;
-
-						this._spawnQuestItems[this._questItems[condition][0]]++;
-					}
-				}
-			}
-		});
-
 		const result = this.originalGenerateBot(sessionId, bot, botJsonTemplate, botGenerationDetails);
 
 		return result;
+	}
+
+	originalHandleItemEvent: QuestItemEventRouter["handleItemEvent"];
+	handleItemEvent(eventAction: string, pmcData: IPmcData, body: any, sessionID: string) {
+		this.questItemEvent.handleItemEvent(eventAction, pmcData, body, sessionID);
+		return this.originalHandleItemEvent(eventAction, pmcData, body, sessionID);
 	}
 }
 

@@ -1,0 +1,52 @@
+[
+    {
+        "ZoneId": "reserv_launcher",
+        "ZoneName": "reserv_launcher",
+        "ZoneLocation": "RezervBase",
+        "ZoneType": "visit",
+        "FlareType": "",
+        "Position": {
+            "X": "8.159113",
+            "Y": "-3.241",
+            "Z": "-6.001561",
+            "W": "0"
+        },
+        "Rotation": {
+            "X": "0",
+            "Y": "0.1240344",
+            "Z": "0",
+            "W": "0.9922779"
+        },
+        "Scale": {
+            "X": "4",
+            "Y": "2.75",
+            "Z": "3",
+            "W": "0"
+        }
+    },
+    {
+        "ZoneId": "streets_launcher",
+        "ZoneName": "streets_launcher",
+        "ZoneLocation": "TarkovStreets",
+        "ZoneType": "visit",
+        "FlareType": "",
+        "Position": {
+            "X": "-213.1646",
+            "Y": "3.21707",
+            "Z": "300.8373",
+            "W": "0"
+        },
+        "Rotation": {
+            "X": "0",
+            "Y": "0",
+            "Z": "0",
+            "W": "1"
+        },
+        "Scale": {
+            "X": "1",
+            "Y": "4.75",
+            "Z": "1",
+            "W": "0"
+        }
+    }
+]

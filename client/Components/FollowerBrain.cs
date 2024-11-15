@@ -485,7 +485,6 @@ namespace friendlyPMC.Components
         {
             // remove this bot from being a follower
             BossPlayers.RemoveFollower(_owner, _boss);
-
             base.Dispose();
         }
 

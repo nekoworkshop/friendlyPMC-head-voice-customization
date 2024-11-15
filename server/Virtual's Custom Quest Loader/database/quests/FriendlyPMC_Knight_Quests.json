@@ -371,7 +371,7 @@
 		"type": "Elimination"
 	},
     "friendlypmc-knight-thieves" : {
-        "QuestName": "My Land",
+        "QuestName": "They robbed us!",
 		"_id": "friendlypmc-knight-thieves",
 		"acceptPlayerMessage": "friendlypmc-knight-thieves acceptPlayerMessage",
 		"canShowNotificationsInGame": true,
@@ -405,50 +405,65 @@
 				}
 			],
 			"AvailableForFinish": [
+                {
+                    "completeInSeconds": 0,
+                    "conditionType": "CounterCreator",
+                    "counter": {
+                      "conditions": [
+                        {
+                          "conditionType": "VisitPlace",
+                          "dynamicLocale": false,
+                          "id": "5e2f9b7c1a4d6e8b12345690",
+                          "target": "reserv_launcher",
+                          "value": 1
+                        }
+                      ],
+                      "id": "64f1a2b3c8d9e0f123456781"
+                    },
+                    "doNotResetIfCounterCompleted": false,
+                    "dynamicLocale": false,
+                    "globalQuestCounterId": "",
+                    "id": "friendlypmc-knight-thieves-1",
+                    "index": 0,
+                    "isOptional" : true,
+                    "parentId": "",
+                    "type": "Discover",
+                    "value": 1,
+                    "visibilityConditions": []
+                },
+                {
+                    "completeInSeconds": 0,
+                    "conditionType": "CounterCreator",
+                    "counter": {
+                      "conditions": [
+                        {
+                          "conditionType": "VisitPlace",
+                          "dynamicLocale": false,
+                          "id": "5a7b3c1d2e9f8a4b12345692",
+                          "target": "streets_launcher",
+                          "value": 1
+                        }
+                      ],
+                      "id": "60d4e5a1b2c3f8d912345673"
+                    },
+                    "doNotResetIfCounterCompleted": false,
+                    "dynamicLocale": false,
+                    "globalQuestCounterId": "",
+                    "id": "friendlypmc-knight-thieves-2",
+                    "index": 1,
+                    "isOptional" : true,
+                    "parentId": "",
+                    "type": "Discover",
+                    "value": 1,
+                    "visibilityConditions": []
+                },
 				{
                     "conditionType": "FindItem",
                     "countInRaid": false,
                     "dogtagLevel": 0,
                     "dynamicLocale": false,
                     "globalQuestCounterId": "",
-                    "id": "friendlypmc-knight-thieves-1",
-                    "index": 0,
-                    "isEncoded": false,
-                    "maxDurability": 100,
-                    "minDurability": 0,
-                    "onlyFoundInRaid": true,
-                    "parentId": "",
-                    "target": [
-                      "5c94bbff86f7747ee735c08f"
-                    ],
-                    "value": 3,
-                    "visibilityConditions": []
-                },
-                {
-                    "conditionType": "HandoverItem",
-                    "dogtagLevel": 0,
-                    "dynamicLocale": false,
-                    "globalQuestCounterId": "",
-                    "id": "friendlypmc-knight-thieves-11",
-                    "index": 1,
-                    "isEncoded": false,
-                    "maxDurability": 100,
-                    "minDurability": 0,
-                    "onlyFoundInRaid": true,
-                    "parentId": "",
-                    "target": [
-                      "5c94bbff86f7747ee735c08f"
-                    ],
-                    "value": 3,
-                    "visibilityConditions": []
-                },
-                {
-                    "conditionType": "FindItem",
-                    "countInRaid": false,
-                    "dogtagLevel": 0,
-                    "dynamicLocale": false,
-                    "globalQuestCounterId": "",
-                    "id": "friendlypmc-knight-thieves-2",
+                    "id": "friendlypmc-knight-thieves-3",
                     "index": 2,
                     "isEncoded": false,
                     "maxDurability": 100,
@@ -456,9 +471,9 @@
                     "onlyFoundInRaid": true,
                     "parentId": "",
                     "target": [
-                      "5c12613b86f7743bbe2c3f76"
+                      "64e3b0f4e3b6f5a4a37e8c1d"
                     ],
-                    "value": 2,
+                    "value": 1,
                     "visibilityConditions": []
                 },
                 {
@@ -466,7 +481,7 @@
                     "dogtagLevel": 0,
                     "dynamicLocale": false,
                     "globalQuestCounterId": "",
-                    "id": "friendlypmc-knight-thieves-21",
+                    "id": "friendlypmc-knight-thieves-4",
                     "index": 3,
                     "isEncoded": false,
                     "maxDurability": 100,
@@ -474,9 +489,9 @@
                     "onlyFoundInRaid": true,
                     "parentId": "",
                     "target": [
-                      "5c12613b86f7743bbe2c3f76"
+                      "5d2bafbc86f77425243e8c3f"
                     ],
-                    "value": 2,
+                    "value": 1,
                     "visibilityConditions": []
                 }
 			],

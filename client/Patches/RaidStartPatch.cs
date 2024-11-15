@@ -64,7 +64,7 @@ namespace friendlyPMC.Patches
                                         isGoonQuest = true;
                                     }
                                 }
-                                //Modules.Logger.LogInfo("settings.LocationId" + settings.LocationId);
+ 
                                 if (!friendlyPMC.squadSpawn.Value && isGoonQuest)
                                 {
                                     Utils.Utils.FlagSet("questGoons", true);

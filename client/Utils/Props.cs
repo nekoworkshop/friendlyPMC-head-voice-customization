@@ -67,8 +67,7 @@ namespace friendlyPMC.Utils
                 // order is important
                 new List<string> {
                     "friendlypmc-knight-competition",
-                    "friendlypmc-knight-my-land",
-                    "friendlypmc-knight-thieves"
+                    "friendlypmc-knight-my-land"
                 }
             }
         };
@@ -90,14 +89,6 @@ namespace friendlyPMC.Utils
                     "bigmap"
                 }
             },
-            {
-                "friendlypmc-knight-thieves",
-                new List<string> {
-                    "tarkovStreets",
-                    "interchange",
-                    "bigmap"
-                }
-            }
         };
 
         public static Dictionary<string, List<string>> QuestsTeamConditions = new Dictionary<string, List<string>>{
