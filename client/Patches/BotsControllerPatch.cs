@@ -796,10 +796,35 @@ namespace friendlyPMC.Patches
             if (boss == WildSpawnType.bossKnight)
             {
                 bossAlly = await GetBossProfile(player,WildSpawnType.bossKnight);
+                if(Utils.Utils.FlagGet("spawnBigPipe"))
+                {
+                    BotCreationDataClass bigPipe = await GetBossProfile(player, WildSpawnType.followerBigPipe);
+                    bossAlly.AddProfiles(bigPipe.Profiles);
+                }
+                if(Utils.Utils.FlagGet("spawnBirdEye"))
+                {
+                    BotCreationDataClass birdEye = await GetBossProfile(player, WildSpawnType.followerBirdEye);
+                    bossAlly.AddProfiles(birdEye.Profiles);
+                }
 
-                //bossFollowers.Add(new IProfileData(side, WildSpawnType.followerBigPipe, BotDifficulty.hard, 0f, @params));
-                //bossFollowers.Add(new IProfileData(side, WildSpawnType.followerBirdEye, BotDifficulty.impossible, 0f, @params));
-
+            } 
+            else if( boss == WildSpawnType.followerBigPipe)
+            {
+                bossAlly = await GetBossProfile(player, WildSpawnType.followerBigPipe);
+                if(Utils.Utils.FlagGet("spawnBirdEye"))
+                {
+                    BotCreationDataClass birdEye = await GetBossProfile(player, WildSpawnType.followerBirdEye);
+                    bossAlly.AddProfiles(birdEye.Profiles);
+                }
+            }
+            else if (boss == WildSpawnType.followerBirdEye)
+            {
+                bossAlly = await GetBossProfile(player, WildSpawnType.followerBirdEye);
+                if(Utils.Utils.FlagGet("spawnBigPipe"))
+                {
+                    BotCreationDataClass bigPipe = await GetBossProfile(player, WildSpawnType.followerBigPipe);
+                    bossAlly.AddProfiles(bigPipe.Profiles);
+                }
             }
 
             if (bossAlly == null) return;
@@ -1458,7 +1483,7 @@ namespace friendlyPMC.Patches
                 }).Forget();
 
             } 
-            else if(Utils.Utils.FlagGet("spawnKnight"))
+            else if(Utils.Utils.FlagGet("spawnKnight") || Utils.Utils.FlagGet("spawnBigPipe") || Utils.Utils.FlagGet("spawnBirdEye"))
             {
                 Modules.Logger.LogInfo("Start Boss Ally Spawn");
                 
@@ -1476,7 +1501,20 @@ namespace friendlyPMC.Patches
                     {
                         try
                         {
-                            bossSpawners.Add(BotsControllerPatch.Instance.SpawnBossFollower(playerBoss));
+                            WildSpawnType type = WildSpawnType.bossKnight;
+                            if(!Utils.Utils.FlagGet("spawnKnight"))
+                            {
+                                if(Utils.Utils.FlagGet("spawnBigPipe"))
+                                {
+                                    type = WildSpawnType.followerBigPipe;
+                                } 
+                                else if(Utils.Utils.FlagGet("spawnBirdEye"))
+                                {
+                                    type = WildSpawnType.followerBirdEye;
+                                }
+                            }
+
+                            bossSpawners.Add(BotsControllerPatch.Instance.SpawnBossFollower(playerBoss,type));
                         }
                         catch (Exception e)
                         {

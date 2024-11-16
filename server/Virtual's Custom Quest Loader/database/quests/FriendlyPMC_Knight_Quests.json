@@ -360,7 +360,24 @@
 					"target": "friendlypmc-knight",
 					"type": "TraderStanding",
 					"value": "0.1"
-				}
+				},
+                {
+                    "findInRaid": true,
+                    "id": "friendlypmc-knight-my-land-reward-3",
+                    "index": 2,
+                    "items": [
+                      {
+                        "_id": "5f92a7bce6193c45012ab7f4",
+                        "_tpl": "5696686a4bdc2da3298b456a",
+                        "upd": {
+                          "StackObjectsCount": 2000
+                        }
+                      }
+                    ],
+                    "target": "5f92a7bce6193c45012ab7f4",
+                    "type": "Item",
+                    "value": "2000"
+                }
 			]
 		},
 		"secretQuest": false,
@@ -405,58 +422,6 @@
 				}
 			],
 			"AvailableForFinish": [
-                {
-                    "completeInSeconds": 0,
-                    "conditionType": "CounterCreator",
-                    "counter": {
-                      "conditions": [
-                        {
-                          "conditionType": "VisitPlace",
-                          "dynamicLocale": false,
-                          "id": "5e2f9b7c1a4d6e8b12345690",
-                          "target": "reserv_launcher",
-                          "value": 1
-                        }
-                      ],
-                      "id": "64f1a2b3c8d9e0f123456781"
-                    },
-                    "doNotResetIfCounterCompleted": false,
-                    "dynamicLocale": false,
-                    "globalQuestCounterId": "",
-                    "id": "friendlypmc-knight-thieves-1",
-                    "index": 0,
-                    "isOptional" : true,
-                    "parentId": "",
-                    "type": "Discover",
-                    "value": 1,
-                    "visibilityConditions": []
-                },
-                {
-                    "completeInSeconds": 0,
-                    "conditionType": "CounterCreator",
-                    "counter": {
-                      "conditions": [
-                        {
-                          "conditionType": "VisitPlace",
-                          "dynamicLocale": false,
-                          "id": "5a7b3c1d2e9f8a4b12345692",
-                          "target": "streets_launcher",
-                          "value": 1
-                        }
-                      ],
-                      "id": "60d4e5a1b2c3f8d912345673"
-                    },
-                    "doNotResetIfCounterCompleted": false,
-                    "dynamicLocale": false,
-                    "globalQuestCounterId": "",
-                    "id": "friendlypmc-knight-thieves-2",
-                    "index": 1,
-                    "isOptional" : true,
-                    "parentId": "",
-                    "type": "Discover",
-                    "value": 1,
-                    "visibilityConditions": []
-                },
 				{
                     "conditionType": "FindItem",
                     "countInRaid": false,
@@ -464,7 +429,7 @@
                     "dynamicLocale": false,
                     "globalQuestCounterId": "",
                     "id": "friendlypmc-knight-thieves-3",
-                    "index": 2,
+                    "index": 0,
                     "isEncoded": false,
                     "maxDurability": 100,
                     "minDurability": 0,
@@ -473,6 +438,58 @@
                     "target": [
                       "64e3b0f4e3b6f5a4a37e8c1d"
                     ],
+                    "value": 1,
+                    "visibilityConditions": []
+                },
+                {
+                    "completeInSeconds": 0,
+                    "conditionType": "CounterCreator",
+                    "counter": {
+                      "conditions": [
+                        {
+                          "conditionType": "VisitPlace",
+                          "dynamicLocale": false,
+                          "id": "friendlypmc-knight-thieves-11",
+                          "target": "reserv_launcher",
+                          "value": 1
+                        }
+                      ],
+                      "id": "friendlypmc-knight-thieves-12"
+                    },
+                    "doNotResetIfCounterCompleted": false,
+                    "dynamicLocale": false,
+                    "globalQuestCounterId": "",
+                    "id": "friendlypmc-knight-thieves-1",
+                    "index": 1,
+                    "isOptional" : true,
+                    "parentId": "friendlypmc-knight-thieves-3",
+                    "type": "Exploration",
+                    "value": 1,
+                    "visibilityConditions": []
+                },
+                {
+                    "completeInSeconds": 0,
+                    "conditionType": "CounterCreator",
+                    "counter": {
+                      "conditions": [
+                        {
+                          "conditionType": "VisitPlace",
+                          "dynamicLocale": false,
+                          "id": "friendlypmc-knight-thieves-21",
+                          "target": "streets_launcher",
+                          "value": 1
+                        }
+                      ],
+                      "id": "friendlypmc-knight-thieves-22"
+                    },
+                    "doNotResetIfCounterCompleted": false,
+                    "dynamicLocale": false,
+                    "globalQuestCounterId": "",
+                    "id": "friendlypmc-knight-thieves-2",
+                    "index": 2,
+                    "isOptional" : true,
+                    "parentId": "friendlypmc-knight-thieves-3",
+                    "type": "Exploration",
                     "value": 1,
                     "visibilityConditions": []
                 },
@@ -489,7 +506,7 @@
                     "onlyFoundInRaid": true,
                     "parentId": "",
                     "target": [
-                      "5d2bafbc86f77425243e8c3f"
+                      "64e3b0f4e3b6f5a4a37e8c1d"
                     ],
                     "value": 1,
                     "visibilityConditions": []
@@ -515,14 +532,14 @@
 					"id": "friendlypmc-knight-thieves-reward-1",
 					"index": 0,
 					"type": "Experience",
-					"value": "35000"
+					"value": "15000"
 				},
 				{
 					"id": "friendlypmc-knight-thieves-reward-2",
 					"index": 1,
 					"target": "friendlypmc-knight",
 					"type": "TraderStanding",
-					"value": "0.2"
+					"value": "0.1"
 				},
                 {
                     "findInRaid": true,
@@ -533,13 +550,13 @@
                         "_id": "5f92a7bce6193c45012ab7f4",
                         "_tpl": "5696686a4bdc2da3298b456a",
                         "upd": {
-                          "StackObjectsCount": 4000
+                          "StackObjectsCount": 5000
                         }
                       }
                     ],
                     "target": "5f92a7bce6193c45012ab7f4",
                     "type": "Item",
-                    "value": "4000"
+                    "value": "5000"
                 }
 			]
 		},
@@ -549,5 +566,323 @@
 		"successMessageText": "friendlypmc-knight-thieves successMessageText",
 		"traderId": "friendlypmc-knight",
 		"type": "PickUp"
+    },
+    "friendlypmc-knight-payback01" :{
+        "QuestName": "Badge Bandit",
+		"_id": "friendlypmc-knight-payback01",
+		"acceptPlayerMessage": "friendlypmc-knight-payback01 acceptPlayerMessage",
+		"canShowNotificationsInGame": true,
+		"changeQuestMessageText": "friendlypmc-knight-payback01 changeQuestMessageText",
+		"completePlayerMessage": "friendlypmc-knight-payback01 completePlayerMessage",
+		"conditions": {
+			"AvailableForStart": [
+				{
+					"compareMethod": ">=",
+					"conditionType": "Level",
+					"dynamicLocale": false,
+					"globalQuestCounterId": "",
+					"id": "friendlypmc-knight-payback01-req-1",
+					"index": 0,
+					"parentId": "",
+					"value": 20,
+					"visibilityConditions": []
+				},
+				{
+					"availableAfter": 0,
+					"conditionType": "Quest",
+					"dispersion": 0,
+					"dynamicLocale": false,
+					"globalQuestCounterId": "",
+					"id": "friendlypmc-knight-payback01-req-2",
+					"index": 0,
+					"parentId": "",
+					"status": [4],
+					"target": "friendlypmc-knight-thieves",
+					"visibilityConditions": []
+				}
+			],
+            "AvailableForFinish" : [
+                {
+					"completeInSeconds": 0,
+					"conditionType": "CounterCreator",
+					"counter": {
+						"conditions": [
+							{
+								"bodyPart": [],
+								"compareMethod": ">=",
+								"conditionType": "Kills",
+								"daytime": {
+									"from": 0,
+									"to": 0
+								},
+								"distance": {
+									"compareMethod": ">=",
+									"value": 0
+								},
+								"dynamicLocale": false,
+								"enemyEquipmentExclusive": [],
+								"enemyEquipmentInclusive": [],
+								"enemyHealthEffects": [],
+								"id": "friendlypmc-knight-payback01-kill",
+								"resetOnSessionEnd": false,
+								"savageRole": [
+									"bossKolontay"
+								],
+								"target": "Savage",
+								"value": 1,
+								"weapon": [],
+								"weaponCaliber": [],
+								"weaponModsExclusive": [],
+								"weaponModsInclusive": []
+							},
+							{
+								"conditionType": "Location",
+								"dynamicLocale": false,
+								"id": "friendlypmc-knight-payback01-location",
+								"target": ["TarkovStreets"]
+							}
+						],
+						"id": "friendlypmc-knight-payback01-cond"
+					},
+					"doNotResetIfCounterCompleted": false,
+					"dynamicLocale": false,
+					"globalQuestCounterId": "",
+					"id": "friendlypmc-knight-payback01-target",
+					"index": 0,
+					"oneSessionOnly": false,
+					"parentId": "",
+					"type": "Elimination",
+					"value": 1,
+					"visibilityConditions": []
+				}
+            ],
+            "Fail": [
+				{
+					"completeInSeconds": 0,
+					"conditionType": "CounterCreator",
+					"counter": {
+						"conditions": [
+							{
+								"conditionType": "ExitStatus",
+								"dynamicLocale": false,
+								"id": "friendlypmc-knight-payback01-fail-1",
+								"status": ["Killed", "Left", "MissingInAction"]
+							},
+							{
+								"conditionType": "Location",
+								"dynamicLocale": false,
+								"id": "ffriendlypmc-knight-payback01-fail-2",
+								"target": ["TarkovStreets"]
+							}
+						],
+						"id": "friendlypmc-knight-payback01-fail-cond"
+					},
+					"doNotResetIfCounterCompleted": false,
+					"dynamicLocale": false,
+					"globalQuestCounterId": "",
+					"id": "friendlypmc-knight-payback01-fail",
+					"index": 0,
+					"oneSessionOnly": false,
+					"parentId": "",
+					"type": "Completion",
+					"value": 1,
+					"visibilityConditions": []
+				}
+			]
+        },
+        "rewards": {
+			"Fail": [],
+			"Started": [],
+			"Success": [
+				{
+					"id": "friendlypmc-knight-payback01-reward-1",
+					"index": 0,
+					"type": "Experience",
+					"value": "35000"
+				},
+				{
+					"id": "friendlypmc-knight-payback01-reward-2",
+					"index": 1,
+					"target": "friendlypmc-knight",
+					"type": "TraderStanding",
+					"value": "0.2"
+				}
+			]
+		},
+        "declinePlayerMessage": "friendlypmc-knight-payback01 declinePlayerMessage",
+		"description": "friendlypmc-knight-payback01 description",
+		"failMessageText": "friendlypmc-knight-payback01 failMessageText",
+		"image": "/files/quest/icon/KnightThieves.jpg",
+		"instantComplete": false,
+		"isKey": false,
+		"location": "any",
+		"name": "friendlypmc-knight-payback01 name",
+		"note": "friendlypmc-knight-payback01 note",
+		"restartable": true,
+        "secretQuest": false,
+		"side": "Pmc",
+		"startedMessageText": "friendlypmc-knight-payback01 startedMessageText",
+		"successMessageText": "friendlypmc-knight-payback01 successMessageText",
+		"traderId": "friendlypmc-knight",
+		"type": "Elimination"
+    },
+    "friendlypmc-knight-payback02" :{
+        "QuestName": "Badge Bandit",
+		"_id": "friendlypmc-knight-payback02",
+		"acceptPlayerMessage": "friendlypmc-knight-payback02 acceptPlayerMessage",
+		"canShowNotificationsInGame": true,
+		"changeQuestMessageText": "friendlypmc-knight-payback02 changeQuestMessageText",
+		"completePlayerMessage": "friendlypmc-knight-payback02 completePlayerMessage",
+		"conditions": {
+			"AvailableForStart": [
+				{
+					"compareMethod": ">=",
+					"conditionType": "Level",
+					"dynamicLocale": false,
+					"globalQuestCounterId": "",
+					"id": "friendlypmc-knight-payback02-req-1",
+					"index": 0,
+					"parentId": "",
+					"value": 20,
+					"visibilityConditions": []
+				},
+				{
+					"availableAfter": 0,
+					"conditionType": "Quest",
+					"dispersion": 0,
+					"dynamicLocale": false,
+					"globalQuestCounterId": "",
+					"id": "friendlypmc-knight-payback02-req-2",
+					"index": 0,
+					"parentId": "",
+					"status": [4],
+					"target": "friendlypmc-knight-thieves",
+					"visibilityConditions": []
+				}
+			],
+            "AvailableForFinish" : [
+                {
+					"completeInSeconds": 0,
+					"conditionType": "CounterCreator",
+					"counter": {
+						"conditions": [
+							{
+								"bodyPart": [],
+								"compareMethod": ">=",
+								"conditionType": "Kills",
+								"daytime": {
+									"from": 0,
+									"to": 0
+								},
+								"distance": {
+									"compareMethod": ">=",
+									"value": 0
+								},
+								"dynamicLocale": false,
+								"enemyEquipmentExclusive": [],
+								"enemyEquipmentInclusive": [],
+								"enemyHealthEffects": [],
+								"id": "friendlypmc-knight-payback02-kill",
+								"resetOnSessionEnd": false,
+								"savageRole": [
+									"bossGluhar"
+								],
+								"target": "Savage",
+								"value": 1,
+								"weapon": [],
+								"weaponCaliber": [],
+								"weaponModsExclusive": [],
+								"weaponModsInclusive": []
+							},
+							{
+								"conditionType": "Location",
+								"dynamicLocale": false,
+								"id": "friendlypmc-knight-payback02-location",
+								"target": ["RezervBase"]
+							}
+						],
+						"id": "friendlypmc-knight-payback02-cond"
+					},
+					"doNotResetIfCounterCompleted": false,
+					"dynamicLocale": false,
+					"globalQuestCounterId": "",
+					"id": "friendlypmc-knight-payback02-target",
+					"index": 0,
+					"oneSessionOnly": false,
+					"parentId": "",
+					"type": "Elimination",
+					"value": 1,
+					"visibilityConditions": []
+				}
+            ],
+            "Fail": [
+				{
+					"completeInSeconds": 0,
+					"conditionType": "CounterCreator",
+					"counter": {
+						"conditions": [
+							{
+								"conditionType": "ExitStatus",
+								"dynamicLocale": false,
+								"id": "friendlypmc-knight-payback02-fail-1",
+								"status": ["Killed", "Left", "MissingInAction"]
+							},
+							{
+								"conditionType": "Location",
+								"dynamicLocale": false,
+								"id": "ffriendlypmc-knight-payback02-fail-2",
+								"target": ["RezervBase"]
+							}
+						],
+						"id": "friendlypmc-knight-payback02-fail-cond"
+					},
+					"doNotResetIfCounterCompleted": false,
+					"dynamicLocale": false,
+					"globalQuestCounterId": "",
+					"id": "friendlypmc-knight-payback02-fail",
+					"index": 0,
+					"oneSessionOnly": false,
+					"parentId": "",
+					"type": "Completion",
+					"value": 1,
+					"visibilityConditions": []
+				}
+			]
+        },
+        "rewards": {
+			"Fail": [],
+			"Started": [],
+			"Success": [
+				{
+					"id": "friendlypmc-knight-payback02-reward-1",
+					"index": 0,
+					"type": "Experience",
+					"value": "35000"
+				},
+				{
+					"id": "friendlypmc-knight-payback02-reward-2",
+					"index": 1,
+					"target": "friendlypmc-knight",
+					"type": "TraderStanding",
+					"value": "0.2"
+				}
+			]
+		},
+        "declinePlayerMessage": "friendlypmc-knight-payback02 declinePlayerMessage",
+		"description": "friendlypmc-knight-payback02 description",
+		"failMessageText": "friendlypmc-knight-payback02 failMessageText",
+		"image": "/files/quest/icon/KnightThieves.jpg",
+		"instantComplete": false,
+		"isKey": false,
+		"location": "any",
+		"name": "friendlypmc-knight-payback02 name",
+		"note": "friendlypmc-knight-payback02 note",
+		"restartable": true,
+        "secretQuest": false,
+		"side": "Pmc",
+		"startedMessageText": "friendlypmc-knight-payback02 startedMessageText",
+		"successMessageText": "friendlypmc-knight-payback02 successMessageText",
+		"traderId": "friendlypmc-knight",
+		"type": "Elimination"
     }
 }

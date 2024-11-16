@@ -64,7 +64,7 @@ import { ItemTpl } from "@spt/models/enums/ItemTpl";
 
 import { ImporterUtil } from "@spt/utils/ImporterUtil";
 
-import { PitQuestItemEventRouter, Quests } from "./Quests";
+import { PitQuestItemEventRouter } from "./Quests";
 import { QuestItemEventRouter } from "@spt/routers/item_events/QuestItemEventRouter";
 import { IPmcData } from "@spt/models/eft/common/IPmcData";
 
@@ -373,7 +373,6 @@ class friendlyPMC {
 					}
 
 					const pmc = this.profileHelper.getPmcProfile(sessionID);
-					this.questItemEvent.UpdateQuestProgress(pmc, info.Config);
 
 					return httpResponseUtil.emptyResponse();
 				}),
@@ -606,6 +605,8 @@ class friendlyPMC {
 				locale[preset] = "";
 			}
 		}
+
+		this.questItemEvent.postDB();
 
 		// add new traders to the database
 		this.knightTrader.AddToDb(tables);

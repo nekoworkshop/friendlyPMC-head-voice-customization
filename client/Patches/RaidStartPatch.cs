@@ -47,7 +47,6 @@ namespace friendlyPMC.Patches
 
                 foreach (var item in Utils.Props.Quests)
                 {
-                    bool found = false;
                     foreach (var item1 in item.Value)
                     {
                         if(item1 == quest.Id)
@@ -76,16 +75,19 @@ namespace friendlyPMC.Patches
                                     {
                                         Utils.Utils.FlagSet("spawnKnight", true);  
                                     }
+                                    else if(item.Key == "BigPipe")
+                                    {
+                                        Utils.Utils.FlagSet("spawnBigPipe", true);  
+                                    }
+                                    else if(item.Key == "BirdEye")
+                                    {
+                                        Utils.Utils.FlagSet("spawnBirdEye", true);  
+                                    }
 
-                                    found = true;
                                     break;
                                 }
                             }   
                         }
-                    }
-                    if(found)
-                    {
-                        break;
                     }
                 }
             });

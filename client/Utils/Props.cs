@@ -67,7 +67,16 @@ namespace friendlyPMC.Utils
                 // order is important
                 new List<string> {
                     "friendlypmc-knight-competition",
-                    "friendlypmc-knight-my-land"
+                    "friendlypmc-knight-my-land",
+                    "friendlypmc-knight-payback01",
+                    "friendlypmc-knight-payback02"
+                }
+            },
+            {
+                "BigPipe",
+                new List<string> {
+                    "friendlypmc-knight-payback01",
+                    "friendlypmc-knight-payback02"
                 }
             }
         };
@@ -89,13 +98,33 @@ namespace friendlyPMC.Utils
                     "bigmap"
                 }
             },
+            {
+                "friendlypmc-knight-payback01",
+                new List<string> {
+                    "tarkovstreets"
+                }
+            },
+            {
+                "friendlypmc-knight-payback02",
+                new List<string> {
+                    "rezervbase"
+                }
+            }
         };
 
         public static Dictionary<string, List<string>> QuestsTeamConditions = new Dictionary<string, List<string>>{
             {
                 "Knight",
                 new List<string> {
-                    
+                    "friendlypmc-knight-payback01-target",
+                    "friendlypmc-knight-payback02-target"
+                }
+            },
+            {
+                "BigPipe",
+                new List<string> {
+                    "friendlypmc-knight-payback01-target",
+                    "friendlypmc-knight-payback02-target"
                 }
             }
         };

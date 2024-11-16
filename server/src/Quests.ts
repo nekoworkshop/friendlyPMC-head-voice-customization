@@ -11,11 +11,20 @@ import { RandomUtil } from "@spt/utils/RandomUtil";
 
 export const Quests = {
 	"friendlypmc-knight-thieves": {
-		itemLocation: ["RezervBase", "TarkovStreets"],
+		itemLocation: ["TarkovStreets", "RezervBase"],
 		itemId: "64e3b0f4e3b6f5a4a37e8c1d",
 		itemContainer: {
 			RezervBase: ["00975"],
-			TarkovStreets: ["container_City_Design_Main_00064", "container_City_Design_Main_00019", "container_City_Design_Main_00062","container_City_Design_Main_00061"],
+			TarkovStreets: ["container_City_Design_Main_00017", "container_City_Design_Main_00020", "container_City_Design_Main_00022"],
+		},
+		itemCondition: "friendlypmc-knight-thieves-4",
+		questDisable: {
+			"friendlypmc-knight-payback01": {
+				itemLocation: "RezervBase",
+			},
+			"friendlypmc-knight-payback02": {
+				itemLocation: "TarkovStreets",
+			},
 		},
 	},
 };
@@ -25,8 +34,6 @@ export class PitQuestItemEventRouter extends ItemEventRouterDefinition {
 	mydb: { [key: string]: any } = {};
 	mydbplace = "";
 
-	private _questsWithItems: string[] = ["friendlypmc-knight-thieves"];
-
 	constructor(@inject("EventOutputHolder") protected eventOutputHolder: EventOutputHolder, @inject("DatabaseService") protected databaseService: DatabaseService, @inject("RandomUtil") protected randomUtil: RandomUtil) {
 		super();
 	}
@@ -35,62 +42,169 @@ export class PitQuestItemEventRouter extends ItemEventRouterDefinition {
 		return [new HandledRoute("QuestAccept", false), new HandledRoute("QuestComplete", false)];
 	}
 
+	public postDB(pmcData: IPmcData) {
+		if (!this.mydb?.progress) return;
+
+		for (let k in this.mydb.progress) {
+			let q = this.mydb.progress[k];
+			// remove quests that have been disabled
+			if (q.disabled) {
+				let traders = this.databaseService.getTraders();
+				for (let k in traders) {
+					let trader = traders[k];
+					let found = false;
+
+					if (trader.questassort && trader.questassort.success) {
+						for (let i in trader.questassort.success) {
+							let quest = trader.questassort.success[i];
+							if (quest == k) {
+								delete trader.questassort.success[i];
+								found = true;
+								break;
+							}
+						}
+					}
+
+					if (found) break;
+				}
+			}
+			// ensure items that are for dynamic quests are added to their respective map containers;
+			if (q.itemId) {
+				let hasItem = false;
+				// - item already exists in inventory
+				if (pmcData.Inventory.items.find(item => item._tpl == q.itemId)) {
+					hasItem = true;
+					// - item was already handed over
+				} else if (Quests[k]?.itemCondition) {
+					Object.keys(pmcData.TaskConditionCounters || {}).forEach(key => {
+						if (key == Quests[k].itemCondition) {
+							hasItem = true;
+						}
+					});
+				}
+
+				if (hasItem) return;
+
+				let mapData = this.databaseService.getLocation(q.itemLocation.toLowerCase());
+				mapData.staticContainers.staticForced = mapData.staticContainers.staticForced || [];
+				mapData.staticContainers.staticForced.push({ containerId: q.itemContainer, itemTpl: q.itemId });
+				mapData.staticContainers.staticContainers.forEach(container => {
+					if (container.template.Id == q.itemContainer) {
+						container.probability = 1;
+					}
+				});
+			}
+		}
+	}
+
 	public override async handleItemEvent(eventAction: string, pmcData: IPmcData, body: any, sessionID: string): Promise<IItemEventRouterResponse> {
 		if (eventAction == "QuestAccept") {
 			const info: IAcceptQuestRequestData = body;
 
-			this._questsWithItems.forEach(quest => {
-				if (info.qid == quest) {
+			// do updates on quests with dynamic objectives
+			Object.keys(Quests).forEach(key => {
+				let q = Quests[key];
+				if (info.qid == key) {
 					this.mydb.progress = this.mydb.progress || {};
-					let loc = this.randomUtil.getArrayValue(Quests[info.qid].itemLocation);
-					this.mydb.progress["friendlypmc-knight-thieves"] = {
-						itemLocation: loc,
-						itemId: Quests["friendlypmc-knight-thieves"].itemId,
-						itemContainer: this.randomUtil.getArrayValue(Quests[info.qid].itemContainer[loc]),
-					};
+					// - if quest is an item quest, decide where to put the item
+					if (q.itemLocation) {
+						let loc: string = this.randomUtil.getArrayValue(q.itemLocation);
+						this.mydb.progress[key] = {
+							itemLocation: loc,
+							itemId: q.itemId,
+							itemContainer: this.randomUtil.getArrayValue(q.itemContainer[loc]),
+						};
 
-					fs.writeFileSync(this.mydbplace + "progress.json", JSON.stringify(this.mydb.progress, null, 4));
+						// -- check if user already has the item
+						if (!pmcData.Inventory.items.find(item => item._tpl == q.itemId)) {
+							// -- update location container to spawn item
+							let mapData = this.databaseService.getLocation(loc.toLowerCase());
+							if (mapData) {
+								mapData.staticContainers.staticForced = mapData.staticContainers.staticForced || [];
+								mapData.staticContainers.staticForced.push({ containerId: this.mydb.progress[key].itemContainer, itemTpl: this.mydb.progress[key].itemId });
+								mapData.staticContainers.staticContainers.forEach(container => {
+									if (container.template.Id == this.mydb.progress[key].itemContainer) {
+										container.probability = 1;
+									}
+								});
+							}
+						}
+
+						// -- if quest disables other quests based on item location, disable them
+						if (Quests[info.qid].questDisable) {
+							Object.keys(Quests[info.qid].questDisable).forEach(key => {
+								let q = Quests[info.qid].questDisable[key];
+								this.mydb.progress[key] = this.mydb.progress[key] || { disabled: false };
+								if (q.itemLocation) {
+									this.mydb.progress[key].disabled = q.itemLocation == this.mydb.progress[info.qid].itemLocation;
+
+									let traders = this.databaseService.getTraders();
+									for (let k in traders) {
+										let trader = traders[k];
+										let found = false;
+
+										if (trader.questassort && trader.questassort.success) {
+											for (let i in trader.questassort.success) {
+												let quest = trader.questassort.success[i];
+												if (quest == key) {
+													// -- if quest has been disabled remove it from its trader
+													if (this.mydb.progress[key].disabled) {
+														delete trader.questassort.success[i];
+														this.mydb.progress[key].disabledKey = i;
+														// -- if quest has been re-enabled we have to put it back to its trader
+													} else if (this.mydb.progress[key].disabledKey) {
+														trader.questassort.success[this.mydb.progress[key].disabledKey] = key;
+														delete this.mydb.progress[key].disabledKey;
+													}
+
+													found = true;
+													break;
+												}
+											}
+										}
+										if (found) {
+											break;
+										}
+									}
+								}
+							});
+						}
+					}
 				}
 			});
 
-			return {
-				warnings: [],
-				profileChanges: "",
-			};
+			// - save progress
+			if (this.mydb.progress) fs.writeFileSync(this.mydbplace + "progress.json", JSON.stringify(this.mydb.progress, null, 4));
+		} else if (eventAction == "QuestComplete") {
+			if (!this.mydb?.progress) return;
+
+			const info: IAcceptQuestRequestData = body;
+			for (let k in this.mydb.progress) {
+				let q = this.mydb.progress[k];
+				if (k == info.qid) {
+					if (q.itemLocation) {
+						let mapData = this.databaseService.getLocation(q.itemLocation.toLowerCase());
+						if (mapData) {
+							mapData.staticContainers.staticForced = mapData.staticContainers.staticForced || [];
+							mapData.staticContainers.staticForced = mapData.staticContainers.staticForced.filter(container => container.itemTpl != q.itemId);
+						}
+					}
+					delete this.mydb.progress[k];
+					break;
+				}
+			}
+
+			if (this.mydb.progress) fs.writeFileSync(this.mydbplace + "progress.json", JSON.stringify(this.mydb.progress, null, 4));
 		}
+
+		return {
+			warnings: [],
+			profileChanges: "",
+		};
 	}
 
 	public ModDB(db: { [key: string]: any }, path: string) {
 		this.mydb = db;
 		this.mydbplace = path;
-	}
-
-	public UpdateQuestProgress(pmc: IPmcData, raidConfig: { sameSideHostile: boolean; badGuy: boolean; englishBear: boolean; pmcArmbands: boolean; location: string }) {
-		Object.keys(Quests).forEach(key => {
-			const q = pmc.Quests.find(q => q.qid == key);
-			if (q.status != 2) {
-				if (this.mydb.progress) {
-					delete this.mydb.progress[key];
-				}
-			} else if (this.mydb.progress && this.mydb.progress[key]) {
-				if (this.mydb.progress[key].itemLocation) {
-					const itemLocation = this.mydb.progress[key].itemLocation;
-					const itemContainer = this.mydb.progress[key].itemContainer;
-					const itemId = this.mydb.progress[key].itemId;
-					if (raidConfig.location == itemLocation) {
-						const mapData = this.databaseService.getLocation(itemLocation.toLowerCase());
-
-						mapData.staticContainers.staticForced = [{ containerId: itemContainer, itemTpl: itemId }];
-						mapData.staticContainers.staticContainers.forEach(container => {
-							if (container.template.Id == itemContainer) {
-								container.probability = 1;
-							}
-						});
-					}
-				}
-			}
-		});
-
-		if (this.mydb.progress) fs.writeFileSync(this.mydbplace + "progress.json", JSON.stringify(this.mydb.progress, null, 4));
 	}
 }

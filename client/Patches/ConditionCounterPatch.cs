@@ -41,6 +41,7 @@ namespace friendlyPMC.Patches
             }
 
             bool hasKnight = false;
+            bool hasPipe = false;
             var followers = BossPlayers.GetFollowersByBoss(ProfileId);
             
             // Knight quests that require Knight to kill
@@ -69,6 +70,34 @@ namespace friendlyPMC.Patches
 
                 return false;
             }
+
+            // BigPipe quests that require BigPipe to kill
+            if (Utils.Props.QuestsKillConditions["BigPipe"].Contains(counter.Id))
+            {
+                if (followers == null || followers.Count == 0)
+                {
+                    return false;
+                }
+
+                foreach (var follower in followers)
+                {
+                    BotOwner bot = follower.GetBot();
+                    if (follower.GetBot().IsRole(WildSpawnType.followerBigPipe))
+                    {
+                        if(Vector3.Distance(bot.GetPlayer.Transform.position, player.Transform.position) <= 80)
+                            hasPipe = true;
+                        break;
+                    }
+                }
+
+                if(hasPipe) 
+                {
+                    return Utils.Utils.FlagGet("pipeKiller");
+                }
+
+                return false;
+            }
+
             // Knight quests that require the player to kill
             if (Utils.Props.QuestsKillConditions["Player"].Contains(counter.Id))
             {
@@ -95,6 +124,28 @@ namespace friendlyPMC.Patches
                 }
 
                 return hasKnight;
+            }
+
+            // BigPipe quests that require BigPipe as teammate - player or bigpipe can kill
+            if (Utils.Props.QuestsTeamConditions["BigPipe"].Contains(counter.Id))
+            {
+                if (followers == null || followers.Count == 0)
+                {
+                    return false;
+                }
+
+                foreach (var follower in followers)
+                {
+                    BotOwner bot = follower.GetBot();
+                    if (follower.GetBot().IsRole(WildSpawnType.followerBigPipe))
+                    {
+                        if(Vector3.Distance(bot.GetPlayer.Transform.position, player.Transform.position) < 80)
+                            hasPipe = true;
+                        break;
+                    }
+                }
+
+                return hasPipe;
             }
 
 

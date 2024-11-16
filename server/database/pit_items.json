@@ -33,7 +33,7 @@
                 "IsUnbuyable": true,
                 "IsUngivable": true,
                 "IsLockedafterEquip": false,
-                "QuestItem": true,
+                "QuestItem": false,
                 "LootExperience": 20,
                 "ExamineExperience": 4,
                 "HideEntrails": false,
