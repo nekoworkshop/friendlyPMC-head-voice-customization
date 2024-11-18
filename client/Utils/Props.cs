@@ -78,6 +78,11 @@ namespace friendlyPMC.Utils
                     "friendlypmc-knight-payback01",
                     "friendlypmc-knight-payback02"
                 }
+            },
+            {
+                "BirdEye",
+                new List<string> {
+                }
             }
         };
 
@@ -124,6 +129,11 @@ namespace friendlyPMC.Utils
                 }
             },
             {
+                "BirdEye",
+                new List<string> {
+                }
+            },
+            {
                 "Any",
                 new List<string> {
                     "friendlypmc-knight-payback01-target",
@@ -136,6 +146,16 @@ namespace friendlyPMC.Utils
                 "Knight",
                 new List<string> {
                     "friendlypmc-knight-my-land-1"
+                }
+            },
+            {
+                "BigPipe",
+                new List<string> {
+                }
+            },
+            {
+                "BirdEye",
+                new List<string> {
                 }
             },
             {

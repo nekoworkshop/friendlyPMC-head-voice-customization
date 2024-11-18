@@ -248,6 +248,15 @@ namespace friendlyPMC.Components
             return base.EndAttackMoving();
         }
 
+        public override AICoreActionEndStruct EndDogFight()
+        {
+            if (!botOwner_0.Memory.HaveEnemy)
+            {
+                return new AICoreActionEndStruct("enemy.None", true);
+            }
+            return base.EndDogFight();
+        }
+
         public override AICoreActionEndStruct EndRunToCover()
         {
             if(!botOwner_0.Memory.HaveEnemy) return new AICoreActionEndStruct("enemy,None", true);

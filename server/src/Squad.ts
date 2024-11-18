@@ -520,9 +520,8 @@ class friendlyPMC {
 
 					const profile = profileHelper.getPmcProfile(sessionID);
 
-					// check if player has completed the first quest from Knight to decide if he will appear in the friend list
+					// check what quests the player has completed to know if we allow the Goons to be in his friend list
 					let hasKnightQuest = false;
-					//
 					let hasBigPipeQuest = false;
 					profile.Quests.forEach(quest => {
 						if (quest.qid == "friendlypmc-knight-competition" && quest.status == 4) {

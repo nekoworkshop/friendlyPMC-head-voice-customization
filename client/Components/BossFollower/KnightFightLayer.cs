@@ -149,7 +149,7 @@ namespace friendlyPMC.Components.BossFollower
             if (enemyVisible)
             {
                 // If the enemy is close or mid-range
-                if (distanceToEnemy <= Utils.Enemy.EnemyDistance.Mid)
+                if (distanceToEnemy <= Utils.Enemy.EnemyDistance.Mid && commonLayer.IsEnemyLowThreat())
                 {
                     // Rush towards the enemy while suppressing
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToEnemy, "assaultRush");
@@ -164,7 +164,7 @@ namespace friendlyPMC.Components.BossFollower
                         botOwner_0.Steering.LookToPoint(botOwner_0.Memory.GoalEnemy.GetCenterPart());
                         return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMovingWithSuppress, "assaultApproach");
                     }
-                    else
+                    else if(commonLayer.IsEnemyLowThreat())
                     {
                         // No cover point found, move towards the enemy while suppressing
                         return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToEnemy, "assaultRush");
@@ -182,12 +182,16 @@ namespace friendlyPMC.Components.BossFollower
                     botOwner_0.Steering.LookToPoint(botOwner_0.Memory.GoalEnemy.GetCenterPart());
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMovingWithSuppress, "assaultApproach");
                 }
-                else
+                else if (commonLayer.IsEnemyLowThreat())
                 {
                     // No cover point found, move towards the enemy's last known position while suppressing
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToEnemy, "assaultRush");
                 }
+                
+                
             }
+
+            return pusherLayer.EngageEnemy();
         }
 
         public AICoreActionResultStruct<BotLogicDecision>? KnightPreFight()

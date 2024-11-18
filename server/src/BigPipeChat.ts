@@ -25,6 +25,7 @@ export class BigPipeChatBot extends KnightChatBot {
 	public SetLang(lang: { [key: string]: any }) {
 		super.SetLang(lang);
 		this.chatHelp.joinRaid = lang.chatHelp.joinRaid.BigPipe;
+		this.chatResponses.joinRaid = lang.chatResponses.joinRaid.BigPipe;
 	}
 
 	public acceptInvite(sessionId: string) {

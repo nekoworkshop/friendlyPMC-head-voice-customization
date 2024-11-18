@@ -26,24 +26,38 @@ namespace friendlyPMC.Patches
         [PatchPrefix]
         private static bool PatchPrefix(ConditionCounterManager __instance, int valueToAdd, TaskConditionCounterClass counter, GStruct404[] checks)
         {
+            
+
+            bool log = counter.Id == "friendlypmc-knight-payback01-target";
+
+             if (log) Modules.Logger.LogInfo("ConditionCounterManager #1");
+
             if (!Singleton<AbstractGame>.Instantiated) return true;
+             if (log) Modules.Logger.LogInfo("ConditionCounterManager #2");
+
             if (GamePlayerOwner.MyPlayer.HealthController == null || !GamePlayerOwner.MyPlayer.HealthController.IsAlive)
             {
                 return true;
             }
 
+             if (log) Modules.Logger.LogInfo("ConditionCounterManager #3");
+
             string ProfileId = GamePlayerOwner.MyPlayer.ProfileId;
             Player player = GamePlayerOwner.MyPlayer;
 
-            if (BossPlayers.Instance == null || !BossPlayers.IsPlayerBoss(ProfileId))
+            if (!BossPlayers.IsPlayerBoss(ProfileId))
             {
                 return true;
             }
 
+             if (log) Modules.Logger.LogInfo("ConditionCounterManager #4");
+
             bool hasKnight = false;
             bool hasPipe = false;
             var followers = BossPlayers.GetFollowersByBoss(ProfileId);
-            
+
+             if (log) Modules.Logger.LogInfo("ConditionCounterManager #5");
+
             // Knight quests that require Knight to kill
             if (Utils.Props.QuestsKillConditions["Knight"].Contains(counter.Id))
             {
@@ -63,6 +77,8 @@ namespace friendlyPMC.Patches
                     }
                 }
 
+                if (log) Modules.Logger.LogInfo("Should be Knight Kill : " + hasKnight);
+
                 if(hasKnight) 
                 {
                     return Utils.Utils.FlagGet("knightKiller");
@@ -71,6 +87,7 @@ namespace friendlyPMC.Patches
                 return false;
             }
 
+            if (log) Modules.Logger.LogInfo("ConditionCounterManager #6");
             // BigPipe quests that require BigPipe to kill
             if (Utils.Props.QuestsKillConditions["BigPipe"].Contains(counter.Id))
             {
@@ -89,8 +106,9 @@ namespace friendlyPMC.Patches
                         break;
                     }
                 }
+                if (log) Modules.Logger.LogInfo("Should be BigPipe Kill : " + hasPipe);
 
-                if(hasPipe) 
+                if (hasPipe) 
                 {
                     return Utils.Utils.FlagGet("pipeKiller");
                 }
@@ -98,12 +116,13 @@ namespace friendlyPMC.Patches
                 return false;
             }
 
+             if (log) Modules.Logger.LogInfo("ConditionCounterManager #7");
             // Goon quests that require the player to kill
             if (Utils.Props.QuestsKillConditions["Player"].Contains(counter.Id))
             {
                 return !Utils.Utils.FlagGet("knightKiller") && !Utils.Utils.FlagGet("pipeKiller") && !Utils.Utils.FlagGet("birdEyeKiller");
             }
-
+            if (log) Modules.Logger.LogInfo("ConditionCounterManager #8");
             // Knight quests that require Knight as teammate - player or Knight can kill
             if (Utils.Props.QuestsTeamConditions["Knight"].Contains(counter.Id))
             {
@@ -123,8 +142,12 @@ namespace friendlyPMC.Patches
                     }
                 }
 
+                if (log) Modules.Logger.LogInfo("Should be a Knight assisted Kill : " + hasTeamer);
+
                 return hasTeamer;
             }
+            
+            if (log) Modules.Logger.LogInfo("ConditionCounterManager #9");
             // BigPipe quests that require BigPipe as teammate - player or BigPipe can kill
             if (Utils.Props.QuestsTeamConditions["BigPipe"].Contains(counter.Id))
             {
@@ -144,8 +167,12 @@ namespace friendlyPMC.Patches
                     }
                 }
 
+                if (log) Modules.Logger.LogInfo("Should be a BigPipe assisted Kill : " + hasTeamer);
+
                 return hasTeamer;
             }
+            
+            if (log) Modules.Logger.LogInfo("ConditionCounterManager #10");
             // Goons quests that require any goon as teammate - player or them can kill
             if (Utils.Props.QuestsTeamConditions["Any"].Contains(counter.Id))
             {
@@ -164,10 +191,12 @@ namespace friendlyPMC.Patches
                     }
                 }
 
+                if (log) Modules.Logger.LogInfo("Should be a Goons assisted Kill : " + hasTeamer);
+
                 return hasTeamer;
             }
             
-
+            if (log) Modules.Logger.LogInfo("ConditionCounterManager #11");
 
             return true;
         }
