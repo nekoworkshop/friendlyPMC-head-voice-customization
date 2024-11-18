@@ -18,7 +18,7 @@ import { HashUtil } from "@spt/utils/HashUtil";
 import { ProfileHelper } from "@spt/helpers/ProfileHelper";
 import { RandomUtil } from "@spt/utils/RandomUtil";
 
-interface IWsGroupMatchInviteAccept extends IWsNotificationEvent, IGroupCharacter {}
+export interface IWsGroupMatchInviteAccept extends IWsNotificationEvent, IGroupCharacter {}
 
 @injectable()
 export class KnightChatBot implements IDialogueChatBot {
@@ -28,17 +28,14 @@ export class KnightChatBot implements IDialogueChatBot {
 		});
 	}
 
-	public constructor(@inject("MailSendService") private mailSendService: MailSendService, @inject("ProfileHelper") private profileHelper: ProfileHelper, @inject("NotificationSendHelper") private notificationSendHelper: NotificationSendHelper, @inject("HashUtil") private hashUtil: HashUtil, @inject("RandomUtil") private randUtil: RandomUtil) {
-		this.mailSendService = mailSendService;
-		this.notificationSendHelper = notificationSendHelper;
-	}
+	public constructor(@inject("MailSendService") protected mailSendService: MailSendService, @inject("ProfileHelper") protected profileHelper: ProfileHelper, @inject("NotificationSendHelper") protected notificationSendHelper: NotificationSendHelper, @inject("HashUtil") protected hashUtil: HashUtil, @inject("RandomUtil") protected randUtil: RandomUtil) {}
 
 	public SetLang(lang: { [key: string]: any }) {
-		this.chatHelp.joinRaid = this._StringFormat(lang.chatHelp.joinRaid, "'" + this.chatCommands.joinRaid.join("' or '") + "'");
+		this.chatHelp.joinRaid = lang.chatHelp.joinRaid.Knight;
 		this.chatHelp.giveWeapon = this._StringFormat(lang.chatHelp.giveWeapon, "'" + this.chatCommands.giveWeapon.join("' or '") + "'");
 
 		this.chatResponses.giveWeapon = lang.chatResponses.giveWeapon;
-		this.chatResponses.joinRaid = lang.chatResponses.joinRaid;
+		this.chatResponses.joinRaid = lang.chatResponses.joinRaid.Knight;
 		this.chatResponses.help = lang.chatResponses.help;
 	}
 

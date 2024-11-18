@@ -116,17 +116,20 @@ namespace friendlyPMC.Utils
             {
                 "Knight",
                 new List<string> {
-                    "friendlypmc-knight-payback01-target",
-                    "friendlypmc-knight-payback02-target"
                 }
             },
             {
                 "BigPipe",
                 new List<string> {
+                }
+            },
+            {
+                "Any",
+                new List<string> {
                     "friendlypmc-knight-payback01-target",
                     "friendlypmc-knight-payback02-target"
                 }
-            }
+            },
         };
         public static Dictionary<string, List<string>> QuestsKillConditions = new Dictionary<string, List<string>>{
             {

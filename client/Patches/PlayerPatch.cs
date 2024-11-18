@@ -177,9 +177,16 @@ namespace friendlyPMC.Patches
             if(aggressor.Profile.Info.Settings.Role == WildSpawnType.bossKnight)
             {
                 knightKiller = true;
+            } else if (aggressor.Profile.Info.Settings.Role == WildSpawnType.followerBigPipe)
+            {
+                pipeKiller = true;
+            }
+            else if (aggressor.Profile.Info.Settings.Role == WildSpawnType.followerBirdEye)
+            {
+                birdEyeKiller = true;
             }
 
-            if(!knightKiller) return;
+            if (!knightKiller) return;
 
             List<string> list = new List<string>();
             Item weapon2 = damageInfo.Weapon;

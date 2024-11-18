@@ -67,6 +67,7 @@ import { ImporterUtil } from "@spt/utils/ImporterUtil";
 import { PitQuestItemEventRouter } from "./Quests";
 import { QuestItemEventRouter } from "@spt/routers/item_events/QuestItemEventRouter";
 import { IPmcData } from "@spt/models/eft/common/IPmcData";
+import { BigPipeChatBot } from "./BigPipeChat";
 
 class friendlyPMC {
 	config = {
@@ -478,15 +479,26 @@ class friendlyPMC {
 				new RouteAction("/singleplayer/pitlang", (url: string, info: any, sessionID: string, output: string): any => {
 					return httpResponseUtil.noBody(this.lang);
 				}),
+				new RouteAction("/singleplayer/pitprogress", (url: string, info: any, sessionID: string, output: string): any => {
+					if (!this.mydb.progress || !this.mydb.progress[sessionID]) {
+						return httpResponseUtil.emptyResponse();
+					}
+					return httpResponseUtil.noBody(this.mydb.progress[sessionID]);
+				}),
 				new RouteAction("/client/match/group/invite/send", async (url: string, info: any, sessionID: string, output: string): Promise<IGetBodyResponseData<string>> => {
 					const aid = info.to;
 
-					// Knight should accept the invite
+					// Knight or BigPipe should accept the invite
 					const knightFriend = container.resolve<KnightChatBot>("KnightChatBot");
+					const pipeFriend = container.resolve<BigPipeChatBot>("BigPipeChatBot");
 
 					if (aid == knightFriend.getChatBot().aid) {
 						setTimeout(() => {
 							knightFriend.acceptInvite(sessionID);
+						}, 2000);
+					} else if (aid == pipeFriend.getChatBot().aid) {
+						setTimeout(() => {
+							pipeFriend.acceptInvite(sessionID);
 						}, 2000);
 					}
 					return this.matchCallbacks.sendGroupInvite(url, info, sessionID);
@@ -494,8 +506,14 @@ class friendlyPMC {
 				new RouteAction("/client/friend/list", async (url: string, info: any, sessionID: string, output: string): Promise<IGetBodyResponseData<IGetFriendListDataResponse>> => {
 					const list = dialogueController.getFriendList(sessionID);
 					const knightFriend = container.resolve<KnightChatBot>("KnightChatBot");
+					const bigPipeFriend = container.resolve<BigPipeChatBot>("BigPipeChatBot");
 					// Fika is removing Knight from the friend list, so we need to add him back
 					let friend = knightFriend.getChatBot();
+					if (list.Friends.findIndex(f => f.aid == friend.aid) == -1) {
+						list.Friends.push(friend);
+					}
+					// Fika is removing BigPipe from the friend list, so we need to add him back
+					friend = bigPipeFriend.getChatBot();
 					if (list.Friends.findIndex(f => f.aid == friend.aid) == -1) {
 						list.Friends.push(friend);
 					}
@@ -504,14 +522,24 @@ class friendlyPMC {
 
 					// check if player has completed the first quest from Knight to decide if he will appear in the friend list
 					let hasKnightQuest = false;
+					//
+					let hasBigPipeQuest = false;
 					profile.Quests.forEach(quest => {
 						if (quest.qid == "friendlypmc-knight-competition" && quest.status == 4) {
 							hasKnightQuest = true;
 						}
+						if (["friendlypmc-knight-payback01", "friendlypmc-knight-payback02"].includes(quest.qid) && quest.status == 4) {
+							hasBigPipeQuest = true;
+						}
 					});
+
 					if (!hasKnightQuest) {
 						list.Friends = list.Friends.filter(friend => friend._id != "bossKnight");
 					}
+					if (!hasBigPipeQuest) {
+						list.Friends = list.Friends.filter(friend => friend._id != "followerBigPipe");
+					}
+
 					return httpResponseUtil.getBody(list);
 				}),
 				new RouteAction("/client/match/raid/ready", async (url: string, info: any, sessionID: string, output: string): Promise<IGetBodyResponseData<boolean>> => {
@@ -521,7 +549,9 @@ class friendlyPMC {
 					clearTimeout(groupStatus[sessionID]);
 					groupStatus[sessionID] = setTimeout(() => {
 						const knightFriend = container.resolve<KnightChatBot>("KnightChatBot");
+						const bigPipeFriend = container.resolve<BigPipeChatBot>("BigPipeChatBot");
 						knightFriend.currentGroup = info.Players;
+						bigPipeFriend.currentGroup = info.Players;
 					});
 
 					return httpResponseUtil.emptyResponse();
@@ -606,8 +636,6 @@ class friendlyPMC {
 			}
 		}
 
-		this.questItemEvent.postDB();
-
 		// add new traders to the database
 		this.knightTrader.AddToDb(tables);
 		this.generalTrader.AddToDb(tables);
@@ -616,9 +644,14 @@ class friendlyPMC {
 		container.register<KnightChatBot>("KnightChatBot", KnightChatBot, {
 			lifecycle: Lifecycle.Singleton,
 		});
+		container.register<BigPipeChatBot>("BigPipeChatBot", BigPipeChatBot, {
+			lifecycle: Lifecycle.Singleton,
+		});
 
 		const knightBot = container.resolve<KnightChatBot>("KnightChatBot");
 		knightBot.SetLang(this.lang);
+		const bigPipeBot = container.resolve<BigPipeChatBot>("BigPipeChatBot");
+		bigPipeBot.SetLang(this.lang);
 
 		container.resolve<DialogueController>("DialogueController").registerChatBot(knightBot);
 	}

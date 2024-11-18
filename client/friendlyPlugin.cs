@@ -349,6 +349,7 @@ namespace friendlyPMC
 
             new PlayerKilledPatch().Enable();
             new ConditionCounterPatch().Enable();
+            new QuestsListViewPatch().Enable();
         }
 
 

@@ -38,12 +38,30 @@
     ],
     
     "chatHelp": {
-        "joinRaid": "I can join you in a raid, use the 'INVITE TO GROUP' command to get me to join you. If you have unlocked BirdEye and BigPipe they can join too. But no extras - being crowded is not my thing.",
-        "giveWeapon": "You can give me a weapon kit to use, just say {0} and the preset name."
+        "joinRaid": {
+            "Knight" : "I can join you in a raid, use the 'INVITE TO GROUP' command to get me to join you. If you have unlocked BirdEye and BigPipe they can join too. But no extras — being crowded is not my thing.",
+            "BigPipe" : "I can join you in a raid, use the 'INVITE TO GROUP' command to get me to join you. The fellas can join too, but no extras — being crowded is not my thing.",
+            "BirdEye" : "I'm happy to join you for the raid. Use the 'INVITE TO GROUP' command when you're ready. The Knight and BigPipe can come along, but no extras — crowds aren't my style."
+        },
+        "giveWeapon": "You can give me a weapon kit to use, just say {0} and the preset name.",
+        "weaponAccept" : {
+            "Knight" : ["I like it, let's do this!","Perfect, I'm ready for action!","Now we're talking! Let's make it count"],
+            "BigPipe" : "Yeah baby, I like it. Let's do this!",
+            "BirdEye" : "Very nice, let's see what we can do with this one."
+        },
+        "weaponReject" : {
+            "Knight" :  ["Not my style my man, what else you got?","That's not gonna cut it. Show me something better.", "Impressive, very nice.... now let's see Paul Allen's gun.", "Nope, not good."],
+            "BigPipe" : ["I'm not feeling that one, got anything else?", "Not my style man, sorry.","Neah, no boeno."],
+            "BirdEye" : ["Sorry, that's not my flavor.","Not my taste, got anything else?","Sorry, but I am sticking with what I have."]
+        }
     },
     "chatResponses": {
         "help": "Here is what I can do:",
-        "joinRaid": ["I'm ready to go!", "Let’s bust some heads!", "No guts, no glory! Let's bring it!", "I'm in!", "Let's do this!", "Rock and roll!", "Count me in!", "Let's roll!", "Lock and load, baby!", "Wax on, wax off. I'll see you there!"]
+        "joinRaid": {
+            "Knight" : ["I'm ready to go!", "Let's bust some heads!", "No guts, no glory! Let's bring it!", "I'm in!", "Let's do this!", "Rock and roll!", "Count me in!", "Let's roll!", "Lock and load, baby!", "Wax on, wax off. I'll see you there!"],
+            "BigPipe": ["I'm ready to go!","Count me in!","Cowabunga! Let's rock!","Let's light it up!", "Let's smoke'em!","It's go time, baby!","Rock and roll!","I'm in!","Finally! Some action, I'll see you there!","Let's do this!"],
+            "BirdEye" : ["One shot, one kill. Let's make it count.","Precision is key. Let's do this.","Don't worry, I'll be there... before they even know it.","No rush—patience wins the day.","I don't miss. Ever.","When the wind shifts, so do I. See you there.","Ready!","I'll be the last thing they never saw coming."]
+        }
     },
 
     "baseSettings": "Base Settings",

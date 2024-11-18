@@ -190,6 +190,7 @@
     <Compile Include="Modules\FollowerCreateNode.cs" />
     <Compile Include="Modules\NpcMessage.cs" />
     <Compile Include="Modules\RadioSound.cs" />
+    <Compile Include="Patches\QuestsListViewPatch.cs" />
     <Compile Include="Patches\BotMemoryPatch.cs" />
     <Compile Include="Patches\BulletImpactPatch.cs" />
     <Compile Include="Patches\ConditionCounterPatch.cs" />

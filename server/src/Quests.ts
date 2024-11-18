@@ -42,61 +42,6 @@ export class PitQuestItemEventRouter extends ItemEventRouterDefinition {
 		return [new HandledRoute("QuestAccept", false), new HandledRoute("QuestComplete", false)];
 	}
 
-	public postDB(pmcData: IPmcData) {
-		if (!this.mydb?.progress) return;
-
-		for (let k in this.mydb.progress) {
-			let q = this.mydb.progress[k];
-			// remove quests that have been disabled
-			if (q.disabled) {
-				let traders = this.databaseService.getTraders();
-				for (let k in traders) {
-					let trader = traders[k];
-					let found = false;
-
-					if (trader.questassort && trader.questassort.success) {
-						for (let i in trader.questassort.success) {
-							let quest = trader.questassort.success[i];
-							if (quest == k) {
-								delete trader.questassort.success[i];
-								found = true;
-								break;
-							}
-						}
-					}
-
-					if (found) break;
-				}
-			}
-			// ensure items that are for dynamic quests are added to their respective map containers;
-			if (q.itemId) {
-				let hasItem = false;
-				// - item already exists in inventory
-				if (pmcData.Inventory.items.find(item => item._tpl == q.itemId)) {
-					hasItem = true;
-					// - item was already handed over
-				} else if (Quests[k]?.itemCondition) {
-					Object.keys(pmcData.TaskConditionCounters || {}).forEach(key => {
-						if (key == Quests[k].itemCondition) {
-							hasItem = true;
-						}
-					});
-				}
-
-				if (hasItem) return;
-
-				let mapData = this.databaseService.getLocation(q.itemLocation.toLowerCase());
-				mapData.staticContainers.staticForced = mapData.staticContainers.staticForced || [];
-				mapData.staticContainers.staticForced.push({ containerId: q.itemContainer, itemTpl: q.itemId });
-				mapData.staticContainers.staticContainers.forEach(container => {
-					if (container.template.Id == q.itemContainer) {
-						container.probability = 1;
-					}
-				});
-			}
-		}
-	}
-
 	public override async handleItemEvent(eventAction: string, pmcData: IPmcData, body: any, sessionID: string): Promise<IItemEventRouterResponse> {
 		if (eventAction == "QuestAccept") {
 			const info: IAcceptQuestRequestData = body;
@@ -106,13 +51,15 @@ export class PitQuestItemEventRouter extends ItemEventRouterDefinition {
 				let q = Quests[key];
 				if (info.qid == key) {
 					this.mydb.progress = this.mydb.progress || {};
+					this.mydb.progress[sessionID] = this.mydb.progress[sessionID] || {};
+					const userProgress = this.mydb.progress[sessionID];
 					// - if quest is an item quest, decide where to put the item
 					if (q.itemLocation) {
 						let loc: string = this.randomUtil.getArrayValue(q.itemLocation);
-						this.mydb.progress[key] = {
+						userProgress[key] = {
 							itemLocation: loc,
 							itemId: q.itemId,
-							itemContainer: this.randomUtil.getArrayValue(q.itemContainer[loc]),
+							itemContainer: this.randomUtil.getArrayValue(<string[]>q.itemContainer[loc]),
 						};
 
 						// -- check if user already has the item
@@ -121,9 +68,9 @@ export class PitQuestItemEventRouter extends ItemEventRouterDefinition {
 							let mapData = this.databaseService.getLocation(loc.toLowerCase());
 							if (mapData) {
 								mapData.staticContainers.staticForced = mapData.staticContainers.staticForced || [];
-								mapData.staticContainers.staticForced.push({ containerId: this.mydb.progress[key].itemContainer, itemTpl: this.mydb.progress[key].itemId });
+								mapData.staticContainers.staticForced.push({ containerId: userProgress[key].itemContainer, itemTpl: userProgress[key].itemId });
 								mapData.staticContainers.staticContainers.forEach(container => {
-									if (container.template.Id == this.mydb.progress[key].itemContainer) {
+									if (container.template.Id == userProgress[key].itemContainer) {
 										container.probability = 1;
 									}
 								});
@@ -134,9 +81,9 @@ export class PitQuestItemEventRouter extends ItemEventRouterDefinition {
 						if (Quests[info.qid].questDisable) {
 							Object.keys(Quests[info.qid].questDisable).forEach(key => {
 								let q = Quests[info.qid].questDisable[key];
-								this.mydb.progress[key] = this.mydb.progress[key] || { disabled: false };
+								userProgress[key] = this.mydb.progress[key] || { disabled: false };
 								if (q.itemLocation) {
-									this.mydb.progress[key].disabled = q.itemLocation == this.mydb.progress[info.qid].itemLocation;
+									userProgress[key].disabled = q.itemLocation == userProgress[info.qid].itemLocation;
 
 									let traders = this.databaseService.getTraders();
 									for (let k in traders) {
@@ -148,13 +95,13 @@ export class PitQuestItemEventRouter extends ItemEventRouterDefinition {
 												let quest = trader.questassort.success[i];
 												if (quest == key) {
 													// -- if quest has been disabled remove it from its trader
-													if (this.mydb.progress[key].disabled) {
+													if (userProgress[key].disabled) {
 														delete trader.questassort.success[i];
-														this.mydb.progress[key].disabledKey = i;
+														userProgress[key].disabledKey = i;
 														// -- if quest has been re-enabled we have to put it back to its trader
-													} else if (this.mydb.progress[key].disabledKey) {
-														trader.questassort.success[this.mydb.progress[key].disabledKey] = key;
-														delete this.mydb.progress[key].disabledKey;
+													} else if (userProgress[key].disabledKey) {
+														trader.questassort.success[userProgress[key].disabledKey] = key;
+														delete userProgress[key].disabledKey;
 													}
 
 													found = true;
@@ -176,11 +123,11 @@ export class PitQuestItemEventRouter extends ItemEventRouterDefinition {
 			// - save progress
 			if (this.mydb.progress) fs.writeFileSync(this.mydbplace + "progress.json", JSON.stringify(this.mydb.progress, null, 4));
 		} else if (eventAction == "QuestComplete") {
-			if (!this.mydb?.progress) return;
+			if (!this.mydb?.progress || !this.mydb.progress[sessionID]) return;
 
 			const info: IAcceptQuestRequestData = body;
-			for (let k in this.mydb.progress) {
-				let q = this.mydb.progress[k];
+			for (let k in this.mydb.progress[sessionID]) {
+				let q = this.mydb.progress[sessionID][k];
 				if (k == info.qid) {
 					if (q.itemLocation) {
 						let mapData = this.databaseService.getLocation(q.itemLocation.toLowerCase());

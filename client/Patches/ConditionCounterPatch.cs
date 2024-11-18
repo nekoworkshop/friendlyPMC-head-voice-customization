@@ -98,55 +98,75 @@ namespace friendlyPMC.Patches
                 return false;
             }
 
-            // Knight quests that require the player to kill
+            // Goon quests that require the player to kill
             if (Utils.Props.QuestsKillConditions["Player"].Contains(counter.Id))
             {
                 return !Utils.Utils.FlagGet("knightKiller") && !Utils.Utils.FlagGet("pipeKiller") && !Utils.Utils.FlagGet("birdEyeKiller");
             }
 
-            // Knight quests that require Knight as teammate - player or knight can kill
+            // Knight quests that require Knight as teammate - player or Knight can kill
             if (Utils.Props.QuestsTeamConditions["Knight"].Contains(counter.Id))
             {
                 if (followers == null || followers.Count == 0)
                 {
                     return false;
                 }
-
+                bool hasTeamer = false;
                 foreach (var follower in followers)
                 {
                     BotOwner bot = follower.GetBot();
                     if (follower.GetBot().IsRole(WildSpawnType.bossKnight))
                     {
                         if(Vector3.Distance(bot.GetPlayer.Transform.position, player.Transform.position) < 80)
-                            hasKnight = true;
+                            hasTeamer = true;
                         break;
                     }
                 }
 
-                return hasKnight;
+                return hasTeamer;
             }
-
-            // BigPipe quests that require BigPipe as teammate - player or bigpipe can kill
+            // BigPipe quests that require BigPipe as teammate - player or BigPipe can kill
             if (Utils.Props.QuestsTeamConditions["BigPipe"].Contains(counter.Id))
             {
                 if (followers == null || followers.Count == 0)
                 {
                     return false;
                 }
-
+                bool hasTeamer = false;
                 foreach (var follower in followers)
                 {
                     BotOwner bot = follower.GetBot();
                     if (follower.GetBot().IsRole(WildSpawnType.followerBigPipe))
                     {
                         if(Vector3.Distance(bot.GetPlayer.Transform.position, player.Transform.position) < 80)
-                            hasPipe = true;
+                            hasTeamer = true;
                         break;
                     }
                 }
 
-                return hasPipe;
+                return hasTeamer;
             }
+            // Goons quests that require any goon as teammate - player or them can kill
+            if (Utils.Props.QuestsTeamConditions["Any"].Contains(counter.Id))
+            {
+                if (followers == null || followers.Count == 0)
+                {
+                    return false;
+                }
+                bool hasTeamer = false;
+                foreach (var follower in followers)
+                {
+                    BotOwner bot = follower.GetBot();
+                    if(Vector3.Distance(bot.GetPlayer.Transform.position, player.Transform.position) < 80)
+                    {
+                        hasTeamer = true;
+                        break;
+                    }
+                }
+
+                return hasTeamer;
+            }
+            
 
 
             return true;

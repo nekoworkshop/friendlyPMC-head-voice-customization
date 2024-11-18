@@ -428,7 +428,7 @@
                     "dogtagLevel": 0,
                     "dynamicLocale": false,
                     "globalQuestCounterId": "",
-                    "id": "friendlypmc-knight-thieves-3",
+                    "id": "friendlypmc-knight-thieves-1",
                     "index": 0,
                     "isEncoded": false,
                     "maxDurability": 100,
@@ -442,64 +442,12 @@
                     "visibilityConditions": []
                 },
                 {
-                    "completeInSeconds": 0,
-                    "conditionType": "CounterCreator",
-                    "counter": {
-                      "conditions": [
-                        {
-                          "conditionType": "VisitPlace",
-                          "dynamicLocale": false,
-                          "id": "friendlypmc-knight-thieves-11",
-                          "target": "reserv_launcher",
-                          "value": 1
-                        }
-                      ],
-                      "id": "friendlypmc-knight-thieves-12"
-                    },
-                    "doNotResetIfCounterCompleted": false,
-                    "dynamicLocale": false,
-                    "globalQuestCounterId": "",
-                    "id": "friendlypmc-knight-thieves-1",
-                    "index": 1,
-                    "isOptional" : true,
-                    "parentId": "friendlypmc-knight-thieves-3",
-                    "type": "Exploration",
-                    "value": 1,
-                    "visibilityConditions": []
-                },
-                {
-                    "completeInSeconds": 0,
-                    "conditionType": "CounterCreator",
-                    "counter": {
-                      "conditions": [
-                        {
-                          "conditionType": "VisitPlace",
-                          "dynamicLocale": false,
-                          "id": "friendlypmc-knight-thieves-21",
-                          "target": "streets_launcher",
-                          "value": 1
-                        }
-                      ],
-                      "id": "friendlypmc-knight-thieves-22"
-                    },
-                    "doNotResetIfCounterCompleted": false,
-                    "dynamicLocale": false,
-                    "globalQuestCounterId": "",
-                    "id": "friendlypmc-knight-thieves-2",
-                    "index": 2,
-                    "isOptional" : true,
-                    "parentId": "friendlypmc-knight-thieves-3",
-                    "type": "Exploration",
-                    "value": 1,
-                    "visibilityConditions": []
-                },
-                {
                     "conditionType": "HandoverItem",
                     "dogtagLevel": 0,
                     "dynamicLocale": false,
                     "globalQuestCounterId": "",
-                    "id": "friendlypmc-knight-thieves-4",
-                    "index": 3,
+                    "id": "friendlypmc-knight-thieves-2",
+                    "index": 1,
                     "isEncoded": false,
                     "maxDurability": 100,
                     "minDurability": 0,
@@ -634,12 +582,6 @@
 								"weaponCaliber": [],
 								"weaponModsExclusive": [],
 								"weaponModsInclusive": []
-							},
-							{
-								"conditionType": "Location",
-								"dynamicLocale": false,
-								"id": "friendlypmc-knight-payback01-location",
-								"target": ["TarkovStreets"]
 							}
 						],
 						"id": "friendlypmc-knight-payback01-cond"
@@ -712,10 +654,10 @@
         "declinePlayerMessage": "friendlypmc-knight-payback01 declinePlayerMessage",
 		"description": "friendlypmc-knight-payback01 description",
 		"failMessageText": "friendlypmc-knight-payback01 failMessageText",
-		"image": "/files/quest/icon/KnightThieves.jpg",
+		"image": "/files/quest/icon/KnightRobocop.jpg",
 		"instantComplete": false,
 		"isKey": false,
-		"location": "any",
+		"location": "5714dc692459777137212e12",
 		"name": "friendlypmc-knight-payback01 name",
 		"note": "friendlypmc-knight-payback01 note",
 		"restartable": true,
@@ -727,7 +669,7 @@
 		"type": "Elimination"
     },
     "friendlypmc-knight-payback02" :{
-        "QuestName": "Badge Bandit",
+        "QuestName": "Tough Nugget",
 		"_id": "friendlypmc-knight-payback02",
 		"acceptPlayerMessage": "friendlypmc-knight-payback02 acceptPlayerMessage",
 		"canShowNotificationsInGame": true,
@@ -793,12 +735,6 @@
 								"weaponCaliber": [],
 								"weaponModsExclusive": [],
 								"weaponModsInclusive": []
-							},
-							{
-								"conditionType": "Location",
-								"dynamicLocale": false,
-								"id": "friendlypmc-knight-payback02-location",
-								"target": ["RezervBase"]
 							}
 						],
 						"id": "friendlypmc-knight-payback02-cond"
@@ -871,10 +807,10 @@
         "declinePlayerMessage": "friendlypmc-knight-payback02 declinePlayerMessage",
 		"description": "friendlypmc-knight-payback02 description",
 		"failMessageText": "friendlypmc-knight-payback02 failMessageText",
-		"image": "/files/quest/icon/KnightThieves.jpg",
+		"image": "/files/quest/icon/KnightRambo.jpg",
 		"instantComplete": false,
 		"isKey": false,
-		"location": "any",
+		"location": "5704e5fad2720bc05b8b4567",
 		"name": "friendlypmc-knight-payback02 name",
 		"note": "friendlypmc-knight-payback02 note",
 		"restartable": true,
