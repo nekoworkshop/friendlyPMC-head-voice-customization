@@ -346,7 +346,7 @@ namespace friendlyPMC.Components.BossFollower
                     return commonLayer.DogFight(out customNavigationPoint_0);
                 }
 
-                if (commonLayer.IsEnemyLowThreat() && Utils.Enemy.Distance(botOwner_0) < Utils.Enemy.EnemyDistance.Mid)
+                if (commonLayer.IsEnemyLowThreat() && Utils.Enemy.Distance(botOwner_0) <= Utils.Enemy.EnemyDistance.Mid)
                 {
                     return KnightAssault();
                 }

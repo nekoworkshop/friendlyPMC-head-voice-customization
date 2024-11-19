@@ -59,7 +59,6 @@ namespace friendlyPMC.Patches
         {
             socialNetworkClass = __instance;
             iChatInteractions = session;
-            Modules.Logger.LogInfo("SocialNetworkClass saved");
         }
 
         public static void RefreshFriendsList()
@@ -71,18 +70,17 @@ namespace friendlyPMC.Patches
         }
     }
     /** Refresh friends list whenever we complete a quest **/
-    internal class GClass2067Patch : ModulePatch
+    internal class QuestClassPatch : ModulePatch
     {
         protected override MethodBase GetTargetMethod()
         {
-            return AccessTools.Method(typeof(GClass2067), "method_5");
+            return AccessTools.Method(typeof(QuestClass), "SetStatus");
         }
 
         [PatchPostfix]
-        private static void PatchPostfix(GClass2069 __instance, DialogOptionDataStruct source, EQuestActionType result, QuestClass quest, ConditionItem condition, GStruct247 lineConstructor)
+        private static void PatchPostfix(QuestClass __instance)
         {
-            Modules.Logger.LogInfo("Quest status " + result);
-            if(result == EQuestActionType.Finished)
+            if(__instance.QuestStatus == EQuestStatus.Success)
             {
                 SocialNetworkClassPatch.RefreshFriendsList();
             }

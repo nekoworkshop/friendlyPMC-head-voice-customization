@@ -147,7 +147,7 @@ namespace friendlyPMC.Patches
 
             botOwner_0.BotTalk.TrySay(EPhraseTrigger.FriendlyFire, true);
 
-            if (brain.currentTactic == "Assist")
+            /*if (brain.currentTactic == "Assist")
             {
                 var boss = botOwner_0.BotFollower.BossToFollow as pitAIBossPlayer;
                 if (boss == null) return;
@@ -164,7 +164,7 @@ namespace friendlyPMC.Patches
                 EnemyInfo info = Utils.Enemy.MakeEnemy(botOwner_0, enemy, EBotEnemyCause.followGetHit);
                 
                 botOwner_0.CalcGoal();
-            }
+            }*/
         }
     }
 }

@@ -926,7 +926,7 @@ namespace friendlyPMC.Components.Tactics
             bool ordchanged = ordersChanged.HasValue ? ordersChanged.Value : this.ordersChanged;
 
             // orders changed
-            if (ordchanged &&
+            /* if (ordchanged &&
                 !ordersIgnoreReasons.Contains(curDecision.Reason) &&
                 !ordersIgnoreDecisions.Contains(curDecision.Action) &&
                 (
@@ -937,7 +937,7 @@ namespace friendlyPMC.Components.Tactics
             {
                 OrderReset();
                 return new AICoreActionEndStruct("orders.Received", true);
-            }
+            } */
 
             AICoreActionEndStruct? shallEndCommon = ShallEndCurrentDecisionCommon(curDecision);
 

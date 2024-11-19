@@ -275,7 +275,7 @@ namespace friendlyPMC
             new QuestsListViewPatch().Enable();
             // social related patches to help with refreshing the list of friends when a quest is completed
             new SocialNetworkClassPatch().Enable();
-            new GClass2067Patch().Enable();
+            new QuestClassPatch().Enable();
             harmony.PatchAll(typeof(SendInvitePatch).Assembly);
 
             // add console commands

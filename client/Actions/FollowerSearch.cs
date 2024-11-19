@@ -47,10 +47,7 @@ namespace friendlyPMC.Actions
                     botPosition,
                     5f,
                     150f,
-                    point =>
-                    {
-                        return Utils.Covers.IsPointBetween(point.Position, botPosition, enemySpot);
-                    }
+                    null
                 );
 
                 if (Spot != null) _lastSpot = Spot.Position;
