@@ -8,6 +8,8 @@ import { MemberCategory } from "@spt/models/enums/MemberCategory";
 
 @injectable()
 export class BigPipeChatBot extends KnightChatBot {
+	protected _botRole = "followerBigPipe";
+
 	getChatBot(): IUserDialogInfo {
 		return {
 			_id: "followerBigPipe",

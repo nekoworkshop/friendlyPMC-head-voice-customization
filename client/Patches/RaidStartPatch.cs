@@ -34,11 +34,23 @@ namespace friendlyPMC.Patches
                     {
                         Utils.Utils.FlagSet("spawnKnight", true);
                     }
+                    else if(player.Id == "followerBigPipe")
+                    {
+                        Utils.Utils.FlagSet("spawnBigPipe", true);
+                    }
+                    else if(player.Id == "followerBirdEye")
+                    {
+                        Utils.Utils.FlagSet("spawnBirdEye", true);
+                    }
                 }
             }
 
             
-            if (Utils.Utils.FlagGet("spawnKnight")) badGuy = true;
+            if (Utils.Utils.FlagGet("spawnKnight") || Utils.Utils.FlagGet("spawnBigPipe") || Utils.Utils.FlagGet("spawnBirdEye")) 
+            {
+                badGuy = true;
+                Utils.Utils.FlagSet("isBadGuy",true);
+            }
 
             Profile profile = __instance.GetProfileBySide(ESideType.Pmc);
 
@@ -79,7 +91,7 @@ namespace friendlyPMC.Patches
                                     {
                                         Utils.Utils.FlagSet("spawnBigPipe", true);  
                                     }
-                                    else if(item.Key == "BirdEye")
+                                    else if(item.Key == "BirdEye" && !(Utils.Utils.FlagGet("spawnKnight") || Utils.Utils.FlagGet("spawnBigPipe")))
                                     {
                                         Utils.Utils.FlagSet("spawnBirdEye", true);  
                                     }

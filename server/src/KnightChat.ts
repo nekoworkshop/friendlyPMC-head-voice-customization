@@ -17,18 +17,35 @@ import { MessageType } from "@spt/models/enums/MessageType";
 import { HashUtil } from "@spt/utils/HashUtil";
 import { ProfileHelper } from "@spt/helpers/ProfileHelper";
 import { RandomUtil } from "@spt/utils/RandomUtil";
+import { BotGenerator } from "@spt/generators/BotGenerator";
+import { BotController } from "@spt/controllers/BotController";
+
+import { IGetOtherProfileResponse } from "@spt/models/eft/profile/IGetOtherProfileResponse";
+import { ItemTpl } from "@spt/models/enums/ItemTpl";
 
 export interface IWsGroupMatchInviteAccept extends IWsNotificationEvent, IGroupCharacter {}
 
 @injectable()
 export class KnightChatBot implements IDialogueChatBot {
+	protected _botRole = "bossKnight";
+
 	private _StringFormat(str: string, ...values: string[]) {
 		return str.replace(/\{(\d+)\}/g, function (match, number) {
 			return typeof values[number] != "undefined" && values[number] !== null ? values[number] : match;
 		});
 	}
-
-	public constructor(@inject("MailSendService") protected mailSendService: MailSendService, @inject("ProfileHelper") protected profileHelper: ProfileHelper, @inject("NotificationSendHelper") protected notificationSendHelper: NotificationSendHelper, @inject("HashUtil") protected hashUtil: HashUtil, @inject("RandomUtil") protected randUtil: RandomUtil) {}
+	//prettier-ignore
+	public constructor(
+        @inject("MailSendService") protected mailSendService: MailSendService, 
+        @inject("ProfileHelper") protected profileHelper: ProfileHelper, 
+        @inject("NotificationSendHelper") protected notificationSendHelper: NotificationSendHelper, 
+        @inject("HashUtil") protected hashUtil: HashUtil,
+        @inject("RandomUtil") protected randUtil: RandomUtil,
+        @inject("BotGenerator") protected botGenerator: BotGenerator,
+        @inject("BotController") protected botController: BotController
+    ) {
+        
+    }
 
 	public SetLang(lang: { [key: string]: any }) {
 		this.chatHelp.joinRaid = lang.chatHelp.joinRaid.Knight;
@@ -57,7 +74,7 @@ export class KnightChatBot implements IDialogueChatBot {
 
 	getChatBot(): IUserDialogInfo {
 		return {
-			_id: "bossKnight",
+			_id: this._botRole,
 			aid: 1113579,
 			Info: {
 				Level: 99,
@@ -65,6 +82,82 @@ export class KnightChatBot implements IDialogueChatBot {
 				SelectedMemberCategory: MemberCategory.SHERPA,
 				Nickname: "Knight",
 				Side: "Usec",
+			},
+		};
+	}
+
+	public PlayerVisualRepresentation(sessionId: string): IGetOtherProfileResponse {
+		const pmcProfile = this.profileHelper.getPmcProfile(sessionId);
+		const botGenerationDetails = this.botController["getBotGenerationDetailsForWave"](
+			{
+				Role: this._botRole,
+				Limit: 1,
+				Difficulty: "hard",
+			},
+			pmcProfile,
+			false,
+			{
+				// max should be between level and level + 5
+				max: pmcProfile.Info.Level + 1,
+				// min should be between level - 5 and level
+				min: Math.max(1, pmcProfile.Info.Level - 1),
+			},
+			1,
+			false
+		);
+		const preparedBotBase = this.botGenerator["getPreparedBotBase"](
+			botGenerationDetails.eventRole ?? botGenerationDetails.role, // Use eventRole if provided,
+			pmcProfile.Info.Side,
+			botGenerationDetails.botDifficulty
+		);
+
+		const botRole = botGenerationDetails.role;
+		const botJsonTemplateClone = this.botController["cloner"].clone(this.botController["botHelper"].getBotTemplate(botRole));
+
+		botGenerationDetails.botRelativeLevelDeltaMax = 1;
+		botGenerationDetails.botRelativeLevelDeltaMin = 1;
+
+		const result = this.botGenerator["generateBot"](sessionId, preparedBotBase, botJsonTemplateClone, botGenerationDetails);
+
+		const info = Object.assign(this.getChatBot(), { GameVersion: "edge_of_darkness" });
+
+		return {
+			id: info._id,
+			aid: info.aid,
+			info: {
+				nickname: info.Info.Nickname,
+				side: info.Info.Side,
+				experience: result.Info.Experience,
+				memberCategory: info.Info.MemberCategory,
+				bannedState: pmcProfile.Info.BannedState,
+				bannedUntil: pmcProfile.Info.BannedUntil,
+				registrationDate: pmcProfile.Info.RegistrationDate,
+			},
+			customization: {
+				head: result.Customization.Head,
+				body: result.Customization.Body,
+				feet: result.Customization.Feet,
+				hands: result.Customization.Hands,
+			},
+			skills: pmcProfile.Skills,
+			equipment: {
+				// Default inventory tpl
+				Id: result.Inventory.items.find(item => item._tpl === ItemTpl.INVENTORY_DEFAULT)._id,
+				Items: result.Inventory.items,
+			},
+			achievements: pmcProfile.Achievements,
+			favoriteItems: result.Inventory.favoriteItems ?? [],
+			pmcStats: {
+				eft: {
+					totalInGameTime: pmcProfile.Stats.Eft.TotalInGameTime,
+					overAllCounters: pmcProfile.Stats.Eft.OverallCounters,
+				},
+			},
+			scavStats: {
+				eft: {
+					totalInGameTime: pmcProfile.Stats.Eft.TotalInGameTime,
+					overAllCounters: pmcProfile.Stats.Eft.OverallCounters,
+				},
 			},
 		};
 	}

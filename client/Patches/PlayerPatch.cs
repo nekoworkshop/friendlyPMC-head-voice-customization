@@ -213,17 +213,17 @@ namespace friendlyPMC.Patches
             string locationId = player.Location;
             float distance = Vector3.Distance(aggressor.Position, __instance.Position);
 
-            if(knightKiller) Utils.Utils.FlagSet("knightKiller",true);
-            else if(pipeKiller) Utils.Utils.FlagSet("pipeKiller",true);
-            else if(birdEyeKiller) Utils.Utils.FlagSet("birdEyeKiller",true);
+            Utils.Utils.FlagSet("knightKiller",knightKiller);
+            Utils.Utils.FlagSet("pipeKiller",pipeKiller);
+            Utils.Utils.FlagSet("birdEyeKiller",birdEyeKiller);
 
             list.ForEach(target=>{
                 player.AbstractQuestControllerClass.CheckKillConditionCounter(target,__instance.ProfileId,new List<string>{},weapon2,bodyPart,locationId,distance,__instance.Profile.Info.Settings.Role.ToStringNoBox<WildSpawnType>(),__instance.CurrentHour,__instance.HealthController.BodyPartEffects,__instance.HealthController.BodyPartEffects,__instance.TriggerZones,new string[]{});
             });
 
-            Utils.Utils.FlagSet("knightKiller",false);
-            Utils.Utils.FlagSet("pipeKiller",false);
-            Utils.Utils.FlagSet("birdEyeKiller",false);
+            if(knightKiller) Utils.Utils.FlagSet("knightKiller",false);
+            if(pipeKiller) Utils.Utils.FlagSet("pipeKiller",false);
+            if(birdEyeKiller) Utils.Utils.FlagSet("birdEyeKiller",false);
         }
     }
 }

@@ -1602,6 +1602,12 @@ namespace friendlyPMC.Patches
             Profile profile = boss.realPlayer.Profile;
 
             bool knightIncrease = false;
+            bool pipeIncrease = false;
+            bool birdEyeIncrease = false;
+
+
+            double maxStanding = 1;
+
             profile.QuestsData.ForEach(quest =>
             {
 
@@ -1613,6 +1619,18 @@ namespace friendlyPMC.Patches
                         knightIncrease = true;
                         break;
                     }
+                    // allow BigPipe to add to the standing only after we complete the payback quest
+                    else if (item.Key == "BigPipe" && (quest.Id == item.Value[0] || quest.Id == item.Value[1]) && quest.Status == EFT.Quests.EQuestStatus.Success)
+                    {
+                        pipeIncrease = true;
+                        break;
+                    }
+                    else if (item.Key == "BirdEye" && quest.Id == item.Value[0] && quest.Status == EFT.Quests.EQuestStatus.Success)
+                    {
+                        birdEyeIncrease = true;
+                        break;
+                    }
+                    
                 }
 
             });
@@ -1621,11 +1639,16 @@ namespace friendlyPMC.Patches
             {
                 foreach (var follower in BossPlayers.GetFollowersByBoss(profile.ProfileId))
                 {
-                    if (follower.GetBot().IsRole(WildSpawnType.bossKnight) && knightIncrease)
+                    BotOwner bot = follower.GetBot();
+                    if (
+                        (bot.IsRole(WildSpawnType.bossKnight) && knightIncrease) ||
+                        (bot.IsRole(WildSpawnType.followerBigPipe) && pipeIncrease) ||
+                        (bot.IsRole(WildSpawnType.followerBirdEye) && birdEyeIncrease)
+                    )
                     {
                         double standing = boss.realPlayer.Profile.GetTraderStanding("friendlypmc-knight");
-                        if (standing < 2)
-                            traderInfo.SetStanding(Math.Min(2, standing + 0.01));
+                        if (standing < maxStanding)
+                            traderInfo.SetStanding(Math.Min(maxStanding, standing + 0.01));
                     };
                 }
             }

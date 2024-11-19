@@ -38,7 +38,10 @@ import { BotGenerationDetails } from "@spt/models/spt/bots/BotGenerationDetails"
 
 import { ISendMessageDetails } from "@spt/models/spt/dialog/ISendMessageDetails";
 import { MessageType } from "@spt/models/enums/MessageType";
+
 import { ProfileHelper } from "@spt/helpers/ProfileHelper";
+import { ProfileController } from "@spt/controllers/ProfileController";
+
 import { IGenerateBotsRequestData } from "@spt/models/eft/bot/IGenerateBotsRequestData";
 import { LocaleService } from "@spt/services/LocaleService";
 
@@ -68,6 +71,7 @@ import { PitQuestItemEventRouter } from "./Quests";
 import { QuestItemEventRouter } from "@spt/routers/item_events/QuestItemEventRouter";
 import { IPmcData } from "@spt/models/eft/common/IPmcData";
 import { BigPipeChatBot } from "./BigPipeChat";
+import { IGetOtherProfileRequest } from "@spt/models/eft/profile/IGetOtherProfileRequest";
 
 class friendlyPMC {
 	config = {
@@ -90,6 +94,9 @@ class friendlyPMC {
 
 	knightTrader: KnightTrader;
 	generalTrader: GeneralTrader;
+
+	knightBot: KnightChatBot;
+	bigPipeBot: BigPipeChatBot;
 
 	profileHelper: ProfileHelper;
 
@@ -182,6 +189,19 @@ class friendlyPMC {
 
 					result["generateBot"] = this.generateBot;
 				}
+			},
+			{ frequency: "Always" }
+		);
+		// patch getOtherProfile so that we can show our followers when "viewing other profiles"
+		this.getOtherProfile = this.getOtherProfile.bind(this);
+		container.afterResolution(
+			"ProfileController",
+			(_t, result: ProfileController) => {
+				if (!this.originalGetOtherProfile) {
+					this.originalGetOtherProfile = result.getOtherProfile.bind(result);
+				}
+
+				result.getOtherProfile = this.getOtherProfile;
 			},
 			{ frequency: "Always" }
 		);
@@ -489,8 +509,8 @@ class friendlyPMC {
 					const aid = info.to;
 
 					// Knight or BigPipe should accept the invite
-					const knightFriend = container.resolve<KnightChatBot>("KnightChatBot");
-					const pipeFriend = container.resolve<BigPipeChatBot>("BigPipeChatBot");
+					const knightFriend = this.knightBot;
+					const pipeFriend = this.bigPipeBot;
 
 					if (aid == knightFriend.getChatBot().aid) {
 						setTimeout(() => {
@@ -505,8 +525,8 @@ class friendlyPMC {
 				}),
 				new RouteAction("/client/friend/list", async (url: string, info: any, sessionID: string, output: string): Promise<IGetBodyResponseData<IGetFriendListDataResponse>> => {
 					const list = dialogueController.getFriendList(sessionID);
-					const knightFriend = container.resolve<KnightChatBot>("KnightChatBot");
-					const bigPipeFriend = container.resolve<BigPipeChatBot>("BigPipeChatBot");
+					const knightFriend = this.knightBot;
+					const bigPipeFriend = this.bigPipeBot;
 					// Fika is removing Knight from the friend list, so we need to add him back
 					let friend = knightFriend.getChatBot();
 					if (list.Friends.findIndex(f => f.aid == friend.aid) == -1) {
@@ -547,7 +567,7 @@ class friendlyPMC {
 				new RouteAction("/client/match/group/pitstatus", async (url: string, info: { Players: string[] }, sessionID: string, output: string) => {
 					clearTimeout(groupStatus[sessionID]);
 					groupStatus[sessionID] = setTimeout(() => {
-						const knightFriend = container.resolve<KnightChatBot>("KnightChatBot");
+						const knightFriend = this.knightBot;
 						const bigPipeFriend = container.resolve<BigPipeChatBot>("BigPipeChatBot");
 						knightFriend.currentGroup = info.Players;
 						bigPipeFriend.currentGroup = info.Players;
@@ -649,8 +669,11 @@ class friendlyPMC {
 
 		const knightBot = container.resolve<KnightChatBot>("KnightChatBot");
 		knightBot.SetLang(this.lang);
+		this.knightBot = knightBot;
+
 		const bigPipeBot = container.resolve<BigPipeChatBot>("BigPipeChatBot");
 		bigPipeBot.SetLang(this.lang);
+		this.bigPipeBot = bigPipeBot;
 
 		container.resolve<DialogueController>("DialogueController").registerChatBot(knightBot);
 	}
@@ -774,6 +797,13 @@ class friendlyPMC {
 		const result = this.originalGenerateBot(sessionId, bot, botJsonTemplate, botGenerationDetails);
 
 		return result;
+	}
+
+	originalGetOtherProfile: ProfileController["getOtherProfile"];
+	getOtherProfile(sessionId: string, request: IGetOtherProfileRequest) {
+		if (request.accountId == this.knightBot.getChatBot().aid.toString()) return this.knightBot.PlayerVisualRepresentation(sessionId);
+		else if (request.accountId == this.bigPipeBot.getChatBot().aid.toString()) return this.bigPipeBot.PlayerVisualRepresentation(sessionId);
+		return this.originalGetOtherProfile(sessionId, request);
 	}
 
 	originalHandleItemEvent: QuestItemEventRouter["handleItemEvent"];

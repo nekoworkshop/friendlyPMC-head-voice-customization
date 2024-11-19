@@ -74,6 +74,7 @@ namespace friendlyPMC.Utils
             },
             {
                 "BigPipe",
+                // order is important
                 new List<string> {
                     "friendlypmc-knight-payback01",
                     "friendlypmc-knight-payback02"

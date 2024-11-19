@@ -201,6 +201,13 @@ namespace friendlyPMC
                 new Modules.Logger();
             }
 
+            
+
+            var harmony = new Harmony("xyz.pit.friendlypmc");
+            // configuration manager patch to help with keeping equipment builds up to date
+            harmony.PatchAll(typeof(ConfigurationManagerPatch).Assembly);
+            
+            // bot patches to help with various scenarios while being a follower of the player
             new BotGroupIsPlayerEnemy().Enable();
             new BotGroupAddEnemy().Enable();
 
@@ -238,92 +245,10 @@ namespace friendlyPMC
             new GestureMenuAvailablePhrasesPatch().Enable();
             new EPhraseTriggerPatch().Enable();
 
-            var harmony = new Harmony("xyz.pit.friendlypmc");
-
+            // spawn patches
             harmony.PatchAll(typeof(LocalGameCtorPatch).Assembly);
-            harmony.PatchAll(typeof(BaseLocalGameVmethod4Patch).Assembly); // spawn patch
+            harmony.PatchAll(typeof(BaseLocalGameVmethod4Patch).Assembly);
             harmony.PatchAll(typeof(BossSpawnerClassPatch).Assembly);
-
-            ConsoleScreen.Processor.RegisterCommand("followerstome", delegate ()
-            {
-                GameWorld gameWorld = Singleton<GameWorld>.Instance;
-
-                bool flag = !Singleton<AbstractGame>.Instantiated;
-                if (flag)
-                {
-                    ConsoleScreen.LogError("This command may only be used inraid");
-                    return;
-                }
-
-
-                if (GamePlayerOwner.MyPlayer.HealthController == null || !GamePlayerOwner.MyPlayer.HealthController.IsAlive)
-                {
-                    return;
-                }
-
-                string id = GamePlayerOwner.MyPlayer.ProfileId;
-
-                if (BossPlayers.Instance != null)
-                {
-                    var followers = BossPlayers.GetFollowersByBoss(id);
-                    Vector3 position = GamePlayerOwner.MyPlayer.Transform.position;
-                    foreach (var follower in followers)
-                    {
-                        if (follower != null && follower.GetBot().HealthController.IsAlive)
-                        {
-                            follower.GetBot().GetPlayer.Teleport(position);
-                        }
-                    }
-                }
-
-            });
-
-            ConsoleScreen.Processor.RegisterCommand("followersfixheal", delegate ()
-            {
-                GameWorld gameWorld = Singleton<GameWorld>.Instance;
-
-                bool flag = !Singleton<AbstractGame>.Instantiated;
-                if (flag)
-                {
-                    ConsoleScreen.LogError("This command may only be used inraid");
-                    return;
-                }
-
-
-                if (GamePlayerOwner.MyPlayer.HealthController == null || !GamePlayerOwner.MyPlayer.HealthController.IsAlive)
-                {
-                    return;
-                }
-
-                string id = GamePlayerOwner.MyPlayer.ProfileId;
-
-                if (BossPlayers.Instance != null)
-                {
-                    var followers = BossPlayers.GetFollowersByBoss(id);
-                    Vector3 position = GamePlayerOwner.MyPlayer.Transform.position;
-                    foreach (var follower in followers)
-                    {
-                        if (follower != null && follower.GetBot().HealthController.IsAlive)
-                        {
-                            (follower.GetBot().Brain.BaseBrain as FollowerBrain).HandsReset();
-                            follower.GetBot().WeaponManager.Selector.TakePrevWeapon();
-                        }
-                    }
-                }
-
-            });
-
-            // set configuration manager
-            configurationManager = Chainloader.PluginInfos
-            .Values
-            .FirstOrDefault(x => x.Instance.GetType().Name == "ConfigurationManager")
-            ?.Instance as ConfigurationManager.ConfigurationManager;
-            // - get config language
-            GetLanguage();
-            // - set config
-            ConfigSet();
-
-            harmony.PatchAll(typeof(ConfigurationManagerPatch).Assembly);
 
             // patch sain in regards to Squad 
             SAINPatch.PatchSAINIfInstalled(harmony);
@@ -336,20 +261,27 @@ namespace friendlyPMC
             new BulletImpactPatch().Enable();
             new PlayerSayPatch().Enable();
             new GamePlayerOwnerPatch().Enable();
-            // patch bot equipment
+            // patch bot equipment to prevent looting companions
             new UnlootableComponentPatch().Enable();
             new ModRaidModdablePatch().Enable();
             new ItemSpecificationPanelPatch().Enable();
-
-            // raid patches
+            // raid patches to help with questing, having bots as being friends and part of the same group, and sending config changes to the server
             new RaidStartPatch().Enable();
             new MainMenuControllerPatch().Enable();
             new MainMenuController74Patch().Enable();
-            harmony.PatchAll(typeof(SendInvitePatch).Assembly);
-
+            // quests related patches
             new PlayerKilledPatch().Enable();
             new ConditionCounterPatch().Enable();
             new QuestsListViewPatch().Enable();
+            // social related patches to help with refreshing the list of friends when a quest is completed
+            new SocialNetworkClassPatch().Enable();
+            new GClass2067Patch().Enable();
+            harmony.PatchAll(typeof(SendInvitePatch).Assembly);
+
+            // add console commands
+            AddConsoleCommands();
+            // set configuration manager
+            SetConfiguration();
         }
 
 
@@ -858,6 +790,90 @@ namespace friendlyPMC
             return optionsLang.tacticOptions;
         }
 
+        private void AddConsoleCommands()
+        {
+                        ConsoleScreen.Processor.RegisterCommand("followerstome", delegate ()
+            {
+                GameWorld gameWorld = Singleton<GameWorld>.Instance;
+
+                bool flag = !Singleton<AbstractGame>.Instantiated;
+                if (flag)
+                {
+                    ConsoleScreen.LogError("This command may only be used inraid");
+                    return;
+                }
+
+
+                if (GamePlayerOwner.MyPlayer.HealthController == null || !GamePlayerOwner.MyPlayer.HealthController.IsAlive)
+                {
+                    return;
+                }
+
+                string id = GamePlayerOwner.MyPlayer.ProfileId;
+
+                if (BossPlayers.Instance != null)
+                {
+                    var followers = BossPlayers.GetFollowersByBoss(id);
+                    Vector3 position = GamePlayerOwner.MyPlayer.Transform.position;
+                    foreach (var follower in followers)
+                    {
+                        if (follower != null && follower.GetBot().HealthController.IsAlive)
+                        {
+                            follower.GetBot().GetPlayer.Teleport(position);
+                        }
+                    }
+                }
+
+            });
+
+            ConsoleScreen.Processor.RegisterCommand("followersfixheal", delegate ()
+            {
+                GameWorld gameWorld = Singleton<GameWorld>.Instance;
+
+                bool flag = !Singleton<AbstractGame>.Instantiated;
+                if (flag)
+                {
+                    ConsoleScreen.LogError("This command may only be used inraid");
+                    return;
+                }
+
+
+                if (GamePlayerOwner.MyPlayer.HealthController == null || !GamePlayerOwner.MyPlayer.HealthController.IsAlive)
+                {
+                    return;
+                }
+
+                string id = GamePlayerOwner.MyPlayer.ProfileId;
+
+                if (BossPlayers.Instance != null)
+                {
+                    var followers = BossPlayers.GetFollowersByBoss(id);
+                    Vector3 position = GamePlayerOwner.MyPlayer.Transform.position;
+                    foreach (var follower in followers)
+                    {
+                        if (follower != null && follower.GetBot().HealthController.IsAlive)
+                        {
+                            (follower.GetBot().Brain.BaseBrain as FollowerBrain).HandsReset();
+                            follower.GetBot().WeaponManager.Selector.TakePrevWeapon();
+                        }
+                    }
+                }
+
+            });
+
+        }
+
+        private void SetConfiguration()
+        {
+            configurationManager = Chainloader.PluginInfos
+            .Values
+            .FirstOrDefault(x => x.Instance.GetType().Name == "ConfigurationManager")
+            ?.Instance as ConfigurationManager.ConfigurationManager;
+            // - get config language
+            GetLanguage();
+            // - set config
+            ConfigSet();
+        }
 
         void Update()
         {

@@ -198,9 +198,9 @@
     <Compile Include="Patches\HearingSensorPatch.cs" />
     <Compile Include="Patches\ItemPatch.cs" />
     <Compile Include="Patches\LookSensorPatch.cs" />
-    <Compile Include="Patches\NotificationReceivedPatch.cs" />
     <Compile Include="Patches\RaidStartPatch.cs" />
     <Compile Include="Patches\SAINPatch.cs" />
+    <Compile Include="Patches\SocialPatch.cs" />
     <Compile Include="Requests\FollowerGoCheck.cs" />
     <Compile Include="Requests\FollowerHold.cs" />
     <Compile Include="Actions\FollowerPatrol.cs" />
