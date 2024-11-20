@@ -376,12 +376,10 @@ namespace friendlyPMC.Components
             {
                 EPhraseTrigger.OpenDoor,
                 EPhraseTrigger.Gogogo,
-                EPhraseTrigger.GoForward,
                 EPhraseTrigger.Silence,
                 EPhraseTrigger.Fire,
                 EPhraseTrigger.GetBack,
-                EPhraseTrigger.CoverMe,
-                EPhraseTrigger.HoldPosition
+                EPhraseTrigger.CoverMe
             };
             List<EPhraseTrigger> bossBusyIgnore = new List<EPhraseTrigger>
             {

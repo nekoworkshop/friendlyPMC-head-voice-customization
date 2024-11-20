@@ -266,7 +266,7 @@
 					"visibilityConditions": []
 				},
 				{
-					"availableAfter": 0,
+					"availableAfter": 3600,
 					"conditionType": "Quest",
 					"dispersion": 0,
 					"dynamicLocale": false,
@@ -515,6 +515,7 @@
 		"traderId": "friendlypmc-knight",
 		"type": "PickUp"
     },
+
     "friendlypmc-knight-payback01" :{
         "QuestName": "Badge Bandit",
 		"_id": "friendlypmc-knight-payback01",
@@ -536,7 +537,7 @@
 					"visibilityConditions": []
 				},
 				{
-					"availableAfter": 0,
+					"availableAfter": 3600,
 					"conditionType": "Quest",
 					"dispersion": 0,
 					"dynamicLocale": false,
@@ -689,7 +690,7 @@
 					"visibilityConditions": []
 				},
 				{
-					"availableAfter": 0,
+					"availableAfter": 3600,
 					"conditionType": "Quest",
 					"dispersion": 0,
 					"dynamicLocale": false,
@@ -793,7 +794,7 @@
 					"id": "friendlypmc-knight-payback02-reward-1",
 					"index": 0,
 					"type": "Experience",
-					"value": "35000"
+					"value": "30000"
 				},
 				{
 					"id": "friendlypmc-knight-payback02-reward-2",
@@ -818,6 +819,321 @@
 		"side": "Pmc",
 		"startedMessageText": "friendlypmc-knight-payback02 startedMessageText",
 		"successMessageText": "friendlypmc-knight-payback02 successMessageText",
+		"traderId": "friendlypmc-knight",
+		"type": "Elimination"
+    },
+
+    "friendlypmc-knight-enemyspotted1" : {
+        "QuestName": "Enemy Spotted",
+        "_id": "friendlypmc-knight-enemyspotted1",
+		"acceptPlayerMessage": "friendlypmc-knight-enemyspotted acceptPlayerMessage",
+		"canShowNotificationsInGame": true,
+		"changeQuestMessageText": "friendlypmc-knight-enemyspotted changeQuestMessageText",
+		"completePlayerMessage": "friendlypmc-knight-enemyspotted completePlayerMessage",
+        "conditions": {
+			"AvailableForStart": [
+				{
+					"compareMethod": ">=",
+					"conditionType": "Level",
+					"dynamicLocale": false,
+					"globalQuestCounterId": "",
+					"id": "friendlypmc-knight-enemyspotted1-req1",
+					"index": 0,
+					"parentId": "",
+					"value": 20,
+					"visibilityConditions": []
+				},
+                {
+					"availableAfter": 3600,
+					"conditionType": "Quest",
+					"dispersion": 0,
+					"dynamicLocale": false,
+					"globalQuestCounterId": "",
+					"id": "friendlypmc-knight-enemyspotted1-req-2",
+					"index": 0,
+					"parentId": "",
+					"status": [4],
+					"target": "friendlypmc-knight-payback01",
+					"visibilityConditions": []
+				}
+			],
+            "AvailableForFinish" : [
+                {
+					"completeInSeconds": 0,
+					"conditionType": "CounterCreator",
+					"counter": {
+						"conditions": [
+							{
+								"bodyPart": [],
+								"compareMethod": ">=",
+								"conditionType": "Kills",
+								"daytime": {
+									"from": 0,
+									"to": 0
+								},
+								"distance": {
+									"compareMethod": ">=",
+									"value": 0
+								},
+								"dynamicLocale": false,
+								"enemyEquipmentExclusive": [],
+								"enemyEquipmentInclusive": [],
+								"enemyHealthEffects": [],
+								"id": "friendlypmc-knight-enemyspotted1-1-kill",
+								"resetOnSessionEnd": false,
+								"savageRole": [],
+								"target": "AnyPmc",
+								"value": 1,
+								"weapon": [],
+								"weaponCaliber": [],
+								"weaponModsExclusive": [],
+								"weaponModsInclusive": []
+							},
+							{
+								"conditionType": "Location",
+								"dynamicLocale": false,
+								"id": "friendlypmc-knight-enemyspotted1-1-location",
+								"target": ["Woods"]
+							}
+						],
+						"id": "friendlypmc-knight-enemyspotted1-1-cond"
+					},
+					"doNotResetIfCounterCompleted": false,
+					"dynamicLocale": false,
+					"globalQuestCounterId": "",
+					"id": "friendlypmc-knight-enemyspotted1-1",
+					"index": 1,
+					"oneSessionOnly": false,
+					"parentId": "",
+					"type": "Elimination",
+					"value": 5,
+					"visibilityConditions": []
+				}
+            ],
+            "Fail": [
+				{
+					"completeInSeconds": 0,
+					"conditionType": "CounterCreator",
+					"counter": {
+						"conditions": [
+							{
+								"conditionType": "ExitStatus",
+								"dynamicLocale": false,
+								"id": "friendlypmc-knight-enemyspotted1-fail-1",
+								"status": ["Killed", "Left", "MissingInAction"]
+							},
+							{
+								"conditionType": "Location",
+								"dynamicLocale": false,
+								"id": "ffriendlypmc-knight-enemyspotted1-fail-2",
+								"target": ["Woods"]
+							}
+						],
+						"id": "friendlypmc-knight-enemyspotted1-fail-cond"
+					},
+					"doNotResetIfCounterCompleted": false,
+					"dynamicLocale": false,
+					"globalQuestCounterId": "",
+					"id": "friendlypmc-knight-enemyspotted1-fail",
+					"index": 0,
+					"oneSessionOnly": false,
+					"parentId": "",
+					"type": "Completion",
+					"value": 1,
+					"visibilityConditions": []
+				}
+			]
+        },
+        "rewards": {
+			"Fail": [],
+			"Started": [],
+			"Success": [
+				{
+					"id": "friendlypmc-knight-enemyspotted1-reward-1",
+					"index": 0,
+					"type": "Experience",
+					"value": "20000"
+				},
+				{
+					"id": "friendlypmc-knight-enemyspotted1-reward-2",
+					"index": 1,
+					"target": "friendlypmc-knight",
+					"type": "TraderStanding",
+					"value": "0.1"
+				}
+			]
+		},
+        "declinePlayerMessage": "friendlypmc-knight-enemyspotted declinePlayerMessage",
+		"description": "friendlypmc-knight-enemyspotted description",
+		"failMessageText": "friendlypmc-knight-enemyspotted failMessageText",
+		"image": "/files/quest/icon/KnightRambo.jpg",
+		"instantComplete": false,
+		"isKey": false,
+		"location": "5704e3c2d2720bac5b8b4567",
+		"name": "friendlypmc-knight-enemyspotted name",
+		"note": "friendlypmc-knight-enemyspotted note",
+		"restartable": true,
+        "secretQuest": false,
+		"side": "Pmc",
+		"startedMessageText": "friendlypmc-knight-enemyspotted startedMessageText",
+		"successMessageText": "friendlypmc-knight-enemyspotted successMessageText",
+		"traderId": "friendlypmc-knight",
+		"type": "Elimination"
+    },
+    "friendlypmc-knight-enemyspotted2" : {
+        "QuestName": "Enemy Spotted",
+        "_id": "friendlypmc-knight-enemyspotted2",
+		"acceptPlayerMessage": "friendlypmc-knight-enemyspotted acceptPlayerMessage",
+		"canShowNotificationsInGame": true,
+		"changeQuestMessageText": "friendlypmc-knight-enemyspotted changeQuestMessageText",
+		"completePlayerMessage": "friendlypmc-knight-enemyspotted completePlayerMessage",
+        "conditions": {
+			"AvailableForStart": [
+				{
+					"compareMethod": ">=",
+					"conditionType": "Level",
+					"dynamicLocale": false,
+					"globalQuestCounterId": "",
+					"id": "friendlypmc-knight-enemyspotted2-req1",
+					"index": 0,
+					"parentId": "",
+					"value": 20,
+					"visibilityConditions": []
+				},
+                {
+					"availableAfter": 3600,
+					"conditionType": "Quest",
+					"dispersion": 0,
+					"dynamicLocale": false,
+					"globalQuestCounterId": "",
+					"id": "friendlypmc-knight-enemyspotted2-req-2",
+					"index": 0,
+					"parentId": "",
+					"status": [4],
+					"target": "friendlypmc-knight-payback02",
+					"visibilityConditions": []
+				}
+			],
+            "AvailableForFinish" : [
+                {
+					"completeInSeconds": 0,
+					"conditionType": "CounterCreator",
+					"counter": {
+						"conditions": [
+							{
+								"bodyPart": [],
+								"compareMethod": ">=",
+								"conditionType": "Kills",
+								"daytime": {
+									"from": 0,
+									"to": 0
+								},
+								"distance": {
+									"compareMethod": ">=",
+									"value": 0
+								},
+								"dynamicLocale": false,
+								"enemyEquipmentExclusive": [],
+								"enemyEquipmentInclusive": [],
+								"enemyHealthEffects": [],
+								"id": "friendlypmc-knight-enemyspotted2-1-kill",
+								"resetOnSessionEnd": false,
+								"savageRole": [],
+								"target": "AnyPmc",
+								"value": 1,
+								"weapon": [],
+								"weaponCaliber": [],
+								"weaponModsExclusive": [],
+								"weaponModsInclusive": []
+							},
+							{
+								"conditionType": "Location",
+								"dynamicLocale": false,
+								"id": "friendlypmc-knight-enemyspotted2-1-location",
+								"target": ["Woods"]
+							}
+						],
+						"id": "friendlypmc-knight-enemyspotted2-1-cond"
+					},
+					"doNotResetIfCounterCompleted": false,
+					"dynamicLocale": false,
+					"globalQuestCounterId": "",
+					"id": "friendlypmc-knight-enemyspotted2-1",
+					"index": 1,
+					"oneSessionOnly": false,
+					"parentId": "",
+					"type": "Elimination",
+					"value": 5,
+					"visibilityConditions": []
+				}
+            ],
+            "Fail": [
+				{
+					"completeInSeconds": 0,
+					"conditionType": "CounterCreator",
+					"counter": {
+						"conditions": [
+							{
+								"conditionType": "ExitStatus",
+								"dynamicLocale": false,
+								"id": "friendlypmc-knight-enemyspotted2-fail-1",
+								"status": ["Killed", "Left", "MissingInAction"]
+							},
+							{
+								"conditionType": "Location",
+								"dynamicLocale": false,
+								"id": "ffriendlypmc-knight-enemyspotted2-fail-2",
+								"target": ["Woods"]
+							}
+						],
+						"id": "friendlypmc-knight-enemyspotted1-fail-cond"
+					},
+					"doNotResetIfCounterCompleted": false,
+					"dynamicLocale": false,
+					"globalQuestCounterId": "",
+					"id": "friendlypmc-knight-enemyspotted2-fail",
+					"index": 0,
+					"oneSessionOnly": false,
+					"parentId": "",
+					"type": "Completion",
+					"value": 1,
+					"visibilityConditions": []
+				}
+			]
+        },
+        "rewards": {
+			"Fail": [],
+			"Started": [],
+			"Success": [
+				{
+					"id": "friendlypmc-knight-enemyspotted2-reward-1",
+					"index": 0,
+					"type": "Experience",
+					"value": "20000"
+				},
+				{
+					"id": "friendlypmc-knight-enemyspotted2-reward-2",
+					"index": 1,
+					"target": "friendlypmc-knight",
+					"type": "TraderStanding",
+					"value": "0.1"
+				}
+			]
+		},
+        "declinePlayerMessage": "friendlypmc-knight-enemyspotted declinePlayerMessage",
+		"description": "friendlypmc-knight-enemyspotted description",
+		"failMessageText": "friendlypmc-knight-enemyspotted failMessageText",
+		"image": "/files/quest/icon/KnightRambo.jpg",
+		"instantComplete": false,
+		"isKey": false,
+		"location": "5704e3c2d2720bac5b8b4567",
+		"name": "friendlypmc-knight-enemyspotted name",
+		"note": "friendlypmc-knight-enemyspotted note",
+		"restartable": true,
+        "secretQuest": false,
+		"side": "Pmc",
+		"startedMessageText": "friendlypmc-knight-enemyspotted startedMessageText",
+		"successMessageText": "friendlypmc-knight-enemyspotted successMessageText",
 		"traderId": "friendlypmc-knight",
 		"type": "Elimination"
     }

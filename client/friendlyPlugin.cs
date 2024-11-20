@@ -248,7 +248,7 @@ namespace friendlyPMC
             // spawn patches
             harmony.PatchAll(typeof(LocalGameCtorPatch).Assembly);
             harmony.PatchAll(typeof(BaseLocalGameVmethod4Patch).Assembly);
-            harmony.PatchAll(typeof(BossSpawnerClassPatch).Assembly);
+            new BossSpawnWaveManagerClassPatch().Enable();
 
             // patch sain in regards to Squad 
             SAINPatch.PatchSAINIfInstalled(harmony);

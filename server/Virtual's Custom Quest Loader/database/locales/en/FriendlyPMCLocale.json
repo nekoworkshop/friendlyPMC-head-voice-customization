@@ -62,15 +62,17 @@
     "friendlypmc-knight-payback02-1": "Eliminate Glukhar while teamed up Knight and BigPipe",
     "friendlypmc-knight-payback02-fail": "You, Knight and BigPipe must not die or leave the raid while the task is active (Status: KIA, Left the Action, MIA, Ran Through)",
 
-    "friendlypmc-knight-sitescene name": "Enemy spotted",
-	"friendlypmc-knight-sitescene description": "BirdEye here, looks like you are getting the fellas to be all gaga over you. I wonder though, how good of a team player are you? Be my spotter and help me take out some targets. Now, I don't like small fries, if you run with me, we go for the big game. Shall we?",
-	"friendlypmc-knight-sitescene startedMessageText": "",
-	"friendlypmc-knight-sitescene successMessageText": "Nice work, you got a good eye. I'll keep you in mind for future work.",
-	"friendlypmc-knight-sitescene failMessageText": "Well that's disappointing. I thought you had it in you.",
-	"friendlypmc-knight-sitescene acceptPlayerMessage": "",
-	"friendlypmc-knight-sitescene declinePlayerMessage": "",
-	"friendlypmc-knight-sitescene changeQuestMessageText": "",
-	"friendlypmc-knight-sitescene note": "Both you and BirdEye will have to survive the raid. BirdEye must be the one to eliminate the targets",
-	"friendlypmc-knight-sitescene-1": "Assist BirdEye in eliminating 5 PMCs on Woods",
-	"friendlypmc-knight-sitescene-fail": "You and BirdEye must not die or leave the raid while the task is active (Status: KIA, Left the Action, MIA, Ran Through)"
+    "friendlypmc-knight-enemyspotted name": "Enemy spotted",
+	"friendlypmc-knight-enemyspotted description": "BirdEye here, looks like you are getting the fellas to be all gaga over you. I wonder though, how good of a team player are you? Be my spotter and help me take out some targets. Now, I don't like small fries, if you run with me, we go for the big game. So, shall we?",
+	"friendlypmc-knight-enemyspotted startedMessageText": "",
+	"friendlypmc-knight-enemyspotted successMessageText": "Nice work man.",
+	"friendlypmc-knight-enemyspotted failMessageText": "Come on man, don't disappoint BirdEye. I know you have it in you.",
+	"friendlypmc-knight-enemyspotted acceptPlayerMessage": "",
+	"friendlypmc-knight-enemyspotted declinePlayerMessage": "",
+	"friendlypmc-knight-enemyspotted changeQuestMessageText": "",
+	"friendlypmc-knight-enemyspotted note": "Both you and BirdEye will have to survive the raid. BirdEye must be the one to eliminate the targets",
+	"friendlypmc-knight-enemyspotted1-1": "Assist BirdEye in eliminating 5 PMCs on Woods",
+	"friendlypmc-knight-enemyspotted1-fail": "You and BirdEye must not die or leave the raid while the task is active (Status: KIA, Left the Action, MIA, Ran Through)",
+    "friendlypmc-knight-enemyspotted2-1": "Assist BirdEye in eliminating 5 PMCs on Woods",
+	"friendlypmc-knight-enemyspotted2-fail": "You and BirdEye must not die or leave the raid while the task is active (Status: KIA, Left the Action, MIA, Ran Through)"
 }

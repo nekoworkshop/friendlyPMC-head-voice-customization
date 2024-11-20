@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using EFT;
 
 namespace friendlyPMC.Utils
 {
@@ -82,7 +83,10 @@ namespace friendlyPMC.Utils
             },
             {
                 "BirdEye",
+                // order is important
                 new List<string> {
+                    "friendlypmc-knight-payback01",
+                    "friendlypmc-knight-payback02",
                 }
             }
         };
@@ -167,6 +171,22 @@ namespace friendlyPMC.Utils
                     "friendlypmc-knight-competition-3"
                 }
             }
+        };
+
+        public static Dictionary<WildSpawnType, List<string>> QuestBosses = new Dictionary<WildSpawnType, List<string>>{
+            {
+                WildSpawnType.bossKolontay,
+                new List<string> {
+                    "friendlypmc-knight-payback01"
+                }
+            },
+            {
+                WildSpawnType.bossGluhar,
+                new List<string> {
+                    "friendlypmc-knight-payback02"
+                }
+            }
+
         };
     }
 }

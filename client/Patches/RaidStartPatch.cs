@@ -55,6 +55,7 @@ namespace friendlyPMC.Patches
             Profile profile = __instance.GetProfileBySide(ESideType.Pmc);
 
             // patch raid settings to determine if user can spawn with a boss do to questing
+            List<string> questCompanions = new List<string>();
             profile.QuestsData.ForEach(quest=>{
 
                 foreach (var item in Utils.Props.Quests)
@@ -85,15 +86,24 @@ namespace friendlyPMC.Patches
                                     
                                     if(item.Key == "Knight")
                                     {
-                                        Utils.Utils.FlagSet("spawnKnight", true);  
+                                        if(!questCompanions.Contains("bossKnight"))
+                                        {
+                                            questCompanions.Add("bossKnight");
+                                        }
                                     }
                                     else if(item.Key == "BigPipe")
                                     {
-                                        Utils.Utils.FlagSet("spawnBigPipe", true);  
+                                        if (!questCompanions.Contains("followerBigPipe"))
+                                        {
+                                            questCompanions.Add("followerBigPipe");
+                                        }
                                     }
-                                    else if(item.Key == "BirdEye" && !(Utils.Utils.FlagGet("spawnKnight") || Utils.Utils.FlagGet("spawnBigPipe")))
+                                    else if (item.Key == "BirdEye")
                                     {
-                                        Utils.Utils.FlagSet("spawnBirdEye", true);  
+                                        if (!questCompanions.Contains("followerBirdEye"))
+                                        {
+                                            questCompanions.Add("followerBirdEye");
+                                        }
                                     }
 
                                     break;
@@ -103,6 +113,29 @@ namespace friendlyPMC.Patches
                     }
                 }
             });
+
+            if (questCompanions.Count > 0)
+            {
+                Utils.Utils.FlagSet("spawnKnight", false);
+                Utils.Utils.FlagSet("spawnBigPipe", false);
+                Utils.Utils.FlagSet("spawnBirdEye", false);
+                questCompanions.ForEach(companion =>
+                {
+                    if (companion == "bossKnight")
+                    {
+                        Utils.Utils.FlagSet("spawnKnight", true);
+                    }
+                    else if (companion == "followerBigPipe")
+                    {
+                        Utils.Utils.FlagSet("spawnBigPipe", true);
+                    }
+                    else if (companion == "followerBirdEye")
+                    {
+                        Utils.Utils.FlagSet("spawnBirdEye", true);
+                    }
+
+                });
+            }
 
             // patch raid settings to that we can change the settings without restarting the game
             var converterClass = typeof(AbstractGame).Assembly.GetTypes()

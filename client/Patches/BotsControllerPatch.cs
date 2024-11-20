@@ -29,6 +29,7 @@ using SPT.Common.Http;
 using Newtonsoft.Json;
 using EFT.Game.Spawning;
 using System.Timers;
+using EFT.Quests;
 
 namespace friendlyPMC.Patches
 {
@@ -1406,16 +1407,16 @@ namespace friendlyPMC.Patches
 
         }
     }
-
+    /** FIKA is causing BossSpawning block not to be respected so we need to force it **/
     [HarmonyPatch(typeof(BossSpawnerClass), "method_2")]
     internal class BossSpawnerClassPatch
     {
-        public static bool Prefix(Task __result,BotCreationDataClass creationData, BossLocationSpawn wave, BotSpawnParams spawnParams, int followersCount, BotZone botZone, List<ISpawnPoint> openedPositions)
+        public static bool Prefix(ref Task __result,BotCreationDataClass creationData, BossLocationSpawn wave, BotSpawnParams spawnParams, int followersCount, BotZone botZone, List<ISpawnPoint> openedPositions)
         {
             if (BotsControllerPatch.Controller != null)
             {
-                // Your custom logic here
                 GClass592 data = new GClass592(EPlayerSide.Savage, wave.BossType, wave.BossDif, wave.Time, spawnParams);
+                
                 if (!BotsControllerPatch.Controller.BotSpawner.CanSpawnRole(data))
                 {
                     __result = null;
@@ -1423,6 +1424,60 @@ namespace friendlyPMC.Patches
                 }
             }
 
+            return true;
+        }
+    }
+
+    internal class BossSpawnWaveManagerClassPatch : ModulePatch
+    {
+        protected override MethodBase GetTargetMethod()
+        {
+            return AccessTools.Method(typeof(BossSpawnWaveManagerClass), "Run");
+
+        }
+        [PatchPrefix]
+        private static bool PatchPrefix(BossSpawnWaveManagerClass __instance)
+        {
+
+            if (!Singleton<AbstractGame>.Instantiated) return true;
+
+            if (GamePlayerOwner.MyPlayer.HealthController == null || !GamePlayerOwner.MyPlayer.HealthController.IsAlive)
+            {
+                return true;
+            }
+
+            Player player = GamePlayerOwner.MyPlayer;
+
+            if(player.Side == EPlayerSide.Savage)
+            {
+                return true;
+            }
+
+            foreach( var wave in __instance.BossSpawnWaves)
+            {
+                // do not spawn the Goons if we are running with them
+                if(
+                    wave.BossType == WildSpawnType.bossKnight &&
+                    !friendlyPMC.squadSpawn.Value &&
+                    (Utils.Utils.FlagGet("spawnKnight") || Utils.Utils.FlagGet("spawnBigPipe") || Utils.Utils.FlagGet("spawnBirdEye"))
+                )
+                {
+                    wave.ShallSpawn = false;
+                    wave.ForceSpawn = false;
+                }
+                // increase the chance of spawning a boss based on player quests
+                if(Utils.Utils.FlagGet("questGoons")) player.Profile.QuestsData.ForEach(quest =>
+                {
+                    foreach (var item in Utils.Props.QuestBosses)
+                    {
+                        if(item.Key == wave.BossType && item.Value.Contains(quest.Id) && quest.Status == EQuestStatus.Started)
+                        {
+                            wave.ShallSpawn = true;
+                            break;
+                        }
+                    }
+                });
+            }
             return true;
         }
     }
