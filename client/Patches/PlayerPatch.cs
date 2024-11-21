@@ -159,6 +159,7 @@ namespace friendlyPMC.Patches
 			}
             
             if (!Singleton<AbstractGame>.Instantiated) return;
+            if (GamePlayerOwner.MyPlayer == null) return;
             if (GamePlayerOwner.MyPlayer.HealthController == null || !GamePlayerOwner.MyPlayer.HealthController.IsAlive)
             {
                 return;
@@ -177,7 +178,8 @@ namespace friendlyPMC.Patches
             if(aggressor.Profile.Info.Settings.Role == WildSpawnType.bossKnight)
             {
                 knightKiller = true;
-            } else if (aggressor.Profile.Info.Settings.Role == WildSpawnType.followerBigPipe)
+            } 
+            else if (aggressor.Profile.Info.Settings.Role == WildSpawnType.followerBigPipe)
             {
                 pipeKiller = true;
             }
@@ -186,7 +188,6 @@ namespace friendlyPMC.Patches
                 birdEyeKiller = true;
             }
 
-            if (!knightKiller) return;
 
             List<string> list = new List<string>();
             Item weapon2 = damageInfo.Weapon;

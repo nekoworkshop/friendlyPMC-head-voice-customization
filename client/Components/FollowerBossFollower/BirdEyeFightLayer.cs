@@ -96,15 +96,16 @@ namespace friendlyPMC.Components.FollowerBossFollower
 
                 // player needs help or has call for a regroup
                 if (
-                    ordersChanged && request != null &&
+                    request != null &&
                     request.BotRequestType == (BotRequestType)CustomBotRequestType.Regroup &&
                     Utils.Utils.GetNavDistance(botPosition, bossPosition) > followerCommonLayer.regroupMinDistance
                 )
                 {
-
-                    if (!botOwner_0.Memory.HaveEnemy || !botOwner_0.Memory.GoalEnemy.IsVisible || !botOwner_0.Memory.GoalEnemy.CanShoot)
+                    if (!botOwner_0.Memory.HaveEnemy || !goalEnemy.IsVisible)
                     {
-                        return followerCommonLayer.GetCloserToBoss(out customNavigationPoint_0);
+                        aicoreActionResultStruct = followerCommonLayer.GetCloserToBoss(out customNavigationPoint_0);
+                        if (aicoreActionResultStruct != null)
+                            return (AICoreActionResultStruct<BotLogicDecision>)aicoreActionResultStruct;
                     }
                     else
                     {
@@ -114,7 +115,7 @@ namespace friendlyPMC.Components.FollowerBossFollower
                 }
 
                 // do not pursue a marksman
-                if (botOwner_0.Memory.GoalEnemy.Owner.IsRole(WildSpawnType.marksman))
+                if (botOwner_0.Memory.HaveEnemy && goalEnemy.Owner.IsRole(WildSpawnType.marksman))
                 {
                     return followerCommonLayer.MarksManFight(out customNavigationPoint_0);
                 }

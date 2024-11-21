@@ -87,6 +87,8 @@ namespace friendlyPMC.Utils
                 new List<string> {
                     "friendlypmc-knight-payback01",
                     "friendlypmc-knight-payback02",
+                    "friendlypmc-knight-enemyspotted1",
+                    "friendlypmc-knight-enemyspotted2"
                 }
             }
         };
@@ -100,7 +102,7 @@ namespace friendlyPMC.Utils
                     "shoreline",
                     "woods"
                 }
-                
+
             },
             {
                 "friendlypmc-knight-my-land",
@@ -118,6 +120,18 @@ namespace friendlyPMC.Utils
                 "friendlypmc-knight-payback02",
                 new List<string> {
                     "rezervbase"
+                }
+            },
+            {
+                "friendlypmc-knight-enemyspotted1",
+                new List<string> {
+                    "woods"
+                }
+            },
+                        {
+                "friendlypmc-knight-enemyspotted2",
+                new List<string> {
+                    "woods"
                 }
             }
         };
@@ -155,12 +169,13 @@ namespace friendlyPMC.Utils
             },
             {
                 "BigPipe",
-                new List<string> {
-                }
+                new List<string> {}
             },
             {
                 "BirdEye",
                 new List<string> {
+                    "friendlypmc-knight-enemyspotted1-1",
+                    "friendlypmc-knight-enemyspotted2-1"
                 }
             },
             {

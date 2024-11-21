@@ -149,9 +149,9 @@ namespace friendlyPMC.Components.BossFollower
             if (enemyVisible)
             {
                 // If the enemy is close or mid-range
-                if (distanceToEnemy <= Utils.Enemy.EnemyDistance.Mid && commonLayer.IsEnemyLowThreat())
+                if (distanceToEnemy <= Utils.Enemy.EnemyDistance.Mid && commonLayer.IsEnemyLowThreat(false,2))
                 {
-                    // Rush towards the enemy while suppressing
+                    // Rush towards the enemy
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToEnemy, "assaultRush");
                 }
                 else
@@ -164,7 +164,7 @@ namespace friendlyPMC.Components.BossFollower
                         botOwner_0.Steering.LookToPoint(botOwner_0.Memory.GoalEnemy.GetCenterPart());
                         return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMovingWithSuppress, "assaultApproach");
                     }
-                    else if(commonLayer.IsEnemyLowThreat())
+                    else if(commonLayer.IsEnemyLowThreat(false,2))
                     {
                         // No cover point found, move towards the enemy while suppressing
                         return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToEnemy, "assaultRush");
@@ -182,7 +182,7 @@ namespace friendlyPMC.Components.BossFollower
                     botOwner_0.Steering.LookToPoint(botOwner_0.Memory.GoalEnemy.GetCenterPart());
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMovingWithSuppress, "assaultApproach");
                 }
-                else if (commonLayer.IsEnemyLowThreat())
+                else if (commonLayer.IsEnemyLowThreat(false,2))
                 {
                     // No cover point found, move towards the enemy's last known position while suppressing
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToEnemy, "assaultRush");
@@ -199,27 +199,20 @@ namespace friendlyPMC.Components.BossFollower
 
             BotRequest request = botOwner_0.BotRequestController.CurRequest;
 
-            if (request != null && !commonLayer.OrderHasChangedRecently)
-            {
-                request.Complete();
-                return null;
-            }
 
             Vector3 botPosition = botOwner_0.GetPlayer.Transform.position;
             Vector3 bossPosition = request != null ? botOwner_0.BotRequestController.CurRequest.Requester.Position : botPosition;
 
             // player needs help or has call for a regroup
             if (
-                commonLayer.OrderHasChangedRecently && request != null &&
+                request != null &&
                 request.BotRequestType == (BotRequestType)CustomBotRequestType.Regroup &&
                 Utils.Utils.GetNavDistance(botPosition, bossPosition) > commonLayer.regroupMinDistance
             )
             {
-
                 if (!botOwner_0.Memory.HaveEnemy || !botOwner_0.Memory.GoalEnemy.IsVisible)
                 {
-                    commonLayer.GetCloserToBoss(out customNavigationPoint_0);
-
+                    return commonLayer.GetCloserToBoss(out customNavigationPoint_0);
                 }
                 else
                 {
@@ -246,7 +239,7 @@ namespace friendlyPMC.Components.BossFollower
             }
 
             // player suggested to do a push
-            if (commonLayer.OrderHasChangedRecently && request != null && request.BotRequestType == BotRequestType.attackClose)
+            if (request != null && request.BotRequestType == BotRequestType.attackClose)
             {
                 AICoreActionResultStruct<BotLogicDecision> forcePush = pusherLayer.EngageEnemy(true);
                 customNavigationPoint_0 = pusherLayer.NavigationPoint;
@@ -346,10 +339,7 @@ namespace friendlyPMC.Components.BossFollower
                     return commonLayer.DogFight(out customNavigationPoint_0);
                 }
 
-                if (commonLayer.IsEnemyLowThreat() && Utils.Enemy.Distance(botOwner_0) <= Utils.Enemy.EnemyDistance.Mid)
-                {
-                    return KnightAssault();
-                }
+                return KnightAssault();
             }
 
             return null;

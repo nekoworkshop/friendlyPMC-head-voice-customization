@@ -29,7 +29,7 @@ namespace friendlyPMC.Components.FollowerBossFollower
             KnightWeaponMtnLayer layer2 = new KnightWeaponMtnLayer(_owner, 78);
             base.method_0(4, layer2, true);
             // artillerry support
-            fightLayer = new BigPipeArtilleryLayer(_owner, 60);
+            fightLayer = new BigPipeArtilleryLayer(_owner, 65);
             base.method_0(5, fightLayer, true);
             // - item taker
             FollowerLootLayer layer7 = new FollowerLootLayer(_owner, 40);

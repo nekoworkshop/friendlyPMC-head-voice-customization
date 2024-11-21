@@ -52,7 +52,7 @@ namespace friendlyPMC.Components
             settingModif.VisibleDistCoef = 1.4f;
             if (bot.IsRole(WildSpawnType.followerBirdEye))
             {
-                settingModif.VisibleDistCoef = 1.6f;
+                settingModif.VisibleDistCoef = 1.3f;
             }
 
             //bot.Settings.FileSettings.Look.FULL_SECTOR_VIEW = true;

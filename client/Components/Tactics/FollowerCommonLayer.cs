@@ -306,7 +306,7 @@ namespace friendlyPMC.Components.Tactics
             ordersChanged = false;
         }
 
-        public bool IsEnemyLowThreat(bool ignoreEquip = false)
+        public bool IsEnemyLowThreat(bool ignoreEquip = false, float maximumEnemies = 1)
         {
             if (!ignoreEquip && dangerTimer > Time.time) return dangerResult;
             else if (ignoreEquip && dangerIgnoreEquipTimer > Time.time) return dangerIgnoreEquipResult;
@@ -314,7 +314,7 @@ namespace friendlyPMC.Components.Tactics
             if (!ignoreEquip)
             {
                 dangerTimer = Time.time + 1f;
-                dangerResult = botOwner_0.Memory.AttackImmediately && Utils.Enemy.GetEnemiesAtLocation(botOwner_0, botOwner_0.Memory.GoalEnemy.ProfileId, botOwner_0.Memory.GoalEnemy.CurrPosition) < 2;
+                dangerResult = botOwner_0.Memory.AttackImmediately && Utils.Enemy.GetEnemiesAtLocation(botOwner_0, botOwner_0.Memory.GoalEnemy.ProfileId, botOwner_0.Memory.GoalEnemy.CurrPosition) <= maximumEnemies;
 
                 return dangerResult;
             }
@@ -926,7 +926,7 @@ namespace friendlyPMC.Components.Tactics
             bool ordchanged = ordersChanged.HasValue ? ordersChanged.Value : this.ordersChanged;
 
             // orders changed
-            /* if (ordchanged &&
+            if (ordchanged &&
                 !ordersIgnoreReasons.Contains(curDecision.Reason) &&
                 !ordersIgnoreDecisions.Contains(curDecision.Action) &&
                 (
@@ -937,7 +937,7 @@ namespace friendlyPMC.Components.Tactics
             {
                 OrderReset();
                 return new AICoreActionEndStruct("orders.Received", true);
-            } */
+            }
 
             AICoreActionEndStruct? shallEndCommon = ShallEndCurrentDecisionCommon(curDecision);
 

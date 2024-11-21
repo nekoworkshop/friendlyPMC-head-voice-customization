@@ -954,7 +954,7 @@ namespace friendlyPMC.Patches
                     stopWatch.Start();
 
                     // switch role on spawning as original one glitches out
-                    if (botRole == WildSpawnType.followerBirdEye)
+                    /*if (botRole == WildSpawnType.followerBirdEye)
                     {
                         if (side == EPlayerSide.Bear)
                         {
@@ -967,7 +967,7 @@ namespace friendlyPMC.Patches
                         else
                             profile.Info.Settings.Role = WildSpawnType.assault;
 
-                    }
+                    }*/
 
                     Action<BotOwner> OnActivate = new Action<BotOwner>((BotOwner owner) =>
                     {
