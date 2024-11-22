@@ -234,7 +234,7 @@
 					"index": 1,
 					"target": "friendlypmc-knight",
 					"type": "TraderStanding",
-					"value": "0.05"
+					"value": "0.1"
 				}
 			]
 		},

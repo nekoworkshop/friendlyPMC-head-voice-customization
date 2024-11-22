@@ -22,9 +22,10 @@
 
 - x - fix glitchy behavior of boss followers
 - x - Knigh and BigPipe
-- - not turning hostile when player accidentally shoots them (mark as known issue, can't be fixed right now) 
+
+- not turning hostile when player accidentally shoots them (mark as known issue, can't be fixed right now) 
 - x - the "Bad Guy" setting should be active when running with bosses
-- x - not having a "good" brain when no longer being a follower
+- - not having a "good" brain when no longer being a follower
 
 - x - see what other screens need patching after having Knight join the group
 - x - on disband group, spawn flags need to be reset
@@ -35,13 +36,15 @@
 - x - add a quest to unlock Knight as a friend
 - x - make it possible for Knight to appear as a friend once the quest is completed
 - x - hook into Player.OnBeenKilledByAggressor to count kills made by Knight as a way to progress kill quests
-- - upon starting the first quest, the Goons are no longer hostile towards the player
+- x - upon starting the first quest, the Goons are no longer hostile towards the player
+- test - make Knight standing go down whenever the player aggros the Goons (but not below 0.1, below 0.5 both BirdEye and BigPipe will no longer be available as friends)(only after the first quest is completed)
 - x - hook into client/profile/view to have Knight show as "the other user" in the profile
 
 - x - when surviving a raid with Knight, increase good standing with him [+0.02] (only after the first quest is completed)
-- - max standing with Knight will be 1
-- - at standing 0.5 unlock trading with Knight
-- - make Knight standing go down whenever the player aggros the Goons (but not below 0.1, below 0.5 both BirdEye and BigPipe will no longer be available as friends)(only after the first quest is completed)
+- at standing 0.5 unlock trading with Knight
+- - add level 2 items for trading
+- - add level 3 items for trading
+
 
 -- === 3.9.1 === ---:
 - bug fixes (whatever will be needed)
@@ -67,8 +70,8 @@
 RELEASE NOTES (3.9) 
 - you can no longer loot spawned followers equipment This does not apply to consumables like magazines, ammo, meds, etc.
 - "On Your Own" will now make followers patrol around the player with a configurable distance when out of combat. In order for this to work they must not be told to hold position and be out of combat. "Follow Me" can get them out of the patrol mode while still retaining the other settings that "On Your Own" has.
-- the mod can now work with different languages. It will based on the language you set for your game. There only 3 languages avalabile for now : English, Russian, German, Romanian. You can look into user/mods/friendlyPMC/lang and add more language jsons there (PM me with the file and I will add it to the mod)
-- added "Bad Guy" setting. This will make the player hostile to all factions.
+- the mod can now work with different languages. It will based on the language you set for your game. There only 4 languages avalabile for now : English, Russian, German, Romanian. You can look into user/mods/friendlyPMC/lang and add more language jsons there (PM me with the file and I will add it to the mod)
+- added "Bad Guy" setting. This will make the player hostile to all factions. This will be on whenever you are running with the Goons.
 - Virtual's Custom Quest Loader is now a dependency
 - new quests added to unlock Knight as a friend (he will appear as a trader) and for unlocking the full Goons squad (BirdEye is still a WIP)
 

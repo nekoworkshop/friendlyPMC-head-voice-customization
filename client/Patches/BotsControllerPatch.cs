@@ -1407,27 +1407,7 @@ namespace friendlyPMC.Patches
 
         }
     }
-    /** FIKA is causing BossSpawning block not to be respected so we need to force it **/
-    [HarmonyPatch(typeof(BossSpawnerClass), "method_2")]
-    internal class BossSpawnerClassPatch
-    {
-        public static bool Prefix(ref Task __result,BotCreationDataClass creationData, BossLocationSpawn wave, BotSpawnParams spawnParams, int followersCount, BotZone botZone, List<ISpawnPoint> openedPositions)
-        {
-            if (BotsControllerPatch.Controller != null)
-            {
-                GClass592 data = new GClass592(EPlayerSide.Savage, wave.BossType, wave.BossDif, wave.Time, spawnParams);
-                
-                if (!BotsControllerPatch.Controller.BotSpawner.CanSpawnRole(data))
-                {
-                    __result = null;
-                    return false;
-                }
-            }
-
-            return true;
-        }
-    }
-
+    
     internal class BossSpawnWaveManagerClassPatch : ModulePatch
     {
         protected override MethodBase GetTargetMethod()

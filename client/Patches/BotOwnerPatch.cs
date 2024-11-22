@@ -9,6 +9,8 @@ using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
 using friendlyPMC.Components;
+using Comfort.Common;
+using UnityEngine.Profiling;
 
 
 namespace friendlyPMC.Patches
@@ -70,9 +72,52 @@ namespace friendlyPMC.Patches
             }
         }
     }
-    /** Fix having followers be enemy of same side just because their roles where under ENEMY_BOT_TYPES **/
     internal class BotOwnerActivatePatch : ModulePatch
     {
+
+        private static List<Action<BotOwner>> onActivate = new List<Action<BotOwner>>
+        {
+            // make Goons neutral to the player if we have completed the first quest from the Goons
+            new Action<BotOwner>((BotOwner bot) =>
+            {
+
+                if(bot.IsRole(WildSpawnType.bossKnight) || bot.IsRole(WildSpawnType.followerBigPipe) || bot.IsRole(WildSpawnType.followerBirdEye))
+                {
+                    foreach (var item in BossPlayers.Instance.GetBossPlayers()) 
+                    {
+                        Player player = item.Value.realPlayer;
+                        string ProfileId = player.ProfileId;
+                        foreach (var data in player.Profile.QuestsData) 
+                        {
+                            if(data.Id == Utils.Props.Quests["Knight"][0])
+                            {
+
+                                if(data.Status == EFT.Quests.EQuestStatus.Success) 
+                                {
+                                    bot.Memory.IsPeace = true;
+                                    bot.Settings.FileSettings.Boss.SHALL_WARN = false;
+                                    bool playerFound = false;
+                                    foreach(var enemy in bot.EnemiesController.EnemyInfos)
+                                    {
+                                        if(enemy.Key.ProfileId == ProfileId)
+                                        {
+                                            playerFound = true;
+                                            enemy.Value.IgnoreUntilAggression = true;
+                                            bot.BotsGroup.RemoveEnemy(player);
+                                            bot.Memory.DeleteInfoAboutEnemy(player);
+                                            bot.BotsGroup.AddAlly(player);
+                                            break;
+                                        }
+                                    }
+                                }
+                                break;
+                            }
+                        }
+                    };
+                    
+                }
+            })
+        };
         protected override MethodBase GetTargetMethod()
         {
             return AccessTools.Method(typeof(BotOwner), "method_10");
@@ -82,8 +127,19 @@ namespace friendlyPMC.Patches
         [PatchPostfix]
         private static void PatchPostfix(BotOwner __instance)
         {
+            
             if (BossPlayers.IsFollower(__instance)) return;
 
+            try
+            {
+                onActivate.ForEach(action => action(__instance));
+            }
+            catch (Exception e)
+            {
+                Modules.Logger.LogError(e);
+            }
+
+            // Fix having followers be enemy of same side just because their roles where under ENEMY_BOT_TYPES
             Dictionary<string, pitAIBossPlayer> playerBosses = BossPlayers.Instance.GetBossPlayers();
 
             foreach (pitAIBossPlayer boss in playerBosses.Values)
@@ -112,6 +168,16 @@ namespace friendlyPMC.Patches
                     }
                 }
             }
+        }
+
+        public static void AddOnActivate(Action<BotOwner> action)
+        { 
+            if(!onActivate.Contains(action)) onActivate.Add(action);
+        }
+
+        public static void RemoveOnActivate(Action<BotOwner> action)
+        {
+            if(onActivate.Contains(action))onActivate.Remove(action);
         }
     }
 }

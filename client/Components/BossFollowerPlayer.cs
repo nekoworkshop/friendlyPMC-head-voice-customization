@@ -49,7 +49,7 @@ namespace friendlyPMC.Components
             settingModif.AccuratySpeedCoef = 1.35f;
             settingModif.ScatteringCoef = 1.7f;
 
-            settingModif.VisibleDistCoef = 1.4f;
+            settingModif.VisibleDistCoef = 1.2f;
             if (bot.IsRole(WildSpawnType.followerBirdEye))
             {
                 settingModif.VisibleDistCoef = 1.3f;
@@ -59,7 +59,8 @@ namespace friendlyPMC.Components
 
             base.SetFollowerSettings(bot);
 
-
+            
+            bot.Settings.FileSettings.Look.LOOK_THROUGH_GRASS = false;
             if (bot.IsRole(WildSpawnType.followerBirdEye))
             {
                 bot.Settings.FileSettings.Core.GainSightCoef = 0.1f;

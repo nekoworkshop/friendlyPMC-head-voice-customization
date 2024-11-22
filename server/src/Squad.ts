@@ -543,6 +543,7 @@ class friendlyPMC {
 					// check what quests the player has completed to know if we allow the Goons to be in his friend list
 					let hasKnightQuest = false;
 					let hasBigPipeQuest = false;
+					let hasBirdEyeQuest = false;
 					profile.Quests.forEach(quest => {
 						if (quest.qid == "friendlypmc-knight-competition" && quest.status == 4) {
 							hasKnightQuest = true;
@@ -551,6 +552,12 @@ class friendlyPMC {
 							hasBigPipeQuest = true;
 						}
 					});
+
+					// low standing will result in the rest of the goons not being available
+					if (profile.TradersInfo["friendlypmc-knight"].standing < 0.5) {
+						hasBigPipeQuest = false;
+						hasBirdEyeQuest = false;
+					}
 
 					if (!hasKnightQuest) {
 						list.Friends = list.Friends.filter(friend => friend._id != "bossKnight");
@@ -657,7 +664,7 @@ class friendlyPMC {
 
 		// add new traders to the database
 		this.knightTrader.AddToDb(tables);
-		this.generalTrader.AddToDb(tables);
+		//this.generalTrader.AddToDb(tables);
 
 		// add new chat bots to the database
 		container.register<KnightChatBot>("KnightChatBot", KnightChatBot, {

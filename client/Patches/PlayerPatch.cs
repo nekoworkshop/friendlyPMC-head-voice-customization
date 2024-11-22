@@ -11,6 +11,8 @@ using friendlyPMC.Components;
 using Comfort.Common;
 using EFT.InventoryLogic;
 using UnityEngine;
+using static EFT.Profile;
+using UnityEngine.Profiling;
 
 namespace friendlyPMC.Patches
 {
@@ -153,10 +155,10 @@ namespace friendlyPMC.Patches
         private static void PatchPrefix(Player __instance, IPlayer aggressor, DamageInfo damageInfo, EBodyPart bodyPart, EDamageType lethalDamageType)
         {
             Player alivePlayerByProfileID = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(aggressor.ProfileId);
-			if (alivePlayerByProfileID == null || aggressor == null || aggressor.Profile == null || aggressor.Profile.Info == null || aggressor.Profile.Info.Settings == null)
-			{
-				return;
-			}
+            if (alivePlayerByProfileID == null || aggressor == null || aggressor.Profile == null || aggressor.Profile.Info == null || aggressor.Profile.Info.Settings == null)
+            {
+                return;
+            }
             
             if (!Singleton<AbstractGame>.Instantiated) return;
             if (GamePlayerOwner.MyPlayer == null) return;
@@ -164,6 +166,27 @@ namespace friendlyPMC.Patches
             {
                 return;
             }
+
+            // penalize Knight standing if player kills any of the goons after they become netural
+            if (BossPlayers.IsPlayerBoss(aggressor.ProfileId) && (new List<WildSpawnType> { WildSpawnType.bossKnight, WildSpawnType.followerBigPipe, WildSpawnType.followerBirdEye } ).Contains(__instance.Profile.Info.Settings.Role))
+            {
+                foreach (var data in alivePlayerByProfileID.Profile.QuestsData)
+                {
+                    if (Utils.Props.Quests["Knight"][0] == data.Id && data.Status == EFT.Quests.EQuestStatus.Success)
+                    {
+
+                        if (alivePlayerByProfileID.Profile.TryGetTraderInfo("friendlypmc-knight", out var traderInfo))
+                        {
+                            double standing = alivePlayerByProfileID.Profile.GetTraderStanding("friendlypmc-knight");
+                            traderInfo.SetStanding(Math.Min(0.1, standing - 0.02));
+                        }
+
+                        break;
+                    }
+                }
+            }
+
+            // have kills of the Goons count as quest kills when needed
             string ProfileId = GamePlayerOwner.MyPlayer.ProfileId;
             Player player = GamePlayerOwner.MyPlayer;
 
@@ -175,20 +198,23 @@ namespace friendlyPMC.Patches
             bool knightKiller = false;
             bool pipeKiller = false;
             bool birdEyeKiller = false;
-            if(aggressor.Profile.Info.Settings.Role == WildSpawnType.bossKnight)
+            // - check if the aggressor is Knight
+            if (aggressor.Profile.Info.Settings.Role == WildSpawnType.bossKnight)
             {
                 knightKiller = true;
-            } 
+            }
+            // - check if the aggressor is BigPipe
             else if (aggressor.Profile.Info.Settings.Role == WildSpawnType.followerBigPipe)
             {
                 pipeKiller = true;
             }
+            // - check if the aggressor is BirdEye
             else if (aggressor.Profile.Info.Settings.Role == WildSpawnType.followerBirdEye)
             {
                 birdEyeKiller = true;
             }
 
-
+            // - partial recreation of the "Test" condition that normally runs for player
             List<string> list = new List<string>();
             Item weapon2 = damageInfo.Weapon;
             
@@ -218,6 +244,7 @@ namespace friendlyPMC.Patches
             Utils.Utils.FlagSet("pipeKiller",pipeKiller);
             Utils.Utils.FlagSet("birdEyeKiller",birdEyeKiller);
 
+            // - check if the kill is a quest kill
             list.ForEach(target=>{
                 player.AbstractQuestControllerClass.CheckKillConditionCounter(target,__instance.ProfileId,new List<string>{},weapon2,bodyPart,locationId,distance,__instance.Profile.Info.Settings.Role.ToStringNoBox<WildSpawnType>(),__instance.CurrentHour,__instance.HealthController.BodyPartEffects,__instance.HealthController.BodyPartEffects,__instance.TriggerZones,new string[]{});
             });
