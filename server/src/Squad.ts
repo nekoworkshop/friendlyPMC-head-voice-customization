@@ -72,6 +72,8 @@ import { QuestItemEventRouter } from "@spt/routers/item_events/QuestItemEventRou
 import { IPmcData } from "@spt/models/eft/common/IPmcData";
 import { BigPipeChatBot } from "./BigPipeChat";
 import { IGetOtherProfileRequest } from "@spt/models/eft/profile/IGetOtherProfileRequest";
+import { IQuest } from "@spt/models/eft/common/tables/IQuest";
+import { objectForEach } from "./Utils";
 
 class friendlyPMC {
 	config = {
@@ -592,7 +594,7 @@ class friendlyPMC {
 		const folder = path.basename(path.dirname(__dirname));
 		this.modFolderName = folder;
 		this.knightTrader = new KnightTrader(folder, preSptModLoader, imageRouter, traderConfig, ragfairConfig, jsonUtil);
-		this.generalTrader = new GeneralTrader(folder, preSptModLoader, imageRouter, traderConfig, ragfairConfig, jsonUtil);
+		//this.generalTrader = new GeneralTrader(folder, preSptModLoader, imageRouter, traderConfig, ragfairConfig, jsonUtil);
 	}
 
 	postDBLoad(container: DependencyContainer) {
@@ -661,6 +663,65 @@ class friendlyPMC {
 				locale[preset] = "";
 			}
 		}
+
+		function DuplicateQuest(target, value: IQuest, nr: string) {
+			const key = value._id;
+			const id = key + nr;
+			target[id] = value;
+			value._id = id;
+			objectForEach(value.conditions, (condition, type) => {
+				if (type == "AvailableForStart") {
+					condition.forEach(c => {
+						c.id = c.id.replace(key, key + nr);
+						if (c.conditionType == "Quest") {
+							c.target = c.target + nr;
+						}
+					});
+				} else if (type == "AvailableForFinish") {
+					condition.forEach(c => {
+						c.id = c.id.replace(key, key + nr);
+						if ("counter" in c) {
+							if (c.counter.id) c.counter.id = c.counter.id.replace(key, key + nr);
+							c.counter.conditions.forEach(cond => {
+								cond.id = cond.id.replace(key, key + nr);
+							});
+						}
+					});
+				} else if (type == "Fail") {
+					condition.forEach(c => {
+						c.id = c.id.replace(key, key + nr);
+						if ("counter" in c) {
+							if (c.counter.id) c.counter.id = c.counter.id.replace(key, key + nr);
+							c.counter.conditions.forEach(cond => {
+								cond.id = cond.id.replace(key, key + nr);
+							});
+						}
+					});
+				}
+			});
+			value.rewards.Success.forEach(reward => {
+				reward.id = reward.id.replace(key, key + nr);
+			});
+
+			tables.traders[knightTrader.traderBase._id].questassort.success[key + nr + "-quest"] = key + nr;
+		}
+
+		// watch for quest add to deal with our double quest system
+		const knightTrader = this.knightTrader;
+		const ProxiWatcher = new Proxy(tables.templates.quests, {
+			set(target, key: string, value: IQuest) {
+				if (["friendlypmc-knight-enemyspotted", "friendlypmc-knight-coverme", "friendlypmc-knight-afavor"].includes(key)) {
+					DuplicateQuest(target, value, "01");
+					DuplicateQuest(target, value, "02");
+				} else {
+					target[key] = value;
+				}
+
+				return true; // Indicate success
+			},
+		});
+
+		tables.templates.quests = ProxiWatcher;
 
 		// add new traders to the database
 		this.knightTrader.AddToDb(tables);

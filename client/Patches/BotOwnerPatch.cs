@@ -74,47 +74,52 @@ namespace friendlyPMC.Patches
     }
     internal class BotOwnerActivatePatch : ModulePatch
     {
-
+        private static List<WildSpawnType> allies = new List<WildSpawnType>
+        {
+            WildSpawnType.bossKnight,
+            WildSpawnType.followerBigPipe,
+            WildSpawnType.followerBirdEye,
+            WildSpawnType.exUsec
+        };
         private static List<Action<BotOwner>> onActivate = new List<Action<BotOwner>>
         {
-            // make Goons neutral to the player if we have completed the first quest from the Goons
+            // make Goons and exUsecs neutral to the player if we have completed the first quest from the Goons
             new Action<BotOwner>((BotOwner bot) =>
             {
-
-                if(bot.IsRole(WildSpawnType.bossKnight) || bot.IsRole(WildSpawnType.followerBigPipe) || bot.IsRole(WildSpawnType.followerBirdEye))
+                foreach (var role in allies)
                 {
-                    foreach (var item in BossPlayers.Instance.GetBossPlayers()) 
+                    if(bot.IsRole(role))
                     {
-                        Player player = item.Value.realPlayer;
-                        string ProfileId = player.ProfileId;
-                        foreach (var data in player.Profile.QuestsData) 
+                        foreach (var item in BossPlayers.Instance.GetBossPlayers()) 
                         {
-                            if(data.Id == Utils.Props.Quests["Knight"][0])
+                            Player player = item.Value.realPlayer;
+                            string ProfileId = player.ProfileId;
+                            foreach (var data in player.Profile.QuestsData) 
                             {
-
-                                if(data.Status == EFT.Quests.EQuestStatus.Success) 
+                                if(data.Id == Utils.Props.Quests["Knight"][0])
                                 {
-                                    bot.Memory.IsPeace = true;
-                                    bot.Settings.FileSettings.Boss.SHALL_WARN = false;
-                                    bool playerFound = false;
-                                    foreach(var enemy in bot.EnemiesController.EnemyInfos)
+                                    if(data.Status == EFT.Quests.EQuestStatus.Success || (data.Status == EFT.Quests.EQuestStatus.Started && role == WildSpawnType.exUsec)) 
                                     {
-                                        if(enemy.Key.ProfileId == ProfileId)
+                                        bot.Memory.IsPeace = true;
+                                        bot.Settings.FileSettings.Boss.SHALL_WARN = false;
+                                        foreach(var enemy in bot.EnemiesController.EnemyInfos)
                                         {
-                                            playerFound = true;
-                                            enemy.Value.IgnoreUntilAggression = true;
-                                            bot.BotsGroup.RemoveEnemy(player);
-                                            bot.Memory.DeleteInfoAboutEnemy(player);
-                                            bot.BotsGroup.AddAlly(player);
-                                            break;
+                                            if(enemy.Key.ProfileId == ProfileId)
+                                            {
+                                                enemy.Value.IgnoreUntilAggression = true;
+                                                bot.BotsGroup.RemoveEnemy(player);
+                                                bot.Memory.DeleteInfoAboutEnemy(player);
+                                                bot.BotsGroup.AddAlly(player);
+                                                break;
+                                            }
                                         }
                                     }
+                                    break;
                                 }
-                                break;
                             }
-                        }
-                    };
-                    
+                        };
+                        break;
+                    }
                 }
             })
         };

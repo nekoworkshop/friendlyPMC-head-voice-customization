@@ -20,7 +20,7 @@ export abstract class TraderBase {
 		quests: string;
 	};
 
-	private traderBase: ITraderBase;
+	public traderBase: ITraderBase;
 	private traderAssort: ITraderAssort;
 	private traderQuests: Record<string, Record<string, string>>;
 

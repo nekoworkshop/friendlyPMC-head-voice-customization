@@ -140,6 +140,7 @@ namespace friendlyPMC.Utils
             {
                 "Knight",
                 new List<string> {
+                    "friendlypmc-knight-my-land-1"
                 }
             },
             {
@@ -164,7 +165,7 @@ namespace friendlyPMC.Utils
             {
                 "Knight",
                 new List<string> {
-                    "friendlypmc-knight-my-land-1"
+                    
                 }
             },
             {

@@ -18,6 +18,8 @@ namespace friendlyPMC.Patches
         public string ItemContainer { get; set; }
         public bool? Disabled { get; set; }
         public string DisabledKey { get; set; }
+
+        public bool? IsVisible { get; set; }
     }
     /** 
      * This patch will remove the quest from the quest list of a trader if it was disabled in the backend
@@ -66,6 +68,21 @@ namespace friendlyPMC.Patches
                         if(item != null)
                         {
                             questController.Quests.Remove(item);
+                        }
+                    } else if(it.IsVisible.HasValue)
+                    {
+                        QuestClass item = null;
+                        foreach (var questItem in questController.Quests)
+                        {
+                            if (questItem.Template.Id == q.Key)
+                            {
+                                item = questItem;
+                                break;
+                            }
+                        }
+                        if (item != null)
+                        {
+                            item.IsVisible = it.IsVisible.Value;
                         }
                     }
                 }
