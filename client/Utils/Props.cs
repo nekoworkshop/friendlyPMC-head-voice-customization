@@ -22,7 +22,6 @@ namespace friendlyPMC.Utils
         private static float _def_bossMaxCoverDistance = 35f;
         private static float _def_bossMinCoverDistance = 10f;
 
-
         public static float coverSearchRadius;
         public static float sprintDistance;
         public static float regroupMinDistance;
@@ -36,7 +35,6 @@ namespace friendlyPMC.Utils
         public static float bossMaxCoverDistance;
         public static float bossMinCoverDistance;
 
-
         public static void Reset()
         {
             coverSearchRadius = _def_coverSearchRadius;
@@ -47,9 +45,8 @@ namespace friendlyPMC.Utils
             bossInnerRadius = _def_bossInnerRadius;
             bossOuterRadius = _def_bossOuterRadius;
             bossMaxCoverDistance = _def_bossMaxCoverDistance;
-            bossMinCoverDistance= _def_bossMinCoverDistance;
+            bossMinCoverDistance = _def_bossMinCoverDistance;
         }
-
 
         public static void FactoryMapSett()
         {
@@ -58,15 +55,15 @@ namespace friendlyPMC.Utils
             bossOuterRadius = 40f;
             coverSearchRadius = 40f;
             searchRadius = 40f;
-
         }
 
-
-        public static Dictionary<string, List<string>> Quests = new Dictionary<string, List<string>>{
+        public static Dictionary<string, List<string>> Quests = new Dictionary<string, List<string>>
+        {
             {
                 "Knight",
                 // order is important
-                new List<string> {
+                new List<string>
+                {
                     "friendlypmc-knight-competition",
                     "friendlypmc-knight-my-land",
                     "friendlypmc-knight-payback01",
@@ -76,112 +73,133 @@ namespace friendlyPMC.Utils
             {
                 "BigPipe",
                 // order is important
-                new List<string> {
+                new List<string>
+                {
                     "friendlypmc-knight-payback01",
-                    "friendlypmc-knight-payback02"
+                    "friendlypmc-knight-payback02",
+                    "friendlypmc-knight-coverme01",
+                    "friendlypmc-knight-coverme02"
                 }
             },
             {
                 "BirdEye",
                 // order is important
-                new List<string> {
+                new List<string>
+                {
                     "friendlypmc-knight-payback01",
                     "friendlypmc-knight-payback02",
                     "friendlypmc-knight-enemyspotted1",
-                    "friendlypmc-knight-enemyspotted2"
+                    "friendlypmc-knight-enemyspotted2",
+                    "friendlypmc-knight-coverme01",
+                    "friendlypmc-knight-coverme02",
+                    "friendlypmc-knight-afavor01",
+                    "friendlypmc-knight-afavor02"
                 }
             }
         };
 
-        public static Dictionary<string, List<string>> QuestsLocations = new Dictionary<string, List<string>>{
+        public static Dictionary<string, List<string>> QuestsLocations = new Dictionary<
+            string,
+            List<string>
+        >
+        {
             {
                 "friendlypmc-knight-competition",
-                new List<string> {
-                    "lighthouse",
-                    "bigmap",
-                    "shoreline",
-                    "woods"
-                }
-
+                new List<string> { "lighthouse", "bigmap", "shoreline", "woods" }
             },
             {
                 "friendlypmc-knight-my-land",
-                new List<string> {
-                    "bigmap"
-                }
+                new List<string> { "bigmap" }
             },
             {
                 "friendlypmc-knight-payback01",
-                new List<string> {
-                    "tarkovstreets"
-                }
+                new List<string> { "tarkovstreets" }
             },
             {
                 "friendlypmc-knight-payback02",
-                new List<string> {
-                    "rezervbase"
-                }
+                new List<string> { "rezervbase" }
             },
             {
-                "friendlypmc-knight-enemyspotted1",
-                new List<string> {
-                    "woods"
-                }
+                "friendlypmc-knight-enemyspotted01",
+                new List<string> { "woods" }
             },
-                        {
-                "friendlypmc-knight-enemyspotted2",
-                new List<string> {
-                    "woods"
-                }
+            {
+                "friendlypmc-knight-enemyspotted02",
+                new List<string> { "woods" }
+            },
+            {
+                "friendlypmc-knight-coverme01",
+                new List<string> { "shoreline" }
+            },
+            {
+                "friendlypmc-knight-coverme02",
+                new List<string> { "shoreline" }
+            },
+            {
+                "friendlypmc-knight-afavor01",
+                new List<string> { "woods" }
+            },
+            {
+                "friendlypmc-knight-afavor02",
+                new List<string> { "woods" }
             }
         };
 
-        public static Dictionary<string, List<string>> QuestsTeamConditions = new Dictionary<string, List<string>>{
+        public static Dictionary<string, List<string>> QuestsTeamConditions = new Dictionary<
+            string,
+            List<string>
+        >
+        {
             {
                 "Knight",
-                new List<string> {
-                    "friendlypmc-knight-my-land-1"
-                }
+                new List<string> { "friendlypmc-knight-my-land-1" }
             },
             {
                 "BigPipe",
-                new List<string> {
-                }
+                new List<string> { }
             },
             {
                 "BirdEye",
-                new List<string> {
-                }
+                new List<string> { }
             },
             {
                 "Any",
-                new List<string> {
+                new List<string>
+                {
                     "friendlypmc-knight-payback01-target",
-                    "friendlypmc-knight-payback02-target"
+                    "friendlypmc-knight-payback02-target",
+                    "friendlypmc-knight-coverme01-target",
+                    "friendlypmc-knight-coverme02-target"
                 }
             },
         };
-        public static Dictionary<string, List<string>> QuestsKillConditions = new Dictionary<string, List<string>>{
+        public static Dictionary<string, List<string>> QuestsKillConditions = new Dictionary<
+            string,
+            List<string>
+        >
+        {
             {
                 "Knight",
-                new List<string> {
-                    
-                }
+                new List<string> { }
             },
             {
                 "BigPipe",
-                new List<string> {}
+                new List<string> { }
             },
             {
                 "BirdEye",
-                new List<string> {
-                    "friendlypmc-knight-enemyspotted1-1",
-                    "friendlypmc-knight-enemyspotted2-1"
+                new List<string>
+                {
+                    "friendlypmc-knight-enemyspotted01-target",
+                    "friendlypmc-knight-enemyspotted02-target",
+                    "friendlypmc-knight-afavor01-target",
+                    "friendlypmc-knight-afavor02-target"
                 }
             },
             {
                 "Player",
-                new List<string> {
+                new List<string>
+                {
                     "friendlypmc-knight-competition-1",
                     "friendlypmc-knight-competition-2",
                     "friendlypmc-knight-competition-3"
@@ -189,20 +207,23 @@ namespace friendlyPMC.Utils
             }
         };
 
-        public static Dictionary<WildSpawnType, List<string>> QuestBosses = new Dictionary<WildSpawnType, List<string>>{
+        public static Dictionary<WildSpawnType, List<string>> QuestBosses = new Dictionary<
+            WildSpawnType,
+            List<string>
+        >
+        {
             {
                 WildSpawnType.bossKolontay,
-                new List<string> {
-                    "friendlypmc-knight-payback01"
-                }
+                new List<string> { "friendlypmc-knight-payback01" }
             },
             {
                 WildSpawnType.bossGluhar,
-                new List<string> {
-                    "friendlypmc-knight-payback02"
-                }
+                new List<string> { "friendlypmc-knight-payback02" }
+            },
+            {
+                WildSpawnType.bossKojaniy,
+                new List<string> { "friendlypmc-knight-afavor01", "friendlypmc-knight-afavor02" }
             }
-
         };
     }
 }

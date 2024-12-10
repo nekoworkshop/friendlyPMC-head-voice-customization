@@ -70,10 +70,14 @@ import { ImporterUtil } from "@spt/utils/ImporterUtil";
 import { PitQuestItemEventRouter } from "./Quests";
 import { QuestItemEventRouter } from "@spt/routers/item_events/QuestItemEventRouter";
 import { IPmcData } from "@spt/models/eft/common/IPmcData";
+
 import { BigPipeChatBot } from "./BigPipeChat";
+import { BirdEyeChatBot } from "./BirdEyeChat";
+
 import { IGetOtherProfileRequest } from "@spt/models/eft/profile/IGetOtherProfileRequest";
 import { IQuest } from "@spt/models/eft/common/tables/IQuest";
-import { objectForEach } from "./Utils";
+
+import { objectCopy, objectForEach } from "./Utils";
 
 class friendlyPMC {
 	config = {
@@ -99,6 +103,7 @@ class friendlyPMC {
 
 	knightBot: KnightChatBot;
 	bigPipeBot: BigPipeChatBot;
+	birdEyeBot: BirdEyeChatBot;
 
 	profileHelper: ProfileHelper;
 
@@ -118,8 +123,6 @@ class friendlyPMC {
 	myDBFolder = "";
 
 	modFolderName: string;
-
-	private _raidLocation: string;
 
 	preSptLoad(container: DependencyContainer) {
 		this.Logger = container.resolve("WinstonLogger");
@@ -513,6 +516,7 @@ class friendlyPMC {
 					// Knight or BigPipe should accept the invite
 					const knightFriend = this.knightBot;
 					const pipeFriend = this.bigPipeBot;
+					const birdEyeFriend = this.birdEyeBot;
 
 					if (aid == knightFriend.getChatBot().aid) {
 						setTimeout(() => {
@@ -522,6 +526,10 @@ class friendlyPMC {
 						setTimeout(() => {
 							pipeFriend.acceptInvite(sessionID);
 						}, 2000);
+					} else if (aid == birdEyeFriend.getChatBot().aid) {
+						setTimeout(() => {
+							birdEyeFriend.acceptInvite(sessionID);
+						}, 2000);
 					}
 					return this.matchCallbacks.sendGroupInvite(url, info, sessionID);
 				}),
@@ -529,6 +537,7 @@ class friendlyPMC {
 					const list = dialogueController.getFriendList(sessionID);
 					const knightFriend = this.knightBot;
 					const bigPipeFriend = this.bigPipeBot;
+					const birdEyeFriend = this.birdEyeBot;
 					// Fika is removing Knight from the friend list, so we need to add him back
 					let friend = knightFriend.getChatBot();
 					if (list.Friends.findIndex(f => f.aid == friend.aid) == -1) {
@@ -536,6 +545,11 @@ class friendlyPMC {
 					}
 					// Fika is removing BigPipe from the friend list, so we need to add him back
 					friend = bigPipeFriend.getChatBot();
+					if (list.Friends.findIndex(f => f.aid == friend.aid) == -1) {
+						list.Friends.push(friend);
+					}
+					// Fika is removing BirdEye from the friend list, so we need to add him back
+					friend = birdEyeFriend.getChatBot();
 					if (list.Friends.findIndex(f => f.aid == friend.aid) == -1) {
 						list.Friends.push(friend);
 					}
@@ -553,6 +567,10 @@ class friendlyPMC {
 						if (["friendlypmc-knight-payback01", "friendlypmc-knight-payback02"].includes(quest.qid) && quest.status == 4) {
 							hasBigPipeQuest = true;
 						}
+
+						if (["friendlypmc-knight-afavor01", "friendlypmc-knight-afavor02"].includes(quest.qid) && quest.status == 4) {
+							hasBirdEyeQuest = true;
+						}
 					});
 
 					// low standing will result in the rest of the goons not being available
@@ -568,6 +586,10 @@ class friendlyPMC {
 						list.Friends = list.Friends.filter(friend => friend._id != "followerBigPipe");
 					}
 
+					if (!hasBirdEyeQuest) {
+						list.Friends = list.Friends.filter(friend => friend._id != "followerBirdEye");
+					}
+
 					return httpResponseUtil.getBody(list);
 				}),
 				new RouteAction("/client/match/raid/ready", async (url: string, info: any, sessionID: string, output: string): Promise<IGetBodyResponseData<boolean>> => {
@@ -578,8 +600,10 @@ class friendlyPMC {
 					groupStatus[sessionID] = setTimeout(() => {
 						const knightFriend = this.knightBot;
 						const bigPipeFriend = container.resolve<BigPipeChatBot>("BigPipeChatBot");
+						const birdEyeFriend = container.resolve<BirdEyeChatBot>("BirdEyeChatBot");
 						knightFriend.currentGroup = info.Players;
 						bigPipeFriend.currentGroup = info.Players;
+						birdEyeFriend.currentGroup = info.Players;
 					});
 
 					return httpResponseUtil.emptyResponse();
@@ -665,51 +689,58 @@ class friendlyPMC {
 		}
 
 		function DuplicateQuest(target, value: IQuest, nr: string) {
+			value = objectCopy(value);
 			const key = value._id;
 			const id = key + nr;
 			target[id] = value;
+
 			value._id = id;
+			value.QuestName = value.QuestName + "" + nr;
 			objectForEach(value.conditions, (condition, type) => {
 				if (type == "AvailableForStart") {
 					condition.forEach(c => {
-						c.id = c.id.replace(key, key + nr);
+						c.id = c.id.replace(key, id);
 						if (c.conditionType == "Quest") {
 							c.target = c.target + nr;
 						}
 					});
 				} else if (type == "AvailableForFinish") {
 					condition.forEach(c => {
-						c.id = c.id.replace(key, key + nr);
+						c.id = c.id.replace(key, id);
 						if ("counter" in c) {
-							if (c.counter.id) c.counter.id = c.counter.id.replace(key, key + nr);
+							if (c.counter.id) c.counter.id = c.counter.id.replace(key, id);
 							c.counter.conditions.forEach(cond => {
-								cond.id = cond.id.replace(key, key + nr);
+								cond.id = cond.id.replace(key, id);
 							});
 						}
 					});
 				} else if (type == "Fail") {
 					condition.forEach(c => {
-						c.id = c.id.replace(key, key + nr);
+						c.id = c.id.replace(key, id);
 						if ("counter" in c) {
-							if (c.counter.id) c.counter.id = c.counter.id.replace(key, key + nr);
+							if (c.counter.id) c.counter.id = c.counter.id.replace(key, id);
 							c.counter.conditions.forEach(cond => {
-								cond.id = cond.id.replace(key, key + nr);
+								cond.id = cond.id.replace(key, id);
 							});
 						}
 					});
 				}
 			});
 			value.rewards.Success.forEach(reward => {
-				reward.id = reward.id.replace(key, key + nr);
+				reward.id = reward.id.replace(key, id);
 			});
 
-			tables.traders[knightTrader.traderBase._id].questassort.success[key + nr + "-quest"] = key + nr;
+			tables.traders[knightTrader.traderBase._id].questassort.success[id + "-quest"] = id;
+			tables.traders[knightTrader.traderBase._id].assort.loyal_level_items[id + "-quest"] = 1;
+
+			return value;
 		}
 
 		// watch for quest add to deal with our double quest system
 		const knightTrader = this.knightTrader;
 		const ProxiWatcher = new Proxy(tables.templates.quests, {
 			set(target, key: string, value: IQuest) {
+				// - all these quests come after the "payback" and need to be duplicated so that one stack is for payback01 and the other for payback02
 				if (["friendlypmc-knight-enemyspotted", "friendlypmc-knight-coverme", "friendlypmc-knight-afavor"].includes(key)) {
 					DuplicateQuest(target, value, "01");
 					DuplicateQuest(target, value, "02");
@@ -717,7 +748,7 @@ class friendlyPMC {
 					target[key] = value;
 				}
 
-				return true; // Indicate success
+				return true;
 			},
 		});
 
@@ -725,13 +756,16 @@ class friendlyPMC {
 
 		// add new traders to the database
 		this.knightTrader.AddToDb(tables);
-		//this.generalTrader.AddToDb(tables);
+		//this.generalTrader.AddToDb(tables); // not for 3.9
 
 		// add new chat bots to the database
 		container.register<KnightChatBot>("KnightChatBot", KnightChatBot, {
 			lifecycle: Lifecycle.Singleton,
 		});
 		container.register<BigPipeChatBot>("BigPipeChatBot", BigPipeChatBot, {
+			lifecycle: Lifecycle.Singleton,
+		});
+		container.register<BirdEyeChatBot>("BirdEyeChatBot", BirdEyeChatBot, {
 			lifecycle: Lifecycle.Singleton,
 		});
 
@@ -742,6 +776,10 @@ class friendlyPMC {
 		const bigPipeBot = container.resolve<BigPipeChatBot>("BigPipeChatBot");
 		bigPipeBot.SetLang(this.lang);
 		this.bigPipeBot = bigPipeBot;
+
+		const birdEyeBot = container.resolve<BirdEyeChatBot>("BirdEyeChatBot");
+		birdEyeBot.SetLang(this.lang);
+		this.birdEyeBot = birdEyeBot;
 
 		container.resolve<DialogueController>("DialogueController").registerChatBot(knightBot);
 	}

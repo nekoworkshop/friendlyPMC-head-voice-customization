@@ -900,7 +900,7 @@
                     "doNotResetIfCounterCompleted": false,
                     "dynamicLocale": false,
                     "globalQuestCounterId": "",
-                    "id": "friendlypmc-knight-enemyspotted-1",
+                    "id": "friendlypmc-knight-enemyspotted-target",
                     "index": 0,
                     "oneSessionOnly": false,
                     "parentId": "",
@@ -1057,7 +1057,7 @@
                     "doNotResetIfCounterCompleted": false,
                     "dynamicLocale": false,
                     "globalQuestCounterId": "",
-                    "id": "friendlypmc-knight-coverme-1",
+                    "id": "friendlypmc-knight-coverme-target",
                     "index": 0,
                     "oneSessionOnly": false,
                     "parentId": "",
@@ -1122,7 +1122,7 @@
         "type": "Elimination"
     },
     "friendlypmc-knight-afavor": {
-        "QuestName": "Badge Bandit",
+        "QuestName": "A Favor",
         "_id": "friendlypmc-knight-afavor",
         "acceptPlayerMessage": "friendlypmc-knight-afavor acceptPlayerMessage",
         "canShowNotificationsInGame": true,
