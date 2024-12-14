@@ -71,8 +71,8 @@
 	"friendlypmc-knight-enemyspotted declinePlayerMessage": "",
 	"friendlypmc-knight-enemyspotted changeQuestMessageText": "",
 	"friendlypmc-knight-enemyspotted note": "Both you and BirdEye will have to survive the raid. BirdEye must be the one to eliminate the targets",
-	"friendlypmc-knight-enemyspotted01-1": "Assist BirdEye in eliminating 5 PMCs on Woods",
-    "friendlypmc-knight-enemyspotted02-1": "Assist BirdEye in eliminating 5 PMCs on Woods",
+	"friendlypmc-knight-enemyspotted01-target": "Assist BirdEye in eliminating 5 PMCs on Woods",
+    "friendlypmc-knight-enemyspotted02-target": "Assist BirdEye in eliminating 5 PMCs on Woods",
 	"friendlypmc-knight-enemyspotted01-fail": "You and BirdEye must not die or leave the raid while the task is active (Status: KIA, Left the Action, MIA, Ran Through)",
     "friendlypmc-knight-enemyspotted02-fail": "You and BirdEye must not die or leave the raid while the task is active (Status: KIA, Left the Action, MIA, Ran Through)",
 
@@ -85,8 +85,8 @@
     "friendlypmc-knight-coverme declinePlayerMessage": "",
     "friendlypmc-knight-coverme changeQuestMessageText": "",
     "friendlypmc-knight-coverme note": "You, BirdEye and BigPipe will have to survive the raid",
-    "friendlypmc-knight-coverme01-1": "Eliminate 8 targets around the Pier in Shoreline while teamed up with BirdEye and BigPipe",
-    "friendlypmc-knight-coverme02-1": "Eliminate 8 targets around the Pier in Shoreline while teamed up with BirdEye and BigPipe",
+    "friendlypmc-knight-coverme01-target": "Eliminate 8 targets around the Pier in Shoreline while teamed up with BirdEye and BigPipe",
+    "friendlypmc-knight-coverme02-target": "Eliminate 8 targets around the Pier in Shoreline while teamed up with BirdEye and BigPipe",
     "friendlypmc-knight-coverme01-fail": "You and BirdEye must not die or leave the raid while the task is active (Status: KIA, Left the Action, MIA, Ran Through)",
     "friendlypmc-knight-coverme02-fail": "You and BirdEye must not die or leave the raid while the task is active (Status: KIA, Left the Action, MIA, Ran Through)",
 

@@ -23,21 +23,24 @@
 - x - fix glitchy behavior of boss followers
 - x - Knigh and BigPipe
 
-- not turning hostile when player accidentally shoots them (mark as known issue, can't be fixed right now) 
-- x - the "Bad Guy" setting should be active when running with bosses
-- - not having a "good" brain when no longer being a follower
+- not turning hostile when player accidentally shoots them (mark as known issue, can't be fixed right now)
+- - not having a "good" brain when no longer being a follower (mark as known issue, can't be fixed right now) 
+
+- x - the "Bad Guy" setting should be active when running with bosses 
 
 - x - see what other screens need patching after having Knight join the group
 - x - on disband group, spawn flags need to be reset
 
 - investigate if health multiplier is not working when using "default" setup for followers
 
-- #inprogress - The Goons Quests (phase 1 - Knight and BigPipe):
+- see if we can make friends list refresh only when an active quest is completed 
+
+- #inprogress - The Goons Quests (phase 1 - unlocking all members):
 - x - add a quest to unlock Knight as a friend
 - x - make it possible for Knight to appear as a friend once the quest is completed
 - x - hook into Player.OnBeenKilledByAggressor to count kills made by Knight as a way to progress kill quests
 - x - upon starting the first quest, the Goons are no longer hostile towards the player
-- test - make Knight standing go down whenever the player aggros the Goons (but not below 0.1, below 0.5 both BirdEye and BigPipe will no longer be available as friends)(only after the first quest is completed)
+- x - make Knight standing go down whenever the player aggros the Goons (but not below 0.1, below 0.5 both BirdEye and BigPipe will no longer be available as friends)(only after the first quest is completed)
 - x - hook into client/profile/view to have Knight show as "the other user" in the profile
 
 - x - when surviving a raid with Knight, increase good standing with him [+0.02] (only after the first quest is completed)
@@ -45,20 +48,18 @@
 - - add level 2 items for trading
 - - add level 3 items for trading
 
+- upgrade to SPT 3.10.x
 
 -- === 3.9.1 === ---:
 - bug fixes (whatever will be needed)
 - add "hold fire/fire at will" commands
 - investigate if we can make "Assist" tactic turn hostile on accidental shots
-- - at 0.5 standing, Knight no longer turns hostile on accidental shots, but killing him will give a penalty of 0.05 standing
-- fix glitchy behavior of boss followers
-- - BirdEye unlocking quests
-- move followers control out of the configuration menu and into the chat window of "The General"
 - see if we can make bot swap weapons when asked to loot (DeadBodyWork)
 - - this should also allow bot to put that weapon as seconday (in case of support without a grenade launcher)
 
 --- ==== 4.0.0 (final phase - "The General" for followers quest) ==== ---:
 - "The General" quests will unlock followers
+- - move followers control out of the configuration menu and into the chat window of "The General"
 - - when these quests are active enforce same side faction to not be hostile
 - - penalize player for killing same side faction members
 - - if player completes the first quest with both followers alive, choose one to become a teammate

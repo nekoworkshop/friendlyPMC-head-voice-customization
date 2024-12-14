@@ -49,5 +49,27 @@ namespace friendlyPMC.Components.FollowerBossFollower
         {
             fightLayer.OrdersChanged();
         }
+
+        protected override void OnDead(EDamageType damageType)
+        {
+            if (_boss == null) return;
+
+            _boss.realPlayer.AbstractQuestControllerClass.Quests.ExecuteForEach(quest => {
+                foreach (var id in Utils.Props.Quests["BirdEye"])
+                {
+                    if (quest.Template.Id == id && (quest.QuestStatus == EFT.Quests.EQuestStatus.Started || quest.QuestStatus == EFT.Quests.EQuestStatus.AvailableForFinish))
+                    {
+                        if (Utils.Utils.FlagGet("questGoons"))
+                        {
+                            quest.SetStatus(EFT.Quests.EQuestStatus.Fail, true, false);
+
+                        }
+                    }
+                }
+            });
+
+            base.OnDead(damageType);
+
+        }
     }
 }

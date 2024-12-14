@@ -88,8 +88,8 @@ namespace friendlyPMC.Utils
                 {
                     "friendlypmc-knight-payback01",
                     "friendlypmc-knight-payback02",
-                    "friendlypmc-knight-enemyspotted1",
-                    "friendlypmc-knight-enemyspotted2",
+                    "friendlypmc-knight-enemyspotted01",
+                    "friendlypmc-knight-enemyspotted02",
                     "friendlypmc-knight-coverme01",
                     "friendlypmc-knight-coverme02",
                     "friendlypmc-knight-afavor01",
