@@ -68,6 +68,7 @@ namespace friendlyPMC.Patches
                         if(item != null)
                         {
                             questController.Quests.Remove(item);
+                            item.IsVisible = false;
                         }
                     } else if(it.IsVisible.HasValue)
                     {

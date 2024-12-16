@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using UnityEngine;
 
 namespace friendlyPMC.Patches
 {
@@ -61,10 +62,13 @@ namespace friendlyPMC.Patches
             iChatInteractions = session;
         }
 
+        private static float delay = 0;
+
         public static void RefreshFriendsList()
         {
-            if (socialNetworkClass != null)
+            if (socialNetworkClass != null && delay < Time.time )
             {
+                delay = Time.time + 2;
                 iChatInteractions.GetFriendsList(new Callback<GClass930>(socialNetworkClass.method_13));
             }
         }

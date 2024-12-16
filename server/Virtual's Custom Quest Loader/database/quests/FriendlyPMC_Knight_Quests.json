@@ -1023,7 +1023,7 @@
                                 "conditionType": "InZone",
                                 "dynamicLocale": false,
                                 "id": "friendlypmc-knight-coverme-location",
-                                "zoneIds": ["prapor_27_1"]
+                                "zoneIds": ["PierZone"]
                             },
                             {
                                 "bodyPart": [],
@@ -1074,7 +1074,7 @@
         "image": "/files/quest/icon/KnightCompetitionQuest.jpg",
         "instantComplete": false,
         "isKey": false,
-        "location": "56f40101d2720b2a4d8b45d6",
+        "location": "5704e554d2720bac5b8b456e",
         "name": "friendlypmc-knight-coverme name",
         "note": "friendlypmc-knight-coverme note",
         "restartable": true,
