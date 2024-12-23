@@ -1,7 +1,7 @@
 [
     {
-        "ZoneId": "PierZone",
-        "ZoneName": "PierZone",
+        "ZoneId": "pier_zone01",
+        "ZoneName": "pier_zone01",
         "ZoneLocation": "Shoreline",
         "ZoneType": "botkillzone",
         "FlareType": "",

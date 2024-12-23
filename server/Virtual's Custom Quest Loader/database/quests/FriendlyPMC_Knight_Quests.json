@@ -1023,7 +1023,7 @@
                                 "conditionType": "InZone",
                                 "dynamicLocale": false,
                                 "id": "friendlypmc-knight-coverme-location",
-                                "zoneIds": ["PierZone"]
+                                "zoneIds": ["PierZone01"]
                             },
                             {
                                 "bodyPart": [],
