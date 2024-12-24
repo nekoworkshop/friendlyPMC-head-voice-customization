@@ -168,22 +168,25 @@ namespace friendlyPMC.Patches
             }
 
             // penalize Knight standing if player kills any of the goons after they become netural
-            if (BossPlayers.IsPlayerBoss(aggressor.ProfileId) && (new List<WildSpawnType> { WildSpawnType.bossKnight, WildSpawnType.followerBigPipe, WildSpawnType.followerBirdEye } ).Contains(__instance.Profile.Info.Settings.Role))
+            if (BossPlayers.IsPlayerBoss(aggressor.ProfileId))
             {
-                foreach (var data in alivePlayerByProfileID.Profile.QuestsData)
-                {
-                    if (Utils.Props.Quests["Knight"][0] == data.Id && data.Status == EFT.Quests.EQuestStatus.Success)
+                if((new List<WildSpawnType> { WildSpawnType.bossKnight, WildSpawnType.followerBigPipe, WildSpawnType.followerBirdEye } ).Contains(__instance.Profile.Info.Settings.Role)) {
+                    foreach (var data in alivePlayerByProfileID.Profile.QuestsData)
                     {
-
-                        if (alivePlayerByProfileID.Profile.TryGetTraderInfo("friendlypmc-knight", out var traderInfo))
+                        if (Utils.Props.Quests["Knight"][0] == data.Id && data.Status == EFT.Quests.EQuestStatus.Success)
                         {
-                            double standing = alivePlayerByProfileID.Profile.GetTraderStanding("friendlypmc-knight");
-                            traderInfo.SetStanding(Math.Min(0.1, standing - 0.02));
-                        }
 
-                        break;
+                            if (alivePlayerByProfileID.Profile.TryGetTraderInfo("friendlypmc-knight", out var traderInfo))
+                            {
+                                double standing = alivePlayerByProfileID.Profile.GetTraderStanding("friendlypmc-knight");
+                                traderInfo.SetStanding(Math.Min(0.1, standing - 0.02));
+                            }
+
+                            break;
+                        }
                     }
                 }
+                return;
             }
 
             // have kills of the Goons count as quest kills when needed
@@ -245,13 +248,15 @@ namespace friendlyPMC.Patches
             Utils.Utils.FlagSet("birdEyeKiller",birdEyeKiller);
 
             // - check if the kill is a quest kill
-            list.ForEach(target=>{
-                player.AbstractQuestControllerClass.CheckKillConditionCounter(target,__instance.ProfileId,new List<string>{},weapon2,bodyPart,locationId,distance,__instance.Profile.Info.Settings.Role.ToStringNoBox<WildSpawnType>(),__instance.CurrentHour,__instance.HealthController.BodyPartEffects,__instance.HealthController.BodyPartEffects,__instance.TriggerZones,new string[]{});
-            });
-
-            if(knightKiller) Utils.Utils.FlagSet("knightKiller",false);
-            if(pipeKiller) Utils.Utils.FlagSet("pipeKiller",false);
-            if(birdEyeKiller) Utils.Utils.FlagSet("birdEyeKiller",false);
+            if(knightKiller || pipeKiller || birdEyeKiller)
+            {
+                list.ForEach(target=>{
+                    player.AbstractQuestControllerClass.CheckKillConditionCounter(target,__instance.ProfileId,new List<string>{},weapon2,bodyPart,locationId,distance,__instance.Profile.Info.Settings.Role.ToStringNoBox<WildSpawnType>(),__instance.CurrentHour,__instance.HealthController.BodyPartEffects,__instance.HealthController.BodyPartEffects,__instance.TriggerZones,new string[]{});
+                });  
+                if(knightKiller) Utils.Utils.FlagSet("knightKiller",false);
+                if(pipeKiller) Utils.Utils.FlagSet("pipeKiller",false);
+                if(birdEyeKiller) Utils.Utils.FlagSet("birdEyeKiller",false);
+            }
         }
     }
 }
