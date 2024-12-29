@@ -228,6 +228,11 @@ namespace friendlyPMC.Components
             return new AICoreActionEndStruct("enemy.None", true);
         }
 
+        public override AICoreActionEndStruct EndSuppressGrenade()
+        {
+            return new AICoreActionEndStruct("enemy.None", true);
+        }
+
         public override AICoreActionEndStruct EndRunToEnemy()
         {
             if (!botOwner_0.Memory.HaveEnemy)

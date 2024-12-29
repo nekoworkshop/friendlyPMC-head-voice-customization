@@ -11,21 +11,12 @@ import { RandomUtil } from "@spt/utils/RandomUtil";
 
 export const Quests = {
 	"friendlypmc-knight-thieves": {
-		itemLocation: ["TarkovStreets", "RezervBase"],
+		itemLocation: ["TarkovStreets"],
 		itemId: "64e3b0f4e3b6f5a4a37e8c1d",
 		itemContainer: {
-			RezervBase: ["00975"],
 			TarkovStreets: ["container_City_Design_Main_00017", "container_City_Design_Main_00020", "container_City_Design_Main_00022"],
 		},
 		itemCondition: "friendlypmc-knight-thieves-4",
-		questDisable: {
-			"friendlypmc-knight-payback01": {
-				itemLocation: "RezervBase",
-			},
-			"friendlypmc-knight-payback02": {
-				itemLocation: "TarkovStreets",
-			},
-		},
 	},
 };
 
@@ -75,46 +66,6 @@ export class PitQuestItemEventRouter extends ItemEventRouterDefinition {
 									}
 								});
 							}
-						}
-
-						// -- if quest disables other quests based on item location, disable them
-						if (Quests[info.qid].questDisable) {
-							Object.keys(Quests[info.qid].questDisable).forEach(key => {
-								let q = Quests[info.qid].questDisable[key];
-								userProgress[key] = this.mydb.progress[key] || { disabled: false };
-								if (q.itemLocation) {
-									userProgress[key].disabled = q.itemLocation == userProgress[info.qid].itemLocation;
-
-									let traders = this.databaseService.getTraders();
-									for (let k in traders) {
-										let trader = traders[k];
-										let found = false;
-
-										if (trader.questassort && trader.questassort.success) {
-											for (let i in trader.questassort.success) {
-												let quest = trader.questassort.success[i];
-												if (quest == key) {
-													// -- if quest has been disabled remove it from its trader
-													if (userProgress[key].disabled) {
-														delete trader.questassort.success[i];
-														userProgress[key].disabledKey = i;
-														// -- if quest has been re-enabled we have to put it back to its trader
-													} else if (userProgress[key].disabledKey) {
-														trader.questassort.success[userProgress[key].disabledKey] = key;
-														delete userProgress[key].disabledKey;
-													}
-
-													found = true;
-													break;
-												}
-											}
-										}
-										if (found) {
-											break;
-										}
-									}
-								}
-							});
 						}
 					}
 				}

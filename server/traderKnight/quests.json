@@ -1,11 +1,12 @@
 {
-    "started": {
-    },
-    "success": {
-        "friendlypmc-knight-competition-quest" : "friendlypmc-knight-competition",
-        "friendlypmc-knight-my-land-quest" : "friendlypmc-knight-my-land",
-        "friendlypmc-knight-thieves-quest" : "friendlypmc-knight-thieves",
-        "friendlypmc-knight-payback01-quest" : "friendlypmc-knight-payback01",
-        "friendlypmc-knight-payback02-quest" : "friendlypmc-knight-payback02"
-    }
+	"started": {},
+	"success": {
+		"friendlypmc-knight-competition-quest": "friendlypmc-knight-competition",
+		"friendlypmc-knight-my-land-quest": "friendlypmc-knight-my-land",
+		"friendlypmc-knight-thieves-quest": "friendlypmc-knight-thieves",
+		"friendlypmc-knight-payback01-quest": "friendlypmc-knight-payback01",
+		"friendlypmc-knight-enemyspotted-quest": "friendlypmc-knight-enemyspotted",
+		"friendlypmc-knight-coverme-quest": "friendlypmc-knight-coverme",
+		"friendlypmc-knight-afavor-quest": "friendlypmc-knight-afavor"
+	}
 }

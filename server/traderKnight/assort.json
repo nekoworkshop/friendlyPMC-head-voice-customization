@@ -1,55 +1,57 @@
 {
-    "barter_scheme": {
-        "IFAKKit": [
-            [
-                {
-                "_tpl": "5696686a4bdc2da3298b456a",
-                "count": 150
-                }
-            ]
-        ],
-        "SalewaKit": [
-            [
-                {
-                "_tpl": "5696686a4bdc2da3298b456a",
-                "count": 200
-                }
-            ]
-        ]
-    },
-    "items": [
-        {
-            "_id": "IFAKKit",
-            "_tpl": "590c678286f77426c9660122",
-            "parentId": "hideout",
-            "slotId": "hideout",
-            "upd": {
-                "StackObjectsCount": 9999999,
-                "UnlimitedCount": true,
-                "BuyRestrictionMax": 10,
-                "BuyRestrictionCurrent": 0
-            }
-        },
-        {
-            "_id": "SalewaKit",
-            "_tpl": "544fb45d4bdc2dee738b4568",
-            "parentId": "hideout",
-            "slotId": "hideout",
-            "upd": {
-                "StackObjectsCount": 9999999,
-                "UnlimitedCount": true,
-                "BuyRestrictionMax": 10,
-                "BuyRestrictionCurrent": 0
-            }
-        }
-    ],
-    "loyal_level_items": {
-        "friendlypmc-knight-competition-quest" : 1,
-        "friendlypmc-knight-my-land-quest" : 1,
-        "friendlypmc-knight-thieves-quest" : 1,
-        "friendlypmc-knight-payback01-quest" : 1,
-        "friendlypmc-knight-payback02-quest" : 1,
-        "SalewaKit": 2,
-        "IFAKKit": 2
-    }
+	"barter_scheme": {
+		"IFAKKit": [
+			[
+				{
+					"_tpl": "5696686a4bdc2da3298b456a",
+					"count": 150
+				}
+			]
+		],
+		"SalewaKit": [
+			[
+				{
+					"_tpl": "5696686a4bdc2da3298b456a",
+					"count": 200
+				}
+			]
+		]
+	},
+	"items": [
+		{
+			"_id": "IFAKKit",
+			"_tpl": "590c678286f77426c9660122",
+			"parentId": "hideout",
+			"slotId": "hideout",
+			"upd": {
+				"StackObjectsCount": 9999999,
+				"UnlimitedCount": true,
+				"BuyRestrictionMax": 10,
+				"BuyRestrictionCurrent": 0
+			}
+		},
+		{
+			"_id": "SalewaKit",
+			"_tpl": "544fb45d4bdc2dee738b4568",
+			"parentId": "hideout",
+			"slotId": "hideout",
+			"upd": {
+				"StackObjectsCount": 9999999,
+				"UnlimitedCount": true,
+				"BuyRestrictionMax": 10,
+				"BuyRestrictionCurrent": 0
+			}
+		}
+	],
+	"loyal_level_items": {
+		"friendlypmc-knight-competition-quest": 1,
+		"friendlypmc-knight-my-land-quest": 1,
+		"friendlypmc-knight-thieves-quest": 1,
+		"friendlypmc-knight-payback01-quest": 1,
+		"friendlypmc-knight-enemyspotted-quest": 1,
+		"friendlypmc-knight-coverme-quest": 1,
+		"friendlypmc-knight-afavor-quest": 1,
+		"SalewaKit": 2,
+		"IFAKKit": 2
+	}
 }

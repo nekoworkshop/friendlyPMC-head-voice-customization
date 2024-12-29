@@ -26,6 +26,7 @@ using friendlyPMC.Components;
 using SPT.Common.Http;
 
 using SPT.Common.Utils;
+using SPT.SinglePlayer.Patches.RaidFix;
 
 namespace friendlyPMC
 {
@@ -121,6 +122,9 @@ namespace friendlyPMC
 
         public Dictionary<string, string> patrolRadius { get; set; }
 
+        public Dictionary<string, string> botTeleport { get; set; }
+        public Dictionary<string, string> botHeal { get; set; }
+
         // used only by BE
         public string[] returnItems { get; set; }
         public string[] returnItemsDeath { get; set; }
@@ -174,6 +178,9 @@ namespace friendlyPMC
 
         public static ConfigEntry<KeyboardShortcut> pingKey;
         public static ConfigEntry<KeyboardShortcut> contactKey;
+
+        public static ConfigEntry<KeyboardShortcut> teleportKey;
+        public static ConfigEntry<KeyboardShortcut> healKey;
 
         private string[] equipPresets = new string[] {};
 
@@ -272,7 +279,6 @@ namespace friendlyPMC
             // quests related patches
             new PlayerKilledPatch().Enable();
             new ConditionCounterPatch().Enable();
-            new QuestsListViewPatch().Enable();
             // social related patches to help with refreshing the list of friends when a quest is completed
             new SocialNetworkClassPatch().Enable();
             new QuestClassPatch().Enable();
@@ -437,10 +443,13 @@ namespace friendlyPMC
             englishBear = Config.Bind("II " + optionsLang.miscSettings, "11 " + optionsLang.englishBear["Name"], true, new ConfigDescription(optionsLang.englishBear["Description"],null, new ConfigurationManagerAttributes { Order = -1100 }));
 
 
-            pingKey = Config.Bind("II " + optionsLang.miscSettings, "11.1 " + optionsLang.pingSquad["Name"], new KeyboardShortcut(KeyCode.None), new ConfigDescription(optionsLang.pingSquad["Description"],null, new ConfigurationManagerAttributes { Order = -1101 }));
+            pingKey = Config.Bind("II " + optionsLang.miscSettings, "12 " + optionsLang.pingSquad["Name"], new KeyboardShortcut(KeyCode.None), new ConfigDescription(optionsLang.pingSquad["Description"],null, new ConfigurationManagerAttributes { Order = -1101 }));
 
-            contactKey = Config.Bind("II " + optionsLang.miscSettings, "11.2 " + optionsLang.enemyContact["Name"], new KeyboardShortcut(KeyCode.None), new ConfigDescription(optionsLang.enemyContact["Description"],null, new ConfigurationManagerAttributes { Order = -1102 }));
-            
+            contactKey = Config.Bind("II " + optionsLang.miscSettings, "13 " + optionsLang.enemyContact["Name"], new KeyboardShortcut(KeyCode.None), new ConfigDescription(optionsLang.enemyContact["Description"],null, new ConfigurationManagerAttributes { Order = -1102 }));
+
+            teleportKey = Config.Bind("II " + optionsLang.miscSettings, "14 " + optionsLang.botTeleport["Name"], new KeyboardShortcut(KeyCode.None), new ConfigDescription(optionsLang.botTeleport["Description"], null, new ConfigurationManagerAttributes { Order = -1103 }));
+            healKey = Config.Bind("II " + optionsLang.miscSettings, "15 " + optionsLang.botHeal["Name"], new KeyboardShortcut(KeyCode.None), new ConfigDescription(optionsLang.botHeal["Description"], null, new ConfigurationManagerAttributes { Order = -1104 }));
+
             ConfigSquadMembersSet();
 
             Config.SettingChanged += (sender, args) =>
@@ -790,75 +799,80 @@ namespace friendlyPMC
             return optionsLang.tacticOptions;
         }
 
-        private void AddConsoleCommands()
+        private void _BotTeleport()
         {
-                        ConsoleScreen.Processor.RegisterCommand("followerstome", delegate ()
+
+            bool flag = !Singleton<AbstractGame>.Instantiated;
+            if (flag)
             {
-                GameWorld gameWorld = Singleton<GameWorld>.Instance;
+                ConsoleScreen.LogError("This command may only be used inraid");
+                return;
+            }
 
-                bool flag = !Singleton<AbstractGame>.Instantiated;
-                if (flag)
+
+            if (GamePlayerOwner.MyPlayer.HealthController == null || !GamePlayerOwner.MyPlayer.HealthController.IsAlive)
+            {
+                return;
+            }
+
+            string id = GamePlayerOwner.MyPlayer.ProfileId;
+
+            if (BossPlayers.Instance != null)
+            {
+                var followers = BossPlayers.GetFollowersByBoss(id);
+                Vector3 position = GamePlayerOwner.MyPlayer.Transform.position;
+                foreach (var follower in followers)
                 {
-                    ConsoleScreen.LogError("This command may only be used inraid");
-                    return;
-                }
-
-
-                if (GamePlayerOwner.MyPlayer.HealthController == null || !GamePlayerOwner.MyPlayer.HealthController.IsAlive)
-                {
-                    return;
-                }
-
-                string id = GamePlayerOwner.MyPlayer.ProfileId;
-
-                if (BossPlayers.Instance != null)
-                {
-                    var followers = BossPlayers.GetFollowersByBoss(id);
-                    Vector3 position = GamePlayerOwner.MyPlayer.Transform.position;
-                    foreach (var follower in followers)
+                    if (follower != null && follower.GetBot().HealthController.IsAlive)
                     {
-                        if (follower != null && follower.GetBot().HealthController.IsAlive)
-                        {
-                            follower.GetBot().GetPlayer.Teleport(position);
-                        }
+                        follower.GetBot().GetPlayer.Teleport(position);
                     }
                 }
+            }
+        }
 
+        private void _BotHeal()
+        {
+            bool flag = !Singleton<AbstractGame>.Instantiated;
+            if (flag)
+            {
+                ConsoleScreen.LogError("This command may only be used inraid");
+                return;
+            }
+
+
+            if (GamePlayerOwner.MyPlayer.HealthController == null || !GamePlayerOwner.MyPlayer.HealthController.IsAlive)
+            {
+                return;
+            }
+
+            string id = GamePlayerOwner.MyPlayer.ProfileId;
+
+            if (BossPlayers.Instance != null)
+            {
+                var followers = BossPlayers.GetFollowersByBoss(id);
+                foreach (var follower in followers)
+                {
+                    if (follower != null && follower.GetBot().HealthController.IsAlive)
+                    {
+                        (follower.GetBot().Brain.BaseBrain as FollowerBrain).HandsReset();
+                        follower.GetBot().WeaponManager.Selector.TakePrevWeapon();
+                    }
+                }
+            }
+
+        }
+
+        private void AddConsoleCommands()
+        {
+            ConsoleScreen.Processor.RegisterCommand("followerstome", delegate ()
+            {
+                _BotTeleport();
             });
 
             ConsoleScreen.Processor.RegisterCommand("followersfixheal", delegate ()
             {
-                GameWorld gameWorld = Singleton<GameWorld>.Instance;
-
-                bool flag = !Singleton<AbstractGame>.Instantiated;
-                if (flag)
-                {
-                    ConsoleScreen.LogError("This command may only be used inraid");
-                    return;
-                }
-
-
-                if (GamePlayerOwner.MyPlayer.HealthController == null || !GamePlayerOwner.MyPlayer.HealthController.IsAlive)
-                {
-                    return;
-                }
-
-                string id = GamePlayerOwner.MyPlayer.ProfileId;
-
-                if (BossPlayers.Instance != null)
-                {
-                    var followers = BossPlayers.GetFollowersByBoss(id);
-                    Vector3 position = GamePlayerOwner.MyPlayer.Transform.position;
-                    foreach (var follower in followers)
-                    {
-                        if (follower != null && follower.GetBot().HealthController.IsAlive)
-                        {
-                            (follower.GetBot().Brain.BaseBrain as FollowerBrain).HandsReset();
-                            follower.GetBot().WeaponManager.Selector.TakePrevWeapon();
-                        }
-                    }
-                }
-
+                _BotHeal();
             });
 
         }
@@ -901,6 +915,16 @@ namespace friendlyPMC
                             boss.realPlayer.Say(EPhraseTrigger.OnRepeatedContact,true);
                     }
                 }
+            }
+
+            if (teleportKey.Value.IsPressed())
+            {
+                _BotTeleport();
+            }
+
+            if (healKey.Value.IsPressed())
+            {
+                _BotHeal();
             }
 
         }

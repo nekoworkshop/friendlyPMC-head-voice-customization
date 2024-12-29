@@ -67,7 +67,6 @@ namespace friendlyPMC.Utils
                     "friendlypmc-knight-competition",
                     "friendlypmc-knight-my-land",
                     "friendlypmc-knight-payback01",
-                    "friendlypmc-knight-payback02"
                 }
             },
             {
@@ -76,9 +75,7 @@ namespace friendlyPMC.Utils
                 new List<string>
                 {
                     "friendlypmc-knight-payback01",
-                    "friendlypmc-knight-payback02",
-                    "friendlypmc-knight-coverme01",
-                    "friendlypmc-knight-coverme02"
+                    "friendlypmc-knight-coverme"
                 }
             },
             {
@@ -87,13 +84,9 @@ namespace friendlyPMC.Utils
                 new List<string>
                 {
                     "friendlypmc-knight-payback01",
-                    "friendlypmc-knight-payback02",
-                    "friendlypmc-knight-enemyspotted01",
-                    "friendlypmc-knight-enemyspotted02",
-                    "friendlypmc-knight-coverme01",
-                    "friendlypmc-knight-coverme02",
-                    "friendlypmc-knight-afavor01",
-                    "friendlypmc-knight-afavor02"
+                    "friendlypmc-knight-enemyspotted",
+                    "friendlypmc-knight-coverme",
+                    "friendlypmc-knight-afavor"
                 }
             }
         };
@@ -116,31 +109,15 @@ namespace friendlyPMC.Utils
                 new List<string> { "tarkovstreets" }
             },
             {
-                "friendlypmc-knight-payback02",
-                new List<string> { "rezervbase" }
-            },
-            {
-                "friendlypmc-knight-enemyspotted01",
+                "friendlypmc-knight-enemyspotted",
                 new List<string> { "woods" }
             },
             {
-                "friendlypmc-knight-enemyspotted02",
-                new List<string> { "woods" }
-            },
-            {
-                "friendlypmc-knight-coverme01",
+                "friendlypmc-knight-coverme0",
                 new List<string> { "shoreline" }
             },
             {
-                "friendlypmc-knight-coverme02",
-                new List<string> { "shoreline" }
-            },
-            {
-                "friendlypmc-knight-afavor01",
-                new List<string> { "woods" }
-            },
-            {
-                "friendlypmc-knight-afavor02",
+                "friendlypmc-knight-afavor",
                 new List<string> { "woods" }
             }
         };
@@ -167,9 +144,7 @@ namespace friendlyPMC.Utils
                 new List<string>
                 {
                     "friendlypmc-knight-payback01-target",
-                    "friendlypmc-knight-payback02-target",
-                    "friendlypmc-knight-coverme01-target",
-                    "friendlypmc-knight-coverme02-target"
+                    "friendlypmc-knight-coverme-target"
                 }
             },
         };
@@ -190,10 +165,8 @@ namespace friendlyPMC.Utils
                 "BirdEye",
                 new List<string>
                 {
-                    "friendlypmc-knight-enemyspotted01-target",
-                    "friendlypmc-knight-enemyspotted02-target",
-                    "friendlypmc-knight-afavor01-target",
-                    "friendlypmc-knight-afavor02-target"
+                    "friendlypmc-knight-enemyspotted-target",
+                    "friendlypmc-knight-afavor-target",
                 }
             },
             {
@@ -217,12 +190,8 @@ namespace friendlyPMC.Utils
                 new List<string> { "friendlypmc-knight-payback01" }
             },
             {
-                WildSpawnType.bossGluhar,
-                new List<string> { "friendlypmc-knight-payback02" }
-            },
-            {
                 WildSpawnType.bossKojaniy,
-                new List<string> { "friendlypmc-knight-afavor01", "friendlypmc-knight-afavor02" }
+                new List<string> { "friendlypmc-knight-afavor" }
             }
         };
     }

@@ -676,7 +676,7 @@ namespace friendlyPMC.Patches
                 return bossCreationTask[boss];
             }
 
-            return PreFetchBossProfiles(player, WildSpawnType.bossKnight);
+            return PreFetchBossProfiles(player, boss);
         }
 
         public void PreFetchScavProfiles(pitAIBossPlayer player)

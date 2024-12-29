@@ -501,6 +501,7 @@ class friendlyPMC {
 
 					return httpResponseUtil.emptyResponse();
 				}),
+
 				new RouteAction("/singleplayer/pitlang", (url: string, info: any, sessionID: string, output: string): any => {
 					return httpResponseUtil.noBody(this.lang);
 				}),
@@ -564,11 +565,11 @@ class friendlyPMC {
 						if (quest.qid == "friendlypmc-knight-competition" && quest.status == 4) {
 							hasKnightQuest = true;
 						}
-						if (["friendlypmc-knight-payback01", "friendlypmc-knight-payback02"].includes(quest.qid) && quest.status == 4) {
+						if (["friendlypmc-knight-payback01"].includes(quest.qid) && quest.status == 4) {
 							hasBigPipeQuest = true;
 						}
 
-						if (["friendlypmc-knight-afavor01", "friendlypmc-knight-afavor02"].includes(quest.qid) && quest.status == 4) {
+						if (["friendlypmc-knight-afavor"].includes(quest.qid) && quest.status == 4) {
 							hasBirdEyeQuest = true;
 						}
 					});
@@ -687,72 +688,6 @@ class friendlyPMC {
 				locale[preset] = "";
 			}
 		}
-
-		function DuplicateQuest(target, value: IQuest, nr: string) {
-			value = objectCopy(value);
-			const key = value._id;
-			const id = key + nr;
-			target[id] = value;
-
-			value._id = id;
-			value.QuestName = value.QuestName + "" + nr;
-			objectForEach(value.conditions, (condition, type) => {
-				if (type == "AvailableForStart") {
-					condition.forEach(c => {
-						c.id = c.id.replace(key, id);
-						if (c.conditionType == "Quest") {
-							c.target = c.target + nr;
-						}
-					});
-				} else if (type == "AvailableForFinish") {
-					condition.forEach(c => {
-						c.id = c.id.replace(key, id);
-						if ("counter" in c) {
-							if (c.counter.id) c.counter.id = c.counter.id.replace(key, id);
-							c.counter.conditions.forEach(cond => {
-								cond.id = cond.id.replace(key, id);
-							});
-						}
-					});
-				} else if (type == "Fail") {
-					condition.forEach(c => {
-						c.id = c.id.replace(key, id);
-						if ("counter" in c) {
-							if (c.counter.id) c.counter.id = c.counter.id.replace(key, id);
-							c.counter.conditions.forEach(cond => {
-								cond.id = cond.id.replace(key, id);
-							});
-						}
-					});
-				}
-			});
-			value.rewards.Success.forEach(reward => {
-				reward.id = reward.id.replace(key, id);
-			});
-
-			tables.traders[knightTrader.traderBase._id].questassort.success[id + "-quest"] = id;
-			tables.traders[knightTrader.traderBase._id].assort.loyal_level_items[id + "-quest"] = 1;
-
-			return value;
-		}
-
-		// watch for quest add to deal with our double quest system
-		const knightTrader = this.knightTrader;
-		const ProxiWatcher = new Proxy(tables.templates.quests, {
-			set(target, key: string, value: IQuest) {
-				// - all these quests come after the "payback" and need to be duplicated so that one stack is for payback01 and the other for payback02
-				if (["friendlypmc-knight-enemyspotted", "friendlypmc-knight-coverme", "friendlypmc-knight-afavor"].includes(key)) {
-					DuplicateQuest(target, value, "01");
-					DuplicateQuest(target, value, "02");
-				} else {
-					target[key] = value;
-				}
-
-				return true;
-			},
-		});
-
-		tables.templates.quests = ProxiWatcher;
 
 		// add new traders to the database
 		this.knightTrader.AddToDb(tables);
