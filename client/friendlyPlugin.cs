@@ -131,7 +131,6 @@ namespace friendlyPMC
         public string[] teamEscaped { get; set; }
         public string[] teamSomeEscaped { get; set; }
         public string[] friendlyEscaped { get; set; }
-        public string[] allyBossEscaped { get; set; }
     }
 
     [BepInPlugin("xyz.pit.friendlypmc", "friendlyPMC", "3.9.0")]

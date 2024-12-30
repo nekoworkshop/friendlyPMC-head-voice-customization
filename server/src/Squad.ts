@@ -308,10 +308,7 @@ class friendlyPMC {
 
 					let isKnightBoss = false;
 
-					if (member.SquadInfo.AllyBoss) {
-						message = this.lang.allyBossEscaped;
-						isKnightBoss = member.SquadInfo.AllyBoss == "bossKnight";
-					} else if (member.SquadInfo.Mate) {
+					if (member.SquadInfo.Mate) {
 						message = this.lang.teamEscaped;
 						if (member.SquadInfo.Partial) {
 							message = this.lang.teamSomeEscaped;
@@ -333,17 +330,7 @@ class friendlyPMC {
 
 					let notice = this._StringFormat(randomUtil.getArrayValue(message), lostMembers);
 
-					if (isKnightBoss) {
-						this.mailSendService.sendMessageToPlayer({
-							recipientId: sessionID,
-							sender: MessageType.NPC_TRADER,
-							//@ts-ignore
-							trader: "friendlypmc-knight",
-							messageText: notice,
-						});
-					} else {
-						this.mailSendService["notificationSendHelper"].sendMessageToPlayer(sessionID, member, notice, MessageType.USER_MESSAGE);
-					}
+					this.mailSendService["notificationSendHelper"].sendMessageToPlayer(sessionID, member, notice, MessageType.USER_MESSAGE);
 
 					return httpResponseUtil.emptyResponse();
 				}),
@@ -844,6 +831,7 @@ class friendlyPMC {
 	getOtherProfile(sessionId: string, request: IGetOtherProfileRequest) {
 		if (request.accountId == this.knightBot.getChatBot().aid.toString()) return this.knightBot.PlayerVisualRepresentation(sessionId);
 		else if (request.accountId == this.bigPipeBot.getChatBot().aid.toString()) return this.bigPipeBot.PlayerVisualRepresentation(sessionId);
+		else if (request.accountId == this.birdEyeBot.getChatBot().aid.toString()) return this.birdEyeBot.PlayerVisualRepresentation(sessionId);
 		return this.originalGetOtherProfile(sessionId, request);
 	}
 

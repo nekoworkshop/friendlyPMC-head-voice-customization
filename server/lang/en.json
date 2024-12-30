@@ -9,8 +9,6 @@
 
 	"friendlyEscaped": ["Glad we made it.\nThanks for letting me tag along.", "Whew, glad I found you.\nI didn't know if I was going to make it. Thanks!", "Not the best outcome, losing some teammates, but I'm glad I at least got out", "Thanks for the help. I'm hauling my fallen teammates' gear back; it's the least I can do."],
 
-	"allyBossEscaped": ["Nice run!\n You did good rookie, you did good.", "Not bad, not bad at all. Let's dot it again sometime rookie.", "Was there even a doubt? They never stood a chance."],
-
 	"chatHelp": {
 		"joinRaid": {
 			"Knight": "I can join you in a raid, use the 'INVITE TO GROUP' command to get me to join you. If you have unlocked BirdEye and BigPipe they can join too. But no extras — being crowded is not my thing.",
