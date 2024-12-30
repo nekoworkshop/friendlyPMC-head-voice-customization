@@ -9,6 +9,9 @@ import { IDatabaseTables } from "@spt/models/spt/server/IDatabaseTables";
 import { JsonUtil } from "@spt/utils/JsonUtil";
 import { ITraderAssort, ITraderBase } from "@spt/models/eft/common/tables/ITrader";
 
+import fs from "fs";
+import path from "path";
+
 export abstract class TraderBase {
 	traderHelper: Helper;
 
@@ -18,6 +21,7 @@ export abstract class TraderBase {
 		base: string;
 		assort: string;
 		quests: string;
+		weapons?: string;
 	};
 
 	public traderBase: ITraderBase;
@@ -30,6 +34,7 @@ export abstract class TraderBase {
 			base: string;
 			assort: string;
 			quests: string;
+			weapons?: string;
 		},
 		preSptModLoader: PreSptModLoader,
 		imageRouter: ImageRouter,
@@ -42,7 +47,7 @@ export abstract class TraderBase {
 		this.OnConstruct(modName, preSptModLoader, imageRouter);
 	}
 
-	private OnConstruct(modName: string, preSptModLoader: PreSptModLoader, imageRouter: ImageRouter) {
+	protected OnConstruct(modName: string, preSptModLoader: PreSptModLoader, imageRouter: ImageRouter) {
 		this.traderBase = require(this.traderFiles.base);
 		this.traderAssort = require(this.traderFiles.assort);
 		this.traderQuests = require(this.traderFiles.quests);
@@ -52,6 +57,31 @@ export abstract class TraderBase {
 
 		Traders[this.traderBase._id] = this.traderBase._id;
 		this.ragfairConfig.traders[this.traderBase._id] = false;
+		// if trader has weapons, read the "weapons" dir and load each json file
+
+		const weaponsPath = this.traderFiles.weapons ? path.join(__dirname, this.traderFiles.weapons) : null;
+		if (weaponsPath && fs.existsSync(weaponsPath)) {
+			const files = fs.readdirSync(weaponsPath);
+			for (const file of files) {
+				try {
+					const weapon: {
+						price: {
+							_tpl: string;
+							count: number;
+						};
+						level: number;
+						item: { [key: string]: any }[];
+					} = require(`${weaponsPath}/${file}`);
+					const wpn = weapon.item[0];
+					this.traderAssort.barter_scheme[wpn._id] = [[weapon.price]];
+					this.traderAssort.loyal_level_items[wpn._id] = weapon.level;
+					this.traderAssort.items.push.apply(this.traderAssort.items, weapon.item);
+				} catch (e) {
+					console.error(`Failed to load weapon: ${file}`);
+					console.error(e);
+				}
+			}
+		}
 	}
 
 	AddToDb(tables: IDatabaseTables) {
@@ -75,6 +105,7 @@ export class KnightTrader extends TraderBase {
 				base: "../traderKnight/base.json",
 				assort: "../traderKnight/assort.json",
 				quests: "../traderKnight/quests.json",
+				weapons: "../traderKnight/weapons",
 			},
 			preSptModLoader,
 			imageRouter,
