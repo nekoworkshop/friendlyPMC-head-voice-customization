@@ -9,7 +9,10 @@ using friendlyPMC.Components;
 
 namespace friendlyPMC.Actions
 {
-    public class FollowerPatrol : GClass361
+    /**
+     * A modified version of the FollowerPatrol class to ensure our followers stay around the player boss
+     */
+    public class FollowerPatrol : GClass404
     {
 
         protected readonly Player player_0;
@@ -151,11 +154,11 @@ namespace friendlyPMC.Actions
                 bool flag;
                 float num;
                 // check if we are in range of the boss
-                float_3 = Time.time + GClass761.Random(1f, 2f);
+                float_3 = Time.time + GClass824.Random(1f, 2f);
                 if (following)
                 {
                     num = distance;
-                    float_3 = Time.time + GClass761.Random(1f, 2f);
+                    float_3 = Time.time + GClass824.Random(1f, 2f);
                 }
                 else
                 {
@@ -230,8 +233,8 @@ namespace friendlyPMC.Actions
                         nocover = true;
                         float minR = Mathf.Min(1f, reachDist * 0.19f);
                         float maxR = Mathf.Min(5f, reachDist * 0.65f);
-                        float num2 = (float)GClass761.RandomSing() * GClass761.Random(minR, maxR);
-                        float num3 = (float)GClass761.RandomSing() * GClass761.Random(minR, maxR);
+                        float num2 = (float)GClass824.RandomSing() * GClass824.Random(minR, maxR);
+                        float num3 = (float)GClass824.RandomSing() * GClass824.Random(minR, maxR);
                         float x = num2 + leaderPosition.x;
                         float z = num3 + leaderPosition.z;
                         NavMeshHit navMeshHit;
@@ -378,7 +381,7 @@ namespace friendlyPMC.Actions
                 {
                     botOwner_0.StopMove();
                     if (!wasHit) botOwner_0.LookData.SetLookPointByHearing(null);
-                    float_6 = Time.time + GClass761.Random(6f, 10f);
+                    float_6 = Time.time + GClass824.Random(6f, 10f);
                 }
                 else if (!wasHit) botOwner.Steering.LookToMovingDirection();
 
@@ -410,7 +413,7 @@ namespace friendlyPMC.Actions
                 NavMeshHit navMeshHit;
                 if (!NavMesh.SamplePosition(randomPosition, out navMeshHit, 10f, -1)) continue;
 
-                if (!GClass326.IsDangerPositionFarEnough(navMeshHit.position, finalcarePositions, 2f * 2f)) continue;
+                if (!GClass369.IsDangerPositionFarEnough(navMeshHit.position, finalcarePositions, 2f * 2f)) continue;
 
                 if (botOwner_0.GoToPoint(navMeshHit.position, true, -1f, false, true, true, false) == NavMeshPathStatus.PathComplete)
                 {
@@ -583,7 +586,7 @@ namespace friendlyPMC.Actions
             if (!bot.Memory.HaveEnemy)
             {
                 bot.BotTalk.TrySay(EPhraseTrigger.Roger, false);
-                bot.Gesture.TryGestus(EGesture.Good, false);
+                bot.Gesture.TryGestus(EInteraction.OkGesture, false);
             }
         }
 
@@ -598,7 +601,7 @@ namespace friendlyPMC.Actions
             if (!bot.Memory.HaveEnemy)
             {
                 bot.BotTalk.TrySay(EPhraseTrigger.Roger, false);
-                bot.Gesture.TryGestus(EGesture.Good, false);
+                bot.Gesture.TryGestus(EInteraction.OkGesture, false);
             }
         }
     }

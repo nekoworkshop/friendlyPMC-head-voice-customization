@@ -17,6 +17,9 @@ using friendlyPMC.Requests;
 
 namespace friendlyPMC.Actions
 {
+    /**
+     * Action for a bot follower to take loot given by the player
+     */
     public class FollowerTakeLoot : BaseNodeAbstractClass
     {
         private BotFollowerPlayer _follower;
@@ -102,7 +105,7 @@ namespace friendlyPMC.Actions
 
             try
             {
-                InventoryControllerClass inventoryControllerClass = botOwner_0.GetPlayer.InventoryControllerClass;
+                InventoryController inventoryControllerClass = botOwner_0.GetPlayer.InventoryController;
                 // order for general loot
                 List<EquipmentSlot> possibleSlots = new List<EquipmentSlot> {
                     EquipmentSlot.Backpack,
@@ -120,7 +123,7 @@ namespace friendlyPMC.Actions
 
                 List<object> equipTypes = new List<object>
                 {
-                    typeof(GrenadeClass)
+                    typeof(ThrowWeapItemClass)
                 };
 
                 foreach (var item1 in equipTypes)
@@ -186,7 +189,7 @@ namespace friendlyPMC.Actions
                         {
                             holdit.AddPossibleExecutors(botOwner_0);
                             holdit.SetGroup(botOwner_0.BotsGroup.RequestsController);
-                            botOwner_0.Gesture.TryGestus(EGesture.Good, true);
+                            botOwner_0.Gesture.TryGestus(EInteraction.OkGesture, true);
                         }
                     }
                 }
@@ -199,19 +202,14 @@ namespace friendlyPMC.Actions
             }
         }
 
-        private ItemAddress FindLocationForItem(Item item, IEnumerable<EquipmentSlot> possibleSlots, InventoryControllerClass botInventoryController)
+        private ItemAddress FindLocationForItem(Item item, IEnumerable<EquipmentSlot> possibleSlots, InventoryController botInventoryController)
         {
             foreach (EquipmentSlot slot in possibleSlots)
             {
-                SearchableItemClass equipmentSlot = botInventoryController.Inventory.Equipment.GetSlot(slot).ContainedItem as SearchableItemClass;
-                foreach (StashGridClass grid in (equipmentSlot?.Grids ?? (new StashGridClass[0])))
+                ItemAddress itemAddress = botInventoryController.Inventory.Equipment.GetSlot(slot).FindLocationForItem(item, out var error);
+                if(itemAddress != null)
                 {
-                    LocationInGrid locationInGrid = grid.FindFreeSpace(item);
-                    if (locationInGrid != null)
-                    {
-
-                        return new ItemAddressClass(grid, locationInGrid);
-                    }
+                    return itemAddress;
                 }
             }
 

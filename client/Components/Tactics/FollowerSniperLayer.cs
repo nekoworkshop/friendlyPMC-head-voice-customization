@@ -94,14 +94,14 @@ namespace friendlyPMC.Components.Tactics
                         {
                             return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMoving, "relocate");
                         }
-                        coverTimer = Time.time + GClass761.Random(3f, 5f);
+                        coverTimer = Time.time + GClass824.Random(3f, 5f);
                         return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "relocateFast");
                     }
                     // - found nothing, fallback
                     if (holdTimer < Time.time)
                     {
-                        float timer = GClass761.Random(2f, 5f);
-                        holdTimer = Time.time + timer + GClass761.Random(2f, 3f);
+                        float timer = GClass824.Random(2f, 5f);
+                        holdTimer = Time.time + timer + GClass824.Random(2f, 3f);
                         return commonLayer.HoldPositionFor(timer);
                     }
 
@@ -121,7 +121,7 @@ namespace friendlyPMC.Components.Tactics
                         GetClosestAttackCoverPoint(botPosition, 20f);
                         if (customNavigationPoint_0 != null && coverTimer < Time.time)
                         {
-                            coverTimer = Time.time + GClass761.Random(3f, 5f);
+                            coverTimer = Time.time + GClass824.Random(3f, 5f);
                             return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMoving, "relocate");
                         }
                     }
@@ -129,8 +129,8 @@ namespace friendlyPMC.Components.Tactics
                     // -- fallback #1, just wait
                     if (holdTimer < Time.time)
                     {
-                        float timer = GClass761.Random(2f, 5f);
-                        holdTimer = Time.time + timer + GClass761.Random(3f, 5f);
+                        float timer = GClass824.Random(2f, 5f);
+                        holdTimer = Time.time + timer + GClass824.Random(3f, 5f);
                         return commonLayer.HoldPositionFor(timer);
                     }
 
@@ -151,8 +151,8 @@ namespace friendlyPMC.Components.Tactics
                 // -- fallback #1, just wait
                 if (holdTimer < Time.time)
                 {
-                    float timer = GClass761.Random(2f, 5f);
-                    holdTimer = Time.time + timer + GClass761.Random(3f, 5f);
+                    float timer = GClass824.Random(2f, 5f);
+                    holdTimer = Time.time + timer + GClass824.Random(3f, 5f);
                     return commonLayer.HoldPositionFor(timer);
                 }
 

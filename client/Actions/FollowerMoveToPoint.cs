@@ -12,7 +12,7 @@ using Comfort.Common;
 
 namespace friendlyPMC.Actions
 {
-    public class FollowerMoveToPoint: GClass173
+    public class FollowerMoveToPoint: GClass196
     {
         private bool _shouldSprint = true;
 
@@ -117,7 +117,7 @@ namespace friendlyPMC.Actions
                 Vector3 requestPos = requester.Position;
                 Vector3 dir01 = requester.LookDirection;
 
-                float offset = GClass761.RandomSing() * GClass761.Random(1f, 2f);
+                float offset = GClass824.RandomSing() * GClass824.Random(1f, 2f);
                 Vector3 direction = Vector3.Cross(Vector3.up, dir01).normalized;
 
                 Vector3 finPos = requestPos + direction * offset;
@@ -179,7 +179,7 @@ namespace friendlyPMC.Actions
                             {
                                 holdit.AddPossibleExecutors(botOwner_0);
                                 holdit.SetGroup(botOwner_0.BotsGroup.RequestsController);
-                                botOwner_0.Gesture.TryGestus(EGesture.Good, true);
+                                botOwner_0.Gesture.TryGestus(EInteraction.OkGesture, true);
                             }
                         }
                     } 
@@ -190,7 +190,7 @@ namespace friendlyPMC.Actions
                     }
                 }
 
-                if (ischecking) checkTime = Time.time + GClass761.Random(4f, 6f);
+                if (ischecking) checkTime = Time.time + GClass824.Random(4f, 6f);
 
                 return;
 

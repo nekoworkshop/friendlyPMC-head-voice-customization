@@ -7,8 +7,10 @@ using UnityEngine.AI;
 
 namespace friendlyPMC.Actions
 {
-
-    public class FollowerGoToEnemy : GClass162
+    /**
+     * A combination of the attackMoving and goToEnemy to use our cover system for "goToEnemy" decision
+     */
+    public class FollowerGoToEnemy : GClass185
     {
         private bool shouldSprint = false;
 
@@ -18,7 +20,7 @@ namespace friendlyPMC.Actions
         private BifacialTransform bifacialTransform_0;
         public FollowerGoToEnemy(BotOwner bot) : base(bot)
         {
-            bifacialTransform_0 = AccessTools.Field(typeof(GClass162), "bifacialTransform_0").GetValue(this) as BifacialTransform;
+            bifacialTransform_0 = AccessTools.Field(typeof(GClass185), "bifacialTransform_0").GetValue(this) as BifacialTransform;
         }
 
         public override void Update()
@@ -35,7 +37,7 @@ namespace friendlyPMC.Actions
                 flag = true;
                 botOwner_0.Steering.LookToPoint(goalEnemy.GetCenterPart());
                 botOwner_0.StopMove();
-                gclass136_0.Update();
+                gclass158_0.Update();
                 return;
             }
             else if (!goalEnemy.IsVisible && Time.time - goalEnemy.GroupInfo.EnemyLastSeenTimeSense >= 5f)
@@ -95,8 +97,8 @@ namespace friendlyPMC.Actions
 
         public void AimAndMove()
         {
-            GClass162.Class109 @class = new GClass162.Class109();
-            @class.gclass162_0 = this;
+            Class115 @class = new Class115();
+            @class.gclass185_0 = this;
             @class.recalcTime = 0f;
 
             bool flag;
@@ -117,7 +119,7 @@ namespace friendlyPMC.Actions
             if (this.float_1 < Time.time)
             {
                 this.float_1 = Time.time + 2f;
-                this.botOwner_0.BotAttackManager.TryPointGetting(centerPos, coverShootType, GClass531.Core.START_DIST_TO_COV, searchType, this.botOwner_0.CurrentEnemyTargetPosition(true), new Action<CustomNavigationPoint>(@class.method_0), new Action(GClass162.Class110.class110_0.method_0), true, false, true, null);
+                this.botOwner_0.BotAttackManager.TryPointGetting(centerPos, coverShootType, GClass583.Core.START_DIST_TO_COV, searchType, this.botOwner_0.CurrentEnemyTargetPosition(true), new Action<CustomNavigationPoint>(@class.method_0), new Action(Class116.class116_0.method_0), true, false, true, null);
             }
             
             botOwner_0.BotAttackManager.UpdateNextTick();
@@ -142,7 +144,7 @@ namespace friendlyPMC.Actions
             }
             if (botOwner_0.GoToPoint(targetPoint, true, -1f, false, false, true, false) == NavMeshPathStatus.PathComplete)
             {
-                Vector3 curPathLastPoint = botOwner_0.Mover.CurPathLastPoint;
+                Vector3 curPathLastPoint = botOwner_0.Mover.TargetPoint.Value;
                 if ((targetPoint - curPathLastPoint).magnitude < 2f)
                 {
                     return true;

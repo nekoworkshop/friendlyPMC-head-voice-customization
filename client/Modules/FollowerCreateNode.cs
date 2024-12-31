@@ -4,11 +4,11 @@ using System.Collections.Generic;
 
 namespace friendlyPMC.Modules
 {
-    // replication of GClass459
+    // replication of GClass507
     public class FollowerCreateNode
     {
 
-        public static GClass134 CreateNode(BotLogicDecision type, BotOwner bot)
+        public static GClass156 CreateNode(BotLogicDecision type, BotOwner bot)
         {
             if(type == BotLogicDecision.doorOpen)
                 return new FollowerOpenDoor(bot);
@@ -54,12 +54,12 @@ namespace friendlyPMC.Modules
             if (type == BotLogicDecision.suppressFire)
                 return new FollowerSuppressionFire(bot);
 
-            return GClass459.CreateNode(type, bot);
+            return GClass507.CreateNode(type, bot);
         }
 
-        public static Dictionary<BotLogicDecision, GClass134> ActionsList(BotOwner bot)
+        public static Dictionary<BotLogicDecision, GClass156> ActionsList(BotOwner bot)
         {
-            Dictionary<BotLogicDecision, GClass134> dictionary = new Dictionary<BotLogicDecision, GClass134>();
+            Dictionary<BotLogicDecision, GClass156> dictionary = new Dictionary<BotLogicDecision, GClass156>();
             smethod_0(dictionary, BotLogicDecision.holdPosition, bot);
             smethod_0(dictionary, BotLogicDecision.goToCoverPoint, bot);
             smethod_0(dictionary, BotLogicDecision.attackMoving, bot);
@@ -127,7 +127,7 @@ namespace friendlyPMC.Modules
             return dictionary;
         }
 
-        public static void smethod_0(Dictionary<BotLogicDecision, GClass134> dictionary, BotLogicDecision botLogicDecision, BotOwner bot)
+        public static void smethod_0(Dictionary<BotLogicDecision, GClass156> dictionary, BotLogicDecision botLogicDecision, BotOwner bot)
         {
             dictionary.Add(botLogicDecision, CreateNode(botLogicDecision, bot));
         }

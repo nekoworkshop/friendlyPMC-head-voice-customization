@@ -490,12 +490,12 @@ namespace friendlyPMC.Modules
                         {
                         	// - we check if any part of the enemy is visible to the player
                             if (
-                                GClass301.CanShootToTarget(new ShootPointClass(enemy.MainParts[BodyPartType.head].Position, 1), player.PlayerBones.WeaponRoot.position, LayerMaskClass.HighPolyWithTerrainMask, false) ||
-                                GClass301.CanShootToTarget(new ShootPointClass(enemy.MainParts[BodyPartType.body].Position, 1), player.PlayerBones.WeaponRoot.position, LayerMaskClass.HighPolyWithTerrainMask, false) ||
-                                GClass301.CanShootToTarget(new ShootPointClass(enemy.MainParts[BodyPartType.leftArm].Position, 1), player.PlayerBones.WeaponRoot.position, LayerMaskClass.HighPolyWithTerrainMask, false) ||
-                                GClass301.CanShootToTarget(new ShootPointClass(enemy.MainParts[BodyPartType.rightArm].Position, 1), player.PlayerBones.WeaponRoot.position, LayerMaskClass.HighPolyWithTerrainMask, false) ||
-                                GClass301.CanShootToTarget(new ShootPointClass(enemy.MainParts[BodyPartType.leftLeg].Position, 1), player.PlayerBones.WeaponRoot.position, LayerMaskClass.HighPolyWithTerrainMask, false) ||
-                                GClass301.CanShootToTarget(new ShootPointClass(enemy.MainParts[BodyPartType.rightLeg].Position, 1), player.PlayerBones.WeaponRoot.position, LayerMaskClass.HighPolyWithTerrainMask, false)
+                                GClass344.CanShootToTarget(new ShootPointClass(enemy.MainParts[BodyPartType.head].Position, 1), player.PlayerBones.WeaponRoot.position, LayerMaskClass.HighPolyWithTerrainMask, false) ||
+                                GClass344.CanShootToTarget(new ShootPointClass(enemy.MainParts[BodyPartType.body].Position, 1), player.PlayerBones.WeaponRoot.position, LayerMaskClass.HighPolyWithTerrainMask, false) ||
+                                GClass344.CanShootToTarget(new ShootPointClass(enemy.MainParts[BodyPartType.leftArm].Position, 1), player.PlayerBones.WeaponRoot.position, LayerMaskClass.HighPolyWithTerrainMask, false) ||
+                                GClass344.CanShootToTarget(new ShootPointClass(enemy.MainParts[BodyPartType.rightArm].Position, 1), player.PlayerBones.WeaponRoot.position, LayerMaskClass.HighPolyWithTerrainMask, false) ||
+                                GClass344.CanShootToTarget(new ShootPointClass(enemy.MainParts[BodyPartType.leftLeg].Position, 1), player.PlayerBones.WeaponRoot.position, LayerMaskClass.HighPolyWithTerrainMask, false) ||
+                                GClass344.CanShootToTarget(new ShootPointClass(enemy.MainParts[BodyPartType.rightLeg].Position, 1), player.PlayerBones.WeaponRoot.position, LayerMaskClass.HighPolyWithTerrainMask, false)
                             )
                             {
                                 Instance._enemiesSeen.Add(enemy);

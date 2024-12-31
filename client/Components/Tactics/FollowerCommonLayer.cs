@@ -355,7 +355,7 @@ namespace friendlyPMC.Components.Tactics
                 maxDistance,
                 (cover) =>
                 {
-                    if (boss != null && !GClass326.IsDangerPositionFarEnough(cover.Position, bossPosition, 0.4f * 0.4f)) return false;
+                    if (boss != null && !GClass369.IsDangerPositionFarEnough(cover.Position, bossPosition, 0.4f * 0.4f)) return false;
 
                     return true;
                 });
@@ -827,7 +827,7 @@ namespace friendlyPMC.Components.Tactics
                 if (canShoot)
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.shootFromCover, "sfc");
 
-                return new AICoreActionResultStruct<BotLogicDecision>(HoldFor(GClass761.Random(2f, 5f)), "wait4it");
+                return new AICoreActionResultStruct<BotLogicDecision>(HoldFor(GClass824.Random(2f, 5f)), "wait4it");
             }
 
             // If the enemy is a sniper and visible, try to find a cover point from which you can shoot
@@ -866,7 +866,7 @@ namespace friendlyPMC.Components.Tactics
             if(coverType == "close")
                 return new AICoreActionResultStruct<BotLogicDecision>((BotLogicDecision)CustomBotDecisions.CoverToCover, "coverBoss");
             else 
-                return new AICoreActionResultStruct<BotLogicDecision>(HoldFor(GClass761.Random(2f, 5f)), "wait4it");
+                return new AICoreActionResultStruct<BotLogicDecision>(HoldFor(GClass824.Random(2f, 5f)), "wait4it");
         }
 
         public AICoreActionEndStruct? ShallEndCurrentDecisionCommon(AICoreActionResultStruct<BotLogicDecision> curDecision)

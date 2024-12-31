@@ -1,12 +1,14 @@
 ﻿using EFT;
 using EFT.Interactive;
 using friendlyPMC.Modules;
-using friendlyPMC.Requests;
 using UnityEngine;
 using UnityEngine.AI;
 
 namespace friendlyPMC.Actions
 {
+    /**
+     * Overwrite the openDoor action for the follower to make him open the door properly and fix look direction.
+     */
     public class FollowerOpenDoor : BaseNodeAbstractClass
     {
 

@@ -1,9 +1,13 @@
 ﻿using EFT;
+using friendlyPMC.Components;
 using UnityEngine;
 
 namespace friendlyPMC.Actions
 {
-    public class FollowerHoldPosition : GClass221
+    /**
+     * Overwrite the holdPosition action for the follower to make him look to the direction of the enemy if he has one.
+     */
+    public class FollowerHoldPosition : GClass256
     {
         private float timer = 0f;
         public FollowerHoldPosition (BotOwner bot) : base(bot) { }
@@ -15,9 +19,11 @@ namespace friendlyPMC.Actions
                 botOwner_0.Steering.LookToDirection(botOwner_0.Memory.GoalEnemy.CurrPosition - botOwner_0.GetPlayer.Transform.position);
             }
 
-            if(!botOwner_0.Memory.HaveEnemy && timer < Time.time)
+            FollowerBrain brain = botOwner_0.Brain.BaseBrain as FollowerBrain;
+
+            if (!botOwner_0.Memory.HaveEnemy && timer < Time.time && (brain == null || (!brain.UnderFire && !brain.WasHit)))
             {
-                timer = Time.time + GClass761.Random(3f, 6f);
+                timer = Time.time + GClass824.Random(3f, 6f);
                 botOwner_0.LookData.SetLookPointByHearing(null);
             }
         }

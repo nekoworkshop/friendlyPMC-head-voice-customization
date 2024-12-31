@@ -8,7 +8,10 @@ using UnityEngine;
 
 namespace friendlyPMC.Actions
 {
-    public class FollowerCoverToCover : GClass159
+    /**
+     * Follower action to move from cover to cover around the boss
+     */
+    public class FollowerCoverToCover : GClass180
     {
         private Vector3? _coverTarget;
         private Vector3? coverPosition;
@@ -119,16 +122,16 @@ namespace friendlyPMC.Actions
                 Mathf.Floor(bossPos.y / 3f) * 3f,
                 Mathf.Floor(bossPos.z / 10f) * 10f
             );
-
+            // act only when boss changed location
             if (targetSpot != _coverTarget)
             {
                 _coverTarget = targetSpot;
 
                 var _members = AccessTools.Field(typeof(BotsGroup), "_members").GetValue(botOwner_0.BotsGroup) as List<BotOwner>;
-
+                // - go for closest cover point to the boss
                 CustomNavigationPoint cover = Covers.GetClosestCoverPoint(botOwner_0, bossPos, Props.searchRadius, 5f, (CustomNavigationPoint point) =>
                 {
-                    if (!GClass326.IsDangerPositionFarEnough(point.Position, new Vector3[] { bossPos }, 0.5f * 0.5f)) return false;
+                    if (!GClass369.IsDangerPositionFarEnough(point.Position, new Vector3[] { bossPos }, 0.5f * 0.5f)) return false;
 
                     if (botOwner_0.BotsGroup.MembersCount == 1) return true;
 

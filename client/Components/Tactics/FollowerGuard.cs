@@ -161,7 +161,7 @@ namespace friendlyPMC.Components.Tactics
 
             if (!botOwner_0.Memory.GoalEnemy.IsSuppressed() && goalEnemy.ShallISuppress())
             {
-                bool useGrenade = GClass761.Random(0f, 2f) > 1f;
+                bool useGrenade = GClass824.Random(0f, 2f) > 1f;
                 ThrowWeapType? grenadeType = new ThrowWeapType?(ThrowWeapType.frag_grenade);
                 // - check if player is too close when using grenade
                 if (useGrenade && botOwner_0.WeaponManager.Grenades.HaveGrenadeOfType(grenadeType.Value))
@@ -260,7 +260,7 @@ namespace friendlyPMC.Components.Tactics
                     GetClosestAttackCoverPoint(enemyPos);
                     if (customNavigationPoint_0 != null)
                     {
-                        bool withSuppr = GClass761.Random(0f, 1f) > 0.5f;
+                        bool withSuppr = GClass824.Random(0f, 1f) > 0.5f;
                         return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMoving, "getInCloseSlow");
                     }
 
@@ -283,7 +283,7 @@ namespace friendlyPMC.Components.Tactics
 
                 if (customNavigationPoint_0 != null && coverTimer < Time.time)
                 {
-                    coverTimer = Time.time + GClass761.Random(3f, 5f);
+                    coverTimer = Time.time + GClass824.Random(3f, 5f);
                     return new AICoreActionResultStruct<BotLogicDecision>((BotLogicDecision)CustomBotDecisions.RunToCover, "relocateFast");
                 }
 
@@ -366,7 +366,7 @@ namespace friendlyPMC.Components.Tactics
                         {
                             Vector3 enemyPos = enemy.Transform.position;
                             // - check if enemy is far enough from the player
-                            if (!GClass326.IsDangerPositionFarEnough(playerPos, new Vector3[]
+                            if (!GClass369.IsDangerPositionFarEnough(playerPos, new Vector3[]
                             {
                                 enemyPos
                             }, 4f)) continue;

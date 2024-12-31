@@ -59,7 +59,7 @@ namespace friendlyPMC.Components.FollowerBossFollower
             {
                 Modules.Logger.LogInfo("baseDecision Error: " + ex.Message);
                 Modules.Logger.LogInfo("Trace: " + ex.StackTrace);
-                return new AICoreActionResultStruct<BotLogicDecision>(HoldFor(GClass761.Random(1f, 2f)), "baseDecision.Error");
+                return new AICoreActionResultStruct<BotLogicDecision>(HoldFor(GClass824.Random(1f, 2f)), "baseDecision.Error");
             }
 
             if (
@@ -88,7 +88,7 @@ namespace friendlyPMC.Components.FollowerBossFollower
             {
                 Modules.Logger.LogInfo("supportDecision Error: " + ex.Message);
                 Modules.Logger.LogInfo("Trace: " + ex.StackTrace);
-                return new AICoreActionResultStruct<BotLogicDecision>(HoldFor(GClass761.Random(1f, 2f)), "supportDecision.Error");
+                return new AICoreActionResultStruct<BotLogicDecision>(HoldFor(GClass824.Random(1f, 2f)), "supportDecision.Error");
             }
 
             if (

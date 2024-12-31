@@ -209,7 +209,7 @@ namespace friendlyPMC.Components.FollowerBossFollower
             {
                 Modules.Logger.LogInfo("BirdEye Decision Error: " + ex.Message);
                 Modules.Logger.LogInfo("Trace: " + ex.StackTrace);
-                return new AICoreActionResultStruct<BotLogicDecision>(HoldFor(GClass761.Random(1f, 2f)), "decision.Error");
+                return new AICoreActionResultStruct<BotLogicDecision>(HoldFor(GClass824.Random(1f, 2f)), "decision.Error");
             }
         }
 

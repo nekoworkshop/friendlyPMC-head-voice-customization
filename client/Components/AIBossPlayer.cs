@@ -76,7 +76,7 @@ namespace friendlyPMC.Components
 
             if (Followers != null && Followers.Count > 0)
             {
-                float chance = GClass761.Random(1, 100);
+                float chance = GClass824.Random(1, 100);
                 bool noreturn = chance > friendlyPMC.returnChanceDeath.Value;
 
                 Followers.ForEach(follower =>

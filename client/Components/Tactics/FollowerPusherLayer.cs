@@ -140,8 +140,8 @@ namespace friendlyPMC.Components.Tactics
                             {
                                 if (holdTimer < Time.time)
                                 {
-                                    float timer = GClass761.Random(2f, 5f);
-                                    holdTimer = Time.time + timer + GClass761.Random(2f, 3f);
+                                    float timer = GClass824.Random(2f, 5f);
+                                    holdTimer = Time.time + timer + GClass824.Random(2f, 3f);
                                     return new AICoreActionResultStruct<BotLogicDecision>(HoldFor(timer), "wait4it");
                                 }
                                 else
@@ -188,8 +188,8 @@ namespace friendlyPMC.Components.Tactics
                             // No cover point found, hold position temporarily
                             if (holdTimer < Time.time)
                             {
-                                float timer = GClass761.Random(2f, 5f);
-                                holdTimer = Time.time + timer + GClass761.Random(2f, 3f);
+                                float timer = GClass824.Random(2f, 5f);
+                                holdTimer = Time.time + timer + GClass824.Random(2f, 3f);
                                 return new AICoreActionResultStruct<BotLogicDecision>(HoldFor(timer), "wait4it");
                             }
                         }
@@ -228,8 +228,8 @@ namespace friendlyPMC.Components.Tactics
                             // --- no approachable point found, hold position temporarily
                             if (holdTimer < Time.time)
                             {
-                                float timer = GClass761.Random(2f, 5f);
-                                holdTimer = Time.time + timer + GClass761.Random(2f, 3f);
+                                float timer = GClass824.Random(2f, 5f);
+                                holdTimer = Time.time + timer + GClass824.Random(2f, 3f);
                                 return new AICoreActionResultStruct<BotLogicDecision>(HoldFor(timer), "wait4it");
                             }
                         }
@@ -249,8 +249,8 @@ namespace friendlyPMC.Components.Tactics
                             // --- no cover point found, hold position temporarily
                             if (holdTimer < Time.time)
                             {
-                                float timer = GClass761.Random(2f, 5f);
-                                holdTimer = Time.time + timer + GClass761.Random(2f, 3f);
+                                float timer = GClass824.Random(2f, 5f);
+                                holdTimer = Time.time + timer + GClass824.Random(2f, 3f);
                                 return new AICoreActionResultStruct<BotLogicDecision>(HoldFor(timer), "wait4it");
                             }
                             else
@@ -259,7 +259,7 @@ namespace friendlyPMC.Components.Tactics
                     }
                 }
                 // - if the enemy is not visible
-                else if (Time.time - lastEnemySeenTime < GClass761.Random(2f, 5f))
+                else if (Time.time - lastEnemySeenTime < GClass824.Random(2f, 5f))
                 {
                     // -- find a cover point closer to the enemy's last known position
                     GetApproachablePoint();
@@ -281,8 +281,8 @@ namespace friendlyPMC.Components.Tactics
             // --  fallback If no conditions are met
             if (holdTimer < Time.time)
             {
-                float timer = GClass761.Random(2f, 5f);
-                holdTimer = Time.time + timer + GClass761.Random(2f, 3f);
+                float timer = GClass824.Random(2f, 5f);
+                holdTimer = Time.time + timer + GClass824.Random(2f, 3f);
                 return new AICoreActionResultStruct<BotLogicDecision>(HoldFor(timer), "waitAbit");
             }
             else

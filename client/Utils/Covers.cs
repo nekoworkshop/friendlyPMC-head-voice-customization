@@ -30,7 +30,7 @@ namespace friendlyPMC.Utils
                 // cover too far
                 if(Vector3.Distance(point.Position, centerPosition) > searchRadius) return false;
 
-                if(boss != null && !GClass326.IsDangerPositionFarEnough(point.Position, bossPosition, 0.7f * 0.7f)) return false;
+                if(boss != null && !GClass369.IsDangerPositionFarEnough(point.Position, bossPosition, 0.7f * 0.7f)) return false;
 
                 navMeshPath.ClearCorners();
                 bool result = NavMesh.CalculatePath(centerPosition, point.Position, -1, navMeshPath);
@@ -66,7 +66,7 @@ namespace friendlyPMC.Utils
             {
                 if(!IsPointBetween(point.Position, pointA, pointB)) return false;
 
-                 if(boss != null && !GClass326.IsDangerPositionFarEnough(point.Position, bossPosition, 0.7f * 0.7f)) return false;
+                 if(boss != null && !GClass369.IsDangerPositionFarEnough(point.Position, bossPosition, 0.7f * 0.7f)) return false;
 
                 if (eligibilityCheck != null && !eligibilityCheck(point)) return false;
 
@@ -193,7 +193,7 @@ namespace friendlyPMC.Utils
                 foreach (var target in shootTarget)
                 {
                     ShootPointClass shootPoint = new ShootPointClass(target, 0.8f);
-                    if (!GClass301.CanShootToTarget(shootPoint, point, LayerMaskClass.HighPolyWithTerrainMask, false))
+                    if (!GClass344.CanShootToTarget(shootPoint, point, LayerMaskClass.HighPolyWithTerrainMask, false))
                     {
                         cansh = false;
                         break;
@@ -227,7 +227,7 @@ namespace friendlyPMC.Utils
 
             return GetClosestShootCover(botOwner, midpoint, minDistance, 200f, (cover) =>
             {
-                if (boss != null && !GClass326.IsDangerPositionFarEnough(cover.Position, bossPosition, 0.7f * 0.7f)) return false;
+                if (boss != null && !GClass369.IsDangerPositionFarEnough(cover.Position, bossPosition, 0.7f * 0.7f)) return false;
 
                 return true;
             });
@@ -254,7 +254,7 @@ namespace friendlyPMC.Utils
                 if (
                     !(point.CoverLevel == CoverLevel.Sit || point.CoverLevel == CoverLevel.Stay) ||
                     !point.IsFreeById(botOwnerId) ||
-                    !GClass326.IsDangerPositionFarEnough(point.Position, dangerPositions, safeDistance * safeDistance) ||
+                    !GClass369.IsDangerPositionFarEnough(point.Position, dangerPositions, safeDistance * safeDistance) ||
                     Vector3.Distance(point.Position, botPosition) <= 1f ||
                     !eligibleCheck(point)
                 )
@@ -333,7 +333,7 @@ namespace friendlyPMC.Utils
                 if (!NavMesh.SamplePosition(scanPosition, out navMeshHit, 10f, NavMesh.AllAreas)) continue;
 
                 // - check if the position is valid based on conditions
-                if (!GClass326.IsDangerPositionFarEnough(navMeshHit.position, new Vector3[] { targetPosition }, minDistance * minDistance)) continue;
+                if (!GClass369.IsDangerPositionFarEnough(navMeshHit.position, new Vector3[] { targetPosition }, minDistance * minDistance)) continue;
                 if (!IsNavigablePoint(botPosition, navMeshHit.position, 150f, mesh)) continue;
 
                 // - check if position meets the eligibility requirements
@@ -344,8 +344,8 @@ namespace friendlyPMC.Utils
                 foreach (var target in shootTarget)
                 {
                     ShootPointClass shootPoint = new ShootPointClass(target, 0.8f);
-                    if (GClass301.CanShootToTarget(shootPoint, navMeshHit.position + botWeaponOffset, Mask, false) ||
-                        GClass301.CanShootToTarget(shootPoint, navMeshHit.position + botWeaponOffset * 0.5f, Mask, false))
+                    if (GClass344.CanShootToTarget(shootPoint, navMeshHit.position + botWeaponOffset, Mask, false) ||
+                        GClass344.CanShootToTarget(shootPoint, navMeshHit.position + botWeaponOffset * 0.5f, Mask, false))
                     {
                         canShoot = true;
                         break;

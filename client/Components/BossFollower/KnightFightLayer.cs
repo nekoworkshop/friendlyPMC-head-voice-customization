@@ -136,7 +136,7 @@ namespace friendlyPMC.Components.BossFollower
             {
                 Modules.Logger.LogInfo("KnightFight Error: " + ex.Message);
                 Modules.Logger.LogInfo("Trace: " + ex.StackTrace);
-                return new AICoreActionResultStruct<BotLogicDecision>(HoldFor(GClass761.Random(1f, 2f)), "decision.Error");
+                return new AICoreActionResultStruct<BotLogicDecision>(HoldFor(GClass824.Random(1f, 2f)), "decision.Error");
             }
         }
 
@@ -352,7 +352,7 @@ namespace friendlyPMC.Components.BossFollower
 
             if (baseDecision.HasValue) return baseDecision.Value;
 
-            bool useGrenade = GClass761.Random(0f, 2f) > 1f;
+            bool useGrenade = GClass824.Random(0f, 2f) > 1f;
             
             AICoreActionResultStruct<BotLogicDecision> decision = guardLayer.method_29(useGrenade,BotLogicDecision.debugGrenade);
 

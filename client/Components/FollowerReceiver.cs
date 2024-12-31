@@ -53,7 +53,7 @@ namespace friendlyPMC.Components
                         if (raycastHit.collider != null && raycastHit.collider.gameObject != null)
                         {
                             if (
-                                GClass301.CanShootToTarget(new ShootPointClass(raycastHit.point,1),ray.origin,LayerMaskClass.HighPolyWithTerrainMask)
+                                GClass344.CanShootToTarget(new ShootPointClass(raycastHit.point,1),ray.origin,LayerMaskClass.HighPolyWithTerrainMask)
                             )
                             //if (!Physics.Linecast(ray.origin, raycastHit.point, GameWorld.LootMaskObstruction))
                             {

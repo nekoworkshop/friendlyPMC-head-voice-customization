@@ -2,7 +2,7 @@
 
 namespace friendlyPMC.Actions
 {
-    public class FollowerRunToCover : GClass180
+    public class FollowerRunToCover : GClass206
     {
         public FollowerRunToCover(BotOwner bot) : base(bot)
         {

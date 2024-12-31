@@ -209,7 +209,7 @@ namespace friendlyPMC.Patches
                 return;
             }
 
-            BotSettingsComponents botSettingsComponents = GClass531.smethod_1(BotDifficulty.normal, role, false);
+            BotSettingsComponents botSettingsComponents = GClass583.smethod_1(BotDifficulty.normal, role, false);
             if(botSettingsComponents != null)
             {
                 if (side == EPlayerSide.Bear) isHostile = botSettingsComponents.Mind.DEFAULT_BEAR_BEHAVIOUR.HasFlag(EWarnBehaviour.Attack);

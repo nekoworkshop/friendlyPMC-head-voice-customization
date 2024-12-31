@@ -11,6 +11,9 @@ using UnityEngine;
 
 namespace friendlyPMC.Actions
 {
+    /**
+     * Alternative action to enemy search for the follower with "Guard" tactic
+     */
     public class FollowerGuardCover : FollowerSniperSearch
     {
         public FollowerGuardCover(BotOwner owner)

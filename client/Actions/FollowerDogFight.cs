@@ -3,9 +3,12 @@ using HarmonyLib;
 
 namespace friendlyPMC.Actions
 {
-    public class FollowerDogFight : GClass160
+    /**
+     * Overwrite of dogFight decision to fix bot's aiming direction
+     */
+    public class FollowerDogFight : GClass183
     {
-        private GClass141 gclass136_1;
+        private GClass158 gclass136_1;
         public FollowerDogFight(BotOwner bot) : base(bot) {
            
         }
@@ -14,7 +17,7 @@ namespace friendlyPMC.Actions
         {
             if(gclass136_1 == null)
             {
-                gclass136_1 = AccessTools.Field(typeof(GClass160), "gclass136_0").GetValue(this) as GClass141;
+                gclass136_1 = AccessTools.Field(typeof(GClass160), "gclass158_0").GetValue(this) as GClass158;
             }
 
             EnemyInfo goalEnemy = botOwner_0.Memory.GoalEnemy;

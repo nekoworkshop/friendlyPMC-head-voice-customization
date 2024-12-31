@@ -92,7 +92,7 @@ namespace friendlyPMC.Components.Tactics
                     }
                 }
                 // - else, hold position
-                return commonLayer.HoldPositionFor(GClass761.Random(2f, 3f), "holdPositionInCover");
+                return commonLayer.HoldPositionFor(GClass824.Random(2f, 3f), "holdPositionInCover");
 
             } 
             else if(enemyVisible)
@@ -141,7 +141,7 @@ namespace friendlyPMC.Components.Tactics
             }
 
             // final fallback decision
-            return commonLayer.HoldPositionFor(GClass761.Random(2f, 3f), "holdPositionInCover");
+            return commonLayer.HoldPositionFor(GClass824.Random(2f, 3f), "holdPositionInCover");
         }
 
         public override AICoreActionEndStruct EndHoldPosition()

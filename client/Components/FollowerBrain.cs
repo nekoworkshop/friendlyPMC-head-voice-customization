@@ -355,8 +355,8 @@ namespace friendlyPMC.Components
                     }
                 }
                 else if (
-                    GClass301.CanShootToTarget(new ShootPointClass(_owner.GetPlayer.MainParts[BodyPartType.head].Position, 1f), enemy.PlayerBones.WeaponRoot.position, _owner.LookSensor.Mask) ||
-                    GClass301.CanShootToTarget(new ShootPointClass(_owner.GetPlayer.MainParts[BodyPartType.head].Position, 1f), enemy.PlayerBones.WeaponRoot.position, _owner.LookSensor.Mask)
+                    GClass344.CanShootToTarget(new ShootPointClass(_owner.GetPlayer.MainParts[BodyPartType.head].Position, 1f), enemy.PlayerBones.WeaponRoot.position, _owner.LookSensor.Mask) ||
+                    GClass344.CanShootToTarget(new ShootPointClass(_owner.GetPlayer.MainParts[BodyPartType.head].Position, 1f), enemy.PlayerBones.WeaponRoot.position, _owner.LookSensor.Mask)
                 )
                 {
                     FakeShot(shootdir);
