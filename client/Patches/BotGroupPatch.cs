@@ -176,7 +176,8 @@ namespace friendlyPMC.Patches
             {
                 if(
                     item.Value.Player?.Profile?.Info?.Settings?.Role == WildSpawnType.shooterBTR ||
-                    item.Value.Player?.Profile?.Info?.Settings?.Role == WildSpawnType.peacefullZryachiyEvent
+                    item.Value.Player?.Profile?.Info?.Settings?.Role == WildSpawnType.peacefullZryachiyEvent ||
+                    item.Value.Player?.Profile?.Info?.Settings?.Role == WildSpawnType.gifter
                 )
                 {
                     RemoveEnemy(item.Value.Player,item.Value.Cause);

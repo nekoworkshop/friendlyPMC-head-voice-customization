@@ -198,7 +198,8 @@ namespace friendlyPMC.Components
                     {
                         if (
                             item.Value.Player.Profile.Info.Settings.Role == WildSpawnType.shooterBTR ||
-                            item.Value.Player.Profile.Info.Settings.Role == WildSpawnType.peacefullZryachiyEvent
+                            item.Value.Player.Profile.Info.Settings.Role == WildSpawnType.peacefullZryachiyEvent ||
+                            item.Value.Player.Profile.Info.Settings.Role == WildSpawnType.gifter
                         )
                         {
                             _player.bossGroup.RemoveEnemy(item.Value.Player);
