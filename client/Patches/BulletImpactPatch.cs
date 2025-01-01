@@ -7,6 +7,7 @@ using Systems.Effects;
 
 namespace friendlyPMC.Patches
 {
+    // patch to detect nearby bullet impacts
     public class BulletImpactPatch : ModulePatch
     {
         protected override MethodBase GetTargetMethod()
@@ -15,7 +16,7 @@ namespace friendlyPMC.Patches
         }
 
         [PatchPostfix]
-        public static void PatchPostfix(EffectsCommutator __instance,EftBulletClass info)
+        public static void PatchPostfix(EffectsCommutator __instance,EftBulletClass info, ShotInfoClass playerHitInfo)
         {
             var player = info.Player;
 

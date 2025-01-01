@@ -5,7 +5,11 @@ using UnityEngine;
 
 namespace friendlyPMC.Components.Tactics
 {
-    public class FollowerPusherLayer : GClass47
+    /** 
+     * This class is not meant to be used directly as a brain layer, but within one 
+     * Enemy Push layer based on Boar follower fight logic
+     * **/
+    public class FollowerPusherLayer : GClass48
     {
         private FollowerCommonLayer commonLayer;
 
@@ -401,7 +405,7 @@ namespace friendlyPMC.Components.Tactics
                 {
                     this.botOwner_0.Memory.Spotted(false, null, null);
                     this.botOwner_0.Memory.BotCurrentCoverInfo.SetCover(this.customNavigationPoint_0, true);
-                    GClass362 gclass = gclass363_0;
+                    GClass405 gclass = gclass363_0;
                     if (gclass != null)
                     {
                         gclass.StartMoveToAttackPoint(botOwner_0.Id);

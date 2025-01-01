@@ -45,9 +45,9 @@ namespace friendlyPMC.Patches
             if (
                 enemy.Side == botOwner_0.Side && groupInfo.Cause == EBotEnemyCause.AddNewMember &&
                 (
-                    (enemy.Side == EPlayerSide.Bear && !botOwner_0.Settings.FileSettings.Mind.DEFAULT_BEAR_BEHAVIOUR.HasFlag(EWarnBehaviour.Attack)) ||
-                    (enemy.Side == EPlayerSide.Usec && !botOwner_0.Settings.FileSettings.Mind.DEFAULT_USEC_BEHAVIOUR.HasFlag(EWarnBehaviour.Attack)) ||
-                    (enemy.Side == EPlayerSide.Savage && !botOwner_0.Settings.FileSettings.Mind.DEFAULT_SAVAGE_BEHAVIOUR.HasFlag(EWarnBehaviour.Attack))
+                    (enemy.Side == EPlayerSide.Bear && !botOwner_0.Settings.FileSettings.Mind.DEFAULT_BEAR_BEHAVIOUR.HasFlag(EWarnBehaviour.AlwaysEnemies)) ||
+                    (enemy.Side == EPlayerSide.Usec && !botOwner_0.Settings.FileSettings.Mind.DEFAULT_USEC_BEHAVIOUR.HasFlag(EWarnBehaviour.AlwaysEnemies)) ||
+                    (enemy.Side == EPlayerSide.Savage && !botOwner_0.Settings.FileSettings.Mind.DEFAULT_SAVAGE_BEHAVIOUR.HasFlag(EWarnBehaviour.AlwaysEnemies))
                 )
             )
             {
@@ -111,15 +111,17 @@ namespace friendlyPMC.Patches
             }
         }
     }
-
+    /**
+     * This patch is used to prevent followers from adding teammates as an enemy on friendly fire
+     */
     internal class BotMemoryDamagePatch : ModulePatch
     {
         protected override MethodBase GetTargetMethod()
         {
-            return AccessTools.Method(typeof(BotMemoryClass), "method_7");
+            return AccessTools.Method(typeof(BotMemoryClass), "method_8");
         }
         [PatchPostfix]
-        private static void PatchPostfix(BotMemoryClass __instance, DamageInfo damageInfo)
+        private static void PatchPostfix(BotMemoryClass __instance, DamageInfoStruct damageInfo)
         {
             var botOwner_0 = AccessTools.Field(typeof(BotMemoryClass), "botOwner_0").GetValue(__instance) as BotOwner;
             var botsGroupField = AccessTools.Field(typeof(BotMemoryClass), "botsGroup_0");

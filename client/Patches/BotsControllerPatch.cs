@@ -20,20 +20,19 @@ using EFT.Bots;
 using System.Collections;
 using System.Linq;
 
-using IProfileData = GClass592;
+using IProfileData = GClass652;
 using ProfileEndPoint = ProfileEndpointFactoryAbstractClass;
-using BotCreator = GClass814;
+using BotCreator = GClass888;
 
 using System.Threading.Tasks;
 using SPT.Common.Http;
 using Newtonsoft.Json;
-using EFT.Game.Spawning;
-using System.Timers;
 using EFT.Quests;
+using EFT.Hideout;
 
 namespace friendlyPMC.Patches
 {
-    internal class CancelToken : GInterface19
+    internal class CancelToken : GInterface22
     {
         CancellationTokenSource cancelSource;
         public CancelToken()
@@ -138,13 +137,13 @@ namespace friendlyPMC.Patches
 
                 if (side == EPlayerSide.Bear)
                 {
-                    bt.Settings.FileSettings.Mind.DEFAULT_BEAR_BEHAVIOUR = sameSideHostile ? EWarnBehaviour.Attack : EWarnBehaviour.Ignore;
-                    bt.Settings.FileSettings.Mind.DEFAULT_SAVAGE_BEHAVIOUR = EWarnBehaviour.Attack;
+                    bt.Settings.FileSettings.Mind.DEFAULT_BEAR_BEHAVIOUR = sameSideHostile ? EWarnBehaviour.AlwaysEnemies : EWarnBehaviour.Neutral;
+                    bt.Settings.FileSettings.Mind.DEFAULT_SAVAGE_BEHAVIOUR = EWarnBehaviour.AlwaysEnemies;
                 }
                 else
                 {
-                    bt.Settings.FileSettings.Mind.DEFAULT_USEC_BEHAVIOUR = sameSideHostile ? EWarnBehaviour.Attack : EWarnBehaviour.Ignore;
-                    bt.Settings.FileSettings.Mind.DEFAULT_SAVAGE_BEHAVIOUR = EWarnBehaviour.Attack;
+                    bt.Settings.FileSettings.Mind.DEFAULT_USEC_BEHAVIOUR = sameSideHostile ? EWarnBehaviour.AlwaysEnemies : EWarnBehaviour.Neutral;
+                    bt.Settings.FileSettings.Mind.DEFAULT_SAVAGE_BEHAVIOUR = EWarnBehaviour.AlwaysEnemies;
                 }
 
                 foreach (BotOwner item2 in botSpawnerClass.method_4(bt))
@@ -212,13 +211,13 @@ namespace friendlyPMC.Patches
             BotSettingsComponents botSettingsComponents = GClass583.smethod_1(BotDifficulty.normal, role, false);
             if(botSettingsComponents != null)
             {
-                if (side == EPlayerSide.Bear) isHostile = botSettingsComponents.Mind.DEFAULT_BEAR_BEHAVIOUR.HasFlag(EWarnBehaviour.Attack);
-                else if (side == EPlayerSide.Usec) isHostile = botSettingsComponents.Mind.DEFAULT_USEC_BEHAVIOUR.HasFlag(EWarnBehaviour.Attack);
-                else isHostile = botSettingsComponents.Mind.DEFAULT_SAVAGE_BEHAVIOUR.HasFlag(EWarnBehaviour.Attack);
+                if (side == EPlayerSide.Bear) isHostile = botSettingsComponents.Mind.DEFAULT_BEAR_BEHAVIOUR.HasFlag(EWarnBehaviour.AlwaysEnemies);
+                else if (side == EPlayerSide.Usec) isHostile = botSettingsComponents.Mind.DEFAULT_USEC_BEHAVIOUR.HasFlag(EWarnBehaviour.AlwaysEnemies);
+                else isHostile = botSettingsComponents.Mind.DEFAULT_SAVAGE_BEHAVIOUR.HasFlag(EWarnBehaviour.AlwaysEnemies);
             }
         }
 
-        private async UniTask ActivateBotFollower(BotCreator botCreator, Profile profile, GClass590 position, BotZone zone,bool shallBeGroup, Func<BotOwner, BotZone, BotsGroup> GroupAction, Action<BotOwner> OnActivate,CancellationToken token)
+        private async UniTask ActivateBotFollower(BotCreator botCreator, Profile profile, GClass649 position, BotZone zone,bool shallBeGroup, Func<BotOwner, BotZone, BotsGroup> GroupAction, Action<BotOwner> OnActivate,CancellationToken token)
         {
 
             await botCreator.ActivateBot(
@@ -283,9 +282,9 @@ namespace friendlyPMC.Patches
 
             var botPresets = AccessTools.Field(typeof(BotCreator), "ginterface18_0").GetValue(botCreator) as BotsPresets;
             var profileEndpoint = AccessTools.Field(typeof(BotsPresets), "iSession").GetValue(botPresets) as ProfileEndPoint;
-            var gclass1200_0 = AccessTools.Field(typeof(ProfileEndPoint), "gclass1200_0").GetValue(profileEndpoint) as GClass1200;
+            var gclass1200_0 = AccessTools.Field(typeof(ProfileEndPoint), "gclass1303_0").GetValue(profileEndpoint) as GClass1303;
 
-            List<WaveInfo> limit = botPresets.method_1(data.PrepareToLoadBackend(1).ToList(), out var list3); ;
+            List<WaveInfo> limit = botPresets.method_3(data.PrepareToLoadBackend(1).ToList(), out var list3); ;
 
             customization["English"] = friendlyPMC.englishBear.Value;
             // call backend
@@ -294,7 +293,7 @@ namespace friendlyPMC.Patches
                 Url = gclass1200_0.Main + "/client/game/bot/followergenerate",
                 Params = new Dictionary<string, object>
                     {
-                        { "Info",  new Class17<List<WaveInfo>>(limit) },
+                        { "Info",  new Class19<List<WaveInfo>>(limit) },
                         { "Custom", customization }
                     },
                 Retries = new byte?(LegacyParamsStruct.DefaultRetries)
@@ -367,14 +366,14 @@ namespace friendlyPMC.Patches
             Dictionary<string, Item> secureContainers = new Dictionary<string, Item>();
 
 
-            Dictionary<string, List<DependencyGraph<IEasyBundle>.GClass3415>> bundleTokens = new Dictionary<string, List<DependencyGraph<IEasyBundle>.GClass3415>>();
+            Dictionary<string, List<DependencyGraph<IEasyBundle>.GClass3802>> bundleTokens = new Dictionary<string, List<DependencyGraph<IEasyBundle>.GClass3802>>();
 
-            Dictionary<string, EquipmentClass> profileEquipment = new Dictionary<string, EquipmentClass>();
+            Dictionary<string, InventoryEquipment> profileEquipment = new Dictionary<string, InventoryEquipment>();
 
             Dictionary<string, string> bundleJobs = new Dictionary<string, string>();
 
             // change bot equipment based on custom presets
-            List<GClass3205> presets = new List<GClass3205>();
+            List<GClass3582> presets = new List<GClass3582>();
             Utils.Equipment.CustomPresets.ForEach(preset =>
             {
                 presets.Add(preset);
@@ -410,7 +409,7 @@ namespace friendlyPMC.Patches
                                     {
                                         if (!bundleTokens.ContainsKey(profile.Id))
                                         {
-                                            bundleTokens.Add(profile.Id, new List<DependencyGraph<IEasyBundle>.GClass3415>());
+                                            bundleTokens.Add(profile.Id, new List<DependencyGraph<IEasyBundle>.GClass3802>());
                                         }
                                         bundleTokens[profile.Id].Add(item.GetAllBundleTokens());
                                     };
@@ -446,7 +445,7 @@ namespace friendlyPMC.Patches
                 {
                     bundleTokens[profile.Id].ForEach(bundle =>
                     {
-                        bundleTasks.Add(GClass1458.WaitForAllBundlesJob(bundle, new Action(GClass1947.Class1694.class1694_0.method_0), default(CancellationToken), null).AsUniTask());
+                        bundleTasks.Add(GClass1600.WaitForAllBundlesJob(bundle, new Action(HideoutAreaStashController.Class1816.class1816_0.method_0), default(CancellationToken), null).AsUniTask());
                     });
 
                 }
@@ -1003,7 +1002,7 @@ namespace friendlyPMC.Patches
                                         if (me.Boss.BossLogic != null)
                                             me.Boss.BossLogic.Dispose();
 
-                                        me.Boss.BossLogic = new GClass371(me, me.Boss);
+                                        me.Boss.BossLogic = new GClass414(me, me.Boss);
                                         me.Boss.NeedProtection = false;
                                     }
 
@@ -1042,7 +1041,7 @@ namespace friendlyPMC.Patches
                         
                         BossPlayers.ShallBeFollower(owner);
 
-                        botSpawnerClass.method_10(owner, bossAlly, new Action<BotOwner>((BotOwner follower) =>
+                        botSpawnerClass.method_11(owner, bossAlly, new Action<BotOwner>((BotOwner follower) =>
                         {
                             Modules.Logger.LogInfo("Ally " + follower.Profile.Nickname + " spawned");
 
@@ -1063,7 +1062,7 @@ namespace friendlyPMC.Patches
                     ActivateBotFollower(
                         botCreator,
                         profile,
-                        new GClass590(position, closestCorePoint.Id, false),
+                        new GClass649(position, closestCorePoint.Id, false),
                         zone, true,
                         GroupAction,
                         OnActivate,
@@ -1289,7 +1288,7 @@ namespace friendlyPMC.Patches
 
                     BossPlayers.ShallBeFollower(owner);
  
-                    botSpawnerClass.method_10(owner, botsData, new Action<BotOwner>((BotOwner follower) =>
+                    botSpawnerClass.method_11(owner, botsData, new Action<BotOwner>((BotOwner follower) =>
                     {
 
                         Modules.Logger.LogInfo("Follower " + follower.Profile.Nickname + " spawned");
@@ -1316,7 +1315,7 @@ namespace friendlyPMC.Patches
                 activateTasks.Add( ActivateBotFollower(
                     botCreator,
                     profile,
-                    new GClass590(position, botsData.GetPosition().CorePointId, false),
+                    new GClass649(position, botsData.GetPosition().CorePointId, false),
                     zone, true,
                     GroupAction,
                     OnActivate,
@@ -1412,11 +1411,11 @@ namespace friendlyPMC.Patches
     {
         protected override MethodBase GetTargetMethod()
         {
-            return AccessTools.Method(typeof(BossSpawnWaveManagerClass), "Run");
+            return AccessTools.Method(typeof(BossSpawnScenario), "Run");
 
         }
         [PatchPrefix]
-        private static bool PatchPrefix(BossSpawnWaveManagerClass __instance)
+        private static bool PatchPrefix(BossSpawnScenario __instance)
         {
 
             if (!Singleton<AbstractGame>.Instantiated) return true;
@@ -1471,15 +1470,14 @@ namespace friendlyPMC.Patches
             Instance = __instance;
         }
     }
-
+    // Spawn followers after the initial spawn of the game
     [HarmonyPatch(typeof(BaseLocalGame<EftGamePlayerOwner>))]
-    [HarmonyPatch("vmethod_4")]
+    [HarmonyPatch("vmethod_1")]
     internal class BaseLocalGameVmethod4Patch
     {
         [HarmonyPostfix]
-        public static IEnumerator Postfix(IEnumerator __result, BaseLocalGame<EftGamePlayerOwner> __instance, BotControllerSettings controllerSettings, ISpawnSystem spawnSystem, Callback runCallback)
+        public static void Postfix(IEnumerator __result, BaseLocalGame<EftGamePlayerOwner> __instance, BotControllerSettings controllerSettings, ISpawnSystem spawnSystem)
         {
-            yield return __result;
             try
             {
                 SpawnFollowers();
@@ -1488,7 +1486,6 @@ namespace friendlyPMC.Patches
             {
                 Modules.Logger.LogError(e);
             }
-            yield break;
         }
 
         public static bool squadSpawned = false;

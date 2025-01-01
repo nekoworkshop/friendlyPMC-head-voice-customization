@@ -2,12 +2,14 @@
 using System;
 using UnityEngine;
 using EFT.InventoryLogic;
-using friendlyPMC.Modules;
 using friendlyPMC.Components.Tactics;
 
 namespace friendlyPMC.Components.BossFollower
 {
-    internal class KnightFightLayer : GClass65
+    /**
+     * Ovewrite the fight layer for Knight to user our cover system and stay around the player boss
+     */
+    internal class KnightFightLayer : GClass67
     {
 
         protected float coverTimer = 0f;

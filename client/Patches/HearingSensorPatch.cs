@@ -55,7 +55,7 @@ namespace friendlyPMC.Patches
         [PatchPostfix]
         public static void Patch(Player __instance, BetterSource ___NestedStepSoundSource)
         {
-            float volume = __instance.MovementContext.CovertMovementVolumeBySpeed * __instance.method_49();
+            float volume = __instance.MovementContext.CovertMovementVolumeBySpeed * __instance.method_54();
             float range = ___NestedStepSoundSource.MaxDistance * 0.85f;
 
             if(BossPlayers.IsPlayerBoss(__instance.ProfileId)) return;
@@ -85,7 +85,7 @@ namespace friendlyPMC.Patches
 
         private static float calcVolume(Player player)
         {
-            return player.MovementContext.CovertMovementVolumeBySpeed * player.method_49();
+            return player.MovementContext.CovertMovementVolumeBySpeed * player.method_54();
         }
     }
 

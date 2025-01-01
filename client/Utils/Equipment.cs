@@ -8,9 +8,9 @@ namespace friendlyPMC.Utils
 {
     internal class Equipment
     {
-        private static List<GClass3205> _EquipmentPresets = new List<GClass3205>();
+        private static List<GClass3582> _EquipmentPresets = new List<GClass3582>();
 
-        public static List<GClass3205> CustomPresets
+        public static List<GClass3582> CustomPresets
         {
             get { return _EquipmentPresets; }
         }

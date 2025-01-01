@@ -7,6 +7,9 @@ using UnityEngine;
 
 namespace friendlyPMC.Components.FollowerBossFollower
 {
+    /**
+     * BigPipe's artillery support layer
+     */
     internal class BigPipeArtilleryLayer : KnightFightLayer
     {
 

@@ -71,7 +71,7 @@ namespace friendlyPMC.Modules
         {
             GatherItems();
 
-            var flatItems = Singleton<ItemFactory>.Instance.TreeToFlatItems(_toSendItems);
+            var flatItems = Singleton<ItemFactoryClass>.Instance.TreeToFlatItems(_toSendItems);
 
             var converterClass = typeof(AbstractGame).Assembly.GetTypes()
                 .First(t => t.GetField("Converters", BindingFlags.Static | BindingFlags.Public) != null);
@@ -110,19 +110,19 @@ namespace friendlyPMC.Modules
                         continue;
                     }
 
-                    InventoryControllerClass _botInventoryController = bot.GetPlayer.InventoryControllerClass;
+                    InventoryController _botInventoryController = bot.GetPlayer.InventoryController;
 
-                    SearchableItemClass tacVest = (SearchableItemClass)
+                    SearchableItemItemClass tacVest = (SearchableItemItemClass)
                         _botInventoryController.Inventory.Equipment
                             .GetSlot(EquipmentSlot.TacticalVest)
                             .ContainedItem;
 
-                    SearchableItemClass backpack = (SearchableItemClass)
+                    SearchableItemItemClass backpack = (SearchableItemItemClass)
                         _botInventoryController.Inventory.Equipment
                             .GetSlot(EquipmentSlot.Backpack)
                             .ContainedItem;
 
-                    SearchableItemClass pockets = (SearchableItemClass)
+                    SearchableItemItemClass pockets = (SearchableItemItemClass)
                         _botInventoryController.Inventory.Equipment
                             .GetSlot(EquipmentSlot.Pockets)
                             .ContainedItem;
@@ -597,24 +597,28 @@ namespace friendlyPMC.Modules
                                 foreach (Slot slot in (contained as Weapon).Slots)
                                 {
                                     if (slot.Locked) continue;
-                                    if (slot.ContainedItem != null && !(slot.ContainedItem is MagazineClass) && !(slot.ContainedItem is BulletClass))
+                                    if (slot.ContainedItem != null && !(slot.ContainedItem is MagazineItemClass) && !(slot.ContainedItem is AmmoItemClass))
                                     {
                                         ModEquipmentStore(slot, items);
                                     }
                                 }
                             } else if(slotType == EquipmentSlot.Headwear || slotType == EquipmentSlot.TacticalVest || slotType == EquipmentSlot.ArmorVest)
                             {
-                                if(contained is LootItemClass)
+                                if(contained is CompoundItem)
                                 {
-                                    foreach (Slot slot in (contained as LootItemClass).Slots)
+                                    foreach (Slot slot in (contained as CompoundItem).Slots)
                                     {
                                         if (slot.Locked) continue;
 
                                         if (slot.ContainedItem != null && !contained.IsUnremovable)
                                         {
                                             items.Add(slot.ContainedItem.Id);
-                                            slot.Locked = true;
-                                            // KEY : Equipped locked slot and locked slot
+                                            // lock item so it cannot be looted
+                                            var lockedField = AccessTools.Field(typeof(Slot), "<Locked>k__BackingField");
+                                            if (lockedField != null)
+                                            {
+                                                lockedField.SetValue(slot, true);
+                                            }
                                         }
                                     }
                                 }

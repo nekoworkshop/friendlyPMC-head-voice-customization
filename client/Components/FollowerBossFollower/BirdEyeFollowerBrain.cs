@@ -53,7 +53,7 @@ namespace friendlyPMC.Components.FollowerBossFollower
         protected override void OnDead(EDamageType damageType)
         {
             if (_boss == null) return;
-
+            // watch for active quests requiring BirdEye as teamate and mark them as failed if he dies
             _boss.realPlayer.AbstractQuestControllerClass.Quests.ExecuteForEach(quest => {
                 foreach (var id in Utils.Props.Quests["BirdEye"])
                 {

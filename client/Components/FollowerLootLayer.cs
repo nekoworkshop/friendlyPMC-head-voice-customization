@@ -3,7 +3,10 @@ using friendlyPMC.Modules;
 
 namespace friendlyPMC.Components
 {
-    internal class FollowerLootLayer : GClass102
+    /**
+     * Looting layer for the followers.
+     */
+    internal class FollowerLootLayer : GClass120
     {
 
         public FollowerLootLayer(BotOwner bot, int priority) : base(bot, priority)

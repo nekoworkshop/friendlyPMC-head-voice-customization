@@ -8,7 +8,7 @@ namespace friendlyPMC.Components
 {
     internal class FollowerAIAgent<T> : AICoreAgentClass<T>
     {
-        public FollowerAIAgent(AICoreControllerClass aiCoreController, AICoreStrategyAbstractClass<T> strategy, Dictionary<T, GClass134> nodesDictionary, GameObject monoBehObject, string name, Func<T, GClass134> lazyGetter) : base(aiCoreController, strategy, nodesDictionary, monoBehObject, name, lazyGetter)
+        public FollowerAIAgent(AICoreControllerClass aiCoreController, AICoreStrategyAbstractClass<T> strategy, Dictionary<T, GClass156> nodesDictionary, GameObject monoBehObject, string name, Func<T, GClass156> lazyGetter) : base(aiCoreController, strategy, nodesDictionary, monoBehObject, name, lazyGetter)
         {
 
         }

@@ -166,10 +166,10 @@ namespace friendlyPMC.Components
             return IsBossRequester(requester) || (requester != null && botOwner_0.BotsGroup.IsAlly(requester));
         }
 
-        public virtual void GestusShown(GClass453 data)
+        public virtual void GestusShown(GClass501 data)
         {
 
-            EGesture gesture = data.Gesture;
+            EInteraction gesture = data.Gesture;
             bool isBossCommunicating = IsBossRequester(data.Player);
 
             bool isAssisting = (botOwner_0.Brain.BaseBrain as FollowerBrain).currentTactic == "Assist";
@@ -180,21 +180,21 @@ namespace friendlyPMC.Components
 
             bool notBusy = !botOwner_0.Memory.HaveEnemy;
 
-            List<EGesture> bossNoGesture = new List<EGesture>
+            List<EInteraction> bossNoGesture = new List<EInteraction>
             {
             };
-            List<EGesture> bossBusyIgnore = new List<EGesture>
+            List<EInteraction> bossBusyIgnore = new List<EInteraction>
             {
 
             };
 
-            List<EGesture> allyNoGesture = new List<EGesture> {
-                EGesture.ThatDirection
+            List<EInteraction> allyNoGesture = new List<EInteraction> {
+                EInteraction.ThereGesture
             };
-            List<EGesture> allyBusyIgnore = new List<EGesture>
+            List<EInteraction> allyBusyIgnore = new List<EInteraction>
             {
-                EGesture.ComeToMe,
-                EGesture.Stop
+                EInteraction.ComeWithMeGesture,
+                EInteraction.HoldGesture
             };
 
             bool isFollowerBoss = false;
@@ -216,7 +216,7 @@ namespace friendlyPMC.Components
                 {
                     if (allyNoGesture.Contains(gesture)) 
                     { 
-                        if(notBusy) botOwner_0.Gesture.TryGestus(EGesture.Bad, false);
+                        if(notBusy) botOwner_0.Gesture.TryGestus(EInteraction.NoGesture, false);
                         return;
 
                     } 
@@ -232,7 +232,7 @@ namespace friendlyPMC.Components
 
                         if (notBusy)
                         {
-                            botOwner_0.Gesture.TryGestus(EGesture.Bad, false);
+                            botOwner_0.Gesture.TryGestus(EInteraction.NoGesture, false);
                         }
                         return;
                     }
@@ -247,7 +247,7 @@ namespace friendlyPMC.Components
             Player playerRequester = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(data.Player.ProfileId);
 
             // on gesture "stop" nearby bots will hold position
-            if (gesture == EGesture.Stop)
+            if (gesture == EInteraction.HoldGesture)
             {
                 if (isBossCommunicating)
                 {
@@ -269,7 +269,7 @@ namespace friendlyPMC.Components
                                 holdit.AddPossibleExecutors(botOwner_0);
                                 holdit.SetGroup(botOwner_0.BotsGroup.RequestsController);
 
-                                botOwner_0.Gesture.TryGestus(EGesture.Good, false);
+                                botOwner_0.Gesture.TryGestus(EInteraction.OkGesture, false);
                             }
                         }
                     }
@@ -283,9 +283,9 @@ namespace friendlyPMC.Components
             }
             // on gesture "come here" only the bot that the player is looking at will come to the player
             // on gesture "go there", the closest bot to the user will move forward  
-            else if (gesture == EGesture.ComeToMe || gesture == EGesture.ThatDirection)
+            else if (gesture == EInteraction.ComeWithMeGesture || gesture == EInteraction.ThereGesture)
             {
-                bool goThere = gesture == EGesture.ThatDirection;
+                bool goThere = gesture == EInteraction.ThereGesture;
 
                 if (isBossCommunicating)
                 {
@@ -308,7 +308,7 @@ namespace friendlyPMC.Components
                         {
                             gclass.AddPossibleExecutors(botOwner_0);
                             gclass.SetGroup(botOwner_0.BotsGroup.RequestsController);
-                            if(gesture != EGesture.ThatDirection) botOwner_0.Gesture.TryGestus(EGesture.Good, false);
+                            if(gesture != EInteraction.ThereGesture) botOwner_0.Gesture.TryGestus(EInteraction.OkGesture, false);
 
                         }
                     }
@@ -319,7 +319,7 @@ namespace friendlyPMC.Components
                     base.method_6(data);
                 }
             }
-            else if (gesture == EGesture.Good)
+            else if (gesture == EInteraction.OkGesture)
             {
                 if (isBossCommunicating)
                 {
@@ -331,7 +331,7 @@ namespace friendlyPMC.Components
                     {
                         Utils.Utils.SetTimeout(() =>
                         {
-                            if (botOwner_0.BotState == EBotState.Active) botOwner_0.Gesture.TryGestus(EGesture.Good,false);
+                            if (botOwner_0.BotState == EBotState.Active) botOwner_0.Gesture.TryGestus(EInteraction.OkGesture,false);
                         }, 500);
                     }
                     return;
@@ -341,7 +341,7 @@ namespace friendlyPMC.Components
                     base.method_6(data);
                 }
             }
-            else if(gesture == (EGesture)CustomGestures.OverThere)
+            else if(gesture == (EInteraction)CustomGestures.OverThere)
             {
                 (botOwner_0.Brain.BaseBrain as FollowerBrain).BossOrdersChanged();
                 if(!botOwner_0.Memory.HaveEnemy && !botOwner_0.BotTalk.IsSilenced)
@@ -357,7 +357,7 @@ namespace friendlyPMC.Components
             }
         }
 
-        public virtual void PhraseSaid(BotEventHandler.GClass599 info)
+        public virtual void PhraseSaid(BotEventHandler.GClass659 info)
         {
             IPlayer requester = info.PlayerRequester;
 
@@ -463,7 +463,7 @@ namespace friendlyPMC.Components
 
                     if (!botOwner_0.Memory.HaveEnemy)
                     {
-                        botOwner_0.Gesture.TryGestus(EGesture.Bad, false);
+                        botOwner_0.Gesture.TryGestus(EInteraction.NoGesture, false);
                         botOwner_0.BotTalk.TrySay(EPhraseTrigger.Negative, false);
                     }
                     return;
@@ -483,7 +483,7 @@ namespace friendlyPMC.Components
                     if (notBusy && isClose)
                     {
                         botOwner_0.BotTalk.TrySay(EPhraseTrigger.Negative, true);
-                        botOwner_0.Gesture.TryGestus(EGesture.Bad, false);
+                        botOwner_0.Gesture.TryGestus(EInteraction.NoGesture, false);
                     }
                     return;
                 }
@@ -511,7 +511,7 @@ namespace friendlyPMC.Components
 
                         bool isGrenadier = false;
 
-                        GClass396 selector = botOwner_0.WeaponManager.Selector as GClass396;
+                        GClass441 selector = botOwner_0.WeaponManager.Selector as GClass441;
                         if(
                             selector != null && 
                             selector.SecondPrimaryWeapon as Weapon != null && 
@@ -642,7 +642,7 @@ namespace friendlyPMC.Components
 
                     if(isClose) {
                         botOwner_0.BotTalk.TrySay(EPhraseTrigger.Roger,true);
-                        botOwner_0.Gesture.TryGestus(EGesture.Good,true);
+                        botOwner_0.Gesture.TryGestus(EInteraction.NoGesture,true);
                     }
 
                 }
@@ -664,7 +664,7 @@ namespace friendlyPMC.Components
                             if (isClose && (notBusy || !botOwner_0.Memory.GoalEnemy.IsVisible))
                             {
                                 botOwner_0.BotTalk.TrySay(EPhraseTrigger.Roger, false);
-                                botOwner_0.Gesture.TryGestus(EGesture.Good, false);
+                                botOwner_0.Gesture.TryGestus(EInteraction.OkGesture, false);
                             }
                         }
                         else if (isClose && (notBusy || !botOwner_0.Memory.GoalEnemy.IsVisible))
@@ -681,7 +681,7 @@ namespace friendlyPMC.Components
 
                     if (botOwner_0.Memory.HaveEnemy)
                     {
-                        botOwner_0.Gesture.TryGestus(EGesture.Bad, true);
+                        botOwner_0.Gesture.TryGestus(EInteraction.NoGesture, true);
                         botOwner_0.BotTalk.TrySay(EPhraseTrigger.DontKnow, false);
 
                         return;
@@ -690,7 +690,7 @@ namespace friendlyPMC.Components
                     Player alivePlayerByProfileID = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(requester.ProfileId);
                     botOwner_0.BotRequestController.TryStopCurrent(alivePlayerByProfileID, false);
                     if(isClose) {
-                        botOwner_0.Gesture.TryGestus(EGesture.Good,true);
+                        botOwner_0.Gesture.TryGestus(EInteraction.OkGesture,true);
                     }
                 }
                 // on Need Help closest bot shall come near boss
@@ -746,7 +746,7 @@ namespace friendlyPMC.Components
                     botOwner_0.BotTalk.SetSilence(120f);
                     if (isClose)
                     {
-                        botOwner_0.Gesture.TryGestus(EGesture.Good, false);
+                        botOwner_0.Gesture.TryGestus(EInteraction.OkGesture, false);
                     }
                 }
                 // disabled
@@ -786,7 +786,7 @@ namespace friendlyPMC.Components
 
                                 if(isClose) {
                                     botOwner_0.BotTalk.TrySay(EPhraseTrigger.Going, true);
-                                    botOwner_0.Gesture.TryGestus(EGesture.Good,true);
+                                    botOwner_0.Gesture.TryGestus(EInteraction.OkGesture,true);
                                 }
                             }
                         }
@@ -805,7 +805,7 @@ namespace friendlyPMC.Components
 
                     if(isClose) {
                         botOwner_0.BotTalk.TrySay(EPhraseTrigger.Roger, true);
-                        botOwner_0.Gesture.TryGestus(EGesture.Good,true);
+                        botOwner_0.Gesture.TryGestus(EInteraction.OkGesture,true);
                     }
                 }
                 // on Stop hold in place
@@ -827,7 +827,7 @@ namespace friendlyPMC.Components
                             holdit.SetGroup(botOwner_0.BotsGroup.RequestsController);
 
                             if(isClose) {
-                                botOwner_0.Gesture.TryGestus(EGesture.Good, true);
+                                botOwner_0.Gesture.TryGestus(EInteraction.OkGesture, true);
                                 botOwner_0.BotTalk.TrySay(EPhraseTrigger.Roger, true);
                             }
                         }
@@ -880,7 +880,7 @@ namespace friendlyPMC.Components
                             if(door.DoorState == EDoorState.Locked)
                             {
                                 botOwner_0.BotTalk.TrySay(EPhraseTrigger.Negative, true);
-                                botOwner_0.Gesture.TryGestus(EGesture.Bad, false);
+                                botOwner_0.Gesture.TryGestus(EInteraction.NoGesture, false);
                                 return;
                             }
 
@@ -901,7 +901,7 @@ namespace friendlyPMC.Components
                                 else
                                 {
                                     botOwner_0.BotTalk.TrySay(EPhraseTrigger.Negative, true);
-                                    botOwner_0.Gesture.TryGestus(EGesture.Bad, false);
+                                    botOwner_0.Gesture.TryGestus(EInteraction.NoGesture, false);
                                     InteractableObjects.RemoveOpener(botOwner_0);
                                 }
                             }
@@ -917,7 +917,7 @@ namespace friendlyPMC.Components
                     if (!notBusy && botOwner_0.Memory.GoalEnemy.HaveSeen && Time.time - botOwner_0.Memory.GoalEnemy.PersonalLastSeenTime < 3f)
                     {
                         
-                        botOwner_0.Gesture.TryGestus(EGesture.Bad, true);
+                        botOwner_0.Gesture.TryGestus(EInteraction.NoGesture, true);
                         botOwner_0.BotTalk.TrySay(EPhraseTrigger.DontKnow, false);
                         return;
                     }
@@ -979,7 +979,7 @@ namespace friendlyPMC.Components
                                         if(isClose) 
                                         {
                                             botOwner_0.BotTalk.TrySay(EPhraseTrigger.Negative, true);
-                                            botOwner_0.Gesture.TryGestus(EGesture.Bad, true);
+                                            botOwner_0.Gesture.TryGestus(EInteraction.NoGesture, true);
                                         }
                                         InteractableObjects.RemoveTaker(botOwner_0);
                                     }
@@ -996,7 +996,7 @@ namespace friendlyPMC.Components
                 {
                     if (notBusy && isClose)
                     {
-                        botOwner_0.Gesture.TryGestus(EGesture.Hello, false);
+                        botOwner_0.Gesture.TryGestus(EInteraction.FriendlyGesture, false);
                     }
                 }
                 else if (info.phrase == EPhraseTrigger.ExitLocated)

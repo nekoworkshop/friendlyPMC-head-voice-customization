@@ -1,16 +1,13 @@
 ﻿using EFT;
 using friendlyPMC.Components;
-using friendlyPMC.Modules;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
-using static RootMotion.FinalIK.IKSolver;
-using static UnityEngine.UI.GridLayoutGroup;
 
 namespace friendlyPMC.Modules
 {
+    /**
+     *  Helper class to manage Boss Players and their followers
+     */
     internal class BossPlayers
     {
         public static BossPlayers Instance { get; private set; }

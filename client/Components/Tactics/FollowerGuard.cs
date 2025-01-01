@@ -11,8 +11,11 @@ using UnityEngine.AI;
 
 namespace friendlyPMC.Components.Tactics
 {
-    /** This class is not meant to be used directly as a brain layer, but within one **/
-    public class FollowerGuard : GClass50
+    /** 
+     * This class is not meant to be used directly as a brain layer, but within one
+     * Ovewrite of "Kill Logic" layer that is able to use grenader launcher as support
+     * **/
+    public class FollowerGuard : GClass52
     {
         protected float coverTimer = 0f;
         protected float holdTimer = 0f;
@@ -27,7 +30,7 @@ namespace friendlyPMC.Components.Tactics
         private float float_10 = 0f;
         private readonly List<Vector3> list_1 = new List<Vector3>();
 
-        private readonly GClass396 gclass396_0 = null;
+        private readonly GClass441 gclass396_0 = null;
 
         public CustomNavigationPoint NavigationPoint
         {
@@ -50,7 +53,7 @@ namespace friendlyPMC.Components.Tactics
             }
             else commonLayer = new FollowerCommonLayer(bot, priority);
 
-            gclass396_0 = botOwner_0.WeaponManager.Selector as GClass396;
+            gclass396_0 = botOwner_0.WeaponManager.Selector as GClass441;
         }
 
         public override string Name()
@@ -92,7 +95,7 @@ namespace friendlyPMC.Components.Tactics
             return commonLayer.ShallGoNearBoss();
         }
 
-        public void OnHit(DamageInfo damageInfo, EBodyPart bodyPart, float damageReducedByArmor)
+        public void OnHit(DamageInfoStruct damageInfo, EBodyPart bodyPart, float damageReducedByArmor)
         {
             if (bodyPart == EBodyPart.Head)
             {
@@ -311,7 +314,7 @@ namespace friendlyPMC.Components.Tactics
         public AICoreActionResultStruct<BotLogicDecision>? CanDoGrenadierSuppressRequest(Ray rayDirection)
         {
             if(!botOwner_0.WeaponManager.Selector.CanChangeToSecondWeapons) return null;
-            GClass396 selector = botOwner_0.WeaponManager.Selector as GClass396;
+            GClass441 selector = botOwner_0.WeaponManager.Selector as GClass441;
 
             if (selector != null && (selector.SecondPrimaryWeapon as Weapon) != null && (selector.SecondPrimaryWeapon as Weapon).IsGrenadeLauncher)
             {

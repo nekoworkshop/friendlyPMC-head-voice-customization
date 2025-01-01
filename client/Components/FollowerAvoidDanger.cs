@@ -2,11 +2,13 @@
 using friendlyPMC.Components.Tactics;
 using friendlyPMC.Utils;
 using System.Collections.Generic;
-using static Koenigz.PerfectCulling.EFT.PerfectCullingTreePreProcess;
 
 namespace friendlyPMC.Components
 {
-    internal class FollowerAvoidDanger : GClass36
+    /**
+     * Ovewrite of the default avoid danger layer to regroup with the boss if needed - this is for BTR case when they run from it
+     */
+    internal class FollowerAvoidDanger : GClass37
     {
 
         private FollowerCommonLayer commonLayer;

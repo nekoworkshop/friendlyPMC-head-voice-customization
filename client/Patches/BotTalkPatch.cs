@@ -7,7 +7,7 @@ using System.Reflection;
 
 namespace friendlyPMC.Patches
 {
-    
+    // patch for preventing bots from talking if silenced command is active
     internal class BotTalkTrySayPatch : ModulePatch
     {
         protected override MethodBase GetTargetMethod()
@@ -24,7 +24,7 @@ namespace friendlyPMC.Patches
             return true;
         }
     }
-
+    // patch for preventing bots from talking if silenced command is active
     internal class BotTalkSayPatch : ModulePatch
     {
         protected override MethodBase GetTargetMethod()

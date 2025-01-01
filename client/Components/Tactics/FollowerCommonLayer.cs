@@ -6,11 +6,13 @@ using System.Collections.Generic;
 
 using UnityEngine;
 using UnityEngine.AI;
-using static RootMotion.FinalIK.IKSolver;
 
 namespace friendlyPMC.Components.Tactics
 {
-    /** This class is not meant to be used directly as a brain layer, but within one **/
+    /** 
+     * This class is not meant to be used directly as a brain layer, but within one 
+     * Follower Layer that holds common decisions
+     * **/
     public class FollowerCommonLayer : BaseLogicLayerSimpleAbstractClass
     {
 
@@ -76,7 +78,7 @@ namespace friendlyPMC.Components.Tactics
             get => _isTakingHeavyDamage;
         }
 
-        private GClass552.Class260 _damageTimer;
+        private GClass605.Class290 _damageTimer;
 
         public string coverType = "close";
 
@@ -228,7 +230,7 @@ namespace friendlyPMC.Components.Tactics
             base.Dispose();
         }
 
-        private void BeingHitAction(DamageInfo info, EBodyPart part, float arg3)
+        private void BeingHitAction(DamageInfoStruct info, EBodyPart part, float arg3)
         {
             if (info.Player == null) return;
 
@@ -900,7 +902,7 @@ namespace friendlyPMC.Components.Tactics
 
             return null;
         }
-
+        /** Shall end the current decision for followers with tactic set to "Assist" **/
         public AICoreActionEndStruct? ShallEndCurrentDecisionAllies(AICoreActionResultStruct<BotLogicDecision> curDecision, bool? ordersChanged = null)
         {
             if (!botOwner_0.Medecine.FirstAid.Using && !botOwner_0.Medecine.SurgicalKit.Using) return null;

@@ -24,7 +24,7 @@ namespace friendlyPMC.Patches
         }
 
         [PatchPrefix]
-        private static bool PatchPrefix(ConditionCounterManager __instance, int valueToAdd, TaskConditionCounterClass counter, GStruct404[] checks)
+        private static bool PatchPrefix(ConditionCounterManager __instance, int valueToAdd, TaskConditionCounterClass counter, GStruct436[] checks)
         {
             try
             {

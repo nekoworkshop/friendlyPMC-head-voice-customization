@@ -194,7 +194,7 @@ namespace friendlyPMC.Components
             GClass98 layer3 = new GClass98(_owner, 88);
             method_0(5, layer3, true);
             // - stay at position in prone mode
-            GClass104 layer8 = new GClass104(_owner, 10, false, CoverLevel.Lay);
+            GClass123 layer8 = new GClass123(_owner, 10, false, CoverLevel.Lay);
             method_0(7, layer8, true);
             // - item taker
             FollowerLootLayer layer9 = new FollowerLootLayer(_owner, 51);
@@ -209,9 +209,9 @@ namespace friendlyPMC.Components
             return "FLBPlayer";
         }
 
-        public override GClass578 EventsPriority()
+        public override GClass635 EventsPriority()
         {
-            return new GClass578(1, 75, 45, 76);
+            return new GClass635(1, 75, 45, 76);
         }
 
         protected virtual void OnDead(EDamageType damageType)
@@ -278,7 +278,7 @@ namespace friendlyPMC.Components
         }
 
         /** Bot should turn to the direction from where he got shot, if he is nor already in combat */
-        protected void BeingHitAction(DamageInfo damageInfo, EBodyPart bodyType, float damageReducedByArmor)
+        protected void BeingHitAction(DamageInfoStruct damageInfo, EBodyPart bodyType, float damageReducedByArmor)
         {
             if (!_owner.Memory.HaveEnemy && damageInfo.Player != null)
             {
@@ -562,9 +562,9 @@ namespace friendlyPMC.Components
         private void SetGrenadierSelector()
         {
             _owner.WeaponManager.Selector.Dispose();
-            _owner.WeaponManager.Selector = new GClass396(_owner);
+            _owner.WeaponManager.Selector = new GClass441(_owner);
 
-            GClass396 selector = _owner.WeaponManager.Selector as GClass396;
+            GClass441 selector = _owner.WeaponManager.Selector as GClass441;
 
             selector.OnActiveEquipmentSlotChanged = (Action<EquipmentSlot>)Delegate.Combine(selector.OnActiveEquipmentSlotChanged, new Action<EquipmentSlot>(_owner.WeaponManager.method_0));
 
@@ -577,7 +577,7 @@ namespace friendlyPMC.Components
         public void HandsReset()
         {
             Player player = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(_owner.ProfileId);
-            InventoryControllerClass inventoryController = player.InventoryControllerClass;
+            InventoryController inventoryController = player.InventoryController;
             if (inventoryController == null)
             {
                 _busyTimer = 0f;

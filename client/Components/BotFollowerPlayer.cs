@@ -28,7 +28,7 @@ namespace friendlyPMC.Components
 
         protected BotDifficultySettingsClass _OldSettings;
         protected string _OldGroupID;
-        protected GClass528 settingModif;
+        protected GClass580 settingModif;
 
         protected bool _IsSquadMate = false;
 
@@ -51,7 +51,7 @@ namespace friendlyPMC.Components
 
             _IsSquadMate = isSquad;
 
-            settingModif = new GClass528(1.2f, 1.2f, 1f, 1.1f, 1f, 1f, 1.2f, 1f, 1f);
+            settingModif = new GClass580(1.2f, 1.2f, 1f, 1.1f, 1f, 1f, 1.2f, 1f, 1f);
 
             NpcMessage.AddNpc(bot, isSquad);
 
@@ -281,7 +281,7 @@ namespace friendlyPMC.Components
             _OldSettings = _bot.Settings;
             _OldGroupID = _bot.GroupId;
             // increase bot's power
-            BotDifficultySettingsClass settings = Singleton<GClass533>.Instance.GetSettings(BotDifficulty.hard, _botRole);
+            BotDifficultySettingsClass settings = Singleton<GClass585>.Instance.GetSettings(BotDifficulty.hard, _botRole);
             // - hardcode some settings to make the bot more efficient
             settings.FileSettings.Move.REACH_DIST = 1.5f;
             settings.FileSettings.Move.REACH_DIST_COVER = 2f;
@@ -329,21 +329,21 @@ namespace friendlyPMC.Components
             // opposing sides are always enemies
             if (playerSide == EPlayerSide.Bear)
             {
-                settings.FileSettings.Mind.DEFAULT_USEC_BEHAVIOUR = EWarnBehaviour.Attack;
+                settings.FileSettings.Mind.DEFAULT_USEC_BEHAVIOUR = EWarnBehaviour.AlwaysEnemies;
             }
             else if (playerSide == EPlayerSide.Usec)
             {
-                settings.FileSettings.Mind.DEFAULT_BEAR_BEHAVIOUR = EWarnBehaviour.Attack;
+                settings.FileSettings.Mind.DEFAULT_BEAR_BEHAVIOUR = EWarnBehaviour.AlwaysEnemies;
             }
 
             if (playerSide != EPlayerSide.Savage)
             {
-                settings.FileSettings.Mind.DEFAULT_SAVAGE_BEHAVIOUR = EWarnBehaviour.Attack;
+                settings.FileSettings.Mind.DEFAULT_SAVAGE_BEHAVIOUR = EWarnBehaviour.AlwaysEnemies;
             }
             else
             {
-                settings.FileSettings.Mind.DEFAULT_USEC_BEHAVIOUR = EWarnBehaviour.Attack;
-                settings.FileSettings.Mind.DEFAULT_BEAR_BEHAVIOUR = EWarnBehaviour.Attack;
+                settings.FileSettings.Mind.DEFAULT_USEC_BEHAVIOUR = EWarnBehaviour.AlwaysEnemies;
+                settings.FileSettings.Mind.DEFAULT_BEAR_BEHAVIOUR = EWarnBehaviour.AlwaysEnemies;
             }
 
 
@@ -434,12 +434,12 @@ namespace friendlyPMC.Components
         protected void AddExtraAmmo()
         {
 
-            InventoryControllerClass inventory = GetInventoryController();
-            SearchableItemClass secureContainer;
+            InventoryController inventory = GetInventoryController();
+            SearchableItemItemClass secureContainer;
 
             try
             {
-                secureContainer = (SearchableItemClass)inventory.Inventory.Equipment.GetSlot(EquipmentSlot.SecuredContainer).ContainedItem;
+                secureContainer = (SearchableItemItemClass)inventory.Inventory.Equipment.GetSlot(EquipmentSlot.SecuredContainer).ContainedItem;
             }
             catch
             {
@@ -466,7 +466,7 @@ namespace friendlyPMC.Components
 
             Item ammoToAdd =
                     weapon.GetCurrentMagazine()?.FirstRealAmmo()
-                    ?? Singleton<ItemFactory>.Instance.CreateItem(
+                    ?? Singleton<ItemFactoryClass>.Instance.CreateItem(
                         MongoID.Generate(),
                         weapon.CurrentAmmoTemplate._id,
                         null
@@ -485,31 +485,19 @@ namespace friendlyPMC.Components
                 Item ammo = ammoToAdd.CloneItem();
                 ammo.StackObjectsCount = ammo.StackMaxSize;
 
-                var location = stashGridClass.FindLocationForItem(ammo);
+                var location = stashGridClass.FindFreeSpace(ammo);
 
                 if (location != null)
                 {
-
-                    var result = stashGridClass.AddItemWithoutRestrictions(ammo);
+                    var result = stashGridClass.AddItemWithoutRestrictions(ammo, location);
 
                     if (result.Succeeded)
                     {
                         ammoAdded += ammo.StackObjectsCount;
-                        try
-                        {
-                            Singleton<GridCacheClass>.Instance.Add(
-                                        _bot.ProfileId,
-                                        location.Grid as GridClassEx,
-                                        ammo
-                                    );
-                        }
-                        catch (Exception e)
-                        {
-                            Modules.Logger.LogError(e);
-                        }
                     }
                     else
                     {
+                        Modules.Logger.LogError("Failed to add ammo to bot's secure container");
                         break;
                     }
                 }
@@ -521,9 +509,9 @@ namespace friendlyPMC.Components
 
         }
 
-        public InventoryControllerClass GetInventoryController()
+        public InventoryController GetInventoryController()
         {
-            return _bot.GetPlayer.InventoryControllerClass;
+            return _bot.GetPlayer.InventoryController;
         }
 
         public virtual FollowerBrain GetFollowerBrain(BotOwner bot, pitAIBossPlayer boss)
@@ -535,7 +523,7 @@ namespace friendlyPMC.Components
         {
             string name = bot.name + " " + _botRole.ToString();
 
-            return new FollowerAIAgent<BotLogicDecision>(bot.BotsController.AICoreController, bot.Brain.BaseBrain, FollowerCreateNode.ActionsList(bot), bot.gameObject, name, new Func<BotLogicDecision, GClass134>((BotLogicDecision decision) =>
+            return new FollowerAIAgent<BotLogicDecision>(bot.BotsController.AICoreController, bot.Brain.BaseBrain, FollowerCreateNode.ActionsList(bot), bot.gameObject, name, new Func<BotLogicDecision, GClass156>((BotLogicDecision decision) =>
             {
                 return FollowerCreateNode.CreateNode(decision, bot);
             }));
@@ -621,9 +609,9 @@ namespace friendlyPMC.Components
                 // - make bot see the player as an aggresor
                 if (warnPlayer)
                 {
-                    _bot.Settings.FileSettings.Mind.DEFAULT_USEC_BEHAVIOUR = _player.realPlayer.Side == EPlayerSide.Usec ? EWarnBehaviour.Warn : EWarnBehaviour.Attack;
-                    _bot.Settings.FileSettings.Mind.DEFAULT_BEAR_BEHAVIOUR = _player.realPlayer.Side == EPlayerSide.Bear ? EWarnBehaviour.Warn : EWarnBehaviour.Attack;
-                    _bot.Settings.FileSettings.Mind.DEFAULT_SAVAGE_BEHAVIOUR = _player.realPlayer.Side == EPlayerSide.Savage ? EWarnBehaviour.Warn : EWarnBehaviour.Attack;
+                    _bot.Settings.FileSettings.Mind.DEFAULT_USEC_BEHAVIOUR = _player.realPlayer.Side == EPlayerSide.Usec ? EWarnBehaviour.Warn : EWarnBehaviour.AlwaysEnemies;
+                    _bot.Settings.FileSettings.Mind.DEFAULT_BEAR_BEHAVIOUR = _player.realPlayer.Side == EPlayerSide.Bear ? EWarnBehaviour.Warn : EWarnBehaviour.AlwaysEnemies;
+                    _bot.Settings.FileSettings.Mind.DEFAULT_SAVAGE_BEHAVIOUR = _player.realPlayer.Side == EPlayerSide.Savage ? EWarnBehaviour.Warn : EWarnBehaviour.AlwaysEnemies;
                     _bot.Settings.FileSettings.Mind.ENEMY_BY_GROUPS_PMC_PLAYERS = true;
                     _bot.Settings.FileSettings.Mind.ENEMY_BY_GROUPS_SAVAGE_PLAYERS = true;
                     _bot.Memory.IsPeace = false;
@@ -669,12 +657,12 @@ namespace friendlyPMC.Components
                 } catch { }
 
                 // - add the old brain (harcoded to followerBoar)
-                _bot.Brain.BaseBrain = new GClass269(_bot, false);
+                _bot.Brain.BaseBrain = new GClass307(_bot, false);
                 // - add old agent back
                 string name = _bot.name + " " + _botRole.ToString();
-                _bot.Brain.Agent = new FollowerAIAgent<BotLogicDecision>(_bot.BotsController.AICoreController, _bot.Brain.BaseBrain, GClass459.ActionsList(_bot), _bot.gameObject, name, new Func<BotLogicDecision, GClass134>((BotLogicDecision decision)=>
+                _bot.Brain.Agent = new FollowerAIAgent<BotLogicDecision>(_bot.BotsController.AICoreController, _bot.Brain.BaseBrain, GClass507.ActionsList(_bot), _bot.gameObject, name, new Func<BotLogicDecision, GClass156>((BotLogicDecision decision)=>
                 {
-                    return GClass459.CreateNode(decision, _bot);
+                    return GClass507.CreateNode(decision, _bot);
                 }));
                 // - put back old receiver
                 _bot.Receiver = new BotReceiver(_bot);

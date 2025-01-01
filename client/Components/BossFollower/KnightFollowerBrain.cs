@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using EFT;
+﻿using EFT;
 
 namespace friendlyPMC.Components.BossFollower
 {
@@ -47,7 +46,7 @@ namespace friendlyPMC.Components.BossFollower
         protected override void OnDead(EDamageType damageType)
         {
             if (_boss == null) return;
-
+            // watch for active quests requiring Knight as teamate and mark them as failed if Knight dies
             _boss.realPlayer.AbstractQuestControllerClass.Quests.ExecuteForEach(quest => {
                 foreach (var id in Utils.Props.Quests["Knight"])
                 {

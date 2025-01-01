@@ -9,8 +9,11 @@ using UnityEngine;
 
 namespace friendlyPMC.Components.Tactics
 {
-    /** This class is not meant to be used directly as a brain layer, but within one **/
-    internal class FollowerSniperLayer : GClass61
+    /** 
+     * This class is not meant to be used directly as a brain layer, but within one 
+     * Sniper fight layer based on BirdEye's fight logic
+     * **/
+    internal class FollowerSniperLayer : GClass63
     {
 
         protected float coverTimer = 0f;

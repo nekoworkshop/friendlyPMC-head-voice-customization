@@ -5,8 +5,11 @@ using UnityEngine;
 
 namespace friendlyPMC.Components.Tactics
 {
-    /** This class is not meant to be used directly as a brain layer, but within one **/
-    public class FollowerHolderLayer : GClass47
+    /** 
+     * This class is not meant to be used directly as a brain layer, but within one 
+     * Hold position layer based on Boar follower fight logic
+     * **/
+    public class FollowerHolderLayer : GClass48
     {
         private FollowerCommonLayer commonLayer;
 

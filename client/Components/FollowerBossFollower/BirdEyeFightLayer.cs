@@ -8,7 +8,10 @@ using UnityEngine;
 
 namespace friendlyPMC.Components.FollowerBossFollower
 {
-    public class BirdEyeFightLayer : GClass61
+    /**
+     * Overwrite of BirdEye's fight layer
+     */
+    public class BirdEyeFightLayer : GClass63
     {
         private FollowerSniperLayer followerSniperLayer;
         private FollowerCommonLayer followerCommonLayer;

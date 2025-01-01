@@ -104,7 +104,7 @@ namespace friendlyPMC.Components
             _group.CheckAndAddEnemy(enemy);
         }
 
-        public void PhraseSaid(BotEventHandler.GClass599 info)
+        public void PhraseSaid(BotEventHandler.GClass659 info)
         {
             if(info.PlayerRequester != null && info.PlayerRequester.ProfileId == realPlayer.ProfileId)
             {
@@ -116,11 +116,11 @@ namespace friendlyPMC.Components
                 }
             }
         }
-        private void GestusShown(GClass453 info)
+        private void GestusShown(GClass501 info)
         {
             if(info.Player != null && info.Player.ProfileId == realPlayer.ProfileId)
             {
-                if (info.Gesture == (EGesture)CustomGestures.OverThere)
+                if (info.Gesture == (EInteraction)CustomGestures.OverThere)
                 {
                     InteractableObjects.CheckSeenEnemies(Player());
                 }
@@ -348,7 +348,7 @@ namespace friendlyPMC.Components
             bot.BotFollower.BossFindAction();
         }
     }
-    public class AIBossPlayerLogic : GClass362
+    public class AIBossPlayerLogic : GClass405
     {
         private Player _player;
         private pitAIBossPlayer _aiplayer;
@@ -359,7 +359,7 @@ namespace friendlyPMC.Components
             _aiplayer = aiplayer;
         }
 
-        public void OnHit(DamageInfo arg1, EBodyPart arg2, float arg3)
+        public void OnHit(DamageInfoStruct arg1, EBodyPart arg2, float arg3)
         {
             if (
                 arg1.Player != null && arg1.Player.IsAI && 

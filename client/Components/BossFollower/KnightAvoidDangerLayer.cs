@@ -1,14 +1,14 @@
 ﻿using EFT;
-using friendlyPMC.Modules;
 using System;
-using System.Collections.Generic;
-using UnityEngine.AI;
 using UnityEngine;
 using friendlyPMC.Components.Tactics;
 
 namespace friendlyPMC.Components.BossFollower
 {
-    internal class KnightAvoidDangerLayer : GClass35
+    /**
+     * Ovewrite the avoid danger layer for the knight to use our cover system
+     */
+    internal class KnightAvoidDangerLayer : GClass36
     {
         protected CustomNavigationPoint customNavigationPoint_0;
 

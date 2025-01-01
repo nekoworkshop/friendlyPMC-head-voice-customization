@@ -70,7 +70,7 @@ namespace friendlyPMC.Patches
         }
 
         [PatchPrefix]
-        private static bool PatchPrefix(BotReceiver __instance, BotEventHandler.GClass599 info)
+        private static bool PatchPrefix(BotReceiver __instance, BotEventHandler.GClass659 info)
         {
 
             BotOwner botOwner = (BotOwner)AccessTools.Field(typeof(BotReceiver), "botOwner_0").GetValue(__instance);
@@ -127,7 +127,7 @@ namespace friendlyPMC.Patches
             return AccessTools.Method(typeof(BotReceiver), "method_6");
         }
         [PatchPrefix]
-        private static bool PatchPrefix(BotReceiver __instance, GClass453 data)
+        private static bool PatchPrefix(BotReceiver __instance, GClass501 data)
         {
             if(data == null)
             {

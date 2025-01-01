@@ -19,8 +19,8 @@ namespace friendlyPMC.Components.FollowerBossFollower
         {
 
             bool usage = base.ShallUseNow();
-
-            if(usage && botOwner_0.WeaponManager.Selector.LastEquipmentSlot != EquipmentSlot.FirstPrimaryWeapon)
+            // when switching back to follow layer, ensure BirdEye is using his sniper rifle
+            if (usage && botOwner_0.WeaponManager.Selector.LastEquipmentSlot != EquipmentSlot.FirstPrimaryWeapon)
             {
                 botOwner_0.WeaponManager.Selector.TryChangeToMain();
             }

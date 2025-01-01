@@ -7,8 +7,10 @@ using UnityEngine;
 
 namespace friendlyPMC.Components
 {
-    // GClass103 is a generic follower layer
-    public class FollowerLayer : GClass103
+    /**
+     * Overwrite of the PatrolAssault layer to make our followers follow the player.
+     */
+    public class FollowerLayer : GClass121
     {
         protected float float_2 = 0f;
 
@@ -187,7 +189,7 @@ namespace friendlyPMC.Components
         public override AICoreActionEndStruct EndSimplePatrol()
         {
             string reason;
-            if (method_13(out reason))
+            if (method_14(out reason))
             {
                 return new AICoreActionEndStruct(reason, true);
             }
@@ -302,12 +304,6 @@ namespace friendlyPMC.Components
 
             return base.ShallEndCurrentDecision(curDecision);
         }
-
-        /*public override CustomNavigationPoint FindPoint(CoverSearchData data, Func<CoverSearchData, CustomNavigationPoint> p, bool checkCurrent)
-        {
-            customNavigationPoint_0 = Utils.Covers.FindPoint(botOwner_0, customNavigationPoint_0);
-            return customNavigationPoint_0;
-        }*/
 
         protected virtual void GetCoverPoint(Vector3 centerPosition, float searchRadius)
         {

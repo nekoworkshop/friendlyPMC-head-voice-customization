@@ -33,11 +33,11 @@ namespace friendlyPMC.Patches
 
                     enemyPhrases.ForEach(phrase =>
                     {
-                        GesturesMenu.Class2965 @class = new GesturesMenu.Class2965();
+                        GesturesMenu.Class3160 @class = new GesturesMenu.Class3160();
                         @class.gesturesMenu_0 = __instance;
                         @class.isSituational = false;
                         GestureBaseItem gestureBaseItem = item.CreateNewPhrase(phrase, @class.isSituational);
-                        gestureBaseItem.OnPointerClicked.Subscribe(new Action<GestureBaseItem.GStruct399>(@class.method_0));
+                        gestureBaseItem.OnPointerClicked.Subscribe(new Action<GestureBaseItem.GStruct431>(@class.method_0));
                         list_1.Add(gestureBaseItem);
                     });
                 }
@@ -48,11 +48,11 @@ namespace friendlyPMC.Patches
 
                     statusPhrases.ForEach(phrase =>
                     {
-                        GesturesMenu.Class2965 @class = new GesturesMenu.Class2965();
+                        GesturesMenu.Class3160 @class = new GesturesMenu.Class3160();
                         @class.gesturesMenu_0 = __instance;
                         @class.isSituational = false;
                         GestureBaseItem gestureBaseItem = item.CreateNewPhrase((EPhraseTrigger)phrase, @class.isSituational);
-                        gestureBaseItem.OnPointerClicked.Subscribe(new Action<GestureBaseItem.GStruct399>(@class.method_0));
+                        gestureBaseItem.OnPointerClicked.Subscribe(new Action<GestureBaseItem.GStruct431>(@class.method_0));
                         list_1.Add(gestureBaseItem);
                     });
 

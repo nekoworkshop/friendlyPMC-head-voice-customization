@@ -15,8 +15,11 @@ using static RootMotion.FinalIK.IKSolver;
 
 namespace friendlyPMC.Components
 {
-    // GClass47 is followerBoar Fight layer
-    internal class FollowerFightLayer : GClass47
+    // GClass48 is followerBoar Fight layer
+    /**
+     * Main fight layer for the followers
+     */
+    internal class FollowerFightLayer : GClass48
     {
 
         private float bossInnerRadius

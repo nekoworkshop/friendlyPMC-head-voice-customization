@@ -42,7 +42,7 @@ namespace friendlyPMC.Patches
                         else
                         {
                             posibleExecuter.BotTalk.TrySay(EPhraseTrigger.Negative);
-                            posibleExecuter.Gesture.TryGestus(EGesture.Bad, true);
+                            posibleExecuter.Gesture.TryGestus(EInteraction.NoGesture, true);
                             __result = false;
                             return false;
                         }
@@ -60,14 +60,14 @@ namespace friendlyPMC.Patches
                         BossPlayers.AddFollower(posibleExecuter, playerBoss);
                         // - bot signals "OK"
                         posibleExecuter.BotTalk.TrySay(EPhraseTrigger.Roger,false);
-                        posibleExecuter.Gesture.TryGestus(EGesture.Good, true);
+                        posibleExecuter.Gesture.TryGestus(EInteraction.OkGesture, true);
 
                     }
                     else
                     {
                         // bot signals "NO"
                         posibleExecuter.BotTalk.TrySay(EPhraseTrigger.Negative);
-                        posibleExecuter.Gesture.TryGestus(EGesture.Bad, true);
+                        posibleExecuter.Gesture.TryGestus(EInteraction.NoGesture, true);
                     }
 
                     __result = false;
@@ -76,7 +76,7 @@ namespace friendlyPMC.Patches
                 {
                     // bot signals "NO"
                     posibleExecuter.BotTalk.TrySay(EPhraseTrigger.Toxic);
-                    posibleExecuter.Gesture.TryGestus(EGesture.FuckYou, true);
+                    posibleExecuter.Gesture.TryGestus(EInteraction.GetOffGesture, true);
                     __result = false;
                     return false;
                 }
@@ -112,7 +112,7 @@ namespace friendlyPMC.Patches
 
                 // bot signals "NO"
                 posibleExecuter.BotTalk.TrySay(EPhraseTrigger.Negative);
-                posibleExecuter.Gesture.TryGestus(EGesture.Bad, true);
+                posibleExecuter.Gesture.TryGestus(EInteraction.NoGesture, true);
 
                 return false;
             }
