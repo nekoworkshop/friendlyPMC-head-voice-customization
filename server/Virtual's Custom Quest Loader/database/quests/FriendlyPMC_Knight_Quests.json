@@ -13,7 +13,7 @@
 					"conditionType": "Level",
 					"dynamicLocale": false,
 					"globalQuestCounterId": "",
-					"id": "friendlypmc-knight-competition-req",
+					"id": "67768e44fa281ca31708b18b",
 					"index": 0,
 					"parentId": "",
 					"value": 20,
@@ -42,7 +42,7 @@
 								"enemyEquipmentExclusive": [],
 								"enemyEquipmentInclusive": [],
 								"enemyHealthEffects": [],
-								"id": "friendlypmc-knight-competition-1-kill",
+								"id": "67768e57fa281ca31708b18e",
 								"resetOnSessionEnd": false,
 								"savageRole": [],
 								"target": "Any",
@@ -55,16 +55,16 @@
 							{
 								"conditionType": "Location",
 								"dynamicLocale": false,
-								"id": "friendlypmc-knight-competition-1-location",
+								"id": "67768e57fa281ca31708b18d",
 								"target": ["Woods"]
 							}
 						],
-						"id": "friendlypmc-knight-competition-1-cond"
+						"id": "67768e78fa281ca31708b18f"
 					},
 					"doNotResetIfCounterCompleted": false,
 					"dynamicLocale": false,
 					"globalQuestCounterId": "",
-					"id": "friendlypmc-knight-competition-1",
+					"id": "67768ec3fa281ca31708b190",
 					"index": 1,
 					"oneSessionOnly": false,
 					"parentId": "",
@@ -93,7 +93,7 @@
 								"enemyEquipmentExclusive": [],
 								"enemyEquipmentInclusive": [],
 								"enemyHealthEffects": [],
-								"id": "friendlypmc-knight-competition-2-kill",
+								"id": "67768efcfa281ca31708b191",
 								"resetOnSessionEnd": false,
 								"savageRole": [],
 								"target": "Any",
@@ -106,16 +106,16 @@
 							{
 								"conditionType": "Location",
 								"dynamicLocale": false,
-								"id": "friendlypmc-knight-competition-2-location",
+								"id": "67768f14fa281ca31708b192",
 								"target": ["Shoreline"]
 							}
 						],
-						"id": "friendlypmc-knight-competition-2-cond"
+						"id": "67768f26fa281ca31708b193"
 					},
 					"doNotResetIfCounterCompleted": false,
 					"dynamicLocale": false,
 					"globalQuestCounterId": "",
-					"id": "friendlypmc-knight-competition-2",
+					"id": "67768f38fa281ca31708b194",
 					"index": 2,
 					"oneSessionOnly": false,
 					"parentId": "",
@@ -144,7 +144,7 @@
 								"enemyEquipmentExclusive": [],
 								"enemyEquipmentInclusive": [],
 								"enemyHealthEffects": [],
-								"id": "friendlypmc-knight-competition-3-kill",
+								"id": "67768fe2fa281ca31708b195",
 								"resetOnSessionEnd": false,
 								"savageRole": [],
 								"target": "Any",
@@ -157,16 +157,16 @@
 							{
 								"conditionType": "Location",
 								"dynamicLocale": false,
-								"id": "friendlypmc-knight-competition-3-location",
+								"id": "67768ff0fa281ca31708b196",
 								"target": ["Lighthouse"]
 							}
 						],
-						"id": "friendlypmc-knight-competition-3-cond"
+						"id": "67768ffffa281ca31708b197"
 					},
 					"doNotResetIfCounterCompleted": false,
 					"dynamicLocale": false,
 					"globalQuestCounterId": "",
-					"id": "friendlypmc-knight-competition-3",
+					"id": "6776900dfa281ca31708b198",
 					"index": 3,
 					"oneSessionOnly": false,
 					"parentId": "",
@@ -184,22 +184,22 @@
 							{
 								"conditionType": "ExitStatus",
 								"dynamicLocale": false,
-								"id": "friendlypmc-knight-competition-fail-1",
+								"id": "67769026fa281ca31708b199",
 								"status": ["Killed", "Left", "MissingInAction"]
 							},
 							{
 								"conditionType": "Location",
 								"dynamicLocale": false,
-								"id": "friendlypmc-knight-competition-fail-2",
+								"id": "67769030fa281ca31708b19a",
 								"target": ["Shoreline", "Lighthouse", "Woods"]
 							}
 						],
-						"id": "friendlypmc-knight-competition-fail-cond"
+						"id": "67769042fa281ca31708b19b"
 					},
 					"doNotResetIfCounterCompleted": false,
 					"dynamicLocale": false,
 					"globalQuestCounterId": "",
-					"id": "friendlypmc-knight-competition-fail",
+					"id": "67769052fa281ca31708b19c",
 					"index": 0,
 					"oneSessionOnly": false,
 					"parentId": "",
@@ -232,7 +232,7 @@
 				{
 					"id": "friendlypmc-knight-competition-reward-2",
 					"index": 1,
-					"target": "friendlypmc-knight",
+					"target": "67768b19fa281ca31708b187",
 					"type": "TraderStanding",
 					"value": "0.1"
 				}
@@ -242,7 +242,7 @@
 		"side": "Pmc",
 		"startedMessageText": "friendlypmc-knight-competition startedMessageText",
 		"successMessageText": "friendlypmc-knight-competition successMessageText",
-		"traderId": "friendlypmc-knight",
+		"traderId": "67768b19fa281ca31708b187",
 		"type": "Elimination"
 	},
 	"6775da597e2dbcb3bd0a02c9": {
@@ -259,7 +259,7 @@
 					"conditionType": "Level",
 					"dynamicLocale": false,
 					"globalQuestCounterId": "",
-					"id": "friendlypmc-knight-my-land-req-1",
+					"id": "67769181fa281ca31708b19d",
 					"index": 0,
 					"parentId": "",
 					"value": 20,
@@ -271,7 +271,7 @@
 					"dispersion": 0,
 					"dynamicLocale": false,
 					"globalQuestCounterId": "",
-					"id": "friendlypmc-knight-my-land-req-2",
+					"id": "67769196fa281ca31708b19e",
 					"index": 0,
 					"parentId": "",
 					"status": [4],
@@ -288,7 +288,7 @@
 							{
 								"conditionType": "InZone",
 								"dynamicLocale": false,
-								"id": "friendlypmc-knight-my-land-location",
+								"id": "677691dbfa281ca31708b19f",
 								"zoneIds": ["prapor_27_1"]
 							},
 							{
@@ -307,7 +307,7 @@
 								"enemyEquipmentExclusive": [],
 								"enemyEquipmentInclusive": [],
 								"enemyHealthEffects": [],
-								"id": "friendlypmc-knight-my-land-kill",
+								"id": "67769250fa281ca31708b1a0",
 								"resetOnSessionEnd": false,
 								"savageRole": [],
 								"target": "Any",
@@ -318,12 +318,12 @@
 								"weaponModsInclusive": []
 							}
 						],
-						"id": "friendlypmc-knight-my-land-cond"
+						"id": "6776925dfa281ca31708b1a1"
 					},
 					"doNotResetIfCounterCompleted": false,
 					"dynamicLocale": false,
 					"globalQuestCounterId": "",
-					"id": "friendlypmc-knight-my-land-1",
+					"id": "6776926bfa281ca31708b1a2",
 					"index": 0,
 					"oneSessionOnly": false,
 					"parentId": "",
@@ -349,21 +349,21 @@
 			"Started": [],
 			"Success": [
 				{
-					"id": "friendlypmc-knight-my-land-reward-1",
+					"id": "67769281fa281ca31708b1a3",
 					"index": 0,
 					"type": "Experience",
 					"value": "24000"
 				},
 				{
-					"id": "friendlypmc-knight-my-land-reward-2",
+					"id": "6776928efa281ca31708b1a4",
 					"index": 1,
-					"target": "friendlypmc-knight",
+					"target": "67768b19fa281ca31708b187",
 					"type": "TraderStanding",
 					"value": "0.1"
 				},
 				{
 					"findInRaid": true,
-					"id": "friendlypmc-knight-my-land-reward-3",
+					"id": "6776929ffa281ca31708b1a5",
 					"index": 2,
 					"items": [
 						{
@@ -384,12 +384,12 @@
 		"side": "Pmc",
 		"startedMessageText": "friendlypmc-knight-my-land startedMessageText",
 		"successMessageText": "friendlypmc-knight-my-land successMessageText",
-		"traderId": "friendlypmc-knight",
+		"traderId": "67768b19fa281ca31708b187",
 		"type": "Elimination"
 	},
-	"friendlypmc-knight-thieves": {
+	"677687f2fa281ca31708b17a": {
 		"QuestName": "They robbed us!",
-		"_id": "friendlypmc-knight-thieves",
+		"_id": "677687f2fa281ca31708b17a",
 		"acceptPlayerMessage": "friendlypmc-knight-thieves acceptPlayerMessage",
 		"canShowNotificationsInGame": true,
 		"changeQuestMessageText": "friendlypmc-knight-thieves changeQuestMessageText",
@@ -401,7 +401,7 @@
 					"conditionType": "Level",
 					"dynamicLocale": false,
 					"globalQuestCounterId": "",
-					"id": "friendlypmc-knight-thieves-req-1",
+					"id": "67769409fa281ca31708b1a6",
 					"index": 0,
 					"parentId": "",
 					"value": 20,
@@ -413,11 +413,11 @@
 					"dispersion": 0,
 					"dynamicLocale": false,
 					"globalQuestCounterId": "",
-					"id": "friendlypmc-knight-thieves-req-2",
+					"id": "67769418fa281ca31708b1a7",
 					"index": 0,
 					"parentId": "",
 					"status": [4],
-					"target": "friendlypmc-knight-my-land",
+					"target": "6775da597e2dbcb3bd0a02c9",
 					"visibilityConditions": []
 				}
 			],
@@ -428,7 +428,7 @@
 					"dogtagLevel": 0,
 					"dynamicLocale": false,
 					"globalQuestCounterId": "",
-					"id": "friendlypmc-knight-thieves-1",
+					"id": "6776942bfa281ca31708b1a8",
 					"index": 0,
 					"isEncoded": false,
 					"maxDurability": 100,
@@ -444,7 +444,7 @@
 					"dogtagLevel": 0,
 					"dynamicLocale": false,
 					"globalQuestCounterId": "",
-					"id": "friendlypmc-knight-thieves-2",
+					"id": "67769441fa281ca31708b1a9",
 					"index": 1,
 					"isEncoded": false,
 					"maxDurability": 100,
@@ -473,21 +473,21 @@
 			"Started": [],
 			"Success": [
 				{
-					"id": "friendlypmc-knight-thieves-reward-1",
+					"id": "6776945cfa281ca31708b1aa",
 					"index": 0,
 					"type": "Experience",
 					"value": "15000"
 				},
 				{
-					"id": "friendlypmc-knight-thieves-reward-2",
+					"id": "67769468fa281ca31708b1ab",
 					"index": 1,
-					"target": "friendlypmc-knight",
+					"target": "67768b19fa281ca31708b187",
 					"type": "TraderStanding",
 					"value": "0.1"
 				},
 				{
 					"findInRaid": true,
-					"id": "friendlypmc-knight-thieves-reward-3",
+					"id": "67769470fa281ca31708b1ac",
 					"index": 2,
 					"items": [
 						{
@@ -508,13 +508,13 @@
 		"side": "Pmc",
 		"startedMessageText": "friendlypmc-knight-thieves startedMessageText",
 		"successMessageText": "friendlypmc-knight-thieves successMessageText",
-		"traderId": "friendlypmc-knight",
+		"traderId": "67768b19fa281ca31708b187",
 		"type": "PickUp"
 	},
 
-	"friendlypmc-knight-payback01": {
+	"67768936fa281ca31708b17c": {
 		"QuestName": "Badge Bandit",
-		"_id": "friendlypmc-knight-payback01",
+		"_id": "67768936fa281ca31708b17c",
 		"acceptPlayerMessage": "friendlypmc-knight-payback01 acceptPlayerMessage",
 		"canShowNotificationsInGame": true,
 		"changeQuestMessageText": "friendlypmc-knight-payback01 changeQuestMessageText",
@@ -542,7 +542,7 @@
 					"index": 0,
 					"parentId": "",
 					"status": [4],
-					"target": "friendlypmc-knight-thieves",
+					"target": "677687f2fa281ca31708b17a",
 					"visibilityConditions": []
 				}
 			],
@@ -640,7 +640,7 @@
 				{
 					"id": "friendlypmc-knight-payback01-reward-2",
 					"index": 1,
-					"target": "friendlypmc-knight",
+					"target": "67768b19fa281ca31708b187",
 					"type": "TraderStanding",
 					"value": "0.2"
 				}
@@ -660,13 +660,13 @@
 		"side": "Pmc",
 		"startedMessageText": "friendlypmc-knight-payback01 startedMessageText",
 		"successMessageText": "friendlypmc-knight-payback01 successMessageText",
-		"traderId": "friendlypmc-knight",
+		"traderId": "67768b19fa281ca31708b187",
 		"type": "Elimination"
 	},
 
-	"friendlypmc-knight-enemyspotted": {
+	"6776899afa281ca31708b17e": {
 		"QuestName": "Enemy Spotted",
-		"_id": "friendlypmc-knight-enemyspotted",
+		"_id": "6776899afa281ca31708b17e",
 		"acceptPlayerMessage": "friendlypmc-knight-enemyspotted acceptPlayerMessage",
 		"canShowNotificationsInGame": true,
 		"changeQuestMessageText": "friendlypmc-knight-enemyspotted changeQuestMessageText",
@@ -694,7 +694,7 @@
 					"index": 0,
 					"parentId": "",
 					"status": [4],
-					"target": "friendlypmc-knight-payback01",
+					"target": "67768936fa281ca31708b17c",
 					"visibilityConditions": []
 				}
 			],
@@ -798,7 +798,7 @@
 				{
 					"id": "friendlypmc-knight-enemyspotted-reward-2",
 					"index": 1,
-					"target": "friendlypmc-knight",
+					"target": "67768b19fa281ca31708b187",
 					"type": "TraderStanding",
 					"value": "0.1"
 				}
@@ -818,12 +818,12 @@
 		"side": "Pmc",
 		"startedMessageText": "friendlypmc-knight-enemyspotted startedMessageText",
 		"successMessageText": "friendlypmc-knight-enemyspotted successMessageText",
-		"traderId": "friendlypmc-knight",
+		"traderId": "67768b19fa281ca31708b187",
 		"type": "Elimination"
 	},
-	"friendlypmc-knight-coverme": {
+	"677689ebfa281ca31708b180": {
 		"QuestName": "Off Limits",
-		"_id": "friendlypmc-knight-coverme",
+		"_id": "677689ebfa281ca31708b180",
 		"acceptPlayerMessage": "friendlypmc-knight-coverme acceptPlayerMessage",
 		"canShowNotificationsInGame": true,
 		"changeQuestMessageText": "friendlypmc-knight-coverme changeQuestMessageText",
@@ -851,7 +851,7 @@
 					"index": 0,
 					"parentId": "",
 					"status": [4],
-					"target": "friendlypmc-knight-enemyspotted",
+					"target": "6776899afa281ca31708b17e",
 					"visibilityConditions": []
 				}
 			],
@@ -933,7 +933,7 @@
 				{
 					"id": "friendlypmc-knight-coverme-reward-2",
 					"index": 1,
-					"target": "friendlypmc-knight",
+					"target": "67768b19fa281ca31708b187",
 					"type": "TraderStanding",
 					"value": "0.1"
 				},
@@ -960,12 +960,12 @@
 		"side": "Pmc",
 		"startedMessageText": "friendlypmc-knight-coverme startedMessageText",
 		"successMessageText": "friendlypmc-knight-coverme successMessageText",
-		"traderId": "friendlypmc-knight",
+		"traderId": "67768b19fa281ca31708b187",
 		"type": "Elimination"
 	},
-	"friendlypmc-knight-afavor": {
+	"67768a41fa281ca31708b182": {
 		"QuestName": "A Favor",
-		"_id": "friendlypmc-knight-afavor",
+		"_id": "67768a41fa281ca31708b182",
 		"acceptPlayerMessage": "friendlypmc-knight-afavor acceptPlayerMessage",
 		"canShowNotificationsInGame": true,
 		"changeQuestMessageText": "friendlypmc-knight-afavor changeQuestMessageText",
@@ -993,7 +993,7 @@
 					"index": 0,
 					"parentId": "",
 					"status": [4],
-					"target": "friendlypmc-knight-coverme",
+					"target": "677689ebfa281ca31708b180",
 					"visibilityConditions": []
 				}
 			],
@@ -1091,7 +1091,7 @@
 				{
 					"id": "friendlypmc-knight-afavor-reward-2",
 					"index": 1,
-					"target": "friendlypmc-knight",
+					"target": "67768b19fa281ca31708b187",
 					"type": "TraderStanding",
 					"value": "0.1"
 				},
@@ -1128,7 +1128,7 @@
 		"side": "Pmc",
 		"startedMessageText": "friendlypmc-knight-afavor startedMessageText",
 		"successMessageText": "friendlypmc-knight-afavor successMessageText",
-		"traderId": "friendlypmc-knight",
+		"traderId": "67768b19fa281ca31708b187",
 		"type": "Elimination"
 	}
 }

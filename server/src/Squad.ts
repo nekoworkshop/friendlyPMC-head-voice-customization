@@ -78,6 +78,7 @@ import { IGetOtherProfileRequest } from "@spt/models/eft/profile/IGetOtherProfil
 import { IQuest } from "@spt/models/eft/common/tables/IQuest";
 
 import { objectCopy, objectForEach } from "./Utils";
+import { IGetRaidConfigurationRequestData } from "@spt/models/eft/match/IGetRaidConfigurationRequestData";
 
 class friendlyPMC {
 	config = {
@@ -159,7 +160,7 @@ class friendlyPMC {
 		this.randomUtil = randomUtil;
 
 		// patch getPmcDifficultySettings as that is where we actually make the bots be friendly
-		this.getPmcDifficultySettings = this.getPmcDifficultySettings.bind(this);
+		/* this.getPmcDifficultySettings = this.getPmcDifficultySettings.bind(this);
 		container.afterResolution(
 			"BotDifficultyHelper",
 			(_t, result: BotDifficultyHelper) => {
@@ -171,7 +172,7 @@ class friendlyPMC {
 			},
 			{ frequency: "Always" }
 		);
-
+        */
 		// patch getBotDifficulty as that is where we actually make the bots be friendly
 		this.getBotDifficulty = this.getBotDifficulty.bind(this);
 		container.afterResolution(
@@ -396,8 +397,6 @@ class friendlyPMC {
 				new RouteAction("/client/game/bot/followergenerate", (url: string, info: { Info: IGenerateBotsRequestData; Preset?: string; Custom?: { Body?: string; Feet?: string; Nickname?: string; English?: boolean; Voice?: string } }, sessionID: string, output: string): any => {
 					const pmcProfile = profileHelper.getPmcProfile(sessionID);
 
-					let level = pmcProfile.Info.Level;
-
 					const custom = info.Custom;
 
 					this.Logger.logWithColor("friendlyPMC: Follower Options - " + JSON.stringify(info.Custom), LogTextColor.WHITE);
@@ -406,7 +405,7 @@ class friendlyPMC {
 
 					for (const condition of info.Info.conditions) {
 						const raidSettings = botController["getMostRecentRaidSettings"]();
-						const botGenerationDetails = botController["getBotGenerationDetailsForWave"](condition, pmcProfile, false, raidSettings, botController["botConfig"].presetBatch[condition.Role], false);
+						const botGenerationDetails = botController["getBotGenerationDetailsForWave"](condition, pmcProfile, false, raidSettings, botController["botConfig"].presetBatch[condition.Role], botController["botHelper"].isBotPmc(condition.Role));
 
 						const preparedBotBase = botGenerator["getPreparedBotBase"](
 							botGenerationDetails.eventRole ?? botGenerationDetails.role, // Use eventRole if provided,
@@ -458,7 +457,6 @@ class friendlyPMC {
 							} else if (pmcProfile.Info.Side.toLowerCase() == "bear") profile.Info.Voice = custom?.English ? `Bear_${randomUtil.getInt(1, 2)}_Eng` : `Bear_${randomUtil.getInt(1, 3)}`;
 						});
 					}
-
 					const res = httpResponseUtil.getBody(conditionPromises);
 
 					return res;
@@ -549,17 +547,17 @@ class friendlyPMC {
 						if (quest.qid == "6775d9957e2dbcb3bd0a02c7" && quest.status == 4) {
 							hasKnightQuest = true;
 						}
-						if (["friendlypmc-knight-payback01"].includes(quest.qid) && quest.status == 4) {
+						if (["67768936fa281ca31708b17c"].includes(quest.qid) && quest.status == 4) {
 							hasBigPipeQuest = true;
 						}
 
-						if (["friendlypmc-knight-afavor"].includes(quest.qid) && quest.status == 4) {
+						if (["67768a41fa281ca31708b182"].includes(quest.qid) && quest.status == 4) {
 							hasBirdEyeQuest = true;
 						}
 					});
 
 					// low standing will result in the rest of the goons not being available
-					if (profile.TradersInfo["friendlypmc-knight"].standing < 0.5) {
+					if (profile.TradersInfo["67768b19fa281ca31708b187"].standing < 0.5) {
 						hasBigPipeQuest = false;
 						hasBirdEyeQuest = false;
 					}
@@ -720,9 +718,9 @@ class friendlyPMC {
 				DEFAULT_ENEMY_BEAR: pmcType == "usec" || pmcType == "sptusec" || pmcType == "pmcusec" || is_hostile,
 				DEFAULT_ENEMY_SAVAGE: true,
 				DEFAULT_ENEMY_USEC: pmcType == "bear" || pmcType == "sptbear" || pmcType == "pmcbear" || is_hostile,
-				DEFAULT_BEAR_BEHAVIOUR: !is_bad_guy && !is_hostile && (pmcType == "bear" || pmcType == "sptbear" || pmcType == "pmcbear") ? "Ignore" : "Attack",
-				DEFAULT_SAVAGE_BEHAVIOUR: "Attack",
-				DEFAULT_USEC_BEHAVIOUR: !is_bad_guy && !is_hostile && (pmcType == "usec" || pmcType == "sptusec" || pmcType == "pmcusec") ? "Ignore" : "Attack",
+				DEFAULT_BEAR_BEHAVIOUR: !is_bad_guy && !is_hostile && (pmcType == "bear" || pmcType == "sptbear" || pmcType == "pmcbear") ? "Neutral" : "AlwaysEnemies",
+				DEFAULT_SAVAGE_BEHAVIOUR: "AlwaysEnemies",
+				DEFAULT_USEC_BEHAVIOUR: !is_bad_guy && !is_hostile && (pmcType == "usec" || pmcType == "sptusec" || pmcType == "pmcusec") ? "Neutral" : "AlwaysEnemies",
 				CAN_RECIVE_PLAYER_REQUESTS: !is_hostile && !is_bad_guy,
 				CAN_RECEIVE_PLAYER_REQUESTS: !is_hostile && !is_bad_guy,
 				CAN_RECEIVE_PLAYER_REQUESTS_USEC: !is_hostile && !is_bad_guy,
@@ -777,8 +775,8 @@ class friendlyPMC {
 			Object.assign(diff.Mind, {
 				ENEMY_BY_GROUPS_PMC_PLAYERS: false,
 				REVENGE_BOT_TYPES: [],
-				DEFAULT_USEC_BEHAVIOUR: "Ignore",
-				DEFAULT_BEAR_BEHAVIOUR: "Ignore",
+				DEFAULT_USEC_BEHAVIOUR: "Neutral",
+				DEFAULT_BEAR_BEHAVIOUR: "Neutral",
 				DEFAULT_ENEMY_BEAR: false,
 				DEFAULT_ENEMY_USEC: false,
 			});
@@ -788,16 +786,15 @@ class friendlyPMC {
 	}
 
 	originalgetPmcDifficultySettings: BotDifficultyHelper["getDifficultySettings"];
-	/** Overwrite get difficulity method to patch the friendly/hostile settings */
+	/** Overwrite get difficulty method to patch the friendly/hostile settings */
 	getPmcDifficultySettings(pmcType: "bear" | "usec", difficulty: string): any {
 		const result = this.originalgetPmcDifficultySettings(pmcType, difficulty);
-
 		return this._makeFriendlyOrHostile(result, pmcType);
 	}
 
 	originalgetBotDifficulty: BotController["getBotDifficulty"];
-	/** Overwrite get difficulity method to patch the friendly/hostile settings */
-	getBotDifficulty(type: string, difficulty: string): any {
+	/** Overwrite get difficulty method to patch the friendly/hostile settings */
+	getBotDifficulty(type: string, difficulty: string, raidConfig?: IGetRaidConfigurationRequestData, ignoreRaidSettings?: boolean): any {
 		let result = this.originalgetBotDifficulty(type, difficulty);
 
 		return this._makeFriendlyOrHostile(result, type);

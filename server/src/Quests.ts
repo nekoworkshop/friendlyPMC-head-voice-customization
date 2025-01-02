@@ -10,7 +10,7 @@ import { IAcceptQuestRequestData } from "@spt/models/eft/quests/IAcceptQuestRequ
 import { RandomUtil } from "@spt/utils/RandomUtil";
 
 export const Quests = {
-	"friendlypmc-knight-thieves": {
+	"677687f2fa281ca31708b17a": {
 		itemLocation: ["TarkovStreets"],
 		itemId: "64e3b0f4e3b6f5a4a37e8c1d",
 		itemContainer: {

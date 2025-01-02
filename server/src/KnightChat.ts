@@ -2,17 +2,15 @@ import { IDialogueChatBot } from "@spt/helpers/Dialogue/IDialogueChatBot";
 import { NotificationSendHelper } from "@spt/helpers/NotificationSendHelper";
 import { ISendMessageRequest } from "@spt/models/eft/dialog/ISendMessageRequest";
 import { MemberCategory } from "@spt/models/enums/MemberCategory";
-import { ILogger } from "@spt/models/spt/utils/ILogger";
 import { MailSendService } from "@spt/services/MailSendService";
 import { inject, injectable } from "tsyringe";
 
 import { NotificationEventType } from "@spt/models/enums/NotificationEventType";
-import { IWsChatMessageReceived } from "@spt/models/eft/ws/IWsChatMessageReceived";
 
 import { IWsNotificationEvent } from "@spt/models/eft/ws/IWsNotificationEvent";
 import { IGroupCharacter } from "@spt/models/eft/match/IGroupCharacter";
 
-import { IUserDialogInfo, Message } from "@spt/models/eft/profile/ISptProfile";
+import { IUserDialogInfo } from "@spt/models/eft/profile/ISptProfile";
 import { MessageType } from "@spt/models/enums/MessageType";
 import { HashUtil } from "@spt/utils/HashUtil";
 import { ProfileHelper } from "@spt/helpers/ProfileHelper";
@@ -88,6 +86,7 @@ export class KnightChatBot implements IDialogueChatBot {
 
 	public PlayerVisualRepresentation(sessionId: string): IGetOtherProfileResponse {
 		const pmcProfile = this.profileHelper.getPmcProfile(sessionId);
+		const raidSettings = this.botController["getMostRecentRaidSettings"]();
 		const botGenerationDetails = this.botController["getBotGenerationDetailsForWave"](
 			{
 				Role: this._botRole,
@@ -96,12 +95,7 @@ export class KnightChatBot implements IDialogueChatBot {
 			},
 			pmcProfile,
 			false,
-			{
-				// max should be between level and level + 5
-				max: pmcProfile.Info.Level + 1,
-				// min should be between level - 5 and level
-				min: Math.max(1, pmcProfile.Info.Level - 1),
-			},
+			raidSettings,
 			1,
 			false
 		);
@@ -146,7 +140,7 @@ export class KnightChatBot implements IDialogueChatBot {
 				Items: result.Inventory.items,
 			},
 			achievements: pmcProfile.Achievements,
-			favoriteItems: result.Inventory.favoriteItems ?? [],
+			favoriteItems: [],
 			pmcStats: {
 				eft: {
 					totalInGameTime: pmcProfile.Stats.Eft.TotalInGameTime,
@@ -198,7 +192,7 @@ export class KnightChatBot implements IDialogueChatBot {
 				recipientId: sessionId,
 				sender: MessageType.NPC_TRADER,
 				//@ts-ignore
-				trader: "friendlypmc-knight",
+				trader: "67768b19fa281ca31708b187",
 				messageText: message,
 			});
 		}, 1000);

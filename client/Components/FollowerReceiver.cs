@@ -10,6 +10,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using HarmonyLib;
 using EFT.InventoryLogic;
+using EFT.AnimatedInteractionsSubsystem.Models;
 
 namespace friendlyPMC.Components
 {
@@ -156,9 +157,16 @@ namespace friendlyPMC.Components
         public bool IsBossRequester(IPlayer requester)
         {
 
-            bool isBossCommunicating = !botOwner_0.BotFollower.HaveBoss ? false : requester != null && botOwner_0.BotFollower.BossToFollow.IsMe(requester);
+            Modules.Logger.LogInfo("Bot Has Boss " + botOwner_0.BotFollower.HaveBoss);
+            if (requester == null)
+            {
+                return false;
+            }
 
-            return isBossCommunicating;
+            if (!botOwner_0.BotFollower.HaveBoss) return false;
+
+
+            return botOwner_0.BotFollower.BossToFollow.Player().ProfileId == requester.ProfileId;
         }
 
         public bool IsAllyRequester(IPlayer requester)
@@ -170,7 +178,11 @@ namespace friendlyPMC.Components
         {
 
             EInteraction gesture = data.Gesture;
+            Modules.Logger.LogInfo("Gesture " + gesture);
             bool isBossCommunicating = IsBossRequester(data.Player);
+
+
+            Modules.Logger.LogInfo("isBossCommunicating " + isBossCommunicating);
 
             bool isAssisting = (botOwner_0.Brain.BaseBrain as FollowerBrain).currentTactic == "Assist";
 
@@ -179,6 +191,10 @@ namespace friendlyPMC.Components
             bool shouldDefault = !BossPlayers.IsPlayerBoss(data.Player.ProfileId);
 
             bool notBusy = !botOwner_0.Memory.HaveEnemy;
+
+
+            Modules.Logger.LogInfo("shouldDefault " + shouldDefault);
+            Modules.Logger.LogInfo("notBusy " + notBusy);
 
             List<EInteraction> bossNoGesture = new List<EInteraction>
             {

@@ -133,6 +133,16 @@ namespace friendlyPMC.Patches
                     else if (__instance.Player.HandsIsEmpty)
                     {
                         __instance.Player.HandsController.ShowGesture(EInteraction.ThereGesture);
+                        foreach (var receiver in Receivers.GetReceivers())
+                        {
+                            GClass501 data = new GClass501
+                            {
+                                Gesture = (EInteraction)CustomGestures.OverThere,
+                                Player = __instance.Player
+                            };
+
+                            receiver.Value.GestusShown(data);
+                        }
                     }
                 }
 
@@ -176,9 +186,9 @@ namespace friendlyPMC.Patches
                         if (Utils.Props.Quests["Knight"][0] == data.Id && data.Status == EFT.Quests.EQuestStatus.Success)
                         {
 
-                            if (alivePlayerByProfileID.Profile.TryGetTraderInfo("friendlypmc-knight", out var traderInfo))
+                            if (alivePlayerByProfileID.Profile.TryGetTraderInfo("67768b19fa281ca31708b187", out var traderInfo))
                             {
-                                double standing = alivePlayerByProfileID.Profile.GetTraderStanding("friendlypmc-knight");
+                                double standing = alivePlayerByProfileID.Profile.GetTraderStanding("67768b19fa281ca31708b187");
                                 traderInfo.SetStanding(Math.Min(0.1, standing - 0.02));
                             }
 

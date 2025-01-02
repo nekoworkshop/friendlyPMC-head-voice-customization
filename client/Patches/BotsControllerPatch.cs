@@ -208,26 +208,52 @@ namespace friendlyPMC.Patches
                 return;
             }
 
-            BotSettingsComponents botSettingsComponents = GClass583.smethod_1(BotDifficulty.normal, role, false);
+            if(friendlyPMC.sameSideHostile.Value)
+            {
+                isHostile = true;
+                return;
+            }
+
+            /*BotSettingsComponents botSettingsComponents = GClass583.smethod_1(GClass583.CheckOnExclude(BotDifficulty.normal,role), role, false);
             if(botSettingsComponents != null)
             {
                 if (side == EPlayerSide.Bear) isHostile = botSettingsComponents.Mind.DEFAULT_BEAR_BEHAVIOUR.HasFlag(EWarnBehaviour.AlwaysEnemies);
                 else if (side == EPlayerSide.Usec) isHostile = botSettingsComponents.Mind.DEFAULT_USEC_BEHAVIOUR.HasFlag(EWarnBehaviour.AlwaysEnemies);
                 else isHostile = botSettingsComponents.Mind.DEFAULT_SAVAGE_BEHAVIOUR.HasFlag(EWarnBehaviour.AlwaysEnemies);
-            }
+            }*/
         }
 
         private async UniTask ActivateBotFollower(BotCreator botCreator, Profile profile, GClass649 position, BotZone zone,bool shallBeGroup, Func<BotOwner, BotZone, BotsGroup> GroupAction, Action<BotOwner> OnActivate,CancellationToken token)
         {
 
-            await botCreator.ActivateBot(
+            GClass888.Class565 @class = new GClass888.Class565();
+            @class.gclass888_0 = botCreator;
+            @class.zone = zone;
+            @class.callback = OnActivate;
+            @class.groupAction = GroupAction;
+            if(profile == null)
+            {
+                Modules.Logger.LogError("Profile is null");
+            }
+            await Task.Yield();
+            try
+            {
+                await botCreator.method_2(profile, position, new Action<BotOwner>(@class.method_0), true, token);
+            }
+            catch (Exception ex)
+            {
+                Modules.Logger.LogError("Failed to activate bot follower");
+                Modules.Logger.LogError(ex);
+            }
+
+            /*await botCreator.ActivateBot(
                 profile,
                 position,
                 zone, shallBeGroup,
                 GroupAction,
                 OnActivate,
                 token
-            );
+            );*/
         }
 
         /** Fetch Follower Profile data along with custom appearance from server */
@@ -280,15 +306,15 @@ namespace friendlyPMC.Patches
                 customization["Nickname"] = nickname;
             }
 
-            var botPresets = AccessTools.Field(typeof(BotCreator), "ginterface18_0").GetValue(botCreator) as BotsPresets;
+            var botPresets = AccessTools.Field(typeof(BotCreator), "ginterface21_0").GetValue(botCreator) as BotsPresets;
             var profileEndpoint = AccessTools.Field(typeof(BotsPresets), "iSession").GetValue(botPresets) as ProfileEndPoint;
             var gclass1200_0 = AccessTools.Field(typeof(ProfileEndPoint), "gclass1303_0").GetValue(profileEndpoint) as GClass1303;
 
             List<WaveInfo> limit = botPresets.method_3(data.PrepareToLoadBackend(1).ToList(), out var list3); ;
 
             customization["English"] = friendlyPMC.englishBear.Value;
-            // call backend
-            var result = await profileEndpoint.method_3<Profile[]>(new LegacyParamsStruct
+            // call backend - follow ProfileEndpointFactoryAbstractClass.LoadBots
+            var result = await profileEndpoint.method_3<GClass1962[]>(new LegacyParamsStruct
             {
                 Url = gclass1200_0.Main + "/client/game/bot/followergenerate",
                 Params = new Dictionary<string, object>
@@ -299,7 +325,7 @@ namespace friendlyPMC.Patches
                 Retries = new byte?(LegacyParamsStruct.DefaultRetries)
             });
 
-            Profile profile = result.ToList().Random();
+            Profile profile = result.Select(new Func<GClass1962, Profile>(ProfileEndpointFactoryAbstractClass.Class1410.class1410_0.method_10)).ToList<Profile>().Random();
             // process backend result
             await Singleton<PoolManager>.Instance.LoadBundlesAndCreatePools(PoolManager.PoolsCategory.Raid, PoolManager.AssemblyType.Local, profile.GetAllPrefabPaths(false).ToArray<ResourceKey>(), JobPriority.General, null, PoolManager.DefaultCancellationToken);
 
@@ -1390,7 +1416,7 @@ namespace friendlyPMC.Patches
                         {
                             if(!HasFika()) Instance?.PreFetchPMCProfiles(playerBoss);
                         }
-                        else
+                        else if (!HasFika())
                             Instance?.CreateFollowerProfiles(playerBoss);
                     }
                 }
@@ -1471,12 +1497,12 @@ namespace friendlyPMC.Patches
         }
     }
     // Spawn followers after the initial spawn of the game
-    [HarmonyPatch(typeof(BaseLocalGame<EftGamePlayerOwner>))]
-    [HarmonyPatch("vmethod_1")]
+    [HarmonyPatch(typeof(BotsEventsController))]
+    [HarmonyPatch("SpawnAction")]
     internal class BaseLocalGameVmethod4Patch
     {
         [HarmonyPostfix]
-        public static void Postfix(IEnumerator __result, BaseLocalGame<EftGamePlayerOwner> __instance, BotControllerSettings controllerSettings, ISpawnSystem spawnSystem)
+        public static void Postfix(BotsEventsController __instance)
         {
             try
             {
@@ -1667,7 +1693,7 @@ namespace friendlyPMC.Patches
 
             });
 
-            if (boss.realPlayer.Profile.TryGetTraderInfo("friendlypmc-knight", out var traderInfo))
+            if (boss.realPlayer.Profile.TryGetTraderInfo("67768b19fa281ca31708b187", out var traderInfo))
             {
                 foreach (var follower in BossPlayers.GetFollowersByBoss(profile.ProfileId))
                 {
@@ -1678,7 +1704,7 @@ namespace friendlyPMC.Patches
                         (bot.IsRole(WildSpawnType.followerBirdEye) && birdEyeIncrease)
                     )
                     {
-                        double standing = boss.realPlayer.Profile.GetTraderStanding("friendlypmc-knight");
+                        double standing = boss.realPlayer.Profile.GetTraderStanding("67768b19fa281ca31708b187");
                         if (standing < maxStanding)
                             traderInfo.SetStanding(Math.Min(maxStanding, standing + 0.01));
                     };

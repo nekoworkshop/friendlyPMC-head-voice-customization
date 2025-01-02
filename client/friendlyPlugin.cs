@@ -283,8 +283,6 @@ namespace friendlyPMC
             new QuestClassPatch().Enable();
             harmony.PatchAll(typeof(SendInvitePatch).Assembly);
 
-            // add console commands
-            AddConsoleCommands();
             // set configuration manager
             SetConfiguration();
         }
@@ -619,7 +617,6 @@ namespace friendlyPMC
 
         private void BuildEquipmentPresets()
         {
-
             var presets = Utils.Equipment.CustomPresets;
 
             var updatedPresets = new string[] {
@@ -630,7 +627,7 @@ namespace friendlyPMC
             {
                 updatedPresets = updatedPresets.AddItem(item.Name).ToArray();
             }
-            
+
             bool wasUpdated = false;
 
             foreach (var item in updatedPresets)
@@ -679,7 +676,9 @@ namespace friendlyPMC
                     }
                     i++;
                 }
+
             }
+
         }
 
         private ConfigEntry<string> UniformOptions(string name, string value, string bodyPart = "top", bool addval = false, int order = 0)
@@ -859,20 +858,6 @@ namespace friendlyPMC
                     }
                 }
             }
-
-        }
-
-        private void AddConsoleCommands()
-        {
-            ConsoleScreen.Processor.RegisterCommand("followerstome", delegate ()
-            {
-                _BotTeleport();
-            });
-
-            ConsoleScreen.Processor.RegisterCommand("followersfixheal", delegate ()
-            {
-                _BotHeal();
-            });
 
         }
 

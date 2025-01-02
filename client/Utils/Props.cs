@@ -66,7 +66,7 @@ namespace friendlyPMC.Utils
                 {
                     "6775d9957e2dbcb3bd0a02c7",
                     "6775da597e2dbcb3bd0a02c9",
-                    "friendlypmc-knight-payback01",
+                    "67768936fa281ca31708b17c",
                 }
             },
             {
@@ -74,8 +74,8 @@ namespace friendlyPMC.Utils
                 // order is important
                 new List<string>
                 {
-                    "friendlypmc-knight-payback01",
-                    "friendlypmc-knight-coverme"
+                    "67768936fa281ca31708b17c",
+                    "677689ebfa281ca31708b180"
                 }
             },
             {
@@ -83,10 +83,10 @@ namespace friendlyPMC.Utils
                 // order is important
                 new List<string>
                 {
-                    "friendlypmc-knight-payback01",
-                    "friendlypmc-knight-enemyspotted",
-                    "friendlypmc-knight-coverme",
-                    "friendlypmc-knight-afavor"
+                    "67768936fa281ca31708b17c",
+                    "6776899afa281ca31708b17e",
+                    "677689ebfa281ca31708b180",
+                    "67768a41fa281ca31708b182"
                 }
             }
         };
@@ -97,7 +97,7 @@ namespace friendlyPMC.Utils
         >
         {
             {
-                "friendlypmc-knight-competition",
+                "6775d9957e2dbcb3bd0a02c7",
                 new List<string> { "lighthouse", "bigmap", "shoreline", "woods" }
             },
             {
@@ -105,19 +105,19 @@ namespace friendlyPMC.Utils
                 new List<string> { "bigmap" }
             },
             {
-                "friendlypmc-knight-payback01",
+                "67768936fa281ca31708b17c",
                 new List<string> { "tarkovstreets" }
             },
             {
-                "friendlypmc-knight-enemyspotted",
+                "6776899afa281ca31708b17e",
                 new List<string> { "woods" }
             },
             {
-                "friendlypmc-knight-coverme0",
+                "677689ebfa281ca31708b180",
                 new List<string> { "shoreline" }
             },
             {
-                "friendlypmc-knight-afavor",
+                "67768a41fa281ca31708b182",
                 new List<string> { "woods" }
             }
         };
@@ -129,7 +129,7 @@ namespace friendlyPMC.Utils
         {
             {
                 "Knight",
-                new List<string> { "friendlypmc-knight-my-land-1" }
+                new List<string> { "6776926bfa281ca31708b1a2" }
             },
             {
                 "BigPipe",
@@ -173,9 +173,9 @@ namespace friendlyPMC.Utils
                 "Player",
                 new List<string>
                 {
-                    "friendlypmc-knight-competition-1",
-                    "friendlypmc-knight-competition-2",
-                    "friendlypmc-knight-competition-3"
+                    "67768ec3fa281ca31708b190",
+                    "67768f38fa281ca31708b194",
+                    "6776900dfa281ca31708b198"
                 }
             }
         };
@@ -187,7 +187,7 @@ namespace friendlyPMC.Utils
         {
             {
                 WildSpawnType.bossKolontay,
-                new List<string> { "friendlypmc-knight-payback01" }
+                new List<string> { "67768936fa281ca31708b17c" }
             },
             {
                 WildSpawnType.bossKojaniy,
