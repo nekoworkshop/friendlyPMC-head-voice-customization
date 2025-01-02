@@ -1,7 +1,7 @@
 {
-	"friendlypmc-knight-competition": {
+	"6775d9957e2dbcb3bd0a02c7": {
 		"QuestName": "Who let the dogs out?",
-		"_id": "friendlypmc-knight-competition",
+		"_id": "6775d9957e2dbcb3bd0a02c7",
 		"acceptPlayerMessage": "friendlypmc-knight-competition acceptPlayerMessage",
 		"canShowNotificationsInGame": true,
 		"changeQuestMessageText": "friendlypmc-knight-competition changeQuestMessageText",
@@ -245,9 +245,9 @@
 		"traderId": "friendlypmc-knight",
 		"type": "Elimination"
 	},
-	"friendlypmc-knight-my-land": {
+	"6775da597e2dbcb3bd0a02c9": {
 		"QuestName": "My Land",
-		"_id": "friendlypmc-knight-my-land",
+		"_id": "6775da597e2dbcb3bd0a02c9",
 		"acceptPlayerMessage": "friendlypmc-knight-my-land acceptPlayerMessage",
 		"canShowNotificationsInGame": true,
 		"changeQuestMessageText": "friendlypmc-knight-my-land changeQuestMessageText",
@@ -275,7 +275,7 @@
 					"index": 0,
 					"parentId": "",
 					"status": [4],
-					"target": "friendlypmc-knight-competition",
+					"target": "6775d9957e2dbcb3bd0a02c7",
 					"visibilityConditions": []
 				}
 			],
@@ -822,7 +822,7 @@
 		"type": "Elimination"
 	},
 	"friendlypmc-knight-coverme": {
-		"QuestName": "Cover Me",
+		"QuestName": "Off Limits",
 		"_id": "friendlypmc-knight-coverme",
 		"acceptPlayerMessage": "friendlypmc-knight-coverme acceptPlayerMessage",
 		"canShowNotificationsInGame": true,

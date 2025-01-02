@@ -81,11 +81,11 @@ namespace friendlyPMC.Patches
     {
         protected override MethodBase GetTargetMethod()
         {
-            return AccessTools.Method(typeof(ItemSpecificationPanel), "method_17");
+            return AccessTools.Method(typeof(ItemSpecificationPanel), "method_21");
         }
 
         [PatchPrefix]
-        public static bool PatchPrefix(ItemSpecificationPanel __instance, ref KeyValuePair<EModLockedState, ModSlotView.GStruct398> __result, Slot slot)
+        public static bool PatchPrefix(ItemSpecificationPanel __instance, ref KeyValuePair<EModLockedState, ModSlotView.GStruct430> __result, Slot slot)
         {
             string itemName = (slot.ContainedItem != null) ? slot.ContainedItem.Name.Localized(null) : string.Empty;
             string id = (slot.ContainedItem != null) ? slot.ContainedItem.Id : null;
@@ -107,7 +107,7 @@ namespace friendlyPMC.Patches
 
                 if (!isBotEquiptment) return true;
 
-                __result = new KeyValuePair<EModLockedState, ModSlotView.GStruct398>(EModLockedState.RaidLock, new ModSlotView.GStruct398
+                __result = new KeyValuePair<EModLockedState, ModSlotView.GStruct430>(EModLockedState.RaidLock, new ModSlotView.GStruct430
                 {
                     Error = "<color=red>" + "Raid lock".Localized(null) + "</color>",
                     ItemName = itemName

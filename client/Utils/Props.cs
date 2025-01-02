@@ -64,8 +64,8 @@ namespace friendlyPMC.Utils
                 // order is important
                 new List<string>
                 {
-                    "friendlypmc-knight-competition",
-                    "friendlypmc-knight-my-land",
+                    "6775d9957e2dbcb3bd0a02c7",
+                    "6775da597e2dbcb3bd0a02c9",
                     "friendlypmc-knight-payback01",
                 }
             },
@@ -101,7 +101,7 @@ namespace friendlyPMC.Utils
                 new List<string> { "lighthouse", "bigmap", "shoreline", "woods" }
             },
             {
-                "friendlypmc-knight-my-land",
+                "6775da597e2dbcb3bd0a02c9",
                 new List<string> { "bigmap" }
             },
             {

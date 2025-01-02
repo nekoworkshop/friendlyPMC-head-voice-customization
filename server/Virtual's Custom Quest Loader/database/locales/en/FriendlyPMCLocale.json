@@ -62,8 +62,8 @@
 	"friendlypmc-knight-enemyspotted-target": "Assist BirdEye in eliminating 5 PMCs on Woods",
 	"friendlypmc-knight-enemyspotted-fail": "You and BirdEye must not die or leave the raid while the task is active (Status: KIA, Left the Action, MIA, Ran Through)",
 
-	"friendlypmc-knight-coverme name": "Cover me",
-	"friendlypmc-knight-coverme description": "Just got off the phone with Lightkeeper and he has soemthing for us. While what exactly it is, you don't need to know, but I do want you to go and have the Pier in Shoreline cleared out. Apparently some guys whill be showing up there for a meeting and Lightkeeper does not want anything spooking them off. Take BirdEye and BigPipe with you.",
+	"friendlypmc-knight-coverme name": "Off Limits",
+	"friendlypmc-knight-coverme description": "We have a situation where we need to secure the Pier in Shoreline and BirdEye suggested for you to tag along. He called it 'part of the test'. Go with him and BigPipe and make sure no one thinks of approauching that Pier.",
 	"friendlypmc-knight-coverme startedMessageText": "",
 	"friendlypmc-knight-coverme successMessageText": "Good job man, here is your reward.",
 	"friendlypmc-knight-coverme failMessageText": "Come on man, you want to be part of The Goons? You need to strike fear into these bastards so they stay away.",
@@ -75,7 +75,7 @@
 	"friendlypmc-knight-coverme-fail": "You and BirdEye must not die or leave the raid while the task is active (Status: KIA, Left the Action, MIA, Ran Through)",
 
 	"friendlypmc-knight-afavor name": "Seal the deal",
-	"friendlypmc-knight-afavor description": "BirdEye here. You can really handle yourself outhere, I like running with you. Listen, I want you to help with something. That Shturman guy needs a real lesson in manners. We where in the Woods approaching the sawmill when he started acting all crazy about how this is his turf and how I should just change my name to Bullseye Bob because I can't hit anything. Well, I think we should show him who is the real One-Tapper. Help me deliver a lesson to him he will never forget and you are in. What do you say?",
+	"friendlypmc-knight-afavor description": "BirdEye here, you can really handle yourself outhere, I like running with you. Listen, I want you to help with something. That Shturman guy needs a real lesson in manners. We where in the Woods approaching the sawmill when he started acting all crazy about how this is his turf and how I should just change my name to Bullseye Bob because I can't hit anything. Well, I think we should show him who is the real One-Tapper. Help me deliver a lesson to him he will never forget and you are in. What do you say?",
 	"friendlypmc-knight-afavor startedMessageText": "",
 	"friendlypmc-knight-afavor successMessageText": "Lovely, just lovely! That will teach him to mess with us.\n(You now have BirdEye as your friend which you can request to join you in raids. Note that he will not spawn if you have Squad Spawn enabled and is only available for PMC)",
 	"friendlypmc-knight-afavor failMessageText": "Just when I got my hopes up, you go ahead and let me down. Not cool man, not cool",

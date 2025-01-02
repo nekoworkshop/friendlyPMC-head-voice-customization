@@ -19,10 +19,10 @@ namespace friendlyPMC.Patches
         }
         protected override MethodBase GetTargetMethod()
         {
-            return AccessTools.Method(typeof(Class266), "SendRaidSettings");
+            return AccessTools.Method(typeof(Class301), "SendRaidSettings");
         }
         [PatchPostfix]
-        private static void PatchPostfix(Class266 __instance, RaidSettings settings)
+        private static void PatchPostfix(Class301 __instance, RaidSettings settings)
         {
             bool badGuy = friendlyPMC.badGuy.Value;
             
@@ -161,9 +161,9 @@ namespace friendlyPMC.Patches
     /** Patch having a raid group to prevent the game from going switching to online matching when starting a game **/
     internal class MainMenuControllerPatch : ModulePatch
     {
-        private static List<GClass1219> RemovedPlayers = new List<GClass1219>();
+        private static List<GClass1323> RemovedPlayers = new List<GClass1323>();
 
-        public static GClass3384<GClass1219> GroupPlayers { get; private set; }
+        public static GClass3771<GClass1323> GroupPlayers { get; private set; }
 
         protected override MethodBase GetTargetMethod()
         {
@@ -178,7 +178,7 @@ namespace friendlyPMC.Patches
 
             RemovedPlayers.Clear();
 
-            GClass1219 currentPlayer = matchmakerPlayerControllerClass.CurrentPlayer;
+            GClass1323 currentPlayer = matchmakerPlayerControllerClass.CurrentPlayer;
             foreach (var player in matchmakerPlayerControllerClass.GroupPlayers)
             {
                 if (player != currentPlayer)

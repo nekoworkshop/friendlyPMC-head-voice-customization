@@ -222,7 +222,7 @@ namespace friendlyPMC
             new BotGroupUsecEnemyPatch().Enable();
 
             new BotOwnerIsFolowerPatch().Enable();
-            new BotOwnerManualUpdatePatch().Enable();
+            new Patches.BotOwnerManualUpdatePatch().Enable();
             new BotOwnerActivatePatch().Enable();
 
             new PatrolDataFollowerPatch().Enable();
@@ -259,8 +259,8 @@ namespace friendlyPMC
             // patch sain in regards to Squad 
             SAINPatch.PatchSAINIfInstalled(harmony);
             // some error catchers here - they do not seem related to this mod
-            new GClass974Patch().Enable();
-            harmony.PatchAll(typeof(LookSensorPatch).Assembly);
+            //new GClass1069Patch().Enable();
+            //harmony.PatchAll(typeof(LookSensorPatch).Assembly);
             // patch hearing
             new HearingSensorPatch().Enable();
             new FootstepSoundPatch().Enable();
@@ -325,10 +325,10 @@ namespace friendlyPMC
                     {
                         Utils.Equipment.CustomPresets.Clear();
 
-                        equipBuilds.Values.Where((GClass3205 build) =>
+                        equipBuilds.Values.Where((GClass3582 build) =>
                         {
                             return build.BuildType == EEquipmentBuildType.Custom;
-                        }).ExecuteForEach((GClass3205 build) =>
+                        }).ExecuteForEach((GClass3582 build) =>
                         {
                             Utils.Equipment.CustomPresets.Add(build);
                         });
@@ -349,7 +349,7 @@ namespace friendlyPMC
                 UniformTopPair.Clear();
                 UniformBottomPair.Clear();
 
-                foreach (var suit in Singleton<CustomizationSolverClass>.Instance.AvailableSuites)
+                foreach (var suit in Singleton<GClass1597>.Instance.AvailableSuites)
                 {
                     if (suit.MainBodyPart == EBodyModelPart.Body || suit.MainBodyPart == EBodyModelPart.Feet)
                     {

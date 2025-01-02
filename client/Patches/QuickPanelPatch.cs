@@ -7,6 +7,7 @@ using friendlyPMC.Modules;
 using HarmonyLib;
 using System;
 using System.Reflection;
+using UnityEngine.Playables;
 
 namespace friendlyPMC.Patches
 {
@@ -28,21 +29,21 @@ namespace friendlyPMC.Patches
                     // original
                     LootItem lootItem = player.InteractableObject as LootItem;
                     bool flag = lootItem != null && lootItem.ItemOwner.RootItem.GetItemComponent<KeyComponent>() != null;
-                    bool flag2 = lootItem != null && lootItem.ItemOwner.RootItem is GClass2737;
+                    bool flag2 = lootItem != null && lootItem.ItemOwner.RootItem is MoneyItemClass;
                     bool flag3 = lootItem != null && (lootItem.ItemOwner.RootItem is Weapon || lootItem.ItemOwner.RootItem.GetItemComponent<KnifeComponent>() != null);
 
-                    // modification here
+                    // modification here - set what loot item will be picked up
                     if (lootItem != null && !flag && !flag2) InteractableObjects.SetCurLootItem(lootItem);
                     else InteractableObjects.SetCurLootItem(null);
 
+                    // original - loot command
                     __instance.method_7(EPhraseTrigger.LootKey, flag);
                     __instance.method_7(EPhraseTrigger.LootMoney, flag2);
                     __instance.method_7(EPhraseTrigger.LootWeapon, flag3);
                     __instance.method_7(EPhraseTrigger.LootGeneric, lootItem != null && !flag && !flag2 && !flag3);
-
-                    // modification here
-                    Corpse x = player.InteractableObject as Corpse;
-			        __instance.method_7(EPhraseTrigger.LootBody, false);
+                    // modification here - disable loot body and loot container command
+                    Corpse corpse = player.InteractableObject as Corpse;
+                    __instance.method_7(EPhraseTrigger.LootBody, false);
                     __instance.method_7(EPhraseTrigger.CheckHim, false);
                     __instance.method_7(EPhraseTrigger.LootContainer, false);
                 }
@@ -52,23 +53,24 @@ namespace friendlyPMC.Patches
                     Logger.LogError(e); 
                 }
 
+                // modification here - open door command
                 Door door = player.InteractableObject as Door;
                 try
                 {
-                    // modification here
                     InteractableObjects.SetCurDoor(door);
 
                     __instance.method_7(EPhraseTrigger.OpenDoor, door != null);
-                } 
-                catch (Exception e) 
+                }
+                catch (Exception e)
                 {
-                    Logger.LogError("Open Door Command Failed:"); 
+                    Logger.LogError("Open Door Command Failed:");
                     Logger.LogError(e);
                 }
 
+                // original
                 __instance.method_7(EPhraseTrigger.LockedDoor, door != null && (door.DoorState == EDoorState.Locked || door.DoorState == EDoorState.Shut));
 
-                // modification is here
+                // modification is here - cooperation command available only if bot is not a follower and is of the same side
                 try
                 {
                     if (player.InteractablePlayer != null && player.InteractablePlayer.IsAI && player.InteractablePlayer.HealthController.IsAlive)
@@ -83,13 +85,15 @@ namespace friendlyPMC.Patches
                         {
                             __instance.method_7(EPhraseTrigger.Cooperation, true);
                         }
-                    } else
+                    }
+                    else
                     {
                         __instance.method_7(EPhraseTrigger.Cooperation, false);
                     }
-                } catch (Exception e) 
+                }
+                catch (Exception e)
                 {
-                    Logger.LogError("Cooperation Command Failed:"); 
+                    Logger.LogError("Cooperation Command Failed:");
                     Logger.LogError(e);
                 }
 

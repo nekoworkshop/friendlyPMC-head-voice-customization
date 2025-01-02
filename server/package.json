@@ -4,7 +4,7 @@
 	"main": "src/Squad.js",
 	"license": "See License file",
 	"author": "Pit Alex",
-	"sptVersion": "3.9.*",
+	"sptVersion": "3.10.*",
 	"scripts": {
 		"setup:environment": "npm i",
 		"build:unzipped": "copyfiles -e \"./node_modules/**/*.*\" -e \"./dist/**/*.*\" -e \"./package-lock.json\" -e \"./tsconfig.json\" -e \"./src/Squad.js\" -e \"./src/PlayGround.ts\" -e \"./types/**/*\" \"./**/*.*\" ./friendlyPMC",

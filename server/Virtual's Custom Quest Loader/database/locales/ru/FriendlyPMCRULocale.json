@@ -63,8 +63,8 @@
 	"friendlypmc-knight-enemyspotted-target": "Помоги BirdEye устранить 5 ЧВК на локации Лес.",
 	"friendlypmc-knight-enemyspotted-fail": "Ты и BirdEye не должны погибнуть или покинуть рейд, пока задача активна (Статус: KIA, Покинул бой, MIA, Пробежка).",
 
-	"friendlypmc-knight-coverme name": "Прикрой меня",
-	"friendlypmc-knight-coverme description": "Только что говорил по телефону с Лайткипером, и у него есть кое-что для нас. Что именно, тебе знать не нужно, но я хочу, чтобы ты зачистил пирс на Побережье. Похоже, там собираются на встречу какие-то ребята, и Лайткипер не хочет, чтобы их что-то вспугнуло. Возьми с собой BirdEye и BigPipe.",
+	"friendlypmc-knight-coverme name": "Доступ Запрещен",
+	"friendlypmc-knight-coverme description": "У нас ситуация: нужно обеспечить безопасность причала на Шорлайне, и BirdEye предложил, чтобы ты присоединился. Он назвал это 'частью испытания'. Отправляйся с ним и BigPipe и убедись, что никто даже не подумает приблизиться к этому причалу.",
 	"friendlypmc-knight-coverme startedMessageText": "",
 	"friendlypmc-knight-coverme successMessageText": "Отличная работа, брат. Вот твоя награда.",
 	"friendlypmc-knight-coverme failMessageText": "Давай, брат, хочешь быть частью Гунов? Ты должен вселить страх в этих ублюдков, чтобы они держались подальше.",

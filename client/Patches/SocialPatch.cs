@@ -1,5 +1,6 @@
 ﻿using Comfort.Common;
 using EFT;
+using EFT.InventoryLogic;
 using EFT.Quests;
 using EFT.Trading;
 using HarmonyLib;
@@ -15,7 +16,7 @@ using UnityEngine;
 namespace friendlyPMC.Patches
 {
     /** Patch notification handler to help with making a bot friend part of our group **/
-    [HarmonyPatch(typeof(GClass3188<RaidSettings>))]
+    [HarmonyPatch(typeof(GClass3565<RaidSettings>))]
     [HarmonyPatch("SendInvite")]
     internal class SendInvitePatch
     {
@@ -56,7 +57,7 @@ namespace friendlyPMC.Patches
         }
 
         [PatchPostfix]
-        private static void PatchPostfix(SocialNetworkClass __instance, IChatInteractions session, InventoryControllerClass inventoryController, string version)
+        private static void PatchPostfix(SocialNetworkClass __instance, IChatInteractions session, InventoryController inventoryController, string version)
         {
             socialNetworkClass = __instance;
             iChatInteractions = session;
@@ -69,7 +70,7 @@ namespace friendlyPMC.Patches
             if (socialNetworkClass != null && delay < Time.time )
             {
                 delay = Time.time + 2;
-                iChatInteractions.GetFriendsList(new Callback<GClass930>(socialNetworkClass.method_13));
+                iChatInteractions.GetFriendsList(new Callback<GClass1010>(socialNetworkClass.method_13));
             }
         }
     }

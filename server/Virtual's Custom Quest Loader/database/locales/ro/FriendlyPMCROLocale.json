@@ -63,8 +63,8 @@
 	"friendlypmc-knight-enemyspotted-target": "Ajută-l pe BirdEye să elimine 5 PMCs pe Woods.",
 	"friendlypmc-knight-enemyspotted-fail": "Tu și BirdEye nu trebuie să muriți sau să părăsiți raidul cât timp sarcina este activă (Status: KIA, A părăsit acțiunea, MIA, Fugit).",
 
-	"friendlypmc-knight-coverme name": "Acoperă-mă",
-	"friendlypmc-knight-coverme description": "Tocmai am vorbit la telefon cu Lightkeeper, iar el are ceva pentru noi. Ce anume este, nu trebuie să știi, dar vreau să mergi și să cureți zona Pier de pe Shoreline. Se pare că niște băieți vor veni acolo pentru o întâlnire, iar Lightkeeper nu vrea să-i sperie nimic. Ia-i pe BirdEye și BigPipe cu tine.",
+	"friendlypmc-knight-coverme name": "Acces Interzis",
+	"friendlypmc-knight-coverme description": "Avem o situație în care trebuie să securizăm debarcaderul din Shoreline, iar BirdEye a sugerat să mergi și tu. A numit-o 'parte din test'. Mergi cu el și BigPipe și asigură-te că nimeni nu se gândește să se apropie de acel debarcader.",
 	"friendlypmc-knight-coverme startedMessageText": "",
 	"friendlypmc-knight-coverme successMessageText": "Bună treabă, omule. Iată recompensa ta.",
 	"friendlypmc-knight-coverme failMessageText": "Haide, omule, vrei să fii parte din Goons? Trebuie să le inspiri frică acestor nenorociți, ca să stea departe.",

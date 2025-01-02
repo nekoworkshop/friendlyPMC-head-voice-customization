@@ -20,14 +20,14 @@ namespace friendlyPMC.Patches
     internal class AIDataContructPatch : ModulePatch
     {
 
-        public static Dictionary<string,AIData> playerAIData = new Dictionary<string, AIData>();
+        public static Dictionary<string, GClass551> playerAIData = new Dictionary<string, GClass551>();
         protected override MethodBase GetTargetMethod()
         {
-            return AccessTools.Constructor(typeof(AIData), new Type[] { typeof(BotOwner), typeof(Player) });
+            return AccessTools.Constructor(typeof(GClass551), new Type[] { typeof(BotOwner), typeof(Player) });
         }
         // overwrite AIData to make it use our pitAIBossPlayer
         [PatchPostfix]
-        private static void PatchPostfix(AIData __instance, BotOwner owner, Player player)
+        private static void PatchPostfix(GClass551 __instance, BotOwner owner, Player player)
         {
             if (owner == null && player != null)
             {
@@ -41,7 +41,7 @@ namespace friendlyPMC.Patches
                         // replace AIBossPlayer with ours
                         if (boss != null)
                         {
-                            var field = AccessTools.Field(typeof(AIData), "<AIBossPlayer>k__BackingField");
+                            var field = AccessTools.Field(typeof(GClass551), "<AIBossPlayer>k__BackingField");
                             field.SetValue(__instance, boss);
                             Logger.LogInfo("Replaced AIBossPlayer in AIData with ours");
                         }
@@ -93,7 +93,7 @@ namespace friendlyPMC.Patches
                 pitAIBossPlayer boss = BossPlayers.GetBoss(__instance.Player.ProfileId);
                 if (boss != null)
                 {
-                    BotEventHandler.GClass599 info = new BotEventHandler.GClass599
+                    BotEventHandler.GClass659 info = new BotEventHandler.GClass659
                     {
                         phrase = (EPhraseTrigger)CustomPhrases.TeamStatus,
                         PlayerRequester = __instance.Player
@@ -116,13 +116,13 @@ namespace friendlyPMC.Patches
                 {
                     if (__instance.Player.HandsController is Player.FirearmController)
                     {
-                        (__instance.Player.HandsController as Player.FirearmController).CurrentOperation.ShowGesture(EGesture.ThatDirection);
+                        (__instance.Player.HandsController as Player.FirearmController).CurrentOperation.ShowGesture(EInteraction.ThereGesture);
 
                         foreach (var receiver in Receivers.GetReceivers())
                         {
-                            GClass453 data = new GClass453
+                            GClass501 data = new GClass501
                             {
-                                Gesture = (EGesture)CustomGestures.OverThere,
+                                Gesture = (EInteraction)CustomGestures.OverThere,
                                 Player = __instance.Player
                             };
 
@@ -132,7 +132,7 @@ namespace friendlyPMC.Patches
                     }
                     else if (__instance.Player.HandsIsEmpty)
                     {
-                        __instance.Player.HandsController.ShowGesture(EGesture.ThatDirection);
+                        __instance.Player.HandsController.ShowGesture(EInteraction.ThereGesture);
                     }
                 }
 
@@ -152,7 +152,7 @@ namespace friendlyPMC.Patches
         }
 
         [PatchPrefix]
-        private static void PatchPrefix(Player __instance, IPlayer aggressor, DamageInfo damageInfo, EBodyPart bodyPart, EDamageType lethalDamageType)
+        private static void PatchPrefix(Player __instance, IPlayer aggressor, DamageInfoStruct damageInfo, EBodyPart bodyPart, EDamageType lethalDamageType)
         {
             Player alivePlayerByProfileID = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(aggressor.ProfileId);
             if (alivePlayerByProfileID == null || aggressor == null || aggressor.Profile == null || aggressor.Profile.Info == null || aggressor.Profile.Info.Settings == null)

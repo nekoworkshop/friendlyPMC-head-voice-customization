@@ -63,8 +63,8 @@
 	"friendlypmc-knight-enemyspotted-target": "Unterstütze BirdEye beim Ausschalten von 5 PMCs auf Woods.",
 	"friendlypmc-knight-enemyspotted-fail": "Du und BirdEye dürft während der aktiven Aufgabe nicht sterben oder den Raid verlassen (Status: KIA, Hat die Aktion verlassen, MIA, Durchgelaufen).",
 
-	"friendlypmc-knight-coverme name": "Deck mich",
-	"friendlypmc-knight-coverme description": "Gerade ein Telefonat mit Lightkeeper gehabt, und er hat etwas für uns. Was genau es ist, musst du nicht wissen, aber ich will, dass du den Pier auf Shoreline freimachst. Offenbar werden dort ein paar Leute zu einem Treffen auftauchen, und Lightkeeper will nicht, dass sie durch irgendetwas verschreckt werden. Nimm BirdEye und BigPipe mit.",
+	"friendlypmc-knight-coverme name": "Zutritt Verboten",
+	"friendlypmc-knight-coverme description": "Wir haben eine Situation, bei der wir den Pier in Shoreline sichern müssen, und BirdEye hat vorgeschlagen, dass du mitkommst. Er nannte es 'Teil des Tests'. Gehe mit ihm und BigPipe und stelle sicher, dass niemand auf die Idee kommt, sich diesem Pier zu nähern.",
 	"friendlypmc-knight-coverme startedMessageText": "",
 	"friendlypmc-knight-coverme successMessageText": "Gute Arbeit, Mann. Hier ist deine Belohnung.",
 	"friendlypmc-knight-coverme failMessageText": "Komm schon, Mann, willst du Teil der Goons sein? Du musst diesen Bastarden Angst einjagen, damit sie wegbleiben.",

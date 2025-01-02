@@ -10,7 +10,7 @@ import { IPmcConfig } from "@spt/models/spt/config/IPmcConfig";
 
 import { ILogger } from "@spt/models/spt/utils/ILogger";
 
-import { Difficulty, IBotType } from "@spt/models/eft/common/tables/IBotType";
+import { IDifficulties, IBotType, IDifficultyCategories } from "@spt/models/eft/common/tables/IBotType";
 
 import { LogTextColor } from "@spt/models/spt/logging/LogTextColor";
 
@@ -34,7 +34,7 @@ import { MatchCallbacks } from "@spt/callbacks/MatchCallbacks";
 import { ProbabilityObjectArray, RandomUtil } from "@spt/utils/RandomUtil";
 import { BotGenerator } from "@spt/generators/BotGenerator";
 import { IBotBase } from "@spt/models/eft/common/tables/IBotBase";
-import { BotGenerationDetails } from "@spt/models/spt/bots/BotGenerationDetails";
+import { IBotGenerationDetails } from "@spt/models/spt/bots/BotGenerationDetails";
 
 import { ISendMessageDetails } from "@spt/models/spt/dialog/ISendMessageDetails";
 import { MessageType } from "@spt/models/enums/MessageType";
@@ -164,10 +164,10 @@ class friendlyPMC {
 			"BotDifficultyHelper",
 			(_t, result: BotDifficultyHelper) => {
 				if (!this.originalgetPmcDifficultySettings) {
-					this.originalgetPmcDifficultySettings = result.getPmcDifficultySettings.bind(result);
+					this.originalgetPmcDifficultySettings = result["getDifficultySettings"].bind(result);
 				}
 
-				result.getPmcDifficultySettings = this.getPmcDifficultySettings;
+				result["getDifficultySettings"] = this.getPmcDifficultySettings;
 			},
 			{ frequency: "Always" }
 		);
@@ -233,8 +233,12 @@ class friendlyPMC {
 
 		for (let k in PMCBOT.convertIntoPmcChance) {
 			PMCBOTVALUES.convertIntoPmcChance[k] = {};
-			PMCBOTVALUES.convertIntoPmcChance[k].min = 0;
-			PMCBOTVALUES.convertIntoPmcChance[k].max = 0;
+			for (let j in PMCBOT.convertIntoPmcChance[k]) {
+				PMCBOTVALUES.convertIntoPmcChance[k][j] = {
+					min: PMCBOT.convertIntoPmcChance[k][j].min,
+					max: PMCBOT.convertIntoPmcChance[k][j].max,
+				};
+			}
 		}
 
 		let groupStatus: { [key: string]: any } = {};
@@ -401,19 +405,8 @@ class friendlyPMC {
 					const conditionPromises: IBotBase[] = [];
 
 					for (const condition of info.Info.conditions) {
-						const botGenerationDetails = botController["getBotGenerationDetailsForWave"](
-							condition,
-							pmcProfile,
-							false,
-							{
-								// max should be between level and level + 5
-								max: level + 5,
-								// min should be between level - 5 and level
-								min: Math.max(1, level - 5),
-							},
-							botController["botConfig"].presetBatch[condition.Role],
-							false
-						);
+						const raidSettings = botController["getMostRecentRaidSettings"]();
+						const botGenerationDetails = botController["getBotGenerationDetailsForWave"](condition, pmcProfile, false, raidSettings, botController["botConfig"].presetBatch[condition.Role], false);
 
 						const preparedBotBase = botGenerator["getPreparedBotBase"](
 							botGenerationDetails.eventRole ?? botGenerationDetails.role, // Use eventRole if provided,
@@ -475,14 +468,18 @@ class friendlyPMC {
 					if (info.State) {
 						PMCBOT.isUsec = 0;
 						for (let k in PMCBOT.convertIntoPmcChance) {
-							PMCBOT.convertIntoPmcChance[k].min = 0;
-							PMCBOT.convertIntoPmcChance[k].max = 0;
+							for (let j in PMCBOT.convertIntoPmcChance[k]) {
+								PMCBOT.convertIntoPmcChance[k][j].min = 0;
+								PMCBOT.convertIntoPmcChance[k][j].max = 0;
+							}
 						}
 					} else {
 						PMCBOT.isUsec = PMCBOTVALUES.isUsec;
 						for (let k in PMCBOT.convertIntoPmcChance) {
-							PMCBOT.convertIntoPmcChance[k].min = PMCBOTVALUES.convertIntoPmcChance[k].min;
-							PMCBOT.convertIntoPmcChance[k].max = PMCBOTVALUES.convertIntoPmcChance[k].max;
+							for (let j in PMCBOT.convertIntoPmcChance[k]) {
+								PMCBOT.convertIntoPmcChance[k][j].min = PMCBOTVALUES.convertIntoPmcChance[k][j].min;
+								PMCBOT.convertIntoPmcChance[k][j].max = PMCBOTVALUES.convertIntoPmcChance[k][j].max;
+							}
 						}
 					}
 
@@ -549,7 +546,7 @@ class friendlyPMC {
 					let hasBigPipeQuest = false;
 					let hasBirdEyeQuest = false;
 					profile.Quests.forEach(quest => {
-						if (quest.qid == "friendlypmc-knight-competition" && quest.status == 4) {
+						if (quest.qid == "6775d9957e2dbcb3bd0a02c7" && quest.status == 4) {
 							hasKnightQuest = true;
 						}
 						if (["friendlypmc-knight-payback01"].includes(quest.qid) && quest.status == 4) {
@@ -613,7 +610,6 @@ class friendlyPMC {
 		const configServer = container.resolve<ConfigServer>("ConfigServer");
 
 		const Bots = configServer.getConfig<IBotConfig>(ConfigTypes.BOT);
-		const PMCBOT = configServer.getConfig<IPmcConfig>(ConfigTypes.PMC);
 
 		const databaseServer = container.resolve<DatabaseServer>("DatabaseServer");
 		const databaseImporter = container.resolve<ImporterUtil>("ImporterUtil");
@@ -639,9 +635,6 @@ class friendlyPMC {
 			this.Logger.error("friendlyPMC: bad language file for " + lang + " - falling back to en");
 			console.error(e);
 		}
-
-		// same side hostile is being changed elsewhere - do this to avoid unwanted outcome
-		PMCBOT.chanceSameSideIsHostilePercent = -1;
 
 		this.Bots = Bots;
 
@@ -706,7 +699,7 @@ class friendlyPMC {
 		container.resolve<DialogueController>("DialogueController").registerChatBot(knightBot);
 	}
 
-	private _makeFriendlyOrHostile(diff: Difficulty, pmcType: string) {
+	private _makeFriendlyOrHostile(diff: IDifficultyCategories, pmcType: string) {
 		const clearWrongEnemy = (mind: Record<string, string | number | boolean | string[]>, type: string) => {
 			const enemyList = <string[]>mind.ENEMY_BOT_TYPES;
 
@@ -794,10 +787,10 @@ class friendlyPMC {
 		return diff;
 	}
 
-	originalgetPmcDifficultySettings: BotDifficultyHelper["getPmcDifficultySettings"];
+	originalgetPmcDifficultySettings: BotDifficultyHelper["getDifficultySettings"];
 	/** Overwrite get difficulity method to patch the friendly/hostile settings */
-	getPmcDifficultySettings(pmcType: "bear" | "usec", difficulty: string, usecType: string, bearType: string): any {
-		const result = this.originalgetPmcDifficultySettings(pmcType, difficulty, usecType, bearType);
+	getPmcDifficultySettings(pmcType: "bear" | "usec", difficulty: string): any {
+		const result = this.originalgetPmcDifficultySettings(pmcType, difficulty);
 
 		return this._makeFriendlyOrHostile(result, pmcType);
 	}
@@ -811,7 +804,7 @@ class friendlyPMC {
 	}
 
 	originalGenerateBot: BotGenerator["generateBot"];
-	generateBot(sessionId: string, bot: IBotBase, botJsonTemplate: IBotType, botGenerationDetails: BotGenerationDetails) {
+	generateBot(sessionId: string, bot: IBotBase, botJsonTemplate: IBotType, botGenerationDetails: IBotGenerationDetails) {
 		const role = botGenerationDetails.role.toLowerCase();
 		// ensure goons have high chance of meds
 		if (role == "followerbirdeye" || role == "followerbigpipe" || role == "bossknight") {
