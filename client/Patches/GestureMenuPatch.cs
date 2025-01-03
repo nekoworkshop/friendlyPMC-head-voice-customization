@@ -36,7 +36,7 @@ namespace friendlyPMC.Patches
                         GesturesMenu.Class3160 @class = new GesturesMenu.Class3160();
                         @class.gesturesMenu_0 = __instance;
                         @class.isSituational = false;
-                        GestureBaseItem gestureBaseItem = item.CreateNewPhrase(phrase, @class.isSituational);
+                        GestureBaseItem gestureBaseItem = item.CreateNewPhrase(phrase, false);
                         gestureBaseItem.OnPointerClicked.Subscribe(new Action<GestureBaseItem.GStruct431>(@class.method_0));
                         list_1.Add(gestureBaseItem);
                     });
@@ -51,7 +51,7 @@ namespace friendlyPMC.Patches
                         GesturesMenu.Class3160 @class = new GesturesMenu.Class3160();
                         @class.gesturesMenu_0 = __instance;
                         @class.isSituational = false;
-                        GestureBaseItem gestureBaseItem = item.CreateNewPhrase((EPhraseTrigger)phrase, @class.isSituational);
+                        GestureBaseItem gestureBaseItem = item.CreateNewPhrase((EPhraseTrigger)phrase,false);
                         gestureBaseItem.OnPointerClicked.Subscribe(new Action<GestureBaseItem.GStruct431>(@class.method_0));
                         list_1.Add(gestureBaseItem);
                     });

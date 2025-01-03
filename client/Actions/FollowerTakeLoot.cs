@@ -14,6 +14,7 @@ using HarmonyLib;
 using EFT.Interactive;
 using Comfort.Common;
 using friendlyPMC.Requests;
+using Diz.LanguageExtensions;
 
 namespace friendlyPMC.Actions
 {
@@ -142,6 +143,7 @@ namespace friendlyPMC.Actions
                 //  - no space left
                 if (locationForItem == null)
                 {
+                    Modules.Logger.LogError("No location to put the item");
                     botOwner_0.BotTalk.TrySay(EPhraseTrigger.Negative, true);
                     ClearLoot();
                     return;
@@ -153,6 +155,7 @@ namespace friendlyPMC.Actions
                 // - failed to make the transaction
                 if (!moveResult.Succeeded)
                 {
+                    Modules.Logger.LogError(moveResult.Error.ToString());
                     ClearLoot();
                     return;
                 }
@@ -206,10 +209,15 @@ namespace friendlyPMC.Actions
         {
             foreach (EquipmentSlot slot in possibleSlots)
             {
-                ItemAddress itemAddress = botInventoryController.Inventory.Equipment.GetSlot(slot).FindLocationForItem(item, out var error);
-                if(itemAddress != null)
+                Slot slot2 = botInventoryController.Inventory.Equipment.GetSlot(slot);
+                Error error;
+                if (!slot2.Deleted)
                 {
-                    return itemAddress;
+                    ItemAddress itemAddress = slot2.FindLocationForItem(item, out error);
+                    if (itemAddress != null)
+                    {
+                        return itemAddress;
+                    }
                 }
             }
 

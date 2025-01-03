@@ -10,7 +10,6 @@ using UnityEngine;
 using System.Collections.Generic;
 using HarmonyLib;
 using EFT.InventoryLogic;
-using EFT.AnimatedInteractionsSubsystem.Models;
 
 namespace friendlyPMC.Components
 {
@@ -157,7 +156,7 @@ namespace friendlyPMC.Components
         public bool IsBossRequester(IPlayer requester)
         {
 
-            Modules.Logger.LogInfo("Bot Has Boss " + botOwner_0.BotFollower.HaveBoss);
+
             if (requester == null)
             {
                 return false;
@@ -181,9 +180,6 @@ namespace friendlyPMC.Components
             Modules.Logger.LogInfo("Gesture " + gesture);
             bool isBossCommunicating = IsBossRequester(data.Player);
 
-
-            Modules.Logger.LogInfo("isBossCommunicating " + isBossCommunicating);
-
             bool isAssisting = (botOwner_0.Brain.BaseBrain as FollowerBrain).currentTactic == "Assist";
 
             float gestusDistance = (botOwner_0.GetPlayer.Transform.position - data.Player.Transform.position).magnitude;
@@ -191,10 +187,6 @@ namespace friendlyPMC.Components
             bool shouldDefault = !BossPlayers.IsPlayerBoss(data.Player.ProfileId);
 
             bool notBusy = !botOwner_0.Memory.HaveEnemy;
-
-
-            Modules.Logger.LogInfo("shouldDefault " + shouldDefault);
-            Modules.Logger.LogInfo("notBusy " + notBusy);
 
             List<EInteraction> bossNoGesture = new List<EInteraction>
             {

@@ -245,18 +245,18 @@ namespace friendlyPMC.Actions
                             return;
                         }
                         
-                        if (sprinting)
-                        {
-                            botOwner_0.Mover.Sprint(false, false);
-                            sprinting = false;
-                        }
-
                         if (botOwner_0.GoToPoint(navMeshHit.position, true, -1f, false, true, true, false) != NavMeshPathStatus.PathComplete)
                         {
                             botOwner_0.StopMove();
                             bool_0 = true;
                             return;
                         } else if (!wasHit) botOwner_0.Steering.LookToMovingDirection();
+
+                        if (sprinting)
+                        {
+                            botOwner_0.Mover.Sprint(false, false);
+                            sprinting = false;
+                        }
                     }
                 }
                 // out of range of the boss

@@ -87,10 +87,11 @@ namespace friendlyPMC.Patches
         [PatchPrefix]
         private static bool PatchPrefix(GamePlayerOwner __instance, int actionId, bool aggressive)
         {
+            pitAIBossPlayer boss = BossPlayers.GetBoss(__instance.Player.ProfileId);
 
             if ((EPhraseTrigger)actionId == (EPhraseTrigger)CustomPhrases.TeamStatus)
             {
-                pitAIBossPlayer boss = BossPlayers.GetBoss(__instance.Player.ProfileId);
+
                 if (boss != null)
                 {
                     BotEventHandler.GClass659 info = new BotEventHandler.GClass659
@@ -106,7 +107,7 @@ namespace friendlyPMC.Patches
             } 
             else if ((EPhraseTrigger)actionId == (EPhraseTrigger)CustomPhrases.OverThere)
             {
-                pitAIBossPlayer boss = BossPlayers.GetBoss(__instance.Player.ProfileId);
+
                 if (boss != null)
                 {
                     InteractableObjects.CheckSeenEnemies(boss.Player());
@@ -116,7 +117,6 @@ namespace friendlyPMC.Patches
                 {
                     if (__instance.Player.HandsController is Player.FirearmController)
                     {
-                        (__instance.Player.HandsController as Player.FirearmController).CurrentOperation.ShowGesture(EInteraction.ThereGesture);
 
                         foreach (var receiver in Receivers.GetReceivers())
                         {
@@ -128,11 +128,13 @@ namespace friendlyPMC.Patches
 
                             receiver.Value.GestusShown(data);
                         }
+
+                        (__instance.Player.HandsController as Player.FirearmController).CurrentOperation.ShowGesture(EInteraction.ThereGesture);
 
                     }
                     else if (__instance.Player.HandsIsEmpty)
                     {
-                        __instance.Player.HandsController.ShowGesture(EInteraction.ThereGesture);
+                        
                         foreach (var receiver in Receivers.GetReceivers())
                         {
                             GClass501 data = new GClass501
@@ -143,11 +145,26 @@ namespace friendlyPMC.Patches
 
                             receiver.Value.GestusShown(data);
                         }
+
+                        __instance.Player.HandsController.ShowGesture(EInteraction.ThereGesture);
                     }
                 }
 
 
                 return false;
+            }
+            // fix for 0.15 not triggering the gesture shown event when it comes from the boss
+            if (boss != null && actionId <=9)
+            {
+
+                foreach (var receiver in Receivers.GetReceivers())
+                {
+                    receiver.Value.GestusShown(new GClass501
+                    {
+                        Gesture = (EInteraction)actionId,
+                        Player = boss.Player()
+                    });
+                }
             }
 
             return true;

@@ -108,17 +108,25 @@ namespace friendlyPMC.Components
         {
             if(info.PlayerRequester != null && info.PlayerRequester.ProfileId == realPlayer.ProfileId)
             {
-                if(info.phrase == (EPhraseTrigger)CustomPhrases.TeamStatus)
+                if (info.phrase == (EPhraseTrigger)CustomPhrases.TeamStatus)
+                {
                     PingTeamates.Instance.Ping(this);
+                    // fix for 0.15 not triggering the phrase said event for custom phrases
+                    foreach (var receiver in Receivers.GetReceivers())
+                    {
+                        receiver.Value.PhraseSaid(info);
+                    }
+                }
                 else if (info.phrase == EPhraseTrigger.OnRepeatedContact)
                 {
                     InteractableObjects.CheckSeenEnemies(Player());
                 }
             }
         }
-        private void GestusShown(GClass501 info)
+        public void GestusShown(GClass501 info)
         {
-            if(info.Player != null && info.Player.ProfileId == realPlayer.ProfileId)
+            Modules.Logger.LogInfo("GestusShown " + info.Gesture);
+            if (info.Player != null && info.Player.ProfileId == realPlayer.ProfileId)
             {
                 if (info.Gesture == (EInteraction)CustomGestures.OverThere)
                 {
