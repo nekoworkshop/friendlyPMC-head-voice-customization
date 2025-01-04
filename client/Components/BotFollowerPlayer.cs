@@ -503,6 +503,7 @@ namespace friendlyPMC.Components
                 }
                 else
                 {
+                    Modules.Logger.LogInfo("No more space in secure container for ammo");
                     break;
                 }
             }

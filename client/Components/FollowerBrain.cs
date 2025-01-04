@@ -191,7 +191,7 @@ namespace friendlyPMC.Components
             GClass36 layer = new FollowerAvoidDanger(_owner, 130);
             method_0(4, layer, true);
             // - weapon malfunction
-            GClass98 layer3 = new GClass98(_owner, 88);
+            GClass105 layer3 = new GClass105(_owner, 88);
             method_0(5, layer3, true);
             // - stay at position in prone mode
             GClass123 layer8 = new GClass123(_owner, 10, false, CoverLevel.Lay);

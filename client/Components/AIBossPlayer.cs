@@ -111,11 +111,6 @@ namespace friendlyPMC.Components
                 if (info.phrase == (EPhraseTrigger)CustomPhrases.TeamStatus)
                 {
                     PingTeamates.Instance.Ping(this);
-                    // fix for 0.15 not triggering the phrase said event for custom phrases
-                    foreach (var receiver in Receivers.GetReceivers())
-                    {
-                        receiver.Value.PhraseSaid(info);
-                    }
                 }
                 else if (info.phrase == EPhraseTrigger.OnRepeatedContact)
                 {

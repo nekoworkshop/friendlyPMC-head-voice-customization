@@ -617,7 +617,7 @@ namespace friendlyPMC.Modules
                                             var lockedField = AccessTools.Field(typeof(Slot), "<Locked>k__BackingField");
                                             if (lockedField != null)
                                             {
-                                                lockedField.SetValue(slot, true);
+                                                //lockedField.SetValue(slot, true);
                                             }
                                         }
                                     }

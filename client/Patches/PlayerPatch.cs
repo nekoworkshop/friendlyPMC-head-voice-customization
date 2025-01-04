@@ -101,6 +101,11 @@ namespace friendlyPMC.Patches
                     };
 
                     boss.PhraseSaid(info);
+
+                    foreach (var receiver in Receivers.GetReceivers())
+                    {
+                        receiver.Value.PhraseSaid(info);
+                    }
                 }
                 return false;
 

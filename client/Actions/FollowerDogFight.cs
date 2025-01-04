@@ -8,7 +8,7 @@ namespace friendlyPMC.Actions
      */
     public class FollowerDogFight : GClass183
     {
-        private GClass158 gclass136_1;
+        private GClass163 gclass136_1;
         public FollowerDogFight(BotOwner bot) : base(bot) {
            
         }
@@ -17,7 +17,7 @@ namespace friendlyPMC.Actions
         {
             if(gclass136_1 == null)
             {
-                gclass136_1 = AccessTools.Field(typeof(GClass160), "gclass158_0").GetValue(this) as GClass158;
+                gclass136_1 = AccessTools.Field(typeof(GClass183), "gclass158_0").GetValue(this) as GClass163;
             }
 
             EnemyInfo goalEnemy = botOwner_0.Memory.GoalEnemy;

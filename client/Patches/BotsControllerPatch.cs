@@ -1193,38 +1193,6 @@ namespace friendlyPMC.Patches
                         // first to try see if this profile has any custom equipment
                         if (botsProfile.TryGetValue(member.Key, out Profile profile))
                         {
-                            // - set what tactic this follower will have
-                            if (tactic != null && tactic != availableTactics[0])
-                            {
- 
-                                if (tactic == availableTactics[3])
-                                {
-                                    tactic = "Push";
-                                }
-                                else if (tactic == availableTactics[4])
-                                {
-                                    tactic = "Defend";
-                                }
-                                else if (tactic == availableTactics[2])
-                                {
-                                    tactic = "Marksman";
-                                    
-                                    // -- adjust sniper skill only for marskman
-                                    float maxSniper = 5500f;
-                                    float sniperIncrement = 102f;
-                                    int botLevel = profile.Info.Level;
-
-                                    float scaledSniper = Utils.Utils.GetScaledValue(0f, sniperIncrement, botLevel, maxSniper);
-                                    if (profile.Skills.Sniper.Current < scaledSniper)
-                                        profile.Skills.Sniper.SetCurrent(scaledSniper, true);
-                                }
-                                else if (tactic == availableTactics[1])
-                                {
-                                    tactic = "Guard";
-                                }
-
-                                profileTactic.Add(profile.ProfileId, tactic);
-                            }
 
                             botsData.AddProfile(profile);
                         }
@@ -1234,6 +1202,38 @@ namespace friendlyPMC.Patches
                             profile = await FetchMemberProfile(member, player.realPlayer.Profile, botCreator, side, type, @params);
 
                             botsData.AddProfile(profile);
+                        }
+
+                        // see what tactic this follower will have
+                        if (tactic != null && tactic != availableTactics[0])
+                        {
+
+                            if (tactic == availableTactics[3])
+                            {
+                                tactic = "Push";
+                            }
+                            else if (tactic == availableTactics[4])
+                            {
+                                tactic = "Defend";
+                            }
+                            else if (tactic == availableTactics[2])
+                            {
+                                tactic = "Marksman";
+
+                                // - adjust sniper skill only for marskman
+                                float maxSniper = 5500f;
+                                float sniperIncrement = 102f;
+                                int botLevel = profile.Info.Level;
+
+                                float scaledSniper = Utils.Utils.GetScaledValue(0f, sniperIncrement, botLevel, maxSniper);
+                                if (profile.Skills.Sniper.Current < scaledSniper)
+                                    profile.Skills.Sniper.SetCurrent(scaledSniper, true);
+                            }
+                            else if (tactic == availableTactics[1])
+                            {
+                                tactic = "Guard";
+                            }
+                            profileTactic.Add(profile.ProfileId, tactic);
                         }
                     }
 
@@ -1416,7 +1416,7 @@ namespace friendlyPMC.Patches
                         {
                             if(!HasFika()) Instance?.PreFetchPMCProfiles(playerBoss);
                         }
-                        else if (!HasFika())
+                        else
                             Instance?.CreateFollowerProfiles(playerBoss);
                     }
                 }

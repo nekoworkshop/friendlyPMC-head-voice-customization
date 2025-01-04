@@ -139,36 +139,23 @@ namespace friendlyPMC.Actions
                 }
 
                 // find an available grid in the equipment slots to which the key can be transferred
-                ItemAddress locationForItem = FindLocationForItem(item, possibleSlots, inventoryControllerClass);
-                //  - no space left
-                if (locationForItem == null)
+                bool wasTransferred = false;
+                foreach (EquipmentSlot slot in possibleSlots)
                 {
-                    Modules.Logger.LogError("No location to put the item");
-                    botOwner_0.BotTalk.TrySay(EPhraseTrigger.Negative, true);
-                    ClearLoot();
-                    return;
+                    if(botOwner_0.ItemTaker.method_10(slot, _lootItem))
+                    {
+                        wasTransferred = true;
+                        break;
+                    }
                 }
-
-                // initialize the transation to transfer the key to the bot
-                var moveResult = InteractionsHandlerClass.Move(item, locationForItem, inventoryControllerClass, true);
-
-                // - failed to make the transaction
-                if (!moveResult.Succeeded)
-                {
-                    Modules.Logger.LogError(moveResult.Error.ToString());
-                    ClearLoot();
-                    return;
-                }
-
-
-                // execute transaction
-                IResult result = await inventoryControllerClass.TryRunNetworkTransaction(moveResult, null);
+                
                 if (botOwner_0.IsDead || botOwner_0.BotState != EBotState.Active)
                 {
                     ClearLoot();
                     return;
                 }
-                if (result.Succeed && _follower.IsSquadMate)
+
+                if (wasTransferred && _follower.IsSquadMate)
                 {
                     InteractableObjects.StoreItem(botOwner_0, item);
                 }
@@ -203,25 +190,6 @@ namespace friendlyPMC.Actions
                 Modules.Logger.LogError(e);
                 ClearLoot();
             }
-        }
-
-        private ItemAddress FindLocationForItem(Item item, IEnumerable<EquipmentSlot> possibleSlots, InventoryController botInventoryController)
-        {
-            foreach (EquipmentSlot slot in possibleSlots)
-            {
-                Slot slot2 = botInventoryController.Inventory.Equipment.GetSlot(slot);
-                Error error;
-                if (!slot2.Deleted)
-                {
-                    ItemAddress itemAddress = slot2.FindLocationForItem(item, out error);
-                    if (itemAddress != null)
-                    {
-                        return itemAddress;
-                    }
-                }
-            }
-
-            return null;
         }
 
         private void ClearLoot()
