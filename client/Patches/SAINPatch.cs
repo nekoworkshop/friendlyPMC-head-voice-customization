@@ -24,6 +24,8 @@ namespace friendlyPMC.Patches
         private static Type enemyTalk = null;
         private static Type GroupClass = null;
 
+        private static Type BotHearingClass = null;
+
         public static void PatchSAINIfInstalled(Harmony harmony)
         {
             if (IsSAINInstalled())
@@ -38,16 +40,23 @@ namespace friendlyPMC.Patches
                 {
                     SAINEnableClass = Type.GetType("SAIN.SAINEnableClass, SAIN");
                 }
+
+
                 
-                if (enemyTalk != null)
+                if (enemyTalk == null)
                 {
                     enemyTalk = Type.GetType("SAIN.SAINComponent.Classes.Talk.EnemyTalk, SAIN");
 
                 }
 
-                if(GroupClass != null)
+                if(GroupClass == null)
                 {
                     GroupClass = Type.GetType("SAIN.SAINComponent.Classes.Talk.GroupTalk, SAIN");
+                }
+
+                if (BotHearingClass == null)
+                {
+                    BotHearingClass = Type.GetType("SAIN.Components.BotControllerSpace.Classes.BotHearingClass, SAIN");
                 }
 
                 if (squadType != null)
@@ -68,7 +77,7 @@ namespace friendlyPMC.Patches
 
                 if (GroupClass != null)
                 {
-                    harmony.Patch(AccessTools.Method(GroupClass, "EnemyConversation"), new HarmonyMethod(typeof(SAINPatch).GetMethod(nameof(PatchPlayerTalked), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance)));
+                    harmony.Patch(AccessTools.Method(GroupClass, "EnemyConversation"), new HarmonyMethod(typeof(SAINPatch).GetMethod(nameof(PatchEnemyConvesation), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance)));
                 }
 
                 if (squadType != null && SAINEnableClass != null)
@@ -178,6 +187,12 @@ namespace friendlyPMC.Patches
             }
 
             return true;
+        }
+
+        [HarmonyPrefix]
+        private static bool PatchEnemyConvesation(EPhraseTrigger trigger, ETagStatus status, Player player)
+        {
+            return PatchPlayerTalked(trigger, status, player);
         }
     }
 }

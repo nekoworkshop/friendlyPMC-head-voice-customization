@@ -37,10 +37,6 @@
 		"Name": "Dimensiunea echipei",
 		"Description": "Numărul de însoțitori care apar cu tine"
 	},
-	"badGuy": {
-		"Name": "Inamic",
-		"Description": "Ar trebui ca jucătorul să fie ostil tuturor boților PMC, indiferent de facțiune"
-	},
 	"extraPickups": {
 		"Name": "Numărul maxim de însoțitori ridicați",
 		"Description": "Numărul maxim de însoțitori pe care jucătorul îi poate ridica în timpul unui raid. Acest lucru este în plus față de echipă."
@@ -97,9 +93,13 @@
 		"Name": "Mesaje la sfârșitul raidului",
 		"Description": "Însoțitorii vor trimite un mesaj la sfârșitul raidului pe baza condițiilor, cum ar fi dacă toți au ieșit sau dacă ai ridicat un însoțitor și l-ai ținut în viață. Mesajele de returnare a obiectelor sunt excluse."
 	},
-	"sameSideHostile": {
-		"Name": "Hostil între boții PMC de aceeași parte",
-		"Description": "Boții PMC de aceeași parte să fie ostili unul față de celălalt (însoțitorii rămân prietenoși cu tine)."
+	"friendlyPMC": {
+		"Name": "Partea PMC Prietenoasă",
+		"Description": "Ar trebui ca boții PMC de pe aceeași parte să fie întotdeauna prietenoși unii cu alții"
+	},
+	"badGuy": {
+		"Name": "Inamic",
+		"Description": "Ar trebui ca jucătorul să fie ostil tuturor boților PMC, indiferent de facțiune"
 	},
 	"pmcArmbands": {
 		"Name": "Brățări PMC",

@@ -92,10 +92,11 @@
 		"Name": "Nachrichten am Ende des Raids",
 		"Description": "Folgespieler senden am Ende des Raids basierend auf Bedingungen wie ob alle rausgekommen sind oder ob Sie einen Folgespieler aufgenommen und ihn am Leben gehalten haben, eine Nachricht. Rückmeldungen zu Gegenständen sind ausgeschlossen."
 	},
-	"sameSideHostile": {
-		"Name": "Feindliche Bots der gleichen PMC-Seite",
-		"Description": "Sollten die PMC-Bots derselben Seite feindlich zueinander sein (Folgespieler bleiben freundlich zu Ihnen)."
+	"friendlyPMC": {
+		"Name": "Freundliche PMC-Seite",
+		"Description": "Sollten PMC-Bots derselben Seite immer freundlich zueinander sein"
 	},
+
 	"badGuy": {
 		"Name": "Böser",
 		"Description": "Sollte der Spieler gegenüber allen PMC-Bots, unabhängig von der Fraktion, feindlich eingestellt sein"

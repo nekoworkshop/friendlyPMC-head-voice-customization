@@ -108,7 +108,7 @@ namespace friendlyPMC
         public Dictionary<string, string> equipmentLock { get; set; }
         public Dictionary<string, string> npcSendMessage { get; set; }
 
-        public Dictionary<string, string> sameSideHostile { get; set; }
+        public Dictionary<string, string> friendlyPMC { get; set; }
         public Dictionary<string, string> badGuy { get; set; }
         public Dictionary<string, string> pmcArmbands { get; set; }
         public Dictionary<string, string> englishBear { get; set; }
@@ -166,7 +166,7 @@ namespace friendlyPMC
         public static ConfigEntry<bool> enemyMarker;
         public static ConfigEntry<bool> npcSendMessage;
 
-        public static ConfigEntry<bool> sameSideHostile;
+        public static ConfigEntry<bool> friendlyPMCFLAG;
         public static ConfigEntry<bool> badGuy;
 
         public static ConfigEntry<bool> pmcArmbands;
@@ -431,7 +431,7 @@ namespace friendlyPMC
 
             npcSendMessage = Config.Bind("II " + optionsLang.miscSettings, "7 " + optionsLang.npcSendMessage["Name"], true, new ConfigDescription(optionsLang.npcSendMessage["Description"],null, new ConfigurationManagerAttributes { Order = -700 }));
 
-            sameSideHostile = Config.Bind("II " + optionsLang.miscSettings, "8 " + optionsLang.sameSideHostile["Name"], false, new ConfigDescription(optionsLang.sameSideHostile["Description"],null, new ConfigurationManagerAttributes { Order = -800 }));
+            friendlyPMCFLAG = Config.Bind("II " + optionsLang.miscSettings, "8 " + optionsLang.friendlyPMC["Name"], true, new ConfigDescription(optionsLang.friendlyPMC["Description"],null, new ConfigurationManagerAttributes { Order = -800 }));
 
             badGuy = Config.Bind("II " + optionsLang.miscSettings, "9 " + optionsLang.badGuy["Name"], false, new ConfigDescription(optionsLang.badGuy["Description"], null, new ConfigurationManagerAttributes { Order = -900 }));
 

@@ -115,9 +115,9 @@
 		"Name": "Raid End Messages",
 		"Description": "Followers will send message at the end of the raid based on conditions such as if all made it out or if you picked up a follower and kept him alive. Return items messages are excluded"
 	},
-	"sameSideHostile": {
-		"Name": "Same PMC Side Hostile",
-		"Description": "Should PMC Bots of the same side be hostile to each other (followers remain friendly to you)"
+	"friendlyPMC": {
+		"Name": "Friendly PMC Side",
+		"Description": "Should PMC Bots of the same side always be friendly to each other"
 	},
 	"badGuy": {
 		"Name": "Bad Guy",

@@ -120,7 +120,6 @@ namespace friendlyPMC.Components
         }
         public void GestusShown(GClass501 info)
         {
-            Modules.Logger.LogInfo("GestusShown " + info.Gesture);
             if (info.Player != null && info.Player.ProfileId == realPlayer.ProfileId)
             {
                 if (info.Gesture == (EInteraction)CustomGestures.OverThere)

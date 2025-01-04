@@ -147,7 +147,7 @@ namespace friendlyPMC.Patches
             {
                 Config = new Dictionary<string, object>
                 {
-                    { "sameSideHostile", friendlyPMC.sameSideHostile.Value },
+                    { "friendlyPMC", friendlyPMC.friendlyPMCFLAG.Value },
                     { "badGuy", badGuy },
                     { "pmcArmbands", friendlyPMC.pmcArmbands.Value },
                     { "englishBear", friendlyPMC.englishBear.Value },

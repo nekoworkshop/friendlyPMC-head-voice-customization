@@ -98,7 +98,7 @@ namespace friendlyPMC.Patches
             WildSpawnType sptUsec = WildSpawnType.pmcUSEC;
 
             WildSpawnType roleh;
-            bool sameSideHostile = badGuyGroup;
+            bool sameSideFriendly = false;
 
             if (player.realPlayer.Side == EPlayerSide.Bear)
             {
@@ -113,7 +113,7 @@ namespace friendlyPMC.Patches
                 roleh = WildSpawnType.assault;
             }
 
-            if(!badGuyGroup) GetSameSideHostile(roleh, player.realPlayer.Side, out sameSideHostile);
+            if(!badGuyGroup) GetSameSideFriendly(roleh, player.realPlayer.Side, out sameSideFriendly);
 
             EPlayerSide side = player.realPlayer.Side;
 
@@ -135,17 +135,26 @@ namespace friendlyPMC.Patches
                 bt.Settings.FileSettings.Mind.USE_ADD_TO_ENEMY_VALIDATION = true;
                 bt.Settings.FileSettings.Mind.VALID_REASONS_TO_ADD_ENEMY = new EBotEnemyCause[] { };
 
-                if (side == EPlayerSide.Bear)
-                {
-                    bt.Settings.FileSettings.Mind.DEFAULT_BEAR_BEHAVIOUR = sameSideHostile ? EWarnBehaviour.AlwaysEnemies : EWarnBehaviour.Neutral;
-                    bt.Settings.FileSettings.Mind.DEFAULT_SAVAGE_BEHAVIOUR = EWarnBehaviour.AlwaysEnemies;
-                }
-                else
-                {
-                    bt.Settings.FileSettings.Mind.DEFAULT_USEC_BEHAVIOUR = sameSideHostile ? EWarnBehaviour.AlwaysEnemies : EWarnBehaviour.Neutral;
-                    bt.Settings.FileSettings.Mind.DEFAULT_SAVAGE_BEHAVIOUR = EWarnBehaviour.AlwaysEnemies;
-                }
+                bt.Settings.FileSettings.Mind.DEFAULT_SAVAGE_BEHAVIOUR = EWarnBehaviour.AlwaysEnemies;
 
+                if(badGuyGroup) 
+                {
+                    bt.Settings.FileSettings.Mind.DEFAULT_BEAR_BEHAVIOUR = EWarnBehaviour.AlwaysEnemies;
+                    bt.Settings.FileSettings.Mind.DEFAULT_USEC_BEHAVIOUR = EWarnBehaviour.AlwaysEnemies;
+                    
+                } 
+                else 
+                {
+
+                    if (side == EPlayerSide.Bear)
+                    {
+                        bt.Settings.FileSettings.Mind.DEFAULT_BEAR_BEHAVIOUR = sameSideFriendly ? EWarnBehaviour.AlwaysFriends : oldBehaviourBear;
+                    }
+                    else
+                    {
+                        bt.Settings.FileSettings.Mind.DEFAULT_USEC_BEHAVIOUR = sameSideFriendly ? EWarnBehaviour.AlwaysFriends : oldBehaviorUsec;
+                    }
+                }
                 foreach (BotOwner item2 in botSpawnerClass.method_4(bt))
                 {
                     list.Add(item2);
@@ -198,29 +207,20 @@ namespace friendlyPMC.Patches
             return botsGroup;
         }
 
-        private void GetSameSideHostile(WildSpawnType role, EPlayerSide side, out bool isHostile)
+        private void GetSameSideFriendly(WildSpawnType role, EPlayerSide side, out bool isFriends)
         {
-            isHostile = false;
+            isFriends = true;
 
             if(friendlyPMC.badGuy.Value || Utils.Utils.FlagGet("isBadGuy"))
             {
-                isHostile = true;
+                isFriends = false;
                 return;
             }
 
-            if(friendlyPMC.sameSideHostile.Value)
+            if(friendlyPMC.friendlyPMCFLAG.Value)
             {
-                isHostile = true;
                 return;
             }
-
-            /*BotSettingsComponents botSettingsComponents = GClass583.smethod_1(GClass583.CheckOnExclude(BotDifficulty.normal,role), role, false);
-            if(botSettingsComponents != null)
-            {
-                if (side == EPlayerSide.Bear) isHostile = botSettingsComponents.Mind.DEFAULT_BEAR_BEHAVIOUR.HasFlag(EWarnBehaviour.AlwaysEnemies);
-                else if (side == EPlayerSide.Usec) isHostile = botSettingsComponents.Mind.DEFAULT_USEC_BEHAVIOUR.HasFlag(EWarnBehaviour.AlwaysEnemies);
-                else isHostile = botSettingsComponents.Mind.DEFAULT_SAVAGE_BEHAVIOUR.HasFlag(EWarnBehaviour.AlwaysEnemies);
-            }*/
         }
 
         private async UniTask ActivateBotFollower(BotCreator botCreator, Profile profile, GClass649 position, BotZone zone,bool shallBeGroup, Func<BotOwner, BotZone, BotsGroup> GroupAction, Action<BotOwner> OnActivate,CancellationToken token)

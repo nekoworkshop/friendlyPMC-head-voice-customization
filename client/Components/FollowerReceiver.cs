@@ -177,7 +177,7 @@ namespace friendlyPMC.Components
         {
 
             EInteraction gesture = data.Gesture;
-            Modules.Logger.LogInfo("Gesture " + gesture);
+
             bool isBossCommunicating = IsBossRequester(data.Player);
 
             bool isAssisting = (botOwner_0.Brain.BaseBrain as FollowerBrain).currentTactic == "Assist";
@@ -1004,7 +1004,7 @@ namespace friendlyPMC.Components
                 {
                     if (notBusy && isClose)
                     {
-                        botOwner_0.Gesture.TryGestus(EInteraction.FriendlyGesture, false);
+                        botOwner_0.Gesture.TryGestus(EInteraction.FriendlyGesture, true);
                     }
                 }
                 else if (info.phrase == EPhraseTrigger.ExitLocated)

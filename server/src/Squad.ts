@@ -82,7 +82,7 @@ import { IGetRaidConfigurationRequestData } from "@spt/models/eft/match/IGetRaid
 
 class friendlyPMC {
 	config = {
-		sameSideHostile: false,
+		friendlyPMC: false,
 		badGuy: false,
 		armbands: true,
 		englishBear: true,
@@ -339,10 +339,10 @@ class friendlyPMC {
 
 					return httpResponseUtil.emptyResponse();
 				}),
-				new RouteAction("/client/raid/pitconfig", (url: string, info: { Config: { sameSideHostile: boolean; badGuy: boolean; englishBear: boolean; pmcArmbands: boolean; location: string } }, sessionID: string, output: string): any => {
+				new RouteAction("/client/raid/pitconfig", (url: string, info: { Config: { friendlyPMC: boolean; badGuy: boolean; englishBear: boolean; pmcArmbands: boolean; location: string } }, sessionID: string, output: string): any => {
 					this.config.armbands = info.Config.pmcArmbands;
 
-					this.config.sameSideHostile = info.Config.sameSideHostile;
+					this.config.friendlyPMC = info.Config.friendlyPMC;
 					this.config.badGuy = info.Config.badGuy;
 					this.config.englishBear = info.Config.englishBear;
 
@@ -708,23 +708,23 @@ class friendlyPMC {
 			if (idxl > -1) enemyList.splice(idxl, 1);
 		};
 
-		let is_hostile = this.config.sameSideHostile || false;
+		let is_friendly = this.config.friendlyPMC || false;
 		const is_bad_guy = this.config.badGuy || false;
 		pmcType = pmcType.toLowerCase();
 
 		// force the friendly mind here as some mods may overwrite things
 		if (pmcType == "bear" || pmcType == "usec" || pmcType == "sptbear" || pmcType == "sptusec" || pmcType == "pmcbear" || pmcType == "pmcusec") {
 			Object.assign(diff.Mind, {
-				DEFAULT_ENEMY_BEAR: pmcType == "usec" || pmcType == "sptusec" || pmcType == "pmcusec" || is_hostile,
+				DEFAULT_ENEMY_BEAR: is_friendly && (pmcType == "bear" || pmcType == "sptbear" || pmcType == "pmcbear") ? false : diff.Mind.DEFAULT_ENEMY_BEAR,
 				DEFAULT_ENEMY_SAVAGE: true,
-				DEFAULT_ENEMY_USEC: pmcType == "bear" || pmcType == "sptbear" || pmcType == "pmcbear" || is_hostile,
-				DEFAULT_BEAR_BEHAVIOUR: !is_bad_guy && !is_hostile && (pmcType == "bear" || pmcType == "sptbear" || pmcType == "pmcbear") ? "Neutral" : "AlwaysEnemies",
+				DEFAULT_ENEMY_USEC: is_friendly && (pmcType == "usec" || pmcType == "sptusec" || pmcType == "pmcusec") ? false : diff.Mind.DEFAULT_ENEMY_USEC,
+				DEFAULT_BEAR_BEHAVIOUR: is_friendly && (pmcType == "bear" || pmcType == "sptbear" || pmcType == "pmcbear") ? (!is_bad_guy ? "Neutral" : "Warn") : diff.Mind.DEFAULT_BEAR_BEHAVIOUR,
 				DEFAULT_SAVAGE_BEHAVIOUR: "AlwaysEnemies",
-				DEFAULT_USEC_BEHAVIOUR: !is_bad_guy && !is_hostile && (pmcType == "usec" || pmcType == "sptusec" || pmcType == "pmcusec") ? "Neutral" : "AlwaysEnemies",
-				CAN_RECIVE_PLAYER_REQUESTS: !is_hostile && !is_bad_guy,
-				CAN_RECEIVE_PLAYER_REQUESTS: !is_hostile && !is_bad_guy,
-				CAN_RECEIVE_PLAYER_REQUESTS_USEC: !is_hostile && !is_bad_guy,
-				CAN_RECEIVE_PLAYER_REQUESTS_BEAR: !is_hostile && !is_bad_guy,
+				DEFAULT_USEC_BEHAVIOUR: is_friendly && (pmcType == "usec" || pmcType == "sptusec" || pmcType == "pmcusec") ? (!is_bad_guy ? "Neutral" : "Warn") : diff.Mind.DEFAULT_BEAR_BEHAVIOUR,
+				CAN_RECIVE_PLAYER_REQUESTS: is_friendly && !is_bad_guy,
+				CAN_RECEIVE_PLAYER_REQUESTS: is_friendly && !is_bad_guy,
+				CAN_RECEIVE_PLAYER_REQUESTS_USEC: is_friendly && !is_bad_guy,
+				CAN_RECEIVE_PLAYER_REQUESTS_BEAR: is_friendly && !is_bad_guy,
 			});
 
 			const Core: { [key: string]: any } = {};
@@ -749,7 +749,7 @@ class friendlyPMC {
 				FRIEND_DEAD_AGR_LOW: -0.000001,
 			});
 
-			if (!is_hostile) {
+			if (is_friendly) {
 				if (pmcType == "bear" || pmcType == "sptbear" || pmcType == "pmcbear") {
 					clearWrongEnemy(diff.Mind, "sptBear");
 					clearWrongEnemy(diff.Mind, "bear");
@@ -762,7 +762,7 @@ class friendlyPMC {
 			}
 			// ensure these settings are set last as they are not dependent of "is_hostile" flag
 			Object.assign(diff.Mind, {
-				ENEMY_BY_GROUPS_PMC_PLAYERS: is_hostile || is_bad_guy,
+				ENEMY_BY_GROUPS_PMC_PLAYERS: !is_friendly || is_bad_guy,
 				CAN_RECEIVE_PLAYER_REQUESTS_SAVAGE: false,
 			});
 		} else if (pmcType == "assault") {
