@@ -712,15 +712,17 @@ class friendlyPMC {
 		const is_bad_guy = this.config.badGuy || false;
 		pmcType = pmcType.toLowerCase();
 
+		if (is_bad_guy) is_friendly = false;
+
 		// force the friendly mind here as some mods may overwrite things
 		if (pmcType == "bear" || pmcType == "usec" || pmcType == "sptbear" || pmcType == "sptusec" || pmcType == "pmcbear" || pmcType == "pmcusec") {
 			Object.assign(diff.Mind, {
 				DEFAULT_ENEMY_BEAR: is_friendly && (pmcType == "bear" || pmcType == "sptbear" || pmcType == "pmcbear") ? false : diff.Mind.DEFAULT_ENEMY_BEAR,
 				DEFAULT_ENEMY_SAVAGE: true,
 				DEFAULT_ENEMY_USEC: is_friendly && (pmcType == "usec" || pmcType == "sptusec" || pmcType == "pmcusec") ? false : diff.Mind.DEFAULT_ENEMY_USEC,
-				DEFAULT_BEAR_BEHAVIOUR: is_friendly && (pmcType == "bear" || pmcType == "sptbear" || pmcType == "pmcbear") ? (!is_bad_guy ? "Neutral" : "Warn") : diff.Mind.DEFAULT_BEAR_BEHAVIOUR,
+				DEFAULT_BEAR_BEHAVIOUR: is_bad_guy ? "AlwaysEnemies" : is_friendly && (pmcType == "bear" || pmcType == "sptbear" || pmcType == "pmcbear") ? "Neutral" : diff.Mind.DEFAULT_BEAR_BEHAVIOUR,
 				DEFAULT_SAVAGE_BEHAVIOUR: "AlwaysEnemies",
-				DEFAULT_USEC_BEHAVIOUR: is_friendly && (pmcType == "usec" || pmcType == "sptusec" || pmcType == "pmcusec") ? (!is_bad_guy ? "Neutral" : "Warn") : diff.Mind.DEFAULT_BEAR_BEHAVIOUR,
+				DEFAULT_USEC_BEHAVIOUR: is_bad_guy ? "AlwaysEnemies" : is_friendly && (pmcType == "usec" || pmcType == "sptusec" || pmcType == "pmcusec") ? "Neutral" : diff.Mind.DEFAULT_BEAR_BEHAVIOUR,
 				CAN_RECIVE_PLAYER_REQUESTS: is_friendly && !is_bad_guy,
 				CAN_RECEIVE_PLAYER_REQUESTS: is_friendly && !is_bad_guy,
 				CAN_RECEIVE_PLAYER_REQUESTS_USEC: is_friendly && !is_bad_guy,
