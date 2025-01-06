@@ -74,6 +74,8 @@ RELEASE NOTES (3.9)
 - removed "Same PMC Side Hostile" and replaced it with "Friendly PMC Side" which is on by default. This is in order to leave the new behavior that the game brings with PMC Karmato  take over when this is off.
 - Virtual's Custom Quest Loader is now a dependency
 - new quests added to unlock Knight as a friend (he will appear as a trader) and for unlocking the full Goons squad
+- - when starting the first quest exUsec are no longer hostile towards the player
+- - when completing the first quest, Knight will appear as a friend and the Goons are no longer hostile towards the player
 - fix having the gifter seen as an enemy to your followers
 
 ==================================================================================
