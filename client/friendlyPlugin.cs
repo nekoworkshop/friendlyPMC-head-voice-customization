@@ -26,7 +26,6 @@ using friendlyPMC.Components;
 using SPT.Common.Http;
 
 using SPT.Common.Utils;
-using SPT.SinglePlayer.Patches.RaidFix;
 
 namespace friendlyPMC
 {

@@ -415,8 +415,8 @@ class friendlyPMC {
 								if (["pmcUSEC", "pmcBEAR"].includes(setting.BotRole)) {
 									setting.BearPlayerBehaviour = this.config.badGuy || setting.BotRole == "pmcUSEC" ? "AlwaysEnemies" : "Neutral";
 									setting.UsecPlayerBehaviour = this.config.badGuy || setting.BotRole == "pmcBEAR" ? "AlwaysEnemies" : "Neutral";
-									setting.BearEnemyChance = setting.BotRole == "pmcBEAR" ? 0 : setting.BearEnemyChance;
-									setting.UsecEnemyChance = setting.BotRole == "pmcUSEC" ? 0 : setting.UsecEnemyChance;
+									setting.BearEnemyChance = setting.BotRole == "pmcBEAR" && this.config.friendlyPMC ? 0 : setting.BearEnemyChance;
+									setting.UsecEnemyChance = setting.BotRole == "pmcUSEC" && this.config.friendlyPMC ? 0 : setting.UsecEnemyChance;
 								}
 							});
 						}
@@ -738,6 +738,16 @@ class friendlyPMC {
 	}
 
 	private _makeFriendlyOrHostile(diff: IDifficultyCategories, pmcType: string) {
+		const is_bad_guy = this.config.badGuy || false;
+
+		if (is_bad_guy) {
+			Object.assign(diff.Mind, {
+				ENEMY_BY_GROUPS_PMC_PLAYERS: true,
+				CAN_RECEIVE_PLAYER_REQUESTS_SAVAGE: false,
+			});
+			return diff;
+		}
+
 		const clearWrongEnemy = (mind: Record<string, string | number | boolean | string[]>, type: string) => {
 			const enemyList = <string[]>mind.ENEMY_BOT_TYPES;
 
@@ -748,11 +758,9 @@ class friendlyPMC {
 			if (idxl > -1) enemyList.splice(idxl, 1);
 		};
 
-		let is_friendly = this.config.friendlyPMC || false;
-		const is_bad_guy = this.config.badGuy || false;
-		pmcType = pmcType.toLowerCase();
+		const is_friendly = this.config.friendlyPMC || false;
 
-		if (is_bad_guy) is_friendly = false;
+		pmcType = pmcType.toLowerCase();
 
 		// force the friendly mind here as some mods may overwrite things
 		if (pmcType == "bear" || pmcType == "usec" || pmcType == "sptbear" || pmcType == "sptusec" || pmcType == "pmcbear" || pmcType == "pmcusec") {
@@ -763,10 +771,10 @@ class friendlyPMC {
 				DEFAULT_BEAR_BEHAVIOUR: is_friendly && (pmcType == "bear" || pmcType == "sptbear" || pmcType == "pmcbear") ? "Neutral" : diff.Mind.DEFAULT_BEAR_BEHAVIOUR,
 				DEFAULT_SAVAGE_BEHAVIOUR: "AlwaysEnemies",
 				DEFAULT_USEC_BEHAVIOUR: is_friendly && (pmcType == "usec" || pmcType == "sptusec" || pmcType == "pmcusec") ? "Neutral" : diff.Mind.DEFAULT_BEAR_BEHAVIOUR,
-				CAN_RECIVE_PLAYER_REQUESTS: is_friendly && !is_bad_guy,
-				CAN_RECEIVE_PLAYER_REQUESTS: is_friendly && !is_bad_guy,
-				CAN_RECEIVE_PLAYER_REQUESTS_USEC: is_friendly && !is_bad_guy,
-				CAN_RECEIVE_PLAYER_REQUESTS_BEAR: is_friendly && !is_bad_guy,
+				CAN_RECIVE_PLAYER_REQUESTS: is_friendly ? true : diff.Mind.CAN_RECIVE_PLAYER_REQUESTS,
+				CAN_RECEIVE_PLAYER_REQUESTS: is_friendly ? true : diff.Mind.CAN_RECEIVE_PLAYER_REQUESTS,
+				CAN_RECEIVE_PLAYER_REQUESTS_USEC: is_friendly ? true : diff.Mind.CAN_RECEIVE_PLAYER_REQUESTS_USEC,
+				CAN_RECEIVE_PLAYER_REQUESTS_BEAR: is_friendly ? true : diff.Mind.CAN_RECEIVE_PLAYER_REQUESTS_BEAR,
 			});
 
 			const Core: { [key: string]: any } = {};
