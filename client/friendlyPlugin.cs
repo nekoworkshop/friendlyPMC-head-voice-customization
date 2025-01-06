@@ -274,6 +274,7 @@ namespace friendlyPMC
             new RaidStartPatch().Enable();
             new MainMenuControllerPatch().Enable();
             new MainMenuController74Patch().Enable();
+            new TarkovApplicationPatch().Enable();
             // quests related patches
             new PlayerKilledPatch().Enable();
             new ConditionCounterPatch().Enable();

@@ -30,15 +30,15 @@ namespace friendlyPMC.Patches
             {
                 foreach (var player in MainMenuControllerPatch.GroupPlayers)
                 {
-                    if(player.Id == "bossKnight")
+                    if(player.Id == "677c4e0cc7a538c4210d4d47")
                     {
                         Utils.Utils.FlagSet("spawnKnight", true);
                     }
-                    else if(player.Id == "followerBigPipe")
+                    else if(player.Id == "677c4e0cc7a538c4210d4d48")
                     {
                         Utils.Utils.FlagSet("spawnBigPipe", true);
                     }
-                    else if(player.Id == "followerBirdEye")
+                    else if(player.Id == "677c4e0cc7a538c4210d4d49")
                     {
                         Utils.Utils.FlagSet("spawnBirdEye", true);
                     }
@@ -235,4 +235,18 @@ namespace friendlyPMC.Patches
         }
     }
 
+    internal class TarkovApplicationPatch : ModulePatch
+    {  
+        protected override MethodBase GetTargetMethod()
+        {
+            return AccessTools.Method(typeof(TarkovApplication), "method_35");
+        }
+
+        // ensure RaidMode is local
+        [PatchPrefix]
+        private static void PatchPrefix(TarkovApplication __instance)
+        {
+            __instance.CurrentRaidSettings.RaidMode = ERaidMode.Local;
+        } 
+    }
 }
