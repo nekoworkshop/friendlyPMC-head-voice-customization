@@ -6,12 +6,32 @@
 	"friendlyEscaped": ["Gut, dass wir es geschafft haben.\nDanke, dass ich mitkommen durfte.", "Puh, gut, dass ich dich gefunden habe.\nIch wusste nicht, ob ich es schaffe. Danke!", "Kein ideales Ende, einige Teammitglieder verloren, aber wenigstens habe ich es rausgeschafft.", "Danke für die Hilfe. Ich bringe die Ausrüstung meiner gefallenen Teamkameraden zurück; das ist das Mindeste, was ich tun kann."],
 
 	"chatHelp": {
-		"joinRaid": "Ich kann mich dir in einem Raid anschließen, benutze den Befehl 'IN GRUPPE EINLADEN', damit ich mich dir anschließe. Wenn du BirdEye und BigPipe freigeschaltet hast, können sie auch mitmachen. Aber keine Extras - ich mag keine Menschenmengen.",
-		"giveWeapon": "Du kannst mir ein Waffenset geben, das ich nutzen soll. Sag einfach {0} und den Namen des Presets."
+		"joinRaid": {
+            "Knight": "Ich kann bei einem Raid mitmachen, benutze den Befehl 'INVITE TO GROUP', damit ich mich anschließen kann. Wenn du BirdEye und BigPipe freigeschaltet hast, können sie auch mitmachen. Aber keine Extras — überfüllte Gruppen sind nicht mein Ding.",
+            "BigPipe": "Ich kann bei einem Raid mitmachen, benutze den Befehl 'INVITE TO GROUP', damit ich mich anschließen kann. Die Jungs können auch mitmachen, aber keine Extras — überfüllte Gruppen sind nicht mein Ding.",
+            "BirdEye": "Ich bin gerne dabei für den Raid. Verwende den Befehl 'INVITE TO GROUP', wenn du bereit bist. Der Knight und BigPipe können auch mitkommen, aber keine Extras — Menschenmengen sind nicht mein Stil."
+        },
+        "giveWeapon": "Du kannst mir ein Waffenset geben, sage einfach {0} und den Namen des Presets.",
+        "weaponAccept": {
+            "Knight": ["Das gefällt mir, los geht's!", "Perfekt, ich bin bereit für Action!", "Das ist es! Lass uns loslegen."],
+            "BigPipe": "Ja, Baby, das gefällt mir. Los geht's!",
+            "BirdEye": "Sehr schön, mal sehen, was wir damit machen können."
+        },
+        "weaponReject": {
+            "Knight": ["Nicht mein Stil, was hast du sonst noch?", "Das reicht nicht. Zeig mir etwas Besseres.", "Beeindruckend, sehr schön... jetzt lass uns Paul Allens Waffe sehen.", "Nein, das ist nicht gut."],
+            "BigPipe": ["Das gefällt mir nicht, hast du noch etwas anderes?", "Nicht mein Stil, Mann, sorry.", "Nee, das passt nicht."],
+            "BirdEye": ["Tut mir leid, das ist nicht mein Geschmack.", "Nicht mein Stil, hast du etwas anderes?", "Sorry, aber ich bleibe bei dem, was ich habe."]
+        }
+
 	},
 	"chatResponses": {
-		"help": "Hier ist, was ich kann:"
-	},
+        "help": "Hier ist, was ich tun kann:",
+        "joinRaid": {
+            "Knight": ["Ich bin bereit!", "Lass uns Köpfe einschlagen!", "Kein Mut, kein Ruhm! Lass uns loslegen!", "Ich bin dabei!", "Los geht's!", "Rock'n'Roll!", "Zähl auf mich!", "Auf geht's!", "Laden und entsichern, Baby!", "Wax on, wax off. Wir sehen uns dort!"],
+            "BigPipe": ["Ich bin bereit!", "Zähl auf mich!", "Cowabunga! Lass uns rocken!", "Lass uns loslegen!", "Lass sie uns rauchen!", "Es ist Zeit, Baby!", "Rock'n'Roll!", "Ich bin dabei!", "Endlich! Etwas Action, wir sehen uns dort!", "Los geht's!"],
+            "BirdEye": ["Ein Schuss, ein Treffer. Lass es uns richtig machen.", "Präzision ist der Schlüssel. Lass uns loslegen.", "Keine Sorge, ich werde da sein... bevor sie es überhaupt bemerken.", "Kein Stress – Geduld gewinnt den Tag.", "Ich verfehle nie. Niemals.", "Wenn sich der Wind dreht, tue ich es auch. Wir sehen uns dort.", "Bereit!", "Ich werde das Letzte sein, was sie nie kommen sahen."]
+        }
+    },
 
 	"baseSettings": "Grundlegende Einstellungen",
 	"miscSettings": "Verschiedenes",

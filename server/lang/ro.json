@@ -6,13 +6,32 @@
 	"friendlyEscaped": ["Mă bucur că am reușit.\nMulțumesc că m-ai lăsat să te însoțesc.", "Uf, mă bucur că te-am găsit.\nNu știam dacă voi reuși. Mulțumesc!", "Nu este cel mai bun rezultat, pierzând câțiva colegi, dar mă bucur că măcar am ieșit.", "Mulțumesc pentru ajutor. Îmi car echipamentul colegilor căzuți înapoi; măcar atât pot să fac."],
 
 	"chatHelp": {
-		"joinRaid": "Pot să mă alătur ție într-un raid, folosește comanda 'INVITĂ ÎN GRUP' pentru a mă alătura. Dacă i-ai deblocat pe BirdEye și BigPipe, și ei se pot alătura. Dar fără extra - nu-mi place aglomerația.",
-		"giveWeapon": "Îmi poți da un set de arme de folosit, doar spune {0} și numele presetului."
+		"joinRaid": {
+            "Knight": "Pot să mă alătur la un raid, folosește comanda 'INVITE TO GROUP' pentru a mă include. Dacă ai deblocat BirdEye și BigPipe, pot veni și ei. Dar fără alți extra — aglomerația nu e stilul meu.",
+            "BigPipe": "Pot să mă alătur la un raid, folosește comanda 'INVITE TO GROUP' pentru a mă include. Băieții pot veni și ei, dar fără alți extra — aglomerația nu e stilul meu.",
+            "BirdEye": "Sunt bucuros să mă alătur raidului. Folosește comanda 'INVITE TO GROUP' când ești gata. Knight și BigPipe pot veni și ei, dar fără alți extra — mulțimile nu sunt pe gustul meu."
+        },
+        "giveWeapon": "Îmi poți oferi un set de arme, doar spune {0} și numele presetului.",
+        "weaponAccept": {
+            "Knight": ["Îmi place, hai să facem asta!", "Perfect, sunt gata de acțiune!", "Acum vorbim serios! Hai să facem treabă."],
+            "BigPipe": "Da, frate, îmi place. Hai să o facem!",
+            "BirdEye": "Foarte bine, să vedem ce putem face cu asta."
+        },
+        "weaponReject": {
+            "Knight": ["Nu e pe gustul meu, ce altceva mai ai?", "Asta nu merge. Arată-mi ceva mai bun.", "Impresionant, foarte frumos... acum să vedem arma lui Paul Allen.", "Nu, nu e bine."],
+            "BigPipe": ["Nu-mi place asta, mai ai altceva?", "Nu e stilul meu, frate, scuze.", "Nah, nu merge."],
+            "BirdEye": ["Îmi pare rău, nu e pe gustul meu.", "Nu-mi place asta, mai ai altceva?", "Îmi pare rău, dar rămân la ceea ce am."]
+        }
+
 	},
 	"chatResponses": {
-		"help": "Iată ce pot face:",
-		"joinRaid": ["Sunt pregătit, hai să mergem!", "Să-i dăm bice!", "Fără risc, fără câștig!", "Hai să o facem!", "E timpul să dăm drumul la muzică!", "Mă bag!", "Hai să dăm startul!", "Încarcă și dă-i bătaie!", "Ne vedem acolo!"]
-	},
+        "help": "Iată ce pot face:",
+        "joinRaid": {
+            "Knight": ["Sunt gata!", "Hai să le spargem capetele!", "Fără curaj, fără glorie! Hai să facem asta!", "Sunt în!", "Hai să începem!", "Rock and roll!", "Contează pe mine!", "Hai să mergem!", "Încarcă și pregătește-te, baby!", "Wax on, wax off. Ne vedem acolo!"],
+            "BigPipe": ["Sunt gata!", "Contează pe mine!", "Cowabunga! Hai să rock-uim!", "Hai să aprindem atmosfera!", "Să-i prăjim!", "Este timpul, baby!", "Rock and roll!", "Sunt în!", "În sfârșit! Un pic de acțiune, ne vedem acolo!", "Hai să facem asta!"],
+            "BirdEye": ["Un foc, o țintă. Hai să o facem cum trebuie.", "Precizia este cheia. Hai să facem asta.", "Nu-ți face griji, voi fi acolo... înainte să-și dea seama.", "Fără grabă – răbdarea câștigă ziua.", "Nu ratez niciodată. Niciodată.", "Când vântul se schimbă, la fel și eu. Ne vedem acolo.", "Gata!", "Voi fi ultimul lucru pe care nu l-au văzut niciodată venind."]
+        }
+    },
 
 	"baseSettings": "Setări de bază",
 	"miscSettings": "Diverse",
