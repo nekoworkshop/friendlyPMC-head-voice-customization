@@ -845,7 +845,7 @@ class friendlyPMC {
 	originalgetBotDifficulty: BotController["getBotDifficulty"];
 	/** Overwrite get difficulty method to patch the friendly/hostile settings */
 	getBotDifficulty(type: string, difficulty: string, raidConfig?: IGetRaidConfigurationRequestData, ignoreRaidSettings?: boolean): any {
-		let result = this.originalgetBotDifficulty(type, difficulty);
+		let result = this.originalgetBotDifficulty(type, difficulty, raidConfig, ignoreRaidSettings);
 
 		return this._makeFriendlyOrHostile(result, type);
 	}
@@ -863,6 +863,7 @@ class friendlyPMC {
 		}
 
 		const result = this.originalGenerateBot(sessionId, bot, botJsonTemplate, botGenerationDetails);
+        result.
 
 		return result;
 	}
