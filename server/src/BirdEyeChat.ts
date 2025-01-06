@@ -12,7 +12,7 @@ export class BirdEyeChatBot extends KnightChatBot {
 
 	getChatBot(): IUserDialogInfo {
 		return {
-			_id: "followerBirdEye",
+			_id: "677c4e0cc7a538c4210d4d49",
 			aid: 1113581,
 			Info: {
 				Level: 99,

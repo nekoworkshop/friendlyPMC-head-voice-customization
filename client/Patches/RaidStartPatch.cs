@@ -158,7 +158,12 @@ namespace friendlyPMC.Patches
         }
     }
 
-    /** Patch having a raid group to prevent the game from going switching to online matching when starting a game **/
+    /** 
+     * Patch having a raid group to prevent the game from going switching to online matching when starting a game 
+     * look for method doing:
+     * this.raidSettings_0.RaidMode = ERaidMode.Online
+     * and checking : this.matchmakerPlayerControllerClass.GroupPlayers.Count != 1
+     * **/
     internal class MainMenuControllerPatch : ModulePatch
     {
         private static List<GClass1323> RemovedPlayers = new List<GClass1323>();
@@ -167,7 +172,7 @@ namespace friendlyPMC.Patches
 
         protected override MethodBase GetTargetMethod()
         {
-            return AccessTools.Method(typeof(MainMenuController), "method_44");
+            return AccessTools.Method(typeof(MainMenuController), "method_46");
         }
 
         // ensure group is empty before moving to the next screen
@@ -210,12 +215,15 @@ namespace friendlyPMC.Patches
             GroupPlayers = matchmakerPlayerControllerClass.GroupPlayers;
         }
     }
-    /** Patch having a raid group to prevent the game from going switching to online matching when pressing "Ready" in the raid settings screen **/
+    /** 
+     * Patch having a raid group to prevent the game from going switching to online matching when pressing "Ready" in the raid settings screen 
+     * this is handler assigned to createRaidSettingsForProfileClass.OnShowReadyScreen
+     * **/
     internal class MainMenuController74Patch : ModulePatch
     {
         protected override MethodBase GetTargetMethod()
         {
-            return AccessTools.Method(typeof(MainMenuController), "method_75");
+            return AccessTools.Method(typeof(MainMenuController), "method_77");
         }
 
         // ensure RaidMode is local

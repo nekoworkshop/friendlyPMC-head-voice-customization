@@ -12,7 +12,7 @@ export class BigPipeChatBot extends KnightChatBot {
 
 	getChatBot(): IUserDialogInfo {
 		return {
-			_id: "followerBigPipe",
+			_id: "677c4e0cc7a538c4210d4d48",
 			aid: 1113580,
 			Info: {
 				Level: 99,

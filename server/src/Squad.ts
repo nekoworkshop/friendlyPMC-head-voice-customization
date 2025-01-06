@@ -548,59 +548,63 @@ class friendlyPMC {
 				}),
 				new RouteAction("/client/friend/list", async (url: string, info: any, sessionID: string, output: string): Promise<IGetBodyResponseData<IGetFriendListDataResponse>> => {
 					const list = dialogueController.getFriendList(sessionID);
-					const knightFriend = this.knightBot;
-					const bigPipeFriend = this.bigPipeBot;
-					const birdEyeFriend = this.birdEyeBot;
-					// Fika is removing Knight from the friend list, so we need to add him back
-					let friend = knightFriend.getChatBot();
-					if (list.Friends.findIndex(f => f.aid == friend.aid) == -1) {
-						list.Friends.push(friend);
-					}
-					// Fika is removing BigPipe from the friend list, so we need to add him back
-					friend = bigPipeFriend.getChatBot();
-					if (list.Friends.findIndex(f => f.aid == friend.aid) == -1) {
-						list.Friends.push(friend);
-					}
-					// Fika is removing BirdEye from the friend list, so we need to add him back
-					friend = birdEyeFriend.getChatBot();
-					if (list.Friends.findIndex(f => f.aid == friend.aid) == -1) {
-						list.Friends.push(friend);
-					}
-
-					const profile = profileHelper.getPmcProfile(sessionID);
-
-					// check what quests the player has completed to know if we allow the Goons to be in his friend list
-					let hasKnightQuest = false;
-					let hasBigPipeQuest = false;
-					let hasBirdEyeQuest = false;
-					profile.Quests.forEach(quest => {
-						if (quest.qid == "6775d9957e2dbcb3bd0a02c7" && quest.status == 4) {
-							hasKnightQuest = true;
+					try {
+						const knightFriend = this.knightBot;
+						const bigPipeFriend = this.bigPipeBot;
+						const birdEyeFriend = this.birdEyeBot;
+						// Fika is removing Knight from the friend list, so we need to add him back
+						let friend = knightFriend.getChatBot();
+						if (list.Friends.findIndex(f => f.aid == friend.aid) == -1) {
+							list.Friends.push(friend);
 						}
-						if (["67768936fa281ca31708b17c"].includes(quest.qid) && quest.status == 4) {
-							hasBigPipeQuest = true;
+						// Fika is removing BigPipe from the friend list, so we need to add him back
+						friend = bigPipeFriend.getChatBot();
+						if (list.Friends.findIndex(f => f.aid == friend.aid) == -1) {
+							list.Friends.push(friend);
+						}
+						// Fika is removing BirdEye from the friend list, so we need to add him back
+						friend = birdEyeFriend.getChatBot();
+						if (list.Friends.findIndex(f => f.aid == friend.aid) == -1) {
+							list.Friends.push(friend);
 						}
 
-						if (["67768a41fa281ca31708b182"].includes(quest.qid) && quest.status == 4) {
-							hasBirdEyeQuest = true;
+						const profile = profileHelper.getPmcProfile(sessionID);
+
+						// check what quests the player has completed to know if we allow the Goons to be in his friend list
+						let hasKnightQuest = false;
+						let hasBigPipeQuest = false;
+						let hasBirdEyeQuest = false;
+						profile.Quests.forEach(quest => {
+							if (quest.qid == "6775d9957e2dbcb3bd0a02c7" && quest.status == 4) {
+								hasKnightQuest = true;
+							}
+							if (["67768936fa281ca31708b17c"].includes(quest.qid) && quest.status == 4) {
+								hasBigPipeQuest = true;
+							}
+
+							if (["67768a41fa281ca31708b182"].includes(quest.qid) && quest.status == 4) {
+								hasBirdEyeQuest = true;
+							}
+						});
+
+						// low standing will result in the rest of the goons not being available
+						if (profile.TradersInfo["67768b19fa281ca31708b187"].standing < 0.5) {
+							hasBigPipeQuest = false;
+							hasBirdEyeQuest = false;
 						}
-					});
 
-					// low standing will result in the rest of the goons not being available
-					if (profile.TradersInfo["67768b19fa281ca31708b187"].standing < 0.5) {
-						hasBigPipeQuest = false;
-						hasBirdEyeQuest = false;
-					}
+						if (!hasKnightQuest) {
+							list.Friends = list.Friends.filter(friend => friend._id != knightFriend.getChatBot()._id);
+						}
+						if (!hasBigPipeQuest) {
+							list.Friends = list.Friends.filter(friend => friend._id != bigPipeFriend.getChatBot()._id);
+						}
 
-					if (!hasKnightQuest) {
-						list.Friends = list.Friends.filter(friend => friend._id != "bossKnight");
-					}
-					if (!hasBigPipeQuest) {
-						list.Friends = list.Friends.filter(friend => friend._id != "followerBigPipe");
-					}
-
-					if (!hasBirdEyeQuest) {
-						list.Friends = list.Friends.filter(friend => friend._id != "followerBirdEye");
+						if (!hasBirdEyeQuest) {
+							list.Friends = list.Friends.filter(friend => friend._id != birdEyeFriend.getChatBot()._id);
+						}
+					} catch (e) {
+						this.Logger.error("friendlyPMC: Error in friend list: " + e);
 					}
 
 					return httpResponseUtil.getBody(list);
@@ -863,7 +867,6 @@ class friendlyPMC {
 		}
 
 		const result = this.originalGenerateBot(sessionId, bot, botJsonTemplate, botGenerationDetails);
-        result.
 
 		return result;
 	}

@@ -72,7 +72,7 @@ export class KnightChatBot implements IDialogueChatBot {
 
 	getChatBot(): IUserDialogInfo {
 		return {
-			_id: this._botRole,
+			_id: "677c4e0cc7a538c4210d4d47",
 			aid: 1113579,
 			Info: {
 				Level: 99,
