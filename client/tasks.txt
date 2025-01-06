@@ -68,10 +68,10 @@
 RELEASE NOTES (3.9) 
 - update to SPT 3.10.x
 - you can no longer loot spawned followers equipment This does not apply to consumables like magazines, ammo, meds, etc.
-- "On Your Own" will now make followers patrol around the player with a configurable distance when out of combat. In order for this to work they must not be told to hold position and be out of combat. "Follow Me" can get them out of the patrol mode while still retaining the other settings that "On Your Own" has.
-- the mod can now work with different languages. It will based on the language you set for your game. There only 4 languages avalabile for now : English, Russian, German, Romanian. You can look into user/mods/friendlyPMC/lang and add more language jsons there (PM me with the file and I will add it to the mod) . For quests, languages are in mods\Virtual's Custom Quest Loader\database\locales - en\ge\ro\ru
-- added "Bad Guy" setting. This will make the player hostile to all factions. This will be on whenever you are running with the Goons.
-- remove "Same PMC Side Hostile" and replaced it with "Friendly PMC Side" which is on by default. This is in order to leave the new behavior that the game bring with PMC Karma take over when this is off.
+- "On Your Own" will now make followers patrol around the player with a configurable distance when out of combat. In order for this to work they must not be told to hold position and be out of combat. "Follow Me" can get them out of patrol mode while still retaining the other settings that "On Your Own" has.
+- the mod can now work with different languages. It will based on the language you set for your game. There are only 4 languages available for now: English, Russian, German, and Romanian. You can look into user/mods/friendlyPMC/lang and add more language jsons there (PM me with the file and I will add it to the mod) . For quests, languages are in mods\Virtual's Custom Quest Loader\database\locales - en\ge\ro\ru
+- added a "Bad Guy" setting. This will make the player hostile to all factions. This will be on whenever you are running with the Goons.
+- removed "Same PMC Side Hostile" and replaced it with "Friendly PMC Side" which is on by default. This is in order to leave the new behavior that the game brings with PMC Karmato  take over when this is off.
 - Virtual's Custom Quest Loader is now a dependency
 - new quests added to unlock Knight as a friend (he will appear as a trader) and for unlocking the full Goons squad
 - fix having the gifter seen as an enemy to your followers

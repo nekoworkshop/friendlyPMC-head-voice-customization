@@ -6,7 +6,7 @@ import { BotDifficultyHelper } from "@spt/helpers/BotDifficultyHelper";
 import { BotController } from "@spt/controllers/BotController";
 
 import { IBotConfig } from "@spt/models/spt/config/IBotConfig";
-import { IPmcConfig } from "@spt/models/spt/config/IPmcConfig";
+import { IHostilitySettings, IPmcConfig } from "@spt/models/spt/config/IPmcConfig";
 
 import { ILogger } from "@spt/models/spt/utils/ILogger";
 
@@ -79,6 +79,7 @@ import { IQuest } from "@spt/models/eft/common/tables/IQuest";
 
 import { objectCopy, objectForEach } from "./Utils";
 import { IGetRaidConfigurationRequestData } from "@spt/models/eft/match/IGetRaidConfigurationRequestData";
+import { IAdditionalHostilitySettings } from "@spt/models/eft/common/ILocationBase";
 
 class friendlyPMC {
 	config = {
@@ -109,6 +110,7 @@ class friendlyPMC {
 	profileHelper: ProfileHelper;
 
 	databaseService: DatabaseService;
+	databaseServer: DatabaseServer;
 
 	questItemEvent: PitQuestItemEventRouter;
 
@@ -124,6 +126,8 @@ class friendlyPMC {
 	myDBFolder = "";
 
 	modFolderName: string;
+
+	private _hostilitySettings: { [key: string]: IAdditionalHostilitySettings[] } = {};
 
 	preSptLoad(container: DependencyContainer) {
 		this.Logger = container.resolve("WinstonLogger");
@@ -160,7 +164,7 @@ class friendlyPMC {
 		this.randomUtil = randomUtil;
 
 		// patch getPmcDifficultySettings as that is where we actually make the bots be friendly
-		/* this.getPmcDifficultySettings = this.getPmcDifficultySettings.bind(this);
+		this.getPmcDifficultySettings = this.getPmcDifficultySettings.bind(this);
 		container.afterResolution(
 			"BotDifficultyHelper",
 			(_t, result: BotDifficultyHelper) => {
@@ -172,7 +176,6 @@ class friendlyPMC {
 			},
 			{ frequency: "Always" }
 		);
-        */
 		// patch getBotDifficulty as that is where we actually make the bots be friendly
 		this.getBotDifficulty = this.getBotDifficulty.bind(this);
 		container.afterResolution(
@@ -241,7 +244,6 @@ class friendlyPMC {
 				};
 			}
 		}
-
 		let groupStatus: { [key: string]: any } = {};
 
 		staticRouterModService.registerStaticRouter(
@@ -389,8 +391,36 @@ class friendlyPMC {
 							Bear_3: 1,
 						};
 					}
+					// change bot location hostility settings based on our config
+					const locations = this.databaseServer.getTables().locations;
+					for (let k in locations) {
+						const loc: (typeof locations)["bigmap"] = locations[k];
+						if (!loc.base || loc.base.Name == "Private Sector" || loc.base.Name == "Terminal" || loc.base.Name == "Town" || loc.base.Name == "Suburbs" || loc.base.Name == "Arena") continue;
 
-					const pmc = this.profileHelper.getPmcProfile(sessionID);
+						if (!loc.base.BotLocationModifier?.AdditionalHostilitySettings) continue;
+
+						loc.base.BotLocationModifier.AdditionalHostilitySettings = objectCopy(this._hostilitySettings[k]);
+
+						if (!this.config.friendlyPMC) {
+							if (this.config.badGuy) {
+								loc.base.BotLocationModifier.AdditionalHostilitySettings.forEach(setting => {
+									if (["pmcUSEC", "pmcBEAR"].includes(setting.BotRole)) {
+										setting.BearPlayerBehaviour = "AlwaysEnemies";
+										setting.UsecPlayerBehaviour = "AlwaysEnemies";
+									}
+								});
+							}
+						} else {
+							loc.base.BotLocationModifier.AdditionalHostilitySettings.forEach(setting => {
+								if (["pmcUSEC", "pmcBEAR"].includes(setting.BotRole)) {
+									setting.BearPlayerBehaviour = this.config.badGuy || setting.BotRole == "pmcUSEC" ? "AlwaysEnemies" : "Neutral";
+									setting.UsecPlayerBehaviour = this.config.badGuy || setting.BotRole == "pmcBEAR" ? "AlwaysEnemies" : "Neutral";
+									setting.BearEnemyChance = setting.BotRole == "pmcBEAR" ? 0 : setting.BearEnemyChance;
+									setting.UsecEnemyChance = setting.BotRole == "pmcUSEC" ? 0 : setting.UsecEnemyChance;
+								}
+							});
+						}
+					}
 
 					return httpResponseUtil.emptyResponse();
 				}),
@@ -610,6 +640,7 @@ class friendlyPMC {
 		const Bots = configServer.getConfig<IBotConfig>(ConfigTypes.BOT);
 
 		const databaseServer = container.resolve<DatabaseServer>("DatabaseServer");
+		this.databaseServer = databaseServer;
 		const databaseImporter = container.resolve<ImporterUtil>("ImporterUtil");
 
 		const tables = databaseServer.getTables();
@@ -641,6 +672,15 @@ class friendlyPMC {
 		this.myDBFolder = `${this.preSptModLoader.getModPath(this.modFolderName)}database/`;
 		this.mydb = databaseImporter.loadRecursive(this.myDBFolder);
 		this.questItemEvent.ModDB(this.mydb, this.myDBFolder);
+
+		const locations = tables.locations;
+		for (let k in locations) {
+			const loc: (typeof locations)["bigmap"] = locations[k];
+			if (!loc.base || loc.base.Name == "Private Sector" || loc.base.Name == "Terminal" || loc.base.Name == "Town" || loc.base.Name == "Suburbs" || loc.base.Name == "Arena") continue;
+
+			if (!loc.base.BotLocationModifier?.AdditionalHostilitySettings) continue;
+			this._hostilitySettings[k] = objectCopy(loc.base.BotLocationModifier.AdditionalHostilitySettings);
+		}
 
 		// add new items to the database
 		for (let item of this.mydb.pit_items.items) {
@@ -720,9 +760,9 @@ class friendlyPMC {
 				DEFAULT_ENEMY_BEAR: is_friendly && (pmcType == "bear" || pmcType == "sptbear" || pmcType == "pmcbear") ? false : diff.Mind.DEFAULT_ENEMY_BEAR,
 				DEFAULT_ENEMY_SAVAGE: true,
 				DEFAULT_ENEMY_USEC: is_friendly && (pmcType == "usec" || pmcType == "sptusec" || pmcType == "pmcusec") ? false : diff.Mind.DEFAULT_ENEMY_USEC,
-				DEFAULT_BEAR_BEHAVIOUR: is_bad_guy ? "AlwaysEnemies" : is_friendly && (pmcType == "bear" || pmcType == "sptbear" || pmcType == "pmcbear") ? "Neutral" : diff.Mind.DEFAULT_BEAR_BEHAVIOUR,
+				DEFAULT_BEAR_BEHAVIOUR: is_friendly && (pmcType == "bear" || pmcType == "sptbear" || pmcType == "pmcbear") ? "Neutral" : diff.Mind.DEFAULT_BEAR_BEHAVIOUR,
 				DEFAULT_SAVAGE_BEHAVIOUR: "AlwaysEnemies",
-				DEFAULT_USEC_BEHAVIOUR: is_bad_guy ? "AlwaysEnemies" : is_friendly && (pmcType == "usec" || pmcType == "sptusec" || pmcType == "pmcusec") ? "Neutral" : diff.Mind.DEFAULT_BEAR_BEHAVIOUR,
+				DEFAULT_USEC_BEHAVIOUR: is_friendly && (pmcType == "usec" || pmcType == "sptusec" || pmcType == "pmcusec") ? "Neutral" : diff.Mind.DEFAULT_BEAR_BEHAVIOUR,
 				CAN_RECIVE_PLAYER_REQUESTS: is_friendly && !is_bad_guy,
 				CAN_RECEIVE_PLAYER_REQUESTS: is_friendly && !is_bad_guy,
 				CAN_RECEIVE_PLAYER_REQUESTS_USEC: is_friendly && !is_bad_guy,
