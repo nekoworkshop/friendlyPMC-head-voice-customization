@@ -15,7 +15,7 @@ export class BigPipeChatBot extends KnightChatBot {
 			_id: "677c4e0cc7a538c4210d4d48",
 			aid: 1113580,
 			Info: {
-				Level: 99,
+				Level: 60,
 				MemberCategory: MemberCategory.SHERPA,
 				SelectedMemberCategory: MemberCategory.SHERPA,
 				Nickname: "BigPipe",

@@ -615,9 +615,6 @@ class friendlyPMC {
 				new RouteAction("/client/match/raid/not-ready", async (url: string, info: any, sessionID: string, output: string): Promise<any> => {
 					return httpResponseUtil.getBody(true);
 				}),
-				new RouteAction("/client/match/available", async (url: string, info: any, sessionID: string, output: string): Promise<any> => {
-					return httpResponseUtil.getBody(true);
-				}),
 				new RouteAction("/client/match/group/pitstatus", async (url: string, info: { Players: string[] }, sessionID: string, output: string) => {
 					clearTimeout(groupStatus[sessionID]);
 					groupStatus[sessionID] = setTimeout(() => {

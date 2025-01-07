@@ -63,7 +63,7 @@
 	"friendlypmc-knight-enemyspotted-fail": "You and BirdEye must not die or leave the raid while the task is active (Status: KIA, Left the Action, MIA, Ran Through)",
 
 	"friendlypmc-knight-coverme name": "Off Limits",
-	"friendlypmc-knight-coverme description": "We have a situation where we need to secure the Pier in Shoreline and BirdEye suggested for you to tag along. He called it 'part of the test'. Go with him and BigPipe and make sure no one thinks of approauching that Pier.",
+	"friendlypmc-knight-coverme description": "We have a situation where we need to secure the Pier in Shoreline and BirdEye suggested for you to tag along. He called it 'part of the test'. Go with him and BigPipe and make sure no one thinks of approaching that Pier.",
 	"friendlypmc-knight-coverme startedMessageText": "",
 	"friendlypmc-knight-coverme successMessageText": "Good job man, here is your reward.",
 	"friendlypmc-knight-coverme failMessageText": "Come on man, you want to be part of The Goons? You need to strike fear into these bastards so they stay away.",

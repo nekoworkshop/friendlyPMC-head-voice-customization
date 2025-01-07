@@ -82,6 +82,9 @@ RELEASE NOTES (3.9)
 Issues:
 - transit won't work while in a group with the Goons
 - sometimes bots can pick up enemies far away and start running towards them
+- "Bad Guy" flag does not always make all same side bots hostile (some can spawn in a "warning" mode where they won't attack you until you get close enough to them)
+- "friendly PMC side" flag does not always make all same side bots friendly (the "warning" mode can affect this one as well - it's something new in the game and can't be fully disabled)
+- bots in "Assist" tactic will not turn hostile on accidental shots (this means bots you picked up during raids, Scav followers or Goons)
 ==================================================================================
 NOTES:
 - we can save a bot's profile after it was generated in order to be re-used by simply sending the profile to BE. We should save it by nickname. (we still need to figure out how to progress the bot's level with the player )

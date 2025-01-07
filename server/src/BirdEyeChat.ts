@@ -15,7 +15,7 @@ export class BirdEyeChatBot extends KnightChatBot {
 			_id: "677c4e0cc7a538c4210d4d49",
 			aid: 1113581,
 			Info: {
-				Level: 99,
+				Level: 60,
 				MemberCategory: MemberCategory.SHERPA,
 				SelectedMemberCategory: MemberCategory.SHERPA,
 				Nickname: "BirdEye",

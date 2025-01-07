@@ -75,7 +75,7 @@ export class KnightChatBot implements IDialogueChatBot {
 			_id: "677c4e0cc7a538c4210d4d47",
 			aid: 1113579,
 			Info: {
-				Level: 99,
+				Level: 60,
 				MemberCategory: MemberCategory.SHERPA,
 				SelectedMemberCategory: MemberCategory.SHERPA,
 				Nickname: "Knight",
@@ -108,10 +108,12 @@ export class KnightChatBot implements IDialogueChatBot {
 		const botRole = botGenerationDetails.role;
 		const botJsonTemplateClone = this.botController["cloner"].clone(this.botController["botHelper"].getBotTemplate(botRole));
 
-		botGenerationDetails.botRelativeLevelDeltaMax = 1;
+		botGenerationDetails.botRelativeLevelDeltaMax = 50;
 		botGenerationDetails.botRelativeLevelDeltaMin = 1;
 
 		const result = this.botGenerator["generateBot"](sessionId, preparedBotBase, botJsonTemplateClone, botGenerationDetails);
+		result.Info.Level = 60;
+		result.Info.Experience = 9999999;
 
 		const info = Object.assign(this.getChatBot(), { GameVersion: "edge_of_darkness" });
 
