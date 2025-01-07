@@ -415,7 +415,10 @@ namespace friendlyPMC.Components
             // - friendly bot never gets tired
             bot.GetPlayer.Physical.Stamina.ForceMode = true;
             bot.GetPlayer.Physical.HandsStamina.ForceMode = true;
+            // - need no food
             bot.GetPlayer.HealthController.DisableMetabolism();
+            // - and blackout does not affect them
+            bot.GetPlayer.ActiveHealthController.DoPainKiller();
             // - have followers share the same groupId as the player
             bot.GetPlayer.Profile.Info.GroupId = _player.realPlayer.GroupId;
             bot.GetPlayer.Profile.Info.TeamId = _player.realPlayer.Profile.Info.TeamId;

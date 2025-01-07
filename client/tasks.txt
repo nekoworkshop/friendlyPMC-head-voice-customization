@@ -81,7 +81,7 @@ RELEASE NOTES (3.9)
 - fix having the gifter seen as an enemy to your followers
 Issues:
 - transit won't work while in a group with the Goons
-
+- sometimes bots can pick up enemies far away and start running towards them
 ==================================================================================
 NOTES:
 - we can save a bot's profile after it was generated in order to be re-used by simply sending the profile to BE. We should save it by nickname. (we still need to figure out how to progress the bot's level with the player )

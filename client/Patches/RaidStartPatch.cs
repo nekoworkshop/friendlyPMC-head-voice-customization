@@ -82,6 +82,11 @@ namespace friendlyPMC.Patches
                                 if (!friendlyPMC.squadSpawn.Value && isGoonQuest)
                                 {
                                     Utils.Utils.FlagSet("questGoons", true);
+                                    // - when doing Goons quests, we reset any other companions
+                                    Utils.Utils.FlagSet("spawnKnight", false);
+                                    Utils.Utils.FlagSet("spawnBigPipe", false);
+                                    Utils.Utils.FlagSet("spawnBirdEye", false);
+
                                     // - when doing Goons quests, we are always bad guys
                                     Utils.Utils.FlagSet("isBadGuy", true);
                                     badGuy = true;
@@ -118,9 +123,6 @@ namespace friendlyPMC.Patches
 
             if (questCompanions.Count > 0)
             {
-                Utils.Utils.FlagSet("spawnKnight", false);
-                Utils.Utils.FlagSet("spawnBigPipe", false);
-                Utils.Utils.FlagSet("spawnBirdEye", false);
                 questCompanions.ForEach(companion =>
                 {
                     if (companion == "bossKnight")
@@ -189,7 +191,7 @@ namespace friendlyPMC.Patches
             }
 
             RaidSettings raidSettings_0 = AccessTools.Field(typeof(MainMenuController), "raidSettings_0").GetValue(__instance) as RaidSettings;
-            if (!RaidStartPatch.HasFika()) raidSettings_0.RaidMode = ERaidMode.Local;
+            raidSettings_0.RaidMode = ERaidMode.Local;
         }
 
         [PatchPostfix]
