@@ -273,7 +273,6 @@ namespace friendlyPMC
             // raid patches to help with questing, having bots as being friends and part of the same group, and sending config changes to the server
             new RaidStartPatch().Enable();
             new MainMenuControllerPatch().Enable();
-            new MainMenuController74Patch().Enable();
             new TarkovApplicationPatch().Enable();
             // quests related patches
             new PlayerKilledPatch().Enable();

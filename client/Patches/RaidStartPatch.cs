@@ -25,73 +25,75 @@ namespace friendlyPMC.Patches
         private static void PatchPostfix(Class301 __instance, RaidSettings settings)
         {
             bool badGuy = friendlyPMC.badGuy.Value;
-            
-            if(MainMenuControllerPatch.GroupPlayers != null)
+
+            if (MainMenuControllerPatch.GroupPlayers != null)
             {
                 foreach (var player in MainMenuControllerPatch.GroupPlayers)
                 {
-                    if(player.Id == "677c4e0cc7a538c4210d4d47")
+                    if (player.Id == "677c4e0cc7a538c4210d4d47")
                     {
                         Utils.Utils.FlagSet("spawnKnight", true);
                     }
-                    else if(player.Id == "677c4e0cc7a538c4210d4d48")
+                    else if (player.Id == "677c4e0cc7a538c4210d4d48")
                     {
                         Utils.Utils.FlagSet("spawnBigPipe", true);
                     }
-                    else if(player.Id == "677c4e0cc7a538c4210d4d49")
+                    else if (player.Id == "677c4e0cc7a538c4210d4d49")
                     {
                         Utils.Utils.FlagSet("spawnBirdEye", true);
                     }
                 }
             }
 
-            
-            if (Utils.Utils.FlagGet("spawnKnight") || Utils.Utils.FlagGet("spawnBigPipe") || Utils.Utils.FlagGet("spawnBirdEye")) 
+
+
+            if (Utils.Utils.FlagGet("spawnKnight") || Utils.Utils.FlagGet("spawnBigPipe") || Utils.Utils.FlagGet("spawnBirdEye"))
             {
                 badGuy = true;
-                Utils.Utils.FlagSet("isBadGuy",true);
+                Utils.Utils.FlagSet("isBadGuy", true);
             }
 
             Profile profile = __instance.GetProfileBySide(ESideType.Pmc);
 
             // patch raid settings to determine if user can spawn with a boss do to questing
             List<string> questCompanions = new List<string>();
-            profile.QuestsData.ForEach(quest=>{
+            profile.QuestsData.ForEach(quest =>
+            {
 
                 foreach (var item in Utils.Props.Quests)
                 {
                     foreach (var item1 in item.Value)
                     {
-                        if(item1 == quest.Id)
+                        if (item1 == quest.Id)
                         {
-                            if(quest.Status == EFT.Quests.EQuestStatus.Started)
+                            if (quest.Status == EFT.Quests.EQuestStatus.Started)
                             {
                                 bool isGoonQuest = true;
 
-                                if(Utils.Props.QuestsLocations.TryGetValue(quest.Id, out List<string> locations))
+                                if (Utils.Props.QuestsLocations.TryGetValue(quest.Id, out List<string> locations))
                                 {
                                     isGoonQuest = false;
-                                    if(locations.Contains(settings.LocationId.ToLower()))
+                                    if (locations.Contains(settings.LocationId.ToLower()))
                                     {
                                         isGoonQuest = true;
                                     }
                                 }
- 
+
                                 if (!friendlyPMC.squadSpawn.Value && isGoonQuest)
                                 {
                                     Utils.Utils.FlagSet("questGoons", true);
                                     // - when doing Goons quests, we are always bad guys
-                                    Utils.Utils.FlagSet("isBadGuy",true);
+                                    Utils.Utils.FlagSet("isBadGuy", true);
                                     badGuy = true;
-                                    
-                                    if(item.Key == "Knight")
+
+                                    if (item.Key == "Knight")
                                     {
-                                        if(!questCompanions.Contains("bossKnight"))
+                                        if (!questCompanions.Contains("bossKnight"))
                                         {
                                             questCompanions.Add("bossKnight");
                                         }
                                     }
-                                    else if(item.Key == "BigPipe")
+                                    else if (item.Key == "BigPipe")
                                     {
                                         if (!questCompanions.Contains("followerBigPipe"))
                                         {
@@ -108,7 +110,7 @@ namespace friendlyPMC.Patches
 
                                     break;
                                 }
-                            }   
+                            }
                         }
                     }
                 }
@@ -157,96 +159,64 @@ namespace friendlyPMC.Patches
             }.ToJson(_defaultJsonConverters));
         }
     }
-
-    /** 
-     * Patch having a raid group to prevent the game from going switching to online matching when starting a game 
-     * look for method doing:
-     * this.raidSettings_0.RaidMode = ERaidMode.Online
-     * and checking : this.matchmakerPlayerControllerClass.GroupPlayers.Count != 1
-     * **/
+    /**
+     * Ensure the game does not see player having a group which would switch the game mode to Online
+     */
     internal class MainMenuControllerPatch : ModulePatch
     {
-        private static List<GClass1323> RemovedPlayers = new List<GClass1323>();
-
-        public static GClass3771<GClass1323> GroupPlayers { get; private set; }
+        public static GClass3771<GClass1323> GroupPlayers { get; set; }
 
         protected override MethodBase GetTargetMethod()
         {
             return AccessTools.Method(typeof(MainMenuController), "method_46");
         }
 
-        // ensure group is empty before moving to the next screen
         [PatchPrefix]
         private static void PatchPrefix(MainMenuController __instance)
         {
             MatchmakerPlayerControllerClass matchmakerPlayerControllerClass = AccessTools.Field(typeof(MainMenuController), "matchmakerPlayerControllerClass").GetValue(__instance) as MatchmakerPlayerControllerClass;
 
-            RemovedPlayers.Clear();
-
-            GClass1323 currentPlayer = matchmakerPlayerControllerClass.CurrentPlayer;
-            foreach (var player in matchmakerPlayerControllerClass.GroupPlayers)
+            GroupPlayers = new GClass3771<GClass1323>();
+            foreach (var item in matchmakerPlayerControllerClass.GroupPlayers)
             {
-                if (player != currentPlayer)
-                {
-                    RemovedPlayers.Add(player);
-                }
+                if (item != matchmakerPlayerControllerClass.CurrentPlayer)
+                    GroupPlayers.Add(item);
             }
 
-            RemovedPlayers.ForEach(player => matchmakerPlayerControllerClass.GroupPlayers.Remove(player));
+            foreach (var item in GroupPlayers)
+            {
+                matchmakerPlayerControllerClass.GroupPlayers.Remove(item);
+            }
 
             RaidSettings raidSettings_0 = AccessTools.Field(typeof(MainMenuController), "raidSettings_0").GetValue(__instance) as RaidSettings;
-            if(!RaidStartPatch.HasFika()) raidSettings_0.RaidMode = ERaidMode.Local;
+            if (!RaidStartPatch.HasFika()) raidSettings_0.RaidMode = ERaidMode.Local;
         }
 
-        // add removed players back to the group
         [PatchPostfix]
         private static void PatchPostfix(MainMenuController __instance)
         {
             MatchmakerPlayerControllerClass matchmakerPlayerControllerClass = AccessTools.Field(typeof(MainMenuController), "matchmakerPlayerControllerClass").GetValue(__instance) as MatchmakerPlayerControllerClass;
 
-            // Add back all players that were removed in the prefix
-            foreach (var player in RemovedPlayers)
+            foreach (var item in GroupPlayers)
             {
-                matchmakerPlayerControllerClass.GroupPlayers.Add(player);
+                matchmakerPlayerControllerClass.GroupPlayers.Add(item);
             }
-
-            // Clear the removed players list after restoring
-            RemovedPlayers.Clear();
-            GroupPlayers = matchmakerPlayerControllerClass.GroupPlayers;
         }
     }
-    /** 
-     * Patch having a raid group to prevent the game from going switching to online matching when pressing "Ready" in the raid settings screen 
-     * this is handler assigned to createRaidSettingsForProfileClass.OnShowReadyScreen
-     * **/
-    internal class MainMenuController74Patch : ModulePatch
-    {
-        protected override MethodBase GetTargetMethod()
-        {
-            return AccessTools.Method(typeof(MainMenuController), "method_77");
-        }
-
-        // ensure RaidMode is local
-        [PatchPrefix]
-        private static void PatchPrefix(MainMenuController __instance)
-        {
-            RaidSettings raidSettings_0 = AccessTools.Field(typeof(MainMenuController), "raidSettings_0").GetValue(__instance) as RaidSettings;
-            if(!RaidStartPatch.HasFika())raidSettings_0.RaidMode = ERaidMode.Local;
-        }
-    }
-
+    /**
+     * Ensure the game is set to Local mode even when player is part of a group
+     */
     internal class TarkovApplicationPatch : ModulePatch
-    {  
+    {
         protected override MethodBase GetTargetMethod()
         {
             return AccessTools.Method(typeof(TarkovApplication), "method_35");
         }
-
-        // ensure RaidMode is local
         [PatchPrefix]
         private static void PatchPrefix(TarkovApplication __instance)
         {
-            __instance.CurrentRaidSettings.RaidMode = ERaidMode.Local;
-        } 
+            RaidSettings _raidSettings = AccessTools.Field(typeof(TarkovApplication), "_raidSettings").GetValue(__instance) as RaidSettings;
+            _raidSettings.RaidMode = ERaidMode.Local;
+        }
     }
 }
