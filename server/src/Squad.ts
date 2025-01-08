@@ -6,11 +6,11 @@ import { BotDifficultyHelper } from "@spt/helpers/BotDifficultyHelper";
 import { BotController } from "@spt/controllers/BotController";
 
 import { IBotConfig } from "@spt/models/spt/config/IBotConfig";
-import { IHostilitySettings, IPmcConfig } from "@spt/models/spt/config/IPmcConfig";
+import { IPmcConfig } from "@spt/models/spt/config/IPmcConfig";
 
 import { ILogger } from "@spt/models/spt/utils/ILogger";
 
-import { IDifficulties, IBotType, IDifficultyCategories } from "@spt/models/eft/common/tables/IBotType";
+import { IBotType, IDifficultyCategories } from "@spt/models/eft/common/tables/IBotType";
 
 import { LogTextColor } from "@spt/models/spt/logging/LogTextColor";
 
@@ -27,11 +27,10 @@ import { HttpResponseUtil } from "@spt/utils/HttpResponseUtil";
 import { IUserDialogInfo } from "@spt/models/eft/profile/ISptProfile";
 
 import { DialogueController } from "@spt/controllers/DialogueController";
-import { DialogueCallbacks } from "@spt/callbacks/DialogueCallbacks";
 
 import { MatchCallbacks } from "@spt/callbacks/MatchCallbacks";
 
-import { ProbabilityObjectArray, RandomUtil } from "@spt/utils/RandomUtil";
+import { RandomUtil } from "@spt/utils/RandomUtil";
 import { BotGenerator } from "@spt/generators/BotGenerator";
 import { IBotBase } from "@spt/models/eft/common/tables/IBotBase";
 import { IBotGenerationDetails } from "@spt/models/spt/bots/BotGenerationDetails";
@@ -75,11 +74,14 @@ import { BigPipeChatBot } from "./BigPipeChat";
 import { BirdEyeChatBot } from "./BirdEyeChat";
 
 import { IGetOtherProfileRequest } from "@spt/models/eft/profile/IGetOtherProfileRequest";
-import { IQuest } from "@spt/models/eft/common/tables/IQuest";
+import { LauncherController } from "@spt/controllers/LauncherController";
 
-import { objectCopy, objectForEach } from "./Utils";
+import { objectCopy } from "./Utils";
 import { IGetRaidConfigurationRequestData } from "@spt/models/eft/match/IGetRaidConfigurationRequestData";
 import { IAdditionalHostilitySettings } from "@spt/models/eft/common/ILocationBase";
+import { ILoginRequestData } from "@spt/models/eft/launcher/ILoginRequestData";
+
+import { Quests } from "./Quests";
 
 class friendlyPMC {
 	config = {
@@ -97,6 +99,7 @@ class friendlyPMC {
 	notificationSendHelper: NotificationSendHelper;
 	LocaleService: LocaleService;
 	randomUtil: RandomUtil;
+
 	matchCallbacks: MatchCallbacks;
 	preSptModLoader: PreSptModLoader;
 
@@ -214,7 +217,7 @@ class friendlyPMC {
 			},
 			{ frequency: "Always" }
 		);
-
+		// patch quest handder to handle our custom quests
 		this.handleItemEvent = this.handleItemEvent.bind(this);
 		container.afterResolution(
 			"QuestItemEventRouter",
@@ -223,6 +226,19 @@ class friendlyPMC {
 					this.originalHandleItemEvent = result.handleItemEvent.bind(result);
 
 					result.handleItemEvent = this.handleItemEvent;
+				}
+			},
+			{ frequency: "Always" }
+		);
+		// patch login to handle our custom quests item locations
+		this.launcherLogin = this.launcherLogin.bind(this);
+		container.afterResolution(
+			"LauncherController",
+			(_t, result: LauncherController) => {
+				if (!this.originalLauncherLogin) {
+					this.originalLauncherLogin = result.login.bind(result);
+
+					result.login = this.launcherLogin;
 				}
 			},
 			{ frequency: "Always" }
@@ -886,6 +902,20 @@ class friendlyPMC {
 	handleItemEvent(eventAction: string, pmcData: IPmcData, body: any, sessionID: string) {
 		this.questItemEvent.handleItemEvent(eventAction, pmcData, body, sessionID);
 		return this.originalHandleItemEvent(eventAction, pmcData, body, sessionID);
+	}
+
+	originalLauncherLogin: LauncherController["login"];
+	launcherLogin(info: ILoginRequestData) {
+		const profile = this.originalLauncherLogin(info);
+		for (const sessionID in this.profileHelper.getProfiles()) {
+			const profile = this.profileHelper.getPmcProfile(sessionID);
+			profile.Quests.forEach(quest => {
+				if (quest.status == 2) {
+					this.questItemEvent.handleItemEvent("QuestAccept", profile, { qid: quest.qid }, sessionID);
+				}
+			});
+		}
+		return profile;
 	}
 }
 
