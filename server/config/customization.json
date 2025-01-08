@@ -1,0 +1,44 @@
+{
+    "squad_customization": [
+        {
+            "name": "HK416",
+            "head": "Klukai Head",
+            "voice": "HK416"
+        },
+        {
+            "name": "Mosin",
+            "head": "Mosin-Nagant Head",
+            "voice": "Mosin"
+        },
+        {
+            "name": "PPSh",
+            "head": "PPSh Head",
+            "voice": "Ppsh-41"
+        },
+        {
+            "name": "G36",
+            "head": "Centaureissi Head",
+            "voice": "G36"
+        },
+        {
+            "name": "G11",
+            "head": "Mechty Head",
+            "voice": "Ash-12.7"
+        },
+        {
+            "name": "Vector",
+            "head": "Vector Head",
+            "voice": "Ash-12.7"
+        },
+        {
+            "name": "Tololo",
+            "head": "Tololo Head",
+            "voice": "Ash-12.7"
+        },
+        {
+            "name": "UMP9",
+            "head": "Lenna Head",
+            "voice": "Lenna"
+        }
+    ]
+}

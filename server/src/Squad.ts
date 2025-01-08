@@ -83,6 +83,8 @@ import { IGetRaidConfigurationRequestData } from "@spt/models/eft/match/IGetRaid
 import { IAdditionalHostilitySettings } from "@spt/models/eft/common/ILocationBase";
 import { HashUtil } from "@spt/utils/HashUtil";
 
+import { squad_customization } from "../config/customization.json"
+
 class friendlyPMC {
 	config = {
 		friendlyPMC: false,
@@ -575,6 +577,49 @@ class friendlyPMC {
 										break;
 								}
 							});
+							// Anime Shit head and voice patch
+							// Find matching customization entry based on member nickname.
+							const customization = databaseService.getCustomization();
+							const squadMemberCustomization = squad_customization.find((p) => p.name === custom.Nickname);
+
+							if (squadMemberCustomization) {
+
+								// Load the localized strings so we can look up the voice name
+								const localeData = this.LocaleService.getLocaleDb();
+
+								// Find potential locale keys of the voices from the locale DB.
+								const voiceLocaleKeys = Object.keys(localeData).filter(key => localeData[key] === squadMemberCustomization.voice);
+								const headLocaleKeys = Object.keys(localeData).filter(key => localeData[key] === squadMemberCustomization.head);
+
+								// Assuming the voice locale key is in the form of `${itemId} Name`,
+								// trim the key to get the potential voice Id.
+								const voiceIds = voiceLocaleKeys.map(key => key.slice(0, -5));
+								const headIds = headLocaleKeys.map(key => key.slice(0, -5));
+
+								// Filter the Id candidates by verifying they are actually pointing at voices or heads
+								// This is needed since the localized string may share the same string as something else, such as "G36"
+								const voiceId = voiceIds.find(id => (Object.values(customization).find((item: any) => item._parent === "5fc100cf95572123ae738483" && item._name === squadMemberCustomization.voice)))
+								const headId = headIds.find(id => (Object.values(customization).find((item: any) => item._parent === "5cc085e214c02e000c6bea67" && item._id === id)))
+
+								//Assign voice
+								if (voiceId) {
+									bot.Info.Voice = squadMemberCustomization.voice;
+									console.log("[FriendlyPMC] Voice assigned to squadmate: " + JSON.stringify(squadMemberCustomization.voice));
+								} else {
+									console.log("[FriendlyPMC] No matching voice found for:" + squadMemberCustomization.voice);
+								}
+
+								// Assign head
+								if (headId) {
+									bot.Customization.Head = headId;
+									console.log("[FriendlyPMC] Head assigned to squadmate: " + JSON.stringify(headId));
+								} else {
+									console.log("[FriendlyPMC] No matching head found for:" + squadMemberCustomization.head);
+								}
+
+							} else {
+								console.log("[FriendlyPMC] No matching squad member customization config found for:" + custom.Nickname);
+							}
 						}
 
 						conditionPromises.push(bot);
