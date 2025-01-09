@@ -81,6 +81,9 @@ import { IEmptyRequestData } from "@spt/models/eft/common/IEmptyRequestData";
 import { objectCopy } from "./Utils";
 import { IGetRaidConfigurationRequestData } from "@spt/models/eft/match/IGetRaidConfigurationRequestData";
 import { IAdditionalHostilitySettings } from "@spt/models/eft/common/ILocationBase";
+import { ILoginRequestData } from "@spt/models/eft/launcher/ILoginRequestData";
+
+import { Quests } from "./Quests";
 
 class friendlyPMC {
 	config = {
@@ -98,6 +101,7 @@ class friendlyPMC {
 	notificationSendHelper: NotificationSendHelper;
 	LocaleService: LocaleService;
 	randomUtil: RandomUtil;
+
 	matchCallbacks: MatchCallbacks;
 	preSptModLoader: PreSptModLoader;
 
