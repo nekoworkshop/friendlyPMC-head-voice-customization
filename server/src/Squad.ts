@@ -81,9 +81,6 @@ import { IEmptyRequestData } from "@spt/models/eft/common/IEmptyRequestData";
 import { objectCopy } from "./Utils";
 import { IGetRaidConfigurationRequestData } from "@spt/models/eft/match/IGetRaidConfigurationRequestData";
 import { IAdditionalHostilitySettings } from "@spt/models/eft/common/ILocationBase";
-import { ILoginRequestData } from "@spt/models/eft/launcher/ILoginRequestData";
-
-import { Quests } from "./Quests";
 
 class friendlyPMC {
 	config = {
@@ -101,7 +98,6 @@ class friendlyPMC {
 	notificationSendHelper: NotificationSendHelper;
 	LocaleService: LocaleService;
 	randomUtil: RandomUtil;
-
 	matchCallbacks: MatchCallbacks;
 	preSptModLoader: PreSptModLoader;
 
@@ -421,7 +417,7 @@ class friendlyPMC {
 
 						if (!this.config.friendlyPMC) {
 							if (this.config.badGuy) {
-								loc.base.BotLocationModifier.AdditionalHostilitySettings.forEach((setting) => {
+								loc.base.BotLocationModifier.AdditionalHostilitySettings.forEach(setting => {
 									if (["pmcUSEC", "pmcBEAR"].includes(setting.BotRole)) {
 										setting.BearPlayerBehaviour = "AlwaysEnemies";
 										setting.UsecPlayerBehaviour = "AlwaysEnemies";
@@ -429,7 +425,7 @@ class friendlyPMC {
 								});
 							}
 						} else {
-							loc.base.BotLocationModifier.AdditionalHostilitySettings.forEach((setting) => {
+							loc.base.BotLocationModifier.AdditionalHostilitySettings.forEach(setting => {
 								if (["pmcUSEC", "pmcBEAR"].includes(setting.BotRole)) {
 									setting.BearPlayerBehaviour = this.config.badGuy || setting.BotRole == "pmcUSEC" ? "AlwaysEnemies" : "Neutral";
 									setting.UsecPlayerBehaviour = this.config.badGuy || setting.BotRole == "pmcBEAR" ? "AlwaysEnemies" : "Neutral";
@@ -484,7 +480,7 @@ class friendlyPMC {
 
 						conditionPromises.push(bot);
 
-						conditionPromises.forEach((profile) => {
+						conditionPromises.forEach(profile => {
 							if (custom) {
 								if (custom.Body) {
 									profile.Customization.Body = custom.Body;
@@ -572,17 +568,17 @@ class friendlyPMC {
 						const birdEyeFriend = this.birdEyeBot;
 						// Fika is removing Knight from the friend list, so we need to add him back
 						let friend = knightFriend.getChatBot();
-						if (list.Friends.findIndex((f) => f.aid == friend.aid) == -1) {
+						if (list.Friends.findIndex(f => f.aid == friend.aid) == -1) {
 							list.Friends.push(friend);
 						}
 						// Fika is removing BigPipe from the friend list, so we need to add him back
 						friend = bigPipeFriend.getChatBot();
-						if (list.Friends.findIndex((f) => f.aid == friend.aid) == -1) {
+						if (list.Friends.findIndex(f => f.aid == friend.aid) == -1) {
 							list.Friends.push(friend);
 						}
 						// Fika is removing BirdEye from the friend list, so we need to add him back
 						friend = birdEyeFriend.getChatBot();
-						if (list.Friends.findIndex((f) => f.aid == friend.aid) == -1) {
+						if (list.Friends.findIndex(f => f.aid == friend.aid) == -1) {
 							list.Friends.push(friend);
 						}
 
@@ -592,7 +588,7 @@ class friendlyPMC {
 						let hasKnightQuest = false;
 						let hasBigPipeQuest = false;
 						let hasBirdEyeQuest = false;
-						profile.Quests.forEach((quest) => {
+						profile.Quests.forEach(quest => {
 							if (quest.qid == "6775d:957e2dbcb3bd0a02c7" && quest.status == 4) {
 								hasKnightQuest = true;
 							}
@@ -612,14 +608,14 @@ class friendlyPMC {
 						}
 
 						if (!hasKnightQuest) {
-							list.Friends = list.Friends.filter((friend) => friend._id != knightFriend.getChatBot()._id);
+							list.Friends = list.Friends.filter(friend => friend._id != knightFriend.getChatBot()._id);
 						}
 						if (!hasBigPipeQuest) {
-							list.Friends = list.Friends.filter((friend) => friend._id != bigPipeFriend.getChatBot()._id);
+							list.Friends = list.Friends.filter(friend => friend._id != bigPipeFriend.getChatBot()._id);
 						}
 
 						if (!hasBirdEyeQuest) {
-							list.Friends = list.Friends.filter((friend) => friend._id != birdEyeFriend.getChatBot()._id);
+							list.Friends = list.Friends.filter(friend => friend._id != birdEyeFriend.getChatBot()._id);
 						}
 					} catch (e) {
 						this.Logger.error("friendlyPMC: Error in friend list: " + e);
@@ -912,7 +908,7 @@ class friendlyPMC {
 
 		const profile = this.profileHelper.getPmcProfile(sessionID);
 		if (!profile) return result;
-		profile.Quests.forEach((quest) => {
+		profile.Quests.forEach(quest => {
 			let id = quest.qid;
 			if (Quests[id]) {
 				if (quest.status == 2) {
