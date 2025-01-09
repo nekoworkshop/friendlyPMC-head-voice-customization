@@ -14,9 +14,8 @@ export const Quests = {
 		itemLocation: ["TarkovStreets"],
 		itemId: "64e3b0f4e3b6f5a4a37e8c1d",
 		itemContainer: {
-			TarkovStreets: ["container_City_Design_Main_00017", "container_City_Design_Main_00020", "container_City_Design_Main_00022"],
+			TarkovStreets: ["container_City_SE_02_DesignStuff_00002", "container_City_SE_02_DesignStuff_00004"],
 		},
-		itemCondition: "friendlypmc-knight-thieves-4",
 	},
 };
 

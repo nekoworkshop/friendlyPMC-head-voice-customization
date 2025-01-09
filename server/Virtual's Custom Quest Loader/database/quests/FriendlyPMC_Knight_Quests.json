@@ -332,7 +332,37 @@
 					"visibilityConditions": []
 				}
 			],
-			"Fail": []
+			"Fail": [{
+                "completeInSeconds": 0,
+                "conditionType": "CounterCreator",
+                "counter": {
+                    "conditions": [
+                        {
+                            "conditionType": "ExitStatus",
+                            "dynamicLocale": false,
+                            "id": "677feac5f539f6d923006709",
+                            "status": ["Killed", "Left", "MissingInAction"]
+                        },
+                        {
+                            "conditionType": "Location",
+                            "dynamicLocale": false,
+                            "id": "677feac5f539f6d92300670a",
+                            "target": ["bigmap"]
+                        }
+                    ],
+                    "id": "677feac5f539f6d92300670b"
+                },
+                "doNotResetIfCounterCompleted": false,
+                "dynamicLocale": false,
+                "globalQuestCounterId": "",
+                "id": "677fea2ff539f6d923006705",
+                "index": 0,
+                "oneSessionOnly": false,
+                "parentId": "",
+                "type": "Completion",
+                "value": 1,
+                "visibilityConditions": []
+            }]
 		},
 		"declinePlayerMessage": "friendlypmc-knight-my-land declinePlayerMessage",
 		"description": "friendlypmc-knight-my-land description",
@@ -464,7 +494,7 @@
 		"image": "/files/quest/icon/KnightThieves.jpg",
 		"instantComplete": false,
 		"isKey": false,
-		"location": "any",
+		"location": "5714dc692459777137212e12",
 		"name": "friendlypmc-knight-thieves name",
 		"note": "friendlypmc-knight-thieves note",
 		"restartable": true,
@@ -526,7 +556,7 @@
 					"conditionType": "Level",
 					"dynamicLocale": false,
 					"globalQuestCounterId": "",
-					"id": "friendlypmc-knight-payback01-req-1",
+					"id": "677fe662f539f6d9230066e3",
 					"index": 0,
 					"parentId": "",
 					"value": 20,
@@ -538,7 +568,7 @@
 					"dispersion": 0,
 					"dynamicLocale": false,
 					"globalQuestCounterId": "",
-					"id": "friendlypmc-knight-payback01-req-2",
+					"id": "677fe662f539f6d9230066e4",
 					"index": 0,
 					"parentId": "",
 					"status": [4],
@@ -568,7 +598,7 @@
 								"enemyEquipmentExclusive": [],
 								"enemyEquipmentInclusive": [],
 								"enemyHealthEffects": [],
-								"id": "friendlypmc-knight-payback01-kill",
+								"id": "677fe6a9f539f6d9230066e5",
 								"resetOnSessionEnd": false,
 								"savageRole": ["bossKolontay"],
 								"target": "Savage",
@@ -579,12 +609,12 @@
 								"weaponModsInclusive": []
 							}
 						],
-						"id": "friendlypmc-knight-payback01-cond"
+						"id": "677fe6a9f539f6d9230066e6"
 					},
 					"doNotResetIfCounterCompleted": false,
 					"dynamicLocale": false,
 					"globalQuestCounterId": "",
-					"id": "friendlypmc-knight-payback01-target",
+					"id": "677fe6a9f539f6d9230066e7",
 					"index": 0,
 					"oneSessionOnly": false,
 					"parentId": "",
@@ -602,22 +632,22 @@
 							{
 								"conditionType": "ExitStatus",
 								"dynamicLocale": false,
-								"id": "friendlypmc-knight-payback01-fail-1",
+								"id": "677fe755f539f6d9230066e9",
 								"status": ["Killed", "Left", "MissingInAction"]
 							},
 							{
 								"conditionType": "Location",
 								"dynamicLocale": false,
-								"id": "ffriendlypmc-knight-payback01-fail-2",
+								"id": "677fe7a6f539f6d9230066eb",
 								"target": ["TarkovStreets"]
 							}
 						],
-						"id": "friendlypmc-knight-payback01-fail-cond"
+						"id": "677fe755f539f6d9230066ea"
 					},
 					"doNotResetIfCounterCompleted": false,
 					"dynamicLocale": false,
 					"globalQuestCounterId": "",
-					"id": "friendlypmc-knight-payback01-fail",
+					"id": "677fe755f539f6d9230066e8",
 					"index": 0,
 					"oneSessionOnly": false,
 					"parentId": "",
@@ -742,7 +772,7 @@
 					"doNotResetIfCounterCompleted": false,
 					"dynamicLocale": false,
 					"globalQuestCounterId": "",
-					"id": "friendlypmc-knight-enemyspotted-target",
+					"id": "677fe7a6f539f6d9230066ec",
 					"index": 0,
 					"oneSessionOnly": false,
 					"parentId": "",
@@ -760,22 +790,22 @@
 							{
 								"conditionType": "ExitStatus",
 								"dynamicLocale": false,
-								"id": "friendlypmc-knight-enemyspotted-fail-1",
+								"id": "677fe807f539f6d9230066ee",
 								"status": ["Killed", "Left", "MissingInAction"]
 							},
 							{
 								"conditionType": "Location",
 								"dynamicLocale": false,
-								"id": "friendlypmc-knight-enemyspotted-fail-2",
+								"id": "677fe807f539f6d9230066ef",
 								"target": ["Woods"]
 							}
 						],
-						"id": "friendlypmc-knight-enemyspotted-fail-cond"
+						"id": "677fe807f539f6d9230066f0"
 					},
 					"doNotResetIfCounterCompleted": false,
 					"dynamicLocale": false,
 					"globalQuestCounterId": "",
-					"id": "friendlypmc-knight-enemyspotted-fail",
+					"id": "677fe7a6f539f6d9230066ed",
 					"index": 0,
 					"oneSessionOnly": false,
 					"parentId": "",
@@ -899,7 +929,7 @@
 					"doNotResetIfCounterCompleted": false,
 					"dynamicLocale": false,
 					"globalQuestCounterId": "",
-					"id": "friendlypmc-knight-coverme-target",
+					"id": "677fe82bf539f6d9230066f2",
 					"index": 0,
 					"oneSessionOnly": false,
 					"parentId": "",
@@ -908,7 +938,37 @@
 					"visibilityConditions": []
 				}
 			],
-			"Fail": []
+			"Fail": [{
+                "completeInSeconds": 0,
+                "conditionType": "CounterCreator",
+                "counter": {
+                    "conditions": [
+                        {
+                            "conditionType": "ExitStatus",
+                            "dynamicLocale": false,
+                            "id": "677fe905f539f6d9230066f4",
+                            "status": ["Killed", "Left", "MissingInAction"]
+                        },
+                        {
+                            "conditionType": "Location",
+                            "dynamicLocale": false,
+                            "id": "677fe905f539f6d9230066f5",
+                            "target": ["Shoreline"]
+                        }
+                    ],
+                    "id": "677fe905f539f6d9230066f6"
+                },
+                "doNotResetIfCounterCompleted": false,
+                "dynamicLocale": false,
+                "globalQuestCounterId": "",
+                "id": "677fe82bf539f6d9230066f3",
+                "index": 0,
+                "oneSessionOnly": false,
+                "parentId": "",
+                "type": "Completion",
+                "value": 1,
+                "visibilityConditions": []
+            }]
 		},
 		"declinePlayerMessage": "friendlypmc-knight-coverme declinePlayerMessage",
 		"description": "friendlypmc-knight-coverme description",
@@ -977,7 +1037,7 @@
 					"conditionType": "Level",
 					"dynamicLocale": false,
 					"globalQuestCounterId": "",
-					"id": "friendlypmc-knight-afavor-req-1",
+					"id": "677fe972f539f6d9230066f7",
 					"index": 0,
 					"parentId": "",
 					"value": 20,
@@ -989,7 +1049,7 @@
 					"dispersion": 0,
 					"dynamicLocale": false,
 					"globalQuestCounterId": "",
-					"id": "friendlypmc-knight-afavor-req-2",
+					"id": "677fe972f539f6d9230066f8",
 					"index": 0,
 					"parentId": "",
 					"status": [4],
@@ -1019,7 +1079,7 @@
 								"enemyEquipmentExclusive": [],
 								"enemyEquipmentInclusive": [],
 								"enemyHealthEffects": [],
-								"id": "friendlypmc-knight-afavor-kill",
+								"id": "677fe972f539f6d9230066f9",
 								"resetOnSessionEnd": false,
 								"savageRole": ["bossKojaniy"],
 								"target": "Savage",
@@ -1030,12 +1090,12 @@
 								"weaponModsInclusive": []
 							}
 						],
-						"id": "friendlypmc-knight-afavor-cond"
+						"id": "677fe999f539f6d9230066fa"
 					},
 					"doNotResetIfCounterCompleted": false,
 					"dynamicLocale": false,
 					"globalQuestCounterId": "",
-					"id": "friendlypmc-knight-afavor-target",
+					"id": "677fe999f539f6d9230066fb",
 					"index": 0,
 					"oneSessionOnly": false,
 					"parentId": "",
@@ -1053,22 +1113,22 @@
 							{
 								"conditionType": "ExitStatus",
 								"dynamicLocale": false,
-								"id": "friendlypmc-knight-afavor-fail-1",
+								"id": "677fe9d5f539f6d9230066fd",
 								"status": ["Killed", "Left", "MissingInAction"]
 							},
 							{
 								"conditionType": "Location",
 								"dynamicLocale": false,
-								"id": "friendlypmc-knight-afavor-fail-2",
+								"id": "677fe9d5f539f6d9230066fe",
 								"target": ["Woods"]
 							}
 						],
-						"id": "friendlypmc-knight-afavor-fail-cond"
+						"id": "677fe9d5f539f6d9230066ff"
 					},
 					"doNotResetIfCounterCompleted": false,
 					"dynamicLocale": false,
 					"globalQuestCounterId": "",
-					"id": "friendlypmc-knight-afavor-fail",
+					"id": "677fe9d5f539f6d923006700",
 					"index": 0,
 					"oneSessionOnly": false,
 					"parentId": "",

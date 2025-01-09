@@ -24,7 +24,7 @@
 	"friendlypmc-knight-my-land changeQuestMessageText": "",
 	"friendlypmc-knight-my-land note": "",
 	"6776926bfa281ca31708b1a2": "Ajută-l pe Knight să elimine 8 ținte în jurul Scav Base pe Customs.",
-	"friendlypmc-knight-my-land-fail": "Knight nu trebuie să moară în timp ce sarcina este activă (Status: KIA, A părăsit acțiunea, MIA, Fugit).",
+	"677fea2ff539f6d923006705": "Knight nu trebuie să moară în timp ce sarcina este activă (Status: KIA, A părăsit acțiunea, MIA, Fugit).",
 
 	"friendlypmc-knight-thieves name": "Ne-au jefuit!",
 	"friendlypmc-knight-thieves description": "Desigur că ne-au jefuit, dar nu mă îngrijorează mărunțișurile pe care mâinile lor murdare le-au luat. Totuși, au luat ceva important și avem nevoie să-l recuperăm. Este lansatorul de grenade al lui Pipe. Asta nu a fost un furt întâmplător, cu siguranță l-au căutat intenționat și l-au luat. Și știau unde era. M-am 'interesat' și am aflat unde a fost lăsat. Du-te și recuperează-l, iar noi ne vom ocupa mai târziu de cel care a fost în spatele acestui lucru.",
@@ -37,7 +37,7 @@
 	"friendlypmc-knight-thieves note": "",
 	"6776942bfa281ca31708b1a8": "Caută lansatorul de grenade al lui BigPipe în Hive hookah lounge, pe Streets of Tarkov.",
 	"67769441fa281ca31708b1a9": "Predă arma.",
-	"friendlypmc-knight-thieves-fail": "",
+	"677fe82bf539f6d9230066f1": "",
 
 	"friendlypmc-knight-payback01 name": "Banditul cu insigne",
 	"friendlypmc-knight-payback01 description": "Domnul Robocop s-a gândit să se modernizeze și și-a luat singur dreptul de a ne lua lucrurile—fără întrebări, fără permisiune. Dar hei, se spune că nimeni nu este deasupra legii, nu? E timpul să testăm asta. Kollontay este clientul, iar piciorul nostru este pe cale să facă un mic furt... direct în gura lui!",
@@ -48,8 +48,8 @@
 	"friendlypmc-knight-payback01 declinePlayerMessage": "",
 	"friendlypmc-knight-payback01 changeQuestMessageText": "",
 	"friendlypmc-knight-payback01 note": "",
-	"friendlypmc-knight-payback01-target": "Elimină-l pe Kollontay pe Streets of Tarkov în timp ce ești în echipă cu Goons.",
-	"friendlypmc-knight-payback01-fail": "Tu și Goons nu trebuie să muriți sau să părăsiți raidul cât timp sarcina este activă (Status: KIA, A părăsit acțiunea, MIA, Fugit).",
+	"677fe6a9f539f6d9230066e7": "Elimină-l pe Kollontay pe Streets of Tarkov în timp ce ești în echipă cu Goons.",
+	"677fe755f539f6d9230066e8": "Tu și Goons nu trebuie să muriți sau să părăsiți raidul cât timp sarcina este activă (Status: KIA, A părăsit acțiunea, MIA, Fugit).",
 
 	"friendlypmc-knight-enemyspotted name": "Inamic detectat",
 	"friendlypmc-knight-enemyspotted description": "Aici BirdEye. Se pare că îi dai pe băieți pe spate. Totuși, mă întreb, cât de bun coechipier ești? Fii spotter-ul meu și ajută-mă să elimin câteva ținte. Nu-mi plac cei mărunți, dacă vii cu mine, mergem după prada mare. Deci, ești gata?",
@@ -60,8 +60,8 @@
 	"friendlypmc-knight-enemyspotted declinePlayerMessage": "",
 	"friendlypmc-knight-enemyspotted changeQuestMessageText": "",
 	"friendlypmc-knight-enemyspotted note": "Atât tu, cât și BirdEye trebuie să supraviețuiți raidului. BirdEye trebuie să elimine țintele.",
-	"friendlypmc-knight-enemyspotted-target": "Ajută-l pe BirdEye să elimine 5 PMCs pe Woods.",
-	"friendlypmc-knight-enemyspotted-fail": "Tu și BirdEye nu trebuie să muriți sau să părăsiți raidul cât timp sarcina este activă (Status: KIA, A părăsit acțiunea, MIA, Fugit).",
+	"677fe7a6f539f6d9230066ec": "Ajută-l pe BirdEye să elimine 5 PMCs pe Woods.",
+	"677fe7a6f539f6d9230066ed": "Tu și BirdEye nu trebuie să muriți sau să părăsiți raidul cât timp sarcina este activă (Status: KIA, A părăsit acțiunea, MIA, Fugit).",
 
 	"friendlypmc-knight-coverme name": "Acces Interzis",
 	"friendlypmc-knight-coverme description": "Avem o situație în care trebuie să securizăm debarcaderul din Shoreline, iar BirdEye a sugerat să mergi și tu. A numit-o 'parte din test'. Mergi cu el și BigPipe și asigură-te că nimeni nu se gândește să se apropie de acel debarcader.",
@@ -72,8 +72,8 @@
 	"friendlypmc-knight-coverme declinePlayerMessage": "",
 	"friendlypmc-knight-coverme changeQuestMessageText": "",
 	"friendlypmc-knight-coverme note": "Tu, BirdEye și BigPipe trebuie să supraviețuiți raidului.",
-	"friendlypmc-knight-coverme-target": "Elimină 8 ținte din zona Pier de pe Shoreline în timp ce ești în echipă cu BirdEye și BigPipe.",
-	"friendlypmc-knight-coverme-fail": "Tu, BigPipe și BirdEye nu trebuie să muriți sau să părăsiți raidul cât timp sarcina este activă (Status: KIA, A părăsit acțiunea, MIA, Fugit).",
+	"677fe82bf539f6d9230066f2": "Elimină 8 ținte din zona Pier de pe Shoreline în timp ce ești în echipă cu BirdEye și BigPipe.",
+	"677fe82bf539f6d9230066f3": "Tu, BigPipe și BirdEye nu trebuie să muriți sau să părăsiți raidul cât timp sarcina este activă (Status: KIA, A părăsit acțiunea, MIA, Fugit).",
 
 	"friendlypmc-knight-afavor name": "Sigilarea înțelegerii",
 	"friendlypmc-knight-afavor description": "BirdEye aici. Te descurci excelent acolo, îmi place să lucrez cu tine. Ascultă, vreau să mă ajuți cu ceva. Tipul ăsta, Shturman, are nevoie de o lecție serioasă de bune maniere. Eram în Pădure, aproape de gater, când a început să se comporte ciudat, spunând că acesta este teritoriul lui și că ar trebui să-mi schimb numele în Bob Ținta pentru că nu pot să nimeresc nimic. Ei bine, cred că ar trebui să-i arătăm cine este adevăratul maestru al loviturii. Ajută-mă să-i dăm o lecție pe care nu o va uita niciodată și ești în echipă. Ce zici?",
@@ -84,6 +84,6 @@
 	"friendlypmc-knight-afavor declinePlayerMessage": "",
 	"friendlypmc-knight-afavor changeQuestMessageText": "",
 	"friendlypmc-knight-afavor note": "Atât tu, cât și BirdEye trebuie să supraviețuiți raidului.",
-	"friendlypmc-knight-afavor-target": "Ajută-l pe BirdEye să-l elimine pe Shturman.",
-	"friendlypmc-knight-afavor-fail": "Tu și BirdEye nu trebuie să muriți sau să părăsiți raidul cât timp sarcina este activă (Status: KIA, A părăsit acțiunea, MIA, Fugit)."
+	"677fe999f539f6d9230066fb": "Ajută-l pe BirdEye să-l elimine pe Shturman.",
+	"677fe9d5f539f6d923006700": "Tu și BirdEye nu trebuie să muriți sau să părăsiți raidul cât timp sarcina este activă (Status: KIA, A părăsit acțiunea, MIA, Fugit)."
 }

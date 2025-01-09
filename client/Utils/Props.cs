@@ -143,8 +143,8 @@ namespace friendlyPMC.Utils
                 "Any",
                 new List<string>
                 {
-                    "friendlypmc-knight-payback01-target",
-                    "friendlypmc-knight-coverme-target"
+                    "677fe6a9f539f6d9230066e7",
+                    "677fe82bf539f6d9230066f2"
                 }
             },
         };
@@ -165,8 +165,8 @@ namespace friendlyPMC.Utils
                 "BirdEye",
                 new List<string>
                 {
-                    "friendlypmc-knight-enemyspotted-target",
-                    "friendlypmc-knight-afavor-target",
+                    "677fe7a6f539f6d9230066ec",
+                    "677fe999f539f6d9230066fb",
                 }
             },
             {

@@ -24,7 +24,7 @@
 	"friendlypmc-knight-my-land changeQuestMessageText": "",
 	"friendlypmc-knight-my-land note": "",
 	"6776926bfa281ca31708b1a2": "Hilf Knight, 8 Ziele rund um die Scav-Basis auf Customs zu eliminieren.",
-	"friendlypmc-knight-my-land-fail": "Knight darf nicht sterben, während die Aufgabe aktiv ist (Status: KIA, Hat die Aktion verlassen, MIA, Durchgelaufen).",
+	"677fea2ff539f6d923006705": "Knight darf nicht sterben, während die Aufgabe aktiv ist (Status: KIA, Hat die Aktion verlassen, MIA, Durchgelaufen).",
 
 	"friendlypmc-knight-thieves name": "Sie haben uns ausgeraubt!",
 	"friendlypmc-knight-thieves description": "Natürlich haben sie uns ausgeraubt, aber die kleinen Dinge, die ihre dreckigen Hände mitgenommen haben, sind mir egal. Aber sie haben etwas Wichtiges gestohlen, und das brauchen wir zurück. Es ist Pipes Granatwerfer. Das war kein zufälliger Diebstahl, sie haben ihn gezielt gesucht und mitgenommen. Und sie wussten, wo er war. Ich habe mich 'umgehört' und herausgefunden, wo er abgegeben wurde. Hol ihn zurück, und wir kümmern uns später um den Kerl, der dahintersteckt.",
@@ -37,7 +37,7 @@
 	"friendlypmc-knight-thieves note": "",
 	"6776942bfa281ca31708b1a8": "Suche nach BigPipes Granatwerfer in der Hive Shisha-Lounge in Streets of Tarkov.",
 	"67769441fa281ca31708b1a9": "Gib die Waffe ab.",
-	"friendlypmc-knight-thieves-fail": "",
+	"677fe82bf539f6d9230066f1": "",
 
 	"friendlypmc-knight-payback01 name": "Abzeichen-Bandit",
 	"friendlypmc-knight-payback01 description": "Mister Robocop dachte, er könnte sich aufrüsten und hat sich einfach das Recht genommen, unsere Sachen mitzunehmen—ohne zu fragen, ohne Erlaubnis. Aber hey, sie sagen, niemand steht über dem Gesetz, richtig? Zeit, das zu testen. Kollontay ist das Ziel, und unser Fuß wird jetzt selbst ein bisschen klauen... direkt in seinen Mund!",
@@ -48,8 +48,8 @@
 	"friendlypmc-knight-payback01 declinePlayerMessage": "",
 	"friendlypmc-knight-payback01 changeQuestMessageText": "",
 	"friendlypmc-knight-payback01 note": "",
-	"friendlypmc-knight-payback01-target": "Eliminiere Kollontay in Streets of Tarkov, während du mit den Goons im Team bist.",
-	"friendlypmc-knight-payback01-fail": "Du und die Goons dürft während der aktiven Aufgabe nicht sterben oder den Raid verlassen (Status: KIA, Hat die Aktion verlassen, MIA, Durchgelaufen).",
+	"677fe6a9f539f6d9230066e7": "Eliminiere Kollontay in Streets of Tarkov, während du mit den Goons im Team bist.",
+	"677fe755f539f6d9230066e8": "Du und die Goons dürft während der aktiven Aufgabe nicht sterben oder den Raid verlassen (Status: KIA, Hat die Aktion verlassen, MIA, Durchgelaufen).",
 
 	"friendlypmc-knight-enemyspotted name": "Feind gesichtet",
 	"friendlypmc-knight-enemyspotted description": "Hier spricht BirdEye. Sieht so aus, als würdest du die Jungs ziemlich beeindrucken. Aber ich frage mich, wie gut du wirklich im Team bist? Sei mein Spotter und hilf mir, ein paar Ziele auszuschalten. Ich mag keine kleinen Fische, wenn du mit mir läufst, jagen wir das große Wild. Also, bist du dabei?",
@@ -60,8 +60,8 @@
 	"friendlypmc-knight-enemyspotted declinePlayerMessage": "",
 	"friendlypmc-knight-enemyspotted changeQuestMessageText": "",
 	"friendlypmc-knight-enemyspotted note": "Sowohl du als auch BirdEye müssen den Raid überleben. BirdEye muss die Ziele ausschalten.",
-	"friendlypmc-knight-enemyspotted-target": "Unterstütze BirdEye beim Ausschalten von 5 PMCs auf Woods.",
-	"friendlypmc-knight-enemyspotted-fail": "Du und BirdEye dürft während der aktiven Aufgabe nicht sterben oder den Raid verlassen (Status: KIA, Hat die Aktion verlassen, MIA, Durchgelaufen).",
+	"677fe7a6f539f6d9230066ec": "Unterstütze BirdEye beim Ausschalten von 5 PMCs auf Woods.",
+	"677fe7a6f539f6d9230066ed": "Du und BirdEye dürft während der aktiven Aufgabe nicht sterben oder den Raid verlassen (Status: KIA, Hat die Aktion verlassen, MIA, Durchgelaufen).",
 
 	"friendlypmc-knight-coverme name": "Zutritt Verboten",
 	"friendlypmc-knight-coverme description": "Wir haben eine Situation, bei der wir den Pier in Shoreline sichern müssen, und BirdEye hat vorgeschlagen, dass du mitkommst. Er nannte es 'Teil des Tests'. Gehe mit ihm und BigPipe und stelle sicher, dass niemand auf die Idee kommt, sich diesem Pier zu nähern.",
@@ -72,8 +72,8 @@
 	"friendlypmc-knight-coverme declinePlayerMessage": "",
 	"friendlypmc-knight-coverme changeQuestMessageText": "",
 	"friendlypmc-knight-coverme note": "Du, BirdEye und BigPipe müssen den Raid überleben.",
-	"friendlypmc-knight-coverme-target": "Eliminiere 8 Ziele rund um den Pier auf Shoreline, während du mit BirdEye und BigPipe im Team bist.",
-	"friendlypmc-knight-coverme-fail": "Du, BigPipe und BirdEye dürft während der aktiven Aufgabe nicht sterben oder den Raid verlassen (Status: KIA, Hat die Aktion verlassen, MIA, Durchgelaufen).",
+	"677fe82bf539f6d9230066f2": "Eliminiere 8 Ziele rund um den Pier auf Shoreline, während du mit BirdEye und BigPipe im Team bist.",
+	"677fe82bf539f6d9230066f3": "Du, BigPipe und BirdEye dürft während der aktiven Aufgabe nicht sterben oder den Raid verlassen (Status: KIA, Hat die Aktion verlassen, MIA, Durchgelaufen).",
 
 	"friendlypmc-knight-afavor name": "Abmachung besiegeln",
 	"friendlypmc-knight-afavor description": "BirdEye hier. Du kannst dich da draußen wirklich behaupten, ich laufe gerne mit dir. Hör zu, ich will, dass du mir bei etwas hilfst. Dieser Shturman-Typ braucht eine richtige Lektion in Manieren. Wir waren im Wald und näherten uns dem Sägewerk, als er anfing, total durchzudrehen und zu behaupten, das sei sein Revier. Außerdem meinte er, ich sollte meinen Namen in Bullseye Bob ändern, weil ich nichts treffen kann. Na ja, ich denke, wir sollten ihm zeigen, wer hier der wahre One-Tapper ist. Hilf mir, ihm eine Lektion zu erteilen, die er nie vergessen wird, und du bist dabei. Was sagst du?",
@@ -84,6 +84,6 @@
 	"friendlypmc-knight-afavor declinePlayerMessage": "",
 	"friendlypmc-knight-afavor changeQuestMessageText": "",
 	"friendlypmc-knight-afavor note": "Sowohl du als auch BirdEye müssen den Raid überleben.",
-	"friendlypmc-knight-afavor-target": "Unterstütze BirdEye bei der Eliminierung von Shturman.",
-	"friendlypmc-knight-afavor-fail": "Du und BirdEye dürft während der aktiven Aufgabe nicht sterben oder den Raid verlassen (Status: KIA, Hat die Aktion verlassen, MIA, Durchgelaufen)."
+	"677fe999f539f6d9230066fb": "Unterstütze BirdEye bei der Eliminierung von Shturman.",
+	"677fe9d5f539f6d923006700": "Du und BirdEye dürft während der aktiven Aufgabe nicht sterben oder den Raid verlassen (Status: KIA, Hat die Aktion verlassen, MIA, Durchgelaufen)."
 }

@@ -23,7 +23,7 @@
 	"friendlypmc-knight-my-land changeQuestMessageText": "",
 	"friendlypmc-knight-my-land note": "",
 	"6776926bfa281ca31708b1a2": "Help Knight eliminate 8 targets around the Scav Base on Customs",
-	"friendlypmc-knight-my-land-fail": "Knight must not die while the task is active (Status: KIA, Left the Action, MIA, Ran Through)",
+	"677fea2ff539f6d923006705": "Knight must not die while the task is active (Status: KIA, Left the Action, MIA, Ran Through)",
 
 	"friendlypmc-knight-thieves name": "They robbed us!",
 	"friendlypmc-knight-thieves description": "Of course they robbed us, but I am not worried about the little things their dirty hands took. However, they took something important and we need it back. It's Pipe's grenade launcher. That was no random steal, they specifically must've searched for it and grabbed it. And they knew where it was. I 'asked' arround and found where it was dropped off. Go get it back and we will deal with the guy behind this later.",
@@ -36,7 +36,7 @@
 	"friendlypmc-knight-thieves note": "",
 	"6776942bfa281ca31708b1a8": "Look for BigPipe's grenade launcher in the Hive hookah lounge, in Streets of Tarkov.",
 	"67769441fa281ca31708b1a9": "Hand over the weapon.",
-	"friendlypmc-knight-thieves-fail": "",
+	"677fe82bf539f6d9230066f1": "",
 
 	"friendlypmc-knight-payback01 name": "Badge Bandit",
 	"friendlypmc-knight-payback01 description": "Mister Robocop thought of upgrading and he gave himself the right to just take to our stuff—no questions, no permission. But hey, they say nobody is above the law, right? Time to put that to the test. Kollontay is the client, and our foot is about to do some thieving of its own... straight into his mouth!",
@@ -47,8 +47,8 @@
 	"friendlypmc-knight-payback01 declinePlayerMessage": "",
 	"friendlypmc-knight-payback01 changeQuestMessageText": "",
 	"friendlypmc-knight-payback01 note": "",
-	"friendlypmc-knight-payback01-target": "Eliminate Kollontay on Streets of Tarkov while teamed up the Goons",
-	"friendlypmc-knight-payback01-fail": "You and Goons must not die or leave the raid while the task is active (Status: KIA, Left the Action, MIA, Ran Through)",
+	"677fe6a9f539f6d9230066e7": "Eliminate Kollontay on Streets of Tarkov while teamed up the Goons",
+	"677fe755f539f6d9230066e8": "You and Goons must not die or leave the raid while the task is active (Status: KIA, Left the Action, MIA, Ran Through)",
 
 	"friendlypmc-knight-enemyspotted name": "Enemy spotted",
 	"friendlypmc-knight-enemyspotted description": "BirdEye here, looks like you are getting the fellas to be all gaga over you. I wonder though, how good of a team player are you? Be my spotter and help me take out some targets. Now, I don't like small fries, if you run with me, we go for the big game. So, shall we?",
@@ -59,8 +59,8 @@
 	"friendlypmc-knight-enemyspotted declinePlayerMessage": "",
 	"friendlypmc-knight-enemyspotted changeQuestMessageText": "",
 	"friendlypmc-knight-enemyspotted note": "Both you and BirdEye will have to survive the raid. BirdEye must be the one to eliminate the targets",
-	"friendlypmc-knight-enemyspotted-target": "Assist BirdEye in eliminating 5 PMCs on Woods",
-	"friendlypmc-knight-enemyspotted-fail": "You and BirdEye must not die or leave the raid while the task is active (Status: KIA, Left the Action, MIA, Ran Through)",
+	"677fe7a6f539f6d9230066ec": "Assist BirdEye in eliminating 5 PMCs on Woods",
+	"677fe7a6f539f6d9230066ed": "You and BirdEye must not die or leave the raid while the task is active (Status: KIA, Left the Action, MIA, Ran Through)",
 
 	"friendlypmc-knight-coverme name": "Off Limits",
 	"friendlypmc-knight-coverme description": "We have a situation where we need to secure the Pier in Shoreline and BirdEye suggested for you to tag along. He called it 'part of the test'. Go with him and BigPipe and make sure no one thinks of approaching that Pier.",
@@ -71,8 +71,8 @@
 	"friendlypmc-knight-coverme declinePlayerMessage": "",
 	"friendlypmc-knight-coverme changeQuestMessageText": "",
 	"friendlypmc-knight-coverme note": "You, BirdEye and BigPipe will have to survive the raid",
-	"friendlypmc-knight-coverme-target": "Eliminate 8 targets around the Pier in Shoreline while teamed up with BirdEye and BigPipe",
-	"friendlypmc-knight-coverme-fail": "You and BirdEye must not die or leave the raid while the task is active (Status: KIA, Left the Action, MIA, Ran Through)",
+	"677fe82bf539f6d9230066f2": "Eliminate 8 targets around the Pier in Shoreline while teamed up with BirdEye and BigPipe",
+	"677fe82bf539f6d9230066f3": "You and BirdEye must not die or leave the raid while the task is active (Status: KIA, Left the Action, MIA, Ran Through)",
 
 	"friendlypmc-knight-afavor name": "Seal the deal",
 	"friendlypmc-knight-afavor description": "BirdEye here, you can really handle yourself outhere, I like running with you. Listen, I want you to help with something. That Shturman guy needs a real lesson in manners. We where in the Woods approaching the sawmill when he started acting all crazy about how this is his turf and how I should just change my name to Bullseye Bob because I can't hit anything. Well, I think we should show him who is the real One-Tapper. Help me deliver a lesson to him he will never forget and you are in. What do you say?",
@@ -83,6 +83,6 @@
 	"friendlypmc-knight-afavor declinePlayerMessage": "",
 	"friendlypmc-knight-afavor changeQuestMessageText": "",
 	"friendlypmc-knight-afavor note": "Both you and BirdEye will have to survive the raid",
-	"friendlypmc-knight-afavor-target": "Assist BirdEye in eliminating Shturman",
-	"friendlypmc-knight-afavor-fail": "You and BirdEye must not die or leave the raid while the task is active (Status: KIA, Left the Action, MIA, Ran Through)"
+	"677fe999f539f6d9230066fb": "Assist BirdEye in eliminating Shturman",
+	"677fe9d5f539f6d923006700": "You and BirdEye must not die or leave the raid while the task is active (Status: KIA, Left the Action, MIA, Ran Through)"
 }

@@ -6,11 +6,11 @@ import { BotDifficultyHelper } from "@spt/helpers/BotDifficultyHelper";
 import { BotController } from "@spt/controllers/BotController";
 
 import { IBotConfig } from "@spt/models/spt/config/IBotConfig";
-import { IHostilitySettings, IPmcConfig } from "@spt/models/spt/config/IPmcConfig";
+import { IPmcConfig } from "@spt/models/spt/config/IPmcConfig";
 
 import { ILogger } from "@spt/models/spt/utils/ILogger";
 
-import { IDifficulties, IBotType, IDifficultyCategories } from "@spt/models/eft/common/tables/IBotType";
+import { IBotType, IDifficultyCategories } from "@spt/models/eft/common/tables/IBotType";
 
 import { LogTextColor } from "@spt/models/spt/logging/LogTextColor";
 
@@ -27,11 +27,10 @@ import { HttpResponseUtil } from "@spt/utils/HttpResponseUtil";
 import { IUserDialogInfo } from "@spt/models/eft/profile/ISptProfile";
 
 import { DialogueController } from "@spt/controllers/DialogueController";
-import { DialogueCallbacks } from "@spt/callbacks/DialogueCallbacks";
 
 import { MatchCallbacks } from "@spt/callbacks/MatchCallbacks";
 
-import { ProbabilityObjectArray, RandomUtil } from "@spt/utils/RandomUtil";
+import { RandomUtil } from "@spt/utils/RandomUtil";
 import { BotGenerator } from "@spt/generators/BotGenerator";
 import { IBotBase } from "@spt/models/eft/common/tables/IBotBase";
 import { IBotGenerationDetails } from "@spt/models/spt/bots/BotGenerationDetails";
@@ -67,7 +66,7 @@ import { ItemTpl } from "@spt/models/enums/ItemTpl";
 
 import { ImporterUtil } from "@spt/utils/ImporterUtil";
 
-import { PitQuestItemEventRouter } from "./Quests";
+import { PitQuestItemEventRouter, Quests } from "./Quests";
 import { QuestItemEventRouter } from "@spt/routers/item_events/QuestItemEventRouter";
 import { IPmcData } from "@spt/models/eft/common/IPmcData";
 
@@ -75,9 +74,11 @@ import { BigPipeChatBot } from "./BigPipeChat";
 import { BirdEyeChatBot } from "./BirdEyeChat";
 
 import { IGetOtherProfileRequest } from "@spt/models/eft/profile/IGetOtherProfileRequest";
-import { IQuest } from "@spt/models/eft/common/tables/IQuest";
 
-import { objectCopy, objectForEach } from "./Utils";
+import { GameCallbacks } from "@spt/callbacks/GameCallbacks";
+import { IEmptyRequestData } from "@spt/models/eft/common/IEmptyRequestData";
+
+import { objectCopy } from "./Utils";
 import { IGetRaidConfigurationRequestData } from "@spt/models/eft/match/IGetRaidConfigurationRequestData";
 import { IAdditionalHostilitySettings } from "@spt/models/eft/common/ILocationBase";
 
@@ -214,7 +215,7 @@ class friendlyPMC {
 			},
 			{ frequency: "Always" }
 		);
-
+		// patch handleItemEvent so that we can handle our custom events
 		this.handleItemEvent = this.handleItemEvent.bind(this);
 		container.afterResolution(
 			"QuestItemEventRouter",
@@ -223,6 +224,19 @@ class friendlyPMC {
 					this.originalHandleItemEvent = result.handleItemEvent.bind(result);
 
 					result.handleItemEvent = this.handleItemEvent;
+				}
+			},
+			{ frequency: "Always" }
+		);
+		// patch launcher login to handle our custom quests
+		this.gameStart = this.gameStart.bind(this);
+		container.afterResolution(
+			"GameCallbacks",
+			(_t, result: GameCallbacks) => {
+				if (!this.originalGameStart) {
+					this.originalGameStart = result.gameStart.bind(result);
+
+					result.gameStart = this.gameStart;
 				}
 			},
 			{ frequency: "Always" }
@@ -403,7 +417,7 @@ class friendlyPMC {
 
 						if (!this.config.friendlyPMC) {
 							if (this.config.badGuy) {
-								loc.base.BotLocationModifier.AdditionalHostilitySettings.forEach(setting => {
+								loc.base.BotLocationModifier.AdditionalHostilitySettings.forEach((setting) => {
 									if (["pmcUSEC", "pmcBEAR"].includes(setting.BotRole)) {
 										setting.BearPlayerBehaviour = "AlwaysEnemies";
 										setting.UsecPlayerBehaviour = "AlwaysEnemies";
@@ -411,7 +425,7 @@ class friendlyPMC {
 								});
 							}
 						} else {
-							loc.base.BotLocationModifier.AdditionalHostilitySettings.forEach(setting => {
+							loc.base.BotLocationModifier.AdditionalHostilitySettings.forEach((setting) => {
 								if (["pmcUSEC", "pmcBEAR"].includes(setting.BotRole)) {
 									setting.BearPlayerBehaviour = this.config.badGuy || setting.BotRole == "pmcUSEC" ? "AlwaysEnemies" : "Neutral";
 									setting.UsecPlayerBehaviour = this.config.badGuy || setting.BotRole == "pmcBEAR" ? "AlwaysEnemies" : "Neutral";
@@ -466,7 +480,7 @@ class friendlyPMC {
 
 						conditionPromises.push(bot);
 
-						conditionPromises.forEach(profile => {
+						conditionPromises.forEach((profile) => {
 							if (custom) {
 								if (custom.Body) {
 									profile.Customization.Body = custom.Body;
@@ -554,17 +568,17 @@ class friendlyPMC {
 						const birdEyeFriend = this.birdEyeBot;
 						// Fika is removing Knight from the friend list, so we need to add him back
 						let friend = knightFriend.getChatBot();
-						if (list.Friends.findIndex(f => f.aid == friend.aid) == -1) {
+						if (list.Friends.findIndex((f) => f.aid == friend.aid) == -1) {
 							list.Friends.push(friend);
 						}
 						// Fika is removing BigPipe from the friend list, so we need to add him back
 						friend = bigPipeFriend.getChatBot();
-						if (list.Friends.findIndex(f => f.aid == friend.aid) == -1) {
+						if (list.Friends.findIndex((f) => f.aid == friend.aid) == -1) {
 							list.Friends.push(friend);
 						}
 						// Fika is removing BirdEye from the friend list, so we need to add him back
 						friend = birdEyeFriend.getChatBot();
-						if (list.Friends.findIndex(f => f.aid == friend.aid) == -1) {
+						if (list.Friends.findIndex((f) => f.aid == friend.aid) == -1) {
 							list.Friends.push(friend);
 						}
 
@@ -574,8 +588,8 @@ class friendlyPMC {
 						let hasKnightQuest = false;
 						let hasBigPipeQuest = false;
 						let hasBirdEyeQuest = false;
-						profile.Quests.forEach(quest => {
-							if (quest.qid == "6775d9957e2dbcb3bd0a02c7" && quest.status == 4) {
+						profile.Quests.forEach((quest) => {
+							if (quest.qid == "6775d:957e2dbcb3bd0a02c7" && quest.status == 4) {
 								hasKnightQuest = true;
 							}
 							if (["67768936fa281ca31708b17c"].includes(quest.qid) && quest.status == 4) {
@@ -594,14 +608,14 @@ class friendlyPMC {
 						}
 
 						if (!hasKnightQuest) {
-							list.Friends = list.Friends.filter(friend => friend._id != knightFriend.getChatBot()._id);
+							list.Friends = list.Friends.filter((friend) => friend._id != knightFriend.getChatBot()._id);
 						}
 						if (!hasBigPipeQuest) {
-							list.Friends = list.Friends.filter(friend => friend._id != bigPipeFriend.getChatBot()._id);
+							list.Friends = list.Friends.filter((friend) => friend._id != bigPipeFriend.getChatBot()._id);
 						}
 
 						if (!hasBirdEyeQuest) {
-							list.Friends = list.Friends.filter(friend => friend._id != birdEyeFriend.getChatBot()._id);
+							list.Friends = list.Friends.filter((friend) => friend._id != birdEyeFriend.getChatBot()._id);
 						}
 					} catch (e) {
 						this.Logger.error("friendlyPMC: Error in friend list: " + e);
@@ -886,6 +900,24 @@ class friendlyPMC {
 	handleItemEvent(eventAction: string, pmcData: IPmcData, body: any, sessionID: string) {
 		this.questItemEvent.handleItemEvent(eventAction, pmcData, body, sessionID);
 		return this.originalHandleItemEvent(eventAction, pmcData, body, sessionID);
+	}
+
+	originalGameStart: GameCallbacks["gameStart"];
+	gameStart(url: string, info: IEmptyRequestData, sessionID: string) {
+		const result = this.originalGameStart(url, info, sessionID);
+
+		const profile = this.profileHelper.getPmcProfile(sessionID);
+		if (!profile) return result;
+		profile.Quests.forEach((quest) => {
+			let id = quest.qid;
+			if (Quests[id]) {
+				if (quest.status == 2) {
+					this.questItemEvent.handleItemEvent("QuestAccept", profile, { qid: id }, sessionID);
+				}
+			}
+		});
+
+		return result;
 	}
 }
 

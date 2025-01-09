@@ -1,53 +1,4 @@
--- === 3.9 === ---:
-- x - remove from player's inventory any equipment he looted from his dead teammates
-- x - bot to signal teammate down
-
-- x - "On Your Own" to be enhanced where the followers will form a partol perimeter around the player with configurable distance ?
-
-- x - prepare the stage for working with different languages
-
-- x - assist tactic should also do supression on it's own and also use grenades
-- x - goons can do supression (no grenades) while using the "Assist" tactic
-- x - investigate the hands stuck after throwing a grenade bug further
-
-- #inprogress - more improvement on awareness
-- x - better checks for enemy voice (if it is a battle voice - auto aquire target)
-- x - check for bush sounds
-- x - increase hearing volume
-- - check for gunshots and auto aquire target if close enough
-
-- x - revamp the search action where we manually check the best spot for a shooting position rather than just doing a random pick
-
-- x - add "Bad Guy" setting
-
-- x - fix glitchy behavior of boss followers
-- x - Knigh and BigPipe
-
-- x - the "Bad Guy" setting should be active when running with bosses 
-
-- x - see what other screens need patching after having Knight join the group
-- x - on disband group, spawn flags need to be reset
-
-- investigate if health multiplier is not working when using "default" setup for followers
-
-- x - see if we can make friends list refresh only when an active quest is completed 
-
-- #inprogress - The Goons Quests (phase 1 - unlocking all members):
-- x - add a quest to unlock Knight as a friend
-- x - make it possible for Knight to appear as a friend once the quest is completed
-- x - hook into Player.OnBeenKilledByAggressor to count kills made by Knight as a way to progress kill quests
-- x - upon starting the first quest, the Goons are no longer hostile towards the player
-- x - make Knight standing go down whenever the player aggros the Goons (but not below 0.1, below 0.5 both BirdEye and BigPipe will no longer be available as friends)(only after the first quest is completed)
-- x - hook into client/profile/view to have Knight show as "the other user" in the profile
-
-- x - when surviving a raid with Knight, increase good standing with him [+0.02] (only after the first quest is completed)
-- x - at standing 0.5 unlock trading with Knight
-- x- add level 2 items for trading
-- x - add level 3 items for trading
-
-- upgrade to SPT 3.10.x
-
--- === 3.9.1 === ---:
+-- === 3.9.2 === ---:
 - attempt to make transit work while in a group with the Goons
 - fix SAIN hearing patch interfering with the mod
 - bug fixes (whatever will be needed)
@@ -67,27 +18,8 @@
 
 
 ==================================================================================
-RELEASE NOTES (3.9) 
-- update to SPT 3.10.x
-- New dependency: Virtual's Custom Quest Loader
-- added a "Bad Guy" setting. This will make the player hostile to all factions. This will be on whenever you are running with the Goons.
-- removed "Same PMC Side Hostile" and replaced it with "Friendly PMC Side" which is on by default. This is in order to leave the new behavior that the game brings with PMC Karma to take over when this is off.
-- new quests added to unlock Knight as a friend (he will appear as a trader) and for unlocking the full Goons squad
-- added 2 new bindings - Followers Teleport and Followers Heal
-- the mod can now work with different languages. It will based on the language you set for your game. There are only 4 languages available for now: English, Russian, German, and Romanian. You can look into user/mods/friendlyPMC/lang and add more language jsons there (PM me with the file and I will add it to the mod). For quests, languages are in mods\Virtual's Custom Quest Loader\database\locales - en\ge\ro\ru
-- "On Your Own" will now make followers patrol around the player with a configurable distance when out of combat. In order for this to work they must not be told to hold position and be out of combat. "Follow Me" can get them out of patrol mode while still retaining the other settings that "On Your Own" has.
-- you can no longer loot spawned followers equipment This does not apply to consumables like magazines, ammo, meds, etc.
-- fix having the gifter seen as an enemy to your followers
+RELEASE NOTES (3.9.2) 
 
-- - when starting the first quest exUsec are no longer hostile towards the player
-- - when completing the first quest, Knight will appear as a friend and the Goons are no longer hostile towards the player
-
-Issues:
-- transit won't work while in a group with the Goons
-- sometimes bots can pick up enemies far away and start running towards them
-- "Bad Guy" flag does not always make all same side bots hostile (some can spawn in a "warning" mode where they won't attack you until you get close enough to them)
-- "friendly PMC side" flag does not always make all same side bots friendly (the "warning" mode can affect this one as well - it's something new in the game and can't be fully disabled)
-- bots in "Assist" tactic will not turn hostile on accidental shots (this means bots you picked up during raids, Scav followers or Goons)
 ==================================================================================
 NOTES:
 - we can save a bot's profile after it was generated in order to be re-used by simply sending the profile to BE. We should save it by nickname. (we still need to figure out how to progress the bot's level with the player )
