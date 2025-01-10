@@ -1,18 +1,16 @@
 ﻿using EFT;
 using friendlyPMC.Components;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace friendlyPMC.Actions
 {
-    // GClass224 enhancement
-    internal class FollowerSuppressionFire : GClass224
+    /**
+     * Enhancement of the suppression fire action for a follower
+     */
+    public class FollowerSuppressionFire : GClass259
     {
-        private readonly GClass145 gclass145_0;
+        private readonly GClass167 gclass145_0;
 
         private bool _init = false;
         private bool grSupport = false;
@@ -24,7 +22,7 @@ namespace friendlyPMC.Actions
         private bool bool_1 = false;
         public FollowerSuppressionFire(BotOwner bot) : base(bot)
         {
-            gclass145_0 = new GClass145(bot);
+            gclass145_0 = new GClass167(bot);
         }
 
         protected virtual void Init()
@@ -127,7 +125,7 @@ namespace friendlyPMC.Actions
                 {
                     ShootPointClass shootPointClass = new ShootPointClass(point.Value, 1f);
 
-                    if (GClass301.CanShootToTarget(shootPointClass, botOwner_0.WeaponRoot.position, botOwner_0.LookSensor.Mask, false))
+                    if (GClass344.CanShootToTarget(shootPointClass, botOwner_0.WeaponRoot.position, botOwner_0.LookSensor.Mask, false))
                     {
                         bool_1 = true;
                         botOwner_0.StopMove();
@@ -137,7 +135,7 @@ namespace friendlyPMC.Actions
 
                     Vector3? firePosition = Utils.Covers.FindShootPosition(botOwner_0, 12f, 70f, position =>
                     {
-                        if (GClass301.CanShootToTarget(shootPointClass, position + botOwner_0.WeaponRoot.position, botOwner_0.LookSensor.Mask, false))
+                        if (GClass344.CanShootToTarget(shootPointClass, position + botOwner_0.WeaponRoot.position, botOwner_0.LookSensor.Mask, false))
                         {
                             return true;
                         }

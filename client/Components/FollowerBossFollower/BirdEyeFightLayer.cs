@@ -8,7 +8,10 @@ using UnityEngine;
 
 namespace friendlyPMC.Components.FollowerBossFollower
 {
-    internal class BirdEyeFightLayer : GClass61
+    /**
+     * Overwrite of BirdEye's fight layer
+     */
+    public class BirdEyeFightLayer : GClass63
     {
         private FollowerSniperLayer followerSniperLayer;
         private FollowerCommonLayer followerCommonLayer;
@@ -96,15 +99,16 @@ namespace friendlyPMC.Components.FollowerBossFollower
 
                 // player needs help or has call for a regroup
                 if (
-                    ordersChanged && request != null &&
+                    request != null &&
                     request.BotRequestType == (BotRequestType)CustomBotRequestType.Regroup &&
                     Utils.Utils.GetNavDistance(botPosition, bossPosition) > followerCommonLayer.regroupMinDistance
                 )
                 {
-
-                    if (!botOwner_0.Memory.HaveEnemy || !botOwner_0.Memory.GoalEnemy.IsVisible)
+                    if (!botOwner_0.Memory.HaveEnemy || !goalEnemy.IsVisible)
                     {
-                        return followerCommonLayer.GetCloserToBoss(out customNavigationPoint_0);
+                        aicoreActionResultStruct = followerCommonLayer.GetCloserToBoss(out customNavigationPoint_0);
+                        if (aicoreActionResultStruct != null)
+                            return (AICoreActionResultStruct<BotLogicDecision>)aicoreActionResultStruct;
                     }
                     else
                     {
@@ -114,7 +118,7 @@ namespace friendlyPMC.Components.FollowerBossFollower
                 }
 
                 // do not pursue a marksman
-                if (botOwner_0.Memory.GoalEnemy.Owner.IsRole(WildSpawnType.marksman))
+                if (botOwner_0.Memory.HaveEnemy && goalEnemy.Owner.IsRole(WildSpawnType.marksman))
                 {
                     return followerCommonLayer.MarksManFight(out customNavigationPoint_0);
                 }
@@ -208,7 +212,7 @@ namespace friendlyPMC.Components.FollowerBossFollower
             {
                 Modules.Logger.LogInfo("BirdEye Decision Error: " + ex.Message);
                 Modules.Logger.LogInfo("Trace: " + ex.StackTrace);
-                return new AICoreActionResultStruct<BotLogicDecision>(HoldFor(GClass761.Random(1f, 2f)), "decision.Error");
+                return new AICoreActionResultStruct<BotLogicDecision>(HoldFor(GClass824.Random(1f, 2f)), "decision.Error");
             }
         }
 

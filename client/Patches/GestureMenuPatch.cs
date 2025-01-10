@@ -33,11 +33,11 @@ namespace friendlyPMC.Patches
 
                     enemyPhrases.ForEach(phrase =>
                     {
-                        GesturesMenu.Class2965 @class = new GesturesMenu.Class2965();
+                        GesturesMenu.Class3160 @class = new GesturesMenu.Class3160();
                         @class.gesturesMenu_0 = __instance;
                         @class.isSituational = false;
-                        GestureBaseItem gestureBaseItem = item.CreateNewPhrase(phrase, @class.isSituational);
-                        gestureBaseItem.OnPointerClicked.Subscribe(new Action<GestureBaseItem.GStruct399>(@class.method_0));
+                        GestureBaseItem gestureBaseItem = item.CreateNewPhrase(phrase, false);
+                        gestureBaseItem.OnPointerClicked.Subscribe(new Action<GestureBaseItem.GStruct431>(@class.method_0));
                         list_1.Add(gestureBaseItem);
                     });
                 }
@@ -48,11 +48,11 @@ namespace friendlyPMC.Patches
 
                     statusPhrases.ForEach(phrase =>
                     {
-                        GesturesMenu.Class2965 @class = new GesturesMenu.Class2965();
+                        GesturesMenu.Class3160 @class = new GesturesMenu.Class3160();
                         @class.gesturesMenu_0 = __instance;
                         @class.isSituational = false;
-                        GestureBaseItem gestureBaseItem = item.CreateNewPhrase((EPhraseTrigger)phrase, @class.isSituational);
-                        gestureBaseItem.OnPointerClicked.Subscribe(new Action<GestureBaseItem.GStruct399>(@class.method_0));
+                        GestureBaseItem gestureBaseItem = item.CreateNewPhrase((EPhraseTrigger)phrase,false);
+                        gestureBaseItem.OnPointerClicked.Subscribe(new Action<GestureBaseItem.GStruct431>(@class.method_0));
                         list_1.Add(gestureBaseItem);
                     });
 
@@ -91,17 +91,17 @@ namespace friendlyPMC.Patches
             {
                 if (trigger == EPhraseTrigger.OnRepeatedContact)
                 {
-                    __result = ((Dictionary<string, string>)friendlyPMC.optionsLang["gestures"])["OnRepeatedContact"];
+                    __result = friendlyPMC.optionsLang.gestures["OnRepeatedContact"];
                     return false;
                 }
                 else if (trigger == (EPhraseTrigger)CustomPhrases.TeamStatus)
                 {
-                    __result = ((Dictionary<string, string>)friendlyPMC.optionsLang["gestures"])["TeamStatus"];
+                    __result = friendlyPMC.optionsLang.gestures["TeamStatus"];
                     return false;
                 }
                 else if (trigger == (EPhraseTrigger)CustomPhrases.OverThere)
                 {
-                    __result = ((Dictionary<string, string>)friendlyPMC.optionsLang["gestures"])["OverThere"];
+                    __result = friendlyPMC.optionsLang.gestures["OverThere"];
                     return false;
                 }
             }

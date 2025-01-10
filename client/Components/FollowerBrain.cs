@@ -12,7 +12,7 @@ using HandEvent = GEventArgs1;
 
 namespace friendlyPMC.Components
 {
-    internal class FollowerBrain : BaseBrain
+    public class FollowerBrain : BaseBrain
     {
         FollowerFightLayer fightLayer;
 
@@ -89,7 +89,7 @@ namespace friendlyPMC.Components
         private const float TIME_TO_RESET_HEAL_FIRSTAID = 15f;
         private const float TIME_TO_RESET_HEAL_STIMS = 3f;
         private const float TIME_TO_RESET_HEAL_SURGERY = 40f;
-        private const float TIME_TO_RESET_WEAPONS_GRENADE = 5f;
+        private const float TIME_TO_RESET_WEAPONS_GRENADE = 3f;
         private const float TIME_TO_RESET_WEAPONS_SWAP = 3f;
 
         private bool GRENADE_THROWING = false;
@@ -175,7 +175,6 @@ namespace friendlyPMC.Components
         /** Add the brain layers for the follower bot. Order matter in terms of the initial priority */
         public virtual void AddLayers()
         {
-            // order matters for which layer get the initial priority
             // - follow
             FollowerLayer followLayer = new FollowerLayer(_owner, 50);
             method_0(1, followLayer, true);
@@ -192,10 +191,10 @@ namespace friendlyPMC.Components
             GClass36 layer = new FollowerAvoidDanger(_owner, 130);
             method_0(4, layer, true);
             // - weapon malfunction
-            GClass98 layer3 = new GClass98(_owner, 88);
+            GClass105 layer3 = new GClass105(_owner, 88);
             method_0(5, layer3, true);
             // - stay at position in prone mode
-            GClass104 layer8 = new GClass104(_owner, 10, false, CoverLevel.Lay);
+            GClass123 layer8 = new GClass123(_owner, 10, false, CoverLevel.Lay);
             method_0(7, layer8, true);
             // - item taker
             FollowerLootLayer layer9 = new FollowerLootLayer(_owner, 51);
@@ -210,9 +209,9 @@ namespace friendlyPMC.Components
             return "FLBPlayer";
         }
 
-        public override GClass578 EventsPriority()
+        public override GClass635 EventsPriority()
         {
-            return new GClass578(1, 75, 45, 76);
+            return new GClass635(1, 75, 45, 76);
         }
 
         protected virtual void OnDead(EDamageType damageType)
@@ -279,7 +278,7 @@ namespace friendlyPMC.Components
         }
 
         /** Bot should turn to the direction from where he got shot, if he is nor already in combat */
-        protected void BeingHitAction(DamageInfo damageInfo, EBodyPart bodyType, float damageReducedByArmor)
+        protected void BeingHitAction(DamageInfoStruct damageInfo, EBodyPart bodyType, float damageReducedByArmor)
         {
             if (!_owner.Memory.HaveEnemy && damageInfo.Player != null)
             {
@@ -338,20 +337,28 @@ namespace friendlyPMC.Components
             // on gun shot if there is a line of sight, turn immmediately
             if((type == AISoundType.silencedGun || type == AISoundType.gun) && !WasHit) 
             {
-                if(distance <= 20f) Utils.Enemy.MakeEnemy(_owner, enemy);
-                else if(
-                    GClass301.CanShootToTarget(new ShootPointClass(_owner.GetPlayer.MainParts[BodyPartType.head].Position,1f),enemy.PlayerBones.WeaponRoot.position,_owner.LookSensor.Mask) ||
-                    GClass301.CanShootToTarget(new ShootPointClass(_owner.GetPlayer.MainParts[BodyPartType.head].Position,1f), enemy.PlayerBones.WeaponRoot.position, _owner.LookSensor.Mask)
-                ) {
-                    Vector3 shootdir = position - _owner.GetPlayer.Transform.position;
+                Vector3 shootdir = position - _owner.GetPlayer.Transform.position;
 
-                    if (shootdir.sqrMagnitude < 1f)
-                    {
-                        shootdir = shootdir.normalized;
+                if (shootdir.sqrMagnitude < 1f)
+                {
+                    shootdir = shootdir.normalized;
+                }
+
+                shootdir *= 20f; // ensure the bot will not look down at the ground
+
+                if (distance <= 35f)
+                {
+                    FakeShot(shootdir);
+                    if(distance <= 20f) {
+                        EnemyInfo enInfo = Utils.Enemy.MakeEnemy(_owner, enemy);
+                        enInfo?.SetVisible(true);
                     }
-                    
-                    shootdir *= 20f; // ensure the bot will not look down at the ground
-
+                }
+                else if (
+                    GClass344.CanShootToTarget(new ShootPointClass(_owner.GetPlayer.MainParts[BodyPartType.head].Position, 1f), enemy.PlayerBones.WeaponRoot.position, _owner.LookSensor.Mask) ||
+                    GClass344.CanShootToTarget(new ShootPointClass(_owner.GetPlayer.MainParts[BodyPartType.head].Position, 1f), enemy.PlayerBones.WeaponRoot.position, _owner.LookSensor.Mask)
+                )
+                {
                     FakeShot(shootdir);
                     _lastGunshotTime = Time.time;
                     return;
@@ -361,33 +368,40 @@ namespace friendlyPMC.Components
             else if(type == AISoundType.step) 
             {
                  Vector3 positionZone = new Vector3(
-                    Mathf.Floor(position.x / 18f) * 18f,
-                    Mathf.Floor(position.y / 18f) * 18f,
-                    Mathf.Floor(position.z / 18f) * 18f
+                    Mathf.Floor(position.x / 8f) * 8f,
+                    Mathf.Floor(position.y / 8f) * 8f,
+                    Mathf.Floor(position.z / 8f) * 8f
                 );
 
                 bool wasProcessed = processedSoundPositions.Contains(positionZone);
 
                 if(wasProcessed && Time.time - _lastSoundTime > 5f ) return;
 
-                if(distance <= 12f) Utils.Enemy.MakeEnemy(_owner, enemy);
-                else {
+                Vector3 dir = position - _owner.GetPlayer.Transform.position;
+
+                if (dir.sqrMagnitude < 1f)
+                {
+                    dir = dir.normalized;
+                }
+
+                dir *= 20f; // ensure the bot will not look down at the ground
+
+                if (!wasProcessed)
+                {
+                    processedSoundPositions.Add(positionZone);
+                    if (processedSoundPositions.Count > 20) processedSoundPositions.RemoveAt(0);
+                }
+
+                if (distance <= 12f)
+                {
+                    FakeShot(dir);
+                    EnemyInfo enInfo = Utils.Enemy.MakeEnemy(_owner, enemy);
+                    enInfo?.SetVisible(true);
+                }
+                else
+                {
                     _lastSoundTime = Time.time;
 
-                    Vector3 dir = position - _owner.GetPlayer.Transform.position;
-
-                    if (dir.sqrMagnitude < 1f)
-                    {
-                        dir = dir.normalized;
-                    }
-                    
-                    dir *= 20f; // ensure the bot will not look down at the ground
-
-                    if(!wasProcessed) {
-                        processedSoundPositions.Add(positionZone);
-                        if(processedSoundPositions.Count > 20) processedSoundPositions.RemoveAt(0);
-                    }
-                    
                     FakeShot(dir);
                 }
             }
@@ -420,25 +434,26 @@ namespace friendlyPMC.Components
             FakeShot(estimatedPos);
         }
         /** On Leave info about this bot should be cleared */
-        public virtual void OnLeave(BotOwner _bot)
+        private void OnLeave(BotOwner _bot)
         {
             OnKilled();
         }
         /** On Death info about this bot should be cleared */
-        protected void OnKilled()
+        protected virtual void OnKilled()
         {
             // remove this bot from being a follower
             Dismissed();
             BossPlayers.RemoveFollower(_owner, _boss);
         }
          
-        protected virtual void OnThrow()
+        private void OnThrow()
         {
             GRENADE_THROWING = true;
+            _busyTimer = 0f;
         }
         protected virtual void OnAddEnemy(IPlayer player)
         {
-            // how does the boss or BTR get added as Enemy here ?? - fix it
+            // how does the boss get added as Enemy here ?? - fix it
             if (
                 player != null && 
                 (
@@ -470,7 +485,6 @@ namespace friendlyPMC.Components
         {
             // remove this bot from being a follower
             BossPlayers.RemoveFollower(_owner, _boss);
-
             base.Dispose();
         }
 
@@ -502,7 +516,6 @@ namespace friendlyPMC.Components
 
                 if(_owner.WeaponManager != null && _owner.WeaponManager.Grenades != null)
                     _owner.WeaponManager.Grenades.OnGrenadeThrowStart -= OnThrow;
-
             }
             catch(Exception ex)
             {
@@ -549,9 +562,9 @@ namespace friendlyPMC.Components
         private void SetGrenadierSelector()
         {
             _owner.WeaponManager.Selector.Dispose();
-            _owner.WeaponManager.Selector = new GClass396(_owner);
+            _owner.WeaponManager.Selector = new GClass441(_owner);
 
-            GClass396 selector = _owner.WeaponManager.Selector as GClass396;
+            GClass441 selector = _owner.WeaponManager.Selector as GClass441;
 
             selector.OnActiveEquipmentSlotChanged = (Action<EquipmentSlot>)Delegate.Combine(selector.OnActiveEquipmentSlotChanged, new Action<EquipmentSlot>(_owner.WeaponManager.method_0));
 
@@ -564,7 +577,7 @@ namespace friendlyPMC.Components
         public void HandsReset()
         {
             Player player = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(_owner.ProfileId);
-            InventoryControllerClass inventoryController = player.InventoryControllerClass;
+            InventoryController inventoryController = player.InventoryController;
             if (inventoryController == null)
             {
                 _busyTimer = 0f;

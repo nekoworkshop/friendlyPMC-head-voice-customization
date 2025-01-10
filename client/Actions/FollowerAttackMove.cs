@@ -1,10 +1,11 @@
 ﻿using EFT;
-using System.Threading;
-using UnityEngine;
 
 namespace friendlyPMC.Actions
 {
-    internal class FollowerAttackMove : GClass162
+    /**
+     * Overwrite of attackMoving decision to fix bot's aiming direction
+     */
+    public class FollowerAttackMove : GClass185
     {
 
         public FollowerAttackMove(BotOwner bot) : base(bot)
@@ -17,7 +18,7 @@ namespace friendlyPMC.Actions
             EnemyInfo goalEnemy = botOwner_0.Memory.GoalEnemy;
             if (goalEnemy != null && goalEnemy.CanShoot && goalEnemy.IsVisible)
             {
-                gclass136_0.Update();
+                gclass158_0.Update();
                 return;
             }
 

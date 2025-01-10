@@ -6,15 +6,9 @@ using friendlyPMC.Modules;
 using HarmonyLib;
 using JetBrains.Annotations;
 
-using System;
 using System.Collections.Generic;
 
 using System.Reflection;
-using System.Threading.Tasks;
-using UnityEngine;
-using System.Diagnostics;
-using Sirenix.Serialization.Utilities;
-using static WindowsManager;
 
 namespace friendlyPMC.Patches
 {
@@ -51,15 +45,17 @@ namespace friendlyPMC.Patches
             if (
                 enemy.Side == botOwner_0.Side && groupInfo.Cause == EBotEnemyCause.AddNewMember &&
                 (
-                    (enemy.Side == EPlayerSide.Bear && !botOwner_0.Settings.FileSettings.Mind.DEFAULT_BEAR_BEHAVIOUR.HasFlag(EWarnBehaviour.Attack)) ||
-                    (enemy.Side == EPlayerSide.Usec && !botOwner_0.Settings.FileSettings.Mind.DEFAULT_USEC_BEHAVIOUR.HasFlag(EWarnBehaviour.Attack)) ||
-                    (enemy.Side == EPlayerSide.Savage && !botOwner_0.Settings.FileSettings.Mind.DEFAULT_SAVAGE_BEHAVIOUR.HasFlag(EWarnBehaviour.Attack))
+                    (enemy.Side == EPlayerSide.Bear && !botOwner_0.Settings.FileSettings.Mind.DEFAULT_BEAR_BEHAVIOUR.HasFlag(EWarnBehaviour.AlwaysEnemies)) ||
+                    (enemy.Side == EPlayerSide.Usec && !botOwner_0.Settings.FileSettings.Mind.DEFAULT_USEC_BEHAVIOUR.HasFlag(EWarnBehaviour.AlwaysEnemies)) ||
+                    (enemy.Side == EPlayerSide.Savage && !botOwner_0.Settings.FileSettings.Mind.DEFAULT_SAVAGE_BEHAVIOUR.HasFlag(EWarnBehaviour.AlwaysEnemies))
                 )
             )
             {
                 return false;
             }
-            if (isfollower && (enemy.Profile.Info.Settings.Role == WildSpawnType.shooterBTR || enemy.Profile.Info.Settings.Role == WildSpawnType.peacefullZryachiyEvent)) return false;
+
+            if (isfollower && (enemy.Profile.Info.Settings.Role == WildSpawnType.shooterBTR || enemy.Profile.Info.Settings.Role == WildSpawnType.peacefullZryachiyEvent || enemy.Profile.Info.Settings.Role == WildSpawnType.gifter)) return false;
+
             // prevent followers from adding teammates as an enemy
             if (isfollower && botOwner_0.BotFollower.HaveBoss)
             {
@@ -73,6 +69,7 @@ namespace friendlyPMC.Patches
                         break;
                     }
                 }
+                
                 if (isTeammate) return false;
             }
             // prevent followers from adding boss player as an enemy
@@ -92,7 +89,7 @@ namespace friendlyPMC.Patches
             {
                 var botOwner_0 = AccessTools.Field(typeof(BotMemoryClass), "botOwner_0").GetValue(__instance) as BotOwner;
 
-                if (botOwner_0.IsRole(WildSpawnType.shooterBTR) || botOwner_0.IsRole(WildSpawnType.peacefullZryachiyEvent)) return;
+                if (botOwner_0.IsRole(WildSpawnType.shooterBTR) || botOwner_0.IsRole(WildSpawnType.peacefullZryachiyEvent) || botOwner_0.IsRole(WildSpawnType.gifter)) return;
 
                 if (botOwner_0.EnemiesController.EnemyInfos.ContainsKey(enemy))
                 {
@@ -114,16 +111,17 @@ namespace friendlyPMC.Patches
             }
         }
     }
-
+    /**
+     * This patch is used to prevent followers from adding teammates as an enemy on friendly fire
+     */
     internal class BotMemoryDamagePatch : ModulePatch
     {
-        public static List<BotOwner> removedBots = new List<BotOwner>();
         protected override MethodBase GetTargetMethod()
         {
-            return AccessTools.Method(typeof(BotMemoryClass), "method_7");
+            return AccessTools.Method(typeof(BotMemoryClass), "method_8");
         }
         [PatchPostfix]
-        private static void PatchPostfix(BotMemoryClass __instance, DamageInfo damageInfo)
+        private static void PatchPostfix(BotMemoryClass __instance, DamageInfoStruct damageInfo)
         {
             var botOwner_0 = AccessTools.Field(typeof(BotMemoryClass), "botOwner_0").GetValue(__instance) as BotOwner;
             var botsGroupField = AccessTools.Field(typeof(BotMemoryClass), "botsGroup_0");
@@ -149,41 +147,26 @@ namespace friendlyPMC.Patches
             var brain = botOwner_0.Brain.BaseBrain as FollowerBrain;
             if (brain == null) return;
 
-            if (brain.currentTactic == "Assist")
+            botOwner_0.BotTalk.TrySay(EPhraseTrigger.FriendlyFire, true);
+
+            /*if (brain.currentTactic == "Assist")
             {
                 var boss = botOwner_0.BotFollower.BossToFollow as pitAIBossPlayer;
                 if (boss == null) return;
 
                 if (damageInfo.Damage <= botOwner_0.Settings.FileSettings.Aiming.MIN_DAMAGE_TO_GET_HIT_AFFETS) return;
 
-                BotZone zone = botOwner_0.BotsGroup.BotZone;
-
-                BossPlayers.Instance.GetFollower(botOwner_0).Dismiss();
-
+                BossPlayers.Instance.GetFollower(botOwner_0).Dismiss(true);
                 BossPlayers.RemoveFollower(botOwner_0, boss);
 
-
-                // make a group to add this bot to as things do not work otherwise
-                var deadBodiesController = AccessTools.Field(typeof(BotSpawner), "_deadBodiesController").GetValue(botOwner_0.BotsController.BotSpawner) as DeadBodiesController;
-                var allPlayers = AccessTools.Field(typeof(BotSpawner), "_allPlayers").GetValue(botOwner_0.BotsController.BotSpawner) as List<Player>;
-
-                List<BotOwner> list = new List<BotOwner>();
-                foreach (BotOwner item in botOwner_0.BotsController.BotSpawner.method_4(botOwner_0))
-                {
-                    list.Add(item);
-                }
-
-                BotsGroup group = new BotsGroup(zone, botOwner_0.BotsController.BotGame, botOwner_0, list, deadBodiesController, allPlayers, false);
-                botOwner_0.BotsGroup = group;
-                botsGroupField.SetValue(__instance, group);
+                __instance.DangerData.TargetNull();
 
                 Player enemy = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(damageInfo.Player.iPlayer.ProfileId);
-
-                removedBots.Add(botOwner_0);
-
-                Utils.Enemy.MakeEnemy(botOwner_0, enemy, EBotEnemyCause.checkAddTODO);
-
-            }
+                
+                EnemyInfo info = Utils.Enemy.MakeEnemy(botOwner_0, enemy, EBotEnemyCause.followGetHit);
+                
+                botOwner_0.CalcGoal();
+            }*/
         }
     }
 }

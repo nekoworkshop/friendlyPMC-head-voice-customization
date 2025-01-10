@@ -4,7 +4,7 @@ using friendlyPMC.Components.BossFollower;
 
 namespace friendlyPMC.Components.FollowerBossFollower
 {
-    internal class BigPipeFollowerBrain : FollowerBrain
+    public class BigPipeFollowerBrain : FollowerBrain
     {
 
         BigPipeArtilleryLayer fightLayer;
@@ -16,24 +16,24 @@ namespace friendlyPMC.Components.FollowerBossFollower
         public override void AddLayers()
         {
             // order matters for which layer get the initial priority
-            // - follow
+            // follow
             BossFollowLayer followLayer = new BossFollowLayer(_owner, 50);
             method_0(1, followLayer, true);
+            // requests
+            FollowerRequestLayer layer4 = new FollowerRequestLayer(_owner, 55);
+            method_0(2, layer4, true);
             // avoid danger
             KnightAvoidDangerLayer layer = new KnightAvoidDangerLayer(_owner, 80);
-            base.method_0(2, layer, true);
+            base.method_0(3, layer, true);
             // weapon maintenance during combat
             KnightWeaponMtnLayer layer2 = new KnightWeaponMtnLayer(_owner, 78);
-            base.method_0(3, layer2, true);
-            // assault building
-            //KnightAssaultBuildingLayer layer3 = new KnightAssaultBuildingLayer(_owner, 70);
-            //base.method_0(4, layer3, true);
+            base.method_0(4, layer2, true);
             // artillerry support
-            fightLayer = new BigPipeArtilleryLayer(_owner, 60);
-            base.method_0(6, fightLayer, true);
+            fightLayer = new BigPipeArtilleryLayer(_owner, 65);
+            base.method_0(5, fightLayer, true);
             // - item taker
             FollowerLootLayer layer7 = new FollowerLootLayer(_owner, 40);
-            method_0(7, layer7, true);
+            method_0(6, layer7, true);
         }
 
         public override string ShortName()
@@ -44,6 +44,28 @@ namespace friendlyPMC.Components.FollowerBossFollower
         public override void BossOrdersChanged()
         {
             fightLayer.OrdersChanged();
+        }
+
+        protected override void OnDead(EDamageType damageType)
+        {
+            if (_boss == null) return;
+            // watch for active quests requiring BigPipe as teamate and mark them as failed if he dies
+            _boss.realPlayer.AbstractQuestControllerClass.Quests.ExecuteForEach(quest => {
+                foreach (var id in Utils.Props.Quests["BigPipe"])
+                {
+                    if (quest.Template.Id == id && (quest.QuestStatus == EFT.Quests.EQuestStatus.Started || quest.QuestStatus == EFT.Quests.EQuestStatus.AvailableForFinish))
+                    {
+                        if (Utils.Utils.FlagGet("questGoons"))
+                        {
+                            quest.SetStatus(EFT.Quests.EQuestStatus.Fail, true, false);
+                        }
+                    }
+                }
+            });
+
+            base.OnDead(damageType);
+
+            
         }
     }
 }

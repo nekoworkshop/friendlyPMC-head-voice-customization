@@ -5,7 +5,11 @@ using UnityEngine;
 
 namespace friendlyPMC.Components.Tactics
 {
-    internal class FollowerPusherLayer : GClass47
+    /** 
+     * This class is not meant to be used directly as a brain layer, but within one 
+     * Enemy Push layer based on Boar follower fight logic
+     * **/
+    public class FollowerPusherLayer : GClass48
     {
         private FollowerCommonLayer commonLayer;
 
@@ -140,8 +144,8 @@ namespace friendlyPMC.Components.Tactics
                             {
                                 if (holdTimer < Time.time)
                                 {
-                                    float timer = GClass761.Random(2f, 5f);
-                                    holdTimer = Time.time + timer + GClass761.Random(2f, 3f);
+                                    float timer = GClass824.Random(2f, 5f);
+                                    holdTimer = Time.time + timer + GClass824.Random(2f, 3f);
                                     return new AICoreActionResultStruct<BotLogicDecision>(HoldFor(timer), "wait4it");
                                 }
                                 else
@@ -188,8 +192,8 @@ namespace friendlyPMC.Components.Tactics
                             // No cover point found, hold position temporarily
                             if (holdTimer < Time.time)
                             {
-                                float timer = GClass761.Random(2f, 5f);
-                                holdTimer = Time.time + timer + GClass761.Random(2f, 3f);
+                                float timer = GClass824.Random(2f, 5f);
+                                holdTimer = Time.time + timer + GClass824.Random(2f, 3f);
                                 return new AICoreActionResultStruct<BotLogicDecision>(HoldFor(timer), "wait4it");
                             }
                         }
@@ -228,8 +232,8 @@ namespace friendlyPMC.Components.Tactics
                             // --- no approachable point found, hold position temporarily
                             if (holdTimer < Time.time)
                             {
-                                float timer = GClass761.Random(2f, 5f);
-                                holdTimer = Time.time + timer + GClass761.Random(2f, 3f);
+                                float timer = GClass824.Random(2f, 5f);
+                                holdTimer = Time.time + timer + GClass824.Random(2f, 3f);
                                 return new AICoreActionResultStruct<BotLogicDecision>(HoldFor(timer), "wait4it");
                             }
                         }
@@ -249,8 +253,8 @@ namespace friendlyPMC.Components.Tactics
                             // --- no cover point found, hold position temporarily
                             if (holdTimer < Time.time)
                             {
-                                float timer = GClass761.Random(2f, 5f);
-                                holdTimer = Time.time + timer + GClass761.Random(2f, 3f);
+                                float timer = GClass824.Random(2f, 5f);
+                                holdTimer = Time.time + timer + GClass824.Random(2f, 3f);
                                 return new AICoreActionResultStruct<BotLogicDecision>(HoldFor(timer), "wait4it");
                             }
                             else
@@ -259,7 +263,7 @@ namespace friendlyPMC.Components.Tactics
                     }
                 }
                 // - if the enemy is not visible
-                else if (Time.time - lastEnemySeenTime < GClass761.Random(2f, 5f))
+                else if (Time.time - lastEnemySeenTime < GClass824.Random(2f, 5f))
                 {
                     // -- find a cover point closer to the enemy's last known position
                     GetApproachablePoint();
@@ -281,8 +285,8 @@ namespace friendlyPMC.Components.Tactics
             // --  fallback If no conditions are met
             if (holdTimer < Time.time)
             {
-                float timer = GClass761.Random(2f, 5f);
-                holdTimer = Time.time + timer + GClass761.Random(2f, 3f);
+                float timer = GClass824.Random(2f, 5f);
+                holdTimer = Time.time + timer + GClass824.Random(2f, 3f);
                 return new AICoreActionResultStruct<BotLogicDecision>(HoldFor(timer), "waitAbit");
             }
             else
@@ -401,7 +405,7 @@ namespace friendlyPMC.Components.Tactics
                 {
                     this.botOwner_0.Memory.Spotted(false, null, null);
                     this.botOwner_0.Memory.BotCurrentCoverInfo.SetCover(this.customNavigationPoint_0, true);
-                    GClass362 gclass = gclass363_0;
+                    GClass405 gclass = gclass363_0;
                     if (gclass != null)
                     {
                         gclass.StartMoveToAttackPoint(botOwner_0.Id);

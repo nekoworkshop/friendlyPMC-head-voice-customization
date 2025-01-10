@@ -2,16 +2,12 @@
 using friendlyPMC.Modules;
 using HarmonyLib;
 using SPT.Reflection.Patching;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using Systems.Effects;
 
 namespace friendlyPMC.Patches
 {
+    // patch to detect nearby bullet impacts
     public class BulletImpactPatch : ModulePatch
     {
         protected override MethodBase GetTargetMethod()
@@ -20,11 +16,11 @@ namespace friendlyPMC.Patches
         }
 
         [PatchPostfix]
-        public static void PatchPostfix(EffectsCommutator __instance,EftBulletClass info)
+        public static void PatchPostfix(EffectsCommutator __instance,EftBulletClass info, ShotInfoClass playerHitInfo)
         {
             var player = info.Player;
 
-            if (__instance.IsHitPointAlreadyProcessed(info.HitPoint))
+            if (!__instance.IsHitPointAlreadyProcessed(info.HitPoint))
             {
                 if(info.Player != null)
                 {

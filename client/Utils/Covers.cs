@@ -10,7 +10,7 @@ using friendlyPMC.Modules;
 
 namespace friendlyPMC.Utils
 {
-    internal class Covers
+    public class Covers
     {
 
         /**
@@ -30,7 +30,7 @@ namespace friendlyPMC.Utils
                 // cover too far
                 if(Vector3.Distance(point.Position, centerPosition) > searchRadius) return false;
 
-                if(boss != null && !GClass326.IsDangerPositionFarEnough(point.Position, bossPosition, 0.7f * 0.7f)) return false;
+                if(boss != null && !GClass369.IsDangerPositionFarEnough(point.Position, bossPosition, 0.7f * 0.7f)) return false;
 
                 navMeshPath.ClearCorners();
                 bool result = NavMesh.CalculatePath(centerPosition, point.Position, -1, navMeshPath);
@@ -66,7 +66,7 @@ namespace friendlyPMC.Utils
             {
                 if(!IsPointBetween(point.Position, pointA, pointB)) return false;
 
-                 if(boss != null && !GClass326.IsDangerPositionFarEnough(point.Position, bossPosition, 0.7f * 0.7f)) return false;
+                 if(boss != null && !GClass369.IsDangerPositionFarEnough(point.Position, bossPosition, 0.7f * 0.7f)) return false;
 
                 if (eligibilityCheck != null && !eligibilityCheck(point)) return false;
 
@@ -193,7 +193,7 @@ namespace friendlyPMC.Utils
                 foreach (var target in shootTarget)
                 {
                     ShootPointClass shootPoint = new ShootPointClass(target, 0.8f);
-                    if (!GClass301.CanShootToTarget(shootPoint, point, LayerMaskClass.HighPolyWithTerrainMask, false))
+                    if (!GClass344.CanShootToTarget(shootPoint, point, LayerMaskClass.HighPolyWithTerrainMask, false))
                     {
                         cansh = false;
                         break;
@@ -227,7 +227,7 @@ namespace friendlyPMC.Utils
 
             return GetClosestShootCover(botOwner, midpoint, minDistance, 200f, (cover) =>
             {
-                if (boss != null && !GClass326.IsDangerPositionFarEnough(cover.Position, bossPosition, 0.7f * 0.7f)) return false;
+                if (boss != null && !GClass369.IsDangerPositionFarEnough(cover.Position, bossPosition, 0.7f * 0.7f)) return false;
 
                 return true;
             });
@@ -254,7 +254,7 @@ namespace friendlyPMC.Utils
                 if (
                     !(point.CoverLevel == CoverLevel.Sit || point.CoverLevel == CoverLevel.Stay) ||
                     !point.IsFreeById(botOwnerId) ||
-                    !GClass326.IsDangerPositionFarEnough(point.Position, dangerPositions, safeDistance * safeDistance) ||
+                    !GClass369.IsDangerPositionFarEnough(point.Position, dangerPositions, safeDistance * safeDistance) ||
                     Vector3.Distance(point.Position, botPosition) <= 1f ||
                     !eligibleCheck(point)
                 )
@@ -297,15 +297,17 @@ namespace friendlyPMC.Utils
             return false;
         }
         /** Find a position from where the bot can shoot at the given target **/
-        public static Vector3? FindShootPosition(BotOwner botOwner,float minDistance, float maxRadius, Func<Vector3, bool> eligibleCheck = null, Vector3? manualTarget = null)
+        public static Vector3? FindShootPosition(BotOwner botOwner, float minDistance, float maxRadius, Func<Vector3, bool> eligibleCheck = null, Vector3? manualTarget = null)
         {
+            if(!botOwner.Memory.HaveEnemy) return null;
+
             Vector3 botPosition = botOwner.GetPlayer.Transform.position;
             Vector3 botWeaponOffset = botOwner.ShootData.WeaponRootOffset;
             LayerMask Mask = botOwner.LookSensor.Mask;
 
             Vector3 targetPosition = botOwner.Memory.GoalEnemy.CurrPosition;
 
-            if(manualTarget.HasValue) targetPosition = manualTarget.Value;
+            if (manualTarget.HasValue) targetPosition = manualTarget.Value;
 
             NavMeshPath mesh = new NavMeshPath();
 
@@ -315,53 +317,47 @@ namespace friendlyPMC.Utils
                 botOwner.Memory.GoalEnemy.Person.MainParts[BodyPartType.body].Position
             };
 
-            // Try to find a valid position within the sphere
-            List<Vector3> positions = new List<Vector3>();
+            // define the angular steps and the scan distance
+            int numSteps = 72; // e.g., 36 steps for a 10° interval, adjust for precision/performance
+            float angleStep = 360f / numSteps;
+            float scanDistance = maxRadius;
 
-            for (int i = 0; i < 25; i++) // Adjust the number of attempts as needed
+            // evaluate positions around the bot in a circular pattern
+            for (int i = 0; i < numSteps; i++)
             {
-                Vector3 randomPosition = targetPosition + UnityEngine.Random.insideUnitSphere * maxRadius;
-                if (randomPosition == Vector3.zero) continue;
-                if (positions.Contains(randomPosition)) continue;
-
-                positions.Add(randomPosition);
+                float angle = i * angleStep;
+                Vector3 direction = Quaternion.Euler(0, angle, 0) * Vector3.forward;
+                Vector3 scanPosition = targetPosition + direction * scanDistance;
 
                 NavMeshHit navMeshHit;
+                if (!NavMesh.SamplePosition(scanPosition, out navMeshHit, 10f, NavMesh.AllAreas)) continue;
 
-                if (!NavMesh.SamplePosition(randomPosition, out navMeshHit, 10f, -1)) continue;
-
-                if (!GClass326.IsDangerPositionFarEnough(navMeshHit.position, new Vector3[] { targetPosition }, minDistance * minDistance)) continue;
-
+                // - check if the position is valid based on conditions
+                if (!GClass369.IsDangerPositionFarEnough(navMeshHit.position, new Vector3[] { targetPosition }, minDistance * minDistance)) continue;
                 if (!IsNavigablePoint(botPosition, navMeshHit.position, 150f, mesh)) continue;
 
-                // Check if the bot can shoot from the random position to the target 
-                bool cansh = false;
-                // check if bot can shoot either the head or torso of the enemy from this position
-                if (manualTarget == null || eligibleCheck == null)
-                {
-                    if (eligibleCheck != null && !eligibleCheck(navMeshHit.position)) continue;
+                // - check if position meets the eligibility requirements
+                if (eligibleCheck != null && !eligibleCheck(navMeshHit.position)) continue;
 
-                    foreach (var target in shootTarget)
+                // - check if bot can shoot from this position to the target (head/torso of the enemy)
+                bool canShoot = false;
+                foreach (var target in shootTarget)
+                {
+                    ShootPointClass shootPoint = new ShootPointClass(target, 0.8f);
+                    if (GClass344.CanShootToTarget(shootPoint, navMeshHit.position + botWeaponOffset, Mask, false) ||
+                        GClass344.CanShootToTarget(shootPoint, navMeshHit.position + botWeaponOffset * 0.5f, Mask, false))
                     {
-                        ShootPointClass shootPoint = new ShootPointClass(target, 0.8f);
-                        if (
-                            GClass301.CanShootToTarget(shootPoint, navMeshHit.position + botWeaponOffset, Mask, false) ||
-                            GClass301.CanShootToTarget(shootPoint, navMeshHit.position + botWeaponOffset * 0.5f, Mask, false)
-                        )
-                        {
-                            cansh = true;
-                            break;
-                        }
+                        canShoot = true;
+                        break;
                     }
                 }
-                // when manual target is set, eligibleCheck becomes the one that determine if the position is good for shooting or not
-                else cansh = eligibleCheck(navMeshHit.position);
 
-                if (cansh) return navMeshHit.position;
+                if (canShoot) return navMeshHit.position;
             }
 
             return null;
         }
+
 
         // taken from SAIN 
         private static bool CheckRayCast(Vector3 point, Vector3 target, float distance = 3f)

@@ -6,12 +6,14 @@ using System.Collections.Generic;
 
 using UnityEngine;
 using UnityEngine.AI;
-using static RootMotion.FinalIK.IKSolver;
 
 namespace friendlyPMC.Components.Tactics
 {
-    /** This class is not meant to be used directly as a brain layer, but within one **/
-    internal class FollowerCommonLayer : BaseLogicLayerSimpleAbstractClass
+    /** 
+     * This class is not meant to be used directly as a brain layer, but within one 
+     * Follower Layer that holds common decisions
+     * **/
+    public class FollowerCommonLayer : BaseLogicLayerSimpleAbstractClass
     {
 
         private CustomNavigationPoint customNavigationPoint_0;
@@ -76,7 +78,7 @@ namespace friendlyPMC.Components.Tactics
             get => _isTakingHeavyDamage;
         }
 
-        private GClass552.Class260 _damageTimer;
+        private GClass605.Class290 _damageTimer;
 
         public string coverType = "close";
 
@@ -228,7 +230,7 @@ namespace friendlyPMC.Components.Tactics
             base.Dispose();
         }
 
-        private void BeingHitAction(DamageInfo info, EBodyPart part, float arg3)
+        private void BeingHitAction(DamageInfoStruct info, EBodyPart part, float arg3)
         {
             if (info.Player == null) return;
 
@@ -306,7 +308,7 @@ namespace friendlyPMC.Components.Tactics
             ordersChanged = false;
         }
 
-        public bool IsEnemyLowThreat(bool ignoreEquip = false)
+        public bool IsEnemyLowThreat(bool ignoreEquip = false, float maximumEnemies = 1)
         {
             if (!ignoreEquip && dangerTimer > Time.time) return dangerResult;
             else if (ignoreEquip && dangerIgnoreEquipTimer > Time.time) return dangerIgnoreEquipResult;
@@ -314,7 +316,7 @@ namespace friendlyPMC.Components.Tactics
             if (!ignoreEquip)
             {
                 dangerTimer = Time.time + 1f;
-                dangerResult = botOwner_0.Memory.AttackImmediately && Utils.Enemy.GetEnemiesAtLocation(botOwner_0, botOwner_0.Memory.GoalEnemy.ProfileId, botOwner_0.Memory.GoalEnemy.CurrPosition) < 2;
+                dangerResult = botOwner_0.Memory.AttackImmediately && Utils.Enemy.GetEnemiesAtLocation(botOwner_0, botOwner_0.Memory.GoalEnemy.ProfileId, botOwner_0.Memory.GoalEnemy.CurrPosition) <= maximumEnemies;
 
                 return dangerResult;
             }
@@ -355,7 +357,7 @@ namespace friendlyPMC.Components.Tactics
                 maxDistance,
                 (cover) =>
                 {
-                    if (boss != null && !GClass326.IsDangerPositionFarEnough(cover.Position, bossPosition, 0.4f * 0.4f)) return false;
+                    if (boss != null && !GClass369.IsDangerPositionFarEnough(cover.Position, bossPosition, 0.4f * 0.4f)) return false;
 
                     return true;
                 });
@@ -827,7 +829,7 @@ namespace friendlyPMC.Components.Tactics
                 if (canShoot)
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.shootFromCover, "sfc");
 
-                return new AICoreActionResultStruct<BotLogicDecision>(HoldFor(GClass761.Random(2f, 5f)), "wait4it");
+                return new AICoreActionResultStruct<BotLogicDecision>(HoldFor(GClass824.Random(2f, 5f)), "wait4it");
             }
 
             // If the enemy is a sniper and visible, try to find a cover point from which you can shoot
@@ -866,7 +868,7 @@ namespace friendlyPMC.Components.Tactics
             if(coverType == "close")
                 return new AICoreActionResultStruct<BotLogicDecision>((BotLogicDecision)CustomBotDecisions.CoverToCover, "coverBoss");
             else 
-                return new AICoreActionResultStruct<BotLogicDecision>(HoldFor(GClass761.Random(2f, 5f)), "wait4it");
+                return new AICoreActionResultStruct<BotLogicDecision>(HoldFor(GClass824.Random(2f, 5f)), "wait4it");
         }
 
         public AICoreActionEndStruct? ShallEndCurrentDecisionCommon(AICoreActionResultStruct<BotLogicDecision> curDecision)
@@ -900,7 +902,7 @@ namespace friendlyPMC.Components.Tactics
 
             return null;
         }
-
+        /** Shall end the current decision for followers with tactic set to "Assist" **/
         public AICoreActionEndStruct? ShallEndCurrentDecisionAllies(AICoreActionResultStruct<BotLogicDecision> curDecision, bool? ordersChanged = null)
         {
             if (!botOwner_0.Medecine.FirstAid.Using && !botOwner_0.Medecine.SurgicalKit.Using) return null;

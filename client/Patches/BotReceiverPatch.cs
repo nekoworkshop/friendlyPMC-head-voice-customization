@@ -4,6 +4,7 @@ using friendlyPMC.Components;
 using friendlyPMC.Modules;
 using HarmonyLib;
 using System.Reflection;
+using System.Collections.Generic;
 
 namespace friendlyPMC.Patches
 {
@@ -44,7 +45,7 @@ namespace friendlyPMC.Patches
         private static bool PatchPrefix(BotReceiver __instance)
         {
             BotOwner botOwner = (BotOwner)AccessTools.Field(typeof(BotReceiver), "botOwner_0").GetValue(__instance);
-            if(botOwner != null)
+            if (botOwner != null)
             {
 
                 FollowerReceiver receiver = Receivers.GetReceiver(botOwner.ProfileId);
@@ -62,25 +63,24 @@ namespace friendlyPMC.Patches
     internal class BotReceiverPhrasePatch : ModulePatch
     {
 
+        public static List<WildSpawnType> goonRole = new List<WildSpawnType> { WildSpawnType.followerBigPipe, WildSpawnType.followerBirdEye, WildSpawnType.bossKnight };
         protected override MethodBase GetTargetMethod()
         {
             return AccessTools.Method(typeof(BotReceiver), "method_0");
         }
 
         [PatchPrefix]
-        private static bool PatchPrefix(BotReceiver __instance, BotEventHandler.GClass599 info)
+        private static bool PatchPrefix(BotReceiver __instance, BotEventHandler.GClass659 info)
         {
-            
-            
 
             BotOwner botOwner = (BotOwner)AccessTools.Field(typeof(BotReceiver), "botOwner_0").GetValue(__instance);
             if (botOwner != null)
             {
-                
-                if(
+                if (
                     !BossPlayers.IsFollower(botOwner) &&
                     (info.phrase == (EPhraseTrigger)CustomPhrases.TeamStatus || info.phrase == (EPhraseTrigger)CustomPhrases.OverThere)
-                ) {
+                )
+                {
                     return false;
                 }
 
@@ -89,21 +89,64 @@ namespace friendlyPMC.Patches
                 {
                     IPlayer requester = info.PlayerRequester;
 
-                    if (requester != null && (botOwner.GetPlayer.Transform.position - requester.Transform.position).magnitude < 10f)
+                    if (requester != null && BossPlayers.IsPlayerBoss(requester.ProfileId) && (botOwner.GetPlayer.Transform.position - requester.Transform.position).magnitude < 10f)
                     {
-
-                        if (!BossPlayers.IsFollower(botOwner) && BossPlayers.IsPlayerBoss(requester.ProfileId))
+                        if (!BossPlayers.IsFollower(botOwner))
                         {
-                            // this will switch the BotReceiver to our own, so the rest can be altered there
+                            // - if goons are friendly, refuse to follow
+                            if (requester != null && botOwner.BotsGroup.IsAlly(requester))
+                            {
+                                foreach(var role in goonRole)
+                                {
+                                    if (botOwner.IsRole(role))
+                                    {
+                                        botOwner.BotTalk.TrySay(EPhraseTrigger.DontKnow, true);
+                                        return false;
+                                    }
+                                }
+                            }
+
+                            // - this will switch the BotReceiver to our own, so the rest can be altered there
                             botOwner.BotsGroup.RequestsController.TryAskFollowMeRequest(requester, botOwner);
                             return false;
                         }
                     }
 
                 }
-                
+
             }
 
+            return true;
+        }
+    }
+    // WIP
+    internal class BotReceiverGestusPatch : ModulePatch
+    {
+        protected override MethodBase GetTargetMethod()
+        {
+            return AccessTools.Method(typeof(BotReceiver), "method_6");
+        }
+        [PatchPrefix]
+        private static bool PatchPrefix(BotReceiver __instance, GClass501 data)
+        {
+            if(data == null)
+            {
+                return true;
+            }
+            BotOwner botOwner = (BotOwner)AccessTools.Field(typeof(BotReceiver), "botOwner_0").GetValue(__instance);
+
+            if (botOwner != null)
+            {
+                if (BossPlayers.IsFollower(botOwner))
+                {
+                    return true;
+                }
+
+                if(data.Player != null && BossPlayers.IsPlayerBoss(data.Player.ProfileId) && BotReceiverPhrasePatch.goonRole.Contains(botOwner.Profile.Info.Settings.Role))
+                {
+                    
+                }
+            }
             return true;
         }
     }

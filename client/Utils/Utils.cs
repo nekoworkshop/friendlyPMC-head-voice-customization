@@ -8,7 +8,7 @@ using System;
 
 namespace friendlyPMC.Utils
 {
-    internal class Utils
+    public class Utils
     {
         
         private static Dictionary<string,bool> flags = new Dictionary<string,bool>();
@@ -46,13 +46,13 @@ namespace friendlyPMC.Utils
             return (pitAIBossPlayer)botOwner.BotFollower.BossToFollow;
         }
         /** Recreation of javascript SetTimeout **/
-        public static GClass552.Class260 SetTimeout(Action func, int timer, bool isLopped = false)
+        public static GClass605.Class290 SetTimeout(Action func, int timer, bool isLopped = false)
         {
             float num = timer / 1000;
 
-            GClass552.Class261 @class = new GClass552.Class261();
-            @class.gclass552_0 = StaticManager.Instance.TimerManager;
-            @class.timer = new GClass552.Class260();
+            GClass605.Class291 @class = new GClass605.Class291();
+            @class.gclass605_0 = StaticManager.Instance.TimerManager;
+            @class.timer = new GClass605.Class290();
             @class.timer.Init(new Action(@class.method_0), new Action(@class.method_1));
             @class.timer.Start(Time.time + num, num, isLopped);
 
@@ -73,7 +73,7 @@ namespace friendlyPMC.Utils
             return @class.timer;
         }
         /** Shortcut to EFT method of doign MakeTimer in relation to bot activity **/
-        public static GClass552.IBotTimer SetBotTimer(Action func,float seconds)
+        public static GClass605.IBotTimer SetBotTimer(Action func,float seconds)
         {
             var Timer = StaticManager.Instance.TimerManager.MakeTimer(TimeSpan.FromSeconds(seconds), false);
 

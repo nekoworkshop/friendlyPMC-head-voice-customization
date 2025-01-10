@@ -11,16 +11,25 @@ using friendlyPMC.Actions;
 
 using System.Linq;
 using friendlyPMC.Modules;
+using System.Collections.Generic;
 
 namespace friendlyPMC.Components
 {
-    internal class BossFollowerPlayer : BotFollowerPlayer
+    public class BossFollowerPlayer : BotFollowerPlayer
     {
 
         public BossFollowerPlayer(BotOwner bot, pitAIBossPlayer player, WildSpawnType bossRole) : base(bot, player, false, bossRole) {
 
             NpcMessage.RemoveNpc(bot.ProfileId);
-            NpcMessage.AddNpc(bot, false, true);
+
+            List<WildSpawnType> bossRoles = new List<WildSpawnType> {
+                WildSpawnType.bossKnight,
+                WildSpawnType.followerBigPipe,
+                WildSpawnType.followerBirdEye
+            };
+            // when questing with bosses, there will not be any messages from them
+            if(!bossRoles.Contains(bossRole) || !Utils.Utils.FlagGet("questGoons"))
+                NpcMessage.AddNpc(bot, false, true);
         }
 
         public override void Init()
@@ -40,11 +49,18 @@ namespace friendlyPMC.Components
             settingModif.AccuratySpeedCoef = 1.35f;
             settingModif.ScatteringCoef = 1.7f;
 
+            settingModif.VisibleDistCoef = 1.2f;
+            if (bot.IsRole(WildSpawnType.followerBirdEye))
+            {
+                settingModif.VisibleDistCoef = 1.3f;
+            }
+
+            //bot.Settings.FileSettings.Look.FULL_SECTOR_VIEW = true;
+
             base.SetFollowerSettings(bot);
+
             
-            //bot.Settings.FileSettings.Core.HearingSense = 1.0f;
-
-
+            bot.Settings.FileSettings.Look.LOOK_THROUGH_GRASS = false;
             if (bot.IsRole(WildSpawnType.followerBirdEye))
             {
                 bot.Settings.FileSettings.Core.GainSightCoef = 0.1f;
@@ -56,11 +72,7 @@ namespace friendlyPMC.Components
                 bot.Settings.FileSettings.Aiming.SCATTERING_DIST_MODIF = 0.2f;
                 bot.Settings.FileSettings.Aiming.COEF_FROM_COVER = 1f;
                 bot.Settings.FileSettings.Aiming.HARD_AIM = 0.9f;
-                // bird eye, aim for the head
-                bot.Settings.FileSettings.Aiming.AIMING_TYPE = 6;
             }
-            
-            bot.Settings.FileSettings.Aiming.AIMING_TYPE = 3;
 
             EPlayerSide side = _player.Player().Side;
 
@@ -75,14 +87,15 @@ namespace friendlyPMC.Components
                 bot.Settings.FileSettings.Mind.WARN_BOT_TYPES = new WildSpawnType[] { };
                 bot.Settings.FileSettings.Mind.FRIENDLY_BOT_TYPES = new WildSpawnType[] { 
                     WildSpawnType.shooterBTR,
-                    WildSpawnType.peacefullZryachiyEvent
+                    WildSpawnType.peacefullZryachiyEvent,
+                    WildSpawnType.gifter
                 };
 
                 foreach (WildSpawnType botType in Enum.GetValues(typeof(WildSpawnType)))
                 {
                     if (side == EPlayerSide.Bear && botType == sptBear)
                     {
-                        if (!_initialBot.Settings.FileSettings.Mind.DEFAULT_BEAR_BEHAVIOUR.HasFlag(EWarnBehaviour.Attack))
+                        if (!_initialBot.Settings.FileSettings.Mind.DEFAULT_BEAR_BEHAVIOUR.HasFlag(EWarnBehaviour.AlwaysEnemies))
                         {
                             bot.Settings.FileSettings.Mind.FRIENDLY_BOT_TYPES = bot.Settings.FileSettings.Mind.FRIENDLY_BOT_TYPES.AddItem(botType).ToArray();
                         } else
@@ -93,7 +106,7 @@ namespace friendlyPMC.Components
                     }
                     else if (side == EPlayerSide.Usec && botType == sptUsec)
                     {
-                        if (!_initialBot.Settings.FileSettings.Mind.DEFAULT_USEC_BEHAVIOUR.HasFlag(EWarnBehaviour.Attack))
+                        if (!_initialBot.Settings.FileSettings.Mind.DEFAULT_USEC_BEHAVIOUR.HasFlag(EWarnBehaviour.AlwaysEnemies))
                         {
                             bot.Settings.FileSettings.Mind.FRIENDLY_BOT_TYPES = bot.Settings.FileSettings.Mind.FRIENDLY_BOT_TYPES.AddItem(botType).ToArray();
                         }
@@ -103,7 +116,7 @@ namespace friendlyPMC.Components
                         }
                         continue;
                     } 
-                    else if(botType != WildSpawnType.shooterBTR && botType != WildSpawnType.peacefullZryachiyEvent)
+                    else if(botType != WildSpawnType.shooterBTR && botType != WildSpawnType.peacefullZryachiyEvent && botType != WildSpawnType.gifter)
                     {
                         bot.Settings.FileSettings.Mind.ENEMY_BOT_TYPES = bot.Settings.FileSettings.Mind.ENEMY_BOT_TYPES.AddItem(botType).ToArray();
                     }
@@ -114,12 +127,12 @@ namespace friendlyPMC.Components
                 {
                     if (botType != sptBear && botType != sptUsec) 
                     {
-                        if (!_initialBot.Settings.FileSettings.Mind.DEFAULT_SAVAGE_BEHAVIOUR.HasFlag(EWarnBehaviour.Attack))
+                        if (!_initialBot.Settings.FileSettings.Mind.DEFAULT_SAVAGE_BEHAVIOUR.HasFlag(EWarnBehaviour.AlwaysEnemies))
                         {
                             bot.Settings.FileSettings.Mind.FRIENDLY_BOT_TYPES = bot.Settings.FileSettings.Mind.FRIENDLY_BOT_TYPES.AddItem(botType).ToArray();
                             bot.Settings.FileSettings.Mind.WARN_BOT_TYPES = bot.Settings.FileSettings.Mind.WARN_BOT_TYPES.AddItem(botType).ToArray();
                         }
-                        else if (botType != WildSpawnType.shooterBTR && botType != WildSpawnType.peacefullZryachiyEvent)
+                        else if (botType != WildSpawnType.shooterBTR && botType != WildSpawnType.peacefullZryachiyEvent && botType != WildSpawnType.gifter)
                         {
                             bot.Settings.FileSettings.Mind.ENEMY_BOT_TYPES = bot.Settings.FileSettings.Mind.ENEMY_BOT_TYPES.AddItem(botType).ToArray();
                         }

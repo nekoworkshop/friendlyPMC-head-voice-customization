@@ -7,10 +7,12 @@ using UnityEngine;
 
 namespace friendlyPMC.Components
 {
-    // GClass103 is a generic follower layer
-    internal class FollowerLayer : GClass103
+    /**
+     * Overwrite of the PatrolAssault layer to make our followers follow the player.
+     */
+    public class FollowerLayer : GClass121
     {
-        protected float float_2;
+        protected float float_2 = 0f;
 
         protected CustomNavigationPoint customNavigationPoint_0;
 
@@ -18,9 +20,14 @@ namespace friendlyPMC.Components
 
         protected bool _triedToSwitchToMain = false;
 
+        protected bool _triedFillMagazines = false;
+
+        protected float float_3 = 0f;
+
         public FollowerLayer(BotOwner bot, int priority) : base(bot, priority)
         {
             float_2 = Time.time + 60f;
+            float_3 = Time.time + 60f;
         }
         public override bool ShallUseNow()
         {
@@ -34,7 +41,11 @@ namespace friendlyPMC.Components
             else 
                 shouldUse = HasBoss() && !InteractableObjects.IsTaker(botOwner_0) && !InteractableObjects.IsOpener(botOwner_0);
 
-            if(!shouldUse) _triedToSwitchToMain = false;
+            if (!shouldUse)
+            {
+                _triedToSwitchToMain = false;
+                _triedFillMagazines = false;
+            }
 
             return shouldUse;
         }
@@ -86,10 +97,6 @@ namespace friendlyPMC.Components
                 {
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.peaceLook, "PeaceLook");
                 }
-                /*if (botOwner_0.SecondWeaponData.HaveActions())
-                {
-                    return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.watchSecondWeapon, "Look2ndWeap");
-                }*/
 
                 if (!HasBoss())
                 {
@@ -101,10 +108,6 @@ namespace friendlyPMC.Components
                     {
                         return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.eatDrink, "EatDrinkDat");
                     }
-                    /*if (botOwner_0.SecondWeaponData.HaveActions())
-                    {
-                        return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.watchSecondWeapon, "Look2ndWeap");
-                    }*/
                     if (botOwner_0.Gesture.HaveRequest())
                     {
                         return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.gesture, "Gesture");
@@ -127,29 +130,36 @@ namespace friendlyPMC.Components
                 PatrolWay way = botOwner_0.PatrollingData.Way;
 
                 // switch to main weapon when out of combat - useful for bots that have launchers as secondary weapon
-                if (!_triedToSwitchToMain && botOwner_0.WeaponManager.Selector.LastEquipmentSlot != EquipmentSlot.FirstPrimaryWeapon)
+                if (!_triedToSwitchToMain && botOwner_0.WeaponManager.Selector.LastEquipmentSlot == EquipmentSlot.SecondPrimaryWeapon)
                 {
                     botOwner_0.WeaponManager.Selector.TryChangeToMain();
                     _triedToSwitchToMain = true;
                 }
-
-
-                if (HasBoss())
-                {
-                    return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.followerPatrol, "BossFollow");
-                }
-
 
                 if ((float)botOwner_0.WeaponManager.Reload.BulletCount / (float)botOwner_0.WeaponManager.Reload.MaxBulletCount < 0.6f && float_2 < Time.time)
                 {
                     float_2 = Time.time + 30f;
                     botOwner_0.WeaponManager.Reload.TryReload();
                 }
+
+                if(!_triedFillMagazines && float_3 < Time.time)
+                {
+                    botOwner_0.WeaponManager.Reload.TryFillMagazines();
+                    _triedFillMagazines = true;
+                    float_3 = Time.time + 30f;
+                }
+
+                if (HasBoss())
+                {
+                    return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.followerPatrol, "BossFollow");
+                }
+
                 if (way != null && way.PatrolType == PatrolType.reserved && botOwner_0.Settings.FileSettings.Patrol.CAN_CHOOSE_RESERV)
                 {
                     botOwner_0.PatrollingData.ComeToPoint();
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.alternativePatrol, "RESER");
                 }
+
                 return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.simplePatrol, "Basic");
             }
             else
@@ -179,7 +189,7 @@ namespace friendlyPMC.Components
         public override AICoreActionEndStruct EndSimplePatrol()
         {
             string reason;
-            if (method_13(out reason))
+            if (method_14(out reason))
             {
                 return new AICoreActionEndStruct(reason, true);
             }
@@ -220,6 +230,11 @@ namespace friendlyPMC.Components
             return new AICoreActionEndStruct("enemy.None", true);
         }
 
+        public override AICoreActionEndStruct EndSuppressGrenade()
+        {
+            return new AICoreActionEndStruct("enemy.None", true);
+        }
+
         public override AICoreActionEndStruct EndRunToEnemy()
         {
             if (!botOwner_0.Memory.HaveEnemy)
@@ -238,6 +253,15 @@ namespace friendlyPMC.Components
             }
 
             return base.EndAttackMoving();
+        }
+
+        public override AICoreActionEndStruct EndDogFight()
+        {
+            if (!botOwner_0.Memory.HaveEnemy)
+            {
+                return new AICoreActionEndStruct("enemy.None", true);
+            }
+            return base.EndDogFight();
         }
 
         public override AICoreActionEndStruct EndRunToCover()
@@ -280,12 +304,6 @@ namespace friendlyPMC.Components
 
             return base.ShallEndCurrentDecision(curDecision);
         }
-
-        /*public override CustomNavigationPoint FindPoint(CoverSearchData data, Func<CoverSearchData, CustomNavigationPoint> p, bool checkCurrent)
-        {
-            customNavigationPoint_0 = Utils.Covers.FindPoint(botOwner_0, customNavigationPoint_0);
-            return customNavigationPoint_0;
-        }*/
 
         protected virtual void GetCoverPoint(Vector3 centerPosition, float searchRadius)
         {

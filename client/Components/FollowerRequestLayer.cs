@@ -1,5 +1,4 @@
-﻿using Comfort.Common;
-using EFT;
+﻿using EFT;
 using friendlyPMC.Components.Tactics;
 using friendlyPMC.Modules;
 using friendlyPMC.Utils;
@@ -9,8 +8,10 @@ using UnityEngine;
 
 namespace friendlyPMC.Components
 {
-    // GClass69 is generic request receiver layer
-    internal class FollowerRequestLayer : GClass69
+    /**
+     * Generic FightReqNull extended class for the follower
+     */
+    internal class FollowerRequestLayer : GClass72
     {
         float coverTimer = 0f;
         float suppressTime = 0f;

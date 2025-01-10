@@ -9,8 +9,11 @@ using UnityEngine;
 
 namespace friendlyPMC.Components.Tactics
 {
-    /** This class is not meant to be used directly as a brain layer, but within one **/
-    internal class FollowerSniperLayer : GClass61
+    /** 
+     * This class is not meant to be used directly as a brain layer, but within one 
+     * Sniper fight layer based on BirdEye's fight logic
+     * **/
+    internal class FollowerSniperLayer : GClass63
     {
 
         protected float coverTimer = 0f;
@@ -94,14 +97,14 @@ namespace friendlyPMC.Components.Tactics
                         {
                             return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMoving, "relocate");
                         }
-                        coverTimer = Time.time + GClass761.Random(3f, 5f);
+                        coverTimer = Time.time + GClass824.Random(3f, 5f);
                         return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "relocateFast");
                     }
                     // - found nothing, fallback
                     if (holdTimer < Time.time)
                     {
-                        float timer = GClass761.Random(2f, 5f);
-                        holdTimer = Time.time + timer + GClass761.Random(2f, 3f);
+                        float timer = GClass824.Random(2f, 5f);
+                        holdTimer = Time.time + timer + GClass824.Random(2f, 3f);
                         return commonLayer.HoldPositionFor(timer);
                     }
 
@@ -121,7 +124,7 @@ namespace friendlyPMC.Components.Tactics
                         GetClosestAttackCoverPoint(botPosition, 20f);
                         if (customNavigationPoint_0 != null && coverTimer < Time.time)
                         {
-                            coverTimer = Time.time + GClass761.Random(3f, 5f);
+                            coverTimer = Time.time + GClass824.Random(3f, 5f);
                             return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMoving, "relocate");
                         }
                     }
@@ -129,8 +132,8 @@ namespace friendlyPMC.Components.Tactics
                     // -- fallback #1, just wait
                     if (holdTimer < Time.time)
                     {
-                        float timer = GClass761.Random(2f, 5f);
-                        holdTimer = Time.time + timer + GClass761.Random(3f, 5f);
+                        float timer = GClass824.Random(2f, 5f);
+                        holdTimer = Time.time + timer + GClass824.Random(3f, 5f);
                         return commonLayer.HoldPositionFor(timer);
                     }
 
@@ -146,13 +149,13 @@ namespace friendlyPMC.Components.Tactics
 
                 if (customNavigationPoint_0 != null && coverTimer < Time.time)
                 {
-                    return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.goToCoverPoint, "reposition");
+                    return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMoving, "reposition");
                 }
                 // -- fallback #1, just wait
                 if (holdTimer < Time.time)
                 {
-                    float timer = GClass761.Random(2f, 5f);
-                    holdTimer = Time.time + timer + GClass761.Random(3f, 5f);
+                    float timer = GClass824.Random(2f, 5f);
+                    holdTimer = Time.time + timer + GClass824.Random(3f, 5f);
                     return commonLayer.HoldPositionFor(timer);
                 }
 

@@ -1,0 +1,161 @@
+{
+	"returnItems": ["Iată lucrurile tale. Uhm, există ceva acolo pentru mine?", "Am lucrurile tale chiar aici.", "Iată tot ce mi-ai dat. Așa că... împărțim asta, nu?", "Uite, acestea sunt toate lucrurile pe care mi le-ai dat.\nExistă ceva acolo pentru mine?", "Iată, prietene, toate lucrurile pe care mi le-ai dat.", "Am lucrurile tale chiar aici. Există ceva ce poți să-mi dai?"],
+	"returnItemsDeath": ["Nu-ți face griji, șefu', am reușit să ieșim.\n Am ce mi-ai dat aici. Totuși, nu am putut să iau echipamentul tău, jackalii erau deja pe el.", "Am reușit să ieșim de acolo. Iată tot ce mi-ai dat. Sper că lucrurile tale sunt asigurate, că nu am putut să le iau."],
+	"teamEscaped": ["Super!\nAm reușit să ieșim.", "Și asta a fost! Am reușit, șefu'.", "Când ultimul om a ajuns la extracție, a fost ca un ceas— toată lumea este în siguranță.", "Ne-am coordonat perfect și acum toată echipa este afară și gata să se echipeze din nou."],
+	"teamSomeEscaped": ["Ei bine, e păcat de {0}, dar măcar restul dintre noi am reușit.", "Câțiva dintre noi au fost loviți, dar sunt bucuros că unii au reușit să iasă în viață."],
+	"friendlyEscaped": ["Mă bucur că am reușit.\nMulțumesc că m-ai lăsat să te însoțesc.", "Uf, mă bucur că te-am găsit.\nNu știam dacă voi reuși. Mulțumesc!", "Nu este cel mai bun rezultat, pierzând câțiva colegi, dar mă bucur că măcar am ieșit.", "Mulțumesc pentru ajutor. Îmi car echipamentul colegilor căzuți înapoi; măcar atât pot să fac."],
+
+	"chatHelp": {
+		"joinRaid": {
+            "Knight": "Pot să mă alătur la un raid, folosește comanda 'INVITE TO GROUP' pentru a mă include. Dacă ai deblocat BirdEye și BigPipe, pot veni și ei. Dar fără alți extra — aglomerația nu e stilul meu.",
+            "BigPipe": "Pot să mă alătur la un raid, folosește comanda 'INVITE TO GROUP' pentru a mă include. Băieții pot veni și ei, dar fără alți extra — aglomerația nu e stilul meu.",
+            "BirdEye": "Sunt bucuros să mă alătur raidului. Folosește comanda 'INVITE TO GROUP' când ești gata. Knight și BigPipe pot veni și ei, dar fără alți extra — mulțimile nu sunt pe gustul meu."
+        },
+        "giveWeapon": "Îmi poți oferi un set de arme, doar spune {0} și numele presetului.",
+        "weaponAccept": {
+            "Knight": ["Îmi place, hai să facem asta!", "Perfect, sunt gata de acțiune!", "Acum vorbim serios! Hai să facem treabă."],
+            "BigPipe": "Da, frate, îmi place. Hai să o facem!",
+            "BirdEye": "Foarte bine, să vedem ce putem face cu asta."
+        },
+        "weaponReject": {
+            "Knight": ["Nu e pe gustul meu, ce altceva mai ai?", "Asta nu merge. Arată-mi ceva mai bun.", "Impresionant, foarte frumos... acum să vedem arma lui Paul Allen.", "Nu, nu e bine."],
+            "BigPipe": ["Nu-mi place asta, mai ai altceva?", "Nu e stilul meu, frate, scuze.", "Nah, nu merge."],
+            "BirdEye": ["Îmi pare rău, nu e pe gustul meu.", "Nu-mi place asta, mai ai altceva?", "Îmi pare rău, dar rămân la ceea ce am."]
+        }
+
+	},
+	"chatResponses": {
+        "help": "Iată ce pot face:",
+        "joinRaid": {
+            "Knight": ["Sunt gata!", "Hai să le spargem capetele!", "Fără curaj, fără glorie! Hai să facem asta!", "Sunt în!", "Hai să începem!", "Rock and roll!", "Contează pe mine!", "Hai să mergem!", "Încarcă și pregătește-te, baby!", "Wax on, wax off. Ne vedem acolo!"],
+            "BigPipe": ["Sunt gata!", "Contează pe mine!", "Cowabunga! Hai să rock-uim!", "Hai să aprindem atmosfera!", "Să-i prăjim!", "Este timpul, baby!", "Rock and roll!", "Sunt în!", "În sfârșit! Un pic de acțiune, ne vedem acolo!", "Hai să facem asta!"],
+            "BirdEye": ["Un foc, o țintă. Hai să o facem cum trebuie.", "Precizia este cheia. Hai să facem asta.", "Nu-ți face griji, voi fi acolo... înainte să-și dea seama.", "Fără grabă – răbdarea câștigă ziua.", "Nu ratez niciodată. Niciodată.", "Când vântul se schimbă, la fel și eu. Ne vedem acolo.", "Gata!", "Voi fi ultimul lucru pe care nu l-au văzut niciodată venind."]
+        }
+    },
+
+	"baseSettings": "Setări de bază",
+	"miscSettings": "Diverse",
+	"testSettings": "Testare",
+	"raidSettings": "Setări raid",
+	"equipOptions": ["Implicit"],
+	"tacticOptions": ["Implicit", "Suport", "Lunetist", "Atacator", "Apărător", "Asist"],
+	"clothesOptions": ["Implicit", "Jucător"],
+	"statusSound": {
+		"Name": "Volumul raportului de stare",
+		"Description": "Volumul sunetului radio atunci când se declanșează raportul de stare"
+	},
+	"enemyMarker": {
+		"Name": "Marcaj dușman",
+		"Description": "Arată poziția dușmanului atunci când se raportează starea. Dacă este dezactivat, sunetul marcajului dușmanului va fi de asemenea dezactivat."
+	},
+	"squadSpawn": {
+		"Name": "Apărutul echipei",
+		"Description": "Setați volumul sunetului raportului de stare"
+	},
+	"squadSize": {
+		"Name": "Dimensiunea echipei",
+		"Description": "Numărul de însoțitori care apar cu tine"
+	},
+	"extraPickups": {
+		"Name": "Numărul maxim de însoțitori ridicați",
+		"Description": "Numărul maxim de însoțitori pe care jucătorul îi poate ridica în timpul unui raid. Acest lucru este în plus față de echipă."
+	},
+	"returnChanceDeath": {
+		"Name": "Șansa de întoarcere a lucrurilor de catre membrii echipei după moarte",
+		"Description": "Șansa ca însoțitorii tăi să returneze obiectele pe care le-ai dat dacă mori. Aceasta se aplică doar membrilor cu care ai apărut."
+	},
+	"squadSetup": {
+		"Name": "Utilizați configurația echipei",
+		"Description": "Utilizați o configurație specifică pentru echipa dvs."
+	},
+	"scanDistance": {
+		"Name": "Distanța maximă de scanare",
+		"Description": "Distanța maximă pentru a captura orice dușman vizibil pe care jucătorul îl semnalizează când emite fraza 'Contact'."
+	},
+	"patrolRadius": {
+		"Name": "Raza de patrulare",
+		"Description": "Raza în care insoțitorii vor patrula în jurul jucătorului."
+	},
+	"enemyRemember": {
+		"Name": "Timpul de uitare a dușmanului (în secunde)",
+		"Description": "Timpul maxim în care un urmăritor își va aminti un dușman. Aceasta se aplică doar la începutul unui raid."
+	},
+	"healthMultiplier": {
+		"Name": "Înmulțitorul de sănătate al echipei",
+		"Description": "Înmulțitorul de sănătate pentru însoțitorii cu care apari. Aceasta se aplică pentru fiecare parte a corpului."
+	},
+	"memberTactic": {
+		"Name": "Tactica membrului {0} al echipei",
+		"Description": "Setați tactica de luptă a membrului echipei. Implicit, este o combinație între atacator și apărător. Atacatorul încearcă să atace frecvent dușmanul. Apărătorul va rămâne pe loc în jurul liderului. Lunetistul va încerca să obțină o poziție din care poate trage, de preferat din spatele jucătorului, la distanță și nu va ataca, chiar dacă este ordonat. Suportul va oferi foc de supresie frecvent și este capabil să folosească grenadele și lansatorul de grenade ca armă secundară."
+	},
+	"memberEquipment": {
+		"Name": "Echipamentul membrului {0} al echipei",
+		"Description": "Setați echipamentul membrului echipei. Puteți alege între implicit (care este echipamentul aleatoriu SPT), echipamentul curent al utilizatorului sau presetările create de utilizator (recomandat dacă folosiți o tactică diferită de implicit)."
+	},
+	"memberName": {
+		"Name": "Porecla membrului {0} al echipei",
+		"Description": "Setați un poreclă personalizată pentru acest membru al echipei. Lăsați liber pentru implicit."
+	},
+	"memberUniformTop": {
+		"Name": "Îmbrăcăminte superioară a membrului {0} al echipei",
+		"Description": "Setați ce îmbrăcăminte superioară ar trebui să poarte acest membru. Lăsați liber pentru implicit."
+	},
+	"memberUniformBottom": {
+		"Name": "Îmbrăcăminte inferioară a membrului {0} al echipei",
+		"Description": "Setați ce pantaloni ar trebui să poarte acest membru. Lăsați liber pentru implicit."
+	},
+	"equipmentLock": {
+		"Name": "Blochează echipamentul echipei",
+		"Description": "Blochează echipamentul membrilor echipei. Acest lucru este util dacă doriți să utilizați presetările proprii de echipament și nu doriți să pierdeți echipamentul dacă tu sau ei mor. Consumabilele sunt excluse."
+	},
+	"npcSendMessage": {
+		"Name": "Mesaje la sfârșitul raidului",
+		"Description": "Însoțitorii vor trimite un mesaj la sfârșitul raidului pe baza condițiilor, cum ar fi dacă toți au ieșit sau dacă ai ridicat un însoțitor și l-ai ținut în viață. Mesajele de returnare a obiectelor sunt excluse."
+	},
+	"friendlyPMC": {
+		"Name": "Partea PMC Prietenoasă",
+		"Description": "Ar trebui ca boții PMC de pe aceeași parte să fie întotdeauna prietenoși unii cu alții"
+	},
+	"badGuy": {
+		"Name": "Inamic",
+		"Description": "Ar trebui ca jucătorul să fie ostil tuturor boților PMC, indiferent de facțiune"
+	},
+	"pmcArmbands": {
+		"Name": "Brățări PMC",
+		"Description": "Boții PMC să aibă brățări (roșii pentru BEARs, albastre pentru USECs)."
+	},
+	"englishBear": {
+		"Name": "BEARs vorbesc engleză",
+		"Description": "Toti boții BEAR să vorbească engleză sau rusă."
+	},
+	"pingSquad": {
+		"Name": "Stare raport",
+		"Description": "Tasta rapidă pentru a declanșa apelul de raport."
+	},
+	"enemyContact": {
+		"Name": "Raport dușman",
+		"Description": "Tasta rapidă pentru a declanșa apelul de contact."
+	},
+	"gestures": {
+		"OverThere": "Acolo",
+		"TeamStatus": "Stare raport",
+		"OnRepeatedContact": "Contact"
+	},
+	"botStatus": {
+		"Dead": "Mort",
+		"Engaged": "În luptă",
+		"Alerted": "Dușman detectat",
+		"Heal": "Se vindecă",
+		"WantToHeal": "Vrea să se vindece"
+	},
+
+	"botTeleport": {
+		"Name": "Teleportare Urmăritori",
+		"Description": "Teleportează toți urmăritorii la poziția jucătorului"
+	},
+
+	"botHeal": {
+		"Name": "Vindecare Urmăritori",
+		"Description": "Vindecă toți urmăritorii. Acest lucru îi scoate și din animația de vindecare sau animația de aruncare a grenadei"
+	}
+}

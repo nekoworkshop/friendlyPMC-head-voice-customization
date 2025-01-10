@@ -11,7 +11,10 @@ using UnityEngine;
 
 namespace friendlyPMC.Actions
 {
-    internal class FollowerSearch : FollowerSniperSearch
+    /**
+     * Enemy search action for a bot follower
+     */
+    public class FollowerSearch : FollowerSniperSearch
     {
         public FollowerSearch(BotOwner owner)
         : base(owner)
@@ -47,10 +50,7 @@ namespace friendlyPMC.Actions
                     botPosition,
                     5f,
                     150f,
-                    point =>
-                    {
-                        return Utils.Covers.IsPointBetween(point.Position, botPosition, enemySpot);
-                    }
+                    null
                 );
 
                 if (Spot != null) _lastSpot = Spot.Position;
@@ -110,7 +110,7 @@ namespace friendlyPMC.Actions
                                                     30f,
                                                     5f,
                                                     (CustomNavigationPoint point)=>{
-                                                        if(!GClass326.IsDangerPositionFarEnough(point.Position, new Vector3[]{ bossPos }, 0.5f * 0.5f)) return false;
+                                                        if(!GClass369.IsDangerPositionFarEnough(point.Position, new Vector3[]{ bossPos }, 0.5f * 0.5f)) return false;
                                                         return true;
                                                     }
                                                 );

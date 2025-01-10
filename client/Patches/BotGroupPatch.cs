@@ -72,9 +72,9 @@ namespace friendlyPMC.Patches
                 {
                     var _initialBotMindSettings = AccessTools.Field(typeof(BotsGroup), "_initialBotMindSettings").GetValue(__instance) as BotGlobalsMindSettings;
                     if (
-                        (person.Side == EPlayerSide.Bear && !_initialBotMindSettings.DEFAULT_BEAR_BEHAVIOUR.HasFlag(EWarnBehaviour.Attack)) ||
-                        (person.Side == EPlayerSide.Usec && !_initialBotMindSettings.DEFAULT_USEC_BEHAVIOUR.HasFlag(EWarnBehaviour.Attack)) ||
-                        (person.Side == EPlayerSide.Savage && !_initialBotMindSettings.DEFAULT_SAVAGE_BEHAVIOUR.HasFlag(EWarnBehaviour.Attack))
+                        (person.Side == EPlayerSide.Bear && !_initialBotMindSettings.DEFAULT_BEAR_BEHAVIOUR.HasFlag(EWarnBehaviour.AlwaysEnemies)) ||
+                        (person.Side == EPlayerSide.Usec && !_initialBotMindSettings.DEFAULT_USEC_BEHAVIOUR.HasFlag(EWarnBehaviour.AlwaysEnemies)) ||
+                        (person.Side == EPlayerSide.Savage && !_initialBotMindSettings.DEFAULT_SAVAGE_BEHAVIOUR.HasFlag(EWarnBehaviour.AlwaysEnemies))
                     )
                     {
                         __result = false;
@@ -150,9 +150,9 @@ namespace friendlyPMC.Patches
             if (_initialBotMindSettings != null && player.Side == __instance.Side)
             {
                 if (
-                    (player.Side == EPlayerSide.Bear && !_initialBotMindSettings.DEFAULT_BEAR_BEHAVIOUR.HasFlag(EWarnBehaviour.Attack)) ||
-                    (player.Side == EPlayerSide.Usec && !_initialBotMindSettings.DEFAULT_USEC_BEHAVIOUR.HasFlag(EWarnBehaviour.Attack)) ||
-                    (player.Side == EPlayerSide.Savage && !_initialBotMindSettings.DEFAULT_SAVAGE_BEHAVIOUR.HasFlag(EWarnBehaviour.Attack))
+                    (player.Side == EPlayerSide.Bear && !_initialBotMindSettings.DEFAULT_BEAR_BEHAVIOUR.HasFlag(EWarnBehaviour.AlwaysEnemies)) ||
+                    (player.Side == EPlayerSide.Usec && !_initialBotMindSettings.DEFAULT_USEC_BEHAVIOUR.HasFlag(EWarnBehaviour.AlwaysEnemies)) ||
+                    (player.Side == EPlayerSide.Savage && !_initialBotMindSettings.DEFAULT_SAVAGE_BEHAVIOUR.HasFlag(EWarnBehaviour.AlwaysEnemies))
                 )
                 {
                     __result = false;
@@ -176,7 +176,8 @@ namespace friendlyPMC.Patches
             {
                 if(
                     item.Value.Player?.Profile?.Info?.Settings?.Role == WildSpawnType.shooterBTR ||
-                    item.Value.Player?.Profile?.Info?.Settings?.Role == WildSpawnType.peacefullZryachiyEvent
+                    item.Value.Player?.Profile?.Info?.Settings?.Role == WildSpawnType.peacefullZryachiyEvent ||
+                    item.Value.Player?.Profile?.Info?.Settings?.Role == WildSpawnType.gifter
                 )
                 {
                     RemoveEnemy(item.Value.Player,item.Value.Cause);

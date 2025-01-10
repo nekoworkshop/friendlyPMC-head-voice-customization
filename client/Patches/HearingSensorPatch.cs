@@ -21,6 +21,8 @@ namespace friendlyPMC.Patches
         {
             BotOwner botOwner_0 = ____botOwner;
 
+            if(type == AISoundType.step) return;
+
             if (BossPlayers.IsFollower(botOwner_0) && !botOwner_0.Memory.HaveEnemy)
             {
                 if (player != null && !BossPlayers.IsPlayerBoss(player.ProfileId))
@@ -40,6 +42,50 @@ namespace friendlyPMC.Patches
                     }
                 }
             }
+        }
+    }
+
+    internal class FootstepSoundPatch : ModulePatch
+    {
+        protected override MethodBase GetTargetMethod()
+        {
+            return AccessTools.Method(typeof(Player), "PlayStepSound");
+        }
+
+        [PatchPostfix]
+        public static void Patch(Player __instance, BetterSource ___NestedStepSoundSource)
+        {
+            float volume = __instance.MovementContext.CovertMovementVolumeBySpeed * __instance.method_54();
+            float range = ___NestedStepSoundSource.MaxDistance * 0.85f;
+
+            if(BossPlayers.IsPlayerBoss(__instance.ProfileId)) return;
+
+            foreach( var follower in BossPlayers.GetFollowers())
+            {
+                BotOwner bot = follower.GetBot();
+                if(bot.ProfileId == __instance.ProfileId || bot.Memory.HaveEnemy) continue;
+                if(!bot.EnemiesController.IsEnemy(__instance) && !bot.BotsGroup.IsEnemy(__instance)) continue;
+
+                Vector3 position = __instance.Transform.position;  
+
+                float power = range * volume;
+
+                power = Mathf.Min(25f, power);
+
+                float distance = Vector3.Distance(bot.GetPlayer.Transform.position, position);
+
+                bool shouldReact = distance <= power;
+
+                if(!shouldReact) continue;
+
+                (bot.Brain.BaseBrain as FollowerBrain).SoundHeard(__instance,position, distance,AISoundType.step);
+
+            }
+        }
+
+        private static float calcVolume(Player player)
+        {
+            return player.MovementContext.CovertMovementVolumeBySpeed * player.method_54();
         }
     }
 
@@ -81,18 +127,21 @@ namespace friendlyPMC.Patches
 
                 if (brain == null || brain.WasHit || bot.Memory.HaveEnemy || bot.BotsGroup == null) return;
                 if (
-                    bot.HearingSensor.method_6(__instance.Transform.position, 40f, out var distance) &&
+                    bot.HearingSensor.method_6(__instance.Transform.position, 50f, out var distance) &&
                     (bot.EnemiesController.IsEnemy(__instance) || bot.BotsGroup.IsEnemy(__instance))
                 )
                 {
-                    if (distance < 12f)
+                    if (distance < 25f)
                     {
                         if (!reportEnemy) bot.BotsGroup.ReportAboutEnemy(__instance, EEnemyPartVisibleType.visible);
-                        Utils.Enemy.MakeEnemy(bot, __instance);
+                        EnemyInfo info = Utils.Enemy.MakeEnemy(bot, __instance);
+                        
                         reported = Time.time + 3f;
                         reportEnemy = true;
+
+                        info?.SetVisible(true);
                     }
-                    else if (distance < 32f)
+                    else if (distance <= 40f)
                     {
                         reported = Time.time + 3f;
                         brain.FakeShot(__instance.MainParts[BodyPartType.body].Position);

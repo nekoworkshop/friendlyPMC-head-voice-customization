@@ -1,17 +1,13 @@
 ﻿using EFT;
-using friendlyPMC.Components;
-using friendlyPMC.Modules;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine.AI;
 using UnityEngine;
 
 namespace friendlyPMC.Components.BossFollower
 {
-    internal class KnightWeaponMtnLayer : GClass98
+    /**
+     * Ovewrite Weapon Malfunction Layer for Knight to use our cover system
+     */
+    internal class KnightWeaponMtnLayer : GClass105
     {
         protected CustomNavigationPoint customNavigationPoint_0;
 

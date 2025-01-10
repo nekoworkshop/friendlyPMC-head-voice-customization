@@ -46,7 +46,7 @@ namespace friendlyPMC.Modules
                         "SquadInfo", new Dictionary<string, object>
                         {
                             { "Mate", isSquadMate  },
-                            { "AllyBoss", isBoss }
+                            { "AllyBoss", isBoss ? npc.Profile.Info.Settings.Role.ToString() : null }
                         }
                     }
                 });
@@ -84,7 +84,7 @@ namespace friendlyPMC.Modules
             {
                 if (((Dictionary<string, object>)item.Value)["SquadInfo"] is Dictionary<string, object> squadInfo)
                 {
-                    if ((bool)squadInfo["AllyBoss"])
+                    if ((string)squadInfo["AllyBoss"] != null)
                         bosses.Add(item.Key);
                     else if (!(bool)squadInfo["Mate"])
                         allies.Add(item.Key);
@@ -116,7 +116,7 @@ namespace friendlyPMC.Modules
                 {
                     if (((Dictionary<string, object>)item.Value)["SquadInfo"] is Dictionary<string, object> squadInfo)
                     {
-                        if ((bool)squadInfo["AllyBoss"])
+                        if ((string)squadInfo["AllyBoss"] != null)
                             bosses.Add(item.Value);
                         else if (!(bool)squadInfo["Mate"])
                             allies.Add(item.Value);

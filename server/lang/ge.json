@@ -1,0 +1,163 @@
+{
+	"returnItems": ["Hier sind deine Sachen. Ähm, ist da was für mich dabei?", "Hier sind deine Sachen.", "Hier ist alles, was du mir gegeben hast. Also... teilen wir das, oder?", "Hier, das ist alles, was du mir gegeben hast.\nIst da was für mich dabei?", "Hier, mein Freund, alles, was du mir gegeben hast.", "Ich habe deine Sachen hier. Ist da was, was du entbehren kannst?"],
+	"returnItemsDeath": ["Keine Sorge, Boss, wir haben es rausgeschafft.\n Ich habe, was du mir gegeben hast, hier. Deine Ausrüstung konnte ich jedoch nicht retten; die Aasgeier waren schon dran.", "Wir konnten entkommen. Hier ist alles, was du mir gegeben hast. Ich hoffe, deine Sachen sind versichert; mehr konnte ich nicht holen."],
+	"teamEscaped": ["Super!\nWir haben es rausgeschafft.", "Und das war’s! Wir haben es geschafft, Boss.", "Als der Letzte den Extrakt erreicht hat, war es wie am Schnürchen—alle sind sicher.", "Perfekt koordiniert, und jetzt ist die ganze Crew draußen und bereit für die nächste Runde."],
+	"teamSomeEscaped": ["Schade um {0}, aber wenigstens haben es die anderen geschafft.", "Ein paar von uns haben es nicht geschafft, aber zum Glück konnten einige lebend entkommen."],
+	"friendlyEscaped": ["Gut, dass wir es geschafft haben.\nDanke, dass ich mitkommen durfte.", "Puh, gut, dass ich dich gefunden habe.\nIch wusste nicht, ob ich es schaffe. Danke!", "Kein ideales Ende, einige Teammitglieder verloren, aber wenigstens habe ich es rausgeschafft.", "Danke für die Hilfe. Ich bringe die Ausrüstung meiner gefallenen Teamkameraden zurück; das ist das Mindeste, was ich tun kann."],
+
+	"chatHelp": {
+		"joinRaid": {
+            "Knight": "Ich kann bei einem Raid mitmachen, benutze den Befehl 'INVITE TO GROUP', damit ich mich anschließen kann. Wenn du BirdEye und BigPipe freigeschaltet hast, können sie auch mitmachen. Aber keine Extras — überfüllte Gruppen sind nicht mein Ding.",
+            "BigPipe": "Ich kann bei einem Raid mitmachen, benutze den Befehl 'INVITE TO GROUP', damit ich mich anschließen kann. Die Jungs können auch mitmachen, aber keine Extras — überfüllte Gruppen sind nicht mein Ding.",
+            "BirdEye": "Ich bin gerne dabei für den Raid. Verwende den Befehl 'INVITE TO GROUP', wenn du bereit bist. Der Knight und BigPipe können auch mitkommen, aber keine Extras — Menschenmengen sind nicht mein Stil."
+        },
+        "giveWeapon": "Du kannst mir ein Waffenset geben, sage einfach {0} und den Namen des Presets.",
+        "weaponAccept": {
+            "Knight": ["Das gefällt mir, los geht's!", "Perfekt, ich bin bereit für Action!", "Das ist es! Lass uns loslegen."],
+            "BigPipe": "Ja, Baby, das gefällt mir. Los geht's!",
+            "BirdEye": "Sehr schön, mal sehen, was wir damit machen können."
+        },
+        "weaponReject": {
+            "Knight": ["Nicht mein Stil, was hast du sonst noch?", "Das reicht nicht. Zeig mir etwas Besseres.", "Beeindruckend, sehr schön... jetzt lass uns Paul Allens Waffe sehen.", "Nein, das ist nicht gut."],
+            "BigPipe": ["Das gefällt mir nicht, hast du noch etwas anderes?", "Nicht mein Stil, Mann, sorry.", "Nee, das passt nicht."],
+            "BirdEye": ["Tut mir leid, das ist nicht mein Geschmack.", "Nicht mein Stil, hast du etwas anderes?", "Sorry, aber ich bleibe bei dem, was ich habe."]
+        }
+
+	},
+	"chatResponses": {
+        "help": "Hier ist, was ich tun kann:",
+        "joinRaid": {
+            "Knight": ["Ich bin bereit!", "Lass uns Köpfe einschlagen!", "Kein Mut, kein Ruhm! Lass uns loslegen!", "Ich bin dabei!", "Los geht's!", "Rock'n'Roll!", "Zähl auf mich!", "Auf geht's!", "Laden und entsichern, Baby!", "Wax on, wax off. Wir sehen uns dort!"],
+            "BigPipe": ["Ich bin bereit!", "Zähl auf mich!", "Cowabunga! Lass uns rocken!", "Lass uns loslegen!", "Lass sie uns rauchen!", "Es ist Zeit, Baby!", "Rock'n'Roll!", "Ich bin dabei!", "Endlich! Etwas Action, wir sehen uns dort!", "Los geht's!"],
+            "BirdEye": ["Ein Schuss, ein Treffer. Lass es uns richtig machen.", "Präzision ist der Schlüssel. Lass uns loslegen.", "Keine Sorge, ich werde da sein... bevor sie es überhaupt bemerken.", "Kein Stress – Geduld gewinnt den Tag.", "Ich verfehle nie. Niemals.", "Wenn sich der Wind dreht, tue ich es auch. Wir sehen uns dort.", "Bereit!", "Ich werde das Letzte sein, was sie nie kommen sahen."]
+        }
+    },
+
+	"baseSettings": "Grundlegende Einstellungen",
+	"miscSettings": "Verschiedenes",
+	"testSettings": "Testen",
+	"raidSettings": "Raid-Einstellungen",
+	"equipOptions": ["Standard"],
+	"tacticOptions": ["Standard", "Unterstützung", "Scharfschütze", "Angreifer", "Halter", "Helfen"],
+	"clothesOptions": ["Standard", "Spieler"],
+	"statusSound": {
+		"Name": "Lautstärke des Statusberichts",
+		"Description": "Lautstärke des Radiosounds beim Auslösen des Statusberichts"
+	},
+	"enemyMarker": {
+		"Name": "Feindmarkierung",
+		"Description": "Zeige die Position des Feindes beim Berichten des Status. Wenn deaktiviert, wird auch der Geräusch der Feindmarkierung deaktiviert."
+	},
+	"squadSpawn": {
+		"Name": "Erscheinen des Squads",
+		"Description": "Lautstärke des Statusberichts einstellen"
+	},
+	"squadSize": {
+		"Name": "Größe des Squads",
+		"Description": "Anzahl der Folgespieler, die mit Ihnen erscheinen"
+	},
+	"extraPickups": {
+		"Name": "Maximale aufgelesene Folgespieler",
+		"Description": "Maximale Anzahl an Folgespielern, die der Spieler während eines Raids aufsammeln kann. Dies ist zusätzlich zum Squad."
+	},
+	"returnChanceDeath": {
+		"Name": "Chance der Rückkehr von Squadmitgliedern nach dem Tod",
+		"Description": "Chance, dass Ihre Folgespieler die Gegenstände zurückbringen, die Sie ihnen gegeben haben, wenn Sie sterben. Dies gilt nur für Mitglieder, mit denen Sie erschienen sind."
+	},
+	"squadSetup": {
+		"Name": "Squad-Setup verwenden",
+		"Description": "Spezifisches Setup für Ihr Squad verwenden."
+	},
+	"scanDistance": {
+		"Name": "Maximale Scandistanz",
+		"Description": "Maximale Distanz, um einen sichtbaren Feind zu erfassen, den der Spieler signalisiert, wenn er den Befehl 'Kontakt' gibt."
+	},
+	"patrolRadius": {
+		"Name": "Patrouillenradius",
+		"Description": "Radius, in dem die Folgespieler um den Spieler patrouillieren."
+	},
+	"enemyRemember": {
+		"Name": "Zeit, um den Feind zu vergessen (in Sekunden)",
+		"Description": "Maximale Zeit, die ein Folgespieler einen Feind erinnert. Dies gilt nur zu Beginn eines Raids."
+	},
+	"healthMultiplier": {
+		"Name": "Gesundheitsmultiplikator des Squads",
+		"Description": "Gesundheitsmultiplikator für die Folgespieler, die mit Ihnen erscheinen. Dies gilt für jedes Körperteil."
+	},
+	"memberTactic": {
+		"Name": "Taktik des Squadmitglieds {0}",
+		"Description": "Taktik des Kampfs für das Squadmitglied festlegen. Standard ist eine Kombination aus Angreifer und Halter. Angreifer versucht, den Feind oft anzugreifen. Halter bleibt in der Nähe des Chefs. Scharfschütze versucht, eine Position zu finden, von der aus er idealerweise aus dem Hintergrund auf den Spieler schießen kann, und wird nicht angreifen, auch wenn es befohlen wird. Unterstützung bietet häufigen Unterdrückungsfeuer und kann Granaten sowie den Granatwerfer als Sekundärwaffe verwenden."
+	},
+	"memberEquipment": {
+		"Name": "Ausrüstung des Squadmitglieds {0}",
+		"Description": "Ausrüstung für das Squadmitglied festlegen. Sie können zwischen Standard (zufällige SPT-Ausrüstung), der aktuellen Ausrüstung des Benutzers oder benutzergenerierten Voreinstellungen wählen (empfohlen, wenn Sie eine andere Taktik als die Standardtaktik verwenden)."
+	},
+	"memberName": {
+		"Name": "Spitzname des Squadmitglieds {0}",
+		"Description": "Individuellen Spitznamen für dieses Squadmitglied festlegen. Leer lassen für Standard."
+	},
+	"memberUniformTop": {
+		"Name": "Obere Kleidung des Squadmitglieds {0}",
+		"Description": "Festlegen, welche Oberbekleidung dieses Mitglied tragen soll. Leer lassen für Standard."
+	},
+	"memberUniformBottom": {
+		"Name": "Untere Kleidung des Squadmitglieds {0}",
+		"Description": "Festlegen, welche Hosen dieses Mitglied tragen soll. Leer lassen für Standard."
+	},
+	"equipmentLock": {
+		"Name": "Ausrüstung des Squads sperren",
+		"Description": "Sperrt die Ausrüstung der Squadmitglieder. Dies ist nützlich, wenn Sie Ihre eigenen Ausrüstungsvoreinstellungen verwenden möchten und nicht möchten, dass die Ausrüstung verloren geht, wenn Sie oder sie sterben. Verbrauchsmaterialien sind ausgeschlossen."
+	},
+	"npcSendMessage": {
+		"Name": "Nachrichten am Ende des Raids",
+		"Description": "Folgespieler senden am Ende des Raids basierend auf Bedingungen wie ob alle rausgekommen sind oder ob Sie einen Folgespieler aufgenommen und ihn am Leben gehalten haben, eine Nachricht. Rückmeldungen zu Gegenständen sind ausgeschlossen."
+	},
+	"friendlyPMC": {
+		"Name": "Freundliche PMC-Seite",
+		"Description": "Sollten PMC-Bots derselben Seite immer freundlich zueinander sein"
+	},
+
+	"badGuy": {
+		"Name": "Böser",
+		"Description": "Sollte der Spieler gegenüber allen PMC-Bots, unabhängig von der Fraktion, feindlich eingestellt sein"
+	},
+
+	"pmcArmbands": {
+		"Name": "PMC-Armbinden",
+		"Description": "Sollten die PMC-Bots Armbinden tragen (rot für BEARs, blau für USECs)."
+	},
+	"englishBear": {
+		"Name": "BEAR sprechen Englisch",
+		"Description": "Sollten die BEAR-Bots Englisch oder Russisch sprechen."
+	},
+	"pingSquad": {
+		"Name": "Ping Squad",
+		"Description": "Schnelltaste zum Auslösen des Berichts."
+	},
+	"enemyContact": {
+		"Name": "Feindbericht",
+		"Description": "Schnelltaste zum Auslösen des Kontakts."
+	},
+	"gestures": {
+		"OverThere": "Dort",
+		"TeamStatus": "Statusbericht",
+		"OnRepeatedContact": "Kontakt"
+	},
+	"botStatus": {
+		"Dead": "Tot",
+		"Engaged": "Im Kampf",
+		"Alerted": "Feind erkannt",
+		"Heal": "Heilen",
+		"WantToHeal": "Möchte heilen"
+	},
+
+	"botTeleport": {
+		"Name": "Gefolgsleute teleportieren",
+		"Description": "Teleportiere alle Gefolgsleute zur Position des Spielers"
+	},
+
+	"botHeal": {
+		"Name": "Gefolgsleute heilen",
+		"Description": "Heilt alle Gefolgsleute. Dies bringt sie auch aus der Heilungsanimation oder der Granatenwurf-Animation heraus"
+	}
+}

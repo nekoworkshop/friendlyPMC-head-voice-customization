@@ -15,18 +15,20 @@ using BepInEx.Bootstrap;
 
 using GridClassEx = GClass2516;
 using GridCacheClass = GClass1401;
+using DrakiaXYZ.BigBrain.Brains;
+using System.Reflection;
 using static EFT.SpeedTree.TreeWind;
 
 namespace friendlyPMC.Components
 {
-    internal class BotFollowerPlayer
+    public class BotFollowerPlayer
     {
         protected BotOwner _bot;
         protected pitAIBossPlayer _player;
 
         protected BotDifficultySettingsClass _OldSettings;
         protected string _OldGroupID;
-        protected GClass528 settingModif;
+        protected GClass580 settingModif;
 
         protected bool _IsSquadMate = false;
 
@@ -49,7 +51,7 @@ namespace friendlyPMC.Components
 
             _IsSquadMate = isSquad;
 
-            settingModif = new GClass528(1.2f, 1.2f, 1f, 1.1f, 1f, 1f, 1f, 1f, 1f);
+            settingModif = new GClass580(1.2f, 1.2f, 1f, 1.1f, 1f, 1f, 1.2f, 1f, 1f);
 
             NpcMessage.AddNpc(bot, isSquad);
 
@@ -121,7 +123,7 @@ namespace friendlyPMC.Components
             }
             _bot.Brain.Agent.Dispose();
             if (baseBrain != null) baseBrain.Dispose();
-            _bot.BotsController.AICoreController.Stop();
+            _bot.BotState = EBotState.NonActive;
             _bot.Receiver.Dispose();
 
             // add special follower settings
@@ -132,7 +134,7 @@ namespace friendlyPMC.Components
             // add the new follower brain
             _bot.Brain.BaseBrain = GetFollowerBrain(_bot, _player);
             _bot.Brain.Agent = GetFollowerAIAgent(_bot);
-            _bot.BotsController.AICoreController.Activate();
+            _bot.BotState = EBotState.Active;
             // let the bot talk
             _bot.BotTalk.SetSilence(0f);
             // force bot to turn off light
@@ -196,7 +198,8 @@ namespace friendlyPMC.Components
                     {
                         if (
                             item.Value.Player.Profile.Info.Settings.Role == WildSpawnType.shooterBTR ||
-                            item.Value.Player.Profile.Info.Settings.Role == WildSpawnType.peacefullZryachiyEvent
+                            item.Value.Player.Profile.Info.Settings.Role == WildSpawnType.peacefullZryachiyEvent ||
+                            item.Value.Player.Profile.Info.Settings.Role == WildSpawnType.gifter
                         )
                         {
                             _player.bossGroup.RemoveEnemy(item.Value.Player);
@@ -278,7 +281,7 @@ namespace friendlyPMC.Components
             _OldSettings = _bot.Settings;
             _OldGroupID = _bot.GroupId;
             // increase bot's power
-            BotDifficultySettingsClass settings = Singleton<GClass533>.Instance.GetSettings(BotDifficulty.hard, _botRole);
+            BotDifficultySettingsClass settings = Singleton<GClass585>.Instance.GetSettings(BotDifficulty.hard, _botRole);
             // - hardcode some settings to make the bot more efficient
             settings.FileSettings.Move.REACH_DIST = 1.5f;
             settings.FileSettings.Move.REACH_DIST_COVER = 2f;
@@ -326,21 +329,21 @@ namespace friendlyPMC.Components
             // opposing sides are always enemies
             if (playerSide == EPlayerSide.Bear)
             {
-                settings.FileSettings.Mind.DEFAULT_USEC_BEHAVIOUR = EWarnBehaviour.Attack;
+                settings.FileSettings.Mind.DEFAULT_USEC_BEHAVIOUR = EWarnBehaviour.AlwaysEnemies;
             }
             else if (playerSide == EPlayerSide.Usec)
             {
-                settings.FileSettings.Mind.DEFAULT_BEAR_BEHAVIOUR = EWarnBehaviour.Attack;
+                settings.FileSettings.Mind.DEFAULT_BEAR_BEHAVIOUR = EWarnBehaviour.AlwaysEnemies;
             }
 
             if (playerSide != EPlayerSide.Savage)
             {
-                settings.FileSettings.Mind.DEFAULT_SAVAGE_BEHAVIOUR = EWarnBehaviour.Attack;
+                settings.FileSettings.Mind.DEFAULT_SAVAGE_BEHAVIOUR = EWarnBehaviour.AlwaysEnemies;
             }
             else
             {
-                settings.FileSettings.Mind.DEFAULT_USEC_BEHAVIOUR = EWarnBehaviour.Attack;
-                settings.FileSettings.Mind.DEFAULT_BEAR_BEHAVIOUR = EWarnBehaviour.Attack;
+                settings.FileSettings.Mind.DEFAULT_USEC_BEHAVIOUR = EWarnBehaviour.AlwaysEnemies;
+                settings.FileSettings.Mind.DEFAULT_BEAR_BEHAVIOUR = EWarnBehaviour.AlwaysEnemies;
             }
 
 
@@ -412,7 +415,10 @@ namespace friendlyPMC.Components
             // - friendly bot never gets tired
             bot.GetPlayer.Physical.Stamina.ForceMode = true;
             bot.GetPlayer.Physical.HandsStamina.ForceMode = true;
+            // - need no food
             bot.GetPlayer.HealthController.DisableMetabolism();
+            // - and blackout does not affect them
+            bot.GetPlayer.ActiveHealthController.DoPainKiller();
             // - have followers share the same groupId as the player
             bot.GetPlayer.Profile.Info.GroupId = _player.realPlayer.GroupId;
             bot.GetPlayer.Profile.Info.TeamId = _player.realPlayer.Profile.Info.TeamId;
@@ -431,12 +437,12 @@ namespace friendlyPMC.Components
         protected void AddExtraAmmo()
         {
 
-            InventoryControllerClass inventory = GetInventoryController();
-            SearchableItemClass secureContainer;
+            InventoryController inventory = GetInventoryController();
+            SearchableItemItemClass secureContainer;
 
             try
             {
-                secureContainer = (SearchableItemClass)inventory.Inventory.Equipment.GetSlot(EquipmentSlot.SecuredContainer).ContainedItem;
+                secureContainer = (SearchableItemItemClass)inventory.Inventory.Equipment.GetSlot(EquipmentSlot.SecuredContainer).ContainedItem;
             }
             catch
             {
@@ -463,7 +469,7 @@ namespace friendlyPMC.Components
 
             Item ammoToAdd =
                     weapon.GetCurrentMagazine()?.FirstRealAmmo()
-                    ?? Singleton<ItemFactory>.Instance.CreateItem(
+                    ?? Singleton<ItemFactoryClass>.Instance.CreateItem(
                         MongoID.Generate(),
                         weapon.CurrentAmmoTemplate._id,
                         null
@@ -482,45 +488,34 @@ namespace friendlyPMC.Components
                 Item ammo = ammoToAdd.CloneItem();
                 ammo.StackObjectsCount = ammo.StackMaxSize;
 
-                var location = stashGridClass.FindLocationForItem(ammo);
+                var location = stashGridClass.FindFreeSpace(ammo);
 
                 if (location != null)
                 {
-
-                    var result = stashGridClass.AddItemWithoutRestrictions(ammo);
+                    var result = stashGridClass.AddItemWithoutRestrictions(ammo, location);
 
                     if (result.Succeeded)
                     {
                         ammoAdded += ammo.StackObjectsCount;
-                        try
-                        {
-                            Singleton<GridCacheClass>.Instance.Add(
-                                        _bot.ProfileId,
-                                        location.Grid as GridClassEx,
-                                        ammo
-                                    );
-                        }
-                        catch (Exception e)
-                        {
-                            Modules.Logger.LogError(e);
-                        }
                     }
                     else
                     {
+                        Modules.Logger.LogError("Failed to add ammo to bot's secure container");
                         break;
                     }
                 }
                 else
                 {
+                    Modules.Logger.LogInfo("No more space in secure container for ammo");
                     break;
                 }
             }
 
         }
 
-        public InventoryControllerClass GetInventoryController()
+        public InventoryController GetInventoryController()
         {
-            return _bot.GetPlayer.InventoryControllerClass;
+            return _bot.GetPlayer.InventoryController;
         }
 
         public virtual FollowerBrain GetFollowerBrain(BotOwner bot, pitAIBossPlayer boss)
@@ -532,7 +527,7 @@ namespace friendlyPMC.Components
         {
             string name = bot.name + " " + _botRole.ToString();
 
-            return new FollowerAIAgent<BotLogicDecision>(bot.BotsController.AICoreController, bot.Brain.BaseBrain, FollowerCreateNode.ActionsList(bot), bot.gameObject, name, new Func<BotLogicDecision, GClass134>((BotLogicDecision decision) =>
+            return new FollowerAIAgent<BotLogicDecision>(bot.BotsController.AICoreController, bot.Brain.BaseBrain, FollowerCreateNode.ActionsList(bot), bot.gameObject, name, new Func<BotLogicDecision, GClass156>((BotLogicDecision decision) =>
             {
                 return FollowerCreateNode.CreateNode(decision, bot);
             }));
@@ -559,7 +554,7 @@ namespace friendlyPMC.Components
             return _player;
         }
         
-        public virtual void Dismiss()
+        public virtual void Dismiss(bool warnPlayer = false)
         {
             if (_bot == null) return;
             try
@@ -573,25 +568,111 @@ namespace friendlyPMC.Components
 
                 if (_bot.IsDead || _bot.BotState != EBotState.Active) return;
 
-                _bot.Brain.Dispose();
+                _bot.BotState = EBotState.NonActive;
 
-                _bot.BotsController.AICoreController.Stop();
+                // disable all follower related brain activity
+                var baseBrain = _bot.Brain.BaseBrain;
+                // - guess work because we cannot access the private property dictionary_0 where the layers are, but no brain has 20 layers, usually it's 10
+                for (int i = 1; i < 20; i++)
+                {
+                    try
+                    {
+                        if (baseBrain != null) baseBrain.method_3(i);
+                    }
+                    catch (Exception)
+                    {
 
-                // put back old settings
+                    }
+                }
+                // - ensure bot no longer follows the player
+                if (_bot.BotFollower.HaveBoss)
+                {
+                    _bot.BotFollower.BossToFollow.RemoveFollower(_bot);
+                    _bot.BotFollower.BossToFollow = null;
+                }
+                // - bot might have request going on, dispose it
+                if (_bot.BotRequestController.CurRequest != null)
+                {
+                    _bot.BotRequestController.CurRequest.Complete();
+                }
+                // - dispose follower specific agents
+                if(_bot.Brain.Agent is FollowerAIAgent<BotLogicDecision>)
+                {
+                    (_bot.Brain.Agent as FollowerAIAgent<BotLogicDecision>).Dispose();
+                } else 
+                    _bot.Brain.Agent.Dispose();
+
+                if (baseBrain != null) baseBrain.Dispose();
+
+                // - put back old settings
                 _bot.Settings = _OldSettings;
                 _bot.Profile.Info.GroupId = _OldGroupID;
                 _bot.ENEMY_LOOK_AT_ME = Mathf.Cos(_OldSettings.FileSettings.Mind.ENEMY_LOOK_AT_ME_ANG * 0.017453292f);
                 _bot.GetPlayer.ActiveHealthController.SetDamageCoeff(_OldSettings.FileSettings.Core.DamageCoeff);
+                
+                // - make bot see the player as an aggresor
+                if (warnPlayer)
+                {
+                    _bot.Settings.FileSettings.Mind.DEFAULT_USEC_BEHAVIOUR = _player.realPlayer.Side == EPlayerSide.Usec ? EWarnBehaviour.Warn : EWarnBehaviour.AlwaysEnemies;
+                    _bot.Settings.FileSettings.Mind.DEFAULT_BEAR_BEHAVIOUR = _player.realPlayer.Side == EPlayerSide.Bear ? EWarnBehaviour.Warn : EWarnBehaviour.AlwaysEnemies;
+                    _bot.Settings.FileSettings.Mind.DEFAULT_SAVAGE_BEHAVIOUR = _player.realPlayer.Side == EPlayerSide.Savage ? EWarnBehaviour.Warn : EWarnBehaviour.AlwaysEnemies;
+                    _bot.Settings.FileSettings.Mind.ENEMY_BY_GROUPS_PMC_PLAYERS = true;
+                    _bot.Settings.FileSettings.Mind.ENEMY_BY_GROUPS_SAVAGE_PLAYERS = true;
+                    _bot.Memory.IsPeace = false;
+                }
 
-                // put back old receiver
+                // - bot needs a new group
+                var botsGroupField = AccessTools.Field(typeof(BotMemoryClass), "botsGroup_0");
+                var deadBodiesController = AccessTools.Field(typeof(BotSpawner), "_deadBodiesController").GetValue(_bot.BotsController.BotSpawner) as DeadBodiesController;
+                var allPlayers = AccessTools.Field(typeof(BotSpawner), "_allPlayers").GetValue(_bot.BotsController.BotSpawner) as List<Player>;
+
+                List<BotOwner> list = new List<BotOwner>();
+                foreach (BotOwner item in _bot.BotsController.BotSpawner.method_4(_bot))
+                {
+                    list.Add(item);
+                }
+
+                BotZone zone = _bot.BotsController.BotSpawner.GetClosestZone(_bot.GetPlayer.Transform.position,out var zoneDist);
+                BotsGroup group = new BotsGroup(zone, _bot.BotsController.BotGame, _bot, list, deadBodiesController, allPlayers, false);
+                _bot.BotsGroup = group;
+                botsGroupField.SetValue(_bot.Memory, group);
+                
+                if(warnPlayer) {
+                    group.AddEnemyGroupIfAllowed(_player.bossGroup.Name,_player.realPlayer.Side);
+                }
+
+                // - ensure the brain manager of BigBrain is also cleared of the bot
+                try
+                {
+                    FieldInfo privateField = AccessTools.Field(typeof(BrainManager), "_instance");
+                    BrainManager brainManager = privateField.GetValue(null) as BrainManager;
+                    if (brainManager != null)
+                    {
+                        FieldInfo activatedBotsField = AccessTools.Field(typeof(BrainManager), "ActivatedBots"); // - future update 
+                        if (activatedBotsField != null)
+                        {
+                            Dictionary<IPlayer, BotOwner> activatedBots = activatedBotsField.GetValue(brainManager) as Dictionary<IPlayer, BotOwner>;
+                            if (activatedBots != null && activatedBots.ContainsKey(_bot.GetPlayer))
+                            {
+                                activatedBots.Remove(_bot.GetPlayer);
+                            }
+                        }
+                    }
+                } catch { }
+
+                // - add the old brain (harcoded to followerBoar)
+                _bot.Brain.BaseBrain = new GClass307(_bot, false);
+                // - add old agent back
+                string name = _bot.name + " " + _botRole.ToString();
+                _bot.Brain.Agent = new FollowerAIAgent<BotLogicDecision>(_bot.BotsController.AICoreController, _bot.Brain.BaseBrain, GClass507.ActionsList(_bot), _bot.gameObject, name, new Func<BotLogicDecision, GClass156>((BotLogicDecision decision)=>
+                {
+                    return GClass507.CreateNode(decision, _bot);
+                }));
+                // - put back old receiver
                 _bot.Receiver = new BotReceiver(_bot);
                 _bot.Receiver.Init();
 
-                // put back old brain
-                _bot.Brain = new StandartBotBrain(_bot);
-                _bot.Brain.Activate();
-
-                _bot.BotsController.AICoreController.Activate();
+                _bot.BotState = EBotState.Active;
 
                 _bot.GetPlayer.Physical.Stamina.ForceMode = false;
                 _bot.GetPlayer.Physical.HandsStamina.ForceMode = false;

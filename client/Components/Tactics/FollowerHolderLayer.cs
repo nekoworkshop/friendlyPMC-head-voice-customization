@@ -5,8 +5,11 @@ using UnityEngine;
 
 namespace friendlyPMC.Components.Tactics
 {
-    /** This class is not meant to be used directly as a brain layer, but within one **/
-    internal class FollowerHolderLayer : GClass47
+    /** 
+     * This class is not meant to be used directly as a brain layer, but within one 
+     * Hold position layer based on Boar follower fight logic
+     * **/
+    public class FollowerHolderLayer : GClass48
     {
         private FollowerCommonLayer commonLayer;
 
@@ -92,7 +95,7 @@ namespace friendlyPMC.Components.Tactics
                     }
                 }
                 // - else, hold position
-                return commonLayer.HoldPositionFor(GClass761.Random(2f, 3f), "holdPositionInCover");
+                return commonLayer.HoldPositionFor(GClass824.Random(2f, 3f), "holdPositionInCover");
 
             } 
             else if(enemyVisible)
@@ -141,7 +144,7 @@ namespace friendlyPMC.Components.Tactics
             }
 
             // final fallback decision
-            return commonLayer.HoldPositionFor(GClass761.Random(2f, 3f), "holdPositionInCover");
+            return commonLayer.HoldPositionFor(GClass824.Random(2f, 3f), "holdPositionInCover");
         }
 
         public override AICoreActionEndStruct EndHoldPosition()

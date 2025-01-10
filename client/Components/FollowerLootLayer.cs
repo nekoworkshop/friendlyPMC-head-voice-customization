@@ -3,7 +3,10 @@ using friendlyPMC.Modules;
 
 namespace friendlyPMC.Components
 {
-    internal class FollowerLootLayer : GClass102
+    /**
+     * Looting layer for the followers.
+     */
+    internal class FollowerLootLayer : GClass120
     {
 
         public FollowerLootLayer(BotOwner bot, int priority) : base(bot, priority)
@@ -15,11 +18,27 @@ namespace friendlyPMC.Components
         {
             var brain = botOwner_0.Brain.BaseBrain as FollowerBrain;
 
-            if (brain != null && brain.UnderFire) return false;
+            bool isTaker = InteractableObjects.IsTaker(botOwner_0);
 
-            if (botOwner_0.Medecine.FirstAid.Have2Do || botOwner_0.Medecine.SurgicalKit.HaveWork || botOwner_0.Medecine.Using) return false;
+            if (brain != null && brain.UnderFire)
+            {
+                if(isTaker) InteractableObjects.RemoveTaker(botOwner_0);
+                return false;
+            }
 
-            return InteractableObjects.IsTaker(botOwner_0);
+            if (botOwner_0.Medecine.FirstAid.Have2Do || botOwner_0.Medecine.SurgicalKit.HaveWork || botOwner_0.Medecine.Using)
+            {
+                if (isTaker) InteractableObjects.RemoveTaker(botOwner_0);
+                return false;
+            }
+
+            if(botOwner_0.Memory.HaveEnemy)
+            {
+                if (isTaker) InteractableObjects.RemoveTaker(botOwner_0);
+                return false;
+            }
+
+            return isTaker;
         }
 
         public override string Name()

@@ -14,10 +14,14 @@ using HarmonyLib;
 using EFT.Interactive;
 using Comfort.Common;
 using friendlyPMC.Requests;
+using Diz.LanguageExtensions;
 
 namespace friendlyPMC.Actions
 {
-    internal class FollowerTakeLoot : BaseNodeAbstractClass
+    /**
+     * Action for a bot follower to take loot given by the player
+     */
+    public class FollowerTakeLoot : BaseNodeAbstractClass
     {
         private BotFollowerPlayer _follower;
 
@@ -102,7 +106,7 @@ namespace friendlyPMC.Actions
 
             try
             {
-                InventoryControllerClass inventoryControllerClass = botOwner_0.GetPlayer.InventoryControllerClass;
+                InventoryController inventoryControllerClass = botOwner_0.GetPlayer.InventoryController;
                 // order for general loot
                 List<EquipmentSlot> possibleSlots = new List<EquipmentSlot> {
                     EquipmentSlot.Backpack,
@@ -120,7 +124,7 @@ namespace friendlyPMC.Actions
 
                 List<object> equipTypes = new List<object>
                 {
-                    typeof(GrenadeClass)
+                    typeof(ThrowWeapItemClass)
                 };
 
                 foreach (var item1 in equipTypes)
@@ -135,34 +139,23 @@ namespace friendlyPMC.Actions
                 }
 
                 // find an available grid in the equipment slots to which the key can be transferred
-                ItemAddress locationForItem = FindLocationForItem(item, possibleSlots, inventoryControllerClass);
-                //  - no space left
-                if (locationForItem == null)
+                bool wasTransferred = false;
+                foreach (EquipmentSlot slot in possibleSlots)
                 {
-                    botOwner_0.BotTalk.TrySay(EPhraseTrigger.Negative, true);
-                    ClearLoot();
-                    return;
+                    if(botOwner_0.ItemTaker.method_10(slot, _lootItem))
+                    {
+                        wasTransferred = true;
+                        break;
+                    }
                 }
-
-                // initialize the transation to transfer the key to the bot
-                var moveResult = InteractionsHandlerClass.Move(item, locationForItem, inventoryControllerClass, true);
-
-                // - failed to make the transaction
-                if (!moveResult.Succeeded)
-                {
-                    ClearLoot();
-                    return;
-                }
-
-
-                // execute transaction
-                IResult result = await inventoryControllerClass.TryRunNetworkTransaction(moveResult, null);
+                
                 if (botOwner_0.IsDead || botOwner_0.BotState != EBotState.Active)
                 {
                     ClearLoot();
                     return;
                 }
-                if (result.Succeed && _follower.IsSquadMate)
+
+                if (wasTransferred && _follower.IsSquadMate)
                 {
                     InteractableObjects.StoreItem(botOwner_0, item);
                 }
@@ -186,7 +179,7 @@ namespace friendlyPMC.Actions
                         {
                             holdit.AddPossibleExecutors(botOwner_0);
                             holdit.SetGroup(botOwner_0.BotsGroup.RequestsController);
-                            botOwner_0.Gesture.TryGestus(EGesture.Good, true);
+                            botOwner_0.Gesture.TryGestus(EInteraction.OkGesture, true);
                         }
                     }
                 }
@@ -197,25 +190,6 @@ namespace friendlyPMC.Actions
                 Modules.Logger.LogError(e);
                 ClearLoot();
             }
-        }
-
-        private ItemAddress FindLocationForItem(Item item, IEnumerable<EquipmentSlot> possibleSlots, InventoryControllerClass botInventoryController)
-        {
-            foreach (EquipmentSlot slot in possibleSlots)
-            {
-                SearchableItemClass equipmentSlot = botInventoryController.Inventory.Equipment.GetSlot(slot).ContainedItem as SearchableItemClass;
-                foreach (StashGridClass grid in (equipmentSlot?.Grids ?? (new StashGridClass[0])))
-                {
-                    LocationInGrid locationInGrid = grid.FindFreeSpace(item);
-                    if (locationInGrid != null)
-                    {
-
-                        return new ItemAddressClass(grid, locationInGrid);
-                    }
-                }
-            }
-
-            return null;
         }
 
         private void ClearLoot()

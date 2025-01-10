@@ -1,44 +1,24 @@
--- === 3.8.1 === ---:
-- x - add position check for player when using the grenade launcher
-- x - add new command "Over There" that acts like "Contact" but with "ThatDirection" gesture and no voice
-- x - needs confirmation that enemy is not hearing the command
-- x - investigate possible bug with many followers spawning and ending up being hostile to each other (5 to start with)
-- x - add busy hands check for grenades
+-- === 3.9.2 === ---:
+- attempt to make transit work while in a group with the Goons
+- fix SAIN hearing patch interfering with the mod
+- bug fixes (whatever will be needed)
+- investigate if we can make "Assist" tactic turn hostile on accidental shots
+- see if we can make bot swap weapons when asked to loot (DeadBodyWork)
+- - this should also allow bot to put that weapon as seconday (in case of support without a grenade launcher)
 
-- x - ping team and over there needs to be silent from the enemy's perspective
-
-- x - fix suppfire looking in the opposite direction
-
-- x - track AIAgent Error made from GetDecision
-- x - debug more the UpdateLook error
-
--- === 3.9 === ---:
-- add punishment for players intentionally killing their teammates
-- - check if in combat or out of combat the kill was done
-- remove from player's inventory any equipment he looted from his dead teammates
-
+--- ==== 4.0.0 (final phase - "The General" for followers quest) ==== ---:
+- "The General" quests will unlock followers
+- - move followers control out of the configuration menu and into the chat window of "The General"
+- - when these quests are active enforce same side faction to not be hostile
+- - penalize player for killing same side faction members
+- - if player completes the first quest with both followers alive, choose one to become a teammate
 - player level to determine if he can pick up any extra followers and how many (maximum 3, disable configuration regarding this)
 - scav karma and level to determine with how many followers can the player spawn (maxium 3) and extra pickups (maximum 2 extras)
-
-- add detection for when enemy ise about to engage the player or any teamember (patch SET EnemyInfo.IsVisible and check if the enemy is a teammate and the distance is close enough for engagement)
-
-- see if we can make bot swap weapons when asked to loot (DeadBodyWork)
-
-- see if bot's kills can count as player's kill
-
-- fix glitchy behavior of boss followers
-- goons send messages at the end of the raid
-
-- goons send join offer for specific maps (Woods, Shoreline, Customs, Lighthouse)
-
---- ==== 4.0.0 (final phase) ==== ---:
-- add squad management terminal
-- after profile create, have 1 bot send a request to become a teamember for the player
 - add "hold fire/fire at will" commands
 
-==================================================================================
-RELEASE NOTES (3.9) 
 
+==================================================================================
+RELEASE NOTES (3.9.2) 
 
 ==================================================================================
 NOTES:

@@ -5,9 +5,11 @@ using System;
 using UnityEngine;
 namespace friendlyPMC.Actions
 {
-    internal class FollowerEnemyCheck
+    /**
+     * Action to check the direction boss reported seeing an enemy
+     */
+    public class FollowerEnemyCheck
     {
-
         public static void CheckBossReport(BotOwner bot)
         {
 
@@ -27,6 +29,7 @@ namespace friendlyPMC.Actions
                         brain.FakeShot(bossPosition + bossLookDirection.normalized * 50f);
                     }
                 }
+                // else make the closest reported enemy an active enemy
                 else
                 {
                     Modules.Logger.LogInfo("Player has seen " + closest.Profile.Nickname);

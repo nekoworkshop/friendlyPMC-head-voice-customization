@@ -11,7 +11,10 @@ using UnityEngine;
 
 namespace friendlyPMC.Actions
 {
-    internal class FollowerGuardCover : FollowerSniperSearch
+    /**
+     * Alternative action to enemy search for the follower with "Guard" tactic
+     */
+    public class FollowerGuardCover : FollowerSniperSearch
     {
         public FollowerGuardCover(BotOwner owner)
         : base(owner)
@@ -64,12 +67,7 @@ namespace friendlyPMC.Actions
                 _actionsQueue.Enqueue(() =>
                 {
                     // else get the next cover between the bot and the enemy
-                    CustomNavigationPoint Spot2 = /*Utils.Covers.GetClosestCoverPointBetween(
-                        botOwner_0,
-                        protectBoss ? bossPos : enemySpot,
-                        enemySpot
-                    );
-                    */Utils.Covers.GetClosestShootCover(
+                    CustomNavigationPoint Spot2 = Utils.Covers.GetClosestShootCover(
                         botOwner_0,
                         protectBoss ? bossPos : botPosition,
                         5f,

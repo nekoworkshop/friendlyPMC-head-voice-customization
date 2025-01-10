@@ -12,7 +12,7 @@ using System.Collections.Generic;
 namespace friendlyPMC.Patches
 {
     [HarmonyPatch(typeof(LookSensor))]
-    [HarmonyPatch("GInterface10.AIPeriodicUpdate")]
+    [HarmonyPatch("GInterface13.AIPeriodicUpdate")]
     internal class LookSensorPatch
     {
         private static Dictionary<string,float> _switch = new Dictionary<string, float>();
@@ -87,15 +87,15 @@ namespace friendlyPMC.Patches
         }
     }
 
-    internal class GClass974Patch : ModulePatch
+    internal class GClass1069Patch : ModulePatch
     {
         protected override MethodBase GetTargetMethod()
         {
-            return AccessTools.Method(typeof(GClass974), "method_7");
+            return AccessTools.Method(typeof(GClass1069), "method_7");
         }
 
         [PatchPrefix]
-        private static bool PatchPrefix(GClass974 __instance, ref float __result, Vector3 listenerPos, BetterSource source)
+        private static bool PatchPrefix(GClass1069 __instance, ref float __result, Vector3 listenerPos, BetterSource source)
         {
             // @TODO : figure out out why it triggers error for followers in some circumstances
             try
@@ -107,7 +107,7 @@ namespace friendlyPMC.Patches
             }
             catch (Exception ex)
             {
-                Logger.LogInfo("GClass974 Error");
+                Logger.LogInfo("GClass1069 Error");
                 Logger.LogInfo(ex.StackTrace);
                 __result = 0.5f;
             }

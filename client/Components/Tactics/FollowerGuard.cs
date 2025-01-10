@@ -11,8 +11,11 @@ using UnityEngine.AI;
 
 namespace friendlyPMC.Components.Tactics
 {
-    /** This class is not meant to be used directly as a brain layer, but within one **/
-    internal class FollowerGuard : GClass50
+    /** 
+     * This class is not meant to be used directly as a brain layer, but within one
+     * Ovewrite of "Kill Logic" layer that is able to use grenader launcher as support
+     * **/
+    public class FollowerGuard : GClass52
     {
         protected float coverTimer = 0f;
         protected float holdTimer = 0f;
@@ -27,7 +30,7 @@ namespace friendlyPMC.Components.Tactics
         private float float_10 = 0f;
         private readonly List<Vector3> list_1 = new List<Vector3>();
 
-        private readonly GClass396 gclass396_0 = null;
+        private readonly GClass441 gclass396_0 = null;
 
         public CustomNavigationPoint NavigationPoint
         {
@@ -50,7 +53,7 @@ namespace friendlyPMC.Components.Tactics
             }
             else commonLayer = new FollowerCommonLayer(bot, priority);
 
-            gclass396_0 = botOwner_0.WeaponManager.Selector as GClass396;
+            gclass396_0 = botOwner_0.WeaponManager.Selector as GClass441;
         }
 
         public override string Name()
@@ -92,7 +95,7 @@ namespace friendlyPMC.Components.Tactics
             return commonLayer.ShallGoNearBoss();
         }
 
-        public void OnHit(DamageInfo damageInfo, EBodyPart bodyPart, float damageReducedByArmor)
+        public void OnHit(DamageInfoStruct damageInfo, EBodyPart bodyPart, float damageReducedByArmor)
         {
             if (bodyPart == EBodyPart.Head)
             {
@@ -161,7 +164,7 @@ namespace friendlyPMC.Components.Tactics
 
             if (!botOwner_0.Memory.GoalEnemy.IsSuppressed() && goalEnemy.ShallISuppress())
             {
-                bool useGrenade = GClass761.Random(0f, 2f) > 1f;
+                bool useGrenade = GClass824.Random(0f, 2f) > 1f;
                 ThrowWeapType? grenadeType = new ThrowWeapType?(ThrowWeapType.frag_grenade);
                 // - check if player is too close when using grenade
                 if (useGrenade && botOwner_0.WeaponManager.Grenades.HaveGrenadeOfType(grenadeType.Value))
@@ -260,7 +263,7 @@ namespace friendlyPMC.Components.Tactics
                     GetClosestAttackCoverPoint(enemyPos);
                     if (customNavigationPoint_0 != null)
                     {
-                        bool withSuppr = GClass761.Random(0f, 1f) > 0.5f;
+                        bool withSuppr = GClass824.Random(0f, 1f) > 0.5f;
                         return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMoving, "getInCloseSlow");
                     }
 
@@ -283,7 +286,7 @@ namespace friendlyPMC.Components.Tactics
 
                 if (customNavigationPoint_0 != null && coverTimer < Time.time)
                 {
-                    coverTimer = Time.time + GClass761.Random(3f, 5f);
+                    coverTimer = Time.time + GClass824.Random(3f, 5f);
                     return new AICoreActionResultStruct<BotLogicDecision>((BotLogicDecision)CustomBotDecisions.RunToCover, "relocateFast");
                 }
 
@@ -311,7 +314,7 @@ namespace friendlyPMC.Components.Tactics
         public AICoreActionResultStruct<BotLogicDecision>? CanDoGrenadierSuppressRequest(Ray rayDirection)
         {
             if(!botOwner_0.WeaponManager.Selector.CanChangeToSecondWeapons) return null;
-            GClass396 selector = botOwner_0.WeaponManager.Selector as GClass396;
+            GClass441 selector = botOwner_0.WeaponManager.Selector as GClass441;
 
             if (selector != null && (selector.SecondPrimaryWeapon as Weapon) != null && (selector.SecondPrimaryWeapon as Weapon).IsGrenadeLauncher)
             {
@@ -366,7 +369,7 @@ namespace friendlyPMC.Components.Tactics
                         {
                             Vector3 enemyPos = enemy.Transform.position;
                             // - check if enemy is far enough from the player
-                            if (!GClass326.IsDangerPositionFarEnough(playerPos, new Vector3[]
+                            if (!GClass369.IsDangerPositionFarEnough(playerPos, new Vector3[]
                             {
                                 enemyPos
                             }, 4f)) continue;

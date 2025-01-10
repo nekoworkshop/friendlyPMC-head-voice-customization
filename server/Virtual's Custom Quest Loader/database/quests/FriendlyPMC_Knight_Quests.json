@@ -1,0 +1,1194 @@
+{
+	"6775d9957e2dbcb3bd0a02c7": {
+		"QuestName": "Who let the dogs out?",
+		"_id": "6775d9957e2dbcb3bd0a02c7",
+		"acceptPlayerMessage": "friendlypmc-knight-competition acceptPlayerMessage",
+		"canShowNotificationsInGame": true,
+		"changeQuestMessageText": "friendlypmc-knight-competition changeQuestMessageText",
+		"completePlayerMessage": "friendlypmc-knight-competition completePlayerMessage",
+		"conditions": {
+			"AvailableForStart": [
+				{
+					"compareMethod": ">=",
+					"conditionType": "Level",
+					"dynamicLocale": false,
+					"globalQuestCounterId": "",
+					"id": "67768e44fa281ca31708b18b",
+					"index": 0,
+					"parentId": "",
+					"value": 20,
+					"visibilityConditions": []
+				}
+			],
+			"AvailableForFinish": [
+				{
+					"completeInSeconds": 0,
+					"conditionType": "CounterCreator",
+					"counter": {
+						"conditions": [
+							{
+								"bodyPart": [],
+								"compareMethod": ">=",
+								"conditionType": "Kills",
+								"daytime": {
+									"from": 0,
+									"to": 0
+								},
+								"distance": {
+									"compareMethod": ">=",
+									"value": 0
+								},
+								"dynamicLocale": false,
+								"enemyEquipmentExclusive": [],
+								"enemyEquipmentInclusive": [],
+								"enemyHealthEffects": [],
+								"id": "67768e57fa281ca31708b18e",
+								"resetOnSessionEnd": false,
+								"savageRole": [],
+								"target": "Any",
+								"value": 1,
+								"weapon": [],
+								"weaponCaliber": [],
+								"weaponModsExclusive": [],
+								"weaponModsInclusive": []
+							},
+							{
+								"conditionType": "Location",
+								"dynamicLocale": false,
+								"id": "67768e57fa281ca31708b18d",
+								"target": ["Woods"]
+							}
+						],
+						"id": "67768e78fa281ca31708b18f"
+					},
+					"doNotResetIfCounterCompleted": false,
+					"dynamicLocale": false,
+					"globalQuestCounterId": "",
+					"id": "67768ec3fa281ca31708b190",
+					"index": 1,
+					"oneSessionOnly": false,
+					"parentId": "",
+					"type": "Elimination",
+					"value": 5,
+					"visibilityConditions": []
+				},
+				{
+					"completeInSeconds": 0,
+					"conditionType": "CounterCreator",
+					"counter": {
+						"conditions": [
+							{
+								"bodyPart": [],
+								"compareMethod": ">=",
+								"conditionType": "Kills",
+								"daytime": {
+									"from": 0,
+									"to": 0
+								},
+								"distance": {
+									"compareMethod": ">=",
+									"value": 0
+								},
+								"dynamicLocale": false,
+								"enemyEquipmentExclusive": [],
+								"enemyEquipmentInclusive": [],
+								"enemyHealthEffects": [],
+								"id": "67768efcfa281ca31708b191",
+								"resetOnSessionEnd": false,
+								"savageRole": [],
+								"target": "Any",
+								"value": 1,
+								"weapon": [],
+								"weaponCaliber": [],
+								"weaponModsExclusive": [],
+								"weaponModsInclusive": []
+							},
+							{
+								"conditionType": "Location",
+								"dynamicLocale": false,
+								"id": "67768f14fa281ca31708b192",
+								"target": ["Shoreline"]
+							}
+						],
+						"id": "67768f26fa281ca31708b193"
+					},
+					"doNotResetIfCounterCompleted": false,
+					"dynamicLocale": false,
+					"globalQuestCounterId": "",
+					"id": "67768f38fa281ca31708b194",
+					"index": 2,
+					"oneSessionOnly": false,
+					"parentId": "",
+					"type": "Elimination",
+					"value": 5,
+					"visibilityConditions": []
+				},
+				{
+					"completeInSeconds": 0,
+					"conditionType": "CounterCreator",
+					"counter": {
+						"conditions": [
+							{
+								"bodyPart": [],
+								"compareMethod": ">=",
+								"conditionType": "Kills",
+								"daytime": {
+									"from": 0,
+									"to": 0
+								},
+								"distance": {
+									"compareMethod": ">=",
+									"value": 0
+								},
+								"dynamicLocale": false,
+								"enemyEquipmentExclusive": [],
+								"enemyEquipmentInclusive": [],
+								"enemyHealthEffects": [],
+								"id": "67768fe2fa281ca31708b195",
+								"resetOnSessionEnd": false,
+								"savageRole": [],
+								"target": "Any",
+								"value": 1,
+								"weapon": [],
+								"weaponCaliber": [],
+								"weaponModsExclusive": [],
+								"weaponModsInclusive": []
+							},
+							{
+								"conditionType": "Location",
+								"dynamicLocale": false,
+								"id": "67768ff0fa281ca31708b196",
+								"target": ["Lighthouse"]
+							}
+						],
+						"id": "67768ffffa281ca31708b197"
+					},
+					"doNotResetIfCounterCompleted": false,
+					"dynamicLocale": false,
+					"globalQuestCounterId": "",
+					"id": "6776900dfa281ca31708b198",
+					"index": 3,
+					"oneSessionOnly": false,
+					"parentId": "",
+					"type": "Elimination",
+					"value": 5,
+					"visibilityConditions": []
+				}
+			],
+			"Fail": [
+				{
+					"completeInSeconds": 0,
+					"conditionType": "CounterCreator",
+					"counter": {
+						"conditions": [
+							{
+								"conditionType": "ExitStatus",
+								"dynamicLocale": false,
+								"id": "67769026fa281ca31708b199",
+								"status": ["Killed", "Left", "MissingInAction"]
+							},
+							{
+								"conditionType": "Location",
+								"dynamicLocale": false,
+								"id": "67769030fa281ca31708b19a",
+								"target": ["Shoreline", "Lighthouse", "Woods"]
+							}
+						],
+						"id": "67769042fa281ca31708b19b"
+					},
+					"doNotResetIfCounterCompleted": false,
+					"dynamicLocale": false,
+					"globalQuestCounterId": "",
+					"id": "67769052fa281ca31708b19c",
+					"index": 0,
+					"oneSessionOnly": false,
+					"parentId": "",
+					"type": "Completion",
+					"value": 1,
+					"visibilityConditions": []
+				}
+			]
+		},
+		"declinePlayerMessage": "friendlypmc-knight-competition declinePlayerMessage",
+		"description": "friendlypmc-knight-competition description",
+		"failMessageText": "friendlypmc-knight-competition failMessageText",
+		"image": "/files/quest/icon/KnightCompetitionQuest.jpg",
+		"instantComplete": false,
+		"isKey": false,
+		"location": "any",
+		"name": "friendlypmc-knight-competition name",
+		"note": "friendlypmc-knight-competition note",
+		"restartable": true,
+		"rewards": {
+			"Fail": [],
+			"Started": [],
+			"Success": [
+				{
+					"id": "friendlypmc-knight-competition-reward-1",
+					"index": 0,
+					"type": "Experience",
+					"value": "32500"
+				},
+				{
+					"id": "friendlypmc-knight-competition-reward-2",
+					"index": 1,
+					"target": "67768b19fa281ca31708b187",
+					"type": "TraderStanding",
+					"value": "0.1"
+				}
+			]
+		},
+		"secretQuest": false,
+		"side": "Pmc",
+		"startedMessageText": "friendlypmc-knight-competition startedMessageText",
+		"successMessageText": "friendlypmc-knight-competition successMessageText",
+		"traderId": "67768b19fa281ca31708b187",
+		"type": "Elimination"
+	},
+	"6775da597e2dbcb3bd0a02c9": {
+		"QuestName": "My Land",
+		"_id": "6775da597e2dbcb3bd0a02c9",
+		"acceptPlayerMessage": "friendlypmc-knight-my-land acceptPlayerMessage",
+		"canShowNotificationsInGame": true,
+		"changeQuestMessageText": "friendlypmc-knight-my-land changeQuestMessageText",
+		"completePlayerMessage": "friendlypmc-knight-my-land completePlayerMessage",
+		"conditions": {
+			"AvailableForStart": [
+				{
+					"compareMethod": ">=",
+					"conditionType": "Level",
+					"dynamicLocale": false,
+					"globalQuestCounterId": "",
+					"id": "67769181fa281ca31708b19d",
+					"index": 0,
+					"parentId": "",
+					"value": 20,
+					"visibilityConditions": []
+				},
+				{
+					"availableAfter": 3600,
+					"conditionType": "Quest",
+					"dispersion": 0,
+					"dynamicLocale": false,
+					"globalQuestCounterId": "",
+					"id": "67769196fa281ca31708b19e",
+					"index": 0,
+					"parentId": "",
+					"status": [4],
+					"target": "6775d9957e2dbcb3bd0a02c7",
+					"visibilityConditions": []
+				}
+			],
+			"AvailableForFinish": [
+				{
+					"completeInSeconds": 0,
+					"conditionType": "CounterCreator",
+					"counter": {
+						"conditions": [
+							{
+								"conditionType": "InZone",
+								"dynamicLocale": false,
+								"id": "677691dbfa281ca31708b19f",
+								"zoneIds": ["prapor_27_1"]
+							},
+							{
+								"bodyPart": [],
+								"compareMethod": ">=",
+								"conditionType": "Kills",
+								"daytime": {
+									"from": 0,
+									"to": 0
+								},
+								"distance": {
+									"compareMethod": ">=",
+									"value": 0
+								},
+								"dynamicLocale": false,
+								"enemyEquipmentExclusive": [],
+								"enemyEquipmentInclusive": [],
+								"enemyHealthEffects": [],
+								"id": "67769250fa281ca31708b1a0",
+								"resetOnSessionEnd": false,
+								"savageRole": [],
+								"target": "Any",
+								"value": 1,
+								"weapon": [],
+								"weaponCaliber": [],
+								"weaponModsExclusive": [],
+								"weaponModsInclusive": []
+							}
+						],
+						"id": "6776925dfa281ca31708b1a1"
+					},
+					"doNotResetIfCounterCompleted": false,
+					"dynamicLocale": false,
+					"globalQuestCounterId": "",
+					"id": "6776926bfa281ca31708b1a2",
+					"index": 0,
+					"oneSessionOnly": false,
+					"parentId": "",
+					"type": "Elimination",
+					"value": 8,
+					"visibilityConditions": []
+				}
+			],
+			"Fail": [{
+                "completeInSeconds": 0,
+                "conditionType": "CounterCreator",
+                "counter": {
+                    "conditions": [
+                        {
+                            "conditionType": "ExitStatus",
+                            "dynamicLocale": false,
+                            "id": "677feac5f539f6d923006709",
+                            "status": ["Killed", "Left", "MissingInAction"]
+                        },
+                        {
+                            "conditionType": "Location",
+                            "dynamicLocale": false,
+                            "id": "677feac5f539f6d92300670a",
+                            "target": ["bigmap"]
+                        }
+                    ],
+                    "id": "677feac5f539f6d92300670b"
+                },
+                "doNotResetIfCounterCompleted": false,
+                "dynamicLocale": false,
+                "globalQuestCounterId": "",
+                "id": "677fea2ff539f6d923006705",
+                "index": 0,
+                "oneSessionOnly": false,
+                "parentId": "",
+                "type": "Completion",
+                "value": 1,
+                "visibilityConditions": []
+            }]
+		},
+		"declinePlayerMessage": "friendlypmc-knight-my-land declinePlayerMessage",
+		"description": "friendlypmc-knight-my-land description",
+		"failMessageText": "friendlypmc-knight-my-land failMessageText",
+		"image": "/files/quest/icon/KnightCompetitionQuest.jpg",
+		"instantComplete": false,
+		"isKey": false,
+		"location": "56f40101d2720b2a4d8b45d6",
+		"name": "friendlypmc-knight-my-land name",
+		"note": "friendlypmc-knight-my-land note",
+		"restartable": true,
+		"rewards": {
+			"Fail": [],
+			"Started": [],
+			"Success": [
+				{
+					"id": "67769281fa281ca31708b1a3",
+					"index": 0,
+					"type": "Experience",
+					"value": "24000"
+				},
+				{
+					"id": "6776928efa281ca31708b1a4",
+					"index": 1,
+					"target": "67768b19fa281ca31708b187",
+					"type": "TraderStanding",
+					"value": "0.1"
+				},
+				{
+					"findInRaid": true,
+					"id": "6776929ffa281ca31708b1a5",
+					"index": 2,
+					"items": [
+						{
+							"_id": "5f92a7bce6193c45012ab7f4",
+							"_tpl": "5696686a4bdc2da3298b456a",
+							"upd": {
+								"StackObjectsCount": 2000
+							}
+						}
+					],
+					"target": "5f92a7bce6193c45012ab7f4",
+					"type": "Item",
+					"value": "2000"
+				}
+			]
+		},
+		"secretQuest": false,
+		"side": "Pmc",
+		"startedMessageText": "friendlypmc-knight-my-land startedMessageText",
+		"successMessageText": "friendlypmc-knight-my-land successMessageText",
+		"traderId": "67768b19fa281ca31708b187",
+		"type": "Elimination"
+	},
+	"677687f2fa281ca31708b17a": {
+		"QuestName": "They robbed us!",
+		"_id": "677687f2fa281ca31708b17a",
+		"acceptPlayerMessage": "friendlypmc-knight-thieves acceptPlayerMessage",
+		"canShowNotificationsInGame": true,
+		"changeQuestMessageText": "friendlypmc-knight-thieves changeQuestMessageText",
+		"completePlayerMessage": "friendlypmc-knight-thieves completePlayerMessage",
+		"conditions": {
+			"AvailableForStart": [
+				{
+					"compareMethod": ">=",
+					"conditionType": "Level",
+					"dynamicLocale": false,
+					"globalQuestCounterId": "",
+					"id": "67769409fa281ca31708b1a6",
+					"index": 0,
+					"parentId": "",
+					"value": 20,
+					"visibilityConditions": []
+				},
+				{
+					"availableAfter": 0,
+					"conditionType": "Quest",
+					"dispersion": 0,
+					"dynamicLocale": false,
+					"globalQuestCounterId": "",
+					"id": "67769418fa281ca31708b1a7",
+					"index": 0,
+					"parentId": "",
+					"status": [4],
+					"target": "6775da597e2dbcb3bd0a02c9",
+					"visibilityConditions": []
+				}
+			],
+			"AvailableForFinish": [
+				{
+					"conditionType": "FindItem",
+					"countInRaid": false,
+					"dogtagLevel": 0,
+					"dynamicLocale": false,
+					"globalQuestCounterId": "",
+					"id": "6776942bfa281ca31708b1a8",
+					"index": 0,
+					"isEncoded": false,
+					"maxDurability": 100,
+					"minDurability": 0,
+					"onlyFoundInRaid": true,
+					"parentId": "",
+					"target": ["64e3b0f4e3b6f5a4a37e8c1d"],
+					"value": 1,
+					"visibilityConditions": []
+				},
+				{
+					"conditionType": "HandoverItem",
+					"dogtagLevel": 0,
+					"dynamicLocale": false,
+					"globalQuestCounterId": "",
+					"id": "67769441fa281ca31708b1a9",
+					"index": 1,
+					"isEncoded": false,
+					"maxDurability": 100,
+					"minDurability": 0,
+					"onlyFoundInRaid": true,
+					"parentId": "",
+					"target": ["64e3b0f4e3b6f5a4a37e8c1d"],
+					"value": 1,
+					"visibilityConditions": []
+				}
+			],
+			"Fail": []
+		},
+		"declinePlayerMessage": "friendlypmc-knight-thieves declinePlayerMessage",
+		"description": "friendlypmc-knight-thieves description",
+		"failMessageText": "friendlypmc-knight-thieves failMessageText",
+		"image": "/files/quest/icon/KnightThieves.jpg",
+		"instantComplete": false,
+		"isKey": false,
+		"location": "5714dc692459777137212e12",
+		"name": "friendlypmc-knight-thieves name",
+		"note": "friendlypmc-knight-thieves note",
+		"restartable": true,
+		"rewards": {
+			"Fail": [],
+			"Started": [],
+			"Success": [
+				{
+					"id": "6776945cfa281ca31708b1aa",
+					"index": 0,
+					"type": "Experience",
+					"value": "15000"
+				},
+				{
+					"id": "67769468fa281ca31708b1ab",
+					"index": 1,
+					"target": "67768b19fa281ca31708b187",
+					"type": "TraderStanding",
+					"value": "0.1"
+				},
+				{
+					"findInRaid": true,
+					"id": "67769470fa281ca31708b1ac",
+					"index": 2,
+					"items": [
+						{
+							"_id": "5f92a7bce6193c45012ab7f4",
+							"_tpl": "5696686a4bdc2da3298b456a",
+							"upd": {
+								"StackObjectsCount": 2000
+							}
+						}
+					],
+					"target": "5f92a7bce6193c45012ab7f4",
+					"type": "Item",
+					"value": "2000"
+				}
+			]
+		},
+		"secretQuest": false,
+		"side": "Pmc",
+		"startedMessageText": "friendlypmc-knight-thieves startedMessageText",
+		"successMessageText": "friendlypmc-knight-thieves successMessageText",
+		"traderId": "67768b19fa281ca31708b187",
+		"type": "PickUp"
+	},
+
+	"67768936fa281ca31708b17c": {
+		"QuestName": "Badge Bandit",
+		"_id": "67768936fa281ca31708b17c",
+		"acceptPlayerMessage": "friendlypmc-knight-payback01 acceptPlayerMessage",
+		"canShowNotificationsInGame": true,
+		"changeQuestMessageText": "friendlypmc-knight-payback01 changeQuestMessageText",
+		"completePlayerMessage": "friendlypmc-knight-payback01 completePlayerMessage",
+		"conditions": {
+			"AvailableForStart": [
+				{
+					"compareMethod": ">=",
+					"conditionType": "Level",
+					"dynamicLocale": false,
+					"globalQuestCounterId": "",
+					"id": "677fe662f539f6d9230066e3",
+					"index": 0,
+					"parentId": "",
+					"value": 20,
+					"visibilityConditions": []
+				},
+				{
+					"availableAfter": 3600,
+					"conditionType": "Quest",
+					"dispersion": 0,
+					"dynamicLocale": false,
+					"globalQuestCounterId": "",
+					"id": "677fe662f539f6d9230066e4",
+					"index": 0,
+					"parentId": "",
+					"status": [4],
+					"target": "677687f2fa281ca31708b17a",
+					"visibilityConditions": []
+				}
+			],
+			"AvailableForFinish": [
+				{
+					"completeInSeconds": 0,
+					"conditionType": "CounterCreator",
+					"counter": {
+						"conditions": [
+							{
+								"bodyPart": [],
+								"compareMethod": ">=",
+								"conditionType": "Kills",
+								"daytime": {
+									"from": 0,
+									"to": 0
+								},
+								"distance": {
+									"compareMethod": ">=",
+									"value": 0
+								},
+								"dynamicLocale": false,
+								"enemyEquipmentExclusive": [],
+								"enemyEquipmentInclusive": [],
+								"enemyHealthEffects": [],
+								"id": "677fe6a9f539f6d9230066e5",
+								"resetOnSessionEnd": false,
+								"savageRole": ["bossKolontay"],
+								"target": "Savage",
+								"value": 1,
+								"weapon": [],
+								"weaponCaliber": [],
+								"weaponModsExclusive": [],
+								"weaponModsInclusive": []
+							}
+						],
+						"id": "677fe6a9f539f6d9230066e6"
+					},
+					"doNotResetIfCounterCompleted": false,
+					"dynamicLocale": false,
+					"globalQuestCounterId": "",
+					"id": "677fe6a9f539f6d9230066e7",
+					"index": 0,
+					"oneSessionOnly": false,
+					"parentId": "",
+					"type": "Elimination",
+					"value": 1,
+					"visibilityConditions": []
+				}
+			],
+			"Fail": [
+				{
+					"completeInSeconds": 0,
+					"conditionType": "CounterCreator",
+					"counter": {
+						"conditions": [
+							{
+								"conditionType": "ExitStatus",
+								"dynamicLocale": false,
+								"id": "677fe755f539f6d9230066e9",
+								"status": ["Killed", "Left", "MissingInAction"]
+							},
+							{
+								"conditionType": "Location",
+								"dynamicLocale": false,
+								"id": "677fe7a6f539f6d9230066eb",
+								"target": ["TarkovStreets"]
+							}
+						],
+						"id": "677fe755f539f6d9230066ea"
+					},
+					"doNotResetIfCounterCompleted": false,
+					"dynamicLocale": false,
+					"globalQuestCounterId": "",
+					"id": "677fe755f539f6d9230066e8",
+					"index": 0,
+					"oneSessionOnly": false,
+					"parentId": "",
+					"type": "Completion",
+					"value": 1,
+					"visibilityConditions": []
+				}
+			]
+		},
+		"rewards": {
+			"Fail": [],
+			"Started": [],
+			"Success": [
+				{
+					"id": "6780679d186897b8890a71bf",
+					"index": 0,
+					"type": "Experience",
+					"value": "35000"
+				},
+				{
+					"id": "6780679d186897b8890a71c0",
+					"index": 1,
+					"target": "67768b19fa281ca31708b187",
+					"type": "TraderStanding",
+					"value": "0.2"
+				}
+			]
+		},
+		"declinePlayerMessage": "friendlypmc-knight-payback01 declinePlayerMessage",
+		"description": "friendlypmc-knight-payback01 description",
+		"failMessageText": "friendlypmc-knight-payback01 failMessageText",
+		"image": "/files/quest/icon/KnightRobocop.jpg",
+		"instantComplete": false,
+		"isKey": false,
+		"location": "5714dc692459777137212e12",
+		"name": "friendlypmc-knight-payback01 name",
+		"note": "friendlypmc-knight-payback01 note",
+		"restartable": true,
+		"secretQuest": false,
+		"side": "Pmc",
+		"startedMessageText": "friendlypmc-knight-payback01 startedMessageText",
+		"successMessageText": "friendlypmc-knight-payback01 successMessageText",
+		"traderId": "67768b19fa281ca31708b187",
+		"type": "Elimination"
+	},
+
+	"6776899afa281ca31708b17e": {
+		"QuestName": "Enemy Spotted",
+		"_id": "6776899afa281ca31708b17e",
+		"acceptPlayerMessage": "friendlypmc-knight-enemyspotted acceptPlayerMessage",
+		"canShowNotificationsInGame": true,
+		"changeQuestMessageText": "friendlypmc-knight-enemyspotted changeQuestMessageText",
+		"completePlayerMessage": "friendlypmc-knight-enemyspotted completePlayerMessage",
+		"conditions": {
+			"AvailableForStart": [
+				{
+					"compareMethod": ">=",
+					"conditionType": "Level",
+					"dynamicLocale": false,
+					"globalQuestCounterId": "",
+					"id": "6780679d186897b8890a71c1",
+					"index": 0,
+					"parentId": "",
+					"value": 20,
+					"visibilityConditions": []
+				},
+				{
+					"availableAfter": 3600,
+					"conditionType": "Quest",
+					"dispersion": 0,
+					"dynamicLocale": false,
+					"globalQuestCounterId": "",
+					"id": "6780679d186897b8890a71c2",
+					"index": 0,
+					"parentId": "",
+					"status": [4],
+					"target": "67768936fa281ca31708b17c",
+					"visibilityConditions": []
+				}
+			],
+			"AvailableForFinish": [
+				{
+					"completeInSeconds": 0,
+					"conditionType": "CounterCreator",
+					"counter": {
+						"conditions": [
+							{
+								"bodyPart": [],
+								"compareMethod": ">=",
+								"conditionType": "Kills",
+								"daytime": {
+									"from": 0,
+									"to": 0
+								},
+								"distance": {
+									"compareMethod": ">=",
+									"value": 0
+								},
+								"dynamicLocale": false,
+								"enemyEquipmentExclusive": [],
+								"enemyEquipmentInclusive": [],
+								"enemyHealthEffects": [],
+								"id": "6780679d186897b8890a71c5",
+								"resetOnSessionEnd": false,
+								"savageRole": [],
+								"target": "AnyPmc",
+								"value": 1,
+								"weapon": [],
+								"weaponCaliber": [],
+								"weaponModsExclusive": [],
+								"weaponModsInclusive": []
+							},
+							{
+								"conditionType": "Location",
+								"dynamicLocale": false,
+								"id": "6780679d186897b8890a71c3",
+								"target": ["Woods"]
+							}
+						],
+						"id": "6780679d186897b8890a71c4"
+					},
+					"doNotResetIfCounterCompleted": false,
+					"dynamicLocale": false,
+					"globalQuestCounterId": "",
+					"id": "677fe7a6f539f6d9230066ec",
+					"index": 0,
+					"oneSessionOnly": false,
+					"parentId": "",
+					"type": "Elimination",
+					"value": 5,
+					"visibilityConditions": []
+				}
+			],
+			"Fail": [
+				{
+					"completeInSeconds": 0,
+					"conditionType": "CounterCreator",
+					"counter": {
+						"conditions": [
+							{
+								"conditionType": "ExitStatus",
+								"dynamicLocale": false,
+								"id": "677fe807f539f6d9230066ee",
+								"status": ["Killed", "Left", "MissingInAction"]
+							},
+							{
+								"conditionType": "Location",
+								"dynamicLocale": false,
+								"id": "677fe807f539f6d9230066ef",
+								"target": ["Woods"]
+							}
+						],
+						"id": "677fe807f539f6d9230066f0"
+					},
+					"doNotResetIfCounterCompleted": false,
+					"dynamicLocale": false,
+					"globalQuestCounterId": "",
+					"id": "677fe7a6f539f6d9230066ed",
+					"index": 0,
+					"oneSessionOnly": false,
+					"parentId": "",
+					"type": "Completion",
+					"value": 1,
+					"visibilityConditions": []
+				}
+			]
+		},
+		"rewards": {
+			"Fail": [],
+			"Started": [],
+			"Success": [
+				{
+					"id": "6780679d186897b8890a71c6",
+					"index": 0,
+					"type": "Experience",
+					"value": "20000"
+				},
+				{
+					"id": "6780679d186897b8890a71c7",
+					"index": 1,
+					"target": "67768b19fa281ca31708b187",
+					"type": "TraderStanding",
+					"value": "0.1"
+				}
+			]
+		},
+		"declinePlayerMessage": "friendlypmc-knight-enemyspotted declinePlayerMessage",
+		"description": "friendlypmc-knight-enemyspotted description",
+		"failMessageText": "friendlypmc-knight-enemyspotted failMessageText",
+		"image": "/files/quest/icon/KnightBirdEye.jpg",
+		"instantComplete": false,
+		"isKey": false,
+		"location": "5704e3c2d2720bac5b8b4567",
+		"name": "friendlypmc-knight-enemyspotted name",
+		"note": "friendlypmc-knight-enemyspotted note",
+		"restartable": true,
+		"secretQuest": false,
+		"side": "Pmc",
+		"startedMessageText": "friendlypmc-knight-enemyspotted startedMessageText",
+		"successMessageText": "friendlypmc-knight-enemyspotted successMessageText",
+		"traderId": "67768b19fa281ca31708b187",
+		"type": "Elimination"
+	},
+	"677689ebfa281ca31708b180": {
+		"QuestName": "Off Limits",
+		"_id": "677689ebfa281ca31708b180",
+		"acceptPlayerMessage": "friendlypmc-knight-coverme acceptPlayerMessage",
+		"canShowNotificationsInGame": true,
+		"changeQuestMessageText": "friendlypmc-knight-coverme changeQuestMessageText",
+		"completePlayerMessage": "friendlypmc-knight-coverme completePlayerMessage",
+		"conditions": {
+			"AvailableForStart": [
+				{
+					"compareMethod": ">=",
+					"conditionType": "Level",
+					"dynamicLocale": false,
+					"globalQuestCounterId": "",
+					"id": "6780679d186897b8890a71c8",
+					"index": 0,
+					"parentId": "",
+					"value": 20,
+					"visibilityConditions": []
+				},
+				{
+					"availableAfter": 3600,
+					"conditionType": "Quest",
+					"dispersion": 0,
+					"dynamicLocale": false,
+					"globalQuestCounterId": "",
+					"id": "67806871186897b8890a71d3",
+					"index": 0,
+					"parentId": "",
+					"status": [4],
+					"target": "6776899afa281ca31708b17e",
+					"visibilityConditions": []
+				}
+			],
+			"AvailableForFinish": [
+				{
+					"completeInSeconds": 0,
+					"conditionType": "CounterCreator",
+					"counter": {
+						"conditions": [
+							{
+								"conditionType": "InZone",
+								"dynamicLocale": false,
+								"id": "67806871186897b8890a71d4",
+								"zoneIds": ["pier_zone01"]
+							},
+							{
+								"bodyPart": [],
+								"compareMethod": ">=",
+								"conditionType": "Kills",
+								"daytime": {
+									"from": 0,
+									"to": 0
+								},
+								"distance": {
+									"compareMethod": ">=",
+									"value": 0
+								},
+								"dynamicLocale": false,
+								"enemyEquipmentExclusive": [],
+								"enemyEquipmentInclusive": [],
+								"enemyHealthEffects": [],
+								"id": "67806871186897b8890a71d5",
+								"resetOnSessionEnd": false,
+								"savageRole": [],
+								"target": "Any",
+								"value": 1,
+								"weapon": [],
+								"weaponCaliber": [],
+								"weaponModsExclusive": [],
+								"weaponModsInclusive": []
+							}
+						],
+						"id": "67806871186897b8890a71d6"
+					},
+					"doNotResetIfCounterCompleted": false,
+					"dynamicLocale": false,
+					"globalQuestCounterId": "",
+					"id": "677fe82bf539f6d9230066f2",
+					"index": 0,
+					"oneSessionOnly": false,
+					"parentId": "",
+					"type": "Elimination",
+					"value": 8,
+					"visibilityConditions": []
+				}
+			],
+			"Fail": [{
+                "completeInSeconds": 0,
+                "conditionType": "CounterCreator",
+                "counter": {
+                    "conditions": [
+                        {
+                            "conditionType": "ExitStatus",
+                            "dynamicLocale": false,
+                            "id": "677fe905f539f6d9230066f4",
+                            "status": ["Killed", "Left", "MissingInAction"]
+                        },
+                        {
+                            "conditionType": "Location",
+                            "dynamicLocale": false,
+                            "id": "677fe905f539f6d9230066f5",
+                            "target": ["Shoreline"]
+                        }
+                    ],
+                    "id": "677fe905f539f6d9230066f6"
+                },
+                "doNotResetIfCounterCompleted": false,
+                "dynamicLocale": false,
+                "globalQuestCounterId": "",
+                "id": "677fe82bf539f6d9230066f3",
+                "index": 0,
+                "oneSessionOnly": false,
+                "parentId": "",
+                "type": "Completion",
+                "value": 1,
+                "visibilityConditions": []
+            }]
+		},
+		"declinePlayerMessage": "friendlypmc-knight-coverme declinePlayerMessage",
+		"description": "friendlypmc-knight-coverme description",
+		"failMessageText": "friendlypmc-knight-coverme failMessageText",
+		"image": "/files/quest/icon/KnightCoverMe.jpg",
+		"instantComplete": false,
+		"isKey": false,
+		"location": "5704e554d2720bac5b8b456e",
+		"name": "friendlypmc-knight-coverme name",
+		"note": "friendlypmc-knight-coverme note",
+		"restartable": true,
+		"rewards": {
+			"Fail": [],
+			"Started": [],
+			"Success": [
+				{
+					"id": "67806871186897b8890a71d7",
+					"index": 0,
+					"type": "Experience",
+					"value": "24000"
+				},
+				{
+					"id": "67806871186897b8890a71d8",
+					"index": 1,
+					"target": "67768b19fa281ca31708b187",
+					"type": "TraderStanding",
+					"value": "0.1"
+				},
+				{
+					"findInRaid": true,
+					"id": "67806871186897b8890a71d9",
+					"index": 2,
+					"items": [
+						{
+							"_id": "5f92a7bce6193c45012ab7f4",
+							"_tpl": "5696686a4bdc2da3298b456a",
+							"upd": {
+								"StackObjectsCount": 3000
+							}
+						}
+					],
+					"target": "5f92a7bce6193c45012ab7f4",
+					"type": "Item",
+					"value": "3000"
+				}
+			]
+		},
+		"secretQuest": false,
+		"side": "Pmc",
+		"startedMessageText": "friendlypmc-knight-coverme startedMessageText",
+		"successMessageText": "friendlypmc-knight-coverme successMessageText",
+		"traderId": "67768b19fa281ca31708b187",
+		"type": "Elimination"
+	},
+	"67768a41fa281ca31708b182": {
+		"QuestName": "A Favor",
+		"_id": "67768a41fa281ca31708b182",
+		"acceptPlayerMessage": "friendlypmc-knight-afavor acceptPlayerMessage",
+		"canShowNotificationsInGame": true,
+		"changeQuestMessageText": "friendlypmc-knight-afavor changeQuestMessageText",
+		"completePlayerMessage": "friendlypmc-knight-afavor completePlayerMessage",
+		"conditions": {
+			"AvailableForStart": [
+				{
+					"compareMethod": ">=",
+					"conditionType": "Level",
+					"dynamicLocale": false,
+					"globalQuestCounterId": "",
+					"id": "677fe972f539f6d9230066f7",
+					"index": 0,
+					"parentId": "",
+					"value": 20,
+					"visibilityConditions": []
+				},
+				{
+					"availableAfter": 3600,
+					"conditionType": "Quest",
+					"dispersion": 0,
+					"dynamicLocale": false,
+					"globalQuestCounterId": "",
+					"id": "677fe972f539f6d9230066f8",
+					"index": 0,
+					"parentId": "",
+					"status": [4],
+					"target": "677689ebfa281ca31708b180",
+					"visibilityConditions": []
+				}
+			],
+			"AvailableForFinish": [
+				{
+					"completeInSeconds": 0,
+					"conditionType": "CounterCreator",
+					"counter": {
+						"conditions": [
+							{
+								"bodyPart": [],
+								"compareMethod": ">=",
+								"conditionType": "Kills",
+								"daytime": {
+									"from": 0,
+									"to": 0
+								},
+								"distance": {
+									"compareMethod": ">=",
+									"value": 0
+								},
+								"dynamicLocale": false,
+								"enemyEquipmentExclusive": [],
+								"enemyEquipmentInclusive": [],
+								"enemyHealthEffects": [],
+								"id": "677fe972f539f6d9230066f9",
+								"resetOnSessionEnd": false,
+								"savageRole": ["bossKojaniy"],
+								"target": "Savage",
+								"value": 1,
+								"weapon": [],
+								"weaponCaliber": [],
+								"weaponModsExclusive": [],
+								"weaponModsInclusive": []
+							}
+						],
+						"id": "677fe999f539f6d9230066fa"
+					},
+					"doNotResetIfCounterCompleted": false,
+					"dynamicLocale": false,
+					"globalQuestCounterId": "",
+					"id": "677fe999f539f6d9230066fb",
+					"index": 0,
+					"oneSessionOnly": false,
+					"parentId": "",
+					"type": "Elimination",
+					"value": 1,
+					"visibilityConditions": []
+				}
+			],
+			"Fail": [
+				{
+					"completeInSeconds": 0,
+					"conditionType": "CounterCreator",
+					"counter": {
+						"conditions": [
+							{
+								"conditionType": "ExitStatus",
+								"dynamicLocale": false,
+								"id": "677fe9d5f539f6d9230066fd",
+								"status": ["Killed", "Left", "MissingInAction"]
+							},
+							{
+								"conditionType": "Location",
+								"dynamicLocale": false,
+								"id": "677fe9d5f539f6d9230066fe",
+								"target": ["Woods"]
+							}
+						],
+						"id": "677fe9d5f539f6d9230066ff"
+					},
+					"doNotResetIfCounterCompleted": false,
+					"dynamicLocale": false,
+					"globalQuestCounterId": "",
+					"id": "677fe9d5f539f6d923006700",
+					"index": 0,
+					"oneSessionOnly": false,
+					"parentId": "",
+					"type": "Completion",
+					"value": 1,
+					"visibilityConditions": []
+				}
+			]
+		},
+		"rewards": {
+			"Fail": [],
+			"Started": [],
+			"Success": [
+				{
+					"id": "67806871186897b8890a71da",
+					"index": 0,
+					"type": "Experience",
+					"value": "30000"
+				},
+				{
+					"id": "67806871186897b8890a71db",
+					"index": 1,
+					"target": "67768b19fa281ca31708b187",
+					"type": "TraderStanding",
+					"value": "0.1"
+				},
+				{
+					"findInRaid": true,
+					"id": "67806871186897b8890a71dc",
+					"index": 2,
+					"items": [
+						{
+							"_id": "5f92a7bce6193c45012ab7f4",
+							"_tpl": "5696686a4bdc2da3298b456a",
+							"upd": {
+								"StackObjectsCount": 3000
+							}
+						}
+					],
+					"target": "5f92a7bce6193c45012ab7f4",
+					"type": "Item",
+					"value": "2000"
+				}
+			]
+		},
+		"declinePlayerMessage": "friendlypmc-knight-afavor declinePlayerMessage",
+		"description": "friendlypmc-knight-afavor description",
+		"failMessageText": "friendlypmc-knight-afavor failMessageText",
+		"image": "/files/quest/icon/KnightShturman.jpg",
+		"instantComplete": false,
+		"isKey": false,
+		"location": "5704e3c2d2720bac5b8b4567",
+		"name": "friendlypmc-knight-afavor name",
+		"note": "friendlypmc-knight-afavor note",
+		"restartable": true,
+		"secretQuest": false,
+		"side": "Pmc",
+		"startedMessageText": "friendlypmc-knight-afavor startedMessageText",
+		"successMessageText": "friendlypmc-knight-afavor successMessageText",
+		"traderId": "67768b19fa281ca31708b187",
+		"type": "Elimination"
+	}
+}

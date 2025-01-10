@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace friendlyPMC.Components
 {
-    internal class pitAIBossPlayer : AIBossPlayer
+    public class pitAIBossPlayer : AIBossPlayer
     {
         private AIBossPlayerLogic aBossLogic;
 
@@ -76,7 +76,7 @@ namespace friendlyPMC.Components
 
             if (Followers != null && Followers.Count > 0)
             {
-                float chance = GClass761.Random(1, 100);
+                float chance = GClass824.Random(1, 100);
                 bool noreturn = chance > friendlyPMC.returnChanceDeath.Value;
 
                 Followers.ForEach(follower =>
@@ -104,23 +104,25 @@ namespace friendlyPMC.Components
             _group.CheckAndAddEnemy(enemy);
         }
 
-        public void PhraseSaid(BotEventHandler.GClass599 info)
+        public void PhraseSaid(BotEventHandler.GClass659 info)
         {
             if(info.PlayerRequester != null && info.PlayerRequester.ProfileId == realPlayer.ProfileId)
             {
-                if(info.phrase == (EPhraseTrigger)CustomPhrases.TeamStatus)
+                if (info.phrase == (EPhraseTrigger)CustomPhrases.TeamStatus)
+                {
                     PingTeamates.Instance.Ping(this);
+                }
                 else if (info.phrase == EPhraseTrigger.OnRepeatedContact)
                 {
                     InteractableObjects.CheckSeenEnemies(Player());
                 }
             }
         }
-        private void GestusShown(GClass453 info)
+        public void GestusShown(GClass501 info)
         {
-            if(info.Player != null && info.Player.ProfileId == realPlayer.ProfileId)
+            if (info.Player != null && info.Player.ProfileId == realPlayer.ProfileId)
             {
-                if (info.Gesture == (EGesture)CustomGestures.OverThere)
+                if (info.Gesture == (EInteraction)CustomGestures.OverThere)
                 {
                     InteractableObjects.CheckSeenEnemies(Player());
                 }
@@ -261,7 +263,7 @@ namespace friendlyPMC.Components
                 else
                 {
                     BotSettingsClass botSettingsClass = new BotSettingsClass(Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(enemy.ProfileId), bossGroup, EBotEnemyCause.addPlayerToBoss);
-
+                    botSettingsClass.EnemyLastPosition = enemy.Position;
                     follower.Memory.AddEnemy(enemy, botSettingsClass, false);
                    
                     if (!follower.Memory.HaveEnemy)
@@ -348,7 +350,7 @@ namespace friendlyPMC.Components
             bot.BotFollower.BossFindAction();
         }
     }
-    internal class AIBossPlayerLogic : GClass362
+    public class AIBossPlayerLogic : GClass405
     {
         private Player _player;
         private pitAIBossPlayer _aiplayer;
@@ -359,7 +361,7 @@ namespace friendlyPMC.Components
             _aiplayer = aiplayer;
         }
 
-        public void OnHit(DamageInfo arg1, EBodyPart arg2, float arg3)
+        public void OnHit(DamageInfoStruct arg1, EBodyPart arg2, float arg3)
         {
             if (
                 arg1.Player != null && arg1.Player.IsAI && 
@@ -422,10 +424,6 @@ namespace friendlyPMC.Components
             _player.BeingHitAction -= OnHit;
         }
 
-        public override void SetPatrolMode()
-        {
-
-        }
 
     }
 }

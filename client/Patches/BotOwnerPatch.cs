@@ -9,44 +9,13 @@ using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
 using friendlyPMC.Components;
+using Comfort.Common;
+using UnityEngine.Profiling;
 
 
 namespace friendlyPMC.Patches
 {
-
-    internal class BotOwnerDamagePatch : ModulePatch
-    {
-        protected override MethodBase GetTargetMethod()
-        {
-            return AccessTools.Method(typeof(BotOwner), "method_9");
-
-        }
-        /** if BOT is getting hit by a player BOSS of which it is a follower of, do not turn hostile **/
-        [PatchPrefix]
-        private static bool PatchPrefix(BotOwner __instance, DamageInfo damageInfo, EBodyPart bodyType, float damageReducedByArmor)
-        {
-            if (__instance != null && __instance.BotFollower != null && __instance.BotFollower.HaveBoss && BossPlayers.IsFollower(__instance) && damageInfo.Player != null)
-            {
-
-                AIBossPlayer player = BossPlayers.Instance.GetBossPlayer(damageInfo.Player.iPlayer.ProfileId);
-
-                if (player != null && BossPlayers.IsFollower(__instance, player))
-                {
-                    // - yell "friendly fire"
-                    __instance.BotTalk.TrySay(EPhraseTrigger.FriendlyFire);
-
-                    __instance.StandBy.GetHit();
-                    __instance.BotPersonalStats.GetHit(damageInfo, bodyType);
-                    __instance.Memory.GetHit(damageInfo);
-
-                    return false;
-                }
-            }
-
-            return true;
-        }
-    }
-
+    /** Skip checking bot's role if we have made this bot a follower of a boss player **/
     internal class BotOwnerIsFolowerPatch : ModulePatch
     {
         protected override MethodBase GetTargetMethod()
@@ -54,7 +23,7 @@ namespace friendlyPMC.Patches
             return AccessTools.Method(typeof(BotOwner), "IsFollower");
 
         }
-        /** Skip checking bot's role if we have made this bot a follower of a boss player **/
+        
         [PatchPrefix]
         private static bool PatchPrefix(BotOwner __instance, ref bool __result)
         {   
@@ -67,7 +36,7 @@ namespace friendlyPMC.Patches
             return true;
         }
     }
-
+    /** Patch on botOwner UpdateManual to allow us to execute custom code **/
     internal class BotOwnerManualUpdatePatch : ModulePatch
     {
 
@@ -76,7 +45,7 @@ namespace friendlyPMC.Patches
         {
             return AccessTools.Method(typeof(BotOwner), "UpdateManual");
         }
-        /** Patch on botOwner UpdateManual to allow us to execute custom code **/
+       
         [PatchPostfix]
         private static void PatchPostfix(BotOwner __instance)
         {
@@ -103,20 +72,79 @@ namespace friendlyPMC.Patches
             }
         }
     }
-
     internal class BotOwnerActivatePatch : ModulePatch
     {
+        private static List<WildSpawnType> allies = new List<WildSpawnType>
+        {
+            WildSpawnType.bossKnight,
+            WildSpawnType.followerBigPipe,
+            WildSpawnType.followerBirdEye,
+            WildSpawnType.exUsec
+        };
+        private static List<Action<BotOwner>> onActivate = new List<Action<BotOwner>>
+        {
+            // make Goons and exUsecs neutral to the player if we have completed the first quest from the Goons
+            new Action<BotOwner>((BotOwner bot) =>
+            {
+                foreach (var role in allies)
+                {
+                    if(bot.IsRole(role))
+                    {
+                        foreach (var item in BossPlayers.Instance.GetBossPlayers()) 
+                        {
+                            Player player = item.Value.realPlayer;
+                            string ProfileId = player.ProfileId;
+                            foreach (var data in player.Profile.QuestsData) 
+                            {
+                                if(data.Id == Utils.Props.Quests["Knight"][0])
+                                {
+                                    if(data.Status == EFT.Quests.EQuestStatus.Success || (data.Status == EFT.Quests.EQuestStatus.Started && role == WildSpawnType.exUsec)) 
+                                    {
+                                        bot.Memory.IsPeace = true;
+                                        bot.Settings.FileSettings.Boss.SHALL_WARN = false;
+                                        foreach(var enemy in bot.EnemiesController.EnemyInfos)
+                                        {
+                                            if(enemy.Key.ProfileId == ProfileId)
+                                            {
+                                                enemy.Value.IgnoreUntilAggression = true;
+                                                bot.BotsGroup.RemoveEnemy(player);
+                                                bot.Memory.DeleteInfoAboutEnemy(player);
+                                                bot.BotsGroup.AddAlly(player);
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    break;
+                                }
+                            }
+                        };
+                        break;
+                    }
+                }
+            })
+        };
         protected override MethodBase GetTargetMethod()
         {
             return AccessTools.Method(typeof(BotOwner), "method_10");
 
         }
-        /** Fix having followers be enemy of same side just because their roles where under ENEMY_BOT_TYPES **/
+        
         [PatchPostfix]
         private static void PatchPostfix(BotOwner __instance)
         {
+            
             if (BossPlayers.IsFollower(__instance)) return;
 
+            try
+            {
+                onActivate.ForEach(action => action(__instance));
+            }
+            catch (Exception e)
+            {
+                Modules.Logger.LogError(e);
+            }
+
+            // Fix having followers be enemy of same side just because their roles where under ENEMY_BOT_TYPES
             Dictionary<string, pitAIBossPlayer> playerBosses = BossPlayers.Instance.GetBossPlayers();
 
             foreach (pitAIBossPlayer boss in playerBosses.Values)
@@ -130,9 +158,9 @@ namespace friendlyPMC.Patches
                     {
                         var sett = __instance.Settings.FileSettings;
                         if (
-                            (bossSide == EPlayerSide.Bear && !sett.Mind.DEFAULT_BEAR_BEHAVIOUR.HasFlag(EWarnBehaviour.Attack)) ||
-                            (bossSide == EPlayerSide.Usec && !sett.Mind.DEFAULT_USEC_BEHAVIOUR.HasFlag(EWarnBehaviour.Attack)) ||
-                            (bossSide == EPlayerSide.Savage && !sett.Mind.DEFAULT_SAVAGE_BEHAVIOUR.HasFlag(EWarnBehaviour.Attack))
+                            (bossSide == EPlayerSide.Bear && !sett.Mind.DEFAULT_BEAR_BEHAVIOUR.HasFlag(EWarnBehaviour.AlwaysEnemies)) ||
+                            (bossSide == EPlayerSide.Usec && !sett.Mind.DEFAULT_USEC_BEHAVIOUR.HasFlag(EWarnBehaviour.AlwaysEnemies)) ||
+                            (bossSide == EPlayerSide.Savage && !sett.Mind.DEFAULT_SAVAGE_BEHAVIOUR.HasFlag(EWarnBehaviour.AlwaysEnemies))
                         )
                         {
                             foreach (var follower in followers)
@@ -145,6 +173,16 @@ namespace friendlyPMC.Patches
                     }
                 }
             }
+        }
+
+        public static void AddOnActivate(Action<BotOwner> action)
+        { 
+            if(!onActivate.Contains(action)) onActivate.Add(action);
+        }
+
+        public static void RemoveOnActivate(Action<BotOwner> action)
+        {
+            if(onActivate.Contains(action))onActivate.Remove(action);
         }
     }
 }

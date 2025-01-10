@@ -10,7 +10,7 @@ using friendlyPMC.Modules;
 
 namespace friendlyPMC.Utils
 {
-    internal class Enemy
+    public class Enemy
     {
         private struct CachedEnemyInfo
         {
@@ -239,12 +239,13 @@ namespace friendlyPMC.Utils
 
             if (info == null)
             {
+                groupInfo.EnemyLastPosition = enemy.Transform.position;
                 info = bot.EnemiesController.AddNew(bot.BotsGroup, enemy, groupInfo);
-
-                info.SetVisible(true);
 
                 bot.EnemiesController.SetInfo(enemy, info);
             }
+
+            info.IgnoreUntilAggression = false;
 
             return info;
 

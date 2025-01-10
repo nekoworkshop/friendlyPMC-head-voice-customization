@@ -7,6 +7,9 @@ using UnityEngine;
 
 namespace friendlyPMC.Components.FollowerBossFollower
 {
+    /**
+     * BigPipe's artillery support layer
+     */
     internal class BigPipeArtilleryLayer : KnightFightLayer
     {
 
@@ -53,18 +56,19 @@ namespace friendlyPMC.Components.FollowerBossFollower
 
             try
             {
-                baseDecision = base.KnightFight();
+                baseDecision = KnightFight();
             }
             catch (Exception ex)
             {
                 Modules.Logger.LogInfo("baseDecision Error: " + ex.Message);
                 Modules.Logger.LogInfo("Trace: " + ex.StackTrace);
-                return new AICoreActionResultStruct<BotLogicDecision>(HoldFor(GClass761.Random(1f, 2f)), "baseDecision.Error");
+                return new AICoreActionResultStruct<BotLogicDecision>(HoldFor(GClass824.Random(1f, 2f)), "baseDecision.Error");
             }
 
             if (
                 baseDecision.Reason == "regroupToBossFast" || 
                 baseDecision.Reason == "regroupToBoss" ||
+                baseDecision.Reason == "pushEnemy" ||
                 (commonLayer.OrderHasChangedRecently && request != null && request.BotRequestType == BotRequestType.attackClose) ||
                 botOwner_0.Memory.GoalEnemy.Owner.IsRole(WildSpawnType.marksman) ||
                 baseDecision.Action == BotLogicDecision.shootFromPlace
@@ -87,7 +91,7 @@ namespace friendlyPMC.Components.FollowerBossFollower
             {
                 Modules.Logger.LogInfo("supportDecision Error: " + ex.Message);
                 Modules.Logger.LogInfo("Trace: " + ex.StackTrace);
-                return new AICoreActionResultStruct<BotLogicDecision>(HoldFor(GClass761.Random(1f, 2f)), "supportDecision.Error");
+                return new AICoreActionResultStruct<BotLogicDecision>(HoldFor(GClass824.Random(1f, 2f)), "supportDecision.Error");
             }
 
             if (

@@ -11,7 +11,10 @@ using UnityEngine;
 
 namespace friendlyPMC.Actions
 {
-    internal class FollowerSniperSearch : GClass159
+    /**
+     * Shooting position search action for a bot sniper follower
+     */
+    public class FollowerSniperSearch : GClass180
     {
         private Vector3? spotPosition;
 
@@ -133,7 +136,7 @@ namespace friendlyPMC.Actions
 
                 if (_lastTarget.HasValue && float_5 < Time.time)
                 {
-                    float_5 = Time.time + GClass761.Random(3f, 4f);
+                    float_5 = Time.time + GClass824.Random(3f, 4f);
 
                     UpdateShootPosition();
 
@@ -278,7 +281,7 @@ namespace friendlyPMC.Actions
                                     30f,
                                     5f,
                                     (CustomNavigationPoint point)=>{
-                                        if(!GClass326.IsDangerPositionFarEnough(point.Position, new Vector3[]{ bossPos }, 0.5f * 0.5f)) return false;
+                                        if(!GClass369.IsDangerPositionFarEnough(point.Position, new Vector3[]{ bossPos }, 0.5f * 0.5f)) return false;
                                         return true;
                                     }
                                 );

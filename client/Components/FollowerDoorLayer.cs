@@ -9,7 +9,10 @@ using UnityEngine;
 
 namespace friendlyPMC.Components
 {
-    internal class FollowerDoorLayer : GClass102
+    /**
+     * Better handler for door opening for our followers to prevent them from getting stuck.
+     */
+    internal class FollowerDoorLayer : GClass120
     {
 
         private float doorOpenTimer;

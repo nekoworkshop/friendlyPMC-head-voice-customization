@@ -84,10 +84,10 @@ namespace friendlyPMC.Actions
             {
 
                 Vector3 dir02 = Requester.LookDirection;
-                float forwardDistance = GClass761.Random(3f, 5f);
+                float forwardDistance = GClass824.Random(3f, 5f);
 
                 Vector3 forwardPosition = Requester.Position + dir02.normalized * forwardDistance;
-                float lateralOffset = GClass761.RandomSing() * GClass761.Random(0.5f, 1.5f);
+                float lateralOffset = GClass824.RandomSing() * GClass824.Random(0.5f, 1.5f);
                 Vector3 lateralDirection = Vector3.Cross(Vector3.up, dir02).normalized;
 
                 Vector3 finalPosition = forwardPosition + lateralDirection * lateralOffset;

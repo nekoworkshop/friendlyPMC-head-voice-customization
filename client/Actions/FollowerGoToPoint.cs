@@ -3,7 +3,10 @@ using UnityEngine;
 
 namespace friendlyPMC.Actions
 {
-    internal class FollowerGoToPoint : GClass173
+    /**
+     * Overwrite of goToPoint decision to include sprinting
+     */
+    public class FollowerGoToPoint : GClass196
     {
         private bool _shouldSprint = true;
 
