@@ -13,14 +13,14 @@
 			"upd": {
 				"Repairable": {
 					"MaxDurability": 100,
-					"Durability": 98.0683441
+					"Durability": 100
 				},
 				"FireMode": {
 					"FireMode": "single"
 				},
 				"StackObjectsCount": 10,
 				"UnlimitedCount": false,
-				"BuyRestrictionMax": 999999,
+				"BuyRestrictionMax": 10,
 				"BuyRestrictionCurrent": 0
 			}
 		},

@@ -20,7 +20,7 @@
 				},
 				"StackObjectsCount": 5,
 				"UnlimitedCount": false,
-				"BuyRestrictionMax": 999999,
+				"BuyRestrictionMax": 5,
 				"BuyRestrictionCurrent": 0
 			}
 		},

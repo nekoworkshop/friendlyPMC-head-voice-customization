@@ -662,13 +662,13 @@
 			"Started": [],
 			"Success": [
 				{
-					"id": "friendlypmc-knight-payback01-reward-1",
+					"id": "6780679d186897b8890a71bf",
 					"index": 0,
 					"type": "Experience",
 					"value": "35000"
 				},
 				{
-					"id": "friendlypmc-knight-payback01-reward-2",
+					"id": "6780679d186897b8890a71c0",
 					"index": 1,
 					"target": "67768b19fa281ca31708b187",
 					"type": "TraderStanding",
@@ -708,7 +708,7 @@
 					"conditionType": "Level",
 					"dynamicLocale": false,
 					"globalQuestCounterId": "",
-					"id": "friendlypmc-knight-enemyspotted-req1",
+					"id": "6780679d186897b8890a71c1",
 					"index": 0,
 					"parentId": "",
 					"value": 20,
@@ -720,7 +720,7 @@
 					"dispersion": 0,
 					"dynamicLocale": false,
 					"globalQuestCounterId": "",
-					"id": "friendlypmc-knight-enemyspotted-req-2",
+					"id": "6780679d186897b8890a71c2",
 					"index": 0,
 					"parentId": "",
 					"status": [4],
@@ -750,7 +750,7 @@
 								"enemyEquipmentExclusive": [],
 								"enemyEquipmentInclusive": [],
 								"enemyHealthEffects": [],
-								"id": "friendlypmc-knight-enemyspotted-1-kill",
+								"id": "6780679d186897b8890a71c5",
 								"resetOnSessionEnd": false,
 								"savageRole": [],
 								"target": "AnyPmc",
@@ -763,11 +763,11 @@
 							{
 								"conditionType": "Location",
 								"dynamicLocale": false,
-								"id": "friendlypmc-knight-enemyspotted-1-location",
+								"id": "6780679d186897b8890a71c3",
 								"target": ["Woods"]
 							}
 						],
-						"id": "friendlypmc-knight-enemyspotted-1-cond"
+						"id": "6780679d186897b8890a71c4"
 					},
 					"doNotResetIfCounterCompleted": false,
 					"dynamicLocale": false,
@@ -820,13 +820,13 @@
 			"Started": [],
 			"Success": [
 				{
-					"id": "friendlypmc-knight-enemyspotted-reward-1",
+					"id": "6780679d186897b8890a71c6",
 					"index": 0,
 					"type": "Experience",
 					"value": "20000"
 				},
 				{
-					"id": "friendlypmc-knight-enemyspotted-reward-2",
+					"id": "6780679d186897b8890a71c7",
 					"index": 1,
 					"target": "67768b19fa281ca31708b187",
 					"type": "TraderStanding",
@@ -865,7 +865,7 @@
 					"conditionType": "Level",
 					"dynamicLocale": false,
 					"globalQuestCounterId": "",
-					"id": "friendlypmc-knight-coverme-req-1",
+					"id": "6780679d186897b8890a71c8",
 					"index": 0,
 					"parentId": "",
 					"value": 20,
@@ -877,7 +877,7 @@
 					"dispersion": 0,
 					"dynamicLocale": false,
 					"globalQuestCounterId": "",
-					"id": "friendlypmc-knight-coverme-req-2",
+					"id": "67806871186897b8890a71d3",
 					"index": 0,
 					"parentId": "",
 					"status": [4],
@@ -894,7 +894,7 @@
 							{
 								"conditionType": "InZone",
 								"dynamicLocale": false,
-								"id": "friendlypmc-knight-coverme-location",
+								"id": "67806871186897b8890a71d4",
 								"zoneIds": ["pier_zone01"]
 							},
 							{
@@ -913,7 +913,7 @@
 								"enemyEquipmentExclusive": [],
 								"enemyEquipmentInclusive": [],
 								"enemyHealthEffects": [],
-								"id": "friendlypmc-knight-coverme-kill",
+								"id": "67806871186897b8890a71d5",
 								"resetOnSessionEnd": false,
 								"savageRole": [],
 								"target": "Any",
@@ -924,7 +924,7 @@
 								"weaponModsInclusive": []
 							}
 						],
-						"id": "friendlypmc-knight-coverme-cond"
+						"id": "67806871186897b8890a71d6"
 					},
 					"doNotResetIfCounterCompleted": false,
 					"dynamicLocale": false,
@@ -985,13 +985,13 @@
 			"Started": [],
 			"Success": [
 				{
-					"id": "friendlypmc-knight-coverme-reward-1",
+					"id": "67806871186897b8890a71d7",
 					"index": 0,
 					"type": "Experience",
 					"value": "24000"
 				},
 				{
-					"id": "friendlypmc-knight-coverme-reward-2",
+					"id": "67806871186897b8890a71d8",
 					"index": 1,
 					"target": "67768b19fa281ca31708b187",
 					"type": "TraderStanding",
@@ -999,7 +999,7 @@
 				},
 				{
 					"findInRaid": true,
-					"id": "friendlypmc-knight-coverme-reward-3",
+					"id": "67806871186897b8890a71d9",
 					"index": 2,
 					"items": [
 						{
@@ -1143,13 +1143,13 @@
 			"Started": [],
 			"Success": [
 				{
-					"id": "friendlypmc-knight-afavor-reward-1",
+					"id": "67806871186897b8890a71da",
 					"index": 0,
 					"type": "Experience",
 					"value": "30000"
 				},
 				{
-					"id": "friendlypmc-knight-afavor-reward-2",
+					"id": "67806871186897b8890a71db",
 					"index": 1,
 					"target": "67768b19fa281ca31708b187",
 					"type": "TraderStanding",
@@ -1157,7 +1157,7 @@
 				},
 				{
 					"findInRaid": true,
-					"id": "friendlypmc-knight-afavor-reward-3",
+					"id": "67806871186897b8890a71dc",
 					"index": 2,
 					"items": [
 						{

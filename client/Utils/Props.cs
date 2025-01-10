@@ -191,7 +191,7 @@ namespace friendlyPMC.Utils
             },
             {
                 WildSpawnType.bossKojaniy,
-                new List<string> { "friendlypmc-knight-afavor" }
+                new List<string> { "67768a41fa281ca31708b182" }
             }
         };
     }
