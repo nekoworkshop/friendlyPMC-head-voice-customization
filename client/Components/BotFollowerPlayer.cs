@@ -188,7 +188,6 @@ namespace friendlyPMC.Components
                     });
 
                     BossPlayers.AddGroupToBoss(_player, _bot.BotsGroup);
-                    _player.bossGroup = _bot.BotsGroup;
                 }
                 else if (_bot.BotsGroup.Id != _player.bossGroup.Id)
                 {

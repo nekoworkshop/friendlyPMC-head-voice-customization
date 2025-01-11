@@ -58,7 +58,7 @@ namespace friendlyPMC.Patches
 
 
             // if friendly PMC side is on, prevent groups from adding same side players as enemies
-            if (friendlyPMC.friendlyPMCFLAG.Value)
+            if (friendlyPMC.friendlyPMCFLAG.Value && (cause == EBotEnemyCause.addBotNoGroup || cause == EBotEnemyCause.AddNewMember || cause == EBotEnemyCause.warn))
             {
                 // - bad guy flag will exclude the player and his followers from the friendly PMC
                 if (friendlyPMC.badGuy.Value || Utils.Utils.FlagGet("isBadGuy"))

@@ -94,7 +94,12 @@ namespace friendlyPMC.Components
 
         private bool GRENADE_THROWING = false;
 
-        public FollowerBrain(BotOwner owner, pitAIBossPlayer boss) : base(owner)
+        public bool  IsThrowingGrenade
+        {
+            get { return GRENADE_THROWING; }
+        }
+
+public FollowerBrain(BotOwner owner, pitAIBossPlayer boss) : base(owner)
         {
             AddLayers();
 
@@ -446,7 +451,7 @@ namespace friendlyPMC.Components
             BossPlayers.RemoveFollower(_owner, _boss);
         }
          
-        private void OnThrow()
+        public void OnThrow()
         {
             GRENADE_THROWING = true;
             _busyTimer = 0f;

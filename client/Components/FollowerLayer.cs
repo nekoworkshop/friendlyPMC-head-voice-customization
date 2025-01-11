@@ -230,10 +230,10 @@ namespace friendlyPMC.Components
             return new AICoreActionEndStruct("enemy.None", true);
         }
 
-        /*public override AICoreActionEndStruct EndSuppressGrenade()
+        public override AICoreActionEndStruct EndSuppressGrenade()
         {
             return new AICoreActionEndStruct("enemy.None", true);
-        }*/
+        }
 
         public override AICoreActionEndStruct EndRunToEnemy()
         {

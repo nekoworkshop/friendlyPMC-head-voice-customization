@@ -46,6 +46,13 @@ namespace friendlyPMC.Components.BossFollower
         {
             pusherLayer?.OnActivate();
             base.OnActivate();
+
+            if (botOwner_0.WeaponManager.Grenades != null)
+            {
+                botOwner_0.WeaponManager.Grenades.OnGrenadeThrowStart += OnThrowGrenade;
+            }
+
+            if (botOwner_0.WeaponManager.Grenades != null) botOwner_0.WeaponManager.Grenades.OnGrenadeThrowStart -= OnThrowGrenade;
         }
 
         public override void Dispose()
@@ -54,8 +61,20 @@ namespace friendlyPMC.Components.BossFollower
             base.Dispose();
         }
 
+        public void OnThrowGrenade()
+        {
+            float killa_AFTER_GRENADE_SUPPRESS_DELAY = botOwner_0.Settings.FileSettings.Boss.KILLA_AFTER_GRENADE_SUPPRESS_DELAY;
+            EnemyInfo goalEnemy = botOwner_0.Memory.GoalEnemy;
+            if (killa_AFTER_GRENADE_SUPPRESS_DELAY > 0f && goalEnemy != null && !goalEnemy.CanShoot)
+            {
+                nullable_0 = new BotLogicDecision?(BotLogicDecision.holdPosition);
+                HoldFor(killa_AFTER_GRENADE_SUPPRESS_DELAY);
+            }
+        }
+
         public override bool ShallUseNow()
         {
+            
             if (!botOwner_0.Memory.HaveEnemy)
             {
                 if (
@@ -321,7 +340,11 @@ namespace friendlyPMC.Components.BossFollower
                     aigreanageThrowData.Force = 6f;
                     aigreanageThrowData.GrenadeType = new ThrowWeapType?(ThrowWeapType.smoke_grenade);
                     botOwner_0.WeaponManager.Grenades.SetThrowData(aigreanageThrowData);
+
                     botOwner_0.WeaponManager.Grenades.DoThrow();
+                    var brain = (botOwner_0.Brain.BaseBrain as FollowerBrain);
+                    if (!brain.IsThrowingGrenade) brain.OnThrow();
+
                     float_29 = Time.time;
                     float_32 = Time.time;
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.suppressFire, "suppress1");

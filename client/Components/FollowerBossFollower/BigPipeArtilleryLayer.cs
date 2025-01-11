@@ -100,6 +100,11 @@ namespace friendlyPMC.Components.FollowerBossFollower
                 supportDecision.Action == BotLogicDecision.suppressGrenade
             )
             {
+                if(supportDecision.Action == BotLogicDecision.suppressGrenade) {
+                    var brain = (botOwner_0.Brain.BaseBrain as FollowerBrain);
+                    if(!brain.IsThrowingGrenade)brain.OnThrow();
+                }
+                
                 return supportDecision;
             }
 
