@@ -40,12 +40,12 @@ namespace friendlyPMC.Modules
                 return new FollowerGuardCover(bot);
 
             if (type == (BotLogicDecision)CustomBotDecisions.EnemySearch)
-                return new FollowerSearch(bot);
+                /*return new FollowerSearch(bot);*/ return new GClass213(bot);
 
-            if (type == BotLogicDecision.goToEnemy)
-                return new FollowerGoToEnemy(bot);
+            /*if (type == BotLogicDecision.goToEnemy)
+                return new FollowerGoToEnemy(bot);*/
 
-            if(type == (BotLogicDecision)CustomBotDecisions.RunToCover)
+            if (type == (BotLogicDecision)CustomBotDecisions.RunToCover)
                 return new FollowerRunToCover(bot);
 
             if(type == BotLogicDecision.dogFight)

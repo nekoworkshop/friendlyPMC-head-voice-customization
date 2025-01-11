@@ -235,7 +235,9 @@ namespace friendlyPMC.Patches
             {
                 Modules.Logger.LogError("Profile is null");
             }
+            
             await Task.Yield();
+            
             try
             {
                 await botCreator.method_2(profile, position, new Action<BotOwner>(@class.method_0), true, token);
@@ -245,6 +247,8 @@ namespace friendlyPMC.Patches
                 Modules.Logger.LogError("Failed to activate bot follower");
                 Modules.Logger.LogError(ex);
             }
+            
+            await Task.Yield();
 
             /*await botCreator.ActivateBot(
                 profile,
@@ -518,6 +522,7 @@ namespace friendlyPMC.Patches
 
                         if (contained != null)
                         {
+                            contained = contained.CloneItem();
                             contained.CurrentAddress = null;
 
                             botSlot.AddWithoutRestrictions(contained);
@@ -1033,8 +1038,8 @@ namespace friendlyPMC.Patches
                                     }
 
                                 }
-
-                                BossPlayers.AddFollower(me, player, false, botRole); // make bot a follower
+                                // make bot boss a follower
+                                BossPlayers.AddFollower(me, player, false, botRole); 
 
                                 Utils.Utils.SetTimeout(() =>
                                 {

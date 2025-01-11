@@ -26,6 +26,8 @@ namespace friendlyPMC.Patches
 
         private static Type BotHearingClass = null;
 
+        private static Type EnemyListController = null;
+
         public static void PatchSAINIfInstalled(Harmony harmony)
         {
             if (IsSAINInstalled())
@@ -59,6 +61,11 @@ namespace friendlyPMC.Patches
                     BotHearingClass = Type.GetType("SAIN.Components.BotControllerSpace.Classes.BotHearingClass, SAIN");
                 }
 
+                if(EnemyListController == null)
+                {
+                    EnemyListController = Type.GetType("SAIN.SAINComponent.Classes.EnemyClasses.EnemyListController, SAIN");
+                }
+
                 if (squadType != null)
                 {
                     // disable this for followers
@@ -78,6 +85,11 @@ namespace friendlyPMC.Patches
                 if (GroupClass != null)
                 {
                     harmony.Patch(AccessTools.Method(GroupClass, "EnemyConversation"), new HarmonyMethod(typeof(SAINPatch).GetMethod(nameof(PatchEnemyConvesation), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance)));
+                }
+
+                if (EnemyListController != null)
+                {
+                    harmony.Patch(AccessTools.Method(EnemyListController, "CheckAddEnemy"), new HarmonyMethod(typeof(SAINPatch).GetMethod(nameof(PatchCheckAddEnemy), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance)));
                 }
 
                 if (squadType != null && SAINEnableClass != null)
@@ -165,6 +177,19 @@ namespace friendlyPMC.Patches
                 Logger.LogError(ex);
             }
             return allow;
+        }
+
+
+        [HarmonyPrefix]
+        private static bool PatchCheckAddEnemy(object __instance, IPlayer IPlayer)
+        {
+            BotOwner botOwner = EnemyListController.GetProperty("BotOwner").GetValue(__instance) as BotOwner;
+            if(botOwner != null && BossPlayers.IsFollower(botOwner))
+            {
+                return false;
+            }
+
+            return true;
         }
 
         [HarmonyPrefix]

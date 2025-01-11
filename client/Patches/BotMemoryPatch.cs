@@ -12,101 +12,38 @@ using System.Reflection;
 
 namespace friendlyPMC.Patches
 {
+    /**
+     * Patch for whoever makes the boss player an enemy, becomes the enemy of the group
+     */
     internal class BotMemoryAddEnemyPatch : ModulePatch
     {
         protected override MethodBase GetTargetMethod()
         {
             return AccessTools.Method(typeof(BotMemoryClass), "AddEnemy");
         }
-        [PatchPrefix]
-        private static bool PatchPrefix(BotMemoryClass __instance, [NotNull] IPlayer enemy, BotSettingsClass groupInfo, bool onActivation)
-        {
-            if (enemy == null || (enemy.IsAI && enemy.AIData?.BotOwner?.GetPlayer == null))
-                return true;
-
-            // prevent followers from adding teammates as an enemy on creation
-            if (enemy.IsAI && enemy.AIData.BotOwner != null && BossPlayers.WillBeFollower(enemy.AIData.BotOwner))
-            {
-                return false;
-            }
-
-            var botOwner_0 = AccessTools.Field(typeof(BotMemoryClass), "botOwner_0").GetValue(__instance) as BotOwner;
-
-            if (botOwner_0 == null) return true;
-
-
-            bool isfollower = BossPlayers.IsFollower(botOwner_0);
-            bool isBossEnemy = BossPlayers.IsPlayerBoss(enemy.ProfileId);
-
-            pitAIBossPlayer playerBoss = null;
-            if (isBossEnemy) playerBoss = BossPlayers.Instance.GetBossPlayer(enemy.ProfileId);
-
-            // prevent same side from being added on creation just because they have a different role
-            if (
-                enemy.Side == botOwner_0.Side && groupInfo.Cause == EBotEnemyCause.AddNewMember &&
-                (
-                    (enemy.Side == EPlayerSide.Bear && !botOwner_0.Settings.FileSettings.Mind.DEFAULT_BEAR_BEHAVIOUR.HasFlag(EWarnBehaviour.AlwaysEnemies)) ||
-                    (enemy.Side == EPlayerSide.Usec && !botOwner_0.Settings.FileSettings.Mind.DEFAULT_USEC_BEHAVIOUR.HasFlag(EWarnBehaviour.AlwaysEnemies)) ||
-                    (enemy.Side == EPlayerSide.Savage && !botOwner_0.Settings.FileSettings.Mind.DEFAULT_SAVAGE_BEHAVIOUR.HasFlag(EWarnBehaviour.AlwaysEnemies))
-                )
-            )
-            {
-                return false;
-            }
-
-            if (isfollower && (enemy.Profile.Info.Settings.Role == WildSpawnType.shooterBTR || enemy.Profile.Info.Settings.Role == WildSpawnType.peacefullZryachiyEvent || enemy.Profile.Info.Settings.Role == WildSpawnType.gifter)) return false;
-
-            // prevent followers from adding teammates as an enemy
-            if (isfollower && botOwner_0.BotFollower.HaveBoss)
-            {
-                bool isTeammate = false;
-
-                foreach (var item in botOwner_0.BotFollower.BossToFollow.Followers)
-                {
-                    if (item.ProfileId == enemy.ProfileId)
-                    {
-                        isTeammate = true;
-                        break;
-                    }
-                }
-                
-                if (isTeammate) return false;
-            }
-            // prevent followers from adding boss player as an enemy
-            else if (playerBoss != null && BossPlayers.IsFollower(botOwner_0, playerBoss))
-            {
-                return false;
-            }
-
-            return true;
-        }
 
         [PatchPostfix]
         private static void PatchPostFix(BotMemoryClass __instance, [NotNull] IPlayer enemy, BotSettingsClass groupInfo, bool onActivation)
         {
-            // whoever makes the boss player an enemy, becomes the enemy of the group
-            if (enemy != null)
+            if( enemy == null ) return;
+            
+            var botOwner_0 = AccessTools.Field(typeof(BotMemoryClass), "botOwner_0").GetValue(__instance) as BotOwner;
+
+            if (botOwner_0.EnemiesController.EnemyInfos.ContainsKey(enemy))
             {
-                var botOwner_0 = AccessTools.Field(typeof(BotMemoryClass), "botOwner_0").GetValue(__instance) as BotOwner;
-
-                if (botOwner_0.IsRole(WildSpawnType.shooterBTR) || botOwner_0.IsRole(WildSpawnType.peacefullZryachiyEvent) || botOwner_0.IsRole(WildSpawnType.gifter)) return;
-
-                if (botOwner_0.EnemiesController.EnemyInfos.ContainsKey(enemy))
+                pitAIBossPlayer boss = BossPlayers.GetBoss(enemy.ProfileId);
+                // whoever makes the boss player an enemy, becomes the enemy of the group
+                if (boss != null)
                 {
-                    var boss = BossPlayers.GetBoss(enemy.ProfileId);
-                    // whoever makes the boss player an enemy, becomes the enemy of the group
-                    if (boss != null)
-                    {
-                        if (boss.bossGroup != null)
-                            boss.bossGroup.AddEnemy(botOwner_0, EBotEnemyCause.addPlayerToBoss);
-                        else
-                            boss.AddEnemy(botOwner_0);
-                    }
-                    // whoever makes a follower an enemy, becomes the enemy of the group
-                    else if (BossPlayers.IsFollower(enemy.AIData?.BotOwner) && enemy.AIData.BotOwner.BotFollower.HaveBoss)
-                    {
-                        enemy.AIData.BotOwner.BotsGroup.AddEnemy(botOwner_0, EBotEnemyCause.addPlayerToBoss);
-                    }
+                    if (boss.bossGroup != null)
+                        boss.bossGroup.AddEnemy(botOwner_0, EBotEnemyCause.addPlayerToBoss);
+                    else
+                        boss.AddEnemy(botOwner_0);
+                }
+                // whoever makes a follower an enemy, becomes the enemy of the group
+                else if (BossPlayers.IsFollower(enemy.AIData?.BotOwner) && enemy.AIData.BotOwner.BotFollower.HaveBoss)
+                {
+                    enemy.AIData.BotOwner.BotsGroup.AddEnemy(botOwner_0, EBotEnemyCause.addPlayerToBoss);
                 }
             }
         }
@@ -124,7 +61,6 @@ namespace friendlyPMC.Patches
         private static void PatchPostfix(BotMemoryClass __instance, DamageInfoStruct damageInfo)
         {
             var botOwner_0 = AccessTools.Field(typeof(BotMemoryClass), "botOwner_0").GetValue(__instance) as BotOwner;
-            var botsGroupField = AccessTools.Field(typeof(BotMemoryClass), "botsGroup_0");
 
             if (damageInfo.Player == null) return;
 
@@ -169,4 +105,18 @@ namespace friendlyPMC.Patches
             }*/
         }
     }
+    // this is used for debug purposes that is why it stays disabled
+    /*[HarmonyPatch(typeof(BotMemoryClass), "GoalEnemy", MethodType.Setter)]
+    public static class GoalEnemyTracePatch
+    {
+        public static void Postfix(BotMemoryClass __instance, EnemyInfo value)
+        {
+            var botOwner_0 = AccessTools.Field(typeof(BotMemoryClass), "botOwner_0").GetValue(__instance) as BotOwner;
+
+            if(BossPlayers.IsFollower(botOwner_0) && value != null && Utils.Props.friendlyBotTypes.Contains(value.Person.Profile.Info.Settings.Role))
+            {
+                Modules.Logger.LogTrace($"Follower {botOwner_0.ProfileId} is targeting friendly player {value.Person.Profile.Info.Nickname}");
+            }
+        }
+    }*/
 }

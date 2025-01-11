@@ -44,6 +44,7 @@ namespace friendlyPMC.Patches
             {
                 return true;
             }
+
             // prevent followers from adding teammates as an enemy on creation
             if (person.IsAI && person.AIData.BotOwner != null && BossPlayers.WillBeFollower(person.AIData.BotOwner))
             {
@@ -52,33 +53,86 @@ namespace friendlyPMC.Patches
             }
 
             var plBoss = BossPlayers.GetBoss(person.ProfileId);
-            var isgroup = BossPlayers.IsBossGroup(__instance.Id);
+            var isAPlayerGroup = BossPlayers.IsBossGroup(__instance.Id);
+            BotsGroup bossGroup = plBoss != null ? plBoss.bossGroup : null;
 
-            if (isgroup && plBoss != null)
+
+            // if friendly PMC side is on, prevent groups from adding same side players as enemies
+            if (friendlyPMC.friendlyPMCFLAG.Value && (cause == EBotEnemyCause.addBotNoGroup || cause == EBotEnemyCause.AddNewMember || cause == EBotEnemyCause.warn))
             {
-                BotsGroup bossGroup = plBoss.bossGroup;
-                // prevent boss players from being added as enemy to the group
-                if ((bossGroup != null && __instance.Id == bossGroup.Id) || __instance.Side == plBoss.realPlayer.Side)
+                // - bad guy flag will exclude the player and his followers from the friendly PMC
+                if (friendlyPMC.badGuy.Value || Utils.Utils.FlagGet("isBadGuy"))
+                {
+                    if (plBoss != null && !isAPlayerGroup) return true;
+
+                    else if (person.IsAI && person.AIData.BotOwner && BossPlayers.IsFollower(person.AIData.BotOwner))
+                    {
+                        return true;
+                    }
+
+                }
+
+                if (
+                    person.Profile.Info.Side == __instance.Side &&
+                    (
+                        !(friendlyPMC.badGuy.Value || Utils.Utils.FlagGet("isBadGuy")) ||
+                        !isAPlayerGroup
+                    )
+                )
                 {
                     __result = false;
                     return false;
                 }
             }
 
-            // prevent same side from being added just because they have a different role
-            if (cause == EBotEnemyCause.addBotNoGroup || cause == EBotEnemyCause.AddNewMember || cause == EBotEnemyCause.warn)
+            // if not a boss group, allow adding enemies
+            if (!isAPlayerGroup) return true;
+
+            // prevent boss players from being added as enemy to the group
+            if (plBoss != null && ((bossGroup != null && __instance.Id == bossGroup.Id) || __instance.Side == plBoss.realPlayer.Side))
             {
-                if (__instance.Side == person.Side)
+                __result = false;
+                return false;
+            }
+            // prevent followers group from adding friendly bots as enemies
+            if (
+                (cause == EBotEnemyCause.addBotNoGroup || cause == EBotEnemyCause.AddNewMember || cause == EBotEnemyCause.warn) &&
+                person.Profile?.Info?.Settings?.Role != null &&
+                Utils.Props.friendlyBotTypes.Contains(person.Profile.Info.Settings.Role)
+            )
+            {
+                __result = false;
+                return false;
+            }
+            // prevent Rogues from being added as enemies if they are friends with the player
+            var bossOfGroup = BossPlayers.GetBossByGroup(__instance.Id);
+
+            var personRole = person.Profile?.Info?.Settings?.Role;
+
+            if (bossOfGroup != null && personRole != null)
+            {
+                Player bossPlayer = bossOfGroup.realPlayer;
+                foreach (var data in bossPlayer.Profile.QuestsData)
                 {
-                    var _initialBotMindSettings = AccessTools.Field(typeof(BotsGroup), "_initialBotMindSettings").GetValue(__instance) as BotGlobalsMindSettings;
-                    if (
-                        (person.Side == EPlayerSide.Bear && !_initialBotMindSettings.DEFAULT_BEAR_BEHAVIOUR.HasFlag(EWarnBehaviour.AlwaysEnemies)) ||
-                        (person.Side == EPlayerSide.Usec && !_initialBotMindSettings.DEFAULT_USEC_BEHAVIOUR.HasFlag(EWarnBehaviour.AlwaysEnemies)) ||
-                        (person.Side == EPlayerSide.Savage && !_initialBotMindSettings.DEFAULT_SAVAGE_BEHAVIOUR.HasFlag(EWarnBehaviour.AlwaysEnemies))
-                    )
+                    if (data.Id == Utils.Props.Quests["Knight"][0])
                     {
-                        __result = false;
-                        return false;
+                        if (data.Status == EFT.Quests.EQuestStatus.Success)
+                        {
+                            if (
+                                Utils.Props.BossFollowersType.Contains(personRole.Value) ||
+                                personRole == WildSpawnType.exUsec
+                            )
+                            {
+                                __result = false;
+                                return false;
+                            }
+
+                        }
+                        else if (data.Status == EFT.Quests.EQuestStatus.Started && personRole == WildSpawnType.exUsec)
+                        {
+                            __result = false;
+                            return false;
+                        }
                     }
                 }
             }
@@ -112,8 +166,8 @@ namespace friendlyPMC.Patches
                 }
                 catch (Exception ex)
                 {
-                    Logger.LogError("Failed to make a group an enemy");
-                    Logger.LogError(ex);
+                    Modules.Logger.LogError("Failed to make a group an enemy");
+                    Modules.Logger.LogError(ex);
                 }
             }
         }
@@ -143,19 +197,18 @@ namespace friendlyPMC.Patches
                 __result = false;
                 return false;
             }
-
-            var _initialBotMindSettings = AccessTools.Field(typeof(BotsGroup), "_initialBotMindSettings").GetValue(__instance) as BotGlobalsMindSettings;
-
-            // prevent same side from being added just because they have a different role
-            if (_initialBotMindSettings != null && player.Side == __instance.Side)
+            // if bad guy flag is on, player and his followers are enemies to all
+            if ((friendlyPMC.badGuy.Value || Utils.Utils.FlagGet("isBadGuy")) && !BossPlayers.IsBossGroup(__instance.Id))
             {
-                if (
-                    (player.Side == EPlayerSide.Bear && !_initialBotMindSettings.DEFAULT_BEAR_BEHAVIOUR.HasFlag(EWarnBehaviour.AlwaysEnemies)) ||
-                    (player.Side == EPlayerSide.Usec && !_initialBotMindSettings.DEFAULT_USEC_BEHAVIOUR.HasFlag(EWarnBehaviour.AlwaysEnemies)) ||
-                    (player.Side == EPlayerSide.Savage && !_initialBotMindSettings.DEFAULT_SAVAGE_BEHAVIOUR.HasFlag(EWarnBehaviour.AlwaysEnemies))
-                )
+                var boss = BossPlayers.GetBoss(player.ProfileId);
+                if(boss !=null)
                 {
-                    __result = false;
+                    __result = true;
+                    return false;
+                } 
+                else if(BossPlayers.GetFollowers().Find(x => x.GetBot().ProfileId == player.ProfileId) != null)
+                {
+                    __result = true;
                     return false;
                 }
             }
@@ -171,13 +224,13 @@ namespace friendlyPMC.Patches
             RemoveEnemy(player.Player());
             AddAlly(player.realPlayer);
             Side = player.realPlayer.Side;
-            // clear BTR as anemy to the group
+            
             foreach (var item in Enemies)
             {
+                WildSpawnType? Role = item.Value.Player?.Profile?.Info?.Settings?.Role;
                 if(
-                    item.Value.Player?.Profile?.Info?.Settings?.Role == WildSpawnType.shooterBTR ||
-                    item.Value.Player?.Profile?.Info?.Settings?.Role == WildSpawnType.peacefullZryachiyEvent ||
-                    item.Value.Player?.Profile?.Info?.Settings?.Role == WildSpawnType.gifter
+                    Role.HasValue &&
+                    Utils.Props.friendlyBotTypes.Contains(Role.Value)
                 )
                 {
                     RemoveEnemy(item.Value.Player,item.Value.Cause);
@@ -185,10 +238,8 @@ namespace friendlyPMC.Patches
                 }
             }
 
-            initialBot.Settings.FileSettings.Mind.FRIENDLY_BOT_TYPES = new WildSpawnType[] {
-                WildSpawnType.shooterBTR,
-                WildSpawnType.peacefullZryachiyEvent
-            };
+            initialBot.Settings.FileSettings.Mind.FRIENDLY_BOT_TYPES = Utils.Props.friendlyBotTypes.ToArray();
+            initialBot.Settings.GetEnemyBotTypes().RemoveAll(x => Utils.Props.friendlyBotTypes.Contains(x));
         }
     }
 }

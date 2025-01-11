@@ -1,5 +1,6 @@
 ﻿using EFT;
 using friendlyPMC.Components;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -261,7 +262,7 @@ namespace friendlyPMC.Modules
 
             bool isAIBoss = false;
 
-            foreach (var item in Utils.Utils.BossFollowersRoles)
+            foreach (var item in Utils.Props.BossFollowersType)
             {
                 if(role == item)
                 {
@@ -279,10 +280,19 @@ namespace friendlyPMC.Modules
                 _follower = new BossFollowerPlayer(bot, player, role);
                 
             }
+            try
+            {
+                _follower.Init();
 
-            _follower.Init();
+            }
+            catch( Exception e)
+            {
+                Modules.Logger.LogError("Failed to init follower");
+                Modules.Logger.LogError(e);
+                return null;
+            }
 
-            if(!isAIBoss)
+            if (!isAIBoss)
             {
                 // scavs and picked up followers have special tactic
                 if (bot.Side == EPlayerSide.Savage || !squadMate)
@@ -496,6 +506,24 @@ namespace friendlyPMC.Modules
         {
             if (Instance == null) return false;
             return Instance._botsGroup.Contains(id);
+        }
+
+        public static pitAIBossPlayer GetBossByGroup(int id)
+        {
+            if(Instance == null) return null;
+            if(Instance._bosses.Count == 0) return null;
+            if(Instance._botsGroup.Contains(id))
+            {
+                foreach (var item in Instance._bosses)
+                {
+                    if (item.Value.bossGroup != null && item.Value.bossGroup.Id == id)
+                    {
+                        return item.Value;
+                    }
+                }
+            }
+
+            return null;
         }
 
         public static void RemoveFollower(BotOwner bot, pitAIBossPlayer player)

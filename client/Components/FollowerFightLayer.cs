@@ -187,6 +187,11 @@ namespace friendlyPMC.Components
         {
             if (wantsToHeal) return true;
 
+            if(commonLayer.CurrentDecision.HasValue && commonLayer.CurrentDecision.Value.Action == BotLogicDecision.suppressGrenade)
+            {
+                return true;
+            }
+
             if (!botOwner_0.Memory.HaveEnemy)
             {
                 if (ordersAreAttack || ordersAreHold)

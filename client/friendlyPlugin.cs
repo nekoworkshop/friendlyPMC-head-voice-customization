@@ -72,7 +72,14 @@ namespace friendlyPMC
     {
         public static void Prefix(ConfigurationManager.ConfigurationManager __instance, bool value)
         {
-            friendlyPMC.Instance.GetEquipmentBuilds();
+            try
+            {
+                friendlyPMC.Instance.GetEquipmentBuilds();
+            }
+            catch (Exception ex)
+            {
+                Modules.Logger.LogError(ex);
+            }
         }
     }
 
@@ -132,7 +139,7 @@ namespace friendlyPMC
         public string[] friendlyEscaped { get; set; }
     }
 
-    [BepInPlugin("xyz.pit.friendlypmc", "friendlyPMC", "3.9.2")]
+    [BepInPlugin("xyz.pit.friendlypmc", "friendlyPMC", "3.9.3")]
     [BepInDependency("xyz.drakia.bigbrain")]
     [BepInDependency("com.Arys.UnityToolkit")]
     public class friendlyPMC : BaseUnityPlugin
@@ -284,6 +291,8 @@ namespace friendlyPMC
 
             // set configuration manager
             SetConfiguration();
+            // this is used for debug purposes that is why it stays disabled
+            //harmony.PatchAll(typeof(GoalEnemyTracePatch).Assembly);
         }
 
 
@@ -346,8 +355,13 @@ namespace friendlyPMC
                 UniformTopPair.Clear();
                 UniformBottomPair.Clear();
 
-                foreach (var suit in Singleton<GClass1597>.Instance.AvailableSuites)
+                var playerEquip = Singleton<GClass1597>.Instance;
+                if(playerEquip == null || playerEquip.AvailableSuites == null) return;
+
+                foreach (var suit in playerEquip.AvailableSuites)
                 {
+                    if(suit == null || suit.Clothings == null || suit.Clothings.Length == 0) continue;
+
                     if (suit.MainBodyPart == EBodyModelPart.Body || suit.MainBodyPart == EBodyModelPart.Feet)
                     {
                         string id = suit.Clothings[0];

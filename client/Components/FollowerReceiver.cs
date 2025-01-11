@@ -214,7 +214,7 @@ namespace friendlyPMC.Components
             };
 
             bool isFollowerBoss = false;
-            foreach (WildSpawnType role in Utils.Utils.BossFollowersRoles)
+            foreach (WildSpawnType role in Utils.Props.BossFollowersType)
             {
                 if (botOwner_0.IsRole(role))
                 {
@@ -430,7 +430,7 @@ namespace friendlyPMC.Components
             };
 
             bool isFollowerBoss = false;
-            foreach (WildSpawnType role in Utils.Utils.BossFollowersRoles)
+            foreach (WildSpawnType role in Utils.Props.BossFollowersType)
             {
                 if (botOwner_0.IsRole(role))
                 {

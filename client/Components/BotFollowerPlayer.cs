@@ -13,11 +13,8 @@ using System.Linq;
 
 using BepInEx.Bootstrap;
 
-using GridClassEx = GClass2516;
-using GridCacheClass = GClass1401;
 using DrakiaXYZ.BigBrain.Brains;
 using System.Reflection;
-using static EFT.SpeedTree.TreeWind;
 
 namespace friendlyPMC.Components
 {
@@ -191,21 +188,6 @@ namespace friendlyPMC.Components
                     });
 
                     BossPlayers.AddGroupToBoss(_player, _bot.BotsGroup);
-                    _player.bossGroup = _bot.BotsGroup;
-
-                    // remove BTR as an enemy for the player group
-                    foreach (var item in _player.bossGroup.Enemies)
-                    {
-                        if (
-                            item.Value.Player.Profile.Info.Settings.Role == WildSpawnType.shooterBTR ||
-                            item.Value.Player.Profile.Info.Settings.Role == WildSpawnType.peacefullZryachiyEvent ||
-                            item.Value.Player.Profile.Info.Settings.Role == WildSpawnType.gifter
-                        )
-                        {
-                            _player.bossGroup.RemoveEnemy(item.Value.Player);
-                            break;
-                        }
-                    }
                 }
                 else if (_bot.BotsGroup.Id != _player.bossGroup.Id)
                 {
@@ -215,21 +197,9 @@ namespace friendlyPMC.Components
             }
             else if (_player.bossGroup != null)
             {
-                // do enemy clearing
-                foreach (var item in _bot.EnemiesController.EnemyInfos)
-                {
-                    if (
-                        item.Value.Person?.Profile?.Info?.Settings?.Role == WildSpawnType.shooterBTR ||
-                        item.Value.Person?.Profile?.Info?.Settings?.Role == WildSpawnType.peacefullZryachiyEvent
-                    )
-                    {
-                        _bot.Memory.DeleteInfoAboutEnemy(item.Value.Person);
-                        break;
-                    }
-                }
 
                 _player.Followers.ForEach(bt => { 
-                    if(_bot.EnemiesController.EnemyInfos.TryGetValue(bt, out var info))
+                    if(_bot.EnemiesController.EnemyInfos.TryGetValue(bt, out var fl))
                     {
                         _bot.EnemiesController.EnemyInfos.Remove(bt);
                     }
@@ -238,6 +208,26 @@ namespace friendlyPMC.Components
                 _player.bossGroup.AddMember(_bot, false);
             }
 
+            // do some enemy clearing
+            // - remove the player as an enemy
+            if (_bot.EnemiesController.EnemyInfos.TryGetValue(_player.realPlayer, out var info))
+            {
+                _bot.EnemiesController.EnemyInfos.Remove(_player.realPlayer);
+            }
+            // - remove friendly bots as enemies
+            Utils.Props.friendlyBotTypes.ForEach(type=>{
+
+                if(_bot.Settings.GetEnemyBotTypes().Contains(type)) _bot.Settings.GetEnemyBotTypes().Remove(type);
+                _bot.EnemiesController.EnemyInfos.Where(e => e.Value.Person.Profile.Info.Settings.Role == type).ToList().ForEach(e => {
+                    _bot.EnemiesController.Remove(e.Key);
+                });
+
+                _bot.BotsGroup.Enemies.Where(e => e.Value.Player.Profile.Info.Settings.Role == type).ToList().ForEach(e => {
+                    _bot.BotsGroup.RemoveEnemy(e.Value.Player);
+                });
+
+            });
+            
             // apply the settings modifier
             _bot.Settings.Current._hearingDistCoef = settingModif.HearingDistCoef;
             _bot.Settings.Current._precicingSpeedCoef = settingModif.PrecicingSpeedCoef;
@@ -347,13 +337,10 @@ namespace friendlyPMC.Components
             }
 
 
-            // follower can turn enemy to anyone and cares about no one but the boss
+            // follower can turn enemy to anyone and cares the boss
             settings.FileSettings.Mind.WARN_BOT_TYPES = new WildSpawnType[] { };
             settings.FileSettings.Mind.REVENGE_BOT_TYPES = new WildSpawnType[] { };
-            settings.FileSettings.Mind.FRIENDLY_BOT_TYPES = new WildSpawnType[] {
-                WildSpawnType.shooterBTR,
-                WildSpawnType.peacefullZryachiyEvent
-            };
+            settings.FileSettings.Mind.FRIENDLY_BOT_TYPES = Utils.Props.friendlyBotTypes.ToArray();
 
             settings.FileSettings.Patrol.PICKUP_ITEMS_TO_BACKPACK_OR_CONTAINER = true;
             settings.FileSettings.Patrol.CHANCE_TO_PLAY_VOICE_WHEN_CLOSE = 50;
