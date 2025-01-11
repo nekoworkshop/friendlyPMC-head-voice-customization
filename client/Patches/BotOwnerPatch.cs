@@ -7,10 +7,7 @@ using HarmonyLib;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using UnityEngine;
 using friendlyPMC.Components;
-using Comfort.Common;
-using UnityEngine.Profiling;
 
 
 namespace friendlyPMC.Patches
@@ -68,7 +65,8 @@ namespace friendlyPMC.Patches
             }
             catch (Exception e)
             {
-                Logger.LogInfo("Exception on BotOwner UpdateManual PatchPostfix: " + e.Message);
+                Modules.Logger.LogError("Exception on BotOwner UpdateManual PatchPostfix");
+                Modules.Logger.LogError(e);
             }
         }
     }
@@ -83,7 +81,7 @@ namespace friendlyPMC.Patches
         };
         private static List<Action<BotOwner>> onActivate = new List<Action<BotOwner>>
         {
-            // make Goons and exUsecs neutral to the player if we have completed the first quest from the Goons
+            // make Goons and exUsecs neutral to the player and his followers if we have completed the first quest from the Goons
             new Action<BotOwner>((BotOwner bot) =>
             {
                 foreach (var role in allies)
@@ -92,7 +90,8 @@ namespace friendlyPMC.Patches
                     {
                         foreach (var item in BossPlayers.Instance.GetBossPlayers()) 
                         {
-                            Player player = item.Value.realPlayer;
+                            pitAIBossPlayer boss = item.Value;
+                            Player player = boss.realPlayer;
                             string ProfileId = player.ProfileId;
                             foreach (var data in player.Profile.QuestsData) 
                             {
@@ -106,10 +105,33 @@ namespace friendlyPMC.Patches
                                         {
                                             if(enemy.Key.ProfileId == ProfileId)
                                             {
+                                                // - make player neutral to bot
                                                 enemy.Value.IgnoreUntilAggression = true;
                                                 bot.BotsGroup.RemoveEnemy(player);
                                                 bot.Memory.DeleteInfoAboutEnemy(player);
                                                 bot.BotsGroup.AddAlly(player);
+                                                // - make all player followers neutral to bot
+                                                boss.Followers.ForEach(follower => {
+                                                    follower.Memory.DeleteInfoAboutEnemy(bot);
+                                                    foreach(var en in follower.EnemiesController.EnemyInfos)
+                                                    {
+                                                        if(en.Key.ProfileId == bot.ProfileId)
+                                                        {
+                                                            en.Value.IgnoreUntilAggression = true;
+                                                            follower.Memory.DeleteInfoAboutEnemy(bot.GetPlayer);
+                                                            
+                                                            if(follower.Settings.GetEnemyBotTypes().Contains(role))
+                                                                follower.Settings.GetEnemyBotTypes().Remove(role);
+
+                                                            follower.Settings.GetFriendlyBotTypes().Add(role);
+                                                        }
+                                                    }
+                                                });
+                                                
+                                                boss.bossGroup.RemoveEnemy(bot);
+                                                boss.bossGroup.AddAlly(bot.GetPlayer);
+
+
                                                 break;
                                             }
                                         }
@@ -142,36 +164,6 @@ namespace friendlyPMC.Patches
             catch (Exception e)
             {
                 Modules.Logger.LogError(e);
-            }
-
-            // Fix having followers be enemy of same side just because their roles where under ENEMY_BOT_TYPES
-            Dictionary<string, pitAIBossPlayer> playerBosses = BossPlayers.Instance.GetBossPlayers();
-
-            foreach (pitAIBossPlayer boss in playerBosses.Values)
-            {
-                var followers = BossPlayers.GetFollowersByBoss(boss.Player().ProfileId);
-
-                if (followers.Count > 0)
-                {
-                    EPlayerSide bossSide = boss.Player().Side;
-                    if (bossSide == __instance.Side)
-                    {
-                        var sett = __instance.Settings.FileSettings;
-                        if (
-                            (bossSide == EPlayerSide.Bear && !sett.Mind.DEFAULT_BEAR_BEHAVIOUR.HasFlag(EWarnBehaviour.AlwaysEnemies)) ||
-                            (bossSide == EPlayerSide.Usec && !sett.Mind.DEFAULT_USEC_BEHAVIOUR.HasFlag(EWarnBehaviour.AlwaysEnemies)) ||
-                            (bossSide == EPlayerSide.Savage && !sett.Mind.DEFAULT_SAVAGE_BEHAVIOUR.HasFlag(EWarnBehaviour.AlwaysEnemies))
-                        )
-                        {
-                            foreach (var follower in followers)
-                            {
-                                var botPlayer = follower.GetBot().GetPlayer;
-
-                                __instance.BotsGroup.RemoveEnemy(botPlayer);
-                            }
-                        }
-                    }
-                }
             }
         }
 

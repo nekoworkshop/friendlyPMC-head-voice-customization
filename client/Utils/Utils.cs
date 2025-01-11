@@ -13,12 +13,7 @@ namespace friendlyPMC.Utils
         
         private static Dictionary<string,bool> flags = new Dictionary<string,bool>();
 
-        public static List<WildSpawnType> BossFollowersRoles = new List<WildSpawnType> { 
-            WildSpawnType.bossKnight, 
-            WildSpawnType.followerBigPipe,
-            WildSpawnType.followerBirdEye
-        };
-
+ 
         /** Get distance between 2 points via navigation path **/
         public static float GetNavDistance(Vector3 point1, Vector3 point2, NavMeshPath existingMesh = null)
         {

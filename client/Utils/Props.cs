@@ -57,6 +57,18 @@ namespace friendlyPMC.Utils
             searchRadius = 40f;
         }
 
+        public static List<WildSpawnType> friendlyBotTypes = new List<WildSpawnType> {
+            WildSpawnType.shooterBTR,
+            WildSpawnType.gifter,
+            WildSpawnType.peacefullZryachiyEvent
+        };
+
+        public static List<WildSpawnType> BossFollowersType = new List<WildSpawnType> {
+            WildSpawnType.bossKnight,
+            WildSpawnType.followerBigPipe,
+            WildSpawnType.followerBirdEye
+        };
+
         public static Dictionary<string, List<string>> Quests = new Dictionary<string, List<string>>
         {
             {
