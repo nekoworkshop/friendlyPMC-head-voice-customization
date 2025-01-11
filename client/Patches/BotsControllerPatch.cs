@@ -518,6 +518,7 @@ namespace friendlyPMC.Patches
 
                         if (contained != null)
                         {
+                            contained = contained.CloneItem();
                             contained.CurrentAddress = null;
 
                             botSlot.AddWithoutRestrictions(contained);

@@ -589,7 +589,7 @@ class friendlyPMC {
 						let hasBigPipeQuest = false;
 						let hasBirdEyeQuest = false;
 						profile.Quests.forEach(quest => {
-							if (quest.qid == "6775d:957e2dbcb3bd0a02c7" && quest.status == 4) {
+							if (quest.qid == "6775d9957e2dbcb3bd0a02c7" && quest.status == 4) {
 								hasKnightQuest = true;
 							}
 							if (["67768936fa281ca31708b17c"].includes(quest.qid) && quest.status == 4) {
@@ -759,14 +759,13 @@ class friendlyPMC {
 	}
 
 	private _makeFriendlyOrHostile(diff: IDifficultyCategories, pmcType: string) {
+		return diff;
 		const is_bad_guy = this.config.badGuy || false;
 
 		if (is_bad_guy) {
 			Object.assign(diff.Mind, {
 				ENEMY_BY_GROUPS_PMC_PLAYERS: true,
-				CAN_RECEIVE_PLAYER_REQUESTS_SAVAGE: false,
 			});
-			return diff;
 		}
 
 		const clearWrongEnemy = (mind: Record<string, string | number | boolean | string[]>, type: string) => {
@@ -789,13 +788,13 @@ class friendlyPMC {
 				DEFAULT_ENEMY_BEAR: is_friendly && (pmcType == "bear" || pmcType == "sptbear" || pmcType == "pmcbear") ? false : diff.Mind.DEFAULT_ENEMY_BEAR,
 				DEFAULT_ENEMY_SAVAGE: true,
 				DEFAULT_ENEMY_USEC: is_friendly && (pmcType == "usec" || pmcType == "sptusec" || pmcType == "pmcusec") ? false : diff.Mind.DEFAULT_ENEMY_USEC,
-				DEFAULT_BEAR_BEHAVIOUR: is_friendly && (pmcType == "bear" || pmcType == "sptbear" || pmcType == "pmcbear") ? "Neutral" : diff.Mind.DEFAULT_BEAR_BEHAVIOUR,
+				DEFAULT_BEAR_BEHAVIOUR: is_bad_guy ? "AlwaysEnemies" : is_friendly && (pmcType == "bear" || pmcType == "sptbear" || pmcType == "pmcbear") ? "Neutral" : diff.Mind.DEFAULT_BEAR_BEHAVIOUR,
 				DEFAULT_SAVAGE_BEHAVIOUR: "AlwaysEnemies",
-				DEFAULT_USEC_BEHAVIOUR: is_friendly && (pmcType == "usec" || pmcType == "sptusec" || pmcType == "pmcusec") ? "Neutral" : diff.Mind.DEFAULT_BEAR_BEHAVIOUR,
-				CAN_RECIVE_PLAYER_REQUESTS: is_friendly ? true : diff.Mind.CAN_RECIVE_PLAYER_REQUESTS,
-				CAN_RECEIVE_PLAYER_REQUESTS: is_friendly ? true : diff.Mind.CAN_RECEIVE_PLAYER_REQUESTS,
-				CAN_RECEIVE_PLAYER_REQUESTS_USEC: is_friendly ? true : diff.Mind.CAN_RECEIVE_PLAYER_REQUESTS_USEC,
-				CAN_RECEIVE_PLAYER_REQUESTS_BEAR: is_friendly ? true : diff.Mind.CAN_RECEIVE_PLAYER_REQUESTS_BEAR,
+				DEFAULT_USEC_BEHAVIOUR: is_bad_guy ? "AlwaysEnemies" : is_friendly && (pmcType == "usec" || pmcType == "sptusec" || pmcType == "pmcusec") ? "Neutral" : diff.Mind.DEFAULT_USEC_BEHAVIOUR,
+				CAN_RECIVE_PLAYER_REQUESTS: is_bad_guy ? false : is_friendly ? true : diff.Mind.CAN_RECIVE_PLAYER_REQUESTS,
+				CAN_RECEIVE_PLAYER_REQUESTS: is_bad_guy ? false : is_friendly ? true : diff.Mind.CAN_RECEIVE_PLAYER_REQUESTS,
+				CAN_RECEIVE_PLAYER_REQUESTS_USEC: is_bad_guy ? false : is_friendly ? true : diff.Mind.CAN_RECEIVE_PLAYER_REQUESTS_USEC,
+				CAN_RECEIVE_PLAYER_REQUESTS_BEAR: is_bad_guy ? false : is_friendly ? true : diff.Mind.CAN_RECEIVE_PLAYER_REQUESTS_BEAR,
 			});
 
 			const Core: { [key: string]: any } = {};
@@ -820,7 +819,7 @@ class friendlyPMC {
 				FRIEND_DEAD_AGR_LOW: -0.000001,
 			});
 
-			if (is_friendly) {
+			if (is_friendly && !is_bad_guy) {
 				if (pmcType == "bear" || pmcType == "sptbear" || pmcType == "pmcbear") {
 					clearWrongEnemy(diff.Mind, "sptBear");
 					clearWrongEnemy(diff.Mind, "bear");
@@ -907,7 +906,8 @@ class friendlyPMC {
 		const result = this.originalGameStart(url, info, sessionID);
 
 		const profile = this.profileHelper.getPmcProfile(sessionID);
-		if (!profile) return result;
+		if (!profile || !profile.Quests) return result;
+
 		profile.Quests.forEach(quest => {
 			let id = quest.qid;
 			if (Quests[id]) {
