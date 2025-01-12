@@ -21,7 +21,9 @@
 
 
 ==================================================================================
-RELEASE NOTES (3.9.2) 
+RELEASE NOTES (3.9.4)
+- fixed Rogue faction turning hostile on player if getting too close while running with the Goons
+- fixed Knight giving raid end messages 
 
 ==================================================================================
 NOTES:

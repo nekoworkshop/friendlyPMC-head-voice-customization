@@ -108,12 +108,13 @@ namespace friendlyPMC.Patches
             }
             // prevent Rogues from being added as enemies if they are friends with the player
             var bossOfGroup = BossPlayers.GetBossByGroup(__instance.Id);
+            var followerOfBoss = BossPlayers.GetFollowers().Find(x => x.GetBot().ProfileId == person.ProfileId);
 
             var personRole = person.Profile?.Info?.Settings?.Role;
 
-            if (isInitialCause && bossOfGroup != null && personRole != null)
+            if (isInitialCause && personRole != null &&  (bossOfGroup != null ||  followerOfBoss != null))
             {
-                Player bossPlayer = bossOfGroup.realPlayer;
+                Player bossPlayer = (followerOfBoss != null ? followerOfBoss.GetBoss() : bossOfGroup).realPlayer;
                 foreach (var data in bossPlayer.Profile.QuestsData)
                 {
                     if (data.Id == Utils.Props.Quests["Knight"][0])

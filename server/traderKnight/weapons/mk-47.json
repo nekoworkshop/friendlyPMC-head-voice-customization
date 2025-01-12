@@ -18,9 +18,9 @@
                 "FireMode": {
                     "FireMode": "fullauto"
                 },
-                "StackObjectsCount": 2,
+                "StackObjectsCount": 5,
 				"UnlimitedCount": false,
-				"BuyRestrictionMax": 2,
+				"BuyRestrictionMax": 5,
 				"BuyRestrictionCurrent": 0
             }
         },
