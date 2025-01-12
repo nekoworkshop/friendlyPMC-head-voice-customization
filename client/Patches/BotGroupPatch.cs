@@ -56,9 +56,11 @@ namespace friendlyPMC.Patches
             var isAPlayerGroup = BossPlayers.IsBossGroup(__instance.Id);
             BotsGroup bossGroup = plBoss != null ? plBoss.bossGroup : null;
 
+            bool isInitialCause = (cause == EBotEnemyCause.addBotNoGroup || cause == EBotEnemyCause.AddNewMember || cause == EBotEnemyCause.warn);
+
 
             // if friendly PMC side is on, prevent groups from adding same side players as enemies
-            if (friendlyPMC.friendlyPMCFLAG.Value && (cause == EBotEnemyCause.addBotNoGroup || cause == EBotEnemyCause.AddNewMember || cause == EBotEnemyCause.warn))
+            if (friendlyPMC.friendlyPMCFLAG.Value && isInitialCause)
             {
                 // - bad guy flag will exclude the player and his followers from the friendly PMC
                 if (friendlyPMC.badGuy.Value || Utils.Utils.FlagGet("isBadGuy"))
@@ -96,7 +98,7 @@ namespace friendlyPMC.Patches
             }
             // prevent followers group from adding friendly bots as enemies
             if (
-                (cause == EBotEnemyCause.addBotNoGroup || cause == EBotEnemyCause.AddNewMember || cause == EBotEnemyCause.warn) &&
+                isInitialCause &&
                 person.Profile?.Info?.Settings?.Role != null &&
                 Utils.Props.friendlyBotTypes.Contains(person.Profile.Info.Settings.Role)
             )
@@ -109,7 +111,7 @@ namespace friendlyPMC.Patches
 
             var personRole = person.Profile?.Info?.Settings?.Role;
 
-            if (bossOfGroup != null && personRole != null)
+            if (isInitialCause && bossOfGroup != null && personRole != null)
             {
                 Player bossPlayer = bossOfGroup.realPlayer;
                 foreach (var data in bossPlayer.Profile.QuestsData)

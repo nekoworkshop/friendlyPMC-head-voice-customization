@@ -302,8 +302,6 @@ class friendlyPMC {
 					let lostMembers = "";
 					let message = this.lang.friendlyEscaped;
 
-					let isKnightBoss = false;
-
 					if (member.SquadInfo.Mate) {
 						message = this.lang.teamEscaped;
 						if (member.SquadInfo.Partial) {

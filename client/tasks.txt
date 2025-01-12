@@ -1,9 +1,9 @@
--- === 3.9.3 === ---:
-- bug fixes (whatever will be needed)
-- fix SAIN hearing patch interfering with the mod
-- fix the issues with badGuy and friendlyPMCSide flags
 -- === 3.9.4 === ---:
- - picked up bots do not attack enemy bots
+- x- remove Knight from giving raid end messages
+- fix exUsec turning hostile on player while running with the Goons
+- picked up bots do not attack enemy bots
+- fix bot running in place
+ -- === 3.9.5 === ---:
 - attempt to make transit work while in a group with the Goons
 - investigate if we can make "Assist" tactic turn hostile on accidental shots
 - see if we can make bot swap weapons when asked to loot (DeadBodyWork)

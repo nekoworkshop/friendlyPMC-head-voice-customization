@@ -125,8 +125,7 @@ namespace friendlyPMC.Modules
                     }
                 }
 
-                if (bosses.Count > 0) info = bosses.Random();
-                else if (allies.Count > 0) info = allies.Random();
+                if (allies.Count > 0) info = allies.Random();
                 else
                 {
                     info = mates.Count > 0 ? mates.Random() : null;
