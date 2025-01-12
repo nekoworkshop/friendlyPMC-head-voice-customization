@@ -226,9 +226,10 @@ namespace friendlyPMC
             new BotMemoryAddEnemyPatch().Enable();
             new BotMemoryDamagePatch().Enable();
             new BotGroupUsecEnemyPatch().Enable();
+            new ExUsecBrainHitPatch().Enable();
 
             new BotOwnerIsFolowerPatch().Enable();
-            new Patches.BotOwnerManualUpdatePatch().Enable();
+            new BotOwnerManualUpdatePatch().Enable();
             new BotOwnerActivatePatch().Enable();
 
             new PatrolDataFollowerPatch().Enable();

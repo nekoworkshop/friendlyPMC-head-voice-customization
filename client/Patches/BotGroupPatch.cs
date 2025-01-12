@@ -6,6 +6,7 @@ using HarmonyLib;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Linq;
 
 namespace friendlyPMC.Patches
 {
@@ -32,6 +33,25 @@ namespace friendlyPMC.Patches
 
     internal class BotGroupAddEnemy : ModulePatch
     {
+
+        public static bool PlayerHasKnightQuest(Profile playerProfile)
+        {
+            if(playerProfile.QuestsData == null) return false;
+            foreach (var data in playerProfile.QuestsData)
+            {
+                if (data.Id == Utils.Props.Quests["Knight"][0])
+                {
+                    if (data.Status == EFT.Quests.EQuestStatus.Success || data.Status == EFT.Quests.EQuestStatus.Started)
+                    {
+                        return true;
+
+                    }
+                }
+            }
+
+            return false;
+        }
+
         protected override MethodBase GetTargetMethod()
         {
             return AccessTools.Method(typeof(BotsGroup), "AddEnemy");
@@ -108,35 +128,43 @@ namespace friendlyPMC.Patches
             }
             // prevent Rogues from being added as enemies if they are friends with the player
             var bossOfGroup = BossPlayers.GetBossByGroup(__instance.Id);
-            var followerOfBoss = BossPlayers.GetFollowers().Find(x => x.GetBot().ProfileId == person.ProfileId);
 
             var personRole = person.Profile?.Info?.Settings?.Role;
 
-            if (isInitialCause && personRole != null &&  (bossOfGroup != null ||  followerOfBoss != null))
+            if (isInitialCause && personRole != null && bossOfGroup != null)
             {
-                Player bossPlayer = (followerOfBoss != null ? followerOfBoss.GetBoss() : bossOfGroup).realPlayer;
-                foreach (var data in bossPlayer.Profile.QuestsData)
+                Player bossPlayer = bossOfGroup.realPlayer;
+                if(PlayerHasKnightQuest(bossPlayer.Profile))
                 {
-                    if (data.Id == Utils.Props.Quests["Knight"][0])
+                    if (
+                        Utils.Props.BossFollowersType.Contains(personRole.Value) ||
+                        personRole == WildSpawnType.exUsec
+                    )
                     {
-                        if (data.Status == EFT.Quests.EQuestStatus.Success)
-                        {
-                            if (
-                                Utils.Props.BossFollowersType.Contains(personRole.Value) ||
-                                personRole == WildSpawnType.exUsec
-                            )
-                            {
-                                __result = false;
-                                return false;
-                            }
-
-                        }
-                        else if (data.Status == EFT.Quests.EQuestStatus.Started && personRole == WildSpawnType.exUsec)
-                        {
-                            __result = false;
-                            return false;
-                        }
+                        __result = false;
+                        return false;
                     }
+                }
+            }
+
+
+            // prevent Rogues from doing "warning" to the player and his followers as enemies if they are friends with the Goons
+            var _initialBot = AccessTools.Field(typeof(BotsGroup), "_initialBot").GetValue(__instance) as BotOwner;
+            var groupRole = __instance.InitialBotType;
+            var _rougeTypes = Utils.Props.BossFollowersType.ToList();
+            _rougeTypes.Add(WildSpawnType.exUsec);
+
+            if(cause == EBotEnemyCause.warn && _initialBot != null && _rougeTypes.Contains(groupRole))
+            {
+                var followerOfBoss = BossPlayers.GetFollowers().Find(x => x.GetBot().ProfileId == person.ProfileId);
+
+                if(
+                    (plBoss != null && PlayerHasKnightQuest(plBoss.realPlayer.Profile)) ||
+                    (followerOfBoss != null && PlayerHasKnightQuest(followerOfBoss.GetBoss().realPlayer.Profile))
+                )
+                {
+                    __result = false;
+                    return false;
                 }
             }
 

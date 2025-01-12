@@ -29,11 +29,6 @@ namespace friendlyPMC.Patches
             
             var botOwner_0 = AccessTools.Field(typeof(BotMemoryClass), "botOwner_0").GetValue(__instance) as BotOwner;
 
-            if (botOwner_0.Profile.Info.Settings.Role == WildSpawnType.exUsec && BossPlayers.IsPlayerBoss(enemy.ProfileId))
-            {
-                Modules.Logger.LogTrace($"Usec turning into an enemy because " + groupInfo.Cause);
-            }
-
             if (botOwner_0.EnemiesController.EnemyInfos.ContainsKey(enemy))
             {
                 pitAIBossPlayer boss = BossPlayers.GetBoss(enemy.ProfileId);

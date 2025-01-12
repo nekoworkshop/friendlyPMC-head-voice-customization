@@ -199,6 +199,7 @@
     <Compile Include="Patches\BotMemoryPatch.cs" />
     <Compile Include="Patches\BulletImpactPatch.cs" />
     <Compile Include="Patches\ConditionCounterPatch.cs" />
+    <Compile Include="Patches\ExUsecBrainPatch.cs" />
     <Compile Include="Patches\GestureMenuPatch.cs" />
     <Compile Include="Patches\HearingSensorPatch.cs" />
     <Compile Include="Patches\ItemPatch.cs" />
