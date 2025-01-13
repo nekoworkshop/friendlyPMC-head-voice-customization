@@ -55,22 +55,6 @@
 			"parentId": "6781fcce618f8c5f9a09486d"
 		},
 		{
-			"_id": "6781fa7d228c503c600bd79e",
-			"_tpl": "64b7af434b75259c590fa893",
-			"slotId": "patron_in_weapon",
-			"parentId": "6781fcce618f8c5f9a09486d"
-		},
-		{
-			"_id": "6781fa7d228c503c600bd79f",
-			"_tpl": "64b7af434b75259c590fa893",
-			"slotId": "cartridges",
-			"location": 0,
-			"upd": {
-				"StackObjectsCount": 30
-			},
-			"parentId": "6781fa7d228c503c600bd79a"
-		},
-		{
 			"_id": "6781fa7d228c503c600bd7a0",
 			"_tpl": "57ac965c24597706be5f975c",
 			"slotId": "mod_scope",

@@ -157,5 +157,10 @@
 	"botHeal": {
 		"Name": "Vindecare Urmăritori",
 		"Description": "Vindecă toți urmăritorii. Acest lucru îi scoate și din animația de vindecare sau animația de aruncare a grenadei"
-	}
+	},
+
+    "botPrefetch": {
+        "Name": "Prefetch Urmăritori",
+        "Description": "Prefetch datele urmăritorilor pentru a reduce timpul necesar pentru a-i spawna. Dezactivați aceasta dacă aveți conflicte cu alte moduri"
+    }
 }

@@ -159,5 +159,9 @@
 	"botHeal": {
 		"Name": "Gefolgsleute heilen",
 		"Description": "Heilt alle Gefolgsleute. Dies bringt sie auch aus der Heilungsanimation oder der Granatenwurf-Animation heraus"
-	}
+	},
+    "botPrefetch": {
+        "Name": "Vorababruf von Gefolgsleutendaten",
+        "Description": "Vorababruf von Gefolgsleutendaten, um die Zeit zu verkürzen, die benötigt wird, um sie zu spawnen. Deaktivieren Sie dies, wenn Sie Konflikte mit anderen Mods haben."
+    }
 }

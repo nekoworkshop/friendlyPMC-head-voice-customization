@@ -1,8 +1,10 @@
 -- === 3.9.4 === ---:
-- x- remove Knight from giving raid end messages
-- fix exUsec turning hostile on player while running with the Goons
+- x - remove Knight from giving raid end messages
+- x - fix exUsec turning hostile on player while running with the Goons
+- x - investigate conflict with EFT API mod causing "Home" button to not work
 - picked up bots do not attack enemy bots
-- fix bot running in place
+- fix followers running in place
+
  -- === 3.9.5 === ---:
 - attempt to make transit work while in a group with the Goons
 - investigate if we can make "Assist" tactic turn hostile on accidental shots
@@ -24,6 +26,8 @@
 RELEASE NOTES (3.9.4)
 - fixed Rogue faction turning hostile on player if getting too close while running with the Goons
 - fixed Knight giving raid end messages 
+- fixed conflict with EFT API mod causing "Home" button to not work
+- fixed possible crashes when buying certain weapons from Knight (the AKs)
 
 ==================================================================================
 NOTES:

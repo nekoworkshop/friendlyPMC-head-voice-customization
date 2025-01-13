@@ -798,6 +798,7 @@ namespace friendlyPMC.Patches
 
         private static bool HasFika()
         {
+            if(!friendlyPMC.botPrefetch.Value) return true;
             return Type.GetType("Fika.Core.Coop.GameMode.CoopGame, Fika.Core") != null;
         }
 

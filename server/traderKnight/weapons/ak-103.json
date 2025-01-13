@@ -83,12 +83,6 @@
 			"slotId": "mod_charge"
 		},
 		{
-			"_id": "67731878d0665afe05056c2e",
-			"_tpl": "54527ac44bdc2d36668b4567",
-			"parentId": "67731878d0665afe05056c25",
-			"slotId": "patron_in_weapon"
-		},
-		{
 			"_id": "67731878d0665afe05056c2f",
 			"_tpl": "5cf4e3f3d7f00c06595bc7f0",
 			"parentId": "67731878d0665afe05056c26",
@@ -99,36 +93,6 @@
 			"_tpl": "602e620f9b513876d4338d9a",
 			"parentId": "67731878d0665afe05056c2a",
 			"slotId": "mod_stock"
-		},
-		{
-			"_id": "67731878d0665afe05056c31",
-			"_tpl": "59e690b686f7746c9f75e848",
-			"parentId": "67731878d0665afe05056c2b",
-			"slotId": "cartridges",
-			"location": 0,
-			"upd": {
-				"StackObjectsCount": 4
-			}
-		},
-		{
-			"_id": "67731878d0665afe05056c32",
-			"_tpl": "54527ac44bdc2d36668b4567",
-			"parentId": "67731878d0665afe05056c2b",
-			"slotId": "cartridges",
-			"location": 1,
-			"upd": {
-				"StackObjectsCount": 7
-			}
-		},
-		{
-			"_id": "67731878d0665afe05056c33",
-			"_tpl": "59e6906286f7746c9f75e847",
-			"parentId": "67731878d0665afe05056c2b",
-			"slotId": "cartridges",
-			"location": 2,
-			"upd": {
-				"StackObjectsCount": 19
-			}
 		},
 		{
 			"_id": "67731878d0665afe05056c34",

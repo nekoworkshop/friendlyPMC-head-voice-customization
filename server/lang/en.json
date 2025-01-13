@@ -161,5 +161,9 @@
 	"botHeal": {
 		"Name": "Followers Heal",
 		"Description": "Heal all followers. This also get's them out of the healing animation or grenade throwing animation"
-	}
+	},
+    "botPrefetch": {
+        "Name": "Prefetch follower data",
+        "Description": "Prefetch follower data to reduce the time it takes to spawn them. Disable this if you have conflicts with other mods"
+    }
 }

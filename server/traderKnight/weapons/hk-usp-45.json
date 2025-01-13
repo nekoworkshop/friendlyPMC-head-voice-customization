@@ -67,12 +67,6 @@
 			"slotId": "mod_mount_000"
 		},
 		{
-			"_id": "8a8caa1a13b1809e83cafe51",
-			"_tpl": "5efb0cabfb3e451d70735af5",
-			"parentId": "c583755055e0aadbc696e58b",
-			"slotId": "patron_in_weapon"
-		},
-		{
 			"_id": "cc5eea171d57f3326151516c",
 			"_tpl": "61963a852d2c397d660036ad",
 			"parentId": "1bb96e69d2caa1e040e4e90c",

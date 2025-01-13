@@ -79,12 +79,6 @@
 			}
 		},
 		{
-			"_id": "6d1b1e04bedac297076b3807",
-			"_tpl": "5efb0cabfb3e451d70735af5",
-			"parentId": "f49706e488a99b348a476eab",
-			"slotId": "patron_in_weapon"
-		},
-		{
 			"_id": "68a612dfd4a8bf8b40cd9e8f",
 			"_tpl": "5f3e7897ddc4f03b010e204a",
 			"parentId": "06324fa3fd875ff477881aef",
