@@ -15,6 +15,13 @@ namespace friendlyPMC.Components.FollowerBossFollower
         public BirdEyeFollowerBrain(BotOwner owner, pitAIBossPlayer boss) : base(owner, boss)
         {
             _currentTactic = "Assist";
+            _defaultFollowDistance = 16;
+            _followDistance = _defaultFollowDistance;
+        }
+
+        public override string ShortName()
+        {
+            return "BirdEyeFLW";
         }
 
         public override void AddLayers()
@@ -38,11 +45,6 @@ namespace friendlyPMC.Components.FollowerBossFollower
             // - item taker
             FollowerLootLayer layer7 = new FollowerLootLayer(_owner, 40);
             method_0(6, layer7, true);
-        }
-
-        public override string ShortName()
-        {
-            return "BirdEyeFLW";
         }
 
         public override void BossOrdersChanged()

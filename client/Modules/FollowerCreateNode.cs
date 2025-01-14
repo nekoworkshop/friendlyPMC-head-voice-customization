@@ -40,7 +40,7 @@ namespace friendlyPMC.Modules
                 return new FollowerGuardCover(bot);
 
             if (type == (BotLogicDecision)CustomBotDecisions.EnemySearch)
-                /*return new FollowerSearch(bot);*/ return new GClass213(bot);
+                return new GClass213(bot);
 
             /*if (type == BotLogicDecision.goToEnemy)
                 return new FollowerGoToEnemy(bot);*/
@@ -53,6 +53,12 @@ namespace friendlyPMC.Modules
 
             if (type == BotLogicDecision.suppressFire)
                 return new FollowerSuppressionFire(bot);
+
+            if (type == BotLogicDecision.followerPatrol)
+            {
+                return new FollowerPatrol(bot);
+            }
+                
 
             return GClass507.CreateNode(type, bot);
         }

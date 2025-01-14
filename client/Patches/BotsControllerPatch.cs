@@ -1381,7 +1381,6 @@ namespace friendlyPMC.Patches
                     new InteractableObjects();
                     new NpcMessage();
                     new Receivers();
-                    new FollowerPatrolInstances();
 
                     PingTeamates.Enable();
 
@@ -1620,7 +1619,6 @@ namespace friendlyPMC.Patches
 
             BossPlayers.Dispose();
             Receivers.Dispose();
-            FollowerPatrolInstances.Dispose();
 
             BotsControllerPatch.spawnedPlayers.Clear();
             BotsControllerPatch.followerCreationTask.Clear();

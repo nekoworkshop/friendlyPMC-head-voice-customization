@@ -45,7 +45,8 @@ namespace friendlyPMC
         EnemySearch = 102,
         MoveToPoint = 103,
         RunToCover = 104,
-        GuardToCover = 105
+        GuardToCover = 105,
+        FollowBoss = 106,
     }
 
     public enum CustomPhrases
@@ -230,8 +231,6 @@ namespace friendlyPMC
             new BotOwnerManualUpdatePatch().Enable();
             new BotOwnerActivatePatch().Enable();
 
-            new PatrolDataFollowerPatch().Enable();
-
             new FollowRequestPatch().Enable();
             new HoldRequestPatch().Enable();
 
@@ -261,11 +260,11 @@ namespace friendlyPMC
             harmony.PatchAll(typeof(BaseLocalGameVmethod4Patch).Assembly);
             new BossSpawnWaveManagerClassPatch().Enable();
 
-            // patch sain in regards to Squad 
+            // attempt to patch some sain methods
             SAINPatch.PatchSAINIfInstalled(harmony);
-            // some error catchers here - they do not seem related to this mod
-            //new GClass1069Patch().Enable();
-            //harmony.PatchAll(typeof(LookSensorPatch).Assembly);
+            // some error catchers here - they do not seem related to this mod but causing conflicts
+            new GClass1069Patch().Enable();
+            harmony.PatchAll(typeof(LookSensorPatch).Assembly);
             // patch hearing
             new HearingSensorPatch().Enable();
             new FootstepSoundPatch().Enable();

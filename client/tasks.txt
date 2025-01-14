@@ -2,11 +2,13 @@
 - x - remove Knight from giving raid end messages
 - x - fix exUsec turning hostile on player while running with the Goons
 - x - investigate conflict with EFT API mod causing "Home" button to not work
+- x - fix followers running in place
+- attempt to reduce the spotting range of the Goons (nothing seems to work...)
+- investigate reported crashes
 - picked up bots do not attack enemy bots
-- fix followers running in place
 
  -- === 3.9.5 === ---:
-- attempt to make transit work while in a group with the Goons
+- attempt to make transit work while in a group with followers
 - investigate if we can make "Assist" tactic turn hostile on accidental shots
 - see if we can make bot swap weapons when asked to loot (DeadBodyWork)
 - - this should also allow bot to put that weapon as seconday (in case of support without a grenade launcher)
@@ -28,6 +30,7 @@ RELEASE NOTES (3.9.4)
 - fixed Knight giving raid end messages 
 - fixed conflict with EFT API mod causing "Home" button to not work
 - fixed possible crashes when buying certain weapons from Knight (the AKs)
+- simplified the code for followers following the player leading to less running in place and removal of a patch
 
 ==================================================================================
 NOTES:

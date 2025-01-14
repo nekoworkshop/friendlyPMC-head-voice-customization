@@ -21,6 +21,7 @@ namespace friendlyPMC.Components
         protected string _currentTactic = null;
         protected string _defaultTactic = null;
 
+        
 
         public string currentTactic
         {
@@ -38,6 +39,27 @@ namespace friendlyPMC.Components
             }
         }
 
+        protected int _defaultFollowDistance = 12;
+        protected int _followDistance;
+
+        public  int followDistance
+        {
+            get
+            {
+                return _followDistance;
+            }
+        }
+
+        protected bool _canPatrol = false;
+
+        public bool canPatrol
+        {
+            get
+            {
+                return _canPatrol;
+            }
+        }
+
         protected bool _needsProtection = true;
 
         public bool bossNeedsProtection
@@ -45,15 +67,6 @@ namespace friendlyPMC.Components
             get
             {
                 return _needsProtection;
-            }
-
-            set
-            {
-                _needsProtection = value;
-                if (fightLayer != null)
-                {
-                    fightLayer.CoverType(value ? "close" : "far");
-                }
             }
         }
 
@@ -99,9 +112,16 @@ namespace friendlyPMC.Components
             get { return GRENADE_THROWING; }
         }
 
-public FollowerBrain(BotOwner owner, pitAIBossPlayer boss) : base(owner)
+        public pitAIBossPlayer playerBoss
+        {
+            get { return _boss; }
+        }
+
+        public FollowerBrain(BotOwner owner, pitAIBossPlayer boss) : base(owner)
         {
             AddLayers();
+
+            _followDistance = _defaultFollowDistance;
 
             _boss = boss;
 
@@ -472,19 +492,6 @@ public FollowerBrain(BotOwner owner, pitAIBossPlayer boss) : base(owner)
                 _owner.BotsGroup.AddAlly((Player)_boss.Player());
             }
         }
-
-        public void ClearFollowerPatrol()
-        {
-            var patrols = FollowerPatrolInstances.GetPatrols();
-            foreach (var item in patrols)
-            {
-                if (item.botOwner.ProfileId == _owner.ProfileId)
-                {
-                    patrols.Remove(item);
-                    break;
-                }
-            }
-        }
        
         public override void Dispose()
         {
@@ -497,8 +504,6 @@ public FollowerBrain(BotOwner owner, pitAIBossPlayer boss) : base(owner)
         {
             try
             {
-                // delete his patrol data
-                ClearFollowerPatrol();
                 // clear info about this bot
                 InteractableObjects.ClearStoredItems(_owner.ProfileId);
                 InteractableObjects.RemoveTaker(_owner);
@@ -554,6 +559,29 @@ public FollowerBrain(BotOwner owner, pitAIBossPlayer boss) : base(owner)
         public virtual void SetTactic(string tactic)
         {
             _currentTactic = tactic;
+        }
+
+        public virtual void SetFollowDistance(int distance)
+        {
+            _followDistance = distance;
+        }
+        public virtual void ResetFollowDistance()
+        {
+            _followDistance = _defaultFollowDistance;
+        }
+
+        public virtual void SetCanPatrol(bool patrol)
+        {
+            _canPatrol = patrol;
+        }
+
+        public virtual void SetBossNeedsProtection(bool value)
+        {
+            _needsProtection = value;
+            if (fightLayer != null)
+            {
+                fightLayer.CoverType(value ? "close" : "far");
+            }
         }
 
         public virtual void BossOrdersChanged()
