@@ -13,42 +13,6 @@ using System.Reflection;
 namespace friendlyPMC.Patches
 {
     /**
-     * Patch for whoever makes the boss player an enemy, becomes the enemy of the group
-     */
-    internal class BotMemoryAddEnemyPatch : ModulePatch
-    {
-        protected override MethodBase GetTargetMethod()
-        {
-            return AccessTools.Method(typeof(BotMemoryClass), "AddEnemy");
-        }
-
-        [PatchPostfix]
-        private static void PatchPostFix(BotMemoryClass __instance, [NotNull] IPlayer enemy, BotSettingsClass groupInfo, bool onActivation)
-        {
-            if( enemy == null ) return;
-            
-            var botOwner_0 = AccessTools.Field(typeof(BotMemoryClass), "botOwner_0").GetValue(__instance) as BotOwner;
-
-            if (botOwner_0.EnemiesController.EnemyInfos.ContainsKey(enemy))
-            {
-                pitAIBossPlayer boss = BossPlayers.GetBoss(enemy.ProfileId);
-                // whoever makes the boss player an enemy, becomes the enemy of the group
-                if (boss != null)
-                {
-                    if (boss.bossGroup != null)
-                        boss.bossGroup.AddEnemy(botOwner_0, EBotEnemyCause.addPlayerToBoss);
-                    else
-                        boss.AddEnemy(botOwner_0);
-                }
-                // whoever makes a follower an enemy, becomes the enemy of the group
-                else if (BossPlayers.IsFollower(enemy.AIData?.BotOwner) && enemy.AIData.BotOwner.BotFollower.HaveBoss)
-                {
-                    enemy.AIData.BotOwner.BotsGroup.AddEnemy(botOwner_0, EBotEnemyCause.addPlayerToBoss);
-                }
-            }
-        }
-    }
-    /**
      * This patch is used to prevent followers from adding teammates as an enemy on friendly fire
      */
     internal class BotMemoryDamagePatch : ModulePatch

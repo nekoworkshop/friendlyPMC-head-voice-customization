@@ -4,7 +4,9 @@
 - x - investigate conflict with EFT API mod causing "Home" button to not work
 - x - fix followers running in place
 - attempt to reduce the spotting range of the Goons (nothing seems to work...)
+- x - test if BotMemoryAddEnemyPatch is really needed since everything seems to come from BotsGroup.AddEnemy (seems it is not needed)
 - investigate reported crashes
+- x - investigate if followers are still hostile to BTR
 - picked up bots do not attack enemy bots
 
  -- === 3.9.5 === ---:
@@ -27,10 +29,13 @@
 ==================================================================================
 RELEASE NOTES (3.9.4)
 - fixed Rogue faction turning hostile on player if getting too close while running with the Goons
+- fixed Goons turning hostile if player got too close to them
 - fixed Knight giving raid end messages 
 - fixed conflict with EFT API mod causing "Home" button to not work
 - fixed possible crashes when buying certain weapons from Knight (the AKs)
 - simplified the code for followers following the player leading to less running in place and removal of a patch
+- fixed a bug with marking follower's equipment unlootable
+- some improvements in detecting bot's hands getting stuck after throwing a grenade
 
 ==================================================================================
 NOTES:

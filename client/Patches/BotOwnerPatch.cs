@@ -81,69 +81,7 @@ namespace friendlyPMC.Patches
         };
         private static List<Action<BotOwner>> onActivate = new List<Action<BotOwner>>
         {
-            // make Goons and exUsecs neutral to the player and his followers if we have completed the first quest from the Goons
-            new Action<BotOwner>((BotOwner bot) =>
-            {
-                foreach (var role in allies)
-                {
-                    if(bot.IsRole(role))
-                    {
-                        foreach (var item in BossPlayers.Instance.GetBossPlayers()) 
-                        {
-                            pitAIBossPlayer boss = item.Value;
-                            Player player = boss.realPlayer;
-                            string ProfileId = player.ProfileId;
-                            foreach (var data in player.Profile.QuestsData) 
-                            {
-                                if(data.Id == Utils.Props.Quests["Knight"][0])
-                                {
-                                    if(data.Status == EFT.Quests.EQuestStatus.Success || (data.Status == EFT.Quests.EQuestStatus.Started && role == WildSpawnType.exUsec)) 
-                                    {
-                                        bot.Memory.IsPeace = true;
-                                        bot.Settings.FileSettings.Boss.SHALL_WARN = false;
-                                        foreach(var enemy in bot.EnemiesController.EnemyInfos)
-                                        {
-                                            if(enemy.Key.ProfileId == ProfileId)
-                                            {
-                                                // - make player neutral to bot
-                                                enemy.Value.IgnoreUntilAggression = true;
-                                                bot.BotsGroup.RemoveEnemy(player);
-                                                bot.Memory.DeleteInfoAboutEnemy(player);
-                                                bot.BotsGroup.AddAlly(player);
-                                                // - make all player followers neutral to bot
-                                                boss.Followers.ForEach(follower => {
-                                                    follower.Memory.DeleteInfoAboutEnemy(bot);
-                                                    foreach(var en in follower.EnemiesController.EnemyInfos)
-                                                    {
-                                                        if(en.Key.ProfileId == bot.ProfileId)
-                                                        {
-                                                            en.Value.IgnoreUntilAggression = true;
-                                                            follower.Memory.DeleteInfoAboutEnemy(bot.GetPlayer);
-                                                            
-                                                            if(follower.Settings.GetEnemyBotTypes().Contains(role))
-                                                                follower.Settings.GetEnemyBotTypes().Remove(role);
-
-                                                            follower.Settings.GetFriendlyBotTypes().Add(role);
-                                                        }
-                                                    }
-                                                });
-                                                
-                                                boss.bossGroup.RemoveEnemy(bot);
-                                                boss.bossGroup.AddAlly(bot.GetPlayer);
-
-
-                                                break;
-                                            }
-                                        }
-                                    }
-                                    break;
-                                }
-                            }
-                        };
-                        break;
-                    }
-                }
-            })
+            
         };
         protected override MethodBase GetTargetMethod()
         {

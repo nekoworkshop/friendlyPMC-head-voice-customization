@@ -342,6 +342,9 @@ namespace friendlyPMC.Components
             settings.FileSettings.Patrol.CAN_FRIENDLY_TILT = true;
             settings.FileSettings.Patrol.VISION_DIST_COEF_PEACE = 1f;
 
+            settings.FileSettings.Boss.SHALL_WARN = false;
+            settings.FileSettings.Patrol.MAX_YDIST_TO_START_WARN_REQUEST_TO_REQUESTER = 0f;
+
             settings.FileSettings.Look.MINIMUM_VISIBLE_DIST = 15f;
 
             settings.FileSettings.Core.CanGrenade = true;

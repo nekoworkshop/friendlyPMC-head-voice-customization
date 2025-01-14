@@ -66,7 +66,6 @@ namespace friendlyPMC.Patches
                         {
                             posibleExecuter.BotTalk.TrySay(EPhraseTrigger.DontKnow, false);
                         }
-
                     }
                     else
                     {

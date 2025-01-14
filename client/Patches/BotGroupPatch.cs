@@ -52,6 +52,8 @@ namespace friendlyPMC.Patches
             return false;
         }
 
+        private static List<string> _isFriendly = new List<string>();
+
         protected override MethodBase GetTargetMethod()
         {
             return AccessTools.Method(typeof(BotsGroup), "AddEnemy");
@@ -65,10 +67,13 @@ namespace friendlyPMC.Patches
                 return true;
             }
 
+            _isFriendly.Clear();
+
             // prevent followers from adding teammates as an enemy on creation
             if (person.IsAI && person.AIData.BotOwner != null && BossPlayers.WillBeFollower(person.AIData.BotOwner))
             {
                 __result = false;
+                _isFriendly.Add(person.ProfileId);
                 return false;
             }
 
@@ -78,6 +83,40 @@ namespace friendlyPMC.Patches
 
             bool isInitialCause = (cause == EBotEnemyCause.addBotNoGroup || cause == EBotEnemyCause.AddNewMember || cause == EBotEnemyCause.warn);
 
+            // prevent Rogues from adding the player and his followers as enemies if they are friends with the Goons
+            var _members = AccessTools.Field(typeof(BotsGroup), "_members").GetValue(__instance) as List<BotOwner>;
+            var groupRole = __instance.InitialBotType;
+            var _rougeTypes = Utils.Props.BossFollowersType.ToList();
+            _rougeTypes.Add(WildSpawnType.exUsec);
+
+            if(isInitialCause && _members != null)
+            {
+                var followerOfBoss = BossPlayers.GetFollowers().Find(x => x.GetBot().ProfileId == person.ProfileId);
+
+                if(
+                    (plBoss != null && PlayerHasKnightQuest(plBoss.realPlayer.Profile)) ||
+                    (followerOfBoss != null && PlayerHasKnightQuest(followerOfBoss.GetBoss().realPlayer.Profile))
+                )
+                {
+                    bool isRogue = false;
+                    foreach(var mem in _members)
+                    {
+                        if(_rougeTypes.Contains(mem.Profile.Info.Settings.Role))
+                        {
+                            isRogue = true;
+                            mem.Settings.FileSettings.Boss.SHALL_WARN = false;
+                            mem.Settings.FileSettings.Patrol.MAX_YDIST_TO_START_WARN_REQUEST_TO_REQUESTER = 0f;
+                        }
+                    }
+
+                    if(isRogue) 
+                    {
+                        _isFriendly.Add(person.ProfileId);
+                        __result = false;
+                        return false;
+                    }
+                }
+            }
 
             // if friendly PMC side is on, prevent groups from adding same side players as enemies
             if (friendlyPMC.friendlyPMCFLAG.Value && isInitialCause)
@@ -102,17 +141,25 @@ namespace friendlyPMC.Patches
                     )
                 )
                 {
+                    _isFriendly.Add(person.ProfileId);
+
+                    foreach(var mem in _members)
+                    {
+                        mem.Settings.FileSettings.Boss.SHALL_WARN = false;
+                        mem.Settings.FileSettings.Patrol.MAX_YDIST_TO_START_WARN_REQUEST_TO_REQUESTER = 0f;
+                    }
                     __result = false;
                     return false;
                 }
             }
 
-            // if not a boss group, allow adding enemies
+            // from this point if this is not the player boss group, allow adding enemies
             if (!isAPlayerGroup) return true;
 
             // prevent boss players from being added as enemy to the group
-            if (plBoss != null && ((bossGroup != null && __instance.Id == bossGroup.Id) || __instance.Side == plBoss.realPlayer.Side))
+            if (plBoss != null && bossGroup != null && __instance.Id == bossGroup.Id)
             {
+                _isFriendly.Add(person.ProfileId);
                 __result = false;
                 return false;
             }
@@ -123,6 +170,7 @@ namespace friendlyPMC.Patches
                 Utils.Props.friendlyBotTypes.Contains(person.Profile.Info.Settings.Role)
             )
             {
+                _isFriendly.Add(person.ProfileId);
                 __result = false;
                 return false;
             }
@@ -134,42 +182,31 @@ namespace friendlyPMC.Patches
             if (isInitialCause && personRole != null && bossOfGroup != null)
             {
                 Player bossPlayer = bossOfGroup.realPlayer;
-                if(PlayerHasKnightQuest(bossPlayer.Profile))
+                var friendly = Utils.Props.BossFollowersType.ToList();
+                friendly.Add(WildSpawnType.exUsec);
+                if (PlayerHasKnightQuest(bossPlayer.Profile))
                 {
                     if (
-                        Utils.Props.BossFollowersType.Contains(personRole.Value) ||
-                        personRole == WildSpawnType.exUsec
+                        Utils.Props.BossFollowersType.Contains(personRole.Value)
                     )
                     {
+                        _isFriendly.Add(person.ProfileId);
                         __result = false;
                         return false;
                     }
                 }
             }
 
-
-            // prevent Rogues from doing "warning" to the player and his followers as enemies if they are friends with the Goons
-            var _initialBot = AccessTools.Field(typeof(BotsGroup), "_initialBot").GetValue(__instance) as BotOwner;
-            var groupRole = __instance.InitialBotType;
-            var _rougeTypes = Utils.Props.BossFollowersType.ToList();
-            _rougeTypes.Add(WildSpawnType.exUsec);
-
-            if(cause == EBotEnemyCause.warn && _initialBot != null && _rougeTypes.Contains(groupRole))
+            if(isAPlayerGroup && person != null && personRole.HasValue && Utils.Props.BossFollowersType.Contains(personRole.Value))
             {
-                var followerOfBoss = BossPlayers.GetFollowers().Find(x => x.GetBot().ProfileId == person.ProfileId);
-
-                if(
-                    (plBoss != null && PlayerHasKnightQuest(plBoss.realPlayer.Profile)) ||
-                    (followerOfBoss != null && PlayerHasKnightQuest(followerOfBoss.GetBoss().realPlayer.Profile))
-                )
-                {
-                    __result = false;
-                    return false;
-                }
+                Modules.Logger.LogInfo("Added " + personRole.Value + " as an enemy because " + cause);
             }
 
             return true;
         }
+        /**
+         * Whoever makes the player or his followers an enemy will become the enemy of the player's boss group (BTR is the exception)
+         */
         [PatchPostfix]
         private static void PatchPostfix(BotsGroup __instance, IPlayer person, EBotEnemyCause cause)
         {
@@ -178,15 +215,41 @@ namespace friendlyPMC.Patches
                 return;
             }
 
-            var plBoss = BossPlayers.GetBoss(person.ProfileId);
+            if(_isFriendly.Contains(person.ProfileId))
+            {
+                _isFriendly.Remove(person.ProfileId);
+                return;
+            }
 
-            // whoever makes the player an enemy is our enemy
+            var _members = AccessTools.Field(typeof(BotsGroup), "_members").GetValue(__instance) as List<BotOwner>;
+
+            var plBoss = BossPlayers.GetBoss(person.ProfileId);
+            
+            bool isFriend = false;
+
+            if(_members !=null)
+            {
+                foreach(var mem in _members)
+                {
+                    // ignore BTR and do not add Rogues as enemies if they are friends with the player or his followers
+                    if(
+                        mem.Profile.Info.Settings.Role == WildSpawnType.shooterBTR
+                    )
+                    {
+                        isFriend = true;
+                        break;
+                    }
+                }
+            }
+
+            if(isFriend) return;
+            
             if (plBoss != null && plBoss.bossGroup != null && plBoss.bossGroup.Id != __instance.Id)
             {
                 try
                 {
                     BotsGroup bossGroup = plBoss.bossGroup;
-                    var _members = AccessTools.Field(typeof(BotsGroup), "_members").GetValue(__instance) as List<BotOwner>;
+                    
                     if (_members != null)
                     {
                         foreach (var item in _members)
