@@ -32,14 +32,17 @@ namespace friendlyPMC.Patches
                     if(itemId == __instance.Item.Id)
                     {
                         isBotEquiptment = true;
-                        return;
+                        break;
                     }
                 }
             });
+            
+            if(isBotEquiptment) {
+                __result = true;
+                return false;
+            }
 
-            __result = isBotEquiptment;
-
-            return false;
+            return true;
         }
     }
     // Make all followers items unremovable

@@ -105,6 +105,8 @@ namespace friendlyPMC.Components
         private const float TIME_TO_RESET_WEAPONS_GRENADE = 3f;
         private const float TIME_TO_RESET_WEAPONS_SWAP = 3f;
 
+        private const float TIME_TO_RESET_HANDS = 5f;
+
         private bool GRENADE_THROWING = false;
 
         public bool  IsThrowingGrenade
@@ -143,6 +145,9 @@ namespace friendlyPMC.Components
             {
                 if (CheckIfBusy()) return;
 
+
+                var _isinteracting = _owner.GetPlayer.HandsController.IsInInteraction() || _owner.GetPlayer.HandsController.IsInInteractionStrictCheck();
+
                 var meds = _owner.Medecine;
                 if (meds != null)
                 {
@@ -150,12 +155,16 @@ namespace friendlyPMC.Components
                     if (CheckActionBusy(meds.FirstAid?.Using == true, TIME_TO_RESET_HEAL_FIRSTAID)) return;
                     if (CheckActionBusy(meds.SurgicalKit?.Using == true, TIME_TO_RESET_HEAL_SURGERY)) return;
                 }
+                if(_owner.WeaponManager != null) 
+                {
+                    if (CheckActionBusy(_owner.WeaponManager.Grenades.ThrowindNow || GRENADE_THROWING, TIME_TO_RESET_WEAPONS_GRENADE))
+                        return;
 
-                if (CheckActionBusy(_owner.WeaponManager.Grenades.ThrowindNow || GRENADE_THROWING, TIME_TO_RESET_WEAPONS_GRENADE))
-                    return;
+                    if (CheckActionBusy(_owner.WeaponManager.Selector.IsChanging, TIME_TO_RESET_WEAPONS_SWAP))
+                        return;
+                }
 
-                if (CheckActionBusy(_owner.WeaponManager.Selector.IsChanging, TIME_TO_RESET_WEAPONS_SWAP))
-                    return;
+                if(_isinteracting && CheckActionBusy(true,TIME_TO_RESET_HANDS)) return;
 
                 ResetBusyState();
             }
@@ -188,7 +197,6 @@ namespace friendlyPMC.Components
 
         private bool CheckIfBusy()
         {
-            // Optionally, return if there's an overarching busy state, such as multiple actions queued.
             return _busyTimer > 0f && _busyTimer > Time.time;
         }
 

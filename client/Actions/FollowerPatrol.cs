@@ -245,6 +245,7 @@ namespace friendlyPMC.Actions
 
                             botOwner_0.GoToSomePointData.SetPoint(nearPoint.Position);
                             botOwner_0.GoToSomePointData.UpdateToGo(false);
+                            if (!wasHit) botOwner_0.Steering.LookToMovingDirection();
 
                             bool_7 = true;
                             return;

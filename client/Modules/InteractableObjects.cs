@@ -566,7 +566,9 @@ namespace friendlyPMC.Modules
                     if (
                         slotType == EquipmentSlot.Dogtag || 
                         slotType == EquipmentSlot.SecuredContainer ||
-                        slotType == EquipmentSlot.Pockets
+                        slotType == EquipmentSlot.Pockets ||
+                        slotType == EquipmentSlot.ArmBand ||
+                        slotType == EquipmentSlot.Scabbard
                     ) continue;
 
                     Slot botSlot = profile.Inventory.Equipment.GetSlot(slotType);
@@ -613,12 +615,6 @@ namespace friendlyPMC.Modules
                                         if (slot.ContainedItem != null && !contained.IsUnremovable)
                                         {
                                             items.Add(slot.ContainedItem.Id);
-                                            // lock item so it cannot be looted
-                                            var lockedField = AccessTools.Field(typeof(Slot), "<Locked>k__BackingField");
-                                            if (lockedField != null)
-                                            {
-                                                //lockedField.SetValue(slot, true);
-                                            }
                                         }
                                     }
                                 }
