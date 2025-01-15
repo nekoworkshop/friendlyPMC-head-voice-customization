@@ -187,7 +187,7 @@ namespace friendlyPMC.Patches
                 if (PlayerHasKnightQuest(bossPlayer.Profile))
                 {
                     if (
-                        Utils.Props.BossFollowersType.Contains(personRole.Value)
+                        friendly.Contains(personRole.Value)
                     )
                     {
                         _isFriendly.Add(person.ProfileId);
@@ -195,11 +195,6 @@ namespace friendlyPMC.Patches
                         return false;
                     }
                 }
-            }
-
-            if(isAPlayerGroup && person != null && personRole.HasValue && Utils.Props.BossFollowersType.Contains(personRole.Value))
-            {
-                Modules.Logger.LogInfo("Added " + personRole.Value + " as an enemy because " + cause);
             }
 
             return true;

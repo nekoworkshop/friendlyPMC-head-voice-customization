@@ -157,8 +157,17 @@ namespace friendlyPMC.Actions
         /** Boss following logic  **/
         protected virtual void Follow(bool following = false, float distance = 0f)
         {
+            
+            if(bool_7)
+            {
+                botOwner_0.GoToSomePointData.UpdateToGo(false);
+                if (!wasHit) botOwner_0.LookData.SetLookPointByHearing(null);
+            }
+
             if (float_3 < Time.time)
             {
+
+                float_3 = Time.time + GClass824.Random(1f, 2f);
 
                 Vector3 leaderPosition = player_0.Transform.position;
                 FollowerBrain brain = botOwner_0.Brain.BaseBrain as FollowerBrain;
@@ -166,19 +175,18 @@ namespace friendlyPMC.Actions
                 bool flag2;
                 bool flag;
                 float num;
+
                 // check if we are in range of the boss
-                float_3 = Time.time + GClass824.Random(1f, 2f);
                 if (following)
                 {
                     num = distance;
-                    float_3 = Time.time + GClass824.Random(1f, 2f);
                 }
                 else
                 {
                     num = Mathf.Abs((bool_0 ? vector3_0 : (leaderPosition - botOwner_0.Position)).magnitude);
                 }
 
-                flag = (flag2 = (num < brain.followDistance)) != bool_1;
+                flag = (flag2 = num < brain.followDistance) != bool_1;
                 bool_1 = flag2;
 
                 // we are in range of the boss
@@ -194,7 +202,6 @@ namespace friendlyPMC.Actions
 
                     if(bool_7)
                     {
-                        botOwner_0.GoToSomePointData.UpdateToGo(false);
                         if(botOwner_0.GoToSomePointData.IsCome())
                         {
                             bool_7 = false;
@@ -248,6 +255,7 @@ namespace friendlyPMC.Actions
                             if (!wasHit) botOwner_0.Steering.LookToMovingDirection();
 
                             bool_7 = true;
+                            float_3 = Time.time + 0.5f;
                             return;
                         }
                         // no cover found, we will just roam around the boss
@@ -273,7 +281,7 @@ namespace friendlyPMC.Actions
                         if (!wasHit) botOwner_0.Steering.LookToMovingDirection();
 
                         bool_7 = true;
-
+                        float_3 = Time.time + 0.5f;
                     }
                 }
                 // out of range of the boss
@@ -283,7 +291,7 @@ namespace friendlyPMC.Actions
                     lastCoverPoint = null;
                     nocover = false;
                     method_0(leaderPosition);
-                    bool val = num > 15f;
+                    bool val = num > Math.Min(brain.followDistance + 3, 16);
 
                     if (val)
                         botOwner_0.Mover.Sprint(true, false);

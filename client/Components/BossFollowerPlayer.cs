@@ -63,6 +63,7 @@ namespace friendlyPMC.Components
                 bot.Settings.FileSettings.Aiming.COEF_FROM_COVER = 1f;
                 bot.Settings.FileSettings.Aiming.HARD_AIM = 0.9f;
                 bot.Settings.FileSettings.Mind.MAX_AGGRO_BOT_DIST = 200f;
+                bot.Settings.FileSettings.Look.MAX_VISION_GRASS_METERS = 1.5f;
             }
 
             EPlayerSide side = _player.Player().Side;
