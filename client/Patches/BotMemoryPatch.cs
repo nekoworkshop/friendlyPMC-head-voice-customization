@@ -70,17 +70,17 @@ namespace friendlyPMC.Patches
         }
     }
     // this is used for debug purposes that is why it stays disabled
-    /*[HarmonyPatch(typeof(BotMemoryClass), "GoalEnemy", MethodType.Setter)]
+    [HarmonyPatch(typeof(BotMemoryClass), "GoalEnemy", MethodType.Setter)]
     public static class GoalEnemyTracePatch
     {
         public static void Postfix(BotMemoryClass __instance, EnemyInfo value)
         {
             var botOwner_0 = AccessTools.Field(typeof(BotMemoryClass), "botOwner_0").GetValue(__instance) as BotOwner;
 
-            if(BossPlayers.IsFollower(botOwner_0) && value != null && Utils.Props.friendlyBotTypes.Contains(value.Person.Profile.Info.Settings.Role))
+            if(BossPlayers.IsFollower(botOwner_0) && value != null)
             {
-                Modules.Logger.LogTrace($"Follower {botOwner_0.ProfileId} is targeting friendly player {value.Person.Profile.Info.Nickname}");
+                Modules.Logger.LogTrace($"Follower accquired an enemy");
             }
         }
-    }*/
+    }
 }

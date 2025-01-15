@@ -162,6 +162,6 @@
 	},
     "botPrefetch": {
         "Name": "Vorababruf von Gefolgsleutendaten",
-        "Description": "Vorababruf von Gefolgsleutendaten, um die Zeit zu verkürzen, die benötigt wird, um sie zu spawnen. Deaktivieren Sie dies, wenn Sie Konflikte mit anderen Mods haben."
+        "Description": "Vorababruf von Gefolgsleutendaten, um die Zeit zu verkürzen, die benötigt wird, um sie zu spawnen. Falls Sie Probleme mit dem Spawnen von Begleitern haben, deaktivieren Sie diese Option und versuchen Sie es erneut. Beachten Sie, dass dies die Spawn-Zeit verlängern kann."
     }
 }

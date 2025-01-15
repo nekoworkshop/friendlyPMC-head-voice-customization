@@ -518,11 +518,11 @@ namespace friendlyPMC.Patches
 
                         Item contained = cloneSlot.ContainedItem;
 
-                        botSlot.RemoveItem();
+                        botSlot.RemoveItemWithoutRestrictions();
 
                         if (contained != null)
                         {
-                            contained = contained.CloneItem();
+                            //contained = contained.CloneItem();
                             contained.CurrentAddress = null;
 
                             botSlot.AddWithoutRestrictions(contained);
@@ -533,7 +533,7 @@ namespace friendlyPMC.Patches
                     if (secureContainers.ContainsKey(profile.Id))
                     {
                         Slot secCon = profile.Inventory.Equipment.GetSlot(EquipmentSlot.SecuredContainer);
-                        secCon.RemoveItem();
+                        secCon.RemoveItemWithoutRestrictions();
                         secureContainers[profile.Id].CurrentAddress = null;
                         secCon.AddWithoutRestrictions(secureContainers[profile.Id]);
                     }
@@ -683,14 +683,14 @@ namespace friendlyPMC.Patches
 
             if(type.HasValue)
             {
-                IProfileData botData = new IProfileData(side, type.Value, BotDifficulty.hard, 0f, @params);
+                IProfileData botData = new IProfileData(side, type.Value, BotDifficulty.normal, 0f, @params);
                 return BotCreationDataClass.Create(botData, botCreator, 1, botSpawnerClass);
             }
             
 
             foreach (var boss in bosses)
             {
-                IProfileData botData = new IProfileData(side, boss, BotDifficulty.hard, 0f, @params);
+                IProfileData botData = new IProfileData(side, boss, BotDifficulty.normal, 0f, @params);
 
                 bossCreationTask[boss] = BotCreationDataClass.Create(botData, botCreator, 1, botSpawnerClass);
             }
@@ -1260,7 +1260,7 @@ namespace friendlyPMC.Patches
             var closestCorePoint = GetClosestCorePoint(Controller, position);
             botsData.AddPosition(position, closestCorePoint.Id);
 
-            botsData.Profiles.ForEach(profile =>
+            botsData.Profiles.ForEach(async profile =>
             {
                 InteractableObjects.StoreEquipment(profile);
 
@@ -1325,13 +1325,13 @@ namespace friendlyPMC.Patches
 
                         Modules.Logger.LogInfo("Follower " + follower.Profile.Nickname + " spawned");
 
-                        spawnedFollowers++;
+                        /*spawnedFollowers++;
 
                         if (spawnedFollowers >= memberCount)
                         {
                             token.Cancel();
                             botsData.StopSpawn();
-                        }
+                        }*/
 
                     }), shallBeGroup, stopWatch);
 
@@ -1344,25 +1344,24 @@ namespace friendlyPMC.Patches
                 AccessTools.Field(typeof(BotSpawner), "_inSpawnProcess").SetValue(botSpawnerClass, _inSpawnProcess + 1);
 
                 // activate the bot
-                activateTasks.Add( ActivateBotFollower(
-                    botCreator,
-                    profile,
-                    new GClass649(position, botsData.GetPosition().CorePointId, false),
-                    zone, true,
-                    GroupAction,
-                    OnActivate,
-                    token.GetCancelToken()
-                ));
+                try
+                {
+                    await ActivateBotFollower(
+                        botCreator,
+                        profile,
+                        new GClass649(position, botsData.GetPosition().CorePointId, false),
+                        zone, true,
+                        GroupAction,
+                        OnActivate,
+                        token.GetCancelToken()
+                    );
+                }
+                catch (Exception ex)
+                {
+                    Modules.Logger.LogError(ex);
+                }
 
             });
-            try
-            {
-                await UniTask.WhenAll(activateTasks.ToArray());
-            }
-            catch (Exception ex)
-            {
-                Modules.Logger.LogError(ex);
-            }
         }
 
         protected override MethodBase GetTargetMethod()

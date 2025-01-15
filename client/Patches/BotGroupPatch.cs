@@ -52,8 +52,6 @@ namespace friendlyPMC.Patches
             return false;
         }
 
-        private static List<string> _isFriendly = new List<string>();
-
         protected override MethodBase GetTargetMethod()
         {
             return AccessTools.Method(typeof(BotsGroup), "AddEnemy");
@@ -67,13 +65,10 @@ namespace friendlyPMC.Patches
                 return true;
             }
 
-            _isFriendly.Clear();
-
             // prevent followers from adding teammates as an enemy on creation
             if (person.IsAI && person.AIData.BotOwner != null && BossPlayers.WillBeFollower(person.AIData.BotOwner))
             {
                 __result = false;
-                _isFriendly.Add(person.ProfileId);
                 return false;
             }
 
@@ -81,7 +76,7 @@ namespace friendlyPMC.Patches
             var isAPlayerGroup = BossPlayers.IsBossGroup(__instance.Id);
             BotsGroup bossGroup = plBoss != null ? plBoss.bossGroup : null;
 
-            bool isInitialCause = (cause == EBotEnemyCause.addBotNoGroup || cause == EBotEnemyCause.AddNewMember || cause == EBotEnemyCause.warn);
+            bool isInitialCause = (cause == EBotEnemyCause.initial || cause == EBotEnemyCause.addBotNoGroup || cause == EBotEnemyCause.AddNewMember || cause == EBotEnemyCause.warn);
 
             // prevent Rogues from adding the player and his followers as enemies if they are friends with the Goons
             var _members = AccessTools.Field(typeof(BotsGroup), "_members").GetValue(__instance) as List<BotOwner>;
@@ -111,7 +106,6 @@ namespace friendlyPMC.Patches
 
                     if(isRogue) 
                     {
-                        _isFriendly.Add(person.ProfileId);
                         __result = false;
                         return false;
                     }
@@ -141,8 +135,6 @@ namespace friendlyPMC.Patches
                     )
                 )
                 {
-                    _isFriendly.Add(person.ProfileId);
-
                     foreach(var mem in _members)
                     {
                         mem.Settings.FileSettings.Boss.SHALL_WARN = false;
@@ -159,7 +151,7 @@ namespace friendlyPMC.Patches
             // prevent boss players from being added as enemy to the group
             if (plBoss != null && bossGroup != null && __instance.Id == bossGroup.Id)
             {
-                _isFriendly.Add(person.ProfileId);
+
                 __result = false;
                 return false;
             }
@@ -170,7 +162,6 @@ namespace friendlyPMC.Patches
                 Utils.Props.friendlyBotTypes.Contains(person.Profile.Info.Settings.Role)
             )
             {
-                _isFriendly.Add(person.ProfileId);
                 __result = false;
                 return false;
             }
@@ -190,7 +181,6 @@ namespace friendlyPMC.Patches
                         friendly.Contains(personRole.Value)
                     )
                     {
-                        _isFriendly.Add(person.ProfileId);
                         __result = false;
                         return false;
                     }
@@ -210,12 +200,6 @@ namespace friendlyPMC.Patches
                 return;
             }
 
-            if(_isFriendly.Contains(person.ProfileId))
-            {
-                _isFriendly.Remove(person.ProfileId);
-                return;
-            }
-
             var _members = AccessTools.Field(typeof(BotsGroup), "_members").GetValue(__instance) as List<BotOwner>;
 
             var plBoss = BossPlayers.GetBoss(person.ProfileId);
@@ -226,7 +210,7 @@ namespace friendlyPMC.Patches
             {
                 foreach(var mem in _members)
                 {
-                    // ignore BTR and do not add Rogues as enemies if they are friends with the player or his followers
+                    // ignore BTR 
                     if(
                         mem.Profile.Info.Settings.Role == WildSpawnType.shooterBTR
                     )
@@ -261,50 +245,7 @@ namespace friendlyPMC.Patches
             }
         }
     }
-    internal class BotGroupIsPlayerEnemy : ModulePatch
-    {
-        protected override MethodBase GetTargetMethod()
-        {
-            return AccessTools.Method(typeof(BotsGroup), "IsPlayerEnemy");
-
-        }
-        [PatchPrefix]
-        private static bool PatchPrefix(BotsGroup __instance, ref bool __result, IPlayer player)
-        {
-            if (BossPlayers.Instance != null && BossPlayers.IsPlayerBoss(player.ProfileId))
-            {
-                BotsGroup bossGroup = BossPlayers.Instance.GetBossPlayer(player.ProfileId).bossGroup;
-                if (bossGroup != null && __instance.Id == bossGroup.Id)
-                {
-                    __result = false;
-                    return false;
-                }
-            }
-            // prevent followers from adding teammates as an enemy on creation
-            if (player.IsAI && player.AIData.BotOwner != null && BossPlayers.WillBeFollower(player.AIData.BotOwner))
-            {
-                __result = false;
-                return false;
-            }
-            // if bad guy flag is on, player and his followers are enemies to all
-            if ((friendlyPMC.badGuy.Value || Utils.Utils.FlagGet("isBadGuy")) && !BossPlayers.IsBossGroup(__instance.Id))
-            {
-                var boss = BossPlayers.GetBoss(player.ProfileId);
-                if(boss !=null)
-                {
-                    __result = true;
-                    return false;
-                } 
-                else if(BossPlayers.GetFollowers().Find(x => x.GetBot().ProfileId == player.ProfileId) != null)
-                {
-                    __result = true;
-                    return false;
-                }
-            }
-
-            return true;
-        }
-    }
+    
     // this is used only in case of squad spawn
     internal class BotsGroupPlayer : BotsGroup
     {

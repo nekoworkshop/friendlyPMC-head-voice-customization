@@ -157,67 +157,74 @@ namespace friendlyPMC.Components
                 Modules.Logger.LogError("Failed to activate new follower patrol mode, fallback to manual mode");
                 Modules.Logger.LogError(e);
             }
-            // make all followers have the same group
-            if (_bot.BotsGroup != null)
+            // make bot join the player's group
+            if (_player.bossGroup != null)
             {
-                // - if there is no group yet, take the bot's group
-                if (_player.bossGroup == null)
-                {
-                    int count = _bot.BotsGroup.MembersCount;
-                    List<BotOwner> membersToRemove = new List<BotOwner>();
-                    for (int i = 0; i < count; i++)
-                    {
-                        BotOwner member = _bot.BotsGroup.Member(i);
-                        if (member.ProfileId != _bot.ProfileId)
-                        {
-                            membersToRemove.Add(member);
-                        }
-                    }
-                    membersToRemove.ForEach(mem =>
-                    {
-                        _bot.BotsGroup.RemoveAlly(mem);
-                    });
-
-                    BossPlayers.AddGroupToBoss(_player, _bot.BotsGroup);
-                }
-                else if (_bot.BotsGroup.Id != _player.bossGroup.Id)
-                {
-                    _bot.BotsGroup.RemoveAlly(_bot);
-                    _player.bossGroup.AddMember(_bot, false);
-                }
-            }
-            else if (_player.bossGroup != null)
-            {
-
-                _player.Followers.ForEach(bt => { 
-                    if(_bot.EnemiesController.EnemyInfos.TryGetValue(bt, out var fl))
+                // clear the player's followers from being enemies to the bot
+                _player.Followers.ForEach(bt => {
+                    if (_bot.EnemiesController.EnemyInfos.TryGetValue(bt, out var fl))
                     {
                         _bot.EnemiesController.EnemyInfos.Remove(bt);
                     }
                 });
-
-                _player.bossGroup.AddMember(_bot, false);
+                // clear the player from being an enemy to the bot
+                if (_bot.EnemiesController.EnemyInfos.TryGetValue(_player.realPlayer, out var info))
+                {
+                    _bot.EnemiesController.EnemyInfos.Remove(_player.realPlayer);
+                }
+                // add the bot to the player's group, if not already (PickUp case here)
+                if (_bot.BotsGroup.Id != _player.bossGroup.Id)
+                {
+                    _bot.BotsGroup.RemoveAlly(_bot);
+                    _player.bossGroup.AddMember(_bot, false);
+                    // do enemy setup again
+                    _bot.Memory.GoalEnemy = null;
+                    var botEnemies = _bot.EnemiesController.EnemyInfos.ToList();
+                    foreach (var item in botEnemies)
+                    {
+                        _bot.Memory.DeleteInfoAboutEnemy(item.Key);
+                    }
+                    foreach (var item in _player.bossGroup.Enemies)
+                    {
+                        _bot.Memory.AddEnemy(item.Key, item.Value, false);
+                    }
+                }
             }
-
-            // do some enemy clearing
-            // - remove the player as an enemy
-            if (_bot.EnemiesController.EnemyInfos.TryGetValue(_player.realPlayer, out var info))
+            // if there is no group yet, take the bot's group (PickUp case here)
+            else
             {
-                _bot.EnemiesController.EnemyInfos.Remove(_player.realPlayer);
+                BossPlayers.AddGroupToBoss(_player, _bot.BotsGroup);
+
+                int count = _bot.BotsGroup.MembersCount;
+                List<BotOwner> membersToRemove = new List<BotOwner>();
+                for (int i = 0; i < count; i++)
+                {
+                    BotOwner member = _bot.BotsGroup.Member(i);
+                    if (member.ProfileId != _bot.ProfileId)
+                    {
+                        membersToRemove.Add(member);
+                    }
+                }
+                membersToRemove.ForEach(mem =>
+                {
+                    _bot.BotsGroup.RemoveAlly(mem);
+                });
+
+                // - go through the enemy filtering process again
+                var groupEnemies = _bot.BotsGroup.Enemies;
+                var botEnemies = _bot.EnemiesController.EnemyInfos.ToList();
+                foreach (var item in botEnemies)
+                {
+                    _bot.Memory.DeleteInfoAboutEnemy(item.Key);
+                }
+                _bot.BotsGroup.Enemies = new Dictionary<IPlayer, BotSettingsClass>();
+                foreach (var item in groupEnemies)
+                {
+                    _bot.BotsGroup.AddEnemy(item.Key, item.Value.Cause);
+                }
+
+                _bot.Memory.GoalEnemy = null;
             }
-            // - remove friendly bots as enemies
-            Utils.Props.friendlyBotTypes.ForEach(type=>{
-
-                if(_bot.Settings.GetEnemyBotTypes().Contains(type)) _bot.Settings.GetEnemyBotTypes().Remove(type);
-                _bot.EnemiesController.EnemyInfos.Where(e => e.Value.Person.Profile.Info.Settings.Role == type).ToList().ForEach(e => {
-                    _bot.EnemiesController.Remove(e.Key);
-                });
-
-                _bot.BotsGroup.Enemies.Where(e => e.Value.Player.Profile.Info.Settings.Role == type).ToList().ForEach(e => {
-                    _bot.BotsGroup.RemoveEnemy(e.Value.Player);
-                });
-
-            });
             
             // apply the settings modifier
             _bot.Settings.Current._hearingDistCoef = settingModif.HearingDistCoef;
@@ -231,15 +238,8 @@ namespace friendlyPMC.Components
             _bot.Settings.Current._triggerDownDelay = settingModif.TriggerDownDelay;
 
 
-            // force  reset enemy state
             Utils.Utils.SetTimeout(() =>
             {
-                if (_bot != null && !_bot.IsDead && _bot.BotState == EBotState.Active && _bot.Memory.HaveEnemy)
-                {
-                    _bot.Memory.DeleteInfoAboutEnemy(_bot.Memory.GoalEnemy.Person);
-                    _bot.Memory.GoalEnemy = null;
-                }
-
                 // TURN OFF THE FLASHLIGHT!
                 if (_bot.BotLight != null && _bot.BotLight.IsEnable)
                 {

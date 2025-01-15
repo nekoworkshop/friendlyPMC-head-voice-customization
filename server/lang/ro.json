@@ -78,7 +78,7 @@
 	},
 	"enemyRemember": {
 		"Name": "Timpul de uitare a dușmanului (în secunde)",
-		"Description": "Timpul maxim în care un urmăritor își va aminti un dușman. Aceasta se aplică doar la începutul unui raid."
+		"Description": "Timpul maxim în care un însoțitor își va aminti un dușman. Aceasta se aplică doar la începutul unui raid."
 	},
 	"healthMultiplier": {
 		"Name": "Înmulțitorul de sănătate al echipei",
@@ -150,17 +150,17 @@
 	},
 
 	"botTeleport": {
-		"Name": "Teleportare Urmăritori",
-		"Description": "Teleportează toți urmăritorii la poziția jucătorului"
+		"Name": "Teleportare Însoțitori",
+		"Description": "Teleportează toți însoțitorii la poziția jucătorului"
 	},
 
 	"botHeal": {
-		"Name": "Vindecare Urmăritori",
-		"Description": "Vindecă toți urmăritorii. Acest lucru îi scoate și din animația de vindecare sau animația de aruncare a grenadei"
+		"Name": "Vindecare Însoțitori",
+		"Description": "Vindecă toți însoțitorii. Acest lucru îi scoate și din animația de vindecare sau animația de aruncare a grenadei"
 	},
 
     "botPrefetch": {
-        "Name": "Prefetch Urmăritori",
-        "Description": "Prefetch datele urmăritorilor pentru a reduce timpul necesar pentru a-i spawna. Dezactivați aceasta dacă aveți conflicte cu alte moduri"
+        "Name": "Prefetch Însoțitori",
+        "Description": "Prefetch datele însoțitorilor pentru a reduce timpul necesar pentru a-i spawna. Dacă întâmpinați probleme cu apariția însoțitorilor, dezactivați această opțiune și încercați din nou. Rețineți că aceasta poate crește timpul de apariție."
     }
 }

@@ -136,7 +136,7 @@ namespace friendlyPMC
         public string[] friendlyEscaped { get; set; }
     }
 
-    [BepInPlugin("xyz.pit.friendlypmc", "friendlyPMC", "3.9.4")]
+    [BepInPlugin("xyz.pit.friendlypmc", "friendlyPMC", "3.9.5")]
     [BepInDependency("xyz.drakia.bigbrain")]
     [BepInDependency("com.Arys.UnityToolkit")]
     public class friendlyPMC : BaseUnityPlugin
@@ -219,7 +219,6 @@ namespace friendlyPMC
             harmony.PatchAll(typeof(ConfigurationManagerPatch).Assembly);
             
             // bot patches to help with various scenarios while being a follower of the player
-            new BotGroupIsPlayerEnemy().Enable();
             new BotGroupAddEnemy().Enable();
             
             new BotMemoryDamagePatch().Enable();
@@ -289,7 +288,7 @@ namespace friendlyPMC
             // set configuration manager
             SetConfiguration();
             // this is used for debug purposes that is why it stays disabled
-            //harmony.PatchAll(typeof(GoalEnemyTracePatch).Assembly);
+            harmony.PatchAll(typeof(GoalEnemyTracePatch).Assembly);
         }
 
 
