@@ -798,6 +798,7 @@ namespace friendlyPMC.Patches
 
         private static bool HasFika()
         {
+            if(!friendlyPMC.botPrefetch.Value) return true;
             return Type.GetType("Fika.Core.Coop.GameMode.CoopGame, Fika.Core") != null;
         }
 
@@ -1380,7 +1381,6 @@ namespace friendlyPMC.Patches
                     new InteractableObjects();
                     new NpcMessage();
                     new Receivers();
-                    new FollowerPatrolInstances();
 
                     PingTeamates.Enable();
 
@@ -1619,7 +1619,6 @@ namespace friendlyPMC.Patches
 
             BossPlayers.Dispose();
             Receivers.Dispose();
-            FollowerPatrolInstances.Dispose();
 
             BotsControllerPatch.spawnedPlayers.Clear();
             BotsControllerPatch.followerCreationTask.Clear();

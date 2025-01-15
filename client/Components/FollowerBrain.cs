@@ -21,6 +21,7 @@ namespace friendlyPMC.Components
         protected string _currentTactic = null;
         protected string _defaultTactic = null;
 
+        
 
         public string currentTactic
         {
@@ -38,6 +39,27 @@ namespace friendlyPMC.Components
             }
         }
 
+        protected int _defaultFollowDistance = 12;
+        protected int _followDistance;
+
+        public  int followDistance
+        {
+            get
+            {
+                return _followDistance;
+            }
+        }
+
+        protected bool _canPatrol = false;
+
+        public bool canPatrol
+        {
+            get
+            {
+                return _canPatrol;
+            }
+        }
+
         protected bool _needsProtection = true;
 
         public bool bossNeedsProtection
@@ -45,15 +67,6 @@ namespace friendlyPMC.Components
             get
             {
                 return _needsProtection;
-            }
-
-            set
-            {
-                _needsProtection = value;
-                if (fightLayer != null)
-                {
-                    fightLayer.CoverType(value ? "close" : "far");
-                }
             }
         }
 
@@ -92,6 +105,8 @@ namespace friendlyPMC.Components
         private const float TIME_TO_RESET_WEAPONS_GRENADE = 3f;
         private const float TIME_TO_RESET_WEAPONS_SWAP = 3f;
 
+        private const float TIME_TO_RESET_HANDS = 5f;
+
         private bool GRENADE_THROWING = false;
 
         public bool  IsThrowingGrenade
@@ -99,9 +114,16 @@ namespace friendlyPMC.Components
             get { return GRENADE_THROWING; }
         }
 
-public FollowerBrain(BotOwner owner, pitAIBossPlayer boss) : base(owner)
+        public pitAIBossPlayer playerBoss
+        {
+            get { return _boss; }
+        }
+
+        public FollowerBrain(BotOwner owner, pitAIBossPlayer boss) : base(owner)
         {
             AddLayers();
+
+            _followDistance = _defaultFollowDistance;
 
             _boss = boss;
 
@@ -123,6 +145,9 @@ public FollowerBrain(BotOwner owner, pitAIBossPlayer boss) : base(owner)
             {
                 if (CheckIfBusy()) return;
 
+
+                var _isinteracting = _owner.GetPlayer.HandsController.IsInInteraction() || _owner.GetPlayer.HandsController.IsInInteractionStrictCheck();
+
                 var meds = _owner.Medecine;
                 if (meds != null)
                 {
@@ -130,12 +155,16 @@ public FollowerBrain(BotOwner owner, pitAIBossPlayer boss) : base(owner)
                     if (CheckActionBusy(meds.FirstAid?.Using == true, TIME_TO_RESET_HEAL_FIRSTAID)) return;
                     if (CheckActionBusy(meds.SurgicalKit?.Using == true, TIME_TO_RESET_HEAL_SURGERY)) return;
                 }
+                if(_owner.WeaponManager != null) 
+                {
+                    if (CheckActionBusy(_owner.WeaponManager.Grenades.ThrowindNow || GRENADE_THROWING, TIME_TO_RESET_WEAPONS_GRENADE))
+                        return;
 
-                if (CheckActionBusy(_owner.WeaponManager.Grenades.ThrowindNow || GRENADE_THROWING, TIME_TO_RESET_WEAPONS_GRENADE))
-                    return;
+                    if (CheckActionBusy(_owner.WeaponManager.Selector.IsChanging, TIME_TO_RESET_WEAPONS_SWAP))
+                        return;
+                }
 
-                if (CheckActionBusy(_owner.WeaponManager.Selector.IsChanging, TIME_TO_RESET_WEAPONS_SWAP))
-                    return;
+                if(_isinteracting && CheckActionBusy(true,TIME_TO_RESET_HANDS)) return;
 
                 ResetBusyState();
             }
@@ -168,7 +197,6 @@ public FollowerBrain(BotOwner owner, pitAIBossPlayer boss) : base(owner)
 
         private bool CheckIfBusy()
         {
-            // Optionally, return if there's an overarching busy state, such as multiple actions queued.
             return _busyTimer > 0f && _busyTimer > Time.time;
         }
 
@@ -472,19 +500,6 @@ public FollowerBrain(BotOwner owner, pitAIBossPlayer boss) : base(owner)
                 _owner.BotsGroup.AddAlly((Player)_boss.Player());
             }
         }
-
-        public void ClearFollowerPatrol()
-        {
-            var patrols = FollowerPatrolInstances.GetPatrols();
-            foreach (var item in patrols)
-            {
-                if (item.botOwner.ProfileId == _owner.ProfileId)
-                {
-                    patrols.Remove(item);
-                    break;
-                }
-            }
-        }
        
         public override void Dispose()
         {
@@ -497,8 +512,6 @@ public FollowerBrain(BotOwner owner, pitAIBossPlayer boss) : base(owner)
         {
             try
             {
-                // delete his patrol data
-                ClearFollowerPatrol();
                 // clear info about this bot
                 InteractableObjects.ClearStoredItems(_owner.ProfileId);
                 InteractableObjects.RemoveTaker(_owner);
@@ -554,6 +567,29 @@ public FollowerBrain(BotOwner owner, pitAIBossPlayer boss) : base(owner)
         public virtual void SetTactic(string tactic)
         {
             _currentTactic = tactic;
+        }
+
+        public virtual void SetFollowDistance(int distance)
+        {
+            _followDistance = distance;
+        }
+        public virtual void ResetFollowDistance()
+        {
+            _followDistance = _defaultFollowDistance;
+        }
+
+        public virtual void SetCanPatrol(bool patrol)
+        {
+            _canPatrol = patrol;
+        }
+
+        public virtual void SetBossNeedsProtection(bool value)
+        {
+            _needsProtection = value;
+            if (fightLayer != null)
+            {
+                fightLayer.CoverType(value ? "close" : "far");
+            }
         }
 
         public virtual void BossOrdersChanged()

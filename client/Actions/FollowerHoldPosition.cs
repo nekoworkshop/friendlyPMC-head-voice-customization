@@ -10,7 +10,9 @@ namespace friendlyPMC.Actions
     public class FollowerHoldPosition : GClass256
     {
         private float timer = 0f;
-        public FollowerHoldPosition (BotOwner bot) : base(bot) { }
+        public FollowerHoldPosition (BotOwner bot) : base(bot) 
+        {
+        }
 
         public override void Look()
         {

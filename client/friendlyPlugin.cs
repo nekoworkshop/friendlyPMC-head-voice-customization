@@ -45,7 +45,8 @@ namespace friendlyPMC
         EnemySearch = 102,
         MoveToPoint = 103,
         RunToCover = 104,
-        GuardToCover = 105
+        GuardToCover = 105,
+        FollowBoss = 106,
     }
 
     public enum CustomPhrases
@@ -59,13 +60,7 @@ namespace friendlyPMC
         OverThere = 201,
     }
 
-    public class FollowerUtils
-    {
-        public static bool IsFollower(BotOwner Bot)
-        {
-            return BossPlayers.IsFollower(Bot);
-        }
-    }
+
 
     [HarmonyPatch(typeof(ConfigurationManager.ConfigurationManager), "DisplayingWindow", MethodType.Setter)]
     public static class ConfigurationManagerPatch
@@ -131,6 +126,8 @@ namespace friendlyPMC
         public Dictionary<string, string> botTeleport { get; set; }
         public Dictionary<string, string> botHeal { get; set; }
 
+        public Dictionary<string, string> botPrefetch { get; set; }
+
         // used only by BE
         public string[] returnItems { get; set; }
         public string[] returnItemsDeath { get; set; }
@@ -139,7 +136,7 @@ namespace friendlyPMC
         public string[] friendlyEscaped { get; set; }
     }
 
-    [BepInPlugin("xyz.pit.friendlypmc", "friendlyPMC", "3.9.3")]
+    [BepInPlugin("xyz.pit.friendlypmc", "friendlyPMC", "3.9.4")]
     [BepInDependency("xyz.drakia.bigbrain")]
     [BepInDependency("com.Arys.UnityToolkit")]
     public class friendlyPMC : BaseUnityPlugin
@@ -162,7 +159,7 @@ namespace friendlyPMC
 
         public static ConfigEntry<int> enemyRemember;
 
-        public static ConfigEntry<float> heatlhMultiplier;
+        public static ConfigEntry<int> heatlhMultiplier;
 
         public static ConfigEntry<int> scanDistance;
 
@@ -177,6 +174,8 @@ namespace friendlyPMC
 
         public static ConfigEntry<bool> pmcArmbands;
         public static ConfigEntry<bool> englishBear;
+
+        public static ConfigEntry<bool> botPrefetch;
 
         public static ConfigEntry<int> patrolRadius;
 
@@ -222,16 +221,14 @@ namespace friendlyPMC
             // bot patches to help with various scenarios while being a follower of the player
             new BotGroupIsPlayerEnemy().Enable();
             new BotGroupAddEnemy().Enable();
-
-            new BotMemoryAddEnemyPatch().Enable();
+            
             new BotMemoryDamagePatch().Enable();
             new BotGroupUsecEnemyPatch().Enable();
+            new ExUsecBrainHitPatch().Enable();
 
             new BotOwnerIsFolowerPatch().Enable();
-            new Patches.BotOwnerManualUpdatePatch().Enable();
+            new BotOwnerManualUpdatePatch().Enable();
             new BotOwnerActivatePatch().Enable();
-
-            new PatrolDataFollowerPatch().Enable();
 
             new FollowRequestPatch().Enable();
             new HoldRequestPatch().Enable();
@@ -262,11 +259,11 @@ namespace friendlyPMC
             harmony.PatchAll(typeof(BaseLocalGameVmethod4Patch).Assembly);
             new BossSpawnWaveManagerClassPatch().Enable();
 
-            // patch sain in regards to Squad 
+            // attempt to patch some sain methods
             SAINPatch.PatchSAINIfInstalled(harmony);
-            // some error catchers here - they do not seem related to this mod
-            //new GClass1069Patch().Enable();
-            //harmony.PatchAll(typeof(LookSensorPatch).Assembly);
+            // some error catchers here - they do not seem related to this mod but causing conflicts
+            new GClass1069Patch().Enable();
+            harmony.PatchAll(typeof(LookSensorPatch).Assembly);
             // patch hearing
             new HearingSensorPatch().Enable();
             new FootstepSoundPatch().Enable();
@@ -410,33 +407,33 @@ namespace friendlyPMC
                 savedConfigValues.Add(it.Key, it.Value);
             });
 
-
+            
             squadSpawn = Config.Bind(
                 "I " + optionsLang.baseSettings, "1 " + optionsLang.squadSpawn["Name"], 
                 true, 
                 new ConfigDescription(optionsLang.squadSpawn["Description"], null, new ConfigurationManagerAttributes { Order = -100 })
             );
-
+            
             squadSize = Config.Bind(
                 "I " + optionsLang.baseSettings, 
                 "1.2  -  " + optionsLang.squadSize["Name"], 
                 2, 
                 new ConfigDescription(optionsLang.squadSize["Description"], new AcceptableValueRange<int>(1, 30), new ConfigurationManagerAttributes { Order = -200 })
             );
-
+            
             returnChanceDeath = Config.Bind("I " + optionsLang.baseSettings, "1.3  -  " + optionsLang.returnChanceDeath["Name"], 50, new ConfigDescription(optionsLang.returnChanceDeath["Description"], new AcceptableValueRange<int>(1, 100), new ConfigurationManagerAttributes { Order = -300 }));
 
             squadSetup = Config.Bind("I " + optionsLang.baseSettings, "1.4  -  " + optionsLang.squadSetup["Name"], false, new ConfigDescription(optionsLang.squadSpawn["Description"],null, new ConfigurationManagerAttributes { Order = -400 }));
-
-            extraPickups = Config.Bind("I " + optionsLang.baseSettings, "2 " + optionsLang.extraPickups["Name"], 1, new ConfigDescription(optionsLang.extraPickups["Description"], new AcceptableValueRange<int>(0, 30),null, new ConfigurationManagerAttributes { Order = -500 }));
-
+            
+            extraPickups = Config.Bind("I " + optionsLang.baseSettings, "2 " + optionsLang.extraPickups["Name"], 1, new ConfigDescription(optionsLang.extraPickups["Description"], new AcceptableValueRange<int>(0, 30), new ConfigurationManagerAttributes { Order = -500 }));
+            
             scanDistance = Config.Bind("II " + optionsLang.miscSettings, "1 " + optionsLang.scanDistance["Name"], 140, new ConfigDescription(optionsLang.scanDistance["Description"], new AcceptableValueRange<int>(50, 300), new ConfigurationManagerAttributes { Order = -100 }));
 
             patrolRadius = Config.Bind("II " + optionsLang.miscSettings, "2 " + optionsLang.patrolRadius["Name"], 50, new ConfigDescription(optionsLang.patrolRadius["Description"], new AcceptableValueRange<int>(30, 100), new ConfigurationManagerAttributes { Order = -200 }));
 
             enemyRemember = Config.Bind("II " + optionsLang.miscSettings, "3 " + optionsLang.enemyRemember["Name"], 20, new ConfigDescription(optionsLang.enemyRemember["Description"], new AcceptableValueRange<int>(5, 60), new ConfigurationManagerAttributes { Order = -300 }));
-
-            heatlhMultiplier = Config.Bind("II " + optionsLang.miscSettings, "4 " + optionsLang.healthMultiplier["Name"], 1f, new ConfigDescription(optionsLang.healthMultiplier["Description"], new AcceptableValueRange<float>(1, 5), new ConfigurationManagerAttributes { Order = -400 }));
+            
+            heatlhMultiplier = Config.Bind("II " + optionsLang.miscSettings, "4 " + optionsLang.healthMultiplier["Name"], 1, new ConfigDescription(optionsLang.healthMultiplier["Description"], new AcceptableValueRange<int>(1, 5), new ConfigurationManagerAttributes { Order = -400 }));
 
             statusSound = Config.Bind("II " + optionsLang.miscSettings, "5 " + optionsLang.statusSound["Name"], 100, new ConfigDescription(optionsLang.statusSound["Description"], new AcceptableValueRange<int>(0, 100), new ConfigurationManagerAttributes { Order = -500 }));
             
@@ -452,7 +449,7 @@ namespace friendlyPMC
 
             englishBear = Config.Bind("II " + optionsLang.miscSettings, "11 " + optionsLang.englishBear["Name"], true, new ConfigDescription(optionsLang.englishBear["Description"],null, new ConfigurationManagerAttributes { Order = -1100 }));
 
-
+            
             pingKey = Config.Bind("II " + optionsLang.miscSettings, "12 " + optionsLang.pingSquad["Name"], new KeyboardShortcut(KeyCode.None), new ConfigDescription(optionsLang.pingSquad["Description"],null, new ConfigurationManagerAttributes { Order = -1101 }));
 
             contactKey = Config.Bind("II " + optionsLang.miscSettings, "13 " + optionsLang.enemyContact["Name"], new KeyboardShortcut(KeyCode.None), new ConfigDescription(optionsLang.enemyContact["Description"],null, new ConfigurationManagerAttributes { Order = -1102 }));
@@ -460,7 +457,10 @@ namespace friendlyPMC
             teleportKey = Config.Bind("II " + optionsLang.miscSettings, "14 " + optionsLang.botTeleport["Name"], new KeyboardShortcut(KeyCode.None), new ConfigDescription(optionsLang.botTeleport["Description"], null, new ConfigurationManagerAttributes { Order = -1103 }));
             healKey = Config.Bind("II " + optionsLang.miscSettings, "15 " + optionsLang.botHeal["Name"], new KeyboardShortcut(KeyCode.None), new ConfigDescription(optionsLang.botHeal["Description"], null, new ConfigurationManagerAttributes { Order = -1104 }));
 
+            botPrefetch = Config.Bind("II " + optionsLang.miscSettings, "16 " + optionsLang.botPrefetch["Name"], true, new ConfigDescription(optionsLang.botPrefetch["Description"], null, new ConfigurationManagerAttributes { Order = -1105 }));
+             
             ConfigSquadMembersSet();
+            
 
             Config.SettingChanged += (sender, args) =>
             {

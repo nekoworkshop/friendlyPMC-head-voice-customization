@@ -12,12 +12,12 @@ namespace friendlyPMC.Actions
     /**
      * A modified version of the FollowerPatrol class to ensure our followers stay around the player boss
      */
-    public class FollowerPatrol : GClass404
+    public class FollowerPatrol : BaseNodeAbstractClass
     {
 
-        protected readonly Player player_0;
+        protected Player player_0;
 
-        protected readonly pitAIBossPlayer boss_0;
+        protected pitAIBossPlayer boss_0;
 
         /** holder for how frequent show the distance between bots and the boss be checked  **/
         private float float_3 = 0f;
@@ -35,9 +35,7 @@ namespace friendlyPMC.Actions
         /** helper for checking if bot is currently moving to a checkpoint **/
         private bool bool_6;
 
-        protected float reachDist = 10f;
-
-        protected bool sprinting = false;
+        private bool bool_7 = false;
 
         protected bool shouldPatrol = false;
 
@@ -56,8 +54,6 @@ namespace friendlyPMC.Actions
 
         private bool init = false;
 
-        protected BotLogicDecision Action = (BotLogicDecision)CustomBotDecisions.SniperSearch;
-
         private float patrolRadius;
 
         private bool doPeacefulActions = false;
@@ -65,18 +61,11 @@ namespace friendlyPMC.Actions
         private bool doPeaceHardAim = false;
         private bool doSecondWpnWatch = false;
 
-        public BotOwner botOwner {
-            get
-            {
-                return botOwner_0;
-            }
-        }
+ 
 
-        public FollowerPatrol(pitAIBossPlayer player, BotOwner owner) : base(owner)
+        public FollowerPatrol(BotOwner owner) : base(owner)
         {
             vector3_0 = owner.Position;
-            player_0 = player.realPlayer;
-            boss_0 = player;
 
             IsInited = true;
 
@@ -102,6 +91,7 @@ namespace friendlyPMC.Actions
 
                 bool_2 = false;
                 bool_6 = false;
+                bool_7 = false;
                 float_3 = 0f;
                 float_4 = 0f;
                 float_6 = 0f;
@@ -125,8 +115,9 @@ namespace friendlyPMC.Actions
             init = false;
         }
 
-        public void Update()
+        public override void Update()
         {
+
             FollowerBrain brain = botOwner_0.Brain.BaseBrain as FollowerBrain;
 
             // let the bot turn to the direction he was hit from
@@ -140,42 +131,68 @@ namespace friendlyPMC.Actions
 
             botOwner_0.DoorOpener.Update();
 
-            if(!shouldPatrol) Follow();
-            else Patrol();
+            if(boss_0 == null)
+            {
+                if(brain == null || brain.playerBoss == null)
+                {
+                    botOwner_0.StopMove();
+                    return;
+                }
+                boss_0 = brain.playerBoss;
+                player_0 = brain.playerBoss.realPlayer;
+            }
+
+            PatrolAround(brain.canPatrol);
+            try
+            {
+                if (!shouldPatrol) Follow();
+                else Patrol();
+            } 
+            catch(Exception e)
+            {
+                Modules.Logger.LogError(e);
+                botOwner_0.StopMove();
+            }
         }
         /** Boss following logic  **/
         protected virtual void Follow(bool following = false, float distance = 0f)
         {
+            
+            if(bool_7)
+            {
+                botOwner_0.GoToSomePointData.UpdateToGo(false);
+                if (!wasHit) botOwner_0.LookData.SetLookPointByHearing(null);
+            }
+
             if (float_3 < Time.time)
             {
+
+                float_3 = Time.time + GClass824.Random(1f, 2f);
+
                 Vector3 leaderPosition = player_0.Transform.position;
+                FollowerBrain brain = botOwner_0.Brain.BaseBrain as FollowerBrain;
 
                 bool flag2;
                 bool flag;
                 float num;
+
                 // check if we are in range of the boss
-                float_3 = Time.time + GClass824.Random(1f, 2f);
                 if (following)
                 {
                     num = distance;
-                    float_3 = Time.time + GClass824.Random(1f, 2f);
                 }
                 else
                 {
                     num = Mathf.Abs((bool_0 ? vector3_0 : (leaderPosition - botOwner_0.Position)).magnitude);
                 }
 
-                flag = (flag2 = (num < reachDist)) != bool_1;
+                flag = (flag2 = num < brain.followDistance) != bool_1;
                 bool_1 = flag2;
 
                 // we are in range of the boss
                 if (flag2)
                 {
-                    if (sprinting)
-                    {
-                        botOwner_0.Mover.Sprint(false, false);
-                        sprinting = false;
-                    }
+                    
 
                     if (bool_0)
                     {
@@ -183,9 +200,20 @@ namespace friendlyPMC.Actions
                         return;
                     }
 
+                    if(bool_7)
+                    {
+                        if(botOwner_0.GoToSomePointData.IsCome())
+                        {
+                            bool_7 = false;
+                        }
+                        return;
+                    }
+
                     if (float_4 < Time.time || flag)
                     {
                         float_4 = Time.time + 8f;
+
+                        int reachDist = brain.followDistance;
 
                         CustomNavigationPoint nearPoint = null;
                         // check if we can find a cover point near the boss to hide and wait
@@ -222,12 +250,13 @@ namespace friendlyPMC.Actions
                             botOwner_0.Memory.SetCoverPoints(nearPoint);
 
 
-                            var status = botOwner_0.Mover.GoToPoint(nearPoint, true, true);
-                            if (status == NavMeshPathStatus.PathComplete)
-                            {
-                                if (!wasHit) botOwner_0.Steering.LookToMovingDirection();
-                                return;
-                            }
+                            botOwner_0.GoToSomePointData.SetPoint(nearPoint.Position);
+                            botOwner_0.GoToSomePointData.UpdateToGo(false);
+                            if (!wasHit) botOwner_0.Steering.LookToMovingDirection();
+
+                            bool_7 = true;
+                            float_3 = Time.time + 0.5f;
+                            return;
                         }
                         // no cover found, we will just roam around the boss
                         nocover = true;
@@ -237,6 +266,7 @@ namespace friendlyPMC.Actions
                         float num3 = (float)GClass824.RandomSing() * GClass824.Random(minR, maxR);
                         float x = num2 + leaderPosition.x;
                         float z = num3 + leaderPosition.z;
+
                         NavMeshHit navMeshHit;
                         if (!NavMesh.SamplePosition(new Vector3(x, leaderPosition.y, z), out navMeshHit, 2f, -1))
                         {
@@ -244,34 +274,28 @@ namespace friendlyPMC.Actions
                             bool_0 = true;
                             return;
                         }
-                        
-                        if (botOwner_0.GoToPoint(navMeshHit.position, true, -1f, false, true, true, false) != NavMeshPathStatus.PathComplete)
-                        {
-                            botOwner_0.StopMove();
-                            bool_0 = true;
-                            return;
-                        } else if (!wasHit) botOwner_0.Steering.LookToMovingDirection();
 
-                        if (sprinting)
-                        {
-                            botOwner_0.Mover.Sprint(false, false);
-                            sprinting = false;
-                        }
+                        botOwner_0.GoToSomePointData.SetPoint(navMeshHit.position);
+                        botOwner_0.GoToSomePointData.UpdateToGo(false);
+                        
+                        if (!wasHit) botOwner_0.Steering.LookToMovingDirection();
+
+                        bool_7 = true;
+                        float_3 = Time.time + 0.5f;
                     }
                 }
                 // out of range of the boss
                 else
                 {
+                    bool_7 = false;
                     lastCoverPoint = null;
                     nocover = false;
                     method_0(leaderPosition);
-                    bool val = num > 15f;
+                    bool val = num > Math.Min(brain.followDistance + 3, 16);
 
-                    if (val && !sprinting)
+                    if (val)
                         botOwner_0.Mover.Sprint(true, false);
-                    else if (!val && sprinting) botOwner_0.Mover.Sprint(false, false);
-
-                    sprinting = val;
+                    else if (!val) botOwner_0.Mover.Sprint(false, false);
                 }
             }
         }
@@ -284,9 +308,13 @@ namespace friendlyPMC.Actions
                 Follow();
             }
 
+            bool_7 = false;
+
             // check if leader is still moving
             Vector3 playerPosition = player_0.Transform.position;
             Vector3 botPosition = botOwner_0.GetPlayer.Transform.position;
+            FollowerBrain brain = botOwner_0.Brain.BaseBrain as FollowerBrain;
+
             if (!bool_2)
             {
                 Vector3 leaderPosition = new Vector3(
@@ -297,7 +325,7 @@ namespace friendlyPMC.Actions
 
                 float num = Mathf.Abs((bool_0 ? vector3_0 : (leaderPosition - botPosition)).magnitude);
                 bool flag2;
-                flag2 = num < reachDist;
+                flag2 = num < brain.followDistance;
 
                 // - boss might or not move, but bot is out range - keep moving
                 if(!flag2)
@@ -383,7 +411,7 @@ namespace friendlyPMC.Actions
                     if (!wasHit) botOwner_0.LookData.SetLookPointByHearing(null);
                     float_6 = Time.time + GClass824.Random(6f, 10f);
                 }
-                else if (!wasHit) botOwner.Steering.LookToMovingDirection();
+                else if (!wasHit) botOwner_0.Steering.LookToMovingDirection();
 
                 return;
             }
@@ -490,11 +518,6 @@ namespace friendlyPMC.Actions
             }
             return navMeshPathStatus;
         }
-        /** Set the distance to the leader to check for **/
-        public void SetReachDist(float dist)
-        {
-            reachDist = dist;    
-        }
 
 
         public void PatrolAround(bool state = false)
@@ -508,100 +531,6 @@ namespace friendlyPMC.Actions
                 float_5 = 0f;
                 bool_2 = false;
                 float_7 = 0f;
-            }
-        }
-    }
-
-    internal class FollowerPatrolInstances
-    {
-        private List<FollowerPatrol> followerPatrols = new List<FollowerPatrol>();
-
-        private static FollowerPatrolInstances Instance;
-
-        private bool IsDisposed = false;
-        public FollowerPatrolInstances()
-        {
-            if (Instance == null) Instance = this;
-        }
-
-        public void Destroy()
-        {
-            if(IsDisposed) return;
-
-            followerPatrols.Clear();
-
-            IsDisposed = true;
-        }
-
-        public static void Dispose()
-        {
-            if(Instance != null)
-            {
-                Instance.Destroy();
-                Instance = null;
-            }
-        }
-
-        public static void AddPatrol(FollowerPatrol followerPatrol)
-        {
-            Instance.followerPatrols.Add(followerPatrol);
-        }
-
-        public static void RemovePatrol(FollowerPatrol followerPatrol)
-        {
-            if(Instance.followerPatrols.Contains(followerPatrol))
-            {
-                Instance.followerPatrols.Remove(followerPatrol);
-            };
-        }
-
-        public static List<FollowerPatrol> GetPatrols()
-        {
-            return Instance.followerPatrols;
-        }
-
-        public static FollowerPatrol GetPatrol(BotOwner bot)
-        {
-            FollowerPatrol patrol = null;
-            foreach (var item in Instance.followerPatrols)
-            {
-                if(item.botOwner.ProfileId ==  bot.ProfileId)
-                {
-                    patrol = item;
-                    break;
-                }
-            }
-
-            return patrol;
-        }
-
-        public static void SetNearPatrol(BotOwner bot)
-        {
-            var patrol = GetPatrol(bot);
-            if (patrol != null)
-            {
-                patrol.SetReachDist(10f);
-            }
-
-            if (!bot.Memory.HaveEnemy)
-            {
-                bot.BotTalk.TrySay(EPhraseTrigger.Roger, false);
-                bot.Gesture.TryGestus(EInteraction.OkGesture, false);
-            }
-        }
-
-        public static void SetFarPatrol(BotOwner bot)
-        {
-            var patrol = GetPatrol(bot);
-            if (patrol != null)
-            {
-                patrol.SetReachDist(20f);
-            }
-
-            if (!bot.Memory.HaveEnemy)
-            {
-                bot.BotTalk.TrySay(EPhraseTrigger.Roger, false);
-                bot.Gesture.TryGestus(EInteraction.OkGesture, false);
             }
         }
     }

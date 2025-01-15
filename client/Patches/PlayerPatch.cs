@@ -183,111 +183,122 @@ namespace friendlyPMC.Patches
             return AccessTools.Method(typeof(Player), "OnBeenKilledByAggressor");
         }
 
-        [PatchPrefix]
-        private static void PatchPrefix(Player __instance, IPlayer aggressor, DamageInfoStruct damageInfo, EBodyPart bodyPart, EDamageType lethalDamageType)
+        [PatchPostfix]
+        private static void PatchPostfix(Player __instance, IPlayer aggressor, DamageInfoStruct damageInfo, EBodyPart bodyPart, EDamageType lethalDamageType)
         {
-            Player alivePlayerByProfileID = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(aggressor.ProfileId);
-            if (alivePlayerByProfileID == null || aggressor == null || aggressor.Profile == null || aggressor.Profile.Info == null || aggressor.Profile.Info.Settings == null)
+            try
             {
-                return;
-            }
-            
-            if (!Singleton<AbstractGame>.Instantiated) return;
-            if (GamePlayerOwner.MyPlayer == null) return;
-            if (GamePlayerOwner.MyPlayer.HealthController == null || !GamePlayerOwner.MyPlayer.HealthController.IsAlive)
-            {
-                return;
-            }
+                if (aggressor == null || aggressor.Profile == null || aggressor.Profile.Info == null || aggressor.Profile.Info.Settings == null) return;
 
-            // penalize Knight standing if player kills any of the goons after they become netural
-            if (BossPlayers.IsPlayerBoss(aggressor.ProfileId))
-            {
-                if((new List<WildSpawnType> { WildSpawnType.bossKnight, WildSpawnType.followerBigPipe, WildSpawnType.followerBirdEye } ).Contains(__instance.Profile.Info.Settings.Role)) {
-                    foreach (var data in alivePlayerByProfileID.Profile.QuestsData)
+                Player alivePlayerByProfileID = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(aggressor.ProfileId);
+                if (alivePlayerByProfileID == null)
+                {
+                    return;
+                }
+
+                if (!Singleton<AbstractGame>.Instantiated) return;
+                if (GamePlayerOwner.MyPlayer == null) return;
+                if (GamePlayerOwner.MyPlayer.HealthController == null || !GamePlayerOwner.MyPlayer.HealthController.IsAlive)
+                {
+                    return;
+                }
+
+                // penalize Knight standing if player kills any of the goons after they become netural
+                if (BossPlayers.IsPlayerBoss(aggressor.ProfileId))
+                {
+                    if (Utils.Props.BossFollowersType.Contains(__instance.Profile.Info.Settings.Role))
                     {
-                        if (Utils.Props.Quests["Knight"][0] == data.Id && data.Status == EFT.Quests.EQuestStatus.Success)
+                        foreach (var data in alivePlayerByProfileID.Profile.QuestsData)
                         {
-
-                            if (alivePlayerByProfileID.Profile.TryGetTraderInfo("67768b19fa281ca31708b187", out var traderInfo))
+                            if (Utils.Props.Quests["Knight"][0] == data.Id && data.Status == EFT.Quests.EQuestStatus.Success)
                             {
-                                double standing = alivePlayerByProfileID.Profile.GetTraderStanding("67768b19fa281ca31708b187");
-                                traderInfo.SetStanding(Math.Min(0.1, standing - 0.02));
-                            }
 
-                            break;
+                                if (alivePlayerByProfileID.Profile.TryGetTraderInfo("67768b19fa281ca31708b187", out var traderInfo))
+                                {
+                                    double standing = alivePlayerByProfileID.Profile.GetTraderStanding("67768b19fa281ca31708b187");
+                                    traderInfo.SetStanding(Math.Min(0.1, standing - 0.02));
+                                }
+
+                                break;
+                            }
                         }
                     }
+                    return;
                 }
-                return;
+
+                // have kills of the Goons count as quest kills when needed
+                string ProfileId = GamePlayerOwner.MyPlayer.ProfileId;
+                Player player = GamePlayerOwner.MyPlayer;
+
+                if (BossPlayers.Instance == null || !BossPlayers.IsPlayerBoss(ProfileId))
+                {
+                    return;
+                }
+
+                bool knightKiller = false;
+                bool pipeKiller = false;
+                bool birdEyeKiller = false;
+                // - check if the aggressor is Knight
+                if (aggressor.Profile.Info.Settings.Role == WildSpawnType.bossKnight)
+                {
+                    knightKiller = true;
+                }
+                // - check if the aggressor is BigPipe
+                else if (aggressor.Profile.Info.Settings.Role == WildSpawnType.followerBigPipe)
+                {
+                    pipeKiller = true;
+                }
+                // - check if the aggressor is BirdEye
+                else if (aggressor.Profile.Info.Settings.Role == WildSpawnType.followerBirdEye)
+                {
+                    birdEyeKiller = true;
+                }
+
+                // - partial recreation of the "Test" condition that normally runs for player
+                List<string> list = new List<string>();
+                Item weapon2 = damageInfo.Weapon;
+
+                list.Add("Any");
+
+                if (__instance.Side == EPlayerSide.Usec)
+                {
+                    list.Add("Usec");
+                    list.Add("AnyPmc");
+                }
+                else if (__instance.Side == EPlayerSide.Bear)
+                {
+                    list.Add("Bear");
+                    list.Add("AnyPmc");
+                }
+                else if (__instance.Side == EPlayerSide.Savage)
+                {
+                    list.Add("Savage");
+                    list.Add("Bot");
+                }
+
+
+                string locationId = player.Location;
+                float distance = Vector3.Distance(aggressor.Position, __instance.Position);
+
+                Utils.Utils.FlagSet("knightKiller", knightKiller);
+                Utils.Utils.FlagSet("pipeKiller", pipeKiller);
+                Utils.Utils.FlagSet("birdEyeKiller", birdEyeKiller);
+
+                // - check if the kill is a quest kill
+                if (knightKiller || pipeKiller || birdEyeKiller)
+                {
+                    list.ForEach(target =>
+                    {
+                        player.AbstractQuestControllerClass.CheckKillConditionCounter(target, __instance.ProfileId, new List<string> { }, weapon2, bodyPart, locationId, distance, __instance.Profile.Info.Settings.Role.ToStringNoBox<WildSpawnType>(), __instance.CurrentHour, __instance.HealthController.BodyPartEffects, __instance.HealthController.BodyPartEffects, __instance.TriggerZones, new string[] { });
+                    });
+                    if (knightKiller) Utils.Utils.FlagSet("knightKiller", false);
+                    if (pipeKiller) Utils.Utils.FlagSet("pipeKiller", false);
+                    if (birdEyeKiller) Utils.Utils.FlagSet("birdEyeKiller", false);
+                }
             }
-
-            // have kills of the Goons count as quest kills when needed
-            string ProfileId = GamePlayerOwner.MyPlayer.ProfileId;
-            Player player = GamePlayerOwner.MyPlayer;
-
-            if (BossPlayers.Instance == null || !BossPlayers.IsPlayerBoss(ProfileId))
+            catch (Exception ex)
             {
-                return;
-            }
-            
-            bool knightKiller = false;
-            bool pipeKiller = false;
-            bool birdEyeKiller = false;
-            // - check if the aggressor is Knight
-            if (aggressor.Profile.Info.Settings.Role == WildSpawnType.bossKnight)
-            {
-                knightKiller = true;
-            }
-            // - check if the aggressor is BigPipe
-            else if (aggressor.Profile.Info.Settings.Role == WildSpawnType.followerBigPipe)
-            {
-                pipeKiller = true;
-            }
-            // - check if the aggressor is BirdEye
-            else if (aggressor.Profile.Info.Settings.Role == WildSpawnType.followerBirdEye)
-            {
-                birdEyeKiller = true;
-            }
-
-            // - partial recreation of the "Test" condition that normally runs for player
-            List<string> list = new List<string>();
-            Item weapon2 = damageInfo.Weapon;
-            
-            list.Add("Any");
-
-            if(__instance.Side == EPlayerSide.Usec)
-            {
-                list.Add("Usec");
-                list.Add("AnyPmc");
-            } 
-            else if(__instance.Side == EPlayerSide.Bear)
-            {
-                list.Add("Bear");
-                list.Add("AnyPmc");
-            } 
-            else if(__instance.Side == EPlayerSide.Savage)
-            {
-                list.Add("Savage");
-                list.Add("Bot");
-            }
-
-    
-            string locationId = player.Location;
-            float distance = Vector3.Distance(aggressor.Position, __instance.Position);
-
-            Utils.Utils.FlagSet("knightKiller",knightKiller);
-            Utils.Utils.FlagSet("pipeKiller",pipeKiller);
-            Utils.Utils.FlagSet("birdEyeKiller",birdEyeKiller);
-
-            // - check if the kill is a quest kill
-            if(knightKiller || pipeKiller || birdEyeKiller)
-            {
-                list.ForEach(target=>{
-                    player.AbstractQuestControllerClass.CheckKillConditionCounter(target,__instance.ProfileId,new List<string>{},weapon2,bodyPart,locationId,distance,__instance.Profile.Info.Settings.Role.ToStringNoBox<WildSpawnType>(),__instance.CurrentHour,__instance.HealthController.BodyPartEffects,__instance.HealthController.BodyPartEffects,__instance.TriggerZones,new string[]{});
-                });  
-                if(knightKiller) Utils.Utils.FlagSet("knightKiller",false);
-                if(pipeKiller) Utils.Utils.FlagSet("pipeKiller",false);
-                if(birdEyeKiller) Utils.Utils.FlagSet("birdEyeKiller",false);
+                Modules.Logger.LogError(ex);
             }
         }
     }

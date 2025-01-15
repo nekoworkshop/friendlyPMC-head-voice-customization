@@ -78,7 +78,7 @@ import { IGetOtherProfileRequest } from "@spt/models/eft/profile/IGetOtherProfil
 import { GameCallbacks } from "@spt/callbacks/GameCallbacks";
 import { IEmptyRequestData } from "@spt/models/eft/common/IEmptyRequestData";
 
-import { objectCopy } from "./Utils";
+import { objectCopy, objectForEach } from "./Utils";
 import { IGetRaidConfigurationRequestData } from "@spt/models/eft/match/IGetRaidConfigurationRequestData";
 import { IAdditionalHostilitySettings } from "@spt/models/eft/common/ILocationBase";
 
@@ -302,8 +302,6 @@ class friendlyPMC {
 					let lostMembers = "";
 					let message = this.lang.friendlyEscaped;
 
-					let isKnightBoss = false;
-
 					if (member.SquadInfo.Mate) {
 						message = this.lang.teamEscaped;
 						if (member.SquadInfo.Partial) {
@@ -381,7 +379,7 @@ class friendlyPMC {
 						};
 					}
 					// change bot location hostility settings based on our config
-					const locations = this.databaseServer.getTables().locations;
+					/* const locations = this.databaseServer.getTables().locations;
 					for (let k in locations) {
 						const loc: (typeof locations)["bigmap"] = locations[k];
 						if (!loc.base || loc.base.Name == "Private Sector" || loc.base.Name == "Terminal" || loc.base.Name == "Town" || loc.base.Name == "Suburbs" || loc.base.Name == "Arena") continue;
@@ -409,7 +407,7 @@ class friendlyPMC {
 								}
 							});
 						}
-					}
+					} */
 
 					return httpResponseUtil.emptyResponse();
 				}),
@@ -640,7 +638,7 @@ class friendlyPMC {
 		const databaseImporter = container.resolve<ImporterUtil>("ImporterUtil");
 
 		const tables = databaseServer.getTables();
-
+		// get the language files - english is default
 		try {
 			if (fs.existsSync(`${__dirname}/../lang/en.json`)) {
 				const lg = require(`../lang/en.json`);

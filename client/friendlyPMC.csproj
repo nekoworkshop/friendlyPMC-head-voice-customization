@@ -199,6 +199,7 @@
     <Compile Include="Patches\BotMemoryPatch.cs" />
     <Compile Include="Patches\BulletImpactPatch.cs" />
     <Compile Include="Patches\ConditionCounterPatch.cs" />
+    <Compile Include="Patches\ExUsecBrainPatch.cs" />
     <Compile Include="Patches\GestureMenuPatch.cs" />
     <Compile Include="Patches\HearingSensorPatch.cs" />
     <Compile Include="Patches\ItemPatch.cs" />
@@ -234,7 +235,6 @@
     <Compile Include="Patches\BotOwnerPatch.cs" />
     <Compile Include="Patches\BotReceiverPatch.cs" />
     <Compile Include="Patches\BotsControllerPatch.cs" />
-    <Compile Include="Patches\PatrolDataFollowerPatch.cs" />
     <Compile Include="Patches\BotTalkPatch.cs" />
     <Compile Include="friendlyPlugin.cs" />
     <Compile Include="Patches\PlayerPatch.cs" />

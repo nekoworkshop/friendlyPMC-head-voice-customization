@@ -32,16 +32,6 @@ namespace friendlyPMC.Components
                 NpcMessage.AddNpc(bot, false, true);
         }
 
-        public override void Init()
-        {
-            base.Init();
-            if (_botRole == WildSpawnType.followerBirdEye)
-            {
-                FollowerPatrol patrol = FollowerPatrolInstances.GetPatrol(_bot);
-                patrol.SetReachDist(17f);
-            }
-        }
-
         protected override void SetFollowerSettings(BotOwner bot)
         {
 
@@ -49,10 +39,10 @@ namespace friendlyPMC.Components
             settingModif.AccuratySpeedCoef = 1.35f;
             settingModif.ScatteringCoef = 1.7f;
 
-            settingModif.VisibleDistCoef = 1.2f;
+            settingModif.VisibleDistCoef = 0.8f;
             if (bot.IsRole(WildSpawnType.followerBirdEye))
             {
-                settingModif.VisibleDistCoef = 1.3f;
+                settingModif.VisibleDistCoef = 0.9f;
             }
 
             //bot.Settings.FileSettings.Look.FULL_SECTOR_VIEW = true;
@@ -63,7 +53,7 @@ namespace friendlyPMC.Components
             bot.Settings.FileSettings.Look.LOOK_THROUGH_GRASS = false;
             if (bot.IsRole(WildSpawnType.followerBirdEye))
             {
-                bot.Settings.FileSettings.Core.GainSightCoef = 0.1f;
+                //bot.Settings.FileSettings.Core.GainSightCoef = 0.1f;
                 bot.Settings.FileSettings.Cover.SOUND_TO_GET_SPOTTED = 10f;
                 bot.Settings.FileSettings.Cover.SPOTTED_COVERS_RADIUS = 12f;
                 bot.Settings.FileSettings.Shoot.LOW_DIST_TO_CHANGE_WEAPON = 30f;
@@ -72,6 +62,8 @@ namespace friendlyPMC.Components
                 bot.Settings.FileSettings.Aiming.SCATTERING_DIST_MODIF = 0.2f;
                 bot.Settings.FileSettings.Aiming.COEF_FROM_COVER = 1f;
                 bot.Settings.FileSettings.Aiming.HARD_AIM = 0.9f;
+                bot.Settings.FileSettings.Mind.MAX_AGGRO_BOT_DIST = 200f;
+                bot.Settings.FileSettings.Look.MAX_VISION_GRASS_METERS = 1.5f;
             }
 
             EPlayerSide side = _player.Player().Side;
@@ -116,11 +108,12 @@ namespace friendlyPMC.Components
                         }
                         continue;
                     } 
-                    else if(botType != WildSpawnType.shooterBTR && botType != WildSpawnType.peacefullZryachiyEvent && botType != WildSpawnType.gifter)
+                    else if(!Utils.Props.friendlyBotTypes.Contains(botType))
                     {
                         bot.Settings.FileSettings.Mind.ENEMY_BOT_TYPES = bot.Settings.FileSettings.Mind.ENEMY_BOT_TYPES.AddItem(botType).ToArray();
                     }
                 }
+                
             } else
             {
                 foreach (WildSpawnType botType in Enum.GetValues(typeof(WildSpawnType)))

@@ -148,23 +148,14 @@ namespace friendlyPMC.Components
                     followerAIBase.Dispose();
                 }
 
-                FollowerPatrolInstances.AddPatrol(new FollowerPatrol(_player, _bot));
-
-                _bot.BotFollower.PatrolDataFollower.IsInited = true;
-                _bot.BotFollower.PatrolDataFollower.ManualUpdate();
+                //_bot.BotFollower.PatrolDataFollower.IsInited = true;
+                //_bot.BotFollower.PatrolDataFollower.ManualUpdate();
 
             }
             catch (Exception e)
             {
                 Modules.Logger.LogError("Failed to activate new follower patrol mode, fallback to manual mode");
                 Modules.Logger.LogError(e);
-
-                _bot.BotFollower.PatrolDataFollower.InitPlayer(_player.realPlayer);
-                if (!_bot.BotFollower.PatrolDataFollower.IsInited)
-                {
-                    _bot.BotFollower.PatrolDataFollower.IsInited = true;
-                }
-                _bot.BotFollower.PatrolDataFollower.ManualUpdate();
             }
             // make all followers have the same group
             if (_bot.BotsGroup != null)
@@ -350,6 +341,9 @@ namespace friendlyPMC.Components
             settings.FileSettings.Patrol.FOLLOWER_START_MOVE_DELAY = 0.5f;
             settings.FileSettings.Patrol.CAN_FRIENDLY_TILT = true;
             settings.FileSettings.Patrol.VISION_DIST_COEF_PEACE = 1f;
+
+            settings.FileSettings.Boss.SHALL_WARN = false;
+            settings.FileSettings.Patrol.MAX_YDIST_TO_START_WARN_REQUEST_TO_REQUESTER = 0f;
 
             settings.FileSettings.Look.MINIMUM_VISIBLE_DIST = 15f;
 
@@ -548,7 +542,6 @@ namespace friendlyPMC.Components
             {
                 // these 2 are automatically called if bot dies or leaves
                 // we call them here in the case bot is still alive but has been dismissed
-                _bot.BotFollower.PatrolDataFollower.Dispose();
                 (_bot.Receiver as FollowerReceiver).Dispose();
                 // turn off follower brain
                 (_bot.Brain.BaseBrain as FollowerBrain).Dismissed();
