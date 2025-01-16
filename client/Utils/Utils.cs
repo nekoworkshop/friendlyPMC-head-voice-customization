@@ -33,7 +33,7 @@ namespace friendlyPMC.Utils
         /** Shortcut to check if bot has boss **/
         public static bool HasBoss(BotOwner botOwner)
         {
-            return botOwner.BotFollower.HaveBoss;
+            return botOwner.BotFollower.HaveBoss && botOwner.BotFollower.BossToFollow is pitAIBossPlayer;
         }
         /** Shortcut to get the boss the follower has **/
         public static pitAIBossPlayer GetBoss(BotOwner botOwner)

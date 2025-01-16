@@ -47,30 +47,33 @@ namespace friendlyPMC.Patches
             var brain = botOwner_0.Brain.BaseBrain as FollowerBrain;
             if (brain == null) return;
 
-            botOwner_0.BotTalk.TrySay(EPhraseTrigger.FriendlyFire, true);
+            
 
-            /*if (brain.currentTactic == "Assist")
+            if (brain.currentTactic == "Assist")
             {
                 var boss = botOwner_0.BotFollower.BossToFollow as pitAIBossPlayer;
                 if (boss == null) return;
 
-                if (damageInfo.Damage <= botOwner_0.Settings.FileSettings.Aiming.MIN_DAMAGE_TO_GET_HIT_AFFETS) return;
+                if (damageInfo.Damage <= botOwner_0.Settings.FileSettings.Aiming.MIN_DAMAGE_TO_GET_HIT_AFFETS)
+                {
+                    botOwner_0.BotTalk.TrySay(EPhraseTrigger.FriendlyFire, true);
+                    return;
+                }
 
-                BossPlayers.Instance.GetFollower(botOwner_0).Dismiss(true);
+                botOwner_0.BotTalk.TrySay(EPhraseTrigger.Rat, false);
+
+                var follower = BossPlayers.Instance.GetFollower(botOwner_0);
                 BossPlayers.RemoveFollower(botOwner_0, boss);
-
-                __instance.DangerData.TargetNull();
-
-                Player enemy = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(damageInfo.Player.iPlayer.ProfileId);
-                
-                EnemyInfo info = Utils.Enemy.MakeEnemy(botOwner_0, enemy, EBotEnemyCause.followGetHit);
-                
-                botOwner_0.CalcGoal();
-            }*/
+                follower.Dismiss(true);
+            } 
+            else
+            {
+                botOwner_0.BotTalk.TrySay(EPhraseTrigger.FriendlyFire, true);
+            }
         }
     }
     // this is used for debug purposes that is why it stays disabled
-    [HarmonyPatch(typeof(BotMemoryClass), "GoalEnemy", MethodType.Setter)]
+    /*[HarmonyPatch(typeof(BotMemoryClass), "GoalEnemy", MethodType.Setter)]
     public static class GoalEnemyTracePatch
     {
         public static void Postfix(BotMemoryClass __instance, EnemyInfo value)
@@ -79,8 +82,8 @@ namespace friendlyPMC.Patches
 
             if(BossPlayers.IsFollower(botOwner_0) && value != null)
             {
-                Modules.Logger.LogTrace($"Follower accquired an enemy");
+                Modules.Logger.LogTrace($"Follower accquired an enemy because " + value.GroupInfo.Cause + "flags : " + value.HaveSeen + "; " + value.ShallKnowEnemy());
             }
         }
-    }
+    }*/
 }

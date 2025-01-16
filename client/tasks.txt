@@ -1,15 +1,19 @@
 -- === 3.9.5 === ---:
-- without SAIN, bots spawned with customization remain frozen after being killed
-- even without SAIN bots pick up enemies through walls, at a distance (check ground zero map)
-- picked up bots do not attack enemy bots (SAIN issue detected)
+- x - even without SAIN bots pick up enemies through walls, at a distance (check ground zero map)
+
 - investigate if we can make "Assist" tactic turn hostile on accidental shots
 
 - attempt to make transit work while in a group with followers
 
+- picked up bots do not attack enemy bots (SAIN issue detected)
+
 - see if it easy to check if player is crouching and copy stance when out of combat
+
+- some clothing makes the followers freeze when being killed (BEAR SPN TOP with BEAR Summer Field BOTTOM)
 
 - see if we can make bot swap weapons when asked to loot (DeadBodyWork)
 - - this should also allow bot to put that weapon as seconday (in case of support without a grenade launcher)
+
 
 - add "hold fire/fire at will" commands
 

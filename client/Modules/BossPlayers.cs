@@ -494,7 +494,7 @@ namespace friendlyPMC.Modules
             };
             if (!Instance._botsGroup.Contains(group.Id)) Instance._botsGroup.Add(group.Id);
 
-            player.bossGroup.AddAlly((Player)player.Player());
+            player.bossGroup.AddAlly(player.realPlayer);
 
             foreach (var enemy in player.GetEnemies())
             {

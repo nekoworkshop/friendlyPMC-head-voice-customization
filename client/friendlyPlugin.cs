@@ -288,7 +288,7 @@ namespace friendlyPMC
             // set configuration manager
             SetConfiguration();
             // this is used for debug purposes that is why it stays disabled
-            harmony.PatchAll(typeof(GoalEnemyTracePatch).Assembly);
+            //harmony.PatchAll(typeof(GoalEnemyTracePatch).Assembly);
         }
 
 
@@ -913,12 +913,12 @@ namespace friendlyPMC
                 }
             }
 
-            if (teleportKey.Value.IsPressed())
+            else if (teleportKey.Value.IsPressed())
             {
                 _BotTeleport();
             }
 
-            if (healKey.Value.IsPressed())
+            else if (healKey.Value.IsPressed())
             {
                 _BotHeal();
             }

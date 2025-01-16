@@ -100,14 +100,22 @@ namespace friendlyPMC.Patches
                                 {
                                     if (botOwner.IsRole(role))
                                     {
-                                        botOwner.BotTalk.TrySay(EPhraseTrigger.DontKnow, true);
+                                        botOwner.BotTalk.TrySay(EPhraseTrigger.DontKnow, false);
                                         return false;
                                     }
                                 }
                             }
 
                             // - this will switch the BotReceiver to our own, so the rest can be altered there
-                            botOwner.BotsGroup.RequestsController.TryAskFollowMeRequest(requester, botOwner);
+                            if(botOwner.BotsGroup.RequestsController.TryAskFollowMeRequest(requester, botOwner))
+                            {
+                                botOwner.BotTalk.TrySay(EPhraseTrigger.Roger, false);
+                            } 
+                            else
+                            {
+                                botOwner.BotTalk.TrySay(EPhraseTrigger.DontKnow, false);
+                            }
+
                             return false;
                         }
                     }
