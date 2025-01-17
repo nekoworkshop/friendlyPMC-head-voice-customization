@@ -76,7 +76,7 @@ namespace friendlyPMC.Patches
             var isAPlayerGroup = BossPlayers.IsBossGroup(__instance.Id);
             BotsGroup bossGroup = plBoss != null ? plBoss.bossGroup : null;
 
-            bool isInitialCause = (cause == EBotEnemyCause.initial || cause == EBotEnemyCause.addBotNoGroup || cause == EBotEnemyCause.AddNewMember || cause == EBotEnemyCause.warn);
+            bool isInitialCause = (cause == EBotEnemyCause.initial || cause == EBotEnemyCause.AddNewMember || cause == EBotEnemyCause.warn);
 
             // prevent Rogues from adding the player and his followers as enemies if they are friends with the Goons
             var _members = AccessTools.Field(typeof(BotsGroup), "_members").GetValue(__instance) as List<BotOwner>;
@@ -157,9 +157,11 @@ namespace friendlyPMC.Patches
             }
             // prevent followers group from adding friendly bots as enemies
             if (
-                isInitialCause &&
                 person.Profile?.Info?.Settings?.Role != null &&
-                Utils.Props.friendlyBotTypes.Contains(person.Profile.Info.Settings.Role)
+                (
+                    (isInitialCause || person.Profile.Info.Settings.Role == WildSpawnType.shooterBTR) &&
+                    Utils.Props.friendlyBotTypes.Contains(person.Profile.Info.Settings.Role)
+                )
             )
             {
                 __result = false;
@@ -246,7 +248,7 @@ namespace friendlyPMC.Patches
         }
     }
     
-    // this is used only in case of squad spawn
+    // this is used only in case of squad spawnt
     internal class BotsGroupPlayer : BotsGroup
     {
         public BotsGroupPlayer(BotZone zone, IBotGame botGame, BotOwner initialBot, List<BotOwner> enemies, DeadBodiesController deadBodiesController, List<Player> allPlayers, pitAIBossPlayer player) : base(zone, botGame, initialBot, enemies, deadBodiesController, allPlayers, false)

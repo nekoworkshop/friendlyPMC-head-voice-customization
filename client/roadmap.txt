@@ -1,20 +1,19 @@
 -- === 3.9.5 === ---:
 - x - even without SAIN bots pick up enemies through walls, at a distance (check ground zero map)
+- - nothing can be done
 
-- investigate if we can make "Assist" tactic turn hostile on accidental shots
+- x - investigate if we can make "Assist" tactic turn hostile on accidental shots
+- x - fix followers seeing the newly added member as an enemy
+- - picked up bots do not attack enemy bots when using SAIN
 
 - attempt to make transit work while in a group with followers
 
-- picked up bots do not attack enemy bots (SAIN issue detected)
+- fix scav run with followers (needs to use a similar call to followergenerate to avoid generating PMC as scav follower)
 
-- see if it easy to check if player is crouching and copy stance when out of combat
-
-- some clothing makes the followers freeze when being killed (BEAR SPN TOP with BEAR Summer Field BOTTOM)
-
+-- === 3.9.6 === ---:
 - see if we can make bot swap weapons when asked to loot (DeadBodyWork)
 - - this should also allow bot to put that weapon as seconday (in case of support without a grenade launcher)
-
-
+- add option to disable throwing grenades
 - add "hold fire/fire at will" commands
 
 --- ==== 4.0.0 (final phase - "The General" for followers quest) ==== ---:
@@ -27,22 +26,17 @@
 - scav karma and level to determine with how many followers can the player spawn (maxium 3) and extra pickups (maximum 2 extras)
 
 
-
 ==================================================================================
 RELEASE NOTES (3.9.5)
+- fixed picked up followers not attacking enemies
+- fixed picked up followers not turning hostile on accidental shots
+
+TO ADD as Known Issue:
+- some clothing makes the followers freeze when being killed (BEAR SPN TOP with BEAR Summer Field BOTTOM)
 
 ==================================================================================
+
 NOTES:
 - we can save a bot's profile after it was generated in order to be re-used by simply sending the profile to BE. We should save it by nickname. (we still need to figure out how to progress the bot's level with the player )
 - Support is Guard tactic in the code
-REVISIT:
- - fix looting animation for loot on the ground
- - error in LookSensor
- - enemy marker when zooming, seems deep calculations must be made against the camera optics
- - add unstuck checks (check if bot is running in place and try to unstuck him)
 
-FUTURE IDEAS:
- - BirEye auto marks enemies as he sees them (enhanced Marskman)
- - goons should be locked behind some flag and once you play with them and are able to end a raid with all 3 alive, 3 new tactis should unlock:
- Enhanced Marksman, Assaulter and Supporter
- - DeadBodyWork should be implemented for "Assist"

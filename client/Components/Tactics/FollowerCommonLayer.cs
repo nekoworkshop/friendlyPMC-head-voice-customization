@@ -343,7 +343,7 @@ namespace friendlyPMC.Components.Tactics
             coverTimer_1 = 1f + Time.time;
 
             Vector3 botPosition = botOwner_0.Transform.position;
-            Vector3 enemyPos = botOwner_0.Memory.GoalEnemy.CurrPosition;
+            Vector3 enemyPos = botOwner_0.Memory.HaveEnemy ? botOwner_0.Memory.GoalEnemy.CurrPosition : botPosition;
 
             pitAIBossPlayer boss = HasBoss() ? GetBoss() : null;
             Vector3[] bossPosition = boss != null ? new Vector3[] { boss.realPlayer.Transform.position } : new Vector3[] { };

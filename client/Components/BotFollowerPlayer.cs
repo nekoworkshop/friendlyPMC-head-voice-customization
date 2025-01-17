@@ -574,7 +574,7 @@ namespace friendlyPMC.Components
                 // - make the player an enemy
                 if (warnPlayer)
                 {
-                    Modules.Logger.LogInfo("Follower dismissed, warning player");
+                    Modules.Logger.LogInfo("Dismissing follower and making him an enemy");
                     // -- bot needs a new group
                     var botsGroupField = AccessTools.Field(typeof(BotMemoryClass), "botsGroup_0");
                     var deadBodiesController = AccessTools.Field(typeof(BotSpawner), "_deadBodiesController").GetValue(_bot.BotsController.BotSpawner) as DeadBodiesController;
@@ -595,16 +595,18 @@ namespace friendlyPMC.Components
                     _bot.BotsGroup = group;
                     botsGroupField.SetValue(_bot.Memory, group);
 
-                    // - make player enemy and his followers enemy of the bot 
+                    // - make player enemy of the bot 
                     _bot.BotsGroup.AddEnemy(_player.realPlayer, EBotEnemyCause.addPlayer);
+                    var playerEnemy = new BotSettingsClass(_player.realPlayer, _bot.BotsGroup, EBotEnemyCause.addPlayer);
+                    _bot.Memory.AddEnemy(_player.realPlayer, playerEnemy, false);
+                    // - make his followers enemy of the bot 
                     foreach (var item in _player.Followers)
                     {
                         _bot.BotsGroup.AddEnemy(item.GetPlayer, EBotEnemyCause.addPlayer);
+                        var flEnemy = new BotSettingsClass(item.GetPlayer, _bot.BotsGroup, EBotEnemyCause.addPlayer);
+                        _bot.Memory.AddEnemy(item.GetPlayer, flEnemy, false);
                     }
                     _bot.Memory.IsPeace = false;
-
-                    //var playerEnemy = new BotSettingsClass(_player.realPlayer, _bot.BotsGroup, EBotEnemyCause.addPlayer);
-                    //_bot.Memory.AddEnemy(_player.realPlayer, playerEnemy, false);
 
                     // - ensure all enemies can be potentially seen
                     foreach (var item in _bot.EnemiesController.EnemyInfos)
@@ -617,6 +619,16 @@ namespace friendlyPMC.Components
                     {
                         info.SetVisible(true);
                         info.GroupInfo.EnemyLastSeenTimeSense = Time.time;
+                        if (_bot.Memory.GoalEnemy == null)
+                        {
+                            _bot.Memory.GoalEnemy = info;
+                        }
+                        // -- report him to the rest of the group
+                        foreach (var item in _player.Followers)
+                        {
+                            Utils.Enemy.MakeEnemy(item, _bot.GetPlayer);
+                        }
+
                     }
                 }
 

@@ -1164,8 +1164,6 @@ namespace friendlyPMC.Patches
                 {
                     profileTactic[profile.Id] = "Assist";
                 });
-
-                PreventPMCConvert(false);
             }
             else 
             {
@@ -1251,9 +1249,6 @@ namespace friendlyPMC.Patches
             {
                 return GetPlayerGroup(player, bt, zn,memberCount);
             });
-
-            
-            int spawnedFollowers = 0;
 
             List<UniTask> activateTasks = new List<UniTask>();
 

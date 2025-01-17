@@ -479,28 +479,6 @@ class friendlyPMC {
 					return res;
 				}),
 
-				new RouteAction("/client/game/bot/preventpmcgenerate", (url: string, info: { State: boolean }, sessionID: string, output: string): any => {
-					if (info.State) {
-						PMCBOT.isUsec = 0;
-						for (let k in PMCBOT.convertIntoPmcChance) {
-							for (let j in PMCBOT.convertIntoPmcChance[k]) {
-								PMCBOT.convertIntoPmcChance[k][j].min = 0;
-								PMCBOT.convertIntoPmcChance[k][j].max = 0;
-							}
-						}
-					} else {
-						PMCBOT.isUsec = PMCBOTVALUES.isUsec;
-						for (let k in PMCBOT.convertIntoPmcChance) {
-							for (let j in PMCBOT.convertIntoPmcChance[k]) {
-								PMCBOT.convertIntoPmcChance[k][j].min = PMCBOTVALUES.convertIntoPmcChance[k][j].min;
-								PMCBOT.convertIntoPmcChance[k][j].max = PMCBOTVALUES.convertIntoPmcChance[k][j].max;
-							}
-						}
-					}
-
-					return httpResponseUtil.emptyResponse();
-				}),
-
 				new RouteAction("/singleplayer/pitlang", (url: string, info: any, sessionID: string, output: string): any => {
 					return httpResponseUtil.noBody(this.lang);
 				}),
