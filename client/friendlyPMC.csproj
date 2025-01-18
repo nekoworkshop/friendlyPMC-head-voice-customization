@@ -197,6 +197,7 @@
     <Compile Include="Modules\NpcMessage.cs" />
     <Compile Include="Modules\RadioSound.cs" />
     <Compile Include="Patches\BotMemoryPatch.cs" />
+    <Compile Include="Patches\BossWarnDataPatch.cs" />
     <Compile Include="Patches\BulletImpactPatch.cs" />
     <Compile Include="Patches\ConditionCounterPatch.cs" />
     <Compile Include="Patches\ExUsecBrainPatch.cs" />

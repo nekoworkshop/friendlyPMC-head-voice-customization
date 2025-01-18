@@ -436,6 +436,12 @@ namespace friendlyPMC.Modules
             return Instance.GetBossPlayer(name);
         }
 
+        public static Dictionary<string, pitAIBossPlayer> GetBosses()
+        {
+            if (Instance == null) return new Dictionary<string, pitAIBossPlayer>();
+            return Instance.GetBossPlayers();
+        }
+
         public static bool IsPlayerBoss(string profileId)
         {
             if (Instance == null) return false;

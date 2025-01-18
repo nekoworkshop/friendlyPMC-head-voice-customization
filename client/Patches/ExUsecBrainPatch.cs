@@ -26,7 +26,7 @@ namespace friendlyPMC.Patches
         {
             IPlayerOwner player = damageinfo.Player;
             // this is original condition + does player have knight quest
-            if (victim.Profile.Side == EPlayerSide.Usec && player.iPlayer.Profile.Side != EPlayerSide.Usec && BotGroupAddEnemy.PlayerHasKnightQuest(player.iPlayer.Profile))
+            if (victim.Profile.Side == EPlayerSide.Usec && player.iPlayer.Profile.Side != EPlayerSide.Usec && BotGroupAddEnemyPatch.PlayerHasKnightQuest(player.iPlayer.Profile))
             {
                 return false;
             }

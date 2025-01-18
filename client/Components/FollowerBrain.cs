@@ -190,6 +190,7 @@ namespace friendlyPMC.Components
                 else
                 {
                     HandsReset();
+                    _owner.WeaponManager.Selector.TakePrevWeapon();
                 }
             }
             return false; // Hands not busy

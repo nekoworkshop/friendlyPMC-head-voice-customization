@@ -60,8 +60,11 @@ namespace friendlyPMC.Patches
                         if (BossPlayers.AddFollower(posibleExecuter, playerBoss) != null)
                         {
                             // - bot signals "OK"
-                            posibleExecuter.BotTalk.TrySay(EPhraseTrigger.Roger, false);
-                            posibleExecuter.Gesture.TryGestus(EInteraction.OkGesture, true);
+                            Utils.Utils.SetTimeout(() =>
+                            {
+                                posibleExecuter.BotTalk.TrySay(EPhraseTrigger.Roger, false);
+                                posibleExecuter.Gesture.TryGestus(EInteraction.OkGesture, true);
+                            },500);
                         } else
                         {
                             posibleExecuter.BotTalk.TrySay(EPhraseTrigger.DontKnow, false);

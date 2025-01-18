@@ -219,8 +219,9 @@ namespace friendlyPMC
             harmony.PatchAll(typeof(ConfigurationManagerPatch).Assembly);
             
             // bot patches to help with various scenarios while being a follower of the player
-            new BotGroupAddEnemy().Enable();
+            new BotGroupAddEnemyPatch().Enable();
             new BotMemoryAddEnemyPatch().Enable();
+            //new BossWarnDataPatch().Enable();
 
             new BotMemoryDamagePatch().Enable();
             new BotGroupUsecEnemyPatch().Enable();
@@ -812,6 +813,7 @@ namespace friendlyPMC
 
         private void _BotTeleport()
         {
+            Modules.Logger.LogInfo("Trigger followers telepor");
 
             bool flag = !Singleton<AbstractGame>.Instantiated;
             if (flag)
@@ -844,6 +846,9 @@ namespace friendlyPMC
 
         private void _BotHeal()
         {
+
+            Modules.Logger.LogInfo("Trigger followers fix heal");
+
             bool flag = !Singleton<AbstractGame>.Instantiated;
             if (flag)
             {
@@ -862,12 +867,17 @@ namespace friendlyPMC
             if (BossPlayers.Instance != null)
             {
                 var followers = BossPlayers.GetFollowersByBoss(id);
+
                 foreach (var follower in followers)
                 {
-                    if (follower != null && follower.GetBot().HealthController.IsAlive)
+                    var bot = follower.GetBot();
+                    if (follower != null && bot.HealthController.IsAlive)
                     {
-                        (follower.GetBot().Brain.BaseBrain as FollowerBrain).HandsReset();
-                        follower.GetBot().WeaponManager.Selector.TakePrevWeapon();
+
+                        bot.AIData.Player.ActiveHealthController.RestoreFullHealth();
+
+                        (bot.Brain.BaseBrain as FollowerBrain).HandsReset();
+                        bot.WeaponManager.Selector.TakePrevWeapon();
                     }
                 }
             }

@@ -28,11 +28,16 @@
 
 ==================================================================================
 RELEASE NOTES (3.9.5)
+- fixed an issue with the grenade throwing action that could cause the bot to remain stuck in the throwing position
 - fixed picked up followers not attacking enemies
 - fixed picked up followers not turning hostile on accidental shots
 
 TO ADD as Known Issue:
 - some clothing makes the followers freeze when being killed (BEAR SPN TOP with BEAR Summer Field BOTTOM)
+- Picked up followers can auto assign an enemy across the map - use attention to reset
+- followers are runing and ducking until the reach me - too much teleportation
+- even small bushes can make the enemy invisible to the followers when yelling "contact"
+- followers picked up do not turn hostile on accidental shots and instead just sit there (WIP)
 
 ==================================================================================
 

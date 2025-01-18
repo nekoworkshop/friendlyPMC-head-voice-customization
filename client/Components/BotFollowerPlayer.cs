@@ -17,6 +17,7 @@ using DrakiaXYZ.BigBrain.Brains;
 using System.Reflection;
 using friendlyPMC.Utils;
 using Sirenix.Serialization.Utilities;
+using friendlyPMC.Patches;
 
 namespace friendlyPMC.Components
 {
@@ -109,7 +110,50 @@ namespace friendlyPMC.Components
                         UnityEngine.Object.Destroy(component);
                     }
                 }
-            } 
+            }
+            
+            // disable SAIN brain
+            if(SAINPatch.IsSAINInstalled())
+            {
+                Type BotController = Type.GetType("SAIN.Components.BotController.BotSpawnController, SAIN");
+
+                if(BotController != null)
+                {
+                    var botSpawnControllerProperty = BotController.GetField("Instance", BindingFlags.Public | BindingFlags.Static);
+
+                    if (botSpawnControllerProperty != null)
+                    {
+                        object botSpawnControllerInstance = botSpawnControllerProperty.GetValue(null);
+
+                        if (botSpawnControllerInstance != null)
+                        {
+                            // Find the removeBot method
+                            var removeBotMethod = BotController.GetMethod("removeBot", BindingFlags.Public | BindingFlags.Instance);
+
+                            if (removeBotMethod != null)
+                            {
+                                // Call the method if you have the bot instance to pass
+                                removeBotMethod.Invoke(botSpawnControllerInstance, new object[] { _bot });
+                                _bot.GetPlayer.MovementContext.SetPatrol(false);
+                                Modules.Logger.LogInfo("SAIN brain disabled for the bot.");
+                            }
+                            else
+                            {
+                                Modules.Logger.LogInfo("Could not find the 'removeBot' method.");
+                            }
+                        }
+                        else
+                        {
+                            Modules.Logger.LogInfo("Could not retrieve the BotSpawnController instance.");
+                        }
+                    }
+                    else
+                    {
+                        Modules.Logger.LogInfo("Could not find the 'Instance' property on BotSpawnController.");
+                    }
+
+                }
+            }
 
             // deactivate old brain
             if (baseBrain != null && baseBrain.CurLayerInfo != null && baseBrain.CurLayerInfo.IsActive)
@@ -172,59 +216,51 @@ namespace friendlyPMC.Components
                 {
                     _bot.EnemiesController.EnemyInfos.Remove(_player.realPlayer);
                 }
-                // add the bot to the player's group, if not already (PickUp case here)
+                // add the bot to the player's group, if not already (PickUp case here with spawn)
                 if (_bot.BotsGroup.Id != _player.bossGroup.Id)
                 {
                     _bot.BotsGroup.RemoveAlly(_bot);
-                    _player.bossGroup.AddMember(_bot, false);
-                    
-                    // - ensure the bot is not marked as enemy already by the others
-                    _player.bossGroup.RemoveEnemy(_bot.GetPlayer);
-                    // - do enemy setup again
-                    _bot.Memory.GoalEnemy = null;
+
+                    _bot.BotsGroup = _player.bossGroup;
+                    var botsGroupField = AccessTools.Field(typeof(BotMemoryClass), "botsGroup_0");
+                    botsGroupField.SetValue(_bot.Memory, _bot.BotsGroup);
+
                     var botEnemies = _bot.EnemiesController.EnemyInfos.ToList();
                     foreach (var item in botEnemies)
                     {
                         _bot.Memory.DeleteInfoAboutEnemy(item.Key);
                     }
-                    foreach (var item in _player.bossGroup.Enemies)
-                    {
-                        _bot.Memory.AddEnemy(item.Key, item.Value, false);
-                    }
+
+                    _player.bossGroup.AddMember(_bot, false);
+
+                    // - ensure the bot is not marked as enemy already by the others
+                    _player.bossGroup.RemoveEnemy(_bot.GetPlayer);
                 }
             }
-            // if there is no group yet, take the bot's group (PickUp case here)
+            // if there is no group yet, we need to make one (PickUp case here without spawn)
             else
             {
-                BossPlayers.AddGroupToBoss(_player, _bot.BotsGroup);
+                
+                _bot.BotsGroup.RemoveAlly(_bot);
 
-                int count = _bot.BotsGroup.MembersCount;
-                List<BotOwner> membersToRemove = new List<BotOwner>();
-                for (int i = 0; i < count; i++)
-                {
-                    BotOwner member = _bot.BotsGroup.Member(i);
-                    if (member.ProfileId != _bot.ProfileId)
-                    {
-                        membersToRemove.Add(member);
-                    }
-                }
-                membersToRemove.ForEach(mem =>
-                {
-                    _bot.BotsGroup.RemoveAlly(mem);
-                });
+                var botsGroupField = AccessTools.Field(typeof(BotMemoryClass), "botsGroup_0");
 
-                // - go through the enemy filtering process again
+                BotZone zone = _bot.BotsController.BotSpawner.GetClosestZone(_bot.GetPlayer.Transform.position, out var zoneDist);
+                BotsGroup group = _bot.BotsController.BotSpawner.GetGroupAndSetEnemies(_bot, zone);
+
+                _bot.BotsGroup = group;
+                botsGroupField.SetValue(_bot.Memory, group);
+                
+                // - go through the enemy filtering process
                 var groupEnemies = _bot.BotsGroup.Enemies;
                 var botEnemies = _bot.EnemiesController.EnemyInfos.ToList();
                 foreach (var item in botEnemies)
                 {
                     _bot.Memory.DeleteInfoAboutEnemy(item.Key);
                 }
-                _bot.BotsGroup.Enemies = new Dictionary<IPlayer, BotSettingsClass>();
-                foreach (var item in groupEnemies)
-                {
-                    _bot.BotsGroup.AddEnemy(item.Key, item.Value.Cause);
-                }
+
+                group.AddMember(_bot, false);
+                BossPlayers.AddGroupToBoss(_player, group);
 
                 _bot.Memory.GoalEnemy = null;
             }
@@ -275,7 +311,6 @@ namespace friendlyPMC.Components
             settings.FileSettings.Mind.ATTACK_IMMEDIATLY_CHANCE_0_100 = 0f;
             settings.FileSettings.Mind.CAN_TALK = true;
             settings.FileSettings.Mind.CAN_STAND_BY = true;
-            settings.FileSettings.Mind.CAN_EXECUTE_REQUESTS = true;
             settings.FileSettings.Mind.CAN_TAKE_ANY_ITEM = true;
             settings.FileSettings.Mind.CAN_TAKE_ITEMS = true;
             settings.FileSettings.Mind.TALK_WITH_QUERY = true;
@@ -304,6 +339,8 @@ namespace friendlyPMC.Components
             settings.FileSettings.Mind.CAN_RECEIVE_PLAYER_REQUESTS_SAVAGE = playerSide == EPlayerSide.Savage;
             settings.FileSettings.Mind.CAN_RECEIVE_PLAYER_REQUESTS_BEAR = playerSide == EPlayerSide.Bear;
             settings.FileSettings.Mind.CAN_RECEIVE_PLAYER_REQUESTS_USEC = playerSide == EPlayerSide.Usec;
+            settings.FileSettings.Mind.CAN_EXECUTE_REQUESTS = true;
+
             settings.FileSettings.Mind.FRIEND_AGR_KILL = 0.000001f;
             settings.FileSettings.Mind.FRIEND_DEAD_AGR_LOW = -0.000001f;
             settings.FileSettings.Mind.REVENGE_FOR_SAVAGE_PLAYERS = false;
@@ -571,65 +608,32 @@ namespace friendlyPMC.Components
                 _bot.GetPlayer.Physical.Stamina.ForceMode = false;
                 _bot.GetPlayer.Physical.HandsStamina.ForceMode = false;
 
-                // - make the player an enemy
-                if (warnPlayer)
+                // -- bot needs a new group
+                var botsGroupField = AccessTools.Field(typeof(BotMemoryClass), "botsGroup_0");
+
+                BotZone zone = _bot.BotsController.BotSpawner.GetClosestZone(_bot.GetPlayer.Transform.position, out var zoneDist);
+                BotsGroup group = _bot.BotsController.BotSpawner.GetGroupAndSetEnemies(_bot, zone);
+
+                _bot.BotsGroup = group;
+                botsGroupField.SetValue(_bot.Memory, group);
+
+                _bot.EnemiesController.EnemyInfos.Values.ToList().ForEach(info =>
                 {
-                    Modules.Logger.LogInfo("Dismissing follower and making him an enemy");
-                    // -- bot needs a new group
-                    var botsGroupField = AccessTools.Field(typeof(BotMemoryClass), "botsGroup_0");
-                    var deadBodiesController = AccessTools.Field(typeof(BotSpawner), "_deadBodiesController").GetValue(_bot.BotsController.BotSpawner) as DeadBodiesController;
-                    var allPlayers = AccessTools.Field(typeof(BotSpawner), "_allPlayers").GetValue(_bot.BotsController.BotSpawner) as List<Player>;
-                    var spawnGroups = AccessTools.Field(typeof(BotSpawner), "_groups").GetValue(_bot.BotsController.BotSpawner) as BotZoneGroupsDictionary;
+                    _bot.Memory.DeleteInfoAboutEnemy(info.Person);
+                });
 
-                    List<BotOwner> list = new List<BotOwner>();
-                    foreach (BotOwner item in _bot.BotsController.BotSpawner.method_4(_bot))
+                _bot.BotsGroup.AddMember(_bot,false);
+
+                _bot.Memory.IsPeace = !warnPlayer;
+
+                if (warnPlayer)
+
+                    _player.Followers.ForEach(fl =>
                     {
-                        list.Add(item);
-                    }
-
-                    BotZone zone = _bot.BotsController.BotSpawner.GetClosestZone(_bot.GetPlayer.Transform.position, out var zoneDist);
-                    BotsGroup group = new BotsGroup(zone, _bot.BotsController.BotGame, _bot, list, deadBodiesController, allPlayers, false);
-
-                    spawnGroups.AddNoKey(group, zone);
-
-                    _bot.BotsGroup = group;
-                    botsGroupField.SetValue(_bot.Memory, group);
-
-                    // - make player enemy of the bot 
-                    _bot.BotsGroup.AddEnemy(_player.realPlayer, EBotEnemyCause.addPlayer);
-                    var playerEnemy = new BotSettingsClass(_player.realPlayer, _bot.BotsGroup, EBotEnemyCause.addPlayer);
-                    _bot.Memory.AddEnemy(_player.realPlayer, playerEnemy, false);
-                    // - make his followers enemy of the bot 
-                    foreach (var item in _player.Followers)
-                    {
-                        _bot.BotsGroup.AddEnemy(item.GetPlayer, EBotEnemyCause.addPlayer);
-                        var flEnemy = new BotSettingsClass(item.GetPlayer, _bot.BotsGroup, EBotEnemyCause.addPlayer);
-                        _bot.Memory.AddEnemy(item.GetPlayer, flEnemy, false);
-                    }
-                    _bot.Memory.IsPeace = false;
-
-                    // - ensure all enemies can be potentially seen
-                    foreach (var item in _bot.EnemiesController.EnemyInfos)
-                    {
-                        item.Value.SetVisible(false);
-                        item.Value.GroupInfo.EnemyLastSeenTimeSense = Time.time;
-                    }
-                    // - make the player the active enemy
-                    if (_bot.EnemiesController.EnemyInfos.TryGetValue(_player.realPlayer, out var info))
-                    {
-                        info.SetVisible(true);
-                        info.GroupInfo.EnemyLastSeenTimeSense = Time.time;
-                        if (_bot.Memory.GoalEnemy == null)
-                        {
-                            _bot.Memory.GoalEnemy = info;
-                        }
-                        // -- report him to the rest of the group
-                        foreach (var item in _player.Followers)
-                        {
-                            Utils.Enemy.MakeEnemy(item, _bot.GetPlayer);
-                        }
-
-                    }
+                        _bot.BotsGroup.AddEnemy(fl.GetPlayer, EBotEnemyCause.addPlayer);
+                    });
+                {
+                    _bot.BotsGroup.AddEnemy(_player.Player(), EBotEnemyCause.addPlayer);
                 }
 
             }

@@ -26,6 +26,7 @@ namespace friendlyPMC.Patches
             if( enemy == null ) return;
             
             var botOwner_0 = AccessTools.Field(typeof(BotMemoryClass), "botOwner_0").GetValue(__instance) as BotOwner;
+
             // - do not assign enemies to followers if the enemy just spawned
             if(BossPlayers.IsFollower(botOwner_0) && enemy != null && (groupInfo.Cause == EBotEnemyCause.addBotAtGroup || groupInfo.Cause == EBotEnemyCause.addBotNoGroup))
             {
@@ -54,8 +55,8 @@ namespace friendlyPMC.Patches
         {
             return AccessTools.Method(typeof(BotMemoryClass), "method_8");
         }
-        [PatchPostfix]
-        private static void PatchPostfix(BotMemoryClass __instance, DamageInfoStruct damageInfo)
+        [PatchPrefix]
+        private static void PatchPrefix(BotMemoryClass __instance, DamageInfoStruct damageInfo)
         {
             var botOwner_0 = AccessTools.Field(typeof(BotMemoryClass), "botOwner_0").GetValue(__instance) as BotOwner;
 
@@ -79,9 +80,7 @@ namespace friendlyPMC.Patches
 
             var brain = botOwner_0.Brain.BaseBrain as FollowerBrain;
             if (brain == null) return;
-
             
-
             if (brain.currentTactic == "Assist")
             {
                 var boss = botOwner_0.BotFollower.BossToFollow as pitAIBossPlayer;

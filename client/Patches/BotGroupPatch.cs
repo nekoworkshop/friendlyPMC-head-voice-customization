@@ -31,7 +31,7 @@ namespace friendlyPMC.Patches
         }
     }
 
-    internal class BotGroupAddEnemy : ModulePatch
+    internal class BotGroupAddEnemyPatch : ModulePatch
     {
 
         public static bool PlayerHasKnightQuest(Profile playerProfile)
@@ -202,6 +202,8 @@ namespace friendlyPMC.Patches
                 return;
             }
 
+            if (cause == EBotEnemyCause.warn) return;
+
             var _members = AccessTools.Field(typeof(BotsGroup), "_members").GetValue(__instance) as List<BotOwner>;
 
             var plBoss = BossPlayers.GetBoss(person.ProfileId);
@@ -227,6 +229,17 @@ namespace friendlyPMC.Patches
             
             if (plBoss != null && plBoss.bossGroup != null && plBoss.bossGroup.Id != __instance.Id)
             {
+                // - skip if the group is of the Goons and they are just spawning
+                if (cause == EBotEnemyCause.AddNewMember)
+                {
+                    var friendly = Utils.Props.BossFollowersType.ToList();
+                    friendly.Add(WildSpawnType.exUsec);
+                    if (PlayerHasKnightQuest(plBoss.realPlayer.Profile))
+                    {
+                        return;
+                    }
+                }
+
                 try
                 {
                     BotsGroup bossGroup = plBoss.bossGroup;

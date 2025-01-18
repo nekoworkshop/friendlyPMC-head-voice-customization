@@ -416,7 +416,7 @@ class friendlyPMC {
 
 					const custom = info.Custom;
 
-					this.Logger.logWithColor("friendlyPMC: Follower Options - " + JSON.stringify(info.Custom), LogTextColor.WHITE);
+					this.Logger.logWithColor("friendlyPMC: Follower Options - " + JSON.stringify(custom ?? {}), LogTextColor.WHITE);
 
 					const conditionPromises: IBotBase[] = [];
 
@@ -439,7 +439,7 @@ class friendlyPMC {
 						botGenerationDetails.botRelativeLevelDeltaMin = 5;
 
 						// FIKA is not always spawning ARM bands for followers
-						if (this.config.armbands) {
+						if (this.config.armbands && botGenerationDetails.isPmc) {
 							botJsonTemplateClone.chances.equipment.ArmBand = 100;
 
 							if (pmcProfile.Info.Side.toLowerCase() == "bear") {
@@ -453,26 +453,27 @@ class friendlyPMC {
 
 						conditionPromises.push(bot);
 
-						conditionPromises.forEach(profile => {
-							if (custom) {
-								if (custom.Body) {
-									profile.Customization.Body = custom.Body;
-								}
-								if (custom.Feet) {
-									profile.Customization.Feet = custom.Feet;
-								}
+						if (botGenerationDetails.isPmc && custom)
+							conditionPromises.forEach(profile => {
+								if (custom) {
+									if (custom.Body) {
+										profile.Customization.Body = custom.Body;
+									}
+									if (custom.Feet) {
+										profile.Customization.Feet = custom.Feet;
+									}
 
-								if (custom.Nickname) {
-									profile.Info.Nickname = custom.Nickname;
-									profile.Info.LowerNickname = custom.Nickname.toLowerCase();
+									if (custom.Nickname) {
+										profile.Info.Nickname = custom.Nickname;
+										profile.Info.LowerNickname = custom.Nickname.toLowerCase();
+									}
 								}
-							}
-							const customization = databaseService.getCustomization();
+								const customization = databaseService.getCustomization();
 
-							if (custom.Voice && customization[custom.Voice]) {
-								profile.Info.Voice = customization[custom.Voice]._name;
-							} else if (pmcProfile.Info.Side.toLowerCase() == "bear") profile.Info.Voice = custom?.English ? `Bear_${randomUtil.getInt(1, 2)}_Eng` : `Bear_${randomUtil.getInt(1, 3)}`;
-						});
+								if (custom.Voice && customization[custom.Voice]) {
+									profile.Info.Voice = customization[custom.Voice]._name;
+								} else if (pmcProfile.Info.Side.toLowerCase() == "bear") profile.Info.Voice = custom?.English ? `Bear_${randomUtil.getInt(1, 2)}_Eng` : `Bear_${randomUtil.getInt(1, 3)}`;
+							});
 					}
 					const res = httpResponseUtil.getBody(conditionPromises);
 

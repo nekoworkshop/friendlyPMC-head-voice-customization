@@ -267,49 +267,51 @@ namespace friendlyPMC.Patches
 
             Dictionary<string, dynamic> customization = new Dictionary<string, dynamic>();
 
-            // assign custom clothes, if se
-            List<string[]> uniforms = friendlyPMC.GetUniformOptions();
-            string top = member.Value[2].Value;
-            int idxt = uniforms[0].IndexOf(top);
-
-            string btm = member.Value[3].Value;
-            int idxb = uniforms[1].IndexOf(btm);
-
-            if (top != uniforms[0][0])
+            // assign custom clothes, if set
+            if(side != EPlayerSide.Savage)
             {
-                // use player clothes if we selected the second option
-                if (top == uniforms[0][1])
-                {
-                    customization["Body"] = boss.Customization[EBodyModelPart.Body];
-                }
-                else if (friendlyPMC.GetUniformPairs()[0].ContainsKey(idxt))
-                {
-                    string id = friendlyPMC.GetUniformPairs()[0][idxt];
-                    customization["Body"] = id;
-                }
-            }
+                List<string[]> uniforms = friendlyPMC.GetUniformOptions();
+                string top = member.Value[2].Value;
+                int idxt = uniforms[0].IndexOf(top);
 
-            if (btm != uniforms[1][0])
-            {
-                // use player pants if we selected the second option
-                if (btm == uniforms[1][1])
-                {
-                    customization["Feet"] = boss.Customization[EBodyModelPart.Feet];
-                }
-                else if (friendlyPMC.GetUniformPairs()[1].ContainsKey(idxb))
-                {
-                    string id = friendlyPMC.GetUniformPairs()[1][idxb];
-                    customization["Feet"] = id;
-                }
-            }
+                string btm = member.Value[3].Value;
+                int idxb = uniforms[1].IndexOf(btm);
 
-            // assign custom nickname, if set
-            string nickname = member.Value[4].Value;
-            if (nickname != null && nickname.Length > 0)
+                if (top != uniforms[0][0])
+                {
+                    // use player clothes if we selected the second option
+                    if (top == uniforms[0][1])
+                    {
+                        customization["Body"] = boss.Customization[EBodyModelPart.Body];
+                    }
+                    else if (friendlyPMC.GetUniformPairs()[0].ContainsKey(idxt))
+                    {
+                        string id = friendlyPMC.GetUniformPairs()[0][idxt];
+                        customization["Body"] = id;
+                    }
+                }
+
+                if (btm != uniforms[1][0])
+                {
+                    // use player pants if we selected the second option
+                    if (btm == uniforms[1][1])
+                    {
+                        customization["Feet"] = boss.Customization[EBodyModelPart.Feet];
+                    }
+                    else if (friendlyPMC.GetUniformPairs()[1].ContainsKey(idxb))
+                    {
+                        string id = friendlyPMC.GetUniformPairs()[1][idxb];
+                        customization["Feet"] = id;
+                    }
+                }
+
+                // assign custom nickname, if set
+                string nickname = member.Value[4].Value;
+                if (nickname != null && nickname.Length > 0)
             {
                 customization["Nickname"] = nickname;
             }
-
+            }
             var botPresets = AccessTools.Field(typeof(BotCreator), "ginterface21_0").GetValue(botCreator) as BotsPresets;
             var profileEndpoint = AccessTools.Field(typeof(BotsPresets), "iSession").GetValue(botPresets) as ProfileEndPoint;
             var gclass1200_0 = AccessTools.Field(typeof(ProfileEndPoint), "gclass1303_0").GetValue(profileEndpoint) as GClass1303;
@@ -713,8 +715,6 @@ namespace friendlyPMC.Patches
         {
             if (Controller == null) return;
 
-            EPlayerSide side = player.Player().Side;
-
             var botSpawnerClass = Controller.BotSpawner;
             BotCreator botCreator = AccessTools.Field(typeof(BotSpawner), "_botCreator").GetValue(botSpawnerClass) as BotCreator;
 
@@ -723,9 +723,26 @@ namespace friendlyPMC.Patches
             BotSpawnParams @params = new BotSpawnParams();
             @params.ShallBeGroup = new ShallBeGroupParams(true, false, memberCount + 1);
 
-            IProfileData data = new IProfileData(side, WildSpawnType.assault, BotDifficulty.hard, 5f, @params);
+            IProfileData data = new IProfileData(EPlayerSide.Savage, WildSpawnType.assault, BotDifficulty.hard, 5f, @params);
 
-            alliesCreationTask[player.realPlayer.ProfileId] = BotCreationDataClass.Create(data, botCreator, memberCount, botSpawnerClass);
+            BotCreationDataClass botCreation = BotCreationDataClass.CreateWithoutProfile(data);
+
+            List<UniTask<Profile>> tasks = new List<UniTask<Profile>>();
+
+            for (int i = 0; i < memberCount; i++)
+            {
+                tasks.Add(FetchMemberProfile(new KeyValuePair<int, List<BepInEx.Configuration.ConfigEntry<string>>>{},player.realPlayer.Profile,botCreator,EPlayerSide.Savage,WildSpawnType.assault,@params));
+            }
+            
+            alliesCreationTask[player.realPlayer.ProfileId] = UniTask.WhenAll(tasks).AsTask().ContinueWith((task) =>
+            {
+                foreach (var item in task.Result)
+                {
+                    botCreation.AddProfile(item);
+                }
+
+                return botCreation;
+            });
         }
 
         public Task<BotCreationDataClass> GetScavProfiles(pitAIBossPlayer player)
@@ -733,9 +750,10 @@ namespace friendlyPMC.Patches
             if (alliesCreationTask.ContainsKey(player.realPlayer.ProfileId))
             {
                 return alliesCreationTask[player.realPlayer.ProfileId];
+            } else {
+                PreFetchScavProfiles(player);
+                return alliesCreationTask[player.realPlayer.ProfileId];
             }
-
-            return null;
         }
 
         public Task<BotCreationDataClass> PreFetchPMCProfiles(pitAIBossPlayer player)
@@ -779,21 +797,6 @@ namespace friendlyPMC.Patches
             }
 
             return PreFetchPMCProfiles(player);
-        }
-
-        public static void PreventPMCConvert(bool state)
-        {
-            var converterClass = typeof(AbstractGame).Assembly.GetTypes()
-                .First(t => t.GetField("Converters", BindingFlags.Static | BindingFlags.Public) != null);
-
-            var _defaultJsonConverters = Traverse.Create(converterClass).Field<JsonConverter[]>("Converters").Value;
-
-            // ensure no PMC bots are generated due to convertIntoPmcChance value of the server
-            RequestHandler.PutJson("/client/game/bot/preventpmcgenerate", new
-            {
-                State = state
-
-            }.ToJson(_defaultJsonConverters));
         }
 
         private static bool HasFika()
@@ -1152,12 +1155,6 @@ namespace friendlyPMC.Patches
             // scav players will have random followers that cannot be customized
             if (side == EPlayerSide.Savage)
             {
-                var converterClass = typeof(AbstractGame).Assembly.GetTypes()
-                .First(t => t.GetField("Converters", BindingFlags.Static | BindingFlags.Public) != null);
-
-                var _defaultJsonConverters = Traverse.Create(converterClass).Field<JsonConverter[]>("Converters").Value;
-                
-
                 botsData = await GetScavProfiles(player);
 
                 botsData.Profiles.ForEach(profile =>

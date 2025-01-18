@@ -1,4 +1,5 @@
 ﻿using EFT;
+using EFT.InventoryLogic;
 using friendlyPMC.Components;
 using System;
 using UnityEngine;
@@ -61,6 +62,10 @@ namespace friendlyPMC.Actions
             if (!_init) Init();
 
             if (grSupport && !botOwner_0.WeaponManager.Selector.IsWeaponReady) return;
+            
+            var selector = botOwner_0.WeaponManager.Selector;
+
+            
 
             if (bool_1)
             {   
@@ -71,6 +76,14 @@ namespace friendlyPMC.Actions
             // our system that handles doing supression fire
             if (grAllowed)
             {
+                if (selector.SecondPrimaryWeapon as Weapon == null || !(selector.SecondPrimaryWeapon as Weapon).IsGrenadeLauncher)
+                {
+                    // - no grenade launcher, switch to game's system
+                    grAllowed = false;
+                    base.Update();
+                    return;
+                }
+
                 botOwner_0.DoorOpener.Update();
 
                 if (grPosition.HasValue)
