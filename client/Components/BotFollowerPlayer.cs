@@ -30,6 +30,9 @@ namespace friendlyPMC.Components
 
         protected bool _IsSquadMate = false;
 
+        protected string _grouId;
+        protected string _teamId;
+
         public bool IsSquadMate
         {
             get
@@ -436,6 +439,8 @@ namespace friendlyPMC.Components
             // - and blackout does not affect them
             bot.GetPlayer.ActiveHealthController.DoPainKiller();
             // - have followers share the same groupId as the player
+            _grouId = bot.GetPlayer.Profile.Info.GroupId;
+            _teamId = bot.GetPlayer.Profile.Info.TeamId;
             bot.GetPlayer.Profile.Info.GroupId = _player.realPlayer.GroupId;
             bot.GetPlayer.Profile.Info.TeamId = _player.realPlayer.Profile.Info.TeamId;
 
@@ -599,9 +604,45 @@ namespace friendlyPMC.Components
                     _bot.BotRequestController.CurRequest.Complete();
                 }
 
+                // remove follower brain
+                _bot.Brain.Dispose();
+                _bot.BotsController.AICoreController.Stop();
+
                 // - put back old receiver
                 _bot.Receiver = new BotReceiver(_bot);
                 _bot.Receiver.Init();
+
+
+                // put back old brain
+                // - first BigBrain has to know the bot is no longer active
+                var brainManagerInstance = AccessTools.Property(typeof(BrainManager), "Instance");
+                bool bigBraidDeactivated = false;
+                if (brainManagerInstance != null)
+                {
+                    BrainManager manager = (BrainManager)brainManagerInstance.GetValue(null);
+                    if (manager != null)
+                    {
+                        var activatedBotsProperty = AccessTools.Field(typeof(BrainManager), "ActivatedBots");
+                        if (activatedBotsProperty != null)
+                        {
+                            var activatedBots = (Dictionary<IPlayer, BotOwner>)activatedBotsProperty.GetValue(manager);
+                            if (activatedBots != null)
+                            {
+                                activatedBots.Remove(_bot.GetPlayer);
+                                bigBraidDeactivated = true;
+                                Modules.Logger.LogInfo("Bot removed from activated bots");
+                            }
+                        }
+                    }
+                }
+                // - now put back the old brain
+                if (bigBraidDeactivated)
+                {
+                    _bot.Brain = new StandartBotBrain(_bot);
+                    _bot.Brain.Activate();
+                }
+
+                _bot.BotsController.AICoreController.Activate();
 
                 _bot.BotState = EBotState.Active;
 
@@ -609,31 +650,48 @@ namespace friendlyPMC.Components
                 _bot.GetPlayer.Physical.HandsStamina.ForceMode = false;
 
                 // -- bot needs a new group
-                var botsGroupField = AccessTools.Field(typeof(BotMemoryClass), "botsGroup_0");
-
                 BotZone zone = _bot.BotsController.BotSpawner.GetClosestZone(_bot.GetPlayer.Transform.position, out var zoneDist);
                 BotsGroup group = _bot.BotsController.BotSpawner.GetGroupAndSetEnemies(_bot, zone);
 
                 _bot.BotsGroup = group;
+                
+                var botsGroupField = AccessTools.Field(typeof(BotMemoryClass), "botsGroup_0");
                 botsGroupField.SetValue(_bot.Memory, group);
 
-                _bot.EnemiesController.EnemyInfos.Values.ToList().ForEach(info =>
-                {
-                    _bot.Memory.DeleteInfoAboutEnemy(info.Person);
-                });
+                _bot.GetPlayer.Profile.Info.GroupId = _grouId;
+                _bot.GetPlayer.Profile.Info.TeamId = _teamId;
 
                 _bot.BotsGroup.AddMember(_bot,false);
 
                 _bot.Memory.IsPeace = !warnPlayer;
 
+                // make player and his followers enemies of the bot
                 if (warnPlayer)
-
+                { 
                     _player.Followers.ForEach(fl =>
                     {
+                        if(_bot.EnemiesController.EnemyInfos.TryGetValue(fl.GetPlayer, out var info))
+                        {
+                            _bot.Memory.DeleteInfoAboutEnemy(fl.GetPlayer);
+                        }
                         _bot.BotsGroup.AddEnemy(fl.GetPlayer, EBotEnemyCause.addPlayer);
                     });
-                {
+
+                    if (_bot.EnemiesController.EnemyInfos.TryGetValue(_player.Player(), out var plinfo))
+                    {
+                        _bot.Memory.DeleteInfoAboutEnemy(_player.Player());
+                    }
+
                     _bot.BotsGroup.AddEnemy(_player.Player(), EBotEnemyCause.addPlayer);
+                    _bot.BotsGroup.Enemies.ExecuteForEach((key, value) =>
+                    {
+                        Modules.Logger.LogInfo("Enemy is " + key.Profile.Nickname);
+                        if(key.ProfileId == _player.Player().ProfileId || BossPlayers.GetFollowers().Find(follower=>follower.GetBot().GetPlayer.ProfileId == key.ProfileId) != null)
+                        {
+                            value.IsHaveSeen = true;
+                            _bot.Memory.AddEnemy(key,value, false);
+                        }
+                    });
                 }
 
             }

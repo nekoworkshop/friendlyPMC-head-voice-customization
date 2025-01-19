@@ -42,8 +42,8 @@ namespace friendlyPMC.Modules
             if (type == (BotLogicDecision)CustomBotDecisions.EnemySearch)
                 return new GClass213(bot);
 
-            /*if (type == BotLogicDecision.goToEnemy)
-                return new FollowerGoToEnemy(bot);*/
+            if (type == BotLogicDecision.goToEnemy)
+                return new FollowerGoToEnemy(bot);
 
             if (type == (BotLogicDecision)CustomBotDecisions.RunToCover)
                 return new FollowerRunToCover(bot);

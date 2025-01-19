@@ -2,18 +2,21 @@
 - x - even without SAIN bots pick up enemies through walls, at a distance (check ground zero map)
 - - nothing can be done
 
-- x - investigate if we can make "Assist" tactic turn hostile on accidental shots
+- investigate if we can make "Assist" tactic turn hostile on accidental shots
 - x - fix followers seeing the newly added member as an enemy
-- - picked up bots do not attack enemy bots when using SAIN
+- x - picked up bots do not attack enemy bots when using SAIN
+- picked followers to not attack the player after turning hostile
 
 - attempt to make transit work while in a group with followers
 
 - fix scav run with followers (needs to use a similar call to followergenerate to avoid generating PMC as scav follower)
 
+- add option to disable throwing grenades
+
 -- === 3.9.6 === ---:
 - see if we can make bot swap weapons when asked to loot (DeadBodyWork)
 - - this should also allow bot to put that weapon as seconday (in case of support without a grenade launcher)
-- add option to disable throwing grenades
+
 - add "hold fire/fire at will" commands
 
 --- ==== 4.0.0 (final phase - "The General" for followers quest) ==== ---:
