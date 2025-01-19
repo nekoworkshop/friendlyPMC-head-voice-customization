@@ -377,7 +377,7 @@ namespace friendlyPMC.Components.BossFollower
 
             if (baseDecision.HasValue) return baseDecision.Value;
 
-            bool useGrenade = GClass824.Random(0f, 2f) > 1f;
+            bool useGrenade = friendlyPMC.botGrenades.Value && GClass824.Random(0f, 2f) > 1f;
             
             AICoreActionResultStruct<BotLogicDecision> decision = guardLayer.method_29(useGrenade,BotLogicDecision.debugGrenade);
 

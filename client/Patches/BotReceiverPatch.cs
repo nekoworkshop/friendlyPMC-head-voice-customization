@@ -109,7 +109,10 @@ namespace friendlyPMC.Patches
                             // - this will switch the BotReceiver to our own, so the rest can be altered there
                             if(botOwner.BotsGroup.RequestsController.TryAskFollowMeRequest(requester, botOwner))
                             {
-                                botOwner.BotTalk.TrySay(EPhraseTrigger.Roger, false);
+                                Utils.Utils.SetTimeout(() =>
+                                {
+                                    botOwner.BotTalk.TrySay(EPhraseTrigger.Roger, false);
+                                }, 1000);
                             } 
                             else
                             {

@@ -2,18 +2,20 @@
 - x - even without SAIN bots pick up enemies through walls, at a distance (check ground zero map)
 - - nothing can be done
 
-- investigate if we can make "Assist" tactic turn hostile on accidental shots
+- x - investigate issues picked up followers
 - x - fix followers seeing the newly added member as an enemy
 - x - picked up bots do not attack enemy bots when using SAIN
-- picked followers to not attack the player after turning hostile
+ 
+- x - make followers stop looking down when out of combat
 
 - attempt to make transit work while in a group with followers
 
-- fix scav run with followers (needs to use a similar call to followergenerate to avoid generating PMC as scav follower)
+- x - fix scav run with followers (needs to use a similar call to followergenerate to avoid generating PMC as scav follower)
 
-- add option to disable throwing grenades
+- x - add option to disable throwing grenades
 
 -- === 3.9.6 === ---:
+-picked followers do not attack the player after turning hostile
 - see if we can make bot swap weapons when asked to loot (DeadBodyWork)
 - - this should also allow bot to put that weapon as seconday (in case of support without a grenade launcher)
 
@@ -31,16 +33,18 @@
 
 ==================================================================================
 RELEASE NOTES (3.9.5)
-- fixed an issue with the grenade throwing action that could cause the bot to remain stuck in the throwing position
-- fixed picked up followers not attacking enemies
-- fixed picked up followers not turning hostile on accidental shots
+fixed an issue with the grenade throwing action that could cause the bot to remain stuck in the throwing position
+fixed picked up followers not attacking enemies
+attempt to address followers looking down when out of combat (might still happen but much less often)
+fixed spawning with followers as SCAV
+added option to disable throwing grenades
 
 TO ADD as Known Issue:
-- some clothing makes the followers freeze when being killed (BEAR SPN TOP with BEAR Summer Field BOTTOM)
-- Picked up followers can auto assign an enemy across the map - use attention to reset
-- followers are runing and ducking until the reach me - too much teleportation
-- even small bushes can make the enemy invisible to the followers when yelling "contact"
-- followers picked up do not turn hostile on accidental shots and instead just sit there (WIP)
+some weapon kits, even if they are standard weapons can cause several issues with the spawned followers, from freezing when dying to sound problems. There is no fix at the moment for this, simply choose a different kit.
+picked up followers can auto assign an enemy across the map - use attention to reset (might need to do it multiple times)
+followers are running and ducking until they reach the player - this can happen when using teleportation too much or right after combat ends. Go within the follow range (~12 meters) to snap them out of it.
+even small bushes can make the enemy invisible to the followers when yelling "contact"
+followers picked up do not turn hostile on friendly fire and instead just sit there (WIP)
 
 ==================================================================================
 

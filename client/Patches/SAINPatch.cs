@@ -74,7 +74,7 @@ namespace friendlyPMC.Patches
 
                 if(SAINEnableClass !=null)
                 {
-                    harmony.Patch(AccessTools.Method(SAINEnableClass, "isBotExcluded"), new HarmonyMethod(typeof(SAINPatch), nameof(PatchisBotExcluded)));
+                    harmony.Patch(AccessTools.Method(SAINEnableClass, "IsSAINDisabledForBot"), new HarmonyMethod(typeof(SAINPatch), nameof(PatchisBotExcluded)));
                 }
 
                 if(enemyTalk != null)
@@ -87,10 +87,10 @@ namespace friendlyPMC.Patches
                     harmony.Patch(AccessTools.Method(GroupClass, "EnemyConversation"), new HarmonyMethod(typeof(SAINPatch).GetMethod(nameof(PatchEnemyConvesation), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance)));
                 }
 
-                if (EnemyListController != null)
+                /*if (EnemyListController != null)
                 {
                     harmony.Patch(AccessTools.Method(EnemyListController, "CheckAddEnemy"), new HarmonyMethod(typeof(SAINPatch).GetMethod(nameof(PatchCheckAddEnemy), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance)));
-                }
+                }*/
 
                 if (squadType != null && SAINEnableClass != null)
                 {

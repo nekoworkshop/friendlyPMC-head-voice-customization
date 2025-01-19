@@ -378,36 +378,6 @@ class friendlyPMC {
 							Bear_3: 1,
 						};
 					}
-					// change bot location hostility settings based on our config
-					/* const locations = this.databaseServer.getTables().locations;
-					for (let k in locations) {
-						const loc: (typeof locations)["bigmap"] = locations[k];
-						if (!loc.base || loc.base.Name == "Private Sector" || loc.base.Name == "Terminal" || loc.base.Name == "Town" || loc.base.Name == "Suburbs" || loc.base.Name == "Arena") continue;
-
-						if (!loc.base.BotLocationModifier?.AdditionalHostilitySettings) continue;
-
-						loc.base.BotLocationModifier.AdditionalHostilitySettings = objectCopy(this._hostilitySettings[k]);
-
-						if (!this.config.friendlyPMC) {
-							if (this.config.badGuy) {
-								loc.base.BotLocationModifier.AdditionalHostilitySettings.forEach(setting => {
-									if (["pmcUSEC", "pmcBEAR"].includes(setting.BotRole)) {
-										setting.BearPlayerBehaviour = "AlwaysEnemies";
-										setting.UsecPlayerBehaviour = "AlwaysEnemies";
-									}
-								});
-							}
-						} else {
-							loc.base.BotLocationModifier.AdditionalHostilitySettings.forEach(setting => {
-								if (["pmcUSEC", "pmcBEAR"].includes(setting.BotRole)) {
-									setting.BearPlayerBehaviour = this.config.badGuy || setting.BotRole == "pmcUSEC" ? "AlwaysEnemies" : "Neutral";
-									setting.UsecPlayerBehaviour = this.config.badGuy || setting.BotRole == "pmcBEAR" ? "AlwaysEnemies" : "Neutral";
-									setting.BearEnemyChance = setting.BotRole == "pmcBEAR" && this.config.friendlyPMC ? 0 : setting.BearEnemyChance;
-									setting.UsecEnemyChance = setting.BotRole == "pmcUSEC" && this.config.friendlyPMC ? 0 : setting.UsecEnemyChance;
-								}
-							});
-						}
-					} */
 
 					return httpResponseUtil.emptyResponse();
 				}),
@@ -449,31 +419,30 @@ class friendlyPMC {
 							}
 						}
 
+						if (botGenerationDetails.isPmc && custom) {
+							if (custom.Body) {
+								botJsonTemplateClone.appearance.body = {};
+								botJsonTemplateClone.appearance.body[custom.Body] = 1;
+							}
+							if (custom.Feet) {
+								botJsonTemplateClone.appearance.feet = {};
+								botJsonTemplateClone.appearance.feet[custom.Feet] = 1;
+							}
+
+							if (custom.Nickname) {
+								botJsonTemplateClone.firstName = [custom.Nickname];
+							}
+
+							if (custom.Voice && pmcProfile.Info.Side.toLowerCase() == "bear") {
+								botJsonTemplateClone.appearance.voice = {};
+								botJsonTemplateClone.appearance.voice["Bear_1_Eng"] = 1;
+								botJsonTemplateClone.appearance.voice["Bear_2_Eng"] = 1;
+							}
+						}
+
 						const bot = botGenerator["generateBot"](sessionID, preparedBotBase, botJsonTemplateClone, botGenerationDetails);
 
 						conditionPromises.push(bot);
-
-						if (botGenerationDetails.isPmc && custom)
-							conditionPromises.forEach(profile => {
-								if (custom) {
-									if (custom.Body) {
-										profile.Customization.Body = custom.Body;
-									}
-									if (custom.Feet) {
-										profile.Customization.Feet = custom.Feet;
-									}
-
-									if (custom.Nickname) {
-										profile.Info.Nickname = custom.Nickname;
-										profile.Info.LowerNickname = custom.Nickname.toLowerCase();
-									}
-								}
-								const customization = databaseService.getCustomization();
-
-								if (custom.Voice && customization[custom.Voice]) {
-									profile.Info.Voice = customization[custom.Voice]._name;
-								} else if (pmcProfile.Info.Side.toLowerCase() == "bear") profile.Info.Voice = custom?.English ? `Bear_${randomUtil.getInt(1, 2)}_Eng` : `Bear_${randomUtil.getInt(1, 3)}`;
-							});
 					}
 					const res = httpResponseUtil.getBody(conditionPromises);
 

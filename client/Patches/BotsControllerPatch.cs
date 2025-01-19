@@ -271,6 +271,8 @@ namespace friendlyPMC.Patches
             if(side != EPlayerSide.Savage)
             {
                 List<string[]> uniforms = friendlyPMC.GetUniformOptions();
+                string[] equipOptions = friendlyPMC.GetEquipOptions();
+
                 string top = member.Value[2].Value;
                 int idxt = uniforms[0].IndexOf(top);
 
@@ -308,9 +310,16 @@ namespace friendlyPMC.Patches
                 // assign custom nickname, if set
                 string nickname = member.Value[4].Value;
                 if (nickname != null && nickname.Length > 0)
-            {
-                customization["Nickname"] = nickname;
-            }
+                {
+                    customization["Nickname"] = nickname;
+                }
+                
+                // assign custom equipment, if set
+                string eq = member.Value[1].Value;
+                if (eq != null && eq != equipOptions[0])
+                {
+                    customization["Equipment"] = eq;
+                }
             }
             var botPresets = AccessTools.Field(typeof(BotCreator), "ginterface21_0").GetValue(botCreator) as BotsPresets;
             var profileEndpoint = AccessTools.Field(typeof(BotsPresets), "iSession").GetValue(botPresets) as ProfileEndPoint;

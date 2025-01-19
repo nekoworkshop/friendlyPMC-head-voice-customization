@@ -162,5 +162,10 @@
     "botPrefetch": {
         "Name": "Prefetch Însoțitori",
         "Description": "Prefetch datele însoțitorilor pentru a reduce timpul necesar pentru a-i spawna. Dacă întâmpinați probleme cu apariția însoțitorilor, dezactivați această opțiune și încercați din nou. Rețineți că aceasta poate crește timpul de apariție."
+    },
+
+    "botGrenades" : {
+        "Name": "Însoțitorii folosesc grenăzi",
+        "Description": "Pot sau nu însoțitorii să folosească grenăzi"
     }
 }

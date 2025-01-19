@@ -128,6 +128,8 @@ namespace friendlyPMC
 
         public Dictionary<string, string> botPrefetch { get; set; }
 
+        public Dictionary<string, string> botGrenades { get; set; }
+
         // used only by BE
         public string[] returnItems { get; set; }
         public string[] returnItemsDeath { get; set; }
@@ -177,6 +179,8 @@ namespace friendlyPMC
 
         public static ConfigEntry<bool> botPrefetch;
 
+        public static ConfigEntry<bool> botGrenades;
+
         public static ConfigEntry<int> patrolRadius;
 
 
@@ -212,7 +216,6 @@ namespace friendlyPMC
                 new Modules.Logger();
             }
 
-            
 
             var harmony = new Harmony("xyz.pit.friendlypmc");
             // configuration manager patch to help with keeping equipment builds up to date
@@ -220,8 +223,7 @@ namespace friendlyPMC
             
             // bot patches to help with various scenarios while being a follower of the player
             new BotGroupAddEnemyPatch().Enable();
-            new BotMemoryAddEnemyPatch().Enable();
-            //new BossWarnDataPatch().Enable();
+            //new BotMemoryAddEnemyPatch().Enable();
 
             new BotMemoryDamagePatch().Enable();
             new BotGroupUsecEnemyPatch().Enable();
@@ -450,15 +452,16 @@ namespace friendlyPMC
 
             englishBear = Config.Bind("II " + optionsLang.miscSettings, "11 " + optionsLang.englishBear["Name"], true, new ConfigDescription(optionsLang.englishBear["Description"],null, new ConfigurationManagerAttributes { Order = -1100 }));
 
-            
-            pingKey = Config.Bind("II " + optionsLang.miscSettings, "12 " + optionsLang.pingSquad["Name"], new KeyboardShortcut(KeyCode.None), new ConfigDescription(optionsLang.pingSquad["Description"],null, new ConfigurationManagerAttributes { Order = -1101 }));
+            botGrenades = Config.Bind("II " + optionsLang.miscSettings, "12 " + optionsLang.botGrenades["Name"], true, new ConfigDescription(optionsLang.botGrenades["Description"], null, new ConfigurationManagerAttributes { Order = -1105 }));
 
-            contactKey = Config.Bind("II " + optionsLang.miscSettings, "13 " + optionsLang.enemyContact["Name"], new KeyboardShortcut(KeyCode.None), new ConfigDescription(optionsLang.enemyContact["Description"],null, new ConfigurationManagerAttributes { Order = -1102 }));
+            pingKey = Config.Bind("II " + optionsLang.miscSettings, "13 " + optionsLang.pingSquad["Name"], new KeyboardShortcut(KeyCode.None), new ConfigDescription(optionsLang.pingSquad["Description"],null, new ConfigurationManagerAttributes { Order = -1101 }));
 
-            teleportKey = Config.Bind("II " + optionsLang.miscSettings, "14 " + optionsLang.botTeleport["Name"], new KeyboardShortcut(KeyCode.None), new ConfigDescription(optionsLang.botTeleport["Description"], null, new ConfigurationManagerAttributes { Order = -1103 }));
-            healKey = Config.Bind("II " + optionsLang.miscSettings, "15 " + optionsLang.botHeal["Name"], new KeyboardShortcut(KeyCode.None), new ConfigDescription(optionsLang.botHeal["Description"], null, new ConfigurationManagerAttributes { Order = -1104 }));
+            contactKey = Config.Bind("II " + optionsLang.miscSettings, "14 " + optionsLang.enemyContact["Name"], new KeyboardShortcut(KeyCode.None), new ConfigDescription(optionsLang.enemyContact["Description"],null, new ConfigurationManagerAttributes { Order = -1102 }));
 
-            botPrefetch = Config.Bind("II " + optionsLang.miscSettings, "16 " + optionsLang.botPrefetch["Name"], true, new ConfigDescription(optionsLang.botPrefetch["Description"], null, new ConfigurationManagerAttributes { Order = -1105 }));
+            teleportKey = Config.Bind("II " + optionsLang.miscSettings, "15 " + optionsLang.botTeleport["Name"], new KeyboardShortcut(KeyCode.None), new ConfigDescription(optionsLang.botTeleport["Description"], null, new ConfigurationManagerAttributes { Order = -1103 }));
+            healKey = Config.Bind("II " + optionsLang.miscSettings, "16 " + optionsLang.botHeal["Name"], new KeyboardShortcut(KeyCode.None), new ConfigDescription(optionsLang.botHeal["Description"], null, new ConfigurationManagerAttributes { Order = -1104 }));
+
+            botPrefetch = Config.Bind("II " + optionsLang.miscSettings, "17 " + optionsLang.botPrefetch["Name"], true, new ConfigDescription(optionsLang.botPrefetch["Description"], null, new ConfigurationManagerAttributes { Order = -1105 }));
              
             ConfigSquadMembersSet();
             

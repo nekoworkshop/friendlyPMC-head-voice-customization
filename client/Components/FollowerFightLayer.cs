@@ -343,7 +343,7 @@ namespace friendlyPMC.Components
                 if (!botOwner_0.Memory.GoalEnemy.IsSuppressed() && botOwner_0.Memory.GoalEnemy.ShallISuppress())
                 {
 
-                    bool useGrenade = GClass824.Random(0f, 2f) > 1f;
+                    bool useGrenade = friendlyPMC.botGrenades.Value &&  GClass824.Random(0f, 2f) > 1f;
                     ThrowWeapType? grenadeType = new ThrowWeapType?(ThrowWeapType.frag_grenade);
                     // - check if player is too close when using grenade
                     if (useGrenade && botOwner_0.WeaponManager.Grenades.HaveGrenadeOfType(grenadeType.Value))

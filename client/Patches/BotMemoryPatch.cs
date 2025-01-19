@@ -47,7 +47,7 @@ namespace friendlyPMC.Patches
         }
     }
     /**
-     * This patch is used to prevent followers from adding teammates as an enemy on friendly fire
+     * Patch to turn "Assist" followers into hostile on friendly fire
      */
     internal class BotMemoryDamagePatch : ModulePatch
     {

@@ -137,7 +137,10 @@ namespace friendlyPMC.Components
                             {
                                 // Call the method if you have the bot instance to pass
                                 removeBotMethod.Invoke(botSpawnControllerInstance, new object[] { _bot });
+                                // reset bot animation stances
                                 _bot.GetPlayer.MovementContext.SetPatrol(false);
+                                _bot.Tilt.Stop();
+
                                 Modules.Logger.LogInfo("SAIN brain disabled for the bot.");
                             }
                             else
@@ -388,7 +391,7 @@ namespace friendlyPMC.Components
 
             settings.FileSettings.Look.MINIMUM_VISIBLE_DIST = 15f;
 
-            settings.FileSettings.Core.CanGrenade = true;
+            settings.FileSettings.Core.CanGrenade = friendlyPMC.botGrenades.Value;
             settings.FileSettings.Core.CanRun = true;
 
             settings.FileSettings.Cover.CHECK_CLOSEST_FRIEND = true;
@@ -682,14 +685,16 @@ namespace friendlyPMC.Components
                         _bot.Memory.DeleteInfoAboutEnemy(_player.Player());
                     }
 
-                    _bot.BotsGroup.AddEnemy(_player.Player(), EBotEnemyCause.addPlayer);
+                    _bot.BotsGroup.CheckAndAddEnemy(_player.Player());
                     _bot.BotsGroup.Enemies.ExecuteForEach((key, value) =>
                     {
-                        Modules.Logger.LogInfo("Enemy is " + key.Profile.Nickname);
-                        if(key.ProfileId == _player.Player().ProfileId || BossPlayers.GetFollowers().Find(follower=>follower.GetBot().GetPlayer.ProfileId == key.ProfileId) != null)
+                        value.IsHaveSeen = key.ProfileId == _player.Player().ProfileId || BossPlayers.GetFollowers().Find(fl=>fl.GetBot().ProfileId == key.ProfileId) != null;
+                        _bot.Memory.AddEnemy(key, value, false);
+
+                        if (key.ProfileId == _player.Player().ProfileId && _bot.EnemiesController.EnemyInfos.TryGetValue(_player.Player(), out var eninfo))
                         {
-                            value.IsHaveSeen = true;
-                            _bot.Memory.AddEnemy(key,value, false);
+                            _bot.Memory.GoalEnemy = eninfo;
+                            Modules.Logger.LogInfo("Make player the enemy");
                         }
                     });
                 }
