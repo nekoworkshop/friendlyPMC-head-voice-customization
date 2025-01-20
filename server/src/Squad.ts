@@ -423,24 +423,33 @@ class friendlyPMC {
 							if (custom.Body) {
 								botJsonTemplateClone.appearance.body = {};
 								botJsonTemplateClone.appearance.body[custom.Body] = 1;
+								preparedBotBase.Customization.Body = custom.Body;
 							}
 							if (custom.Feet) {
 								botJsonTemplateClone.appearance.feet = {};
 								botJsonTemplateClone.appearance.feet[custom.Feet] = 1;
+								preparedBotBase.Customization.Feet = custom.Feet;
 							}
 
 							if (custom.Nickname) {
 								botJsonTemplateClone.firstName = [custom.Nickname];
+								botGenerationDetails.playerName = custom.Nickname;
+								preparedBotBase.Info.Nickname = custom.Nickname;
 							}
 
 							if (custom.Voice && pmcProfile.Info.Side.toLowerCase() == "bear") {
 								botJsonTemplateClone.appearance.voice = {};
 								botJsonTemplateClone.appearance.voice["Bear_1_Eng"] = 1;
 								botJsonTemplateClone.appearance.voice["Bear_2_Eng"] = 1;
+								preparedBotBase.Info.Voice = this.randomUtil.getArrayValue(["Bear_1_Eng", "Bear_2_Eng"]);
 							}
 						}
 
 						const bot = botGenerator["generateBot"](sessionID, preparedBotBase, botJsonTemplateClone, botGenerationDetails);
+						// force name change
+						if (botGenerationDetails.isPmc && custom?.Nickname) {
+							bot.Info.Nickname = custom.Nickname;
+						}
 
 						conditionPromises.push(bot);
 					}

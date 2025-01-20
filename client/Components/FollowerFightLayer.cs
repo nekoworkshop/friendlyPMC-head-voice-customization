@@ -35,7 +35,7 @@ namespace friendlyPMC.Components
         private float suppressTime = 0f;
 
         private float grSuppressTime = 0f;
-        private bool grSupport = false; 
+        private bool grSupport = false;
 
         private bool ordersAreHold = false;
         private bool ordersAreAttack = false;
@@ -102,7 +102,7 @@ namespace friendlyPMC.Components
             holderLayer = new FollowerHolderLayer(bot, priority, commonLayer);
             pusherLayer = new FollowerPusherLayer(bot, priority, commonLayer);
             // guard is support
-            guardLayer = new FollowerGuard(bot,priority, PusherLayer);
+            guardLayer = new FollowerGuard(bot, priority, PusherLayer);
 
         }
         public override void OnActivate()
@@ -154,7 +154,7 @@ namespace friendlyPMC.Components
                 sniperTactic = true;
                 (botOwner_0.Brain.BaseBrain as FollowerBrain).SetTactic("Marksman");
             }
-            else if (tactic == "guard" || tactic  == "support")
+            else if (tactic == "guard" || tactic == "support")
             {
                 guardTactic = true;
                 (botOwner_0.Brain.BaseBrain as FollowerBrain).SetTactic("Guard");
@@ -187,7 +187,7 @@ namespace friendlyPMC.Components
         {
             if (wantsToHeal) return true;
 
-            if(commonLayer.CurrentDecision.HasValue && commonLayer.CurrentDecision.Value.Action == BotLogicDecision.suppressGrenade)
+            if (commonLayer.CurrentDecision.HasValue && commonLayer.CurrentDecision.Value.Action == BotLogicDecision.suppressGrenade)
             {
                 return true;
             }
@@ -335,15 +335,14 @@ namespace friendlyPMC.Components
                 return GuardTactic();
             }
 
-            AICoreActionResultStruct < BotLogicDecision > defaultDecision = DefaultTactic();
+            AICoreActionResultStruct<BotLogicDecision> defaultDecision = DefaultTactic();
 
             if (!guardTactic && !sniperTactic && botOwner_0.Memory.HaveEnemy)
             {
                 // borrow the auto suppression from guard layer
                 if (!botOwner_0.Memory.GoalEnemy.IsSuppressed() && botOwner_0.Memory.GoalEnemy.ShallISuppress())
                 {
-
-                    bool useGrenade = friendlyPMC.botGrenades.Value &&  GClass824.Random(0f, 2f) > 1f;
+                    bool useGrenade = botOwner_0.Settings.FileSettings.Core.CanGrenade && GClass824.Random(0f, 2f) > 1f;
                     ThrowWeapType? grenadeType = new ThrowWeapType?(ThrowWeapType.frag_grenade);
                     // - check if player is too close when using grenade
                     if (useGrenade && botOwner_0.WeaponManager.Grenades.HaveGrenadeOfType(grenadeType.Value))
@@ -506,7 +505,7 @@ namespace friendlyPMC.Components
             if (!allyTactic && bossUnderAttack && (commonLayer.coverType == "close") && (!botOwner_0.Memory.HaveEnemy || !botOwner_0.Memory.GoalEnemy.IsVisible))
             {
                 // - switch the bot's enemy to the one attacking the boss
-                BotOwner closestEnemy = HasBoss()  ? GetBoss().ClosestEnemy() : null;
+                BotOwner closestEnemy = HasBoss() ? GetBoss().ClosestEnemy() : null;
                 if (closestEnemy != null)
                 {
                     GetBoss().PrioritizeEnemy(botOwner_0, closestEnemy);
@@ -586,7 +585,7 @@ namespace friendlyPMC.Components
             }
 
             // come here request during fights
-            if(request != null && request.BotRequestType == BotRequestType.followMe && !allyTactic)
+            if (request != null && request.BotRequestType == BotRequestType.followMe && !allyTactic)
                 return new AICoreActionResultStruct<BotLogicDecision>((BotLogicDecision)CustomBotDecisions.MoveToPoint, "req:comeHere");
 
             // go there request during fights
@@ -629,7 +628,7 @@ namespace friendlyPMC.Components
         {
             AICoreActionEndStruct shouldEnd = base.EndSuppressFire();
 
-            if(shouldEnd.Value)
+            if (shouldEnd.Value)
             {
                 BotRequest curRequest = botOwner_0.BotRequestController.CurRequest;
                 if (curRequest != null && curRequest.BotRequestType == BotRequestType.suppressionFire)
@@ -664,7 +663,7 @@ namespace friendlyPMC.Components
 
         public override AICoreActionEndStruct EndHeal()
         {
-            AICoreActionEndStruct result =  commonLayer.EndHeal();
+            AICoreActionEndStruct result = commonLayer.EndHeal();
 
             if (result.Value) wantsToHeal = false;
 
@@ -723,7 +722,7 @@ namespace friendlyPMC.Components
                 )
             )
             {
-                if(!ordersAreAttack && !ordersAreHold) commonLayer.OrderReset();
+                if (!ordersAreAttack && !ordersAreHold) commonLayer.OrderReset();
                 return new AICoreActionEndStruct("orders.Received", true);
             }
 
@@ -731,13 +730,13 @@ namespace friendlyPMC.Components
 
             if (shallEndCommon.HasValue) return shallEndCommon.Value;
 
-            if(curDecision.Action == (BotLogicDecision)CustomBotDecisions.MoveToPoint)
+            if (curDecision.Action == (BotLogicDecision)CustomBotDecisions.MoveToPoint)
             {
-                if(!botOwner_0.Memory.HaveEnemy) return new AICoreActionEndStruct("enemy.None", true);
+                if (!botOwner_0.Memory.HaveEnemy) return new AICoreActionEndStruct("enemy.None", true);
                 if (!botOwner_0.Memory.GoalEnemy.CanShoot) return new AICoreActionEndStruct("enemy.Shoot", true);
 
-                if (!(botOwner_0.BotRequestController.CurRequest != null && 
-                        (botOwner_0.BotRequestController.CurRequest.BotRequestType ==  BotRequestType.goToPoint ||
+                if (!(botOwner_0.BotRequestController.CurRequest != null &&
+                        (botOwner_0.BotRequestController.CurRequest.BotRequestType == BotRequestType.goToPoint ||
                         botOwner_0.BotRequestController.CurRequest.BotRequestType == BotRequestType.followMe)
                      )
                    )

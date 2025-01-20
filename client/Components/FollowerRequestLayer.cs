@@ -54,22 +54,6 @@ namespace friendlyPMC.Components
 
             BotRequest currRequest = botOwner_0.BotRequestController.CurRequest;
 
-            List<BotRequestType> allyAllowedRequest = new List<BotRequestType>
-            {
-                BotRequestType.getInCover,
-                BotRequestType.hide
-            };
-
-            List<BotRequestType> bossRequests = new List<BotRequestType>
-            {
-               BotRequestType.getInCover,
-               BotRequestType.hide,
-               BotRequestType.wait,
-               BotRequestType.followMe,
-               BotRequestType.goToPoint,
-               (BotRequestType)CustomBotRequestType.Regroup
-            };
-
             if (currRequest == null)
             {
                 return false;
@@ -77,34 +61,7 @@ namespace friendlyPMC.Components
 
             if (botOwner_0.Medecine.FirstAid.Have2Do || botOwner_0.Medecine.SurgicalKit.HaveWork || botOwner_0.Medecine.Using) return false;
 
-
-            pitAIBossPlayer boss = null;
-            if (botOwner_0.BotFollower.BossToFollow != null)
-            {
-                boss = BossPlayers.Instance.GetBossPlayer(botOwner_0.BotFollower.BossToFollow.Player().ProfileId);
-            }
-
-            if (
-                    (
-                        // boss can throw all types of requests
-                        boss != null && bossRequests.Contains(currRequest.BotRequestType)
-                    ) 
-                    ||
-                    // teammates only some
-                    (
-                        boss != null &&
-                        boss.Followers.Contains(currRequest.Requester.AIData.BotOwner) && allyAllowedRequest.Contains(currRequest.BotRequestType)
-                    ) ||
-                    (
-                        boss == null &&
-                        botOwner_0.BotsGroup.Contains(currRequest.Requester.AIData.BotOwner)
-                    )
-                )
-            {
-                return true;
-            }
-
-            return false;
+            return true;
         }
 
         private bool HasBoss()

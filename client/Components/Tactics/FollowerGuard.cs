@@ -164,7 +164,7 @@ namespace friendlyPMC.Components.Tactics
 
             if (!botOwner_0.Memory.GoalEnemy.IsSuppressed() && goalEnemy.ShallISuppress())
             {
-                bool useGrenade = friendlyPMC.botGrenades.Value && GClass824.Random(0f, 2f) > 1f;
+                bool useGrenade = botOwner_0.Settings.FileSettings.Core.CanGrenade && GClass824.Random(0f, 2f) > 1f;
                 ThrowWeapType? grenadeType = new ThrowWeapType?(ThrowWeapType.frag_grenade);
                 // - check if player is too close when using grenade
                 if (useGrenade && botOwner_0.WeaponManager.Grenades.HaveGrenadeOfType(grenadeType.Value))
@@ -208,7 +208,8 @@ namespace friendlyPMC.Components.Tactics
                     // - fallback
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.dogFight, "dgf");
 
-                } else
+                }
+                else
                 {
                     // - try to shot enemy
                     if (botOwner_0.Memory.CurCustomCoverPoint != null && botOwner_0.Memory.CurCustomCoverPoint.CanIShootToEnemy)
@@ -224,11 +225,12 @@ namespace friendlyPMC.Components.Tactics
                         {
                             GetClosestAttackCoverPoint(enemyPos, fightRange);
                             getClose = true;
-                        } else
-                        {
-                            GetClosestAttackCoverPoint(commonLayer.HasBoss()? commonLayer.GetBoss().Position : botPosition, fightRange);
                         }
-                            
+                        else
+                        {
+                            GetClosestAttackCoverPoint(commonLayer.HasBoss() ? commonLayer.GetBoss().Position : botPosition, fightRange);
+                        }
+
                         if (customNavigationPoint_0 != null)
                         {
                             return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMoving, getClose ? "getInCloseSlow" : "relocate");
@@ -267,22 +269,23 @@ namespace friendlyPMC.Components.Tactics
                         return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMoving, "getInCloseSlow");
                     }
 
-                    if(PusherLayer != null)
+                    if (PusherLayer != null)
                         return PusherLayer.EngageEnemy(true);
                     else return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.goToEnemy, "pushEnemy");
-                } 
+                }
                 else if (Enemy.Distance(botOwner_0) == Enemy.EnemyDistance.Mid)
                 {
                     return new AICoreActionResultStruct<BotLogicDecision>((BotLogicDecision)CustomBotDecisions.GuardToCover, "coverBoss");
-                } else if(!(botOwner_0.Memory.AttackImmediately && Enemy.GetEnemiesAtLocation(botOwner_0, botOwner_0.Memory.GoalEnemy.ProfileId, enemyPos) < 3))
+                }
+                else if (!(botOwner_0.Memory.AttackImmediately && Enemy.GetEnemiesAtLocation(botOwner_0, botOwner_0.Memory.GoalEnemy.ProfileId, enemyPos) < 3))
                 {
                     return new AICoreActionResultStruct<BotLogicDecision>((BotLogicDecision)CustomBotDecisions.GuardToCover, "coverBoss");
                 }
 
                 // - look for a shooting spot
                 GetApproachablePoint();
-                if(customNavigationPoint_0 == null)
-                    GetClosestAttackCoverPoint(commonLayer.GetBoss().realPlayer.Transform.position,50f);
+                if (customNavigationPoint_0 == null)
+                    GetClosestAttackCoverPoint(commonLayer.GetBoss().realPlayer.Transform.position, 50f);
 
                 if (customNavigationPoint_0 != null && coverTimer < Time.time)
                 {
@@ -290,7 +293,7 @@ namespace friendlyPMC.Components.Tactics
                     return new AICoreActionResultStruct<BotLogicDecision>((BotLogicDecision)CustomBotDecisions.RunToCover, "relocateFast");
                 }
 
-                if(commonLayer.ShallGoNearBoss())
+                if (commonLayer.ShallGoNearBoss())
                 {
                     customNavigationPoint_0 = commonLayer.GetClosestCoverPointGroup(commonLayer.GetBoss().realPlayer.Transform.position, commonLayer.coverSearchRadius);
 
@@ -313,13 +316,13 @@ namespace friendlyPMC.Components.Tactics
         /** Check if we can do grenade launcher support **/
         public AICoreActionResultStruct<BotLogicDecision>? CanDoGrenadierSuppressRequest(Ray rayDirection)
         {
-            if(!botOwner_0.WeaponManager.Selector.CanChangeToSecondWeapons) return null;
+            if (!botOwner_0.WeaponManager.Selector.CanChangeToSecondWeapons) return null;
             GClass441 selector = botOwner_0.WeaponManager.Selector as GClass441;
 
             if (selector != null && (selector.SecondPrimaryWeapon as Weapon) != null && (selector.SecondPrimaryWeapon as Weapon).IsGrenadeLauncher)
             {
                 RaycastHit[] hits = new RaycastHit[20];
-                
+
                 float scanDistance = 120f;
 
                 float sphereRadius = scanDistance / 2;
@@ -349,7 +352,7 @@ namespace friendlyPMC.Components.Tactics
 
                         if (enemy != null)
                         {
-                            if(commonLayer.HasBoss())
+                            if (commonLayer.HasBoss())
                             {
                                 pitAIBossPlayer boss = commonLayer.GetBoss();
                                 if (boss.Followers.Find(fl => fl.ProfileId == enemy.ProfileId) != null) continue;
@@ -358,11 +361,11 @@ namespace friendlyPMC.Components.Tactics
 
                                 if (!isenemy && boss.bossGroup.IsPlayerEnemy(enemy)) isenemy = true;
                             }
-                            else if(botOwner_0.BotsGroup.IsEnemy(enemy) || botOwner_0.BotsGroup.IsPlayerEnemy(enemy))
+                            else if (botOwner_0.BotsGroup.IsEnemy(enemy) || botOwner_0.BotsGroup.IsPlayerEnemy(enemy))
                             {
                                 isenemy = true;
                             }
-                            
+
                         }
 
                         if (isenemy)
@@ -379,7 +382,7 @@ namespace friendlyPMC.Components.Tactics
                     }
                 }
 
-                if(list_2.Count < 1) return null;
+                if (list_2.Count < 1) return null;
 
                 if (botOwner_0.WeaponManager.Selector.LastEquipmentSlot != EquipmentSlot.SecondPrimaryWeapon)
                     botOwner_0.WeaponManager.Selector.TryChangeWeapon(true);
@@ -389,13 +392,13 @@ namespace friendlyPMC.Components.Tactics
 
                 foreach (Vector3 position in list_2)
                 {
-                    Singleton<BotEventHandler>.Instance.ArtilleryStart(position, 20f,delay);
+                    Singleton<BotEventHandler>.Instance.ArtilleryStart(position, 20f, delay);
                 }
 
                 return GrenadierDecision();
             }
 
-            
+
             return null;
         }
         public bool method_35()

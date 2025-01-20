@@ -2,9 +2,12 @@
 - x - even without SAIN bots pick up enemies through walls, at a distance (check ground zero map)
 - - nothing can be done
 
-- x - investigate issues picked up followers
+- investigate issues picked up followers
 - x - fix followers seeing the newly added member as an enemy
 - x - picked up bots do not attack enemy bots when using SAIN
+- - picked up followers do not obey any command
+
+- find out why bots freeze on death randomly (it's not actually weapon kit)
  
 - x - make followers stop looking down when out of combat
 

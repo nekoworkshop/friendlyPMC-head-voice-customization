@@ -20,6 +20,7 @@ using friendlyPMC.Components;
 
 using UnityEngine.AI;
 using UnityEngine.Profiling;
+using friendlyPMC.Utils;
 
 
 namespace friendlyPMC.Modules

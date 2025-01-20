@@ -6,7 +6,6 @@ using HarmonyLib;
 
 using System.Reflection;
 using JetBrains.Annotations;
-using UnityEngine;
 
 namespace friendlyPMC.Patches
 {
@@ -23,20 +22,20 @@ namespace friendlyPMC.Patches
         [PatchPostfix]
         private static void PatchPostFix(BotMemoryClass __instance, [NotNull] IPlayer enemy, BotSettingsClass groupInfo, bool onActivation)
         {
-            if( enemy == null ) return;
-            
+            if (enemy == null) return;
+
             var botOwner_0 = AccessTools.Field(typeof(BotMemoryClass), "botOwner_0").GetValue(__instance) as BotOwner;
 
             // - do not assign enemies to followers if the enemy just spawned
-            if(BossPlayers.IsFollower(botOwner_0) && enemy != null && (groupInfo.Cause == EBotEnemyCause.addBotAtGroup || groupInfo.Cause == EBotEnemyCause.addBotNoGroup))
+            if (BossPlayers.IsFollower(botOwner_0) && enemy != null && (groupInfo.Cause == EBotEnemyCause.addBotAtGroup || groupInfo.Cause == EBotEnemyCause.addBotNoGroup))
             {
                 foreach (var enInfo in botOwner_0.EnemiesController.EnemyInfos)
                 {
-                    if(enInfo.Key.ProfileId == enemy.ProfileId)
+                    if (enInfo.Key.ProfileId == enemy.ProfileId)
                     {
                         enInfo.Value.SetVisible(false);
                         enInfo.Value.GroupInfo.EnemyLastSeenTimeSense = 0f;
-                        if(__instance.GoalEnemy != null && __instance.GoalEnemy.ProfileId == enemy.ProfileId)
+                        if (__instance.GoalEnemy != null && __instance.GoalEnemy.ProfileId == enemy.ProfileId)
                         {
                             __instance.GoalEnemy = null;
                         }
@@ -58,49 +57,56 @@ namespace friendlyPMC.Patches
         [PatchPrefix]
         private static void PatchPrefix(BotMemoryClass __instance, DamageInfoStruct damageInfo)
         {
-            var botOwner_0 = AccessTools.Field(typeof(BotMemoryClass), "botOwner_0").GetValue(__instance) as BotOwner;
-
-            if (damageInfo.Player == null) return;
-
-            bool isfollower = BossPlayers.IsFollower(botOwner_0);
-            if (!isfollower) return;
-
-            bool isBossEnemy = BossPlayers.IsPlayerBoss(damageInfo.Player.iPlayer.ProfileId);
-
-            bool isTeamate = false;
-
-            if (botOwner_0.BotFollower.BossToFollow == null) return;
-
-            botOwner_0.BotFollower.BossToFollow.Followers.ForEach(bt =>
+            try
             {
-                if (bt.ProfileId == damageInfo.Player.iPlayer.ProfileId) isTeamate = true;
-            });
+                var botOwner_0 = AccessTools.Field(typeof(BotMemoryClass), "botOwner_0").GetValue(__instance) as BotOwner;
 
-            if (!(isBossEnemy || isTeamate)) return;
+                if (damageInfo.Player == null) return;
 
-            var brain = botOwner_0.Brain.BaseBrain as FollowerBrain;
-            if (brain == null) return;
-            
-            if (brain.currentTactic == "Assist")
-            {
-                var boss = botOwner_0.BotFollower.BossToFollow as pitAIBossPlayer;
-                if (boss == null) return;
+                bool isfollower = BossPlayers.IsFollower(botOwner_0);
+                if (!isfollower) return;
 
-                if (damageInfo.Damage <= botOwner_0.Settings.FileSettings.Aiming.MIN_DAMAGE_TO_GET_HIT_AFFETS)
+                bool isBossEnemy = BossPlayers.IsPlayerBoss(damageInfo.Player.iPlayer.ProfileId);
+
+                bool isTeamate = false;
+
+                if (botOwner_0.BotFollower.BossToFollow == null) return;
+
+                botOwner_0.BotFollower.BossToFollow.Followers.ForEach(bt =>
+                {
+                    if (bt.ProfileId == damageInfo.Player.iPlayer.ProfileId) isTeamate = true;
+                });
+
+                if (!(isBossEnemy || isTeamate)) return;
+
+                var brain = botOwner_0.Brain.BaseBrain as FollowerBrain;
+                if (brain == null) return;
+
+                if (brain.currentTactic == "Assist")
+                {
+                    var boss = botOwner_0.BotFollower.BossToFollow as pitAIBossPlayer;
+                    if (boss == null) return;
+
+                    if (damageInfo.Damage <= botOwner_0.Settings.FileSettings.Aiming.MIN_DAMAGE_TO_GET_HIT_AFFETS)
+                    {
+                        botOwner_0.BotTalk.TrySay(EPhraseTrigger.FriendlyFire, true);
+                        return;
+                    }
+
+                    botOwner_0.BotTalk.TrySay(EPhraseTrigger.Rat, false);
+
+                    var follower = BossPlayers.Instance.GetFollower(botOwner_0);
+                    BossPlayers.RemoveFollower(botOwner_0, boss);
+                    follower.Dismiss(true);
+                }
+                else
                 {
                     botOwner_0.BotTalk.TrySay(EPhraseTrigger.FriendlyFire, true);
-                    return;
                 }
-
-                botOwner_0.BotTalk.TrySay(EPhraseTrigger.Rat, false);
-
-                var follower = BossPlayers.Instance.GetFollower(botOwner_0);
-                BossPlayers.RemoveFollower(botOwner_0, boss);
-                follower.Dismiss(true);
-            } 
-            else
+            }
+            catch (System.Exception e)
             {
-                botOwner_0.BotTalk.TrySay(EPhraseTrigger.FriendlyFire, true);
+                Modules.Logger.LogError(e);
             }
         }
     }

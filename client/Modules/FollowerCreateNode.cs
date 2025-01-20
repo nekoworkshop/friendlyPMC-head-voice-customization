@@ -10,7 +10,7 @@ namespace friendlyPMC.Modules
 
         public static GClass156 CreateNode(BotLogicDecision type, BotOwner bot)
         {
-            if(type == BotLogicDecision.doorOpen)
+            if (type == BotLogicDecision.doorOpen)
                 return new FollowerOpenDoor(bot);
 
             if (type == BotLogicDecision.botTakeItem)
@@ -18,25 +18,25 @@ namespace friendlyPMC.Modules
                 return new FollowerTakeLoot(bot);
             }
 
-            if(type == BotLogicDecision.attackMoving)
-                 return new FollowerAttackMove(bot);
+            if (type == BotLogicDecision.attackMoving)
+                return new FollowerAttackMove(bot);
 
-            if(type == BotLogicDecision.holdPosition) 
+            if (type == BotLogicDecision.holdPosition)
                 return new FollowerHoldPosition(bot);
-            
+
             if (type == BotLogicDecision.goToPoint)
                 return new FollowerGoToPoint(bot);
 
             if (type == (BotLogicDecision)CustomBotDecisions.MoveToPoint)
                 return new FollowerMoveToPoint(bot);
 
-            if(type == (BotLogicDecision)CustomBotDecisions.SniperSearch)
+            if (type == (BotLogicDecision)CustomBotDecisions.SniperSearch)
                 return new FollowerSniperSearch(bot);
 
-            if(type == (BotLogicDecision)CustomBotDecisions.CoverToCover)
+            if (type == (BotLogicDecision)CustomBotDecisions.CoverToCover)
                 return new FollowerCoverToCover(bot);
 
-            if(type == (BotLogicDecision)CustomBotDecisions.GuardToCover)
+            if (type == (BotLogicDecision)CustomBotDecisions.GuardToCover)
                 return new FollowerGuardCover(bot);
 
             if (type == (BotLogicDecision)CustomBotDecisions.EnemySearch)
@@ -48,7 +48,7 @@ namespace friendlyPMC.Modules
             if (type == (BotLogicDecision)CustomBotDecisions.RunToCover)
                 return new FollowerRunToCover(bot);
 
-            if(type == BotLogicDecision.dogFight)
+            if (type == BotLogicDecision.dogFight)
                 return new FollowerDogFight(bot);
 
             if (type == BotLogicDecision.suppressFire)
@@ -58,7 +58,7 @@ namespace friendlyPMC.Modules
             {
                 return new FollowerPatrol(bot);
             }
-                
+
 
             return GClass507.CreateNode(type, bot);
         }
