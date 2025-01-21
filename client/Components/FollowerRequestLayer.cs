@@ -18,16 +18,13 @@ namespace friendlyPMC.Components
 
         private CustomNavigationPoint customNavigationPoint_0;
 
-        private FollowerCommonLayer commonLayer;
-
         float heal_time = 0f;
         public FollowerRequestLayer(BotOwner bot, int priority) : base(bot, priority)
         {
-            commonLayer = new FollowerCommonLayer(bot, priority);
         }
 
         AICoreActionResultStruct<BotLogicDecision>? regroupDecision = null;
-        AICoreActionResultStruct<BotLogicDecision>?  hideDecision = null;
+        AICoreActionResultStruct<BotLogicDecision>? hideDecision = null;
 
         public override string Name()
         {
@@ -44,14 +41,15 @@ namespace friendlyPMC.Components
             {
                 if (botOwner_0.BotRequestController.CurRequest?.BotRequestType == BotRequestType.wait)
                     botOwner_0.BotRequestController.CurRequest.Complete();
-
                 return false;
             }
 
             var brain = botOwner_0.Brain.BaseBrain as FollowerBrain;
 
-            if (brain != null && brain.UnderFire) return false;
-
+            if (brain != null && brain.UnderFire)
+            {
+                return false;
+            }
             BotRequest currRequest = botOwner_0.BotRequestController.CurRequest;
 
             if (currRequest == null)
@@ -73,7 +71,7 @@ namespace friendlyPMC.Components
         {
             BotRequest request = botOwner_0.BotRequestController.CurRequest;
 
-            if(request == null)
+            if (request == null)
             {
                 return new AICoreActionResultStruct<BotLogicDecision>(HasBoss() ? BotLogicDecision.followerPatrol : HoldOrCover(botOwner_0), "req:Error");
             }
@@ -105,14 +103,14 @@ namespace friendlyPMC.Components
                     }, 2000);
 
                     regroupDecision = BotLogicDecisions.RegroupToBoss(botOwner_0);
-                    
+
                     return regroupDecision.Value;
 
                 // stay in place
                 case BotRequestType.wait:
                     hideDecision = null;
                     regroupDecision = null;
-                    if (heal_time + 30f < Time.time  && (botOwner_0.Medecine.FirstAid.Have2Do || botOwner_0.Medecine.SurgicalKit.HaveWork))
+                    if (heal_time + 30f < Time.time && (botOwner_0.Medecine.FirstAid.Have2Do || botOwner_0.Medecine.SurgicalKit.HaveWork))
                     {
                         heal_time = Time.time;
                         return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.heal, "heal");
@@ -123,7 +121,7 @@ namespace friendlyPMC.Components
                 case BotRequestType.getInCover:
                 case BotRequestType.hide:
                     regroupDecision = null;
-                    
+
                     if (hideDecision.HasValue) return hideDecision.Value;
 
                     GetCoverPoint(botOwner_0.GetPlayer.Transform.position, 50f);
@@ -132,8 +130,8 @@ namespace friendlyPMC.Components
                         Utils.Utils.SetTimeout(() =>
                         {
                             if (
-                                botOwner_0 != null && !botOwner_0.IsDead && botOwner_0.BotState == EBotState.Active && request != null && 
-                                ( request.BotRequestType == BotRequestType.hide || request.BotRequestType == BotRequestType.getInCover)
+                                botOwner_0 != null && !botOwner_0.IsDead && botOwner_0.BotState == EBotState.Active && request != null &&
+                                (request.BotRequestType == BotRequestType.hide || request.BotRequestType == BotRequestType.getInCover)
                             )
                             {
                                 request.Complete();
@@ -144,20 +142,21 @@ namespace friendlyPMC.Components
                         hideDecision = new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "req:runHide");
                         return hideDecision.Value;
 
-                    } else
+                    }
+                    else
                     {
                         request.Complete();
 
                         return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.holdPosition, "req:cantHide");
                     }
-
+                // "over there" request
                 case BotRequestType.goToPoint:
                     regroupDecision = null;
                     hideDecision = null;
                     return new AICoreActionResultStruct<BotLogicDecision>((BotLogicDecision)CustomBotDecisions.MoveToPoint, "req:goCheck");
             }
 
-            
+
             botOwner_0.BotTalk.TrySay(EPhraseTrigger.Negative, false);
             request.Complete();
             return new AICoreActionResultStruct<BotLogicDecision>(HasBoss() ? BotLogicDecision.followerPatrol : HoldOrCover(botOwner_0), "req:Unhandled");
@@ -174,9 +173,9 @@ namespace friendlyPMC.Components
                 result = new AICoreActionEndStruct("point.Reached", true);
             }
 
-            result =  base.ShallEndCurrentDecision(curDecision);
-            
-            if(result.Value)
+            result = base.ShallEndCurrentDecision(curDecision);
+
+            if (result.Value)
             {
                 regroupDecision = null;
                 hideDecision = null;
@@ -226,7 +225,8 @@ namespace friendlyPMC.Components
             if (this.customNavigationPoint_0 != null)
             {
                 return this.customNavigationPoint_0;
-            } else
+            }
+            else
             {
                 GetCoverPoint(botOwner_0.GetPlayer.Transform.position, 70f);
             }
@@ -244,6 +244,6 @@ namespace friendlyPMC.Components
             botOwner_0.Memory.SetCoverPoints(customNavigationPoint_0);
         }
 
-        
+
     }
 }

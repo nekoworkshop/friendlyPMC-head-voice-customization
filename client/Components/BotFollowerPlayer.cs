@@ -170,6 +170,7 @@ namespace friendlyPMC.Components
             if (baseBrain != null) baseBrain.Dispose();
             _bot.BotState = EBotState.NonActive;
             _bot.Receiver.Dispose();
+            
 
             // add special follower settings
             SetFollowerSettings(_bot);
@@ -228,6 +229,10 @@ namespace friendlyPMC.Components
                     var botsGroupField = AccessTools.Field(typeof(BotMemoryClass), "botsGroup_0");
                     botsGroupField.SetValue(_bot.Memory, _bot.BotsGroup);
 
+                    var _groupRequestController = AccessTools.Field(typeof(BotRequestController), "_groupRequestController");
+                    (_groupRequestController.GetValue(_bot.BotRequestController) as BotGroupRequestController).OnAddRequest -= _bot.BotRequestController.method_0;
+                    _groupRequestController.SetValue(_bot.BotRequestController, null);
+
                     var botEnemies = _bot.EnemiesController.EnemyInfos.ToList();
                     foreach (var item in botEnemies)
                     {
@@ -241,18 +246,22 @@ namespace friendlyPMC.Components
                     }
                 }
             }
-            // if there is no group yet, take the bot's group (PickUp case here without spawn)
+            // if there is no group yet, make one and group the player with the bot (PickUp case here without spawn)
             else
             {
-                _bot.BotsGroup.RemoveAlly(_bot);
+                _bot.BotsGroup.RemoveAlly(_bot); // bot's current group might have other members - we don't need them
 
                 var botsGroupField = AccessTools.Field(typeof(BotMemoryClass), "botsGroup_0");
+                var _groupRequestController = AccessTools.Field(typeof(BotRequestController), "_groupRequestController");
+                (_groupRequestController.GetValue(_bot.BotRequestController) as BotGroupRequestController).OnAddRequest -= _bot.BotRequestController.method_0;
+                _groupRequestController.SetValue(_bot.BotRequestController, null);
 
                 BotZone zone = _bot.BotsController.BotSpawner.GetClosestZone(_bot.GetPlayer.Transform.position, out var zoneDist);
                 BotsGroup group = _bot.BotsController.BotSpawner.GetGroupAndSetEnemies(_bot, zone);
 
                 _bot.BotsGroup = group;
                 botsGroupField.SetValue(_bot.Memory, group);
+                _groupRequestController.SetValue(_bot.BotRequestController, group.RequestsController);
 
                 // - go through the enemy filtering process
                 var groupEnemies = _bot.BotsGroup.Enemies;
@@ -390,14 +399,27 @@ namespace friendlyPMC.Components
 
             settings.FileSettings.Core.CanGrenade = friendlyPMC.botGrenades.Value;
             settings.FileSettings.Core.CanRun = true;
+            settings.FileSettings.Core.AccuratySpeed = 0.25f;
 
             settings.FileSettings.Cover.CHECK_CLOSEST_FRIEND = true;
+            settings.FileSettings.Cover.DOG_FIGHT_AFTER_LEAVE = 1;
+            settings.FileSettings.Cover.HIDE_TO_COVER_TIME = 5;
+            settings.FileSettings.Cover.HITS_TO_LEAVE_COVER = 2;
+            settings.FileSettings.Cover.HITS_TO_LEAVE_COVER_UNKNOWN = 2;
+            settings.FileSettings.Cover.TIME_TO_MOVE_TO_COVER = 15;
+            settings.FileSettings.Cover.RETURN_TO_ATTACK_AFTER_AMBUSH_MIN = 20;
+            settings.FileSettings.Cover.RETURN_TO_ATTACK_AFTER_AMBUSH_MAX = 50;
+            settings.FileSettings.Cover.SPOTTED_GRENADE_RADIUS = 24f;
+            settings.FileSettings.Cover.SPOTTED_GRENADE_TIME = 7;
 
-            settings.FileSettings.Aiming.COEF_IF_MOVE = 2f;
+            settings.FileSettings.Aiming.COEF_IF_MOVE = 1f;
             settings.FileSettings.Aiming.MAX_AIM_TIME = 1.5f;
             settings.FileSettings.Aiming.SHPERE_FRIENDY_FIRE_SIZE = 0.5f;
             settings.FileSettings.Aiming.AIMING_TYPE = 6; // the head is a priority
-            settings.FileSettings.Aiming.ANY_PART_SHOOT_TIME = 5f; // what is this, what does it do?
+            settings.FileSettings.Aiming.ANY_PART_SHOOT_TIME = 0.3f; // what is this, what does it do?
+            settings.FileSettings.Aiming.ANYTIME_LIGHT_WHEN_AIM_100 = 70;
+            settings.FileSettings.Aiming.BAD_SHOOTS_MAX = 3;
+            settings.FileSettings.Aiming.BAD_SHOOTS_MIN = 1;
 
 
             settings.FileSettings.Look.CAN_USE_LIGHT = true;
@@ -596,7 +618,6 @@ namespace friendlyPMC.Components
                     _bot.BotFollower.BossToFollow.RemoveFollower(_bot);
                     _bot.BotFollower.BossToFollow = null;
 
-
                 }
                 // - bot might have request going on, dispose it
                 if (_bot.BotRequestController.CurRequest != null)
@@ -656,7 +677,12 @@ namespace friendlyPMC.Components
                 _bot.BotsGroup = group;
 
                 var botsGroupField = AccessTools.Field(typeof(BotMemoryClass), "botsGroup_0");
+                var _groupRequestController = AccessTools.Field(typeof(BotRequestController), "_groupRequestController");
+                (_groupRequestController.GetValue(_bot.BotRequestController) as BotGroupRequestController).OnAddRequest -= _bot.BotRequestController.method_0;
+                _groupRequestController.SetValue(_bot.BotRequestController, null);
+
                 botsGroupField.SetValue(_bot.Memory, group);
+                _groupRequestController.SetValue(_bot.BotRequestController, group.RequestsController);
 
                 _bot.GetPlayer.Profile.Info.GroupId = _grouId;
                 _bot.GetPlayer.Profile.Info.TeamId = _teamId;

@@ -2,23 +2,20 @@
 - x - even without SAIN bots pick up enemies through walls, at a distance (check ground zero map)
 - - nothing can be done
 
-- investigate issues picked up followers
+- x - investigate issues picked up followers
 - x - fix followers seeing the newly added member as an enemy
 - x - picked up bots do not attack enemy bots when using SAIN
-- - picked up followers do not obey any command
+- x - picked up followers do not obey any command
 
-- find out why bots freeze on death randomly (it's not actually weapon kit)
- 
 - x - make followers stop looking down when out of combat
-
-- attempt to make transit work while in a group with followers
 
 - x - fix scav run with followers (needs to use a similar call to followergenerate to avoid generating PMC as scav follower)
 
 - x - add option to disable throwing grenades
 
 -- === 3.9.6 === ---:
--picked followers do not attack the player after turning hostile
+- find out why bots freeze on death randomly (it's not actually weapon kit)
+- attempt to make transit work while in a group with followers
 - see if we can make bot swap weapons when asked to loot (DeadBodyWork)
 - - this should also allow bot to put that weapon as seconday (in case of support without a grenade launcher)
 
@@ -41,6 +38,7 @@ fixed picked up followers not attacking enemies
 attempt to address followers looking down when out of combat (might still happen but much less often)
 fixed spawning with followers as SCAV
 added option to disable throwing grenades
+fixed Knight standing calculation when doing successfull raids with the Goons or when killing any of them
 
 TO ADD as Known Issue:
 some weapon kits, even if they are standard weapons can cause several issues with the spawned followers, from freezing when dying to sound problems. There is no fix at the moment for this, simply choose a different kit.
@@ -50,6 +48,10 @@ even small bushes can make the enemy invisible to the followers when yelling "co
 followers picked up do not turn hostile on friendly fire and instead just sit there (WIP)
 
 ==================================================================================
+
+
+REVISIT:
+- picked followers do not attack the player after turning hostile
 
 NOTES:
 - we can save a bot's profile after it was generated in order to be re-used by simply sending the profile to BE. We should save it by nickname. (we still need to figure out how to progress the bot's level with the player )

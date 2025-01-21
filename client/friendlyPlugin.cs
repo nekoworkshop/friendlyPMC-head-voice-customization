@@ -225,7 +225,7 @@ namespace friendlyPMC
             new BotGroupAddEnemyPatch().Enable();
             new BotMemoryAddEnemyPatch().Enable();
 
-            new BotMemoryDamagePatch().Enable();
+            //new BotMemoryDamagePatch().Enable();
             new BotGroupUsecEnemyPatch().Enable();
             new ExUsecBrainHitPatch().Enable();
 

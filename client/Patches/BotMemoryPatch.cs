@@ -47,6 +47,7 @@ namespace friendlyPMC.Patches
     }
     /**
      * Patch to turn "Assist" followers into hostile on friendly fire
+     * @notinuse
      */
     internal class BotMemoryDamagePatch : ModulePatch
     {

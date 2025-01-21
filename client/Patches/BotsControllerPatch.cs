@@ -73,7 +73,7 @@ namespace friendlyPMC.Patches
             pmcCreationTask = new Dictionary<string, Task<BotCreationDataClass>>();
         }
 
-        private AICorePoint GetClosestCorePoint(BotsController _botsController,Vector3 position)
+        private AICorePoint GetClosestCorePoint(BotsController _botsController, Vector3 position)
         {
             var coversData = _botsController.CoversData;
             var groupPoint = coversData.GetClosest(position);
@@ -82,7 +82,7 @@ namespace friendlyPMC.Patches
 
         private BotsGroup GetPlayerGroup(pitAIBossPlayer player, BotOwner bt, BotZone zn, int groupSize = 0, bool badGuyGroup = false)
         {
-            if(player.bossGroup != null) return player.bossGroup;
+            if (player.bossGroup != null) return player.bossGroup;
 
             BotSpawner botSpawnerClass = Controller.BotSpawner;
 
@@ -113,7 +113,7 @@ namespace friendlyPMC.Patches
                 roleh = WildSpawnType.assault;
             }
 
-            if(!badGuyGroup) GetSameSideFriendly(roleh, player.realPlayer.Side, out sameSideFriendly);
+            if (!badGuyGroup) GetSameSideFriendly(roleh, player.realPlayer.Side, out sameSideFriendly);
 
             EPlayerSide side = player.realPlayer.Side;
 
@@ -137,13 +137,13 @@ namespace friendlyPMC.Patches
 
                 bt.Settings.FileSettings.Mind.DEFAULT_SAVAGE_BEHAVIOUR = EWarnBehaviour.AlwaysEnemies;
 
-                if(badGuyGroup) 
+                if (badGuyGroup)
                 {
                     bt.Settings.FileSettings.Mind.DEFAULT_BEAR_BEHAVIOUR = EWarnBehaviour.AlwaysEnemies;
                     bt.Settings.FileSettings.Mind.DEFAULT_USEC_BEHAVIOUR = EWarnBehaviour.AlwaysEnemies;
-                    
-                } 
-                else 
+
+                }
+                else
                 {
 
                     if (side == EPlayerSide.Bear)
@@ -159,9 +159,9 @@ namespace friendlyPMC.Patches
                 {
                     list.Add(item2);
                 }
-                
+
                 botsGroup = new BotsGroupPlayer(zn, botGame, bt, list, deadBodiesController, allPlayers, player);
-                if(groupSize != 0) botsGroup.TargetMembersCount = groupSize;
+                if (groupSize != 0) botsGroup.TargetMembersCount = groupSize;
 
                 if (_freeForAll)
                 {
@@ -181,7 +181,7 @@ namespace friendlyPMC.Patches
                 bt.Settings.FileSettings.Mind.DEFAULT_USEC_BEHAVIOUR = oldBehaviorUsec;
                 bt.Settings.FileSettings.Mind.DEFAULT_SAVAGE_BEHAVIOUR = oldBehaviorSavage;
 
-            } 
+            }
             else
             {
                 foreach (BotOwner item2 in botSpawnerClass.method_4(bt))
@@ -211,19 +211,19 @@ namespace friendlyPMC.Patches
         {
             isFriends = true;
 
-            if(friendlyPMC.badGuy.Value || Utils.Utils.FlagGet("isBadGuy"))
+            if (friendlyPMC.badGuy.Value || Utils.Utils.FlagGet("isBadGuy"))
             {
                 isFriends = false;
                 return;
             }
 
-            if(friendlyPMC.friendlyPMCFLAG.Value)
+            if (friendlyPMC.friendlyPMCFLAG.Value)
             {
                 return;
             }
         }
 
-        private async UniTask ActivateBotFollower(BotCreator botCreator, Profile profile, GClass649 position, BotZone zone,bool shallBeGroup, Func<BotOwner, BotZone, BotsGroup> GroupAction, Action<BotOwner> OnActivate,CancellationToken token)
+        private async UniTask ActivateBotFollower(BotCreator botCreator, Profile profile, GClass649 position, BotZone zone, bool shallBeGroup, Func<BotOwner, BotZone, BotsGroup> GroupAction, Action<BotOwner> OnActivate, CancellationToken token)
         {
 
             GClass888.Class565 @class = new GClass888.Class565();
@@ -231,13 +231,13 @@ namespace friendlyPMC.Patches
             @class.zone = zone;
             @class.callback = OnActivate;
             @class.groupAction = GroupAction;
-            if(profile == null)
+            if (profile == null)
             {
                 Modules.Logger.LogError("Profile is null");
             }
-            
+
             await Task.Yield();
-            
+
             try
             {
                 await botCreator.method_2(profile, position, new Action<BotOwner>(@class.method_0), true, token);
@@ -247,7 +247,7 @@ namespace friendlyPMC.Patches
                 Modules.Logger.LogError("Failed to activate bot follower");
                 Modules.Logger.LogError(ex);
             }
-            
+
             await Task.Yield();
 
             /*await botCreator.ActivateBot(
@@ -261,14 +261,14 @@ namespace friendlyPMC.Patches
         }
 
         /** Fetch Follower Profile data along with custom appearance from server */
-        private async UniTask<Profile> FetchMemberProfile(KeyValuePair<int,List<BepInEx.Configuration.ConfigEntry<string>>> member, Profile boss, BotCreator botCreator, EPlayerSide side, WildSpawnType role, BotSpawnParams spawnParams)
+        private async UniTask<Profile> FetchMemberProfile(KeyValuePair<int, List<BepInEx.Configuration.ConfigEntry<string>>> member, Profile boss, BotCreator botCreator, EPlayerSide side, WildSpawnType role, BotSpawnParams spawnParams)
         {
             IProfileData data = new IProfileData(side, role, BotDifficulty.hard, 0f, spawnParams);
 
             Dictionary<string, dynamic> customization = new Dictionary<string, dynamic>();
 
             // assign custom clothes, if set
-            if(side != EPlayerSide.Savage)
+            if (side != EPlayerSide.Savage)
             {
                 List<string[]> uniforms = friendlyPMC.GetUniformOptions();
                 string[] equipOptions = friendlyPMC.GetEquipOptions();
@@ -313,7 +313,7 @@ namespace friendlyPMC.Patches
                 {
                     customization["Nickname"] = nickname;
                 }
-                
+
                 // assign custom equipment, if set
                 string eq = member.Value[1].Value;
                 if (eq != null && eq != equipOptions[0])
@@ -353,7 +353,7 @@ namespace friendlyPMC.Patches
          * **/
         private async UniTask<Dictionary<int, Profile>> CreateProfilesJob(pitAIBossPlayer player)
         {
-            Dictionary<int,Profile> profiles = new Dictionary<int,Profile>();
+            Dictionary<int, Profile> profiles = new Dictionary<int, Profile>();
 
             string[] equipOptions = friendlyPMC.GetEquipOptions();
 
@@ -382,7 +382,7 @@ namespace friendlyPMC.Patches
             @params.ShallBeGroup = new ShallBeGroupParams(true, false, memberCount + 1);
 
             Profile playerProfile = player.realPlayer.Profile;
-            
+
             List<UniTask> profileTasks = new List<UniTask>();
 
             if (friendlyPMC.squadSetup.Value)
@@ -393,7 +393,7 @@ namespace friendlyPMC.Patches
                     if (member.Value[1].Value != equipOptions[0])
                     {
                         // fetch profile from server
-                        profileTasks.Add(FetchMemberProfile(member,playerProfile,botCreator,side,type,@params).ContinueWith(dt =>
+                        profileTasks.Add(FetchMemberProfile(member, playerProfile, botCreator, side, type, @params).ContinueWith(dt =>
                         {
                             profiles[member.Key] = dt;
                         }));
@@ -453,7 +453,8 @@ namespace friendlyPMC.Patches
                                             bundleTokens.Add(profile.Id, new List<DependencyGraph<IEasyBundle>.GClass3802>());
                                         }
                                         bundleTokens[profile.Id].Add(item.GetAllBundleTokens());
-                                    };
+                                    }
+                                    ;
 
                                     bundleJobs[preset.Name] = profile.Id;
 
@@ -478,7 +479,7 @@ namespace friendlyPMC.Patches
             // gather what equipment bundles this bot needs to wait for
             List<UniTask> bundleTasks = new List<UniTask>();
 
-            foreach( var item in profiles)
+            foreach (var item in profiles)
             {
                 Profile profile = item.Value;
 
@@ -495,7 +496,7 @@ namespace friendlyPMC.Patches
             Modules.Logger.LogInfo("Fetching preset assets...");
             try
             {
-                if(bundleTasks.Count > 0) 
+                if (bundleTasks.Count > 0)
                     await UniTask.WhenAll(bundleTasks);
             }
             catch (Exception ex)
@@ -507,7 +508,7 @@ namespace friendlyPMC.Patches
 
             Modules.Logger.LogInfo("Preset assets fetched");
 
-            
+
             foreach (var item in profiles)
             {
                 Profile profile = item.Value;
@@ -521,11 +522,11 @@ namespace friendlyPMC.Patches
 
                         Slot botSlot = profile.Inventory.Equipment.GetSlot(slotType);
 
-                        if(botSlot.IsSpecial) continue;
+                        if (botSlot.IsSpecial) continue;
 
                         Slot cloneSlot = profileEquipment[profile.Id].GetSlot(slotType);
 
-                        if(cloneSlot.IsSpecial) continue;
+                        if (cloneSlot.IsSpecial) continue;
 
                         Item contained = cloneSlot.ContainedItem;
 
@@ -644,7 +645,7 @@ namespace friendlyPMC.Patches
 
                 // --- stress
                 float scaledStrees = Utils.Utils.GetScaledValue(0f, stressIncrement, botLevel, maxStress);
-                if(profile.Skills.StressResistance.Current < scaledStrees)
+                if (profile.Skills.StressResistance.Current < scaledStrees)
                     profile.Skills.StressResistance.SetCurrent(scaledStrees, true);
 
                 // --- perception
@@ -692,12 +693,12 @@ namespace friendlyPMC.Patches
             BotSpawnParams @params = new BotSpawnParams();
             @params.ShallBeGroup = new ShallBeGroupParams(true, false, 4);
 
-            if(type.HasValue)
+            if (type.HasValue)
             {
                 IProfileData botData = new IProfileData(side, type.Value, BotDifficulty.normal, 0f, @params);
                 return BotCreationDataClass.Create(botData, botCreator, 1, botSpawnerClass);
             }
-            
+
 
             foreach (var boss in bosses)
             {
@@ -710,7 +711,7 @@ namespace friendlyPMC.Patches
 
         }
 
-        private Task<BotCreationDataClass> GetBossProfile(pitAIBossPlayer player,WildSpawnType boss)
+        private Task<BotCreationDataClass> GetBossProfile(pitAIBossPlayer player, WildSpawnType boss)
         {
             if (bossCreationTask.ContainsKey(boss))
             {
@@ -740,9 +741,9 @@ namespace friendlyPMC.Patches
 
             for (int i = 0; i < memberCount; i++)
             {
-                tasks.Add(FetchMemberProfile(new KeyValuePair<int, List<BepInEx.Configuration.ConfigEntry<string>>>{},player.realPlayer.Profile,botCreator,EPlayerSide.Savage,WildSpawnType.assault,@params));
+                tasks.Add(FetchMemberProfile(new KeyValuePair<int, List<BepInEx.Configuration.ConfigEntry<string>>> { }, player.realPlayer.Profile, botCreator, EPlayerSide.Savage, WildSpawnType.assault, @params));
             }
-            
+
             alliesCreationTask[player.realPlayer.ProfileId] = UniTask.WhenAll(tasks).AsTask().ContinueWith((task) =>
             {
                 foreach (var item in task.Result)
@@ -759,7 +760,9 @@ namespace friendlyPMC.Patches
             if (alliesCreationTask.ContainsKey(player.realPlayer.ProfileId))
             {
                 return alliesCreationTask[player.realPlayer.ProfileId];
-            } else {
+            }
+            else
+            {
                 PreFetchScavProfiles(player);
                 return alliesCreationTask[player.realPlayer.ProfileId];
             }
@@ -767,7 +770,7 @@ namespace friendlyPMC.Patches
 
         public Task<BotCreationDataClass> PreFetchPMCProfiles(pitAIBossPlayer player)
         {
-            EPlayerSide side = player.Player().Side;;
+            EPlayerSide side = player.Player().Side; ;
 
             // get what type the bot will be 
             WildSpawnType sptBear = WildSpawnType.pmcBEAR;
@@ -810,7 +813,7 @@ namespace friendlyPMC.Patches
 
         private static bool HasFika()
         {
-            if(!friendlyPMC.botPrefetch.Value) return true;
+            if (!friendlyPMC.botPrefetch.Value) return true;
             return Type.GetType("Fika.Core.Coop.GameMode.CoopGame, Fika.Core") != null;
         }
 
@@ -818,7 +821,7 @@ namespace friendlyPMC.Patches
         {
             float dist;
 
-            CancelToken token = cancelToken != null ? cancelToken :  new CancelToken();
+            CancelToken token = cancelToken != null ? cancelToken : new CancelToken();
 
             var botSpawnerClass = Controller.BotSpawner;
             var botCreator = AccessTools.Field(typeof(BotSpawner), "_botCreator").GetValue(botSpawnerClass) as BotCreator;
@@ -839,23 +842,23 @@ namespace friendlyPMC.Patches
 
             if (boss == WildSpawnType.bossKnight)
             {
-                bossAlly = await GetBossProfile(player,WildSpawnType.bossKnight);
-                if(Utils.Utils.FlagGet("spawnBigPipe"))
+                bossAlly = await GetBossProfile(player, WildSpawnType.bossKnight);
+                if (Utils.Utils.FlagGet("spawnBigPipe"))
                 {
                     BotCreationDataClass bigPipe = await GetBossProfile(player, WildSpawnType.followerBigPipe);
                     bossAlly.AddProfiles(bigPipe.Profiles);
                 }
-                if(Utils.Utils.FlagGet("spawnBirdEye"))
+                if (Utils.Utils.FlagGet("spawnBirdEye"))
                 {
                     BotCreationDataClass birdEye = await GetBossProfile(player, WildSpawnType.followerBirdEye);
                     bossAlly.AddProfiles(birdEye.Profiles);
                 }
 
-            } 
-            else if( boss == WildSpawnType.followerBigPipe)
+            }
+            else if (boss == WildSpawnType.followerBigPipe)
             {
                 bossAlly = await GetBossProfile(player, WildSpawnType.followerBigPipe);
-                if(Utils.Utils.FlagGet("spawnBirdEye"))
+                if (Utils.Utils.FlagGet("spawnBirdEye"))
                 {
                     BotCreationDataClass birdEye = await GetBossProfile(player, WildSpawnType.followerBirdEye);
                     bossAlly.AddProfiles(birdEye.Profiles);
@@ -864,7 +867,7 @@ namespace friendlyPMC.Patches
             else if (boss == WildSpawnType.followerBirdEye)
             {
                 bossAlly = await GetBossProfile(player, WildSpawnType.followerBirdEye);
-                if(Utils.Utils.FlagGet("spawnBigPipe"))
+                if (Utils.Utils.FlagGet("spawnBigPipe"))
                 {
                     BotCreationDataClass bigPipe = await GetBossProfile(player, WildSpawnType.followerBigPipe);
                     bossAlly.AddProfiles(bigPipe.Profiles);
@@ -882,14 +885,14 @@ namespace friendlyPMC.Patches
 
             bossAlly.Profiles.ForEach(profile =>
             {
-                
+
                 InteractableObjects.StoreEquipment(profile);
 
                 // normalize boss followers health
                 foreach (EBodyPart part in Enum.GetValues(typeof(EBodyPart)))
                 {
                     profile.Health.BodyParts.TryGetValue(part, out var bodyPart);
-                    if(bodyPart != null)
+                    if (bodyPart != null)
                     {
                         switch (part)
                         {
@@ -992,7 +995,8 @@ namespace friendlyPMC.Patches
                 if (profile.Skills.Perception.Current < scaledPerception)
                     profile.Skills.Perception.SetCurrent(scaledPerception, true);
 
-                spanwers.Add(() => {
+                spanwers.Add(() =>
+                {
                     Stopwatch stopWatch = new Stopwatch();
                     stopWatch.Start();
 
@@ -1052,7 +1056,7 @@ namespace friendlyPMC.Patches
 
                                 }
                                 // make bot boss a follower
-                                BossPlayers.AddFollower(me, player, false, botRole); 
+                                BossPlayers.AddFollower(me, player, false, botRole);
 
                                 Utils.Utils.SetTimeout(() =>
                                 {
@@ -1082,7 +1086,7 @@ namespace friendlyPMC.Patches
                         {
                             owner.GetPlayer.Profile.Info.Side = side;
                         }
-                        
+
                         BossPlayers.ShallBeFollower(owner);
 
                         botSpawnerClass.method_11(owner, bossAlly, new Action<BotOwner>((BotOwner follower) =>
@@ -1100,7 +1104,7 @@ namespace friendlyPMC.Patches
 
                     Func<BotOwner, BotZone, BotsGroup> GroupAction = new Func<BotOwner, BotZone, BotsGroup>((BotOwner bt, BotZone zn) =>
                     {
-                        return GetPlayerGroup(player, bt, zn,0,true);
+                        return GetPlayerGroup(player, bt, zn, 0, true);
                     });
 
                     ActivateBotFollower(
@@ -1113,7 +1117,7 @@ namespace friendlyPMC.Patches
                         token.GetCancelToken()
                     ).Forget();
 
-                });   
+                });
             });
 
             spanwers.Reverse();
@@ -1171,7 +1175,7 @@ namespace friendlyPMC.Patches
                     profileTactic[profile.Id] = "Assist";
                 });
             }
-            else 
+            else
             {
                 // 0 squadMembers means no squadSetup, so just use default
                 if (friendlyPMC.squadMembers.Count < 1)
@@ -1248,12 +1252,12 @@ namespace friendlyPMC.Patches
                     }
 
                 }
-                
+
             }
 
             Func<BotOwner, BotZone, BotsGroup> GroupAction = new Func<BotOwner, BotZone, BotsGroup>((BotOwner bt, BotZone zn) =>
             {
-                return GetPlayerGroup(player, bt, zn,memberCount);
+                return GetPlayerGroup(player, bt, zn, memberCount);
             });
 
             List<UniTask> activateTasks = new List<UniTask>();
@@ -1267,7 +1271,7 @@ namespace friendlyPMC.Patches
 
                 Action<BotOwner> OnActivate = new Action<BotOwner>((BotOwner owner) =>
                 {
-                    
+
                     bool shallBeGroup = botsData.SpawnParams?.ShallBeGroup != null;
 
                     Stopwatch stopWatch = new Stopwatch();
@@ -1289,7 +1293,7 @@ namespace friendlyPMC.Patches
 
                             WildSpawnType botType = type;
 
-                            if(me.Profile.Info?.Settings?.Role != null)
+                            if (me.Profile.Info?.Settings?.Role != null)
                             {
                                 botType = me.Profile.Info.Settings.Role;
                             }
@@ -1320,7 +1324,7 @@ namespace friendlyPMC.Patches
                     }
 
                     BossPlayers.ShallBeFollower(owner);
- 
+
                     botSpawnerClass.method_11(owner, botsData, new Action<BotOwner>((BotOwner follower) =>
                     {
 
@@ -1412,14 +1416,14 @@ namespace friendlyPMC.Patches
                 {
                     if (!friendlyPMC.squadSpawn.Value)
                     {
-                        if(!HasFika()) Instance?.PreFetchBossProfiles(playerBoss);
+                        if (!HasFika()) Instance?.PreFetchBossProfiles(playerBoss);
 
                     }
                     else if (friendlyPMC.squadSetup.Value)
                     {
                         if (friendlyPMC.squadMembers.Count < 1)
                         {
-                            if(!HasFika()) Instance?.PreFetchPMCProfiles(playerBoss);
+                            if (!HasFika()) Instance?.PreFetchPMCProfiles(playerBoss);
                         }
                         else
                             Instance?.CreateFollowerProfiles(playerBoss);
@@ -1437,7 +1441,7 @@ namespace friendlyPMC.Patches
 
         }
     }
-    
+
     internal class BossSpawnWaveManagerClassPatch : ModulePatch
     {
         protected override MethodBase GetTargetMethod()
@@ -1458,15 +1462,15 @@ namespace friendlyPMC.Patches
 
             Player player = GamePlayerOwner.MyPlayer;
 
-            if(player.Side == EPlayerSide.Savage)
+            if (player.Side == EPlayerSide.Savage)
             {
                 return true;
             }
 
-            foreach( var wave in __instance.BossSpawnWaves)
+            foreach (var wave in __instance.BossSpawnWaves)
             {
                 // do not spawn the Goons if we are running with them
-                if(
+                if (
                     wave.BossType == WildSpawnType.bossKnight &&
                     !friendlyPMC.squadSpawn.Value &&
                     (Utils.Utils.FlagGet("spawnKnight") || Utils.Utils.FlagGet("spawnBigPipe") || Utils.Utils.FlagGet("spawnBirdEye"))
@@ -1476,11 +1480,11 @@ namespace friendlyPMC.Patches
                     wave.ForceSpawn = false;
                 }
                 // increase the chance of spawning a boss based on player quests
-                if(Utils.Utils.FlagGet("questGoons")) player.Profile.QuestsData.ForEach(quest =>
+                if (Utils.Utils.FlagGet("questGoons")) player.Profile.QuestsData.ForEach(quest =>
                 {
                     foreach (var item in Utils.Props.QuestBosses)
                     {
-                        if(item.Key == wave.BossType && item.Value.Contains(quest.Id) && quest.Status == EQuestStatus.Started)
+                        if (item.Key == wave.BossType && item.Value.Contains(quest.Id) && quest.Status == EQuestStatus.Started)
                         {
                             wave.ShallSpawn = true;
                             break;
@@ -1492,7 +1496,7 @@ namespace friendlyPMC.Patches
         }
     }
 
-    [HarmonyPatch(typeof(LocalGame),MethodType.Constructor)]
+    [HarmonyPatch(typeof(LocalGame), MethodType.Constructor)]
     internal class LocalGameCtorPatch
     {
         public static LocalGame Instance;
@@ -1540,16 +1544,17 @@ namespace friendlyPMC.Patches
                     squadSpawners.Add(squadSpanner);
                 });
 
-                UniTask.WhenAll(squadSpawners).ContinueWith(() => {
+                UniTask.WhenAll(squadSpawners).ContinueWith(() =>
+                {
                     BotsControllerPatch.alliesCreationTask.Clear();
                     BotsControllerPatch.pmcCreationTask.Clear();
                 }).Forget();
 
-            } 
-            else if(Utils.Utils.FlagGet("spawnKnight") || Utils.Utils.FlagGet("spawnBigPipe") || Utils.Utils.FlagGet("spawnBirdEye"))
+            }
+            else if (Utils.Utils.FlagGet("spawnKnight") || Utils.Utils.FlagGet("spawnBigPipe") || Utils.Utils.FlagGet("spawnBirdEye"))
             {
                 Modules.Logger.LogInfo("Start Boss Ally Spawn");
-                
+
                 BotsControllerPatch.Controller.BotSpawner.SetBlockedRoles(new string[] { "bossKnight", "followerBirdEye", "followerBigPipe" });
 
                 UniTask.Void(async () =>
@@ -1565,19 +1570,19 @@ namespace friendlyPMC.Patches
                         try
                         {
                             WildSpawnType type = WildSpawnType.bossKnight;
-                            if(!Utils.Utils.FlagGet("spawnKnight"))
+                            if (!Utils.Utils.FlagGet("spawnKnight"))
                             {
-                                if(Utils.Utils.FlagGet("spawnBigPipe"))
+                                if (Utils.Utils.FlagGet("spawnBigPipe"))
                                 {
                                     type = WildSpawnType.followerBigPipe;
-                                } 
-                                else if(Utils.Utils.FlagGet("spawnBirdEye"))
+                                }
+                                else if (Utils.Utils.FlagGet("spawnBirdEye"))
                                 {
                                     type = WildSpawnType.followerBirdEye;
                                 }
                             }
 
-                            bossSpawners.Add(BotsControllerPatch.Instance.SpawnBossFollower(playerBoss,type));
+                            bossSpawners.Add(BotsControllerPatch.Instance.SpawnBossFollower(playerBoss, type));
                         }
                         catch (Exception e)
                         {
@@ -1650,9 +1655,10 @@ namespace friendlyPMC.Patches
         /** On raid end, increase standing with Knight trader if we have Knight as follower **/
         private static void BossStandingSave(BotsController controller)
         {
-            
+
             pitAIBossPlayer boss = null;
-            controller.Players.ExecuteForEach(new Action<IPlayer>(player => {
+            controller.Players.ExecuteForEach(new Action<IPlayer>(player =>
+            {
                 if (boss == null)
                 {
                     boss = BossPlayers.GetBoss(player.ProfileId);
@@ -1692,7 +1698,7 @@ namespace friendlyPMC.Patches
                         birdEyeIncrease = true;
                         break;
                     }
-                    
+
                 }
 
             });
@@ -1710,8 +1716,8 @@ namespace friendlyPMC.Patches
                     {
                         double standing = boss.realPlayer.Profile.GetTraderStanding("67768b19fa281ca31708b187");
                         if (standing < maxStanding)
-                            traderInfo.SetStanding(Math.Min(maxStanding, standing + 0.01));
-                    };
+                            traderInfo.SetStanding(Math.Min(maxStanding, standing + 0.05));
+                    }
                 }
             }
         }
@@ -1753,7 +1759,8 @@ namespace friendlyPMC.Patches
 
                 Modules.Logger.LogInfo("Raid CleanUp Finished");
 
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 Modules.Logger.LogError("Raid CleanUp Failed");
                 Modules.Logger.LogError(ex);
