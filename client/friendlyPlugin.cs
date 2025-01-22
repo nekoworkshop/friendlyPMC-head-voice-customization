@@ -206,6 +206,9 @@ namespace friendlyPMC
 
         private List<CancellationTokenSource> refreshTokens = new List<CancellationTokenSource>();
 
+
+        private List<string> _EquipmentPresets = new List<string>();
+
         private void Awake()
         {
 
@@ -259,7 +262,7 @@ namespace friendlyPMC
 
             // spawn patches
             harmony.PatchAll(typeof(LocalGameCtorPatch).Assembly);
-            harmony.PatchAll(typeof(BaseLocalGameVmethod4Patch).Assembly);
+            new BotsEventsControllerSpawnPatch().Enable();
             new BossSpawnWaveManagerClassPatch().Enable();
 
             // attempt to patch some sain methods
@@ -329,14 +332,14 @@ namespace friendlyPMC
                     var equipBuilds = buildStorage.EquipmentBuilds;
                     if (equipBuilds != null)
                     {
-                        Utils.Equipment.CustomPresets.Clear();
+                        _EquipmentPresets.Clear();
 
                         equipBuilds.Values.Where((GClass3582 build) =>
                         {
                             return build.BuildType == EEquipmentBuildType.Custom;
                         }).ExecuteForEach((GClass3582 build) =>
                         {
-                            Utils.Equipment.CustomPresets.Add(build);
+                            _EquipmentPresets.Add(build.Name);
                         });
 
                         BuildEquipmentPresets();
@@ -436,7 +439,7 @@ namespace friendlyPMC
 
             enemyRemember = Config.Bind("II " + optionsLang.miscSettings, "3 " + optionsLang.enemyRemember["Name"], 20, new ConfigDescription(optionsLang.enemyRemember["Description"], new AcceptableValueRange<int>(5, 60), new ConfigurationManagerAttributes { Order = -300 }));
 
-            heatlhMultiplier = Config.Bind("II " + optionsLang.miscSettings, "4 " + optionsLang.healthMultiplier["Name"], 1, new ConfigDescription(optionsLang.healthMultiplier["Description"], new AcceptableValueRange<int>(1, 5), new ConfigurationManagerAttributes { Order = -400 }));
+            heatlhMultiplier = Config.Bind("II " + optionsLang.miscSettings, "4 " + optionsLang.healthMultiplier["Name"], 1, new ConfigDescription(optionsLang.healthMultiplier["Description"], new AcceptableValueRange<int>(1, 10), new ConfigurationManagerAttributes { Order = -400 }));
 
             statusSound = Config.Bind("II " + optionsLang.miscSettings, "5 " + optionsLang.statusSound["Name"], 100, new ConfigDescription(optionsLang.statusSound["Description"], new AcceptableValueRange<int>(0, 100), new ConfigurationManagerAttributes { Order = -500 }));
 
@@ -635,7 +638,7 @@ namespace friendlyPMC
 
         private void BuildEquipmentPresets()
         {
-            var presets = Utils.Equipment.CustomPresets;
+            var presets = _EquipmentPresets;
 
             var updatedPresets = new string[] {
                 optionsLang.equipOptions[0]
@@ -643,7 +646,7 @@ namespace friendlyPMC
 
             foreach (var item in presets)
             {
-                updatedPresets = updatedPresets.AddItem(item.Name).ToArray();
+                updatedPresets = updatedPresets.AddItem(item).ToArray();
             }
 
             bool wasUpdated = false;

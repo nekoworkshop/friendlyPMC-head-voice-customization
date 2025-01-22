@@ -13,8 +13,9 @@
 
 - x - add option to disable throwing grenades
 
+- x - increase the health multiplier for followers
+
 -- === 3.9.6 === ---:
-- find out why bots freeze on death randomly (it's not actually weapon kit)
 - attempt to make transit work while in a group with followers
 - see if we can make bot swap weapons when asked to loot (DeadBodyWork)
 - - this should also allow bot to put that weapon as seconday (in case of support without a grenade launcher)
@@ -33,19 +34,18 @@
 
 ==================================================================================
 RELEASE NOTES (3.9.5)
-fixed an issue with the grenade throwing action that could cause the bot to remain stuck in the throwing position
+fixed issue with follower freezing on death when using custom equip presets
+fixed an issue with the grenade throwing action that could cause the bot to remain stuck in the throwing position (might still happen but much less often and the fixheal should now snap him out of it in all cases)
 fixed picked up followers not attacking enemies
-attempt to address followers looking down when out of combat (might still happen but much less often)
+attempt to address followers looking down when out of combat (still happens but much less often)
 fixed spawning with followers as SCAV
-added option to disable throwing grenades
 fixed Knight standing calculation when doing successfull raids with the Goons or when killing any of them
+added option to disable throwing grenades
+increased the range of the health multiplier for spawned followers
 
 TO ADD as Known Issue:
-some weapon kits, even if they are standard weapons can cause several issues with the spawned followers, from freezing when dying to sound problems. There is no fix at the moment for this, simply choose a different kit.
-picked up followers can auto assign an enemy across the map - use attention to reset (might need to do it multiple times)
 followers are running and ducking until they reach the player - this can happen when using teleportation too much or right after combat ends. Go within the follow range (~12 meters) to snap them out of it.
 even small bushes can make the enemy invisible to the followers when yelling "contact"
-followers picked up do not turn hostile on friendly fire and instead just sit there (WIP)
 
 ==================================================================================
 

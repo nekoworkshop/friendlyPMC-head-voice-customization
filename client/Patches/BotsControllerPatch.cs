@@ -404,154 +404,11 @@ namespace friendlyPMC.Patches
 
             await UniTask.WhenAll(profileTasks);
 
-            Dictionary<string, Item> secureContainers = new Dictionary<string, Item>();
-
-
-            Dictionary<string, List<DependencyGraph<IEasyBundle>.GClass3802>> bundleTokens = new Dictionary<string, List<DependencyGraph<IEasyBundle>.GClass3802>>();
-
-            Dictionary<string, InventoryEquipment> profileEquipment = new Dictionary<string, InventoryEquipment>();
-
-            Dictionary<string, string> bundleJobs = new Dictionary<string, string>();
-
-            // change bot equipment based on custom presets
-            List<GClass3582> presets = new List<GClass3582>();
-            Utils.Equipment.CustomPresets.ForEach(preset =>
-            {
-                presets.Add(preset);
-            });
-
-            try
-            {
-                foreach (var pr in profiles)
-                {
-                    Profile profile = pr.Value;
-
-                    int pid = pr.Key;
-
-                    string eq = friendlyPMC.squadMembers[pid][1].Value;
-                    // when using custom preset - prepare what bundles will need to be prefected
-                    if (eq != null && eq != friendlyPMC.GetEquipOptions()[0])
-                    {
-                        // - remember the original secure container to put it back later as custom presets might overwrite it
-                        var secureContainer = profile.Inventory.Equipment.GetSlot(EquipmentSlot.SecuredContainer).ContainedItem;
-                        // - store the original secure container to use it later, prepare what bundles must be downloaded and associate the bot's profile with the specific preset
-                        secureContainers.Add(profile.Id, secureContainer.CloneItem());
-
-                        foreach (var preset in presets)
-                        {
-                            if (eq == preset.Name)
-                            {
-                                var equipment = preset.Equipment.CloneItem(null);
-                                // - use bundleJobs to detect when more than 1 bot is using the same equipment
-                                if (!bundleJobs.ContainsKey(preset.Name))
-                                {
-                                    // - start collecting all the items used by this preset in order to do bundle load for each
-                                    foreach (var item in equipment.GetAllItems())
-                                    {
-                                        if (!bundleTokens.ContainsKey(profile.Id))
-                                        {
-                                            bundleTokens.Add(profile.Id, new List<DependencyGraph<IEasyBundle>.GClass3802>());
-                                        }
-                                        bundleTokens[profile.Id].Add(item.GetAllBundleTokens());
-                                    }
-                                    ;
-
-                                    bundleJobs[preset.Name] = profile.Id;
-
-                                }
-                                else
-                                {
-                                    bundleTokens[profile.Id] = bundleTokens[bundleJobs[preset.Name]];
-                                }
-
-                                profileEquipment.Add(profile.Id, equipment);
-                            }
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Modules.Logger.LogError("Failed to set squad equipment for a bot");
-                Modules.Logger.LogError(ex);
-            }
-
-            // gather what equipment bundles this bot needs to wait for
-            List<UniTask> bundleTasks = new List<UniTask>();
 
             foreach (var item in profiles)
             {
                 Profile profile = item.Value;
-
-                if (bundleTokens.ContainsKey(profile.Id))
-                {
-                    bundleTokens[profile.Id].ForEach(bundle =>
-                    {
-                        bundleTasks.Add(GClass1600.WaitForAllBundlesJob(bundle, new Action(HideoutAreaStashController.Class1816.class1816_0.method_0), default(CancellationToken), null).AsUniTask());
-                    });
-
-                }
-            }
-
-            Modules.Logger.LogInfo("Fetching preset assets...");
-            try
-            {
-                if (bundleTasks.Count > 0)
-                    await UniTask.WhenAll(bundleTasks);
-            }
-            catch (Exception ex)
-            {
-                Modules.Logger.LogError("Failed to use custom preset, will fall back to default loadout");
-                Modules.Logger.LogError(ex);
-            }
-
-
-            Modules.Logger.LogInfo("Preset assets fetched");
-
-
-            foreach (var item in profiles)
-            {
-                Profile profile = item.Value;
-                // apply the custom preset for the bot as bundles are ready
-                if (profileEquipment.ContainsKey(profile.Id))
-                {
-                    foreach (EquipmentSlot slotType in Enum.GetValues(typeof(EquipmentSlot)))
-                    {
-                        if (slotType == EquipmentSlot.Dogtag) continue;
-
-
-                        Slot botSlot = profile.Inventory.Equipment.GetSlot(slotType);
-
-                        if (botSlot.IsSpecial) continue;
-
-                        Slot cloneSlot = profileEquipment[profile.Id].GetSlot(slotType);
-
-                        if (cloneSlot.IsSpecial) continue;
-
-                        Item contained = cloneSlot.ContainedItem;
-
-                        botSlot.RemoveItemWithoutRestrictions();
-
-                        if (contained != null)
-                        {
-                            //contained = contained.CloneItem();
-                            contained.CurrentAddress = null;
-
-                            botSlot.AddWithoutRestrictions(contained);
-
-                        }
-                    }
-                    // - restore original secure container
-                    if (secureContainers.ContainsKey(profile.Id))
-                    {
-                        Slot secCon = profile.Inventory.Equipment.GetSlot(EquipmentSlot.SecuredContainer);
-                        secCon.RemoveItemWithoutRestrictions();
-                        secureContainers[profile.Id].CurrentAddress = null;
-                        secCon.AddWithoutRestrictions(secureContainers[profile.Id]);
-                    }
-
-                }
-
+                
                 // followers should use the same groupID as the player
                 profile.Info.GroupId = player.realPlayer.GroupId;
                 profile.Info.TeamId = player.Player().Profile.Info.TeamId;
@@ -813,7 +670,6 @@ namespace friendlyPMC.Patches
 
         private static bool HasFika()
         {
-            if (!friendlyPMC.botPrefetch.Value) return true;
             return Type.GetType("Fika.Core.Coop.GameMode.CoopGame, Fika.Core") != null;
         }
 
@@ -1392,7 +1248,7 @@ namespace friendlyPMC.Patches
 
                     Props.Reset();
 
-                    BaseLocalGameVmethod4Patch.squadSpawned = false;
+                    BotsEventsControllerSpawnPatch.squadSpawned = false;
 
                     Controller = __instance;
 
@@ -1412,26 +1268,29 @@ namespace friendlyPMC.Patches
                 spawnedPlayers.Add(playerBoss);
 
                 // prefetch follower profile data
-                if (playerBoss.Player().Side != EPlayerSide.Savage)
+                if (friendlyPMC.botPrefetch.Value)
                 {
-                    if (!friendlyPMC.squadSpawn.Value)
+                    if (playerBoss.Player().Side != EPlayerSide.Savage)
                     {
-                        if (!HasFika()) Instance?.PreFetchBossProfiles(playerBoss);
-
-                    }
-                    else if (friendlyPMC.squadSetup.Value)
-                    {
-                        if (friendlyPMC.squadMembers.Count < 1)
+                        if (!friendlyPMC.squadSpawn.Value)
                         {
-                            if (!HasFika()) Instance?.PreFetchPMCProfiles(playerBoss);
+                            if (!HasFika()) Instance?.PreFetchBossProfiles(playerBoss);
+
                         }
-                        else
-                            Instance?.CreateFollowerProfiles(playerBoss);
+                        else if (friendlyPMC.squadSetup.Value)
+                        {
+                            if (friendlyPMC.squadMembers.Count < 1)
+                            {
+                                if (!HasFika()) Instance?.PreFetchPMCProfiles(playerBoss);
+                            }
+                            else
+                                Instance?.CreateFollowerProfiles(playerBoss);
+                        }
                     }
-                }
-                else if (playerBoss.Player().Side == EPlayerSide.Savage && friendlyPMC.squadSpawn.Value)
-                {
-                    Instance?.PreFetchScavProfiles(playerBoss);
+                    else if (playerBoss.Player().Side == EPlayerSide.Savage && friendlyPMC.squadSpawn.Value)
+                    {
+                        Instance?.PreFetchScavProfiles(playerBoss);
+                    }
                 }
             }
             catch (Exception e)
@@ -1505,13 +1364,15 @@ namespace friendlyPMC.Patches
             Instance = __instance;
         }
     }
-    // Spawn followers after the initial spawn of the game
-    [HarmonyPatch(typeof(BotsEventsController))]
-    [HarmonyPatch("SpawnAction")]
-    internal class BaseLocalGameVmethod4Patch
+
+    internal class BotsEventsControllerSpawnPatch : ModulePatch
     {
-        [HarmonyPostfix]
-        public static void Postfix(BotsEventsController __instance)
+        protected override MethodBase GetTargetMethod()
+        {
+            return AccessTools.Method(typeof(BotsEventsController), "SpawnAction");
+        }
+        [PatchPostfix]
+        private static void PatchPostfix(BotsEventsController __instance)
         {
             try
             {
@@ -1597,7 +1458,9 @@ namespace friendlyPMC.Patches
                 });
             }
         }
+
     }
+    // Spawn followers after the initial spawn of the game
 
     internal class BotsControllerStopPatch : ModulePatch
     {
@@ -1642,7 +1505,7 @@ namespace friendlyPMC.Patches
 
             AIDataContructPatch.playerAIData.Clear();
 
-            BaseLocalGameVmethod4Patch.squadSpawned = false;
+            BotsEventsControllerSpawnPatch.squadSpawned = false;
 
             LocalGameCtorPatch.Instance = null;
 

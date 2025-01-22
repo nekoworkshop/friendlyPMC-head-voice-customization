@@ -81,6 +81,7 @@ import { IEmptyRequestData } from "@spt/models/eft/common/IEmptyRequestData";
 import { objectCopy, objectForEach } from "./Utils";
 import { IGetRaidConfigurationRequestData } from "@spt/models/eft/match/IGetRaidConfigurationRequestData";
 import { IAdditionalHostilitySettings } from "@spt/models/eft/common/ILocationBase";
+import { HashUtil } from "@spt/utils/HashUtil";
 
 class friendlyPMC {
 	config = {
@@ -97,7 +98,9 @@ class friendlyPMC {
 	mailSendService: MailSendService;
 	notificationSendHelper: NotificationSendHelper;
 	LocaleService: LocaleService;
+
 	randomUtil: RandomUtil;
+	hashUtil: HashUtil;
 	matchCallbacks: MatchCallbacks;
 	preSptModLoader: PreSptModLoader;
 
@@ -163,6 +166,7 @@ class friendlyPMC {
 		const randomUtil = container.resolve<RandomUtil>("RandomUtil");
 
 		this.randomUtil = randomUtil;
+		this.hashUtil = container.resolve<HashUtil>("HashUtil");
 
 		// patch generateBot so that the Goons have meds
 		this.generateBot = this.generateBot.bind(this);
@@ -335,8 +339,6 @@ class friendlyPMC {
 					this.config.badGuy = info.Config.badGuy;
 					this.config.englishBear = info.Config.englishBear;
 
-					this.Logger.logWithColor("friendlyPMC: Setting Server Config as " + JSON.stringify(info), LogTextColor.WHITE);
-
 					if (this.config.armbands) {
 						this.Logger.logWithColor("friendlyPMC: Adding Armbands to bots...", LogTextColor.WHITE);
 
@@ -381,12 +383,11 @@ class friendlyPMC {
 
 					return httpResponseUtil.emptyResponse();
 				}),
-				new RouteAction("/client/game/bot/followergenerate", (url: string, info: { Info: IGenerateBotsRequestData; Preset?: string; Custom?: { Body?: string; Feet?: string; Nickname?: string; English?: boolean; Voice?: string } }, sessionID: string, output: string): any => {
+				new RouteAction("/client/game/bot/followergenerate", (url: string, info: { Info: IGenerateBotsRequestData; Preset?: string; Custom?: { Body?: string; Feet?: string; Equipment?: string; Nickname?: string; English?: boolean; Voice?: string } }, sessionID: string, output: string): any => {
 					const pmcProfile = profileHelper.getPmcProfile(sessionID);
+					const playerProfile = profileHelper.getFullProfile(sessionID);
 
 					const custom = info.Custom;
-
-					this.Logger.logWithColor("friendlyPMC: Follower Options - " + JSON.stringify(custom ?? {}), LogTextColor.WHITE);
 
 					const conditionPromises: IBotBase[] = [];
 
@@ -446,9 +447,49 @@ class friendlyPMC {
 						}
 
 						const bot = botGenerator["generateBot"](sessionID, preparedBotBase, botJsonTemplateClone, botGenerationDetails);
-						// force name change
-						if (botGenerationDetails.isPmc && custom?.Nickname) {
-							bot.Info.Nickname = custom.Nickname;
+
+						if (botGenerationDetails.isPmc) {
+							// force name change
+							if (custom?.Nickname) bot.Info.Nickname = custom.Nickname;
+							// equipment change
+							if (custom?.Equipment) {
+								const equipment = playerProfile.userbuilds.equipmentBuilds?.find(e => e.Name == custom.Equipment);
+								if (equipment) {
+									let eid = equipment.Items[0]._id;
+									let clonedBuild = objectCopy(equipment.Items);
+									let newid = this.hashUtil.generate();
+									clonedBuild[0]._id = newid;
+									clonedBuild.forEach(item => {
+										if (item.parentId == eid) {
+											item.parentId = newid;
+										}
+									});
+
+									bot.Inventory.equipment = newid;
+
+									const botSpecialItems = bot.Inventory.items.filter(item => {
+										if (!item.slotId) return false;
+										item.slotId.toLowerCase().includes("dogtag") || item.slotId.includes("SecuredContainer") || item.slotId.includes("SpecialSlot");
+									});
+
+									bot.Inventory.items = clonedBuild
+										.filter(item => {
+											if (!item.slotId) return true;
+											return !item.slotId.includes("SpecialSlot") && !item.slotId.includes("SecuredContainer");
+										})
+										.concat(
+											botSpecialItems.map(item => {
+												if (item.slotId.includes("SpecialSlot")) {
+													let id = clonedBuild.find(i => i.slotId == "Pockets")?._id;
+													if (!id) item.parentId = newid;
+													else item.parentId = id;
+												} else item.parentId = newid;
+
+												return item;
+											})
+										);
+								}
+							}
 						}
 
 						conditionPromises.push(bot);

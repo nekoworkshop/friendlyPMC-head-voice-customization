@@ -478,10 +478,16 @@ namespace friendlyPMC.Components
         protected virtual void OnKilled()
         {
             // remove this bot from being a follower
-            Dismissed();
-            BossPlayers.RemoveFollower(_owner, _boss);
+            try
+            {
+                Dismissed();
+                BossPlayers.RemoveFollower(_owner, _boss);
+            }
+            catch (Exception ex)
+            {
+                Modules.Logger.LogError(ex);
+            }
         }
-
         public void OnThrow()
         {
             GRENADE_THROWING = true;
