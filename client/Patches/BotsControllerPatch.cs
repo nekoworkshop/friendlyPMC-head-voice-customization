@@ -408,7 +408,7 @@ namespace friendlyPMC.Patches
             foreach (var item in profiles)
             {
                 Profile profile = item.Value;
-                
+
                 // followers should use the same groupID as the player
                 profile.Info.GroupId = player.realPlayer.GroupId;
                 profile.Info.TeamId = player.Player().Profile.Info.TeamId;
@@ -1537,7 +1537,7 @@ namespace friendlyPMC.Patches
             bool birdEyeIncrease = false;
 
 
-            double maxStanding = 1;
+            double maxStanding = 2;
 
             profile.QuestsData.ForEach(quest =>
             {

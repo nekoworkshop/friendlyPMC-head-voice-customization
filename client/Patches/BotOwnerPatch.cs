@@ -83,7 +83,8 @@ namespace friendlyPMC.Patches
                {
                    bot.Settings.FileSettings.Boss.SHALL_WARN = false;
                    bot.Settings.FileSettings.Patrol.MAX_YDIST_TO_START_WARN_REQUEST_TO_REQUESTER = 0f;
-               } else if(friendlyPMC.friendlyPMCFLAG.Value && (bot.Side == EPlayerSide.Bear || bot.Side == EPlayerSide.Usec))
+               } 
+               else if(friendlyPMC.friendlyPMCFLAG.Value && (bot.Side == EPlayerSide.Bear || bot.Side == EPlayerSide.Usec))
                {
                      bot.Settings.FileSettings.Boss.SHALL_WARN = false;
                      bot.Settings.FileSettings.Patrol.MAX_YDIST_TO_START_WARN_REQUEST_TO_REQUESTER = 0f;
@@ -92,7 +93,6 @@ namespace friendlyPMC.Patches
                if(Utils.Props.BossFollowersType.Contains(bot.Profile.Info.Settings.Role))
                {
                    bot.Settings.FileSettings.Mind.DEFAULT_USEC_BEHAVIOUR = EWarnBehaviour.AlwaysEnemies;
-                   bot.Settings.FileSettings.Mind.ENEMY_BOT_TYPES = bot.Settings.FileSettings.Mind.ENEMY_BOT_TYPES.AddToArray(WildSpawnType.pmcUSEC);
                }
            })   
         };

@@ -143,38 +143,19 @@
 <p><br></p>
 <p>Note: BirdEye has practically unlimited vision distance and we cannot do anything about it.[/tab]</p>
 <p><br></p>
-<p>[tab='FAQ']</p>
-<p><br></p>
-<p><strong>Q. Do my followers require ammo and meds?</strong></p>
-<p>A. They require meds. But do not put meds in the secure container. The secure container will be used for storing ammo. What ammo will be added is based on what ammo the main weapon has the bots spawn with.</p>
-<p><br></p>
-<p><strong>Q. Why won't my followers pick up the loot?</strong></p>
-<p>A. Out of combat only. They need to have the available space to put the loot and they need to have the path to reach it. Avoid dropping loot in tight spaces.</p>
-<p><br></p>
-<p><strong>Q. Why is there a delay in spawn?</strong></p>
-<p>A. Unfortunately, a lot of mods hook up to the spawning process and if I try to use my own method (which I did in the past) you will start having random errors and random broken bots. I must stay within the standard spawning command and that can produce delays. This is noticeable when you select "Default" as equipment.</p>
-<p><br></p>
-<p><strong>Q. Does this work with FIKA?</strong></p>
-<p>A. Yes and No. It works in a system that has FIKA installed, but only for the host. If you have other players joining you can experience glitches and errors. There are no plans to make this mod FIKA compatible, to work in multiplayer.</p>
-<p><br></p>
-<p><strong>Q. SAIN does x, y,z - can't the followers do the same?</strong></p>
-<p>A. NO. Sain is not designed to have bots work with the player as a team at all. SAIN is not designed to take into account a cross-map moving of a bot making decisions on what to ignore, and what to engage. SAIN is focused on combat engagement and affects the bot's senses in a way that would make your followers pick up targets left and right. SAIN can put the bot in cover holding when it detects an enemy out of sight. That is not what you want your followers to do as you move around the map. So while SAIN has some effect on the followers, it's minimal.</p>
-<p><br></p>
-<p><strong>Q. Can you add this and that feature?</strong></p>
-<p>A. You can propose things, but it will all depend of the level of effort and if it makes sense to be integrated into what I am trying to achieve with this mod.</p>
-<p><br>[/tab]</p>
-<p><br></p>
 <p>[tab='Known Issues']<br></p>
-<p><br></p>
-<p>Some weapon kits can cause problems with spawned followers (custom or standard). From freezing when dying to having sound issues. No fix at the moment, switch to a different kit when this happens</p>
 <p><br></p>
 <p>Mods that mess with meds can create problems for spawned followers.</p>
 <p><br></p>
 <p>Mods that mess with bot spawning via client side changes (like Swag + donuts or having PMC spawning on in Questing Bots) can create problems for spawned followers. Mod has been tested with MOAR and things seem fine.</p>
 <p><br></p>
+<p>Mods that change static loot containers can cause issues with Knight's Quests. If you reach the "They robbed us" quest, remove such mod until you complete that quest.</p>
+<p><br></p>
 <p>Followers can end up running and ducking until they reach the player - this can happen when using teleportation too much or right after combat ends. Go within the follow range (~12 meters) to snap them out of it.</p>
 <p><br></p>
-<p>Bots in the "Assist" tactic, which would be those picked up or scav followers, will run away on friendly fire instead of turning hostile.(WIP)</p>
+<p>When followers use grenades, they do not check impact radius in order to avoid you.</p>
+<p><br></p>
+<p>Followers might still spawn with grenades in their pockets even though you assigned a custom equipment preset that has no grenades.</p>
 <p><br></p>
 <p>"Bad Guy" and "Friendly PMC side" flags do not guarantee every PMC will be friendly or hostile. The new PMC karma system can still affect the bots. But, it would be 1-2 per raid that can end up not obeying these flags.</p>
 <p><br></p>
@@ -182,7 +163,7 @@
 <p><br></p>
 <p>Bots follow in a straight line and can end up intersecting with one another. Yes, that is the navigation logic of the game and cannot be resolved.</p>
 <p><br></p>
-<p>Map transit won't work while in a group with the Goons</p>
+<p>Map transit won't work while having followers (WIP)</p>
 <p><br></p>
 <p>Even small bushes can make the enemy invisible to the followers when yelling "contact"</p>
 <p><br>[/tab]</p>

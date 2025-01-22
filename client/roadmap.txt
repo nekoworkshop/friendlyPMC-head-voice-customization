@@ -1,20 +1,3 @@
--- === 3.9.5 === ---:
-- x - even without SAIN bots pick up enemies through walls, at a distance (check ground zero map)
-- - nothing can be done
-
-- x - investigate issues picked up followers
-- x - fix followers seeing the newly added member as an enemy
-- x - picked up bots do not attack enemy bots when using SAIN
-- x - picked up followers do not obey any command
-
-- x - make followers stop looking down when out of combat
-
-- x - fix scav run with followers (needs to use a similar call to followergenerate to avoid generating PMC as scav follower)
-
-- x - add option to disable throwing grenades
-
-- x - increase the health multiplier for followers
-
 -- === 3.9.6 === ---:
 - attempt to make transit work while in a group with followers
 - see if we can make bot swap weapons when asked to loot (DeadBodyWork)
@@ -33,19 +16,8 @@
 
 
 ==================================================================================
-RELEASE NOTES (3.9.5)
-fixed issue with follower freezing on death when using custom equip presets
-fixed an issue with the grenade throwing action that could cause the bot to remain stuck in the throwing position (might still happen but much less often and the fixheal should now snap him out of it in all cases)
-fixed picked up followers not attacking enemies
-attempt to address followers looking down when out of combat (still happens but much less often)
-fixed spawning with followers as SCAV
-fixed Knight standing calculation when doing successfull raids with the Goons or when killing any of them
-added option to disable throwing grenades
-increased the range of the health multiplier for spawned followers
+RELEASE NOTES (3.9.6)
 
-TO ADD as Known Issue:
-followers are running and ducking until they reach the player - this can happen when using teleportation too much or right after combat ends. Go within the follow range (~12 meters) to snap them out of it.
-even small bushes can make the enemy invisible to the followers when yelling "contact"
 
 ==================================================================================
 
