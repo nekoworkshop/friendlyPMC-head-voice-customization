@@ -124,7 +124,8 @@ namespace friendlyPMC.Actions
 
                 List<object> equipTypes = new List<object>
                 {
-                    typeof(ThrowWeapItemClass)
+                    typeof(ThrowWeapItemClass),
+                    typeof(MedicalItemClass)
                 };
 
                 foreach (var item1 in equipTypes)
@@ -155,17 +156,24 @@ namespace friendlyPMC.Actions
                     return;
                 }
 
+                if(!wasTransferred)
+                {
+                    botOwner_0.BotTalk.TrySay(EPhraseTrigger.DontKnow, true);
+                }
+
                 if (wasTransferred && _follower.IsSquadMate)
                 {
                     InteractableObjects.StoreItem(botOwner_0, item);
                 }
 
+                var req = botOwner_0.BotRequestController.CurRequest as FollowerTakeLootRequest;
+                var fromWait = req != null && req.FromWait;
+
                 await Task.Delay(1000);
                 ClearLoot();
 
                 // back to hold position
-                var req = botOwner_0.BotRequestController.CurRequest as FollowerTakeLootRequest;
-                if (req != null && req.FromWait && !botOwner_0.Memory.HaveEnemy)
+                if (fromWait && !botOwner_0.Memory.HaveEnemy)
                 {
                     IPlayer requester = req != null ? req.Requester : null;
 
@@ -179,7 +187,7 @@ namespace friendlyPMC.Actions
                         {
                             holdit.AddPossibleExecutors(botOwner_0);
                             holdit.SetGroup(botOwner_0.BotsGroup.RequestsController);
-                            botOwner_0.Gesture.TryGestus(EInteraction.OkGesture, true);
+                            botOwner_0.Gesture.TryGestus(EInteraction.NoGesture, true);
                         }
                     }
                 }

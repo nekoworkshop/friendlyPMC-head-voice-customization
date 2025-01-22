@@ -244,7 +244,6 @@
     <Compile Include="Utils\BotLogicDecisions.cs" />
     <Compile Include="Utils\Covers.cs" />
     <Compile Include="Utils\Enemy.cs" />
-    <Compile Include="Utils\Equipment.cs" />
     <Compile Include="Utils\PingTeamates.cs" />
     <Compile Include="Utils\Props.cs" />
     <Compile Include="Utils\Quests.cs" />
@@ -252,6 +251,9 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Actions\BossFollower\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include=".editorconfig" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

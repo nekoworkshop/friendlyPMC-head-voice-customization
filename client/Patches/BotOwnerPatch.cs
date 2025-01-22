@@ -8,6 +8,8 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using friendlyPMC.Components;
+using System.Linq;
+using static EFT.SpeedTree.TreeWind;
 
 
 namespace friendlyPMC.Patches
@@ -72,16 +74,27 @@ namespace friendlyPMC.Patches
     }
     internal class BotOwnerActivatePatch : ModulePatch
     {
-        private static List<WildSpawnType> allies = new List<WildSpawnType>
-        {
-            WildSpawnType.bossKnight,
-            WildSpawnType.followerBigPipe,
-            WildSpawnType.followerBirdEye,
-            WildSpawnType.exUsec
-        };
+        
         private static List<Action<BotOwner>> onActivate = new List<Action<BotOwner>>
         {
-            
+           new Action<BotOwner>((BotOwner bot) =>
+           {
+               if(Utils.Props.BossFollowersType.LogList().AddItem(WildSpawnType.exUsec).Contains(bot.Profile.Info.Settings.Role))
+               {
+                   bot.Settings.FileSettings.Boss.SHALL_WARN = false;
+                   bot.Settings.FileSettings.Patrol.MAX_YDIST_TO_START_WARN_REQUEST_TO_REQUESTER = 0f;
+               } 
+               else if(friendlyPMC.friendlyPMCFLAG.Value && (bot.Side == EPlayerSide.Bear || bot.Side == EPlayerSide.Usec))
+               {
+                     bot.Settings.FileSettings.Boss.SHALL_WARN = false;
+                     bot.Settings.FileSettings.Patrol.MAX_YDIST_TO_START_WARN_REQUEST_TO_REQUESTER = 0f;
+               }
+
+               if(Utils.Props.BossFollowersType.Contains(bot.Profile.Info.Settings.Role))
+               {
+                   bot.Settings.FileSettings.Mind.DEFAULT_USEC_BEHAVIOUR = EWarnBehaviour.AlwaysEnemies;
+               }
+           })   
         };
         protected override MethodBase GetTargetMethod()
         {

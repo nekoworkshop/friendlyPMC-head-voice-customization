@@ -35,7 +35,7 @@
 <p><br><strong>Miscellaneous:</strong></p>
 <ul>
 	<li><strong>[tt]Maximum scan distance[/tt]</strong> - Maximum distance to pick up any visible enemy that the player is signaling when issuing the "Contact" command</li>
-	<li><strong>(<span style="color: rgb(255, 215, 0);">NEW</span>)[tt]Patrol Radius[/tt]</strong> - Maximum distance from the player the followers will patrol around</li>
+	<li><strong>[tt]Patrol Radius[/tt]</strong> - Maximum distance from the player the followers will patrol around</li>
 	<li><strong>[tt]Time to forget about the enemy (in sec.)[/tt]</strong> - Maximum time a follower will remember an enemy. This is applied only at the beginning of a raid</li>
 	<li><strong>[tt]Squad Health Multiplier[/tt]</strong> - Health multiplier for the followers you spawn with. This is applied to each body part.</li>
 	<li><strong>[tt]Report Status Volume[/tt]</strong> - Volume of the radio sound when triggering report status</li>
@@ -44,10 +44,12 @@
 	<li><strong>[tt]Same PMC Side Hostile[/tt]</strong> - Should PMC Bots of the same side be hostile to each other (followers remain friendly to you)</li>
 	<li><strong>[tt]BEARs speak English[/tt]</strong> - Should BEAR bots speak English or Russian</li>
 	<li><strong>[tt]PMC Arm Bands[/tt]</strong> - Should PMC bots have armbands (red for BEARs, blue for USECs) for easier identification</li>
+	<li><strong>(<span style="color: rgb(255, 215, 0);">NEW</span>)[tt]Followers use grenade[/tt]</strong> - Allow followers to use grenades</li>
 	<li><strong>[tt]Ping Squad[/tt]</strong> - Shortcut key for triggering the Report call if you find it too hard to use the quick gesture menu that the game offers with F1-F12 keybinding</li>
 	<li><strong>[tt]Enemy Report[/tt]</strong> - Shortcut key for triggering the Contact call if you find it too hard to use the quick gesture menu that the game offers with F1-F12 keybinding</li>
-	<li><strong>(<span style="color: rgb(255, 215, 0);">NEW</span>)[tt]Followers Teleport[/tt]</strong> - Shortcut key for teleporting all followers to the player's position</li>
-	<li><strong>(<span style="color: rgb(255, 215, 0);">NEW</span>)[tt]Followers Heal[/tt]</strong> - Shortcut key for healing all followers. This also get's them out of the healing animation or grenade-throwing animation</li>
+	<li><strong>[tt]Followers Teleport[/tt]</strong> - Shortcut key for teleporting all followers to the player's position</li>
+	<li><strong>[tt]Followers Heal[/tt]</strong> - Shortcut key for healing all followers. This also get's them out of the healing animation or grenade-throwing animation</li>
+    <li><strong>(<span style="color: rgb(255, 215, 0);">NEW</span>)[tt]Prefetch follower data[/tt]</strong> - Prefetch follower data to reduce the time it takes to spawn them. If you experience problems with followers spawning, disable this option and try again. Take note that this can increase the spawn time.</li>
 </ul>
 <p><strong><br></strong>[/tab]</p>
 <p><br></p>
@@ -141,43 +143,28 @@
 <p><br></p>
 <p>Note: BirdEye has practically unlimited vision distance and we cannot do anything about it.[/tab]</p>
 <p><br></p>
-<p>[tab='FAQ']</p>
+<p>[tab='Known Issues']<br></p>
 <p><br></p>
-<p><strong>Q. Do my followers require ammo and meds?</strong></p>
-<p>A. They require meds. But do not put meds in the secure container. The secure container will be used for storing ammo. What ammo will be added is based on what ammo the main weapon has the bots spawn with.</p>
+<p>Mods that mess with meds can create problems for spawned followers.</p>
 <p><br></p>
-<p><strong>Q. Why won't my followers pick up the loot?</strong></p>
-<p>A. Out of combat only. They need to have the available space to put the loot and they need to have the path to reach it. Avoid dropping loot in tight spaces.</p>
+<p>Mods that mess with bot spawning via client side changes (like Swag + donuts or having PMC spawning on in Questing Bots) can create problems for spawned followers. Mod has been tested with MOAR and things seem fine.</p>
 <p><br></p>
-<p><strong>Q. Why is there a delay in spawn?</strong></p>
-<p>A. Unfortunately, a lot of mods hook up to the spawning process and if I try to use my own method (which I did in the past) you will start having random errors and random broken bots. I must stay within the standard spawning command and that can produce delays. This is noticeable when you select "Default" as equipment.</p>
+<p>Mods that change static loot containers can cause issues with Knight's Quests. If you reach the "They robbed us" quest, remove such mod until you complete that quest.</p>
 <p><br></p>
-<p><strong>Q. Does this work with FIKA?</strong></p>
-<p>A. Yes and No. It works in a system that has FIKA installed, but only for the host. If you have other players joining you can experience glitches and errors. There are no plans to make this mod FIKA compatible, to work in multiplayer.</p>
+<p>Followers can end up running and ducking until they reach the player - this can happen when using teleportation too much or right after combat ends. Go within the follow range (~12 meters) to snap them out of it.</p>
 <p><br></p>
-<p><strong>Q. SAIN does x, y,z - can't the followers do the same?</strong></p>
-<p>A. NO. Sain is not designed to have bots work with the player as a team at all. SAIN is not designed to take into account a cross-map moving of a bot making decisions on what to ignore, and what to engage. SAIN is focused on combat engagement and affects the bot's senses in a way that would make your followers pick up targets left and right. SAIN can put the bot in cover holding when it detects an enemy out of sight. That is not what you want your followers to do as you move around the map. So while SAIN has some effect on the followers, it's minimal.</p>
+<p>When followers use grenades, they do not check impact radius in order to avoid you.</p>
 <p><br></p>
-<p><strong>Q. Can you add this and that feature?</strong></p>
-<p>A. You can propose things, but it will all depend of the level of effort and if it makes sense to be integrated into what I am trying to achieve with this mod.</p>
-<p><br>[/tab]</p>
+<p>Followers might still spawn with grenades in their pockets even though you assigned a custom equipment preset that has no grenades.</p>
 <p><br></p>
-<p>[tab='Known Issues']<br>This mod had a lot of conflicts with existing bot mods and they almost all touch either the spawn behavior or the brain of the bots. Things are stable now, however, I would not rule out conflicts still happening. If you have problems, be sure to specify what other bot mods you are using in the comments.<br><br>Custom equipment can be a problem for bots you spawn with. This means equipment that comes from mods that may not be optimized for being used by bots. This can result in followers not spawning or appearing without a body and being stuck in place. So avoid giving them load-outs with custom equipment.</p>
-<p><br></p>
-<p>Map transit won't work while in a group with the Goons</p>
-<p><br></p>
-<p>"Bad Guy" flag does not always make all same side bots hostile (some can spawn in a "warning" mode where they won't attack you until you get close enough to them)</p>
-<p><br></p>
-<p>"Friendly PMC side" flag does not always make all same side bots friendly (the "warning" mode can affect this one as well - it's something new in the game and can't be fully disabled)</p>
-<p><br></p>
-<p>Bots in the "Assist" tactic will not turn hostile on accidental shots (this means bots you picked up during raids, Scav followers or Goons)</p>
-<p><br></p>
-<p>Realism Mod can conflict with bots on the meds side. That needs to be turned off</p>
+<p>"Bad Guy" and "Friendly PMC side" flags do not guarantee every PMC will be friendly or hostile. The new PMC karma system can still affect the bots. But, it would be 1-2 per raid that can end up not obeying these flags.</p>
 <p><br></p>
 <p>Bots can sometimes pick up an enemy that they never saw or heard. Use the "Attention" command to reset. In some cases, you have to actually take the enemy out as they keep reacquiring him.</p>
 <p><br></p>
 <p>Bots follow in a straight line and can end up intersecting with one another. Yes, that is the navigation logic of the game and cannot be resolved.</p>
 <p><br></p>
-<p>You can have delayed spawns. This especially can happen if you have other mods that also touch the spawn behavior like Donuts and QuestingBots. When you do not select a custom loadout the bots can have a delay in spawning with you. This can range from a couple of seconds to even minutes based on your system and what else you have going on that is executing at the beginning of a raid. To resolve, use custom load-outs, see <strong>Gameplay Guide -&gt; Dealing with Custom Loadouts</strong><br><br>Avoid having lots of followers. The more followers you have the bigger the impact on performance. Unlike regular bots, who are designed to work with the zone they spawned in, your followers must be able to utilize all zones of the map as they follow you. Thus even with all the optimization, the more followers you have the more it has to work to figure out where each is and what covers are available around him.</p>
+<p>Map transit won't work while having followers (WIP)</p>
+<p><br></p>
+<p>Even small bushes can make the enemy invisible to the followers when yelling "contact"</p>
 <p><br>[/tab]</p>
 <p><br>[/tabmenu]</p>

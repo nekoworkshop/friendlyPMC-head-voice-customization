@@ -81,6 +81,7 @@ import { IEmptyRequestData } from "@spt/models/eft/common/IEmptyRequestData";
 import { objectCopy, objectForEach } from "./Utils";
 import { IGetRaidConfigurationRequestData } from "@spt/models/eft/match/IGetRaidConfigurationRequestData";
 import { IAdditionalHostilitySettings } from "@spt/models/eft/common/ILocationBase";
+import { HashUtil } from "@spt/utils/HashUtil";
 
 class friendlyPMC {
 	config = {
@@ -97,7 +98,9 @@ class friendlyPMC {
 	mailSendService: MailSendService;
 	notificationSendHelper: NotificationSendHelper;
 	LocaleService: LocaleService;
+
 	randomUtil: RandomUtil;
+	hashUtil: HashUtil;
 	matchCallbacks: MatchCallbacks;
 	preSptModLoader: PreSptModLoader;
 
@@ -163,6 +166,7 @@ class friendlyPMC {
 		const randomUtil = container.resolve<RandomUtil>("RandomUtil");
 
 		this.randomUtil = randomUtil;
+		this.hashUtil = container.resolve<HashUtil>("HashUtil");
 
 		// patch generateBot so that the Goons have meds
 		this.generateBot = this.generateBot.bind(this);
@@ -335,8 +339,6 @@ class friendlyPMC {
 					this.config.badGuy = info.Config.badGuy;
 					this.config.englishBear = info.Config.englishBear;
 
-					this.Logger.logWithColor("friendlyPMC: Setting Server Config as " + JSON.stringify(info), LogTextColor.WHITE);
-
 					if (this.config.armbands) {
 						this.Logger.logWithColor("friendlyPMC: Adding Armbands to bots...", LogTextColor.WHITE);
 
@@ -378,45 +380,14 @@ class friendlyPMC {
 							Bear_3: 1,
 						};
 					}
-					// change bot location hostility settings based on our config
-					/* const locations = this.databaseServer.getTables().locations;
-					for (let k in locations) {
-						const loc: (typeof locations)["bigmap"] = locations[k];
-						if (!loc.base || loc.base.Name == "Private Sector" || loc.base.Name == "Terminal" || loc.base.Name == "Town" || loc.base.Name == "Suburbs" || loc.base.Name == "Arena") continue;
-
-						if (!loc.base.BotLocationModifier?.AdditionalHostilitySettings) continue;
-
-						loc.base.BotLocationModifier.AdditionalHostilitySettings = objectCopy(this._hostilitySettings[k]);
-
-						if (!this.config.friendlyPMC) {
-							if (this.config.badGuy) {
-								loc.base.BotLocationModifier.AdditionalHostilitySettings.forEach(setting => {
-									if (["pmcUSEC", "pmcBEAR"].includes(setting.BotRole)) {
-										setting.BearPlayerBehaviour = "AlwaysEnemies";
-										setting.UsecPlayerBehaviour = "AlwaysEnemies";
-									}
-								});
-							}
-						} else {
-							loc.base.BotLocationModifier.AdditionalHostilitySettings.forEach(setting => {
-								if (["pmcUSEC", "pmcBEAR"].includes(setting.BotRole)) {
-									setting.BearPlayerBehaviour = this.config.badGuy || setting.BotRole == "pmcUSEC" ? "AlwaysEnemies" : "Neutral";
-									setting.UsecPlayerBehaviour = this.config.badGuy || setting.BotRole == "pmcBEAR" ? "AlwaysEnemies" : "Neutral";
-									setting.BearEnemyChance = setting.BotRole == "pmcBEAR" && this.config.friendlyPMC ? 0 : setting.BearEnemyChance;
-									setting.UsecEnemyChance = setting.BotRole == "pmcUSEC" && this.config.friendlyPMC ? 0 : setting.UsecEnemyChance;
-								}
-							});
-						}
-					} */
 
 					return httpResponseUtil.emptyResponse();
 				}),
-				new RouteAction("/client/game/bot/followergenerate", (url: string, info: { Info: IGenerateBotsRequestData; Preset?: string; Custom?: { Body?: string; Feet?: string; Nickname?: string; English?: boolean; Voice?: string } }, sessionID: string, output: string): any => {
+				new RouteAction("/client/game/bot/followergenerate", (url: string, info: { Info: IGenerateBotsRequestData; Preset?: string; Custom?: { Body?: string; Feet?: string; Equipment?: string; Nickname?: string; English?: boolean; Voice?: string } }, sessionID: string, output: string): any => {
 					const pmcProfile = profileHelper.getPmcProfile(sessionID);
+					const playerProfile = profileHelper.getFullProfile(sessionID);
 
 					const custom = info.Custom;
-
-					this.Logger.logWithColor("friendlyPMC: Follower Options - " + JSON.stringify(info.Custom), LogTextColor.WHITE);
 
 					const conditionPromises: IBotBase[] = [];
 
@@ -439,7 +410,7 @@ class friendlyPMC {
 						botGenerationDetails.botRelativeLevelDeltaMin = 5;
 
 						// FIKA is not always spawning ARM bands for followers
-						if (this.config.armbands) {
+						if (this.config.armbands && botGenerationDetails.isPmc) {
 							botJsonTemplateClone.chances.equipment.ArmBand = 100;
 
 							if (pmcProfile.Info.Side.toLowerCase() == "bear") {
@@ -449,56 +420,83 @@ class friendlyPMC {
 							}
 						}
 
+						if (botGenerationDetails.isPmc && custom) {
+							if (custom.Body) {
+								botJsonTemplateClone.appearance.body = {};
+								botJsonTemplateClone.appearance.body[custom.Body] = 1;
+								preparedBotBase.Customization.Body = custom.Body;
+							}
+							if (custom.Feet) {
+								botJsonTemplateClone.appearance.feet = {};
+								botJsonTemplateClone.appearance.feet[custom.Feet] = 1;
+								preparedBotBase.Customization.Feet = custom.Feet;
+							}
+
+							if (custom.Nickname) {
+								botJsonTemplateClone.firstName = [custom.Nickname];
+								botGenerationDetails.playerName = custom.Nickname;
+								preparedBotBase.Info.Nickname = custom.Nickname;
+							}
+
+							if (custom.Voice && pmcProfile.Info.Side.toLowerCase() == "bear") {
+								botJsonTemplateClone.appearance.voice = {};
+								botJsonTemplateClone.appearance.voice["Bear_1_Eng"] = 1;
+								botJsonTemplateClone.appearance.voice["Bear_2_Eng"] = 1;
+								preparedBotBase.Info.Voice = this.randomUtil.getArrayValue(["Bear_1_Eng", "Bear_2_Eng"]);
+							}
+						}
+
 						const bot = botGenerator["generateBot"](sessionID, preparedBotBase, botJsonTemplateClone, botGenerationDetails);
 
-						conditionPromises.push(bot);
+						if (botGenerationDetails.isPmc) {
+							// force name change
+							if (custom?.Nickname) bot.Info.Nickname = custom.Nickname;
+							// equipment change
+							if (custom?.Equipment) {
+								const equipment = playerProfile.userbuilds.equipmentBuilds?.find(e => e.Name == custom.Equipment);
+								if (equipment) {
+									let eid = equipment.Items[0]._id;
+									let clonedBuild = objectCopy(equipment.Items);
+									let newid = this.hashUtil.generate();
+									clonedBuild[0]._id = newid;
+									clonedBuild.forEach(item => {
+										if (item.parentId == eid) {
+											item.parentId = newid;
+										}
+									});
 
-						conditionPromises.forEach(profile => {
-							if (custom) {
-								if (custom.Body) {
-									profile.Customization.Body = custom.Body;
-								}
-								if (custom.Feet) {
-									profile.Customization.Feet = custom.Feet;
-								}
+									bot.Inventory.equipment = newid;
 
-								if (custom.Nickname) {
-									profile.Info.Nickname = custom.Nickname;
-									profile.Info.LowerNickname = custom.Nickname.toLowerCase();
+									const botSpecialItems = bot.Inventory.items.filter(item => {
+										if (!item.slotId) return false;
+										item.slotId.toLowerCase().includes("dogtag") || item.slotId.includes("SecuredContainer") || item.slotId.includes("SpecialSlot");
+									});
+
+									bot.Inventory.items = clonedBuild
+										.filter(item => {
+											if (!item.slotId) return true;
+											return !item.slotId.includes("SpecialSlot") && !item.slotId.includes("SecuredContainer");
+										})
+										.concat(
+											botSpecialItems.map(item => {
+												if (item.slotId.includes("SpecialSlot")) {
+													let id = clonedBuild.find(i => i.slotId == "Pockets")?._id;
+													if (!id) item.parentId = newid;
+													else item.parentId = id;
+												} else item.parentId = newid;
+
+												return item;
+											})
+										);
 								}
 							}
-							const customization = databaseService.getCustomization();
+						}
 
-							if (custom.Voice && customization[custom.Voice]) {
-								profile.Info.Voice = customization[custom.Voice]._name;
-							} else if (pmcProfile.Info.Side.toLowerCase() == "bear") profile.Info.Voice = custom?.English ? `Bear_${randomUtil.getInt(1, 2)}_Eng` : `Bear_${randomUtil.getInt(1, 3)}`;
-						});
+						conditionPromises.push(bot);
 					}
 					const res = httpResponseUtil.getBody(conditionPromises);
 
 					return res;
-				}),
-
-				new RouteAction("/client/game/bot/preventpmcgenerate", (url: string, info: { State: boolean }, sessionID: string, output: string): any => {
-					if (info.State) {
-						PMCBOT.isUsec = 0;
-						for (let k in PMCBOT.convertIntoPmcChance) {
-							for (let j in PMCBOT.convertIntoPmcChance[k]) {
-								PMCBOT.convertIntoPmcChance[k][j].min = 0;
-								PMCBOT.convertIntoPmcChance[k][j].max = 0;
-							}
-						}
-					} else {
-						PMCBOT.isUsec = PMCBOTVALUES.isUsec;
-						for (let k in PMCBOT.convertIntoPmcChance) {
-							for (let j in PMCBOT.convertIntoPmcChance[k]) {
-								PMCBOT.convertIntoPmcChance[k][j].min = PMCBOTVALUES.convertIntoPmcChance[k][j].min;
-								PMCBOT.convertIntoPmcChance[k][j].max = PMCBOTVALUES.convertIntoPmcChance[k][j].max;
-							}
-						}
-					}
-
-					return httpResponseUtil.emptyResponse();
 				}),
 
 				new RouteAction("/singleplayer/pitlang", (url: string, info: any, sessionID: string, output: string): any => {

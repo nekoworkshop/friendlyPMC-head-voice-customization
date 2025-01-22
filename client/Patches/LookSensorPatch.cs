@@ -11,6 +11,9 @@ using System.Collections.Generic;
 
 namespace friendlyPMC.Patches
 {
+    /**
+     * @notinuse
+     */
     [HarmonyPatch(typeof(LookSensor))]
     [HarmonyPatch("GInterface13.AIPeriodicUpdate")]
     internal class LookSensorPatch
@@ -86,7 +89,9 @@ namespace friendlyPMC.Patches
             _switch.Clear();
         }
     }
-
+    /**
+     * @notinuse
+     */
     internal class GClass1069Patch : ModulePatch
     {
         protected override MethodBase GetTargetMethod()

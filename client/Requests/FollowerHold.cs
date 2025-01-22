@@ -29,15 +29,8 @@ namespace friendlyPMC.Requests
 
         public override bool CanStartExecute(BotOwner executor)
         {
-            if(
-                executor.BotRequestController.CurRequest?.BotRequestType == BotRequestType.followMe ||
-                executor.BotRequestController.CurRequest?.BotRequestType == BotRequestType.goToPoint
-            )
-            {
-                return false;
-            }
-
-            return base.CanStartExecute(executor);
+            
+            return true;
         }
 
         public override AICoreActionEndStruct EndHoldPosition()

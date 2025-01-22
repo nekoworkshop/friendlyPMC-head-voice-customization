@@ -21,7 +21,7 @@ namespace friendlyPMC.Components
         protected string _currentTactic = null;
         protected string _defaultTactic = null;
 
-        
+
 
         public string currentTactic
         {
@@ -42,7 +42,7 @@ namespace friendlyPMC.Components
         protected int _defaultFollowDistance = 12;
         protected int _followDistance;
 
-        public  int followDistance
+        public int followDistance
         {
             get
             {
@@ -78,7 +78,7 @@ namespace friendlyPMC.Components
 
         private const float _BULLET_HEAR_DIST = 50f * 50f;
         private const float _BULLET_IMPACT_DISPERSION = 5f * 5f;
-        
+
         public bool WasHit
         {
             get { return _gotShot > Time.time; }
@@ -109,7 +109,7 @@ namespace friendlyPMC.Components
 
         private bool GRENADE_THROWING = false;
 
-        public bool  IsThrowingGrenade
+        public bool IsThrowingGrenade
         {
             get { return GRENADE_THROWING; }
         }
@@ -155,7 +155,7 @@ namespace friendlyPMC.Components
                     if (CheckActionBusy(meds.FirstAid?.Using == true, TIME_TO_RESET_HEAL_FIRSTAID)) return;
                     if (CheckActionBusy(meds.SurgicalKit?.Using == true, TIME_TO_RESET_HEAL_SURGERY)) return;
                 }
-                if(_owner.WeaponManager != null) 
+                if (_owner.WeaponManager != null)
                 {
                     if (CheckActionBusy(_owner.WeaponManager.Grenades.ThrowindNow || GRENADE_THROWING, TIME_TO_RESET_WEAPONS_GRENADE))
                         return;
@@ -164,7 +164,7 @@ namespace friendlyPMC.Components
                         return;
                 }
 
-                if(_isinteracting && CheckActionBusy(true,TIME_TO_RESET_HANDS)) return;
+                if (_isinteracting && CheckActionBusy(true, TIME_TO_RESET_HANDS)) return;
 
                 ResetBusyState();
             }
@@ -190,6 +190,7 @@ namespace friendlyPMC.Components
                 else
                 {
                     HandsReset();
+                    //_owner.WeaponManager.Selector.TakePrevWeapon();
                 }
             }
             return false; // Hands not busy
@@ -275,7 +276,8 @@ namespace friendlyPMC.Components
                 {
                     flw.BotTalk.TrySay(EPhraseTrigger.OnFriendlyDown, false);
                 }
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 Modules.Logger.LogError(ex);
             }
@@ -297,7 +299,7 @@ namespace friendlyPMC.Components
             {
                 return max;
             }
-           
+
             if (angle <= minAngle)
             {
                 return min;
@@ -315,20 +317,20 @@ namespace friendlyPMC.Components
         {
             if (!_owner.Memory.HaveEnemy && damageInfo.Player != null)
             {
-                if(_owner.BotFollower.HaveBoss)
+                if (_owner.BotFollower.HaveBoss)
                 {
-                    if(_owner.BotFollower.BossToFollow.Player().ProfileId == damageInfo.Player.iPlayer.ProfileId) return;
+                    if (_owner.BotFollower.BossToFollow.Player().ProfileId == damageInfo.Player.iPlayer.ProfileId) return;
                     if (_owner.BotFollower.BossToFollow.Followers.Find(bt => bt.ProfileId == damageInfo.Player.iPlayer.ProfileId)) return;
                 }
 
                 Vector3? pos = damageInfo.Player.iPlayer?.Position;
-                
+
                 if (pos.HasValue)
                 {
                     try
                     {
                         Vector3 direction = pos.Value - _owner.GetPlayer.Transform.position;
-                        
+
                         if (direction.sqrMagnitude < 1f)
                         {
                             direction = direction.normalized;
@@ -337,8 +339,8 @@ namespace friendlyPMC.Components
                         direction = direction * 20f; // ensure the bot will not look down at the ground
 
                         _owner.Steering.LookToPoint(direction, CalcTurnSpeed(_owner.LookDirection, direction));
-                        
-                        if(_gotShot > Time.time && _underFire < Time.time)
+
+                        if (_gotShot > Time.time && _underFire < Time.time)
                         {
                             _underFire = Time.time + 5f;
                             _owner.Memory.SetUnderFire(damageInfo.Player.iPlayer);
@@ -362,13 +364,13 @@ namespace friendlyPMC.Components
         }
 
         /** On enemy sound heard make the bot either look towards the direction of the enemy or automatically make the enemy a target **/
-        public virtual void SoundHeard(Player enemy,Vector3 position, float distance, AISoundType type)
+        public virtual void SoundHeard(Player enemy, Vector3 position, float distance, AISoundType type)
         {
-           
-            if((type == AISoundType.silencedGun || type == AISoundType.gun) && Time.time < _lastGunshotTime + 3f) return;
+
+            if ((type == AISoundType.silencedGun || type == AISoundType.gun) && Time.time < _lastGunshotTime + 3f) return;
 
             // on gun shot if there is a line of sight, turn immmediately
-            if((type == AISoundType.silencedGun || type == AISoundType.gun) && !WasHit) 
+            if ((type == AISoundType.silencedGun || type == AISoundType.gun) && !WasHit)
             {
                 Vector3 shootdir = position - _owner.GetPlayer.Transform.position;
 
@@ -382,7 +384,8 @@ namespace friendlyPMC.Components
                 if (distance <= 35f)
                 {
                     FakeShot(shootdir);
-                    if(distance <= 20f) {
+                    if (distance <= 20f)
+                    {
                         EnemyInfo enInfo = Utils.Enemy.MakeEnemy(_owner, enemy);
                         enInfo?.SetVisible(true);
                     }
@@ -398,17 +401,17 @@ namespace friendlyPMC.Components
                 }
             }
             // turn and face the step sound 
-            else if(type == AISoundType.step) 
+            else if (type == AISoundType.step)
             {
-                 Vector3 positionZone = new Vector3(
-                    Mathf.Floor(position.x / 8f) * 8f,
-                    Mathf.Floor(position.y / 8f) * 8f,
-                    Mathf.Floor(position.z / 8f) * 8f
-                );
+                Vector3 positionZone = new Vector3(
+                   Mathf.Floor(position.x / 8f) * 8f,
+                   Mathf.Floor(position.y / 8f) * 8f,
+                   Mathf.Floor(position.z / 8f) * 8f
+               );
 
                 bool wasProcessed = processedSoundPositions.Contains(positionZone);
 
-                if(wasProcessed && Time.time - _lastSoundTime > 5f ) return;
+                if (wasProcessed && Time.time - _lastSoundTime > 5f) return;
 
                 Vector3 dir = position - _owner.GetPlayer.Transform.position;
 
@@ -442,8 +445,8 @@ namespace friendlyPMC.Components
         /** INSPIRED FROM SAIN - follower to feel bullets flying **/
         public virtual void BulletFelt(EftBulletClass bullet)
         {
-            if(_owner.Memory.HaveEnemy) return;
-            if(Time.time > _hitFreq) return;
+            if (_owner.Memory.HaveEnemy) return;
+            if (Time.time > _hitFreq) return;
 
             Player shooter = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(bullet.PlayerProfileID);
 
@@ -451,11 +454,11 @@ namespace friendlyPMC.Components
             {
                 return;
             }
-            
+
             _hitFreq = Time.time + 1f;
             float distance = (bullet.CurrentPosition - _owner.Position).sqrMagnitude;
 
-            if(distance > _BULLET_HEAR_DIST) return;
+            if (distance > _BULLET_HEAR_DIST) return;
 
             float dispersion = distance / _BULLET_IMPACT_DISPERSION;
 
@@ -475,10 +478,16 @@ namespace friendlyPMC.Components
         protected virtual void OnKilled()
         {
             // remove this bot from being a follower
-            Dismissed();
-            BossPlayers.RemoveFollower(_owner, _boss);
+            try
+            {
+                Dismissed();
+                BossPlayers.RemoveFollower(_owner, _boss);
+            }
+            catch (Exception ex)
+            {
+                Modules.Logger.LogError(ex);
+            }
         }
-         
         public void OnThrow()
         {
             GRENADE_THROWING = true;
@@ -488,7 +497,7 @@ namespace friendlyPMC.Components
         {
             // how does the boss get added as Enemy here ?? - fix it
             if (
-                player != null && 
+                player != null &&
                 (
                     (
                         player.ProfileId == _boss.Player().ProfileId)
@@ -500,7 +509,7 @@ namespace friendlyPMC.Components
                 _owner.BotsGroup.AddAlly((Player)_boss.Player());
             }
         }
-       
+
         public override void Dispose()
         {
             // remove this bot from being a follower
@@ -526,21 +535,21 @@ namespace friendlyPMC.Components
 
                     _owner.GetPlayer.BeingHitAction -= BeingHitAction;
                 }
-                if(_owner.LeaveData != null)
+                if (_owner.LeaveData != null)
                     _owner.LeaveData.OnLeave -= OnLeave;
 
-                if(_owner.Memory != null)
+                if (_owner.Memory != null)
                     _owner.Memory.OnAddEnemy -= OnAddEnemy;
 
-                if(_owner.WeaponManager != null && _owner.WeaponManager.Grenades != null)
+                if (_owner.WeaponManager != null && _owner.WeaponManager.Grenades != null)
                     _owner.WeaponManager.Grenades.OnGrenadeThrowStart -= OnThrow;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Modules.Logger.LogError(ex);
             }
 
-            
+
         }
 
         public virtual void SetBossTactic(string tactic)

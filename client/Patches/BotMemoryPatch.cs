@@ -1,19 +1,53 @@
 ﻿using SPT.Reflection.Patching;
-using Comfort.Common;
 using EFT;
 using friendlyPMC.Components;
 using friendlyPMC.Modules;
 using HarmonyLib;
-using JetBrains.Annotations;
-
-using System.Collections.Generic;
 
 using System.Reflection;
+using JetBrains.Annotations;
 
 namespace friendlyPMC.Patches
 {
     /**
-     * This patch is used to prevent followers from adding teammates as an enemy on friendly fire
+     * Patch to stop followers from acquiring enemies through walls 
+     */
+    internal class BotMemoryAddEnemyPatch : ModulePatch
+    {
+        protected override MethodBase GetTargetMethod()
+        {
+            return AccessTools.Method(typeof(BotMemoryClass), "AddEnemy");
+        }
+
+        [PatchPostfix]
+        private static void PatchPostFix(BotMemoryClass __instance, [NotNull] IPlayer enemy, BotSettingsClass groupInfo, bool onActivation)
+        {
+            if (enemy == null) return;
+
+            var botOwner_0 = AccessTools.Field(typeof(BotMemoryClass), "botOwner_0").GetValue(__instance) as BotOwner;
+
+            // - do not assign enemies to followers if the enemy just spawned
+            if (BossPlayers.IsFollower(botOwner_0) && enemy != null && (groupInfo.Cause == EBotEnemyCause.addBotAtGroup || groupInfo.Cause == EBotEnemyCause.addBotNoGroup))
+            {
+                foreach (var enInfo in botOwner_0.EnemiesController.EnemyInfos)
+                {
+                    if (enInfo.Key.ProfileId == enemy.ProfileId)
+                    {
+                        enInfo.Value.SetVisible(false);
+                        enInfo.Value.GroupInfo.EnemyLastSeenTimeSense = 0f;
+                        if (__instance.GoalEnemy != null && __instance.GoalEnemy.ProfileId == enemy.ProfileId)
+                        {
+                            __instance.GoalEnemy = null;
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    /**
+     * Patch to turn "Assist" followers into hostile on friendly fire
+     * @notinuse
      */
     internal class BotMemoryDamagePatch : ModulePatch
     {
@@ -21,52 +55,60 @@ namespace friendlyPMC.Patches
         {
             return AccessTools.Method(typeof(BotMemoryClass), "method_8");
         }
-        [PatchPostfix]
-        private static void PatchPostfix(BotMemoryClass __instance, DamageInfoStruct damageInfo)
+        [PatchPrefix]
+        private static void PatchPrefix(BotMemoryClass __instance, DamageInfoStruct damageInfo)
         {
-            var botOwner_0 = AccessTools.Field(typeof(BotMemoryClass), "botOwner_0").GetValue(__instance) as BotOwner;
-
-            if (damageInfo.Player == null) return;
-
-            bool isfollower = BossPlayers.IsFollower(botOwner_0);
-            if (!isfollower) return;
-
-            bool isBossEnemy = BossPlayers.IsPlayerBoss(damageInfo.Player.iPlayer.ProfileId);
-
-            bool isTeamate = false;
-
-            if (botOwner_0.BotFollower.BossToFollow == null) return;
-
-            botOwner_0.BotFollower.BossToFollow.Followers.ForEach(bt =>
+            try
             {
-                if (bt.ProfileId == damageInfo.Player.iPlayer.ProfileId) isTeamate = true;
-            });
+                var botOwner_0 = AccessTools.Field(typeof(BotMemoryClass), "botOwner_0").GetValue(__instance) as BotOwner;
 
-            if (!(isBossEnemy || isTeamate)) return;
+                if (damageInfo.Player == null) return;
 
-            var brain = botOwner_0.Brain.BaseBrain as FollowerBrain;
-            if (brain == null) return;
+                bool isfollower = BossPlayers.IsFollower(botOwner_0);
+                if (!isfollower) return;
 
-            botOwner_0.BotTalk.TrySay(EPhraseTrigger.FriendlyFire, true);
+                bool isBossEnemy = BossPlayers.IsPlayerBoss(damageInfo.Player.iPlayer.ProfileId);
 
-            /*if (brain.currentTactic == "Assist")
+                bool isTeamate = false;
+
+                if (botOwner_0.BotFollower.BossToFollow == null) return;
+
+                botOwner_0.BotFollower.BossToFollow.Followers.ForEach(bt =>
+                {
+                    if (bt.ProfileId == damageInfo.Player.iPlayer.ProfileId) isTeamate = true;
+                });
+
+                if (!(isBossEnemy || isTeamate)) return;
+
+                var brain = botOwner_0.Brain.BaseBrain as FollowerBrain;
+                if (brain == null) return;
+
+                if (brain.currentTactic == "Assist")
+                {
+                    var boss = botOwner_0.BotFollower.BossToFollow as pitAIBossPlayer;
+                    if (boss == null) return;
+
+                    if (damageInfo.Damage <= botOwner_0.Settings.FileSettings.Aiming.MIN_DAMAGE_TO_GET_HIT_AFFETS)
+                    {
+                        botOwner_0.BotTalk.TrySay(EPhraseTrigger.FriendlyFire, true);
+                        return;
+                    }
+
+                    botOwner_0.BotTalk.TrySay(EPhraseTrigger.Rat, false);
+
+                    var follower = BossPlayers.Instance.GetFollower(botOwner_0);
+                    BossPlayers.RemoveFollower(botOwner_0, boss);
+                    follower.Dismiss(true);
+                }
+                else
+                {
+                    botOwner_0.BotTalk.TrySay(EPhraseTrigger.FriendlyFire, true);
+                }
+            }
+            catch (System.Exception e)
             {
-                var boss = botOwner_0.BotFollower.BossToFollow as pitAIBossPlayer;
-                if (boss == null) return;
-
-                if (damageInfo.Damage <= botOwner_0.Settings.FileSettings.Aiming.MIN_DAMAGE_TO_GET_HIT_AFFETS) return;
-
-                BossPlayers.Instance.GetFollower(botOwner_0).Dismiss(true);
-                BossPlayers.RemoveFollower(botOwner_0, boss);
-
-                __instance.DangerData.TargetNull();
-
-                Player enemy = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(damageInfo.Player.iPlayer.ProfileId);
-                
-                EnemyInfo info = Utils.Enemy.MakeEnemy(botOwner_0, enemy, EBotEnemyCause.followGetHit);
-                
-                botOwner_0.CalcGoal();
-            }*/
+                Modules.Logger.LogError(e);
+            }
         }
     }
     // this is used for debug purposes that is why it stays disabled
@@ -77,9 +119,9 @@ namespace friendlyPMC.Patches
         {
             var botOwner_0 = AccessTools.Field(typeof(BotMemoryClass), "botOwner_0").GetValue(__instance) as BotOwner;
 
-            if(BossPlayers.IsFollower(botOwner_0) && value != null && Utils.Props.friendlyBotTypes.Contains(value.Person.Profile.Info.Settings.Role))
+            if(BossPlayers.IsFollower(botOwner_0) && value != null)
             {
-                Modules.Logger.LogTrace($"Follower {botOwner_0.ProfileId} is targeting friendly player {value.Person.Profile.Info.Nickname}");
+                Modules.Logger.LogTrace($"Follower accquired an enemy because " + value.GroupInfo.Cause + "flags : " + value.HaveSeen + "; " + value.ShallKnowEnemy());
             }
         }
     }*/

@@ -20,6 +20,7 @@ using friendlyPMC.Components;
 
 using UnityEngine.AI;
 using UnityEngine.Profiling;
+using friendlyPMC.Utils;
 
 
 namespace friendlyPMC.Modules
@@ -453,7 +454,7 @@ namespace friendlyPMC.Modules
 
             pitAIBossPlayer boss = BossPlayers.GetBoss(player.ProfileId);
 
-            if(boss == null || boss.bossGroup == null) return;
+            if(boss == null || boss.bossGroup == null || player.Id == boss.Player().Id) return;
 
             float scanDistance = friendlyPMC.scanDistance.Value;
 

@@ -40,7 +40,7 @@ namespace friendlyPMC.Components.BossFollower
         {
             pusherLayer = new FollowerPusherLayer(bot, priority);
             commonLayer = pusherLayer.CommonLayer;
-            guardLayer = new FollowerGuard(bot, priority,pusherLayer);
+            guardLayer = new FollowerGuard(bot, priority, pusherLayer);
         }
         public override void OnActivate()
         {
@@ -74,7 +74,7 @@ namespace friendlyPMC.Components.BossFollower
 
         public override bool ShallUseNow()
         {
-            
+
             if (!botOwner_0.Memory.HaveEnemy)
             {
                 if (
@@ -153,7 +153,8 @@ namespace friendlyPMC.Components.BossFollower
             try
             {
                 return KnightFight();
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 Modules.Logger.LogInfo("KnightFight Error: " + ex.Message);
                 Modules.Logger.LogInfo("Trace: " + ex.StackTrace);
@@ -170,7 +171,7 @@ namespace friendlyPMC.Components.BossFollower
             if (enemyVisible)
             {
                 // If the enemy is close or mid-range
-                if (distanceToEnemy <= Utils.Enemy.EnemyDistance.Mid && commonLayer.IsEnemyLowThreat(false,2))
+                if (distanceToEnemy <= Utils.Enemy.EnemyDistance.Mid && commonLayer.IsEnemyLowThreat(false, 2))
                 {
                     // Rush towards the enemy
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToEnemy, "assaultRush");
@@ -185,7 +186,7 @@ namespace friendlyPMC.Components.BossFollower
                         botOwner_0.Steering.LookToPoint(botOwner_0.Memory.GoalEnemy.GetCenterPart());
                         return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMovingWithSuppress, "assaultApproach");
                     }
-                    else if(commonLayer.IsEnemyLowThreat(false,2))
+                    else if (commonLayer.IsEnemyLowThreat(false, 2))
                     {
                         // No cover point found, move towards the enemy while suppressing
                         return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToEnemy, "assaultRush");
@@ -203,13 +204,13 @@ namespace friendlyPMC.Components.BossFollower
                     botOwner_0.Steering.LookToPoint(botOwner_0.Memory.GoalEnemy.GetCenterPart());
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMovingWithSuppress, "assaultApproach");
                 }
-                else if (commonLayer.IsEnemyLowThreat(false,2))
+                else if (commonLayer.IsEnemyLowThreat(false, 2))
                 {
                     // No cover point found, move towards the enemy's last known position while suppressing
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToEnemy, "assaultRush");
                 }
-                
-                
+
+
             }
 
             return pusherLayer.EngageEnemy();
@@ -269,7 +270,7 @@ namespace friendlyPMC.Components.BossFollower
 
             return null;
         }
-        
+
         /** Adaptation of original GetDecision from GClass65 */
         public AICoreActionResultStruct<BotLogicDecision>? KnightBaseDecision()
         {
@@ -283,8 +284,8 @@ namespace friendlyPMC.Components.BossFollower
                         return commonLayer.DogFight(out customNavigationPoint_0);
                     }
 
-                    GetClosestAttackCoverPoint(botOwner_0.Memory.GoalEnemy.CurrPosition,10f);
-                    if(customNavigationPoint_0 != null)
+                    GetClosestAttackCoverPoint(botOwner_0.Memory.GoalEnemy.CurrPosition, 10f);
+                    if (customNavigationPoint_0 != null)
                         return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMoving, "enemyNear");
                 }
             }
@@ -311,7 +312,7 @@ namespace friendlyPMC.Components.BossFollower
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.heal, "HealInCover");
                 }
 
-                IL_19D:
+            IL_19D:
                 return KnightAssault();
             }
 
@@ -319,7 +320,7 @@ namespace friendlyPMC.Components.BossFollower
             if (int_16 >= num)
             {
                 int_16 = 0;
-                return commonLayer.HoldPositionFor(7f,"bad covers");
+                return commonLayer.HoldPositionFor(7f, "bad covers");
             }
             float_52 = Time.time;
 
@@ -358,7 +359,7 @@ namespace friendlyPMC.Components.BossFollower
                     botOwner_0.Memory.Spotted(false, null, new float?(32f));
                     int_16++;
                 }
-                
+
                 if (method_12() && botOwner_0.Memory.GoalEnemy.CanShoot && botOwner_0.Memory.GoalEnemy.IsVisible)
                 {
                     return commonLayer.DogFight(out customNavigationPoint_0);
@@ -377,11 +378,11 @@ namespace friendlyPMC.Components.BossFollower
 
             if (baseDecision.HasValue) return baseDecision.Value;
 
-            bool useGrenade = GClass824.Random(0f, 2f) > 1f;
-            
-            AICoreActionResultStruct<BotLogicDecision> decision = guardLayer.method_29(useGrenade,BotLogicDecision.debugGrenade);
+            bool useGrenade = botOwner_0.Settings.FileSettings.Core.CanGrenade && GClass824.Random(0f, 2f) > 1f;
 
-            if(decision.Action != BotLogicDecision.debugGrenade)
+            AICoreActionResultStruct<BotLogicDecision> decision = guardLayer.method_29(useGrenade, BotLogicDecision.debugGrenade);
+
+            if (decision.Action != BotLogicDecision.debugGrenade)
             {
                 return decision;
             }
@@ -400,7 +401,7 @@ namespace friendlyPMC.Components.BossFollower
 
             AICoreActionEndStruct? push = pusherLayer.ShallEndDecision(curDecision);
 
-            if(push.HasValue) return push.Value;
+            if (push.HasValue) return push.Value;
 
             if (curDecision.Reason == "assaultRush" && Utils.Enemy.Distance(botOwner_0) <= Utils.Enemy.EnemyDistance.VeryClose)
             {
@@ -446,7 +447,7 @@ namespace friendlyPMC.Components.BossFollower
 
         public override AICoreActionEndStruct EndFollowerPatrolItem()
         {
-            if(botOwner_0.Memory.HaveEnemy) return new AICoreActionEndStruct("enemy.Present", true);
+            if (botOwner_0.Memory.HaveEnemy) return new AICoreActionEndStruct("enemy.Present", true);
             return base.EndFollowerPatrolItem();
         }
 

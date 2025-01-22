@@ -16,7 +16,7 @@ using UnityEngine.Profiling;
 
 namespace friendlyPMC.Patches
 {
-    
+
     internal class AIDataContructPatch : ModulePatch
     {
 
@@ -37,7 +37,7 @@ namespace friendlyPMC.Patches
                     if (__instance.AIBossPlayer != null && __instance.AIBossPlayer.GetType() != typeof(pitAIBossPlayer))
                     {
                         __instance.AIBossPlayer.Dispose();
-                        pitAIBossPlayer boss =  BossPlayers.GetBoss(player.ProfileId);
+                        pitAIBossPlayer boss = BossPlayers.GetBoss(player.ProfileId);
                         // replace AIBossPlayer with ours
                         if (boss != null)
                         {
@@ -47,7 +47,8 @@ namespace friendlyPMC.Patches
                         }
                     }
 
-                } catch (Exception ex)
+                }
+                catch (Exception ex)
                 {
                     Logger.LogError("Failed to dispose old AIBossPlayer");
                     Logger.LogError(ex);
@@ -109,7 +110,7 @@ namespace friendlyPMC.Patches
                 }
                 return false;
 
-            } 
+            }
             else if ((EPhraseTrigger)actionId == (EPhraseTrigger)CustomPhrases.OverThere)
             {
 
@@ -139,7 +140,7 @@ namespace friendlyPMC.Patches
                     }
                     else if (__instance.Player.HandsIsEmpty)
                     {
-                        
+
                         foreach (var receiver in Receivers.GetReceivers())
                         {
                             GClass501 data = new GClass501
@@ -159,7 +160,7 @@ namespace friendlyPMC.Patches
                 return false;
             }
             // fix for 0.15 not triggering the gesture shown event when it comes from the boss
-            if (boss != null && actionId <=9)
+            if (boss != null && actionId <= 9)
             {
 
                 foreach (var receiver in Receivers.GetReceivers())
@@ -216,7 +217,7 @@ namespace friendlyPMC.Patches
                                 if (alivePlayerByProfileID.Profile.TryGetTraderInfo("67768b19fa281ca31708b187", out var traderInfo))
                                 {
                                     double standing = alivePlayerByProfileID.Profile.GetTraderStanding("67768b19fa281ca31708b187");
-                                    traderInfo.SetStanding(Math.Min(0.1, standing - 0.02));
+                                    traderInfo.SetStanding(Math.Max(0.1, standing - 0.1));
                                 }
 
                                 break;

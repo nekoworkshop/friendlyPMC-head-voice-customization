@@ -191,7 +191,7 @@ namespace friendlyPMC.Components.Tactics
                 {
                     return new AICoreActionEndStruct("CanShoot", true);
                 }
-                if (gclass363_0.IsHitted && commonLayer.coverType == "close")
+                if (gclass363_0 != null && gclass363_0.IsHitted && commonLayer.coverType == "close")
                 {
                     return new AICoreActionEndStruct("bossHit", true);
                 }

@@ -161,7 +161,7 @@ namespace friendlyPMC.Actions
             if(bool_7)
             {
                 botOwner_0.GoToSomePointData.UpdateToGo(false);
-                if (!wasHit) botOwner_0.LookData.SetLookPointByHearing(null);
+                if (!wasHit) botOwner_0.Steering.LookToMovingDirection();
             }
 
             if (float_3 < Time.time)
@@ -277,7 +277,7 @@ namespace friendlyPMC.Actions
 
                         botOwner_0.GoToSomePointData.SetPoint(navMeshHit.position);
                         botOwner_0.GoToSomePointData.UpdateToGo(false);
-                        
+
                         if (!wasHit) botOwner_0.Steering.LookToMovingDirection();
 
                         bool_7 = true;

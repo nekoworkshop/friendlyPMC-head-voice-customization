@@ -436,6 +436,12 @@ namespace friendlyPMC.Modules
             return Instance.GetBossPlayer(name);
         }
 
+        public static Dictionary<string, pitAIBossPlayer> GetBosses()
+        {
+            if (Instance == null) return new Dictionary<string, pitAIBossPlayer>();
+            return Instance.GetBossPlayers();
+        }
+
         public static bool IsPlayerBoss(string profileId)
         {
             if (Instance == null) return false;
@@ -494,7 +500,7 @@ namespace friendlyPMC.Modules
             };
             if (!Instance._botsGroup.Contains(group.Id)) Instance._botsGroup.Add(group.Id);
 
-            player.bossGroup.AddAlly((Player)player.Player());
+            player.bossGroup.AddAlly(player.realPlayer);
 
             foreach (var enemy in player.GetEnemies())
             {

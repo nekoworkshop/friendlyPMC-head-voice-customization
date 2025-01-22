@@ -17,10 +17,8 @@ namespace friendlyPMC.Actions
         private float float_0 = 0f;
         private float float_1 = 0f;
 
-        private BifacialTransform bifacialTransform_0;
         public FollowerGoToEnemy(BotOwner bot) : base(bot)
         {
-            bifacialTransform_0 = AccessTools.Field(typeof(GClass185), "bifacialTransform_0").GetValue(this) as BifacialTransform;
         }
 
         public override void Update()
@@ -105,7 +103,7 @@ namespace friendlyPMC.Actions
             Vector3 centerPos;
             if (botOwner_0.Memory.IsInCover && !this.botOwner_0.LookSensor.EnoughDistToShoot(out flag))
             {
-                centerPos = (this.bifacialTransform_0.position + this.botOwner_0.Memory.GoalEnemy.EnemyLastPosition) / 2f;
+                centerPos = (botOwner_0.Transform.position + this.botOwner_0.Memory.GoalEnemy.EnemyLastPosition) / 2f;
             }
             else
             {

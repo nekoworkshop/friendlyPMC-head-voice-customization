@@ -33,7 +33,7 @@ namespace friendlyPMC.Patches
             if (IsSAINInstalled())
             {
 
-                if(squadType == null)
+                if (squadType == null)
                 {
                     squadType = Type.GetType("SAIN.BotController.Classes.Squad, SAIN");
                 }
@@ -44,14 +44,14 @@ namespace friendlyPMC.Patches
                 }
 
 
-                
+
                 if (enemyTalk == null)
                 {
                     enemyTalk = Type.GetType("SAIN.SAINComponent.Classes.Talk.EnemyTalk, SAIN");
 
                 }
 
-                if(GroupClass == null)
+                if (GroupClass == null)
                 {
                     GroupClass = Type.GetType("SAIN.SAINComponent.Classes.Talk.GroupTalk, SAIN");
                 }
@@ -61,7 +61,7 @@ namespace friendlyPMC.Patches
                     BotHearingClass = Type.GetType("SAIN.Components.BotControllerSpace.Classes.BotHearingClass, SAIN");
                 }
 
-                if(EnemyListController == null)
+                if (EnemyListController == null)
                 {
                     EnemyListController = Type.GetType("SAIN.SAINComponent.Classes.EnemyClasses.EnemyListController, SAIN");
                 }
@@ -72,12 +72,12 @@ namespace friendlyPMC.Patches
                     harmony.Patch(AccessTools.Method(squadType, "clearPlayerPlace"), new HarmonyMethod(typeof(SAINPatch).GetMethod(nameof(PatchClearPlayerPlace), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance)));
                 }
 
-                if(SAINEnableClass !=null)
+                if (SAINEnableClass != null)
                 {
                     harmony.Patch(AccessTools.Method(SAINEnableClass, "isBotExcluded"), new HarmonyMethod(typeof(SAINPatch), nameof(PatchisBotExcluded)));
                 }
 
-                if(enemyTalk != null)
+                if (enemyTalk != null)
                 {
                     harmony.Patch(AccessTools.Method(enemyTalk, "playerTalked"), new HarmonyMethod(typeof(SAINPatch).GetMethod(nameof(PatchPlayerTalked), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance)));
                 }
@@ -87,10 +87,10 @@ namespace friendlyPMC.Patches
                     harmony.Patch(AccessTools.Method(GroupClass, "EnemyConversation"), new HarmonyMethod(typeof(SAINPatch).GetMethod(nameof(PatchEnemyConvesation), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance)));
                 }
 
-                if (EnemyListController != null)
+                /*if (EnemyListController != null)
                 {
                     harmony.Patch(AccessTools.Method(EnemyListController, "CheckAddEnemy"), new HarmonyMethod(typeof(SAINPatch).GetMethod(nameof(PatchCheckAddEnemy), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance)));
-                }
+                }*/
 
                 if (squadType != null && SAINEnableClass != null)
                 {
@@ -115,7 +115,7 @@ namespace friendlyPMC.Patches
             {
                 return true;
             }
-            
+
             bool allow = true;
 
             if (BossPlayers.Instance == null) return allow;
@@ -134,7 +134,7 @@ namespace friendlyPMC.Patches
                 MethodInfo moveNextMethod = enumeratorType.GetMethod("MoveNext");
                 // Get the Current property
                 PropertyInfo currentProperty = enumeratorType.GetProperty("Current");
-            
+
                 while ((bool)moveNextMethod.Invoke(enumerator, null))
                 {
                     var current = currentProperty.GetValue(enumerator);
@@ -171,7 +171,8 @@ namespace friendlyPMC.Patches
                         }
                     }
                 }
-            } catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 Logger.LogError("Failed to run SAIN clearPlayerPlace Patch");
                 Logger.LogError(ex);
@@ -184,7 +185,7 @@ namespace friendlyPMC.Patches
         private static bool PatchCheckAddEnemy(object __instance, IPlayer IPlayer)
         {
             BotOwner botOwner = EnemyListController.GetProperty("BotOwner").GetValue(__instance) as BotOwner;
-            if(botOwner != null && BossPlayers.IsFollower(botOwner))
+            if (botOwner != null && BossPlayers.IsFollower(botOwner))
             {
                 return false;
             }
@@ -206,7 +207,7 @@ namespace friendlyPMC.Patches
         [HarmonyPrefix]
         private static bool PatchPlayerTalked(EPhraseTrigger phrase, ETagStatus mask, Player player)
         {
-            if(phrase == (EPhraseTrigger)CustomPhrases.TeamStatus || phrase == (EPhraseTrigger)CustomPhrases.OverThere)
+            if (phrase == (EPhraseTrigger)CustomPhrases.TeamStatus || phrase == (EPhraseTrigger)CustomPhrases.OverThere)
             {
                 return false;
             }

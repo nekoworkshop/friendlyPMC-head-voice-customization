@@ -73,6 +73,11 @@ namespace friendlyPMC.Components.Tactics
         public override AICoreActionResultStruct<BotLogicDecision> GetDecision()
         {
 
+            if(!botOwner_0.Memory.HaveEnemy)
+            {
+                return commonLayer.HoldPositionFor(Time.time + GClass824.Random(1f, 2f));
+            }
+
             Vector3 botPosition = botOwner_0.GetPlayer.Transform.position;
             bool enemyVisible = botOwner_0.Memory.GoalEnemy.IsVisible;
 
