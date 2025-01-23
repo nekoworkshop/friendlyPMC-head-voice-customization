@@ -170,7 +170,7 @@ namespace friendlyPMC.Components
             if (baseBrain != null) baseBrain.Dispose();
             _bot.BotState = EBotState.NonActive;
             _bot.Receiver.Dispose();
-            
+
 
             // add special follower settings
             SetFollowerSettings(_bot);
@@ -651,7 +651,6 @@ namespace friendlyPMC.Components
                             {
                                 activatedBots.Remove(_bot.GetPlayer);
                                 bigBraidDeactivated = true;
-                                Modules.Logger.LogInfo("Bot removed from activated bots");
                             }
                         }
                     }

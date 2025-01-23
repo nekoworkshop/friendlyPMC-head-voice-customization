@@ -1,9 +1,14 @@
 -- === 3.9.6 === ---:
-- attempt to make transit work while in a group with followers
+- x - make followers not throw grenades when the enemy is out of throwing range
+- x - fixed Knight trader standing not increasing when running with BirdEye or BigPipe
+- add more trade items to Knight
+
+-- === 3.10 === ---:
 - see if we can make bot swap weapons when asked to loot (DeadBodyWork)
 - - this should also allow bot to put that weapon as seconday (in case of support without a grenade launcher)
-
+- attempt to make transit work while in a group with followers (this needs profile and equipment saving of the bot in order to restore it after transit)
 - add "hold fire/fire at will" commands
+- add more trade items to Knight
 
 --- ==== 4.0.0 (final phase - "The General" for followers quest) ==== ---:
 - "The General" quests will unlock followers
@@ -17,7 +22,8 @@
 
 ==================================================================================
 RELEASE NOTES (3.9.6)
-
+fixed issue with Knight trader not increasing when running with BirdEye or BigPipe
+updated follower to not throw grenades when the enemy is out of throwing range
 
 ==================================================================================
 
