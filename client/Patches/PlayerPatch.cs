@@ -151,8 +151,6 @@ namespace friendlyPMC.Patches
 
                             receiver.Value.GestusShown(data);
                         }
-
-                        __instance.Player.HandsController.ShowGesture(EInteraction.ThereGesture);
                     }
                 }
 

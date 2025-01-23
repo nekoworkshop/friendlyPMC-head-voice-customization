@@ -921,7 +921,6 @@ namespace friendlyPMC.Components
                 if (!notBusy && botOwner_0.Memory.GoalEnemy.HaveSeen && Time.time - botOwner_0.Memory.GoalEnemy.PersonalLastSeenTime < 3f)
                 {
 
-                    botOwner_0.Gesture.TryGestus(EInteraction.NoGesture, true);
                     botOwner_0.BotTalk.TrySay(EPhraseTrigger.DontKnow, false);
                     return;
                 }

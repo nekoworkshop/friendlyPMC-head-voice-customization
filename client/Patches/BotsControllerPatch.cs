@@ -753,27 +753,27 @@ namespace friendlyPMC.Patches
                         switch (part)
                         {
                             case EBodyPart.Head:
-                                bodyPart.Health.Minimum = 120;
-                                bodyPart.Health.Maximum = 120;
-                                bodyPart.Health.Current = 120;
+                                bodyPart.Health.Minimum = 120 * friendlyPMC.heatlhMultiplier.Value;
+                                bodyPart.Health.Maximum = 120 * friendlyPMC.heatlhMultiplier.Value;
+                                bodyPart.Health.Current = 120 * friendlyPMC.heatlhMultiplier.Value;
                                 break;
                             case EBodyPart.Chest:
                             case EBodyPart.Stomach:
-                                bodyPart.Health.Minimum = 220;
-                                bodyPart.Health.Maximum = 220;
-                                bodyPart.Health.Current = 220;
+                                bodyPart.Health.Minimum = 220 * friendlyPMC.heatlhMultiplier.Value;
+                                bodyPart.Health.Maximum = 220 * friendlyPMC.heatlhMultiplier.Value;
+                                bodyPart.Health.Current = 220 * friendlyPMC.heatlhMultiplier.Value;
                                 break;
                             case EBodyPart.RightArm:
                             case EBodyPart.LeftArm:
-                                bodyPart.Health.Minimum = 150;
-                                bodyPart.Health.Maximum = 150;
-                                bodyPart.Health.Current = 150;
+                                bodyPart.Health.Minimum = 150 * friendlyPMC.heatlhMultiplier.Value;
+                                bodyPart.Health.Maximum = 150 * friendlyPMC.heatlhMultiplier.Value;
+                                bodyPart.Health.Current = 150 * friendlyPMC.heatlhMultiplier.Value;
                                 break;
                             case EBodyPart.RightLeg:
                             case EBodyPart.LeftLeg:
-                                bodyPart.Health.Minimum = 170;
-                                bodyPart.Health.Maximum = 170;
-                                bodyPart.Health.Current = 170;
+                                bodyPart.Health.Minimum = 170 * friendlyPMC.heatlhMultiplier.Value;
+                                bodyPart.Health.Maximum = 170 * friendlyPMC.heatlhMultiplier.Value;
+                                bodyPart.Health.Current = 170 * friendlyPMC.heatlhMultiplier.Value;
                                 break;
 
                             default:

@@ -1,7 +1,9 @@
 -- === 3.9.6 === ---:
 - x - make followers not throw grenades when the enemy is out of throwing range
 - x - fixed Knight trader standing not increasing when running with BirdEye or BigPipe
+- x - allow health multiplier to also affect the Goons
 - add more trade items to Knight
+- add option to increase the display time of the ping team
 
 -- === 3.10 === ---:
 - see if we can make bot swap weapons when asked to loot (DeadBodyWork)
@@ -24,7 +26,7 @@
 RELEASE NOTES (3.9.6)
 fixed issue with Knight trader not increasing when running with BirdEye or BigPipe
 updated follower to not throw grenades when the enemy is out of throwing range
-
+health multipler now also affects the Goons' health
 ==================================================================================
 
 
