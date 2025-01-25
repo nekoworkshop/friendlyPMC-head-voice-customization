@@ -2,6 +2,11 @@
 - x - make followers not throw grenades when the enemy is out of throwing range
 - x - fixed Knight trader standing not increasing when running with BirdEye or BigPipe
 - x - allow health multiplier to also affect the Goons
+- totest - see if it is possible to make the bot switch enemy based on proximity and visibility
+- - check sounds nearby
+- - turn when being hit
+- x - update custom gear code on the sever side to use unique IDs for each item
+- totest - when doing "enemy spotted" cast the ray starting in front of the player's head (0.1f) to avoid hitting the nightvision  
 - add more trade items to Knight
 - add option to increase the display time of the ping team
 

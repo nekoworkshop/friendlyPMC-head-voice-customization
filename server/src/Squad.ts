@@ -465,6 +465,17 @@ class friendlyPMC {
 										}
 									});
 
+									// go through all the items and ensure their ids are unique in the clonedBuild, exclude the first item
+									// check the parent id of any item to update it to the new id should the item have a parent an item for which we just changed the id
+									clonedBuild.forEach(item => {
+										if (item._id == newid) return;
+										const _pid = item._id;
+										item._id = this.hashUtil.generate();
+										clonedBuild.forEach(i => {
+											if (i.parentId == _pid) i.parentId = item._id;
+										});
+									});
+
 									bot.Inventory.equipment = newid;
 
 									const botSpecialItems = bot.Inventory.items.filter(item => {

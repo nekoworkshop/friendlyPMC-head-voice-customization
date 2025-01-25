@@ -190,7 +190,7 @@ namespace friendlyPMC.Components
                 else
                 {
                     HandsReset();
-                    //_owner.WeaponManager.Selector.TakePrevWeapon();
+                    _owner.WeaponManager.Selector.TakePrevWeapon();
                 }
             }
             return false; // Hands not busy
@@ -312,10 +312,10 @@ namespace friendlyPMC.Components
             return result;
         }
 
-        /** Bot should turn to the direction from where he got shot, if he is nor already in combat */
+        /** Bot should turn to the direction from where he got shot, if he is nor already engaging */
         protected void BeingHitAction(DamageInfoStruct damageInfo, EBodyPart bodyType, float damageReducedByArmor)
         {
-            if (!_owner.Memory.HaveEnemy && damageInfo.Player != null)
+            if (damageInfo.Player != null)
             {
                 if (_owner.BotFollower.HaveBoss)
                 {
@@ -330,6 +330,9 @@ namespace friendlyPMC.Components
                     try
                     {
                         Vector3 direction = pos.Value - _owner.GetPlayer.Transform.position;
+
+                        if (_owner.Memory.HaveEnemy && (_owner.Memory.GoalEnemy.IsVisible || Time.time - _owner.Memory.GoalEnemy.PersonalLastSeenTime < 1.5f)) return;
+
 
                         if (direction.sqrMagnitude < 1f)
                         {

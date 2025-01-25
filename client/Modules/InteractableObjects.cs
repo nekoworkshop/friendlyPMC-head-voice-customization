@@ -30,7 +30,7 @@ namespace friendlyPMC.Modules
         public static InteractableObjects Instance;
 
         private Door _currDoor;
-        private Dictionary<string,Door> _doorsToOpen;
+        private Dictionary<string, Door> _doorsToOpen;
 
         private LootItem _lootItem;
         private Vector3? _lootPosition;
@@ -193,12 +193,13 @@ namespace friendlyPMC.Modules
                 if (!SendStoreItems())
                 {
                     NpcMessage.NpcSendThankYou();
-                } else
+                }
+                else
                 {
                     string id = NpcMessage.GetNpcType("boss");
                     if (id == null) id = NpcMessage.GetNpcType("ally");
 
-                    if(id != null)
+                    if (id != null)
                     {
                         NpcMessage.NpcSendThankYou(id);
                     }
@@ -227,9 +228,9 @@ namespace friendlyPMC.Modules
 
             _lootItem = null;
             _lootedItems = null;
-           
+
             _enemiesSeen = null;
-            
+
             _doorsToOpen = null;
 
             _isBossDead = false;
@@ -349,8 +350,9 @@ namespace friendlyPMC.Modules
             {
                 if (!Instance._doorsToOpen.ContainsKey(bot.ProfileId))
                 {
-                    Instance._doorsToOpen.Add(bot.ProfileId,Instance._currDoor);
-                } else
+                    Instance._doorsToOpen.Add(bot.ProfileId, Instance._currDoor);
+                }
+                else
                 {
                     Instance._doorsToOpen[bot.ProfileId] = door != null ? door : Instance._currDoor;
                 }
@@ -366,14 +368,14 @@ namespace friendlyPMC.Modules
 
         public static void RemoveOpener(BotOwner bot)
         {
-            if(Instance == null) return;
-            if(Instance._doorsToOpen.ContainsKey(bot.ProfileId)) Instance._doorsToOpen.Remove(bot.ProfileId);
+            if (Instance == null) return;
+            if (Instance._doorsToOpen.ContainsKey(bot.ProfileId)) Instance._doorsToOpen.Remove(bot.ProfileId);
         }
 
         public static Door GetDoorToOpen(BotOwner bot)
         {
-            if( Instance == null) return null;
-            if(!Instance._doorsToOpen.ContainsKey(bot.ProfileId)) return null;
+            if (Instance == null) return null;
+            if (!Instance._doorsToOpen.ContainsKey(bot.ProfileId)) return null;
             return Instance._doorsToOpen[bot.ProfileId];
         }
 
@@ -437,8 +439,8 @@ namespace friendlyPMC.Modules
 
         public static void ClearStoredItems(string bot)
         {
-            if (Instance == null ||Instance._isBossDead) return;
-            
+            if (Instance == null || Instance._isBossDead) return;
+
             if (Instance._lootedItems.ContainsKey(bot))
             {
                 Instance._lootedItems.Remove(bot);
@@ -454,7 +456,7 @@ namespace friendlyPMC.Modules
 
             pitAIBossPlayer boss = BossPlayers.GetBoss(player.ProfileId);
 
-            if(boss == null || boss.bossGroup == null || player.Id == boss.Player().Id) return;
+            if (boss == null || boss.bossGroup == null || player.Id == boss.Player().Id) return;
 
             float scanDistance = friendlyPMC.scanDistance.Value;
 
@@ -489,14 +491,15 @@ namespace friendlyPMC.Modules
 
                         if (isenemy)
                         {
-                        	// - we check if any part of the enemy is visible to the player
+                            Vector3 firePos = player.PlayerBones.Head.position + playerLookDirection; //player.PlayerBones.WeaponRoot.position
+                            // - we check if any part of the enemy is visible to the player
                             if (
-                                GClass344.CanShootToTarget(new ShootPointClass(enemy.MainParts[BodyPartType.head].Position, 1), player.PlayerBones.WeaponRoot.position, LayerMaskClass.HighPolyWithTerrainMask, false) ||
-                                GClass344.CanShootToTarget(new ShootPointClass(enemy.MainParts[BodyPartType.body].Position, 1), player.PlayerBones.WeaponRoot.position, LayerMaskClass.HighPolyWithTerrainMask, false) ||
-                                GClass344.CanShootToTarget(new ShootPointClass(enemy.MainParts[BodyPartType.leftArm].Position, 1), player.PlayerBones.WeaponRoot.position, LayerMaskClass.HighPolyWithTerrainMask, false) ||
-                                GClass344.CanShootToTarget(new ShootPointClass(enemy.MainParts[BodyPartType.rightArm].Position, 1), player.PlayerBones.WeaponRoot.position, LayerMaskClass.HighPolyWithTerrainMask, false) ||
-                                GClass344.CanShootToTarget(new ShootPointClass(enemy.MainParts[BodyPartType.leftLeg].Position, 1), player.PlayerBones.WeaponRoot.position, LayerMaskClass.HighPolyWithTerrainMask, false) ||
-                                GClass344.CanShootToTarget(new ShootPointClass(enemy.MainParts[BodyPartType.rightLeg].Position, 1), player.PlayerBones.WeaponRoot.position, LayerMaskClass.HighPolyWithTerrainMask, false)
+                                GClass344.CanShootToTarget(new ShootPointClass(enemy.MainParts[BodyPartType.head].Position, 1), firePos, LayerMaskClass.HighPolyWithTerrainMask, false) ||
+                                GClass344.CanShootToTarget(new ShootPointClass(enemy.MainParts[BodyPartType.body].Position, 1), firePos, LayerMaskClass.HighPolyWithTerrainMask, false) ||
+                                GClass344.CanShootToTarget(new ShootPointClass(enemy.MainParts[BodyPartType.leftArm].Position, 1), firePos, LayerMaskClass.HighPolyWithTerrainMask, false) ||
+                                GClass344.CanShootToTarget(new ShootPointClass(enemy.MainParts[BodyPartType.rightArm].Position, 1), firePos, LayerMaskClass.HighPolyWithTerrainMask, false) ||
+                                GClass344.CanShootToTarget(new ShootPointClass(enemy.MainParts[BodyPartType.leftLeg].Position, 1), firePos, LayerMaskClass.HighPolyWithTerrainMask, false) ||
+                                GClass344.CanShootToTarget(new ShootPointClass(enemy.MainParts[BodyPartType.rightLeg].Position, 1), firePos, LayerMaskClass.HighPolyWithTerrainMask, false)
                             )
                             {
                                 Instance._enemiesSeen.Add(enemy);
@@ -518,7 +521,8 @@ namespace friendlyPMC.Modules
                 }
             }
 
-            if(closest != null ) {
+            if (closest != null)
+            {
                 Instance._closestEnemySeen = closest;
             }
         }
@@ -551,10 +555,10 @@ namespace friendlyPMC.Modules
             {
                 items.Add(slot.ContainedItem.Id);
 
-                if (slot.ContainedItem is Mod) foreach(Slot modSlot in (slot.ContainedItem as Mod).Slots)
-                {
-                    if (modSlot.ContainedItem != null) ModEquipmentStore(modSlot,items);
-                }
+                if (slot.ContainedItem is Mod) foreach (Slot modSlot in (slot.ContainedItem as Mod).Slots)
+                    {
+                        if (modSlot.ContainedItem != null) ModEquipmentStore(modSlot, items);
+                    }
             }
         }
         public static void StoreEquipment(Profile profile)
@@ -565,7 +569,7 @@ namespace friendlyPMC.Modules
                 foreach (EquipmentSlot slotType in Enum.GetValues(typeof(EquipmentSlot)))
                 {
                     if (
-                        slotType == EquipmentSlot.Dogtag || 
+                        slotType == EquipmentSlot.Dogtag ||
                         slotType == EquipmentSlot.SecuredContainer ||
                         slotType == EquipmentSlot.Pockets ||
                         slotType == EquipmentSlot.ArmBand ||
@@ -595,7 +599,7 @@ namespace friendlyPMC.Modules
                         else
                         {
                             items.Add(contained.Id);
-                            if(contained is Weapon)
+                            if (contained is Weapon)
                             {
                                 foreach (Slot slot in (contained as Weapon).Slots)
                                 {
@@ -605,9 +609,10 @@ namespace friendlyPMC.Modules
                                         ModEquipmentStore(slot, items);
                                     }
                                 }
-                            } else if(slotType == EquipmentSlot.Headwear || slotType == EquipmentSlot.TacticalVest || slotType == EquipmentSlot.ArmorVest)
+                            }
+                            else if (slotType == EquipmentSlot.Headwear || slotType == EquipmentSlot.TacticalVest || slotType == EquipmentSlot.ArmorVest)
                             {
-                                if(contained is CompoundItem)
+                                if (contained is CompoundItem)
                                 {
                                     foreach (Slot slot in (contained as CompoundItem).Slots)
                                     {
@@ -624,7 +629,7 @@ namespace friendlyPMC.Modules
                     }
                 }
 
-                if(items.Count > 0)
+                if (items.Count > 0)
                 {
                     Instance._followersEquipment.Add(profile.ProfileId, items);
                 }
@@ -634,7 +639,7 @@ namespace friendlyPMC.Modules
 
         public static Dictionary<string, List<string>> GetStoredEquipment()
         {
-            if(Instance == null) return new Dictionary<string, List<string>>();
+            if (Instance == null) return new Dictionary<string, List<string>>();
             return Instance._followersEquipment;
         }
     }

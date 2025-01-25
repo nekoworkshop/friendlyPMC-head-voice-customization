@@ -20,25 +20,52 @@ namespace friendlyPMC.Patches
         public static void PatchPostfix(BotHearingSensor __instance, BotOwner ____botOwner, IPlayer player, Vector3 position, float power, AISoundType type)
         {
             BotOwner botOwner_0 = ____botOwner;
-
-            if(type == AISoundType.step) return;
-
-            if (BossPlayers.IsFollower(botOwner_0) && !botOwner_0.Memory.HaveEnemy)
+            // check if enemy is trying to sneak up on the bot - only during combat
+            if (type == AISoundType.step)
             {
-                if (player != null && !BossPlayers.IsPlayerBoss(player.ProfileId))
+                if (BossPlayers.IsFollower(botOwner_0) && player != null && !BossPlayers.IsPlayerBoss(player.ProfileId))
                 {
                     if (player.IsAI && BossPlayers.IsFollower(player.AIData.BotOwner)) return;
+                    if (!(botOwner_0.EnemiesController.IsEnemy(player) || botOwner_0.BotsGroup.IsEnemy(player))) return;
+                    if (!botOwner_0.Memory.HaveEnemy) return;
+                    if (botOwner_0.Memory.GoalEnemy.IsVisible && botOwner_0.Memory.GoalEnemy.CanShoot) return;
+
+                    if (botOwner_0.Memory.GoalEnemy.PersonalLastSeenTime + 2f < Time.time)
+                    {
+                        return;
+                    }
+
+                    bool shouldReact = __instance.method_6(position, power, out var distance);
 
                     Player person = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(player.ProfileId);
+                    if (person != null && shouldReact) (botOwner_0.Brain.BaseBrain as FollowerBrain).SoundHeard(person, position, distance, type);
+                }
 
-                    if (botOwner_0.EnemiesController.IsEnemy(person) || botOwner_0.BotsGroup.IsEnemy(player))
+                return;
+            }
+            else if (BossPlayers.IsFollower(botOwner_0) && player != null && !BossPlayers.IsPlayerBoss(player.ProfileId))
+            {
+                if (player.IsAI && BossPlayers.IsFollower(player.AIData.BotOwner)) return;
+
+                if (botOwner_0.EnemiesController.IsEnemy(player) || botOwner_0.BotsGroup.IsEnemy(player))
+                {
+                    bool shouldReact = __instance.method_6(position, power, out var distance);
+                    Vector3 botPosition = botOwner_0.GetPlayer.Transform.position;
+
+                    if (
+                        botOwner_0.Memory.HaveEnemy && (
+                            botOwner_0.Memory.GoalEnemy.PersonalLastSeenTime + 2f < Time.time ||
+                            (position - botPosition).sqrMagnitude > (botOwner_0.Memory.GoalEnemy.EnemyLastPosition - botPosition).sqrMagnitude
+                        )
+                    )
                     {
-                        bool shouldReact = __instance.method_6(position,power, out var distance);
+                        shouldReact = false;
+                    }
 
-                        if(shouldReact && botOwner_0.Brain.BaseBrain is FollowerBrain)
-                        {
-                            (botOwner_0.Brain.BaseBrain as FollowerBrain).SoundHeard(person,position, distance,type);
-                        }
+                    if (shouldReact && botOwner_0.Brain.BaseBrain is FollowerBrain)
+                    {
+                        Player person = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(player.ProfileId);
+                        if (person != null) (botOwner_0.Brain.BaseBrain as FollowerBrain).SoundHeard(person, position, distance, type);
                     }
                 }
             }
@@ -58,15 +85,15 @@ namespace friendlyPMC.Patches
             float volume = __instance.MovementContext.CovertMovementVolumeBySpeed * __instance.method_54();
             float range = ___NestedStepSoundSource.MaxDistance * 0.85f;
 
-            if(BossPlayers.IsPlayerBoss(__instance.ProfileId)) return;
+            if (BossPlayers.IsPlayerBoss(__instance.ProfileId)) return;
 
-            foreach( var follower in BossPlayers.GetFollowers())
+            foreach (var follower in BossPlayers.GetFollowers())
             {
                 BotOwner bot = follower.GetBot();
-                if(bot.ProfileId == __instance.ProfileId || bot.Memory.HaveEnemy) continue;
-                if(!bot.EnemiesController.IsEnemy(__instance) && !bot.BotsGroup.IsEnemy(__instance)) continue;
+                if (bot.ProfileId == __instance.ProfileId || bot.Memory.HaveEnemy) continue;
+                if (!bot.EnemiesController.IsEnemy(__instance) && !bot.BotsGroup.IsEnemy(__instance)) continue;
 
-                Vector3 position = __instance.Transform.position;  
+                Vector3 position = __instance.Transform.position;
 
                 float power = range * volume;
 
@@ -76,9 +103,9 @@ namespace friendlyPMC.Patches
 
                 bool shouldReact = distance <= power;
 
-                if(!shouldReact) continue;
+                if (!shouldReact) continue;
 
-                (bot.Brain.BaseBrain as FollowerBrain).SoundHeard(__instance,position, distance,AISoundType.step);
+                (bot.Brain.BaseBrain as FollowerBrain).SoundHeard(__instance, position, distance, AISoundType.step);
 
             }
         }
@@ -121,7 +148,8 @@ namespace friendlyPMC.Patches
             if (isfollower) return;
 
             bool reportEnemy = false;
-            BossPlayers.GetFollowers().ForEach(follower => {
+            BossPlayers.GetFollowers().ForEach(follower =>
+            {
                 BotOwner bot = follower.GetBot();
                 FollowerBrain brain = bot.Brain.BaseBrain as FollowerBrain;
 
@@ -135,7 +163,7 @@ namespace friendlyPMC.Patches
                     {
                         if (!reportEnemy) bot.BotsGroup.ReportAboutEnemy(__instance, EEnemyPartVisibleType.visible);
                         EnemyInfo info = Utils.Enemy.MakeEnemy(bot, __instance);
-                        
+
                         reported = Time.time + 3f;
                         reportEnemy = true;
 
