@@ -480,7 +480,8 @@ class friendlyPMC {
 
 									const botSpecialItems = bot.Inventory.items.filter(item => {
 										if (!item.slotId) return false;
-										item.slotId.toLowerCase().includes("dogtag") || item.slotId.includes("SecuredContainer") || item.slotId.includes("SpecialSlot");
+										const id = item.slotId.toLowerCase();
+										return id.toLowerCase().includes("dogtag") || id.includes("secured") || item.slotId.includes("special");
 									});
 
 									bot.Inventory.items = clonedBuild

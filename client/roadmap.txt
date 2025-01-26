@@ -6,18 +6,19 @@
 - x- check sounds nearby
 - x - turn when being hit
 - x - update custom gear code on the sever side to use unique IDs for each item
-- when doing "enemy spotted" ray cast does not seem to work
-- update marskman tactic to switch to secondary like BirdEye
+- x - fixed spawned followers not having secured container so extra ammo could not be added to them
+- x - when doing "enemy spotted" ray cast does not seem to work
+- x - "coverBoss" action seems to send the boss off running far off in the back
 
-- investigate if the death freeze bug still happening (so far no crahes)
+- investigate if the death freeze bug still happening (so far no crashes)
 
 - add more trade items to Knight
 - add option to increase the display time of the ping team
 
 -- === 3.10 === ---:
+- update marskman tactic to switch to secondary like BirdEye
 - see if we can make bot swap weapons when asked to loot (DeadBodyWork)
 - - this should also allow bot to put that weapon as seconday (in case of support without a grenade launcher)
-- attempt to make transit work while in a group with followers (this needs profile and equipment saving of the bot in order to restore it after transit)
 - add "hold fire/fire at will" commands
 - add more trade items to Knight
 
@@ -29,11 +30,13 @@
 - - if player completes the first quest with both followers alive, choose one to become a teammate
 - player level to determine if he can pick up any extra followers and how many (maximum 3, disable configuration regarding this)
 - scav karma and level to determine with how many followers can the player spawn (maxium 3) and extra pickups (maximum 2 extras)
-
+- attempt to make transit work while in a group with followers (this needs profile and equipment saving of the bot in order to restore it after transit)
 
 ==================================================================================
 RELEASE NOTES (3.9.6)
 fixed issue with Knight trader not increasing when running with BirdEye or BigPipe
+fixed spawned followers not having secured container so extra ammo could not be added to them
+fixed "enemy spotted" command not registering the enemy the play saw even if the bot didn't also see it
 updated follower to not throw grenades when the enemy is out of throwing range
 health multipler now also affects the Goons' health
 ==================================================================================

@@ -456,7 +456,7 @@ namespace friendlyPMC.Modules
 
             pitAIBossPlayer boss = BossPlayers.GetBoss(player.ProfileId);
 
-            if (boss == null || boss.bossGroup == null || player.Id == boss.Player().Id) return;
+            if (boss == null || boss.bossGroup == null) return;
 
             float scanDistance = friendlyPMC.scanDistance.Value;
 
@@ -475,8 +475,6 @@ namespace friendlyPMC.Modules
                     LayerMaskClass.PlayerMask
                 );
 
-            Modules.Logger.LogInfo("CheckSeenEnemies has " + numHits + " hits");
-
             // get all enemies the boss might have seen
             for (int i = 0; i < numHits; i++)
             {
@@ -487,14 +485,16 @@ namespace friendlyPMC.Modules
                     if (enemy != null)
                     {
                         if (boss.Followers.Find(fl => fl.ProfileId == enemy.ProfileId) != null) continue;
+
+                        if (player.ProfileId == enemy.ProfileId) continue;
+
                         bool isenemy = boss.bossGroup.IsEnemy(enemy);
 
                         if (!isenemy && boss.bossGroup.IsPlayerEnemy(enemy)) isenemy = true;
 
                         if (isenemy)
                         {
-                            Modules.Logger.LogInfo("Enemy in sight");
-                            Vector3 firePos = player.PlayerBones.Head.position + playerLookDirection; //player.PlayerBones.WeaponRoot.position
+                            Vector3 firePos = player.PlayerBones.WeaponRoot.position;
                             // - we check if any part of the enemy is visible to the player
                             if (
                                 GClass344.CanShootToTarget(new ShootPointClass(enemy.MainParts[BodyPartType.head].Position, 1), firePos, LayerMaskClass.HighPolyWithTerrainMask, false) ||
@@ -505,20 +505,10 @@ namespace friendlyPMC.Modules
                                 GClass344.CanShootToTarget(new ShootPointClass(enemy.MainParts[BodyPartType.rightLeg].Position, 1), firePos, LayerMaskClass.HighPolyWithTerrainMask, false)
                             )
                             {
-                                Modules.Logger.LogInfo("Enemy seen: " + enemy.Profile.Nickname);
                                 Instance._enemiesSeen.Add(enemy);
                             }
-                        } else
-                        {
-                            Modules.Logger.LogInfo("No enemy in sight");
                         }
-                    } else
-                    {
-                        Modules.Logger.LogInfo("No Player Component found");
                     }
-                } else
-                {
-                    Modules.Logger.LogInfo("No collider or gameobject");
                 }
             }
 

@@ -845,7 +845,7 @@ namespace friendlyPMC
                 Vector3 position = GamePlayerOwner.MyPlayer.Transform.position;
                 foreach (var follower in followers)
                 {
-                    if (follower != null && follower.GetBot().HealthController.IsAlive)
+                    if (follower != null && follower.GetBot().HealthController.IsAlive && !follower.GetBot().DoorOpener.Interacting)
                     {
                         follower.GetBot().GetPlayer.Teleport(position);
                     }
