@@ -475,6 +475,8 @@ namespace friendlyPMC.Modules
                     LayerMaskClass.PlayerMask
                 );
 
+            Modules.Logger.LogInfo("CheckSeenEnemies has " + numHits + " hits");
+
             // get all enemies the boss might have seen
             for (int i = 0; i < numHits; i++)
             {
@@ -491,6 +493,7 @@ namespace friendlyPMC.Modules
 
                         if (isenemy)
                         {
+                            Modules.Logger.LogInfo("Enemy in sight");
                             Vector3 firePos = player.PlayerBones.Head.position + playerLookDirection; //player.PlayerBones.WeaponRoot.position
                             // - we check if any part of the enemy is visible to the player
                             if (
@@ -502,10 +505,20 @@ namespace friendlyPMC.Modules
                                 GClass344.CanShootToTarget(new ShootPointClass(enemy.MainParts[BodyPartType.rightLeg].Position, 1), firePos, LayerMaskClass.HighPolyWithTerrainMask, false)
                             )
                             {
+                                Modules.Logger.LogInfo("Enemy seen: " + enemy.Profile.Nickname);
                                 Instance._enemiesSeen.Add(enemy);
                             }
+                        } else
+                        {
+                            Modules.Logger.LogInfo("No enemy in sight");
                         }
+                    } else
+                    {
+                        Modules.Logger.LogInfo("No Player Component found");
                     }
+                } else
+                {
+                    Modules.Logger.LogInfo("No collider or gameobject");
                 }
             }
 
