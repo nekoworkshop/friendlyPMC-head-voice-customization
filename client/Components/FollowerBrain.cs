@@ -495,6 +495,7 @@ namespace friendlyPMC.Components
         {
             GRENADE_THROWING = true;
             _busyTimer = 0f;
+            Modules.Logger.LogInfo("Grenade Throwing");
         }
         protected virtual void OnAddEnemy(IPlayer player)
         {

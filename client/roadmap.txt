@@ -9,6 +9,7 @@
 - x - fixed spawned followers not having secured container so extra ammo could not be added to them
 - x - when doing "enemy spotted" ray cast does not seem to work
 - x - "coverBoss" action seems to send the boss off running far off in the back
+- see what else can be done to help make bots stop getting stuck after throwing a grenade
 
 - investigate if the death freeze bug still happening (so far no crashes)
 
@@ -39,6 +40,10 @@ fixed spawned followers not having secured container so extra ammo could not be 
 fixed "enemy spotted" command not registering the enemy the play saw even if the bot didn't also see it
 updated follower to not throw grenades when the enemy is out of throwing range
 health multipler now also affects the Goons' health
+
+Add to issues:
+"Performance improvements" mode can cause conflicts with this mod
+Followers might still end up stuck after throwing a grenade
 ==================================================================================
 
 
