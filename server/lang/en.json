@@ -135,6 +135,10 @@
 		"Name": "Ping Squad",
 		"Description": "Shortcut key for triggering the Report call"
 	},
+    "pingTime" : {
+        "Name": "Ping Squad Display Time",
+        "Description": "Time in seconds to display the followers status"
+    },
 	"enemyContact": {
 		"Name": "Enemy Report",
 		"Description": "Shortcut key for triggering the Contact call"

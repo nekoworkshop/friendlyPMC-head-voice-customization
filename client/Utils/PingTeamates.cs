@@ -59,7 +59,7 @@ namespace friendlyPMC.Utils
         {
             if (lasttime > Time.time) return;
 
-            lasttime = Time.time + 5f;
+            lasttime = Time.time + friendlyPMC.pingTime.Value;
 
             locationPing = false;
 

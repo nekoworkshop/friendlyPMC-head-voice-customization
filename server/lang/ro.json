@@ -132,6 +132,10 @@
 		"Name": "Stare raport",
 		"Description": "Tasta rapidă pentru a declanșa apelul de raport."
 	},
+    "pingTime" : {
+        "Name": "Timpul de afișare a stării echipei",
+        "Description": "Timpul în secunde pentru a afișa starea însoțitorilor"
+    },
 	"enemyContact": {
 		"Name": "Raport dușman",
 		"Description": "Tasta rapidă pentru a declanșa apelul de contact."
