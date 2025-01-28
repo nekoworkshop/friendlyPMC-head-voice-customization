@@ -1,0 +1,2 @@
+Both attackMoving and attackMovingWithSuppress internally use the coverSearch logic meaning our code to get a point before this decision is useless. Needs rework.
+ClosestFriendCoverPoint needs a patch to also include the boss player in the search for cover points.

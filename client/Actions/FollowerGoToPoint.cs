@@ -20,7 +20,7 @@ namespace friendlyPMC.Actions
 
         public override void Update()
         {
-            base.method_0();
+            base.method_0(true);
             botOwner_0.GoToSomePointData.UpdateToGo(_shouldSprint);
         }
     }

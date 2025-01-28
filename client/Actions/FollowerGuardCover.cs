@@ -49,11 +49,11 @@ namespace friendlyPMC.Actions
                 bool protectBoss = (botOwner_0.Brain.BaseBrain as FollowerBrain).bossNeedsProtection;
 
                 // get closest attack point from the bot's position
-                CustomNavigationPoint Spot = Utils.Covers.GetClosestShootCover(
+                CustomNavigationPoint Spot = Utils.Covers.GetCover(
                     botOwner_0,
-                    botPosition,
-                    5f,
-                    maxDist
+                    protectBoss ? bossPos : botPosition,
+                    CoverSearchType.shoot_toCover_toBot_Distances,
+                    50f
                 );
 
                 if (Spot != null)
@@ -67,15 +67,10 @@ namespace friendlyPMC.Actions
                 _actionsQueue.Enqueue(() =>
                 {
                     // else get the next cover between the bot and the enemy
-                    CustomNavigationPoint Spot2 = Utils.Covers.GetClosestShootCover(
+                    CustomNavigationPoint Spot2 = Utils.Covers.GetCover(
                         botOwner_0,
-                        protectBoss ? bossPos : botPosition,
-                        5f,
-                        maxDist * 2,
-                        point =>
-                        {
-                            return Utils.Covers.IsPointBetween(point.Position, botPosition, enemySpot);
-                        }
+                        (botOwner_0.Position + enemySpot) / 2f,
+                        CoverSearchType.closerToSelectedPoint
                     );
 
                     if (Spot2 != null)
@@ -107,11 +102,10 @@ namespace friendlyPMC.Actions
                             if (protectBoss)
                             {
                                 // - get closest attack point to the boss
-                                CustomNavigationPoint Spot3 = Utils.Covers.GetClosestShootCover(
+                                CustomNavigationPoint Spot3 = Utils.Covers.GetCover(
                                     botOwner_0,
                                     bossPos,
-                                    5f,
-                                    90f
+                                    CoverSearchType.shoot_toCover_toBot_Distances
                                 );
                                 if (Spot3 != null)
                                 {
@@ -124,11 +118,11 @@ namespace friendlyPMC.Actions
                                 // - else get closest cover to the boss and cover him
                                 _actionsQueue.Enqueue(() =>
                                 {
-                                    CustomNavigationPoint Spot5 = Utils.Covers.GetClosestCoverPoint(
+                                    CustomNavigationPoint Spot5 = Utils.Covers.GetCover(
                                         botOwner_0,
-                                        bossPos,
-                                        30f,
-                                        5f
+                                        (bossPos + enemySpot) / 2f,
+                                        CoverSearchType.closerToSelectedPoint,
+                                        35f
                                     );
 
                                     if (Spot5 != null)
@@ -143,11 +137,11 @@ namespace friendlyPMC.Actions
                             else
                             {
                                 // else get closest cover
-                                CustomNavigationPoint Spot4 = Utils.Covers.GetClosestCoverPoint(
+                                CustomNavigationPoint Spot4 = Utils.Covers.GetCover(
                                     botOwner_0,
                                     botPosition,
-                                    30f,
-                                    5f
+                                    CoverSearchType.closerToSelectedPoint,
+                                    35f
                                 );
 
                                 if (Spot4 != null)

@@ -193,14 +193,13 @@ namespace friendlyPMC.Components.Tactics
                 if (!botOwner_0.Memory.IsInCover)
                 {
                     // - find cover to shoot from
-                    // @TODO - needs fixing, bot ends up moving somewhere in the back!
                     GetClosestAttackCoverPoint(botPosition);
 
                     if (customNavigationPoint_0 != null)
                     {
                         if (commonLayer.GetNavDistance(customNavigationPoint_0.Position) < 25f)
                         {
-                            return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMoving, "relocate");
+                            return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.goToCoverPointTactical, "relocate");
                         }
                         return new AICoreActionResultStruct<BotLogicDecision>((BotLogicDecision)CustomBotDecisions.RunToCover, "relocateFast");
                     }
@@ -215,7 +214,6 @@ namespace friendlyPMC.Components.Tactics
                     if (botOwner_0.Memory.CurCustomCoverPoint != null && botOwner_0.Memory.CurCustomCoverPoint.CanIShootToEnemy)
                         return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.shootFromCover, "shootFromCover");
                     // - else find better spot
-                    // @TODO - needs fixing, bot ends up moving somewhere in the back!
                     else
                     {
                         bool getClose = false;
@@ -223,21 +221,10 @@ namespace friendlyPMC.Components.Tactics
                             Enemy.Distance(botOwner_0) <= Enemy.EnemyDistance.Close &&
                             botOwner_0.Memory.AttackImmediately && Enemy.GetEnemiesAtLocation(botOwner_0, botOwner_0.Memory.GoalEnemy.ProfileId, enemyPos) < 3)
                         {
-                            GetClosestAttackCoverPoint(enemyPos, fightRange);
                             getClose = true;
                         }
-                        else
-                        {
-                            GetClosestAttackCoverPoint(commonLayer.HasBoss() ? commonLayer.GetBoss().Position : botPosition, fightRange);
-                        }
-
-                        if (customNavigationPoint_0 != null)
-                        {
-                            return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMoving, getClose ? "getInCloseSlow" : "relocate");
-                        }
+                        return new AICoreActionResultStruct<BotLogicDecision>(getClose ? BotLogicDecision.attackMoving : BotLogicDecision.goToCoverPointTactical, getClose ? "getInCloseSlow" : "relocate");
                     }
-
-                    return new AICoreActionResultStruct<BotLogicDecision>((BotLogicDecision)CustomBotDecisions.GuardToCover, "coverBoss");
                 }
             }
             // enemy not visible
@@ -262,15 +249,13 @@ namespace friendlyPMC.Components.Tactics
                 if (
                     Enemy.Distance(botOwner_0) <= Enemy.EnemyDistance.Close && Enemy.GetEnemiesAtLocation(botOwner_0, botOwner_0.Memory.GoalEnemy.ProfileId, enemyPos) < 4)
                 {
-                    GetClosestAttackCoverPoint(enemyPos);
+                    GetClosestAttackCoverPoint(enemyPos, 150f, CoverSearchType.closerToSelectedPoint);
                     if (customNavigationPoint_0 != null)
                     {
-                        bool withSuppr = GClass824.Random(0f, 1f) > 0.5f;
-                        return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMoving, "getInCloseSlow");
+                        return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.goToCoverPointTactical, "getInCloseSlow");
                     }
 
-                    if (PusherLayer != null)
-                        return PusherLayer.EngageEnemy(true);
+                    if (PusherLayer != null) return PusherLayer.EngageEnemy(true);
                     else return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.goToEnemy, "pushEnemy");
                 }
                 else if (Enemy.Distance(botOwner_0) == Enemy.EnemyDistance.Mid)
@@ -300,7 +285,10 @@ namespace friendlyPMC.Components.Tactics
                     if (customNavigationPoint_0 != null)
                     {
                         if (commonLayer.GetNavDistance(customNavigationPoint_0.Position) < commonLayer.sprintDistance)
-                            return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMoving, "regroupToBoss");
+                        {
+                            botOwner_0.GoToSomePointData.SetPoint(customNavigationPoint_0.Position);
+                            return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.goToPoint, "regroupToBoss");
+                        }
                         else
                             return new AICoreActionResultStruct<BotLogicDecision>((BotLogicDecision)CustomBotDecisions.RunToCover, "regroupToBossFast");
                     }
@@ -437,6 +425,7 @@ namespace friendlyPMC.Components.Tactics
             if (request != null && request.BotRequestType == BotRequestType.suppressionFire) request.Complete();
             return (BotLogicDecision)CustomBotDecisions.GuardToCover;
         }
+
         public override AICoreActionEndStruct EndHoldPosition()
         {
             if (method_35())
@@ -452,7 +441,6 @@ namespace friendlyPMC.Components.Tactics
             return base.EndHoldPosition();
         }
 
-
         public override AICoreActionEndStruct EndShootFromCover()
         {
             if (method_35())
@@ -463,14 +451,14 @@ namespace friendlyPMC.Components.Tactics
         }
 
 
-        protected virtual void GetClosestAttackCoverPoint(Vector3 centerPosition, float minDistance = 15f)
+        protected virtual void GetClosestAttackCoverPoint(Vector3 centerPosition, float searchRadius = 150f, CoverSearchType searchType = CoverSearchType.shoot_toCover_toBot_Distances)
         {
-            customNavigationPoint_0 = commonLayer.GetClosestShootCover(centerPosition, minDistance);
+            customNavigationPoint_0 = PusherLayer.GetClosestAttackCoverPoint(centerPosition, searchRadius, searchType);
         }
 
-        protected virtual void GetClosestCoverPoint(Vector3 centerPosition, float searchRadius, float safeDistance = 5f, Func<CustomNavigationPoint, bool> extraChecks = null)
+        protected virtual void GetClosestCoverPoint(Vector3 centerPosition, float searchRadius)
         {
-            customNavigationPoint_0 = commonLayer.GetClosestCoverPoint(centerPosition, searchRadius, safeDistance, extraChecks);
+            customNavigationPoint_0 = commonLayer.GetClosestCoverPoint(centerPosition, searchRadius);
         }
 
         public virtual void GetApproachablePoint()

@@ -513,47 +513,23 @@ namespace friendlyPMC.Components
                 // - guard(support) tries to get in front of the boss
                 if (guardTactic)
                 {
-                    customNavigationPoint_0 = closestEnemy == null ? null : Covers.GetClosestCoverPointBetween(botOwner_0, bossPosition, closestEnemy.GetPlayer.Transform.position);
-
-                    if (customNavigationPoint_0 != null)
+                    if (GetNavDistance(bossPosition) > commonLayer.sprintDistance)
                     {
-                        botOwner_0.Memory.SetCoverPoints(customNavigationPoint_0);
-
-                        if (GetNavDistance(customNavigationPoint_0.Position) > commonLayer.sprintDistance)
-                        {
+                        GetClosestAttackCoverPoint(closestEnemy ? closestEnemy.Position : bossPosition, bossOuterRadius);
+                        if (customNavigationPoint_0 != null)
                             return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "protectBossFast");
-                        }
                         else
-                        {
                             return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMoving, "protectBossSlow");
-                        }
                     }
                     else
                     {
-                        GetClosestCoverPoint(bossPosition, bossInnerRadius);
-
-                        if (customNavigationPoint_0 != null)
-                        {
-                            if (GetNavDistance(customNavigationPoint_0.Position) > commonLayer.sprintDistance)
-                            {
-                                return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "protectBossFast");
-                            }
-                            else
-                            {
-                                return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMoving, "protectBossSlow");
-                            }
-
-                        }
-                        else
-                        {
-                            return EngageEnemy();
-                        }
+                        return EngageEnemy();
                     }
                 }
                 // - sniper tries to find shooting spot
                 if (sniperTactic || holdTactic)
                 {
-                    GetClosestAttackCoverPoint(bossPosition, bossOuterRadius);
+                    GetClosestAttackCoverPoint(botPosition);
                     if (customNavigationPoint_0 != null)
                     {
                         return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "relocateFast");
@@ -765,7 +741,7 @@ namespace friendlyPMC.Components
 
         public void GetClosestCoverPoint(Vector3 centerPosition, float searchRadius, float safeDistance = 5f, Func<CustomNavigationPoint, bool> extraChecks = null)
         {
-            customNavigationPoint_0 = commonLayer.GetClosestCoverPoint(centerPosition, searchRadius, safeDistance, extraChecks);
+            customNavigationPoint_0 = Utils.Covers.GetCover(botOwner_0, centerPosition, CoverSearchType.closerToSelectedPoint, searchRadius);// commonLayer.GetClosestCoverPoint(centerPosition, searchRadius, safeDistance, extraChecks);
         }
         /** Find the closest safe cover point to the given position, within the given radius **/
         public void GetClosestSafeCoverPoint(Vector3 centerPosition, float safeDistance = 10f)
@@ -798,9 +774,9 @@ namespace friendlyPMC.Components
 
         }
         /** Find a shoot positionm that is closest to the enemy but at a minimum distance and maximum from the enemy **/
-        public void GetClosestAttackCoverPoint(Vector3 centerPosition, float minDistance = 5f, float maxDistance = 150f)
+        public void GetClosestAttackCoverPoint(Vector3 centerPosition, float maxDistance = 150f)
         {
-            customNavigationPoint_0 = commonLayer.GetClosestShootCover(centerPosition, minDistance, maxDistance);
+            customNavigationPoint_0 = pusherLayer.GetClosestAttackCoverPoint(centerPosition, maxDistance);
         }
 
         private void GetClosestCoverPointGroup(Vector3 centerPosition, float searchRadius)

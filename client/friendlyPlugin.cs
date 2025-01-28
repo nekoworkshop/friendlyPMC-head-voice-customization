@@ -47,6 +47,7 @@ namespace friendlyPMC
         RunToCover = 104,
         GuardToCover = 105,
         FollowBoss = 106,
+        attackRetreat = 107,
     }
 
     public enum CustomPhrases

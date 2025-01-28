@@ -179,7 +179,7 @@ namespace friendlyPMC.Components.BossFollower
                 else
                 {
                     // Find a cover point closer to the enemy
-                    GetClosestAttackCoverPoint(botOwner_0.Memory.GoalEnemy.CurrPosition, 5f);
+                    GetClosestAttackCoverPoint(botOwner_0.Memory.GoalEnemy.CurrPosition);
                     if (customNavigationPoint_0 != null)
                     {
                         // Move towards the cover point while suppressing the enemy
@@ -197,7 +197,7 @@ namespace friendlyPMC.Components.BossFollower
             else
             {
                 // Find a cover point closer to the enemy's last known position
-                GetClosestAttackCoverPoint(botOwner_0.Memory.GoalEnemy.CurrPosition, 5f);
+                GetClosestAttackCoverPoint(botOwner_0.Memory.GoalEnemy.CurrPosition);
                 if (customNavigationPoint_0 != null)
                 {
                     // Move towards the cover point while suppressing
@@ -284,7 +284,7 @@ namespace friendlyPMC.Components.BossFollower
                         return commonLayer.DogFight(out customNavigationPoint_0);
                     }
 
-                    GetClosestAttackCoverPoint(botOwner_0.Memory.GoalEnemy.CurrPosition, 10f);
+                    GetClosestAttackCoverPoint(botOwner_0.Memory.GoalEnemy.CurrPosition);
                     if (customNavigationPoint_0 != null)
                         return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMoving, "enemyNear");
                 }
@@ -465,9 +465,9 @@ namespace friendlyPMC.Components.BossFollower
             customNavigationPoint_0 = commonLayer.GetApproachableCover();
         }
 
-        protected void GetClosestAttackCoverPoint(Vector3 centerPosition, float minDistance = 5f)
+        protected void GetClosestAttackCoverPoint(Vector3 centerPosition)
         {
-            customNavigationPoint_0 = commonLayer.GetClosestShootCover(centerPosition, minDistance);
+            customNavigationPoint_0 = commonLayer.GetClosestShootCover(centerPosition);
         }
     }
 }

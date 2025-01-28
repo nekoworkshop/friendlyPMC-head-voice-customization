@@ -213,7 +213,7 @@ namespace friendlyPMC.Components.Tactics
 
         protected virtual void GetClosestCoverPoint(Vector3 centerPosition, float searchRadius, float safeDistance = 5f, Func<CustomNavigationPoint, bool> extraChecks = null)
         {
-            customNavigationPoint_0 = commonLayer.GetClosestCoverPoint(centerPosition, searchRadius, safeDistance, extraChecks);
+            customNavigationPoint_0 = commonLayer.GetClosestCoverPoint(centerPosition, searchRadius);
         }
     }
 }

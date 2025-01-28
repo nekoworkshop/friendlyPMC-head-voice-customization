@@ -21,6 +21,11 @@ namespace friendlyPMC.Modules
             if (type == BotLogicDecision.attackMoving)
                 return new FollowerAttackMove(bot);
 
+            if (type == (BotLogicDecision)CustomBotDecisions.attackRetreat)
+            {
+                return new FollowerAttackRetreat(bot);
+            }
+
             if (type == BotLogicDecision.holdPosition)
                 return new FollowerHoldPosition(bot);
 
