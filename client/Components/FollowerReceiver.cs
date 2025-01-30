@@ -257,7 +257,6 @@ namespace friendlyPMC.Components
                 }
                 else if (isAssisting)
                 {
-                    Modules.Logger.LogInfo("Gesture shown from Boss: " + gesture.ToString() + "; To " + botOwner_0.Profile.Nickname);
                     if (!notBusy && allyBusyIgnore.Contains(gesture))
                     {
                         return;
@@ -837,7 +836,7 @@ namespace friendlyPMC.Components
                         botOwner_0.Gesture.TryGestus(EInteraction.NoGesture, true);
                     }
                 }
-                    return;
+                return;
             }
             // on Go Go Go reset tactic
             if (info.phrase == EPhraseTrigger.Gogogo && (botLookedAt == null || botLookedAt.ProfileId == botOwner_0.ProfileId))
@@ -921,7 +920,6 @@ namespace friendlyPMC.Components
                 if (!notBusy && botOwner_0.Memory.GoalEnemy.HaveSeen && Time.time - botOwner_0.Memory.GoalEnemy.PersonalLastSeenTime < 3f)
                 {
 
-                    botOwner_0.Gesture.TryGestus(EInteraction.NoGesture, true);
                     botOwner_0.BotTalk.TrySay(EPhraseTrigger.DontKnow, false);
                     return;
                 }

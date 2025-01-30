@@ -451,6 +451,9 @@ class friendlyPMC {
 						if (botGenerationDetails.isPmc) {
 							// force name change
 							if (custom?.Nickname) bot.Info.Nickname = custom.Nickname;
+							// force clothing change
+							if (custom?.Body) bot.Customization.Body = custom.Body;
+							if (custom?.Feet) bot.Customization.Feet = custom.Feet;
 							// equipment change
 							if (custom?.Equipment) {
 								const equipment = playerProfile.userbuilds.equipmentBuilds?.find(e => e.Name == custom.Equipment);
@@ -465,13 +468,25 @@ class friendlyPMC {
 										}
 									});
 
-									bot.Inventory.equipment = newid;
-
-									const botSpecialItems = bot.Inventory.items.filter(item => {
-										if (!item.slotId) return false;
-										item.slotId.toLowerCase().includes("dogtag") || item.slotId.includes("SecuredContainer") || item.slotId.includes("SpecialSlot");
+									// go through all the items and ensure their ids are unique in the clonedBuild, exclude the first item
+									// check the parent id of any item to update it to the new id should the item have a parent an item for which we just changed the id
+									clonedBuild.forEach(item => {
+										if (item._id == newid) return;
+										const _pid = item._id;
+										item._id = this.hashUtil.generate();
+										clonedBuild.forEach(i => {
+											if (i.parentId == _pid) i.parentId = item._id;
+										});
 									});
 
+									bot.Inventory.equipment = newid;
+									// remember bot's tag and secured container so we can add them back later
+									const botSpecialItems = bot.Inventory.items.filter(item => {
+										if (!item.slotId) return false;
+										const id = item.slotId.toLowerCase();
+										return id.toLowerCase().includes("dogtag") || id.includes("secured") || item.slotId.includes("special");
+									});
+									// switch out the equipment and put back the special items
 									bot.Inventory.items = clonedBuild
 										.filter(item => {
 											if (!item.slotId) return true;

@@ -60,7 +60,9 @@ namespace friendlyPMC.Utils
         public static List<WildSpawnType> friendlyBotTypes = new List<WildSpawnType> {
             WildSpawnType.shooterBTR,
             WildSpawnType.gifter,
-            WildSpawnType.peacefullZryachiyEvent
+            WildSpawnType.peacefullZryachiyEvent,
+            WildSpawnType.bossZryachiy,
+            WildSpawnType.followerZryachiy
         };
 
         public static List<WildSpawnType> BossFollowersType = new List<WildSpawnType> {

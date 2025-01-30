@@ -179,16 +179,16 @@ namespace friendlyPMC.Actions
 
                     Player playerRequester = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(requester.ProfileId);
 
-                    if (botOwner_0.BotRequestController.TryStopCurrent(playerRequester, false))
+                    if (botOwner_0.BotRequestController.CurRequest != null)
                     {
-                        FollowerHold holdit = new FollowerHold(playerRequester);
+                        botOwner_0.BotRequestController.CurRequest.Complete();
+                    }
 
-                        if (botOwner_0.BotsGroup.RequestsController.TryAddRequest(holdit))
-                        {
-                            holdit.AddPossibleExecutors(botOwner_0);
-                            holdit.SetGroup(botOwner_0.BotsGroup.RequestsController);
-                            botOwner_0.Gesture.TryGestus(EInteraction.NoGesture, true);
-                        }
+                    FollowerHold holdit = new FollowerHold(playerRequester);
+
+                    if (holdit.SetGroup(botOwner_0.BotsGroup.RequestsController))
+                    {
+                        holdit.AddPossibleExecutors(botOwner_0);
                     }
                 }
             }

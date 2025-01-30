@@ -151,8 +151,6 @@ namespace friendlyPMC.Patches
 
                             receiver.Value.GestusShown(data);
                         }
-
-                        __instance.Player.HandsController.ShowGesture(EInteraction.ThereGesture);
                     }
                 }
 
@@ -218,6 +216,7 @@ namespace friendlyPMC.Patches
                                 {
                                     double standing = alivePlayerByProfileID.Profile.GetTraderStanding("67768b19fa281ca31708b187");
                                     traderInfo.SetStanding(Math.Max(0.1, standing - 0.1));
+                                    Modules.Logger.LogInfo("Penalize standing with Knight trader for killing a Goon");
                                 }
 
                                 break;

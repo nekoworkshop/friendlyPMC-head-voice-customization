@@ -53,7 +53,7 @@ namespace friendlyPMC.Actions
                     botOwner_0,
                     botPosition,
                     5f,
-                    150f
+                    maxDist
                 );
 
                 if (Spot != null)
@@ -61,7 +61,7 @@ namespace friendlyPMC.Actions
                     _lastSpot = Spot.Position;
                     return;
                 }
-                
+
                 _lastSpot = null;
 
                 _actionsQueue.Enqueue(() =>
@@ -71,7 +71,7 @@ namespace friendlyPMC.Actions
                         botOwner_0,
                         protectBoss ? bossPos : botPosition,
                         5f,
-                        150f,
+                        maxDist * 2,
                         point =>
                         {
                             return Utils.Covers.IsPointBetween(point.Position, botPosition, enemySpot);
@@ -118,7 +118,7 @@ namespace friendlyPMC.Actions
                                     _lastSpot = Spot3.Position;
                                     return;
                                 }
-                                
+
                                 _lastSpot = null;
 
                                 // - else get closest cover to the boss and cover him

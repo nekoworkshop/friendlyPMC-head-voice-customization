@@ -115,6 +115,7 @@ namespace friendlyPMC
         public Dictionary<string, string> englishBear { get; set; }
 
         public Dictionary<string, string> pingSquad { get; set; }
+        public Dictionary<string, string> pingTime { get; set; }
         public Dictionary<string, string> enemyContact { get; set; }
 
         public Dictionary<string, string> gestures { get; set; }
@@ -138,7 +139,7 @@ namespace friendlyPMC
         public string[] friendlyEscaped { get; set; }
     }
 
-    [BepInPlugin("xyz.pit.friendlypmc", "friendlyPMC", "3.9.5")]
+    [BepInPlugin("xyz.pit.friendlypmc", "friendlyPMC", "3.9.6")]
     [BepInDependency("xyz.drakia.bigbrain")]
     [BepInDependency("com.Arys.UnityToolkit")]
     public class friendlyPMC : BaseUnityPlugin
@@ -185,6 +186,8 @@ namespace friendlyPMC
 
 
         public static ConfigEntry<KeyboardShortcut> pingKey;
+        public static ConfigEntry<int> pingTime;
+
         public static ConfigEntry<KeyboardShortcut> contactKey;
 
         public static ConfigEntry<KeyboardShortcut> teleportKey;
@@ -459,12 +462,14 @@ namespace friendlyPMC
 
             pingKey = Config.Bind("II " + optionsLang.miscSettings, "13 " + optionsLang.pingSquad["Name"], new KeyboardShortcut(KeyCode.None), new ConfigDescription(optionsLang.pingSquad["Description"], null, new ConfigurationManagerAttributes { Order = -1003 }));
 
-            contactKey = Config.Bind("II " + optionsLang.miscSettings, "14 " + optionsLang.enemyContact["Name"], new KeyboardShortcut(KeyCode.None), new ConfigDescription(optionsLang.enemyContact["Description"], null, new ConfigurationManagerAttributes { Order = -1004 }));
+            pingTime = Config.Bind("II " + optionsLang.miscSettings, "14 " + optionsLang.pingTime["Name"], 5, new ConfigDescription(optionsLang.pingTime["Description"], new AcceptableValueRange<int>(5, 30), new ConfigurationManagerAttributes { Order = -1004 }));
 
-            teleportKey = Config.Bind("II " + optionsLang.miscSettings, "15 " + optionsLang.botTeleport["Name"], new KeyboardShortcut(KeyCode.None), new ConfigDescription(optionsLang.botTeleport["Description"], null, new ConfigurationManagerAttributes { Order = -1005 }));
-            healKey = Config.Bind("II " + optionsLang.miscSettings, "16 " + optionsLang.botHeal["Name"], new KeyboardShortcut(KeyCode.None), new ConfigDescription(optionsLang.botHeal["Description"], null, new ConfigurationManagerAttributes { Order = -1006 }));
+            contactKey = Config.Bind("II " + optionsLang.miscSettings, "15 " + optionsLang.enemyContact["Name"], new KeyboardShortcut(KeyCode.None), new ConfigDescription(optionsLang.enemyContact["Description"], null, new ConfigurationManagerAttributes { Order = -1005 }));
 
-            botPrefetch = Config.Bind("II " + optionsLang.miscSettings, "17 " + optionsLang.botPrefetch["Name"], true, new ConfigDescription(optionsLang.botPrefetch["Description"], null, new ConfigurationManagerAttributes { Order = -1007 }));
+            teleportKey = Config.Bind("II " + optionsLang.miscSettings, "16 " + optionsLang.botTeleport["Name"], new KeyboardShortcut(KeyCode.None), new ConfigDescription(optionsLang.botTeleport["Description"], null, new ConfigurationManagerAttributes { Order = -1006 }));
+            healKey = Config.Bind("II " + optionsLang.miscSettings, "17 " + optionsLang.botHeal["Name"], new KeyboardShortcut(KeyCode.None), new ConfigDescription(optionsLang.botHeal["Description"], null, new ConfigurationManagerAttributes { Order = -1007 }));
+
+            botPrefetch = Config.Bind("II " + optionsLang.miscSettings, "18 " + optionsLang.botPrefetch["Name"], true, new ConfigDescription(optionsLang.botPrefetch["Description"], null, new ConfigurationManagerAttributes { Order = -1008 }));
 
             ConfigSquadMembersSet();
 
@@ -845,7 +850,7 @@ namespace friendlyPMC
                 Vector3 position = GamePlayerOwner.MyPlayer.Transform.position;
                 foreach (var follower in followers)
                 {
-                    if (follower != null && follower.GetBot().HealthController.IsAlive)
+                    if (follower != null && follower.GetBot().HealthController.IsAlive && !follower.GetBot().DoorOpener.Interacting)
                     {
                         follower.GetBot().GetPlayer.Teleport(position);
                     }

@@ -170,7 +170,7 @@ namespace friendlyPMC.Components
             if (baseBrain != null) baseBrain.Dispose();
             _bot.BotState = EBotState.NonActive;
             _bot.Receiver.Dispose();
-            
+
 
             // add special follower settings
             SetFollowerSettings(_bot);
@@ -249,12 +249,15 @@ namespace friendlyPMC.Components
             // if there is no group yet, make one and group the player with the bot (PickUp case here without spawn)
             else
             {
-                _bot.BotsGroup.RemoveAlly(_bot); // bot's current group might have other members - we don't need them
+                _bot.BotsGroup.RemoveAlly(_bot);
 
                 var botsGroupField = AccessTools.Field(typeof(BotMemoryClass), "botsGroup_0");
                 var _groupRequestController = AccessTools.Field(typeof(BotRequestController), "_groupRequestController");
                 (_groupRequestController.GetValue(_bot.BotRequestController) as BotGroupRequestController).OnAddRequest -= _bot.BotRequestController.method_0;
                 _groupRequestController.SetValue(_bot.BotRequestController, null);
+
+                _bot.Settings.GetEnemyBotTypes().RemoveAll(x => Utils.Props.friendlyBotTypes.Contains(x));
+                _bot.Settings.GetFriendlyBotTypes().AddRange(Utils.Props.friendlyBotTypes);
 
                 BotZone zone = _bot.BotsController.BotSpawner.GetClosestZone(_bot.GetPlayer.Transform.position, out var zoneDist);
                 BotsGroup group = _bot.BotsController.BotSpawner.GetGroupAndSetEnemies(_bot, zone);
@@ -651,7 +654,6 @@ namespace friendlyPMC.Components
                             {
                                 activatedBots.Remove(_bot.GetPlayer);
                                 bigBraidDeactivated = true;
-                                Modules.Logger.LogInfo("Bot removed from activated bots");
                             }
                         }
                     }

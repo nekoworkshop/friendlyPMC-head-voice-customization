@@ -753,27 +753,27 @@ namespace friendlyPMC.Patches
                         switch (part)
                         {
                             case EBodyPart.Head:
-                                bodyPart.Health.Minimum = 120;
-                                bodyPart.Health.Maximum = 120;
-                                bodyPart.Health.Current = 120;
+                                bodyPart.Health.Minimum = 120 * friendlyPMC.heatlhMultiplier.Value;
+                                bodyPart.Health.Maximum = 120 * friendlyPMC.heatlhMultiplier.Value;
+                                bodyPart.Health.Current = 120 * friendlyPMC.heatlhMultiplier.Value;
                                 break;
                             case EBodyPart.Chest:
                             case EBodyPart.Stomach:
-                                bodyPart.Health.Minimum = 220;
-                                bodyPart.Health.Maximum = 220;
-                                bodyPart.Health.Current = 220;
+                                bodyPart.Health.Minimum = 220 * friendlyPMC.heatlhMultiplier.Value;
+                                bodyPart.Health.Maximum = 220 * friendlyPMC.heatlhMultiplier.Value;
+                                bodyPart.Health.Current = 220 * friendlyPMC.heatlhMultiplier.Value;
                                 break;
                             case EBodyPart.RightArm:
                             case EBodyPart.LeftArm:
-                                bodyPart.Health.Minimum = 150;
-                                bodyPart.Health.Maximum = 150;
-                                bodyPart.Health.Current = 150;
+                                bodyPart.Health.Minimum = 150 * friendlyPMC.heatlhMultiplier.Value;
+                                bodyPart.Health.Maximum = 150 * friendlyPMC.heatlhMultiplier.Value;
+                                bodyPart.Health.Current = 150 * friendlyPMC.heatlhMultiplier.Value;
                                 break;
                             case EBodyPart.RightLeg:
                             case EBodyPart.LeftLeg:
-                                bodyPart.Health.Minimum = 170;
-                                bodyPart.Health.Maximum = 170;
-                                bodyPart.Health.Current = 170;
+                                bodyPart.Health.Minimum = 170 * friendlyPMC.heatlhMultiplier.Value;
+                                bodyPart.Health.Maximum = 170 * friendlyPMC.heatlhMultiplier.Value;
+                                bodyPart.Health.Current = 170 * friendlyPMC.heatlhMultiplier.Value;
                                 break;
 
                             default:
@@ -1548,18 +1548,16 @@ namespace friendlyPMC.Patches
                     if (item.Key == "Knight" && quest.Id == item.Value[0] && quest.Status == EFT.Quests.EQuestStatus.Success)
                     {
                         knightIncrease = true;
-                        break;
                     }
                     // allow BigPipe to add to the standing only after we complete the payback quest
-                    else if (item.Key == "BigPipe" && (quest.Id == item.Value[0] || quest.Id == item.Value[1]) && quest.Status == EFT.Quests.EQuestStatus.Success)
+                    if (item.Key == "BigPipe" && (quest.Id == item.Value[0]) && quest.Status == EFT.Quests.EQuestStatus.Success)
                     {
                         pipeIncrease = true;
-                        break;
                     }
-                    else if (item.Key == "BirdEye" && quest.Id == item.Value[0] && quest.Status == EFT.Quests.EQuestStatus.Success)
+                    // allow BirdEye to add to the standing only after we complete the enemy spotted quest
+                    if (item.Key == "BirdEye" && quest.Id == item.Value[0] && quest.Status == EFT.Quests.EQuestStatus.Success)
                     {
                         birdEyeIncrease = true;
-                        break;
                     }
 
                 }
@@ -1568,9 +1566,8 @@ namespace friendlyPMC.Patches
 
             if (boss.realPlayer.Profile.TryGetTraderInfo("67768b19fa281ca31708b187", out var traderInfo))
             {
-                foreach (var follower in BossPlayers.GetFollowersByBoss(profile.ProfileId))
+                boss.Followers.ForEach(bot =>
                 {
-                    BotOwner bot = follower.GetBot();
                     if (
                         (bot.IsRole(WildSpawnType.bossKnight) && knightIncrease) ||
                         (bot.IsRole(WildSpawnType.followerBigPipe) && pipeIncrease) ||
@@ -1579,9 +1576,12 @@ namespace friendlyPMC.Patches
                     {
                         double standing = boss.realPlayer.Profile.GetTraderStanding("67768b19fa281ca31708b187");
                         if (standing < maxStanding)
+                        {
                             traderInfo.SetStanding(Math.Min(maxStanding, standing + 0.05));
+                            Modules.Logger.LogInfo("Increasing standing with Knight trader");
+                        }
                     }
-                }
+                });
             }
         }
     }

@@ -145,16 +145,6 @@ namespace friendlyPMC.Components
             {
                 if (CheckIfBusy()) return;
 
-
-                var _isinteracting = _owner.GetPlayer.HandsController.IsInInteraction() || _owner.GetPlayer.HandsController.IsInInteractionStrictCheck();
-
-                var meds = _owner.Medecine;
-                if (meds != null)
-                {
-                    if (CheckActionBusy(meds.Stimulators?.Using == true, TIME_TO_RESET_HEAL_STIMS)) return;
-                    if (CheckActionBusy(meds.FirstAid?.Using == true, TIME_TO_RESET_HEAL_FIRSTAID)) return;
-                    if (CheckActionBusy(meds.SurgicalKit?.Using == true, TIME_TO_RESET_HEAL_SURGERY)) return;
-                }
                 if (_owner.WeaponManager != null)
                 {
                     if (CheckActionBusy(_owner.WeaponManager.Grenades.ThrowindNow || GRENADE_THROWING, TIME_TO_RESET_WEAPONS_GRENADE))
@@ -163,6 +153,17 @@ namespace friendlyPMC.Components
                     if (CheckActionBusy(_owner.WeaponManager.Selector.IsChanging, TIME_TO_RESET_WEAPONS_SWAP))
                         return;
                 }
+
+                var meds = _owner.Medecine;
+                if (meds != null)
+                {
+                    if (CheckActionBusy(meds.Stimulators?.Using == true, TIME_TO_RESET_HEAL_STIMS)) return;
+                    if (CheckActionBusy(meds.FirstAid?.Using == true, TIME_TO_RESET_HEAL_FIRSTAID)) return;
+                    if (CheckActionBusy(meds.SurgicalKit?.Using == true, TIME_TO_RESET_HEAL_SURGERY)) return;
+                }
+
+
+                var _isinteracting = _owner.GetPlayer.HandsController.IsInInteraction() || _owner.GetPlayer.HandsController.IsInInteractionStrictCheck();
 
                 if (_isinteracting && CheckActionBusy(true, TIME_TO_RESET_HANDS)) return;
 
@@ -190,7 +191,7 @@ namespace friendlyPMC.Components
                 else
                 {
                     HandsReset();
-                    //_owner.WeaponManager.Selector.TakePrevWeapon();
+                    _owner.WeaponManager.Selector.TakePrevWeapon();
                 }
             }
             return false; // Hands not busy
@@ -312,10 +313,10 @@ namespace friendlyPMC.Components
             return result;
         }
 
-        /** Bot should turn to the direction from where he got shot, if he is nor already in combat */
+        /** Bot should turn to the direction from where he got shot, if he is nor already engaging */
         protected void BeingHitAction(DamageInfoStruct damageInfo, EBodyPart bodyType, float damageReducedByArmor)
         {
-            if (!_owner.Memory.HaveEnemy && damageInfo.Player != null)
+            if (damageInfo.Player != null)
             {
                 if (_owner.BotFollower.HaveBoss)
                 {
@@ -330,6 +331,9 @@ namespace friendlyPMC.Components
                     try
                     {
                         Vector3 direction = pos.Value - _owner.GetPlayer.Transform.position;
+
+                        if (_owner.Memory.HaveEnemy && (_owner.Memory.GoalEnemy.IsVisible || Time.time - _owner.Memory.GoalEnemy.PersonalLastSeenTime < 1.5f)) return;
+
 
                         if (direction.sqrMagnitude < 1f)
                         {

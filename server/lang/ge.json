@@ -134,6 +134,10 @@
 		"Name": "Ping Squad",
 		"Description": "Schnelltaste zum Auslösen des Berichts."
 	},
+    "pingTime" : {
+        "Name": "Ping Squad-Anzeigedauer",
+        "Description": "Zeit in Sekunden, um den Status der Folgespieler anzuzeigen"
+    },
 	"enemyContact": {
 		"Name": "Feindbericht",
 		"Description": "Schnelltaste zum Auslösen des Kontakts."
