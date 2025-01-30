@@ -44,12 +44,12 @@
 	<li><strong>[tt]Friendly PMC Side [/tt]</strong> - Should PMC Bots of the same side always be friendly towards one another and ignore the new PMC Karma system.</li>
 	<li><strong>[tt]BEARs speak English[/tt]</strong> - Should BEAR bots speak English or Russian</li>
 	<li><strong>[tt]PMC Arm Bands[/tt]</strong> - Should PMC bots have armbands (red for BEARs, blue for USECs) for easier identification</li>
-	<li><strong>(<span style="color:rgb(255,215,0);">NEW</span>)[tt]Followers use grenade[/tt]</strong> - Allow followers to use grenades</li>
+	<li><strong>[tt]Followers use grenade[/tt]</strong> - Allow followers to use grenades</li>
 	<li><strong>[tt]Ping Squad[/tt]</strong> - Shortcut key for triggering the Report call if you find it too hard to use the quick gesture menu that the game offers with F1-F12 keybinding</li>
 	<li><strong>[tt]Enemy Report[/tt]</strong> - Shortcut key for triggering the Contact call if you find it too hard to use the quick gesture menu that the game offers with F1-F12 keybinding</li>
 	<li><strong>[tt]Followers Teleport[/tt]</strong> - Shortcut key for teleporting all followers to the player's position</li>
-	<li><strong>[tt]Followers Heal[/tt]</strong> - Shortcut key for healing all followers. This also get's them out of the healing animation or grenade-throwing animation</li>
-	<li><strong>(<span style="color:rgb(255,215,0);">NEW</span>)[tt]Prefetch follower data[/tt]</strong> - Prefetch follower data to reduce the time it takes to spawn them. If you experience problems with followers spawning, disable this option and try again. Take note that this can increase the spawn time.</li>
+	<li><strong>[tt]Followers Heal[/tt]</strong> - Shortcut key for healing all followers. This also gets them out of the healing animation or grenade-throwing animation</li>
+	<li><strong>[tt]Prefetch follower data[/tt]</strong> - Prefetch follower data to reduce the time it takes to spawn them. If you experience problems with followers spawning, disable this option and try again. Take note that this can increase the spawn time.</li>
 </ul>
 <p><strong><br></strong>[/tab]</p>
 <p><br></p>
@@ -87,7 +87,7 @@
 <p><strong>In ENEMY:</strong></p>
 <ul>
 	<li><strong>Contact</strong> - Makes your followers look toward the direction you are looking and if you have an enemy in your visual they will pick him up. This is dependent on "Maximum scan distance" and if you can clearly see the enemy's head or torso.</li>
-	<li><strong>Over There</strong> - Same as Contact, but instead of voice signaling it does a hand gesture towards the direction</li>
+	<li><strong>Over There</strong> - Same as Contact, but instead of voice signaling it does a hand gesture toward the direction</li>
 </ul>
 <p><strong>In GESTURES (these do not work while in combat, except for "That Direction" and "Come To Me"):</strong></p>
 <ul>
@@ -99,11 +99,12 @@
 <ul>
 	<li><strong>Open Door</strong> - Shows up when facing a door and being close enough to it. The closest bot to you will attempt to open the door. He must be within a 20-meter distance</li>
 	<li><strong>Loot This</strong> - Shows up when looking at loot. The closest bot to you will attempt to pick up the loot. Only squad members you spawned with will return the loot at the raid end</li>
+	<li><strong>Cooperative</strong> - Shows up when looking at a bot of the same faction that you can recruit.</li>
 </ul>
 <p><br>As mentioned above, scavs and allies will not listen to all the commands. The commands available for them are: regroup, follow me, stop, and attention. You can imagine them being in the permanent "On Your Own" command.</p>
 <p><br>[/tab]</p>
 <p><br></p>
-<p>[tab='Gameplay Guide']<br><br>Let's start by acknowledging that we are not dealing with top-tier AI here and thus your followers can end up doing stupid things or not properly engage. We cannot rely on the SAIN AI as that mod is not designed to make room for a situation where you have the player as a team leader issuing commands left and right.  You will find yourself relying on Attention and Contact commands a lot. One for getting them unstuck and back to the direction you want and the other to get them to engage as they can have eagle eye observation and also be stone-deaf and oblivious to what is going on.  <br><br>As mentioned in the Squad Commands section, you can issue commands to the entire team or individuals (starting with version 3.7). This allows for a combination where you can have some members stay in place while others follow you (issue Stop for all and then look at one and issue Follow Me to have just him follow) Some won't prioritize covering you while others will. The Stop and Come To Me gestures can be chained so you can move bots in the positions you want them. The Contact command will make them face the direction you want as you set them in place and go for the loot.<br><br><strong>Tactics Details:</strong></p>
+<p>[tab='Gameplay Guide']<br><br><strong>Tactics Details:</strong></p>
 <ul>
 	<li><strong>[tt]Default[/tt]</strong> - A balanced tactic between hold position and push. Followers will stay around you if the enemy is too far, looking for spots to shoot from and if the enemy is close enough, and is weaker than them, they will attempt to push him.</li>
 	<li><strong>[tt]Support[/tt]</strong> - A follower with support tactic will provide frequent suppression fire, will be able to use grenades(even if SAIN disables that), and will be able to use the grenade launcher if he has it as a secondary weapon. He can use the launcher on his own or when asked to provide suppression fire.</li>
@@ -111,6 +112,7 @@
 	<li><strong>[tt]Holder[/tt]</strong> - Bots with the Holder tactic will stand around you, mostly in cover, and waiting for the enemy to come into their vision or be close enough for an ambush.</li>
 	<li><strong>[tt]Pusher[/tt]</strong> - The opposite of Holder. In Pusher mode, the bot will prioritize pushing the enemy.</li>
 </ul>
+<p><br></p>
 <p><strong>Dealing with Custom Loadouts:</strong></p>
 <p>You can have your bots use custom load-outs provided you have created custom equipment presets. You can create presets by pressing the save button and naming the preset in the section that is above your character's loadout section in the Character screen:</p>
 <p><br></p>
@@ -125,19 +127,19 @@
 <p><br></p>
 <p><img src="https://i.ibb.co/x6yb4XC/Screenshot-2024-09-16-192443.png" alt="Screenshot-2024-09-16-192443" border="0"></p>
 <p><br></p>
-<p><strong>(<span style="color:rgb(255,215,0);">NEW</span>)Knight Quests Guide:</strong></p>
+<p><strong>Knight Quests Guide:</strong></p>
 <p><br></p>
 <p>Knight will have quests available at level 20 and they involve doing specific tasks while being teamed up with Knight. Pay attention to the description of the quest as some of the killing quests require them to do the kill instead of you, others just you, and others anybody can make the kill.</p>
 <p><br></p>
 <p>You must have "Squad Spawn" disabled when doing Knight Quests or they won't spawn and just you won't be able to complete the quest</p>
 <p><br></p>
-<p>As soon as you start the first quest, the Rogue faction will no longer be hostile but shooting them will make them hostile. After you complete the first quest the Goons also stop being hostile but killing any of them will result in Knight standing going down.</p>
+<p>As soon as you start the first quest, the Rogue faction will no longer be hostile but shooting them will make them hostile. After you complete the first quest the Goons also stop being hostile but killing any of them will result in Knight standing going down (-0.1 per kill).</p>
 <p><br></p>
 <p>After completing the first quest Knight will appear as a friend in the friend list and you can have him join you in raids by right-clicking on him and choosing "INVITE TO GROUP". The "Squad Spawn" disabled rule applies here as well, he will not spawn if this is enabled even though you invited him. This will be the case for all the Goons as you unlock them.</p>
 <p><br></p>
 <p>When running with the Goons, everyone is hostile towards you except the Rogue faction.</p>
 <p><br></p>
-<p>Killing any of the Goons will penalize you on Knight's standing once you complete the first quest and having the standing go below 0.5 will lock BigPipe and BirdEye from the friend list. Every time you end a raid with any of them alive, the standing will go up by 0.1 and that is per Goon (so you have a total of 0.3 for a successful raid).</p>
+<p>Killing any of the Goons will penalize you on Knight's standing once you complete the first quest and having the standing go below 0.5 will lock BigPipe and BirdEye from the friend list. Every time you end a raid with any of them alive, the standing will go up by 0.05 and that is per Goon.</p>
 <p><br></p>
 <p>Giving them items will not give any return after a raid so stick to giving them only meds, if needed.</p>
 <p><br></p>
@@ -146,14 +148,18 @@
 <p>[tab='Known Issues']</p>
 <p><br></p>
 <p>Mods that mess with meds can create problems for spawned followers.</p>
+<p>The</p>
+<p>"Performance improvements" mod can cause conflicts with this mod.</p>
 <p><br></p>
-<p>Mods that mess with bot spawning via client side changes (like Swag + donuts or having PMC spawning on in Questing Bots) can create problems for spawned followers. Mod has been tested with MOAR and things seem fine.</p>
+<p>Mods that mess with bot spawning via client-side changes (like Swag + donuts or having PMC spawning on in Questing Bots) can create problems for spawned followers. The mod has been tested with MOAR and things seem fine.</p>
 <p><br></p>
 <p>Mods that change static loot containers can cause issues with Knight's Quests. If you reach the "They robbed us" quest, remove such mod until you complete that quest.</p>
 <p><br></p>
 <p>Followers can end up running and ducking until they reach the player - this can happen when using teleportation too much or right after combat ends. Go within the follow range (~12 meters) to snap them out of it.</p>
 <p><br></p>
-<p>When followers use grenades, they do not check impact radius in order to avoid you.</p>
+<p>When followers use grenades, they do not check the impact radius in order to avoid you.</p>
+<p><br></p>
+<p>Followers might still end up stuck after throwing a grenade.</p>
 <p><br></p>
 <p>Followers might still spawn with grenades in their pockets even though you assigned a custom equipment preset that has no grenades.</p>
 <p><br></p>
@@ -163,7 +169,7 @@
 <p><br></p>
 <p>Bots follow in a straight line and can end up intersecting with one another. Yes, that is the navigation logic of the game and cannot be resolved.</p>
 <p><br></p>
-<p>Map transit won't work while having followers (WIP)</p>
+<p>Map transit won't work while having followers</p>
 <p><br></p>
 <p>Even small bushes can make the enemy invisible to the followers when yelling "contact"</p>
 <p><br>[/tab]</p>
