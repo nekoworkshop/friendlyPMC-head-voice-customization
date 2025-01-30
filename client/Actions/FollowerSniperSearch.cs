@@ -49,7 +49,7 @@ namespace friendlyPMC.Actions
         protected string searchType = "SniperSearch";
         public FollowerSniperSearch(BotOwner bot) : base(bot)
         {
-            
+
         }
 
         protected virtual void Init()
@@ -183,7 +183,8 @@ namespace friendlyPMC.Actions
                     }
                     else SetSearchPosition();
                 }
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 Modules.Logger.LogError($"{searchType} Error");
                 Modules.Logger.LogError(ex);
@@ -200,11 +201,11 @@ namespace friendlyPMC.Actions
                 Mathf.Floor(enemyPosition.z / 12f) * 12f
             );
 
-            if(targetSpot != _lastTarget)
+            if (targetSpot != _lastTarget)
             {
                 _lastTarget = targetSpot;
                 spotPosition = null;
-                covering = false;;
+                covering = false; ;
             }
         }
 
@@ -219,7 +220,7 @@ namespace friendlyPMC.Actions
         {
             botOwner_0.SetPose(searchPose);
             botOwner_0.StopMove();
-            if(botOwner_0.Memory.HaveEnemy)
+            if (botOwner_0.Memory.HaveEnemy)
                 botOwner_0.Steering.LookToPoint(botOwner_0.Memory.GoalEnemy.GetCenterPart());
         }
 
@@ -241,12 +242,22 @@ namespace friendlyPMC.Actions
             if (_lastTarget.HasValue)
             {
                 Vector3 enemySpot = botOwner_0.Memory.GoalEnemy.CurrPosition;
+                ShootPointClass shootPointClass = botOwner_0.CurrentEnemyTargetPosition(true);
                 // get closest cover to the bot from where he can shoot the enemy
-                CustomNavigationPoint Spot = Utils.Covers.GetClosestShootCover(
+                CustomNavigationPoint Spot = Utils.Covers.GetClosestCoverPoint(
                     botOwner_0,
-                    enemySpot,
-                    minDist, 
-                    maxDist
+                    botOwner_0.Position,
+                    maxDist,
+                    minDist,
+                    point =>
+                    {
+                        if (GClass344.CanShootToTarget(shootPointClass, point, botOwner_0.LookSensor.Mask, false))
+                        {
+                            point.CanIShootToEnemy = true;
+                            return true;
+                        }
+                        return false;
+                    }
                 );
 
                 if (Spot != null) _lastSpot = Spot.Position;
@@ -255,7 +266,8 @@ namespace friendlyPMC.Actions
 
                 if (!_lastSpot.HasValue)
                 {
-                    _actionsQueue.Enqueue(() => {
+                    _actionsQueue.Enqueue(() =>
+                    {
                         // else get a shooting spot relative to the bot
                         if (botOwner_0.IsDead || botOwner_0.BotState != EBotState.Active || !botOwner_0.Memory.HaveEnemy) return;
 
@@ -280,8 +292,9 @@ namespace friendlyPMC.Actions
                                     protectBoss ? bossPos : bossPos,
                                     30f,
                                     5f,
-                                    (CustomNavigationPoint point)=>{
-                                        if(!GClass369.IsDangerPositionFarEnough(point.Position, new Vector3[]{ bossPos }, 0.5f * 0.5f)) return false;
+                                    (CustomNavigationPoint point) =>
+                                    {
+                                        if (!GClass369.IsDangerPositionFarEnough(point.Position, new Vector3[] { bossPos }, 0.5f * 0.5f)) return false;
                                         return true;
                                     }
                                 );

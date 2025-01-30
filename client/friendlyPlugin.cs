@@ -26,6 +26,7 @@ using friendlyPMC.Components;
 using SPT.Common.Http;
 
 using SPT.Common.Utils;
+using EFT.InventoryLogic;
 
 namespace friendlyPMC
 {
@@ -893,6 +894,12 @@ namespace friendlyPMC
 
                         (bot.Brain.BaseBrain as FollowerBrain).HandsReset();
                         bot.WeaponManager.Selector.TakePrevWeapon();
+
+                        GClass441 selector = bot.WeaponManager.Selector as GClass441;
+                        if (selector != null && (selector.SecondPrimaryWeapon as Weapon) != null && (selector.SecondPrimaryWeapon as Weapon).IsGrenadeLauncher)
+                        {
+                            selector.TryChangeToMain();
+                        }
                     }
                 }
             }

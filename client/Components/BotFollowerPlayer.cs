@@ -15,8 +15,6 @@ using BepInEx.Bootstrap;
 
 using DrakiaXYZ.BigBrain.Brains;
 using System.Reflection;
-using friendlyPMC.Utils;
-using Sirenix.Serialization.Utilities;
 using friendlyPMC.Patches;
 
 namespace friendlyPMC.Components
@@ -249,7 +247,7 @@ namespace friendlyPMC.Components
             // if there is no group yet, make one and group the player with the bot (PickUp case here without spawn)
             else
             {
-                _bot.BotsGroup.RemoveAlly(_bot); // bot's current group might have other members - we don't need them
+                _bot.BotsGroup.RemoveAlly(_bot);
 
                 var botsGroupField = AccessTools.Field(typeof(BotMemoryClass), "botsGroup_0");
                 var _groupRequestController = AccessTools.Field(typeof(BotRequestController), "_groupRequestController");
@@ -420,6 +418,7 @@ namespace friendlyPMC.Components
             settings.FileSettings.Aiming.ANYTIME_LIGHT_WHEN_AIM_100 = 70;
             settings.FileSettings.Aiming.BAD_SHOOTS_MAX = 3;
             settings.FileSettings.Aiming.BAD_SHOOTS_MIN = 1;
+            settings.FileSettings.Aiming.MAX_AIMING_UPGRADE_BY_TIME = 0.20f;
 
 
             settings.FileSettings.Look.CAN_USE_LIGHT = true;
@@ -430,7 +429,7 @@ namespace friendlyPMC.Components
             settings.FileSettings.Look.VISIBLE_ANG_NIGHTVISION = 120f;
             settings.FileSettings.Look.LOOK_THROUGH_PERIOD_BY_HIT = 5f;
             settings.FileSettings.Look.LightOnVisionDistance = 40.0f;
-
+            settings.FileSettings.Look.LOOK_LAST_POSENEMY_IF_NO_DANGER_SEC = 25f;
             settings.FileSettings.Look.VISIBLE_ANG_LIGHT = 45.0f;
             settings.FileSettings.Look.VISIBLE_DISNACE_WITH_LIGHT = 65.0f;
 

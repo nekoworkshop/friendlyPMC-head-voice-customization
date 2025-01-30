@@ -40,7 +40,7 @@ namespace friendlyPMC.Components.Tactics
         public override void OnActivate()
         {
             base.OnActivate();
-            if(!existingCommon) commonLayer?.OnActivate();
+            if (!existingCommon) commonLayer?.OnActivate();
         }
         public override void Dispose()
         {
@@ -89,7 +89,7 @@ namespace friendlyPMC.Components.Tactics
                     if (customNavigationPoint_0 != null)
                     {
                         if (commonLayer.GetNavDistance(customNavigationPoint_0.Position) < commonLayer.sprintDistance)
-                            return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMoving, "regroupToBoss");
+                            return new AICoreActionResultStruct<BotLogicDecision>((BotLogicDecision)CustomBotDecisions.attackRetreat, "regroupToBoss");
                         else
                             return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "regroupToBossFast");
                     }
@@ -97,21 +97,21 @@ namespace friendlyPMC.Components.Tactics
                 // - else, hold position
                 return commonLayer.HoldPositionFor(GClass824.Random(2f, 3f), "holdPositionInCover");
 
-            } 
-            else if(enemyVisible)
+            }
+            else if (enemyVisible)
             {
-            // else if can engage enemy, start fight
+                // else if can engage enemy, start fight
                 AICoreActionResultStruct<BotLogicDecision>? aicoreActionResultStruct = commonLayer.DogFight(out customNavigationPoint_0);
-                if (aicoreActionResultStruct.HasValue) 
+                if (aicoreActionResultStruct.HasValue)
                     return aicoreActionResultStruct.Value;
-            // else retreat
+                // else retreat
                 else
                 {
                     customNavigationPoint_0 = commonLayer.GetClosestCoverPoint(botPosition, commonLayer.coverSearchRadius);
                     if (customNavigationPoint_0 != null)
                     {
                         if (commonLayer.GetNavDistance(customNavigationPoint_0.Position) < commonLayer.sprintDistance)
-                            return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMoving, "backOff");
+                            return new AICoreActionResultStruct<BotLogicDecision>((BotLogicDecision)CustomBotDecisions.attackRetreat, "backOff");
                         else
                             return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "moveToCover");
                     }
@@ -126,21 +126,20 @@ namespace friendlyPMC.Components.Tactics
                 if (customNavigationPoint_0 != null)
                 {
                     if (commonLayer.GetNavDistance(customNavigationPoint_0.Position) < commonLayer.sprintDistance)
-                        return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMoving, "regroupToBoss");
+                        return new AICoreActionResultStruct<BotLogicDecision>((BotLogicDecision)CustomBotDecisions.attackRetreat, "regroupToBoss");
                     else
                         return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "regroupToBossFast");
                 }
 
-                //return new AICoreActionResultStruct<BotLogicDecision>((BotLogicDecision)CustomBotDecisions.CoverToCover, "coverBoss");
+                return new AICoreActionResultStruct<BotLogicDecision>((BotLogicDecision)CustomBotDecisions.CoverToCover, "coverBoss");
             }
             else
             {
                 customNavigationPoint_0 = commonLayer.GetClosestCoverPoint(interestPosition, commonLayer.coverSearchRadius);
-            }
-
-            if (customNavigationPoint_0 != null)
-            {
-                return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "moveToCover");
+                if (customNavigationPoint_0 != null)
+                {
+                    return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "moveToCover");
+                }
             }
 
             // final fallback decision

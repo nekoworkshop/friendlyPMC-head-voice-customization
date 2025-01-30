@@ -73,7 +73,7 @@ namespace friendlyPMC.Components.Tactics
         public override AICoreActionResultStruct<BotLogicDecision> GetDecision()
         {
 
-            if(!botOwner_0.Memory.HaveEnemy)
+            if (!botOwner_0.Memory.HaveEnemy)
             {
                 return commonLayer.HoldPositionFor(Time.time + GClass824.Random(1f, 2f));
             }
@@ -95,7 +95,7 @@ namespace friendlyPMC.Components.Tactics
                     {
                         if (commonLayer.GetNavDistance(customNavigationPoint_0.Position) < 25f)
                         {
-                            return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMoving, "relocate");
+                            return new AICoreActionResultStruct<BotLogicDecision>((BotLogicDecision)CustomBotDecisions.attackRetreat, "relocate");
                         }
                         coverTimer = Time.time + GClass824.Random(3f, 5f);
                         return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "relocateFast");
@@ -125,7 +125,7 @@ namespace friendlyPMC.Components.Tactics
                         if (customNavigationPoint_0 != null && coverTimer < Time.time)
                         {
                             coverTimer = Time.time + GClass824.Random(3f, 5f);
-                            return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMoving, "relocate");
+                            return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.goToCoverPointTactical, "relocate");
                         }
                     }
 
@@ -149,7 +149,7 @@ namespace friendlyPMC.Components.Tactics
 
                 if (customNavigationPoint_0 != null && coverTimer < Time.time)
                 {
-                    return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMoving, "reposition");
+                    return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.goToCoverPointTactical, "reposition");
                 }
                 // -- fallback #1, just wait
                 if (holdTimer < Time.time)
@@ -208,7 +208,7 @@ namespace friendlyPMC.Components.Tactics
 
         protected virtual void GetClosestAttackCoverPoint(Vector3 centerPosition, float minDistance = 15f)
         {
-            customNavigationPoint_0 = commonLayer.GetClosestShootCover(centerPosition, minDistance);
+            customNavigationPoint_0 = commonLayer.GetClosestShootCover(centerPosition, 150f, minDistance);
         }
 
         protected virtual void GetClosestCoverPoint(Vector3 centerPosition, float searchRadius, float safeDistance = 5f, Func<CustomNavigationPoint, bool> extraChecks = null)

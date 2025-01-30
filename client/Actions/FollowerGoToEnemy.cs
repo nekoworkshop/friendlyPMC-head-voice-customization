@@ -66,10 +66,11 @@ namespace friendlyPMC.Actions
                     botOwner_0.Steering.LookToPoint(goalEnemy.GetCenterPart());
 
                     return;
-                } else if(!shouldSprint)
+                }
+                else if (!shouldSprint)
                 {
                     AimAndMove();
-                }    
+                }
             }
             else
             {
@@ -101,16 +102,17 @@ namespace friendlyPMC.Actions
 
             bool flag;
             Vector3 centerPos;
+            Vector3 enemyPos = botOwner_0.Memory.GoalEnemy.EnemyLastPosition;
             if (botOwner_0.Memory.IsInCover && !this.botOwner_0.LookSensor.EnoughDistToShoot(out flag))
             {
-                centerPos = (botOwner_0.Transform.position + this.botOwner_0.Memory.GoalEnemy.EnemyLastPosition) / 2f;
+                centerPos = (botOwner_0.Transform.position + enemyPos) / 2f;
             }
             else
             {
-                centerPos = botOwner_0.Transform.position;
+                centerPos = enemyPos;
             }
-            
-            @class.withShoot = (botOwner_0.Tactic.IsCurTactic(BotsGroup.BotCurrentTactic.Attack) || botOwner_0.Tactic.IsCurTactic(BotsGroup.BotCurrentTactic.Protect));
+
+            @class.withShoot = true;
             CoverShootType coverShootType = @class.withShoot ? CoverShootType.shoot : CoverShootType.hide;
             CoverSearchType searchType = this.botOwner_0.Tactic.SubTactic.SearchTypeAttackMoving(coverShootType);
 
@@ -119,7 +121,7 @@ namespace friendlyPMC.Actions
                 this.float_1 = Time.time + 2f;
                 this.botOwner_0.BotAttackManager.TryPointGetting(centerPos, coverShootType, GClass583.Core.START_DIST_TO_COV, searchType, this.botOwner_0.CurrentEnemyTargetPosition(true), new Action<CustomNavigationPoint>(@class.method_0), new Action(Class116.class116_0.method_0), true, false, true, null);
             }
-            
+
             botOwner_0.BotAttackManager.UpdateNextTick();
 
             this.AimingAndShoot();
@@ -158,7 +160,7 @@ namespace friendlyPMC.Actions
 
             CustomNavigationPoint customNavigationPoint = null;
 
-            List<CustomNavigationPoint> closePoints = Utils.Covers.GetCoverPoints(botOwner_0, targetPoint, 25f);
+            List<CustomNavigationPoint> closePoints = Utils.Covers.GetCoverPoints(botOwner_0, targetPoint, 20f);
             if (closePoints.Count > 0)
             {
                 customNavigationPoint = closePoints.RandomElement();
@@ -169,7 +171,7 @@ namespace friendlyPMC.Actions
                 CustomNavigationPoint freeClosePoint = Utils.Covers.GetClosestCoverPoint(botOwner_0, targetPoint, 30f, 1f);
                 if (freeClosePoint != null)
                 {
-                    freeClosePoint = customNavigationPoint;
+                    customNavigationPoint = freeClosePoint;
                 }
             }
 

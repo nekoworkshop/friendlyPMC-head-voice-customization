@@ -336,13 +336,25 @@ namespace friendlyPMC.Components.Tactics
         }
         /** Find a shoot positionm that is closest to the enemy but at a minimum distance and maximum from the enemy **/
         // customNavigationPoint_1
-        public CustomNavigationPoint GetClosestShootCover(Vector3 centerPosition, float maxDistance = 150f)
+        public CustomNavigationPoint GetClosestShootCover(Vector3 centerPosition, float maxDistance = 150f, float minDistance = 2f)
         {
             if (coverTimer_1 > Time.time) return customNavigationPoint_1;
 
             coverTimer_1 = 1f + Time.time;
 
-            customNavigationPoint_1 = Covers.GetCover(botOwner_0, centerPosition, CoverSearchType.shoot_toCover_toBot_Distances, maxDistance);
+            ShootPointClass shootPointClass = botOwner_0.CurrentEnemyTargetPosition(true);
+
+            customNavigationPoint_1 = Covers.GetClosestCoverPoint(botOwner_0, centerPosition, maxDistance, minDistance, point =>
+            {
+                if (GClass344.CanShootToTarget(shootPointClass, point, botOwner_0.LookSensor.Mask, false))
+                {
+                    point.CanIShootToEnemy = true;
+                    return true;
+                }
+                return false;
+            });//Covers.GetCover(botOwner_0, centerPosition, CoverSearchType.shoot_toCover_toBot_Distances, maxDistance);
+
+            if (customNavigationPoint_1 != null) botOwner_0.Tactic.SetTactic(BotsGroup.BotCurrentTactic.Attack);
 
             botOwner_0.Memory.SetCoverPoints(customNavigationPoint_1);
             return customNavigationPoint_1;
@@ -356,9 +368,8 @@ namespace friendlyPMC.Components.Tactics
 
             coverTimer_1 = 1f + Time.time;
 
-            customNavigationPoint_1 = Covers.GetCover(botOwner_0, (botOwner_0.Position + botOwner_0.Memory.GoalEnemy.CurrPosition) / 2f,CoverSearchType.shoot_toCover_toBot_Distances); 
+            GetClosestShootCover((botOwner_0.Position + botOwner_0.Memory.GoalEnemy.CurrPosition) / 2f, 120f);
 
-            botOwner_0.Memory.SetCoverPoints(customNavigationPoint_1);
             return customNavigationPoint_1;
         }
         /** Find the closest cover point to the given position, within the given radius and ensuring it is at minimum safeDistance from danger **/
@@ -369,7 +380,7 @@ namespace friendlyPMC.Components.Tactics
 
             coverTimer_2 = 1f + Time.time;
 
-            CustomNavigationPoint point = Covers.GetCover(botOwner_0, centerPosition, CoverSearchType.closerToSelectedPoint,  searchRadius);
+            CustomNavigationPoint point = Covers.GetCover(botOwner_0, centerPosition, CoverSearchType.closerToSelectedPoint, searchRadius);
 
             customNavigationPoint_2 = point;
 
@@ -496,16 +507,10 @@ namespace friendlyPMC.Components.Tactics
             customNavigationPoint_3 = point;
             botOwner_0.Memory.SetCoverPoints(point);
 
-            return customNavigationPoint_3;
-        }
-
-        /** Get closest cover point for the bot to pointA within the area between pointA and pointB **/
-        public CustomNavigationPoint GetClosestCoverPointBetween(Vector3 pointA, Vector3 pointB)
-        {
-            CustomNavigationPoint point = Covers.GetClosestCoverPointBetween(botOwner_0, pointA, pointB);
-
-            customNavigationPoint_3 = point;
-            botOwner_0.Memory.SetCoverPoints(point);
+            if (point != null)
+            {
+                botOwner_0.Tactic.SetTactic(BotsGroup.BotCurrentTactic.Ambush);
+            }
 
             return customNavigationPoint_3;
         }
@@ -604,11 +609,13 @@ namespace friendlyPMC.Components.Tactics
                         // -- critical damage and enemy has enough distance, run for cover
                         if (health < 50f && Enemy.Distance(botOwner_0) > Enemy.EnemyDistance.VeryClose)
                         {
+                            botOwner_0.Tactic.SetTactic(BotsGroup.BotCurrentTactic.Ambush);
                             return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "damageCritical");
                         }
                         else
                         {
                             // -- else retreat while shooting
+                            botOwner_0.Tactic.SetTactic(BotsGroup.BotCurrentTactic.Ambush);
                             if (!botOwner_0.Memory.GoalEnemy.IsVisible) botOwner_0.Steering.LookToPoint(botOwner_0.Memory.GoalEnemy.GetCenterPart());
                             return new AICoreActionResultStruct<BotLogicDecision>((BotLogicDecision)CustomBotDecisions.attackRetreat, "backOff");
                         }
@@ -709,7 +716,7 @@ namespace friendlyPMC.Components.Tactics
                             }
                             else
                             {
-                                return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMoving, "moveToHeal");
+                                return new AICoreActionResultStruct<BotLogicDecision>((BotLogicDecision)CustomBotDecisions.attackRetreat, "moveToHeal");
                             }
                         }
                         // - nothing found, no heal
@@ -731,13 +738,14 @@ namespace friendlyPMC.Components.Tactics
 
                     if (customNavigationPoint_2 != null)
                     {
+                        botOwner_0.Tactic.SetTactic(BotsGroup.BotCurrentTactic.Ambush);
                         if (GetNavDistance(customNavigationPoint_2.Position) > sprintDistance && Enemy.DistanceProxy(botOwner_0, botPosition) > Enemy.ProxyDistance.VeryClose)
                         {
                             return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "runToHeal");
                         }
                         else
                         {
-                            return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMoving, "moveToHeal");
+                            return new AICoreActionResultStruct<BotLogicDecision>((BotLogicDecision)CustomBotDecisions.attackRetreat, "moveToHeal");
                         }
                     }
                     // - nothing found, do not heal
@@ -785,10 +793,14 @@ namespace friendlyPMC.Components.Tactics
 
             if (customNavigationPoint_2 != null)
             {
+                botOwner_0.Tactic.SetTactic(BotsGroup.BotCurrentTactic.Attack);
+
                 if (GetNavDistance(customNavigationPoint_2.Position) < sprintDistance)
-                    return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMoving, "moveCloserToBoss");
+                    return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.goToCoverPointTactical, "moveCloserToBoss");
                 else
+                {
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "moveCloserToBossFast");
+                }
 
             }
 
@@ -818,7 +830,7 @@ namespace friendlyPMC.Components.Tactics
             // If the enemy is a sniper and visible, try to find a cover point from which you can shoot
             if (enemyVisible)
             {
-                GetClosestShootCover(botPosition, 200); // Find cover close to the bot's position
+                GetClosestShootCover(botPosition, 100f); // Find cover close to the bot's position
 
                 navpoint = customNavigationPoint_1;
 
@@ -828,9 +840,8 @@ namespace friendlyPMC.Components.Tactics
                     {
                         return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "relocateFast");
                     }
-
-                    return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMoving, "reposition");
                 }
+                return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMoving, "reposition");
             }
 
             // If the sniper is not visible, try to find a cover point closer to the bot's position
@@ -842,6 +853,7 @@ namespace friendlyPMC.Components.Tactics
 
                 if (customNavigationPoint_2 != null)
                 {
+                    botOwner_0.Tactic.SetTactic(BotsGroup.BotCurrentTactic.Attack);
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "relocateFast");
                 }
             }

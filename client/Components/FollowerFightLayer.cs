@@ -1,17 +1,12 @@
 ﻿
-using Comfort.Common;
 using EFT;
 using EFT.InventoryLogic;
 using friendlyPMC.Components.Tactics;
 using friendlyPMC.Modules;
 using friendlyPMC.Utils;
 using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Timers;
 using UnityEngine;
 using UnityEngine.AI;
-using static RootMotion.FinalIK.IKSolver;
 
 namespace friendlyPMC.Components
 {
@@ -476,7 +471,7 @@ namespace friendlyPMC.Components
                 }
                 else
                 {
-                    GetCoverPoint(botPosition, 50f);
+                    GetCoverPoint(botPosition, Props.coverSearchRadius);
 
                     if (customNavigationPoint_0 != null)
                     {
@@ -491,7 +486,7 @@ namespace friendlyPMC.Components
                             }
 
                         }, 4000);
-
+                        botOwner_0.Tactic.SetTactic(BotsGroup.BotCurrentTactic.Ambush);
                         return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "runToCover");
                     }
                     else
@@ -545,13 +540,15 @@ namespace friendlyPMC.Components
 
                 if (customNavigationPoint_0 != null)
                 {
+                    botOwner_0.Tactic.SetTactic(BotsGroup.BotCurrentTactic.Attack);
+
                     if (GetNavDistance(customNavigationPoint_0.Position) > commonLayer.sprintDistance)
                     {
                         return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "protectBossFast");
                     }
                     else
                     {
-                        return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMoving, "protectBossSlow");
+                        return new AICoreActionResultStruct<BotLogicDecision>((BotLogicDecision)CustomBotDecisions.attackRetreat, "protectBossSlow");
                     }
                 }
                 else
@@ -774,7 +771,7 @@ namespace friendlyPMC.Components
 
         }
         /** Find a shoot positionm that is closest to the enemy but at a minimum distance and maximum from the enemy **/
-        public void GetClosestAttackCoverPoint(Vector3 centerPosition, float maxDistance = 150f)
+        public void GetClosestAttackCoverPoint(Vector3 centerPosition, float maxDistance = 100f)
         {
             customNavigationPoint_0 = pusherLayer.GetClosestAttackCoverPoint(centerPosition, maxDistance);
         }
