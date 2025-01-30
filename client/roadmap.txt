@@ -10,11 +10,11 @@
 - x - when doing "enemy spotted" ray cast does not seem to work
 - x - "coverBoss" action seems to send the boss off running far off in the back
 
-- see what else can be done to help make bots stop getting stuck after throwing a grenade
+- x - follower is seeing same side faction as enemy on doing "enemy contact" command
 
-- investigate if the death freeze bug still happening (so far no crashes)
+- x - investigate if the death freeze bug still happening - can't replicate
 
-- add more trade items to Knight
+- x - add more trade items to Knight
 - x - add option to increase the display time of the ping team
 
 -- === 3.10 === ---:
@@ -24,6 +24,7 @@
 - - this should also allow bot to put that weapon as seconday (in case of support without a grenade launcher)
 - add "hold fire/fire at will" commands
 - add more trade items to Knight
+- see what else can be done to help make bots stop getting stuck after throwing a grenade
 
 --- ==== 4.0.0 (final phase - "The General" for followers quest) ==== ---:
 - "The General" quests will unlock followers

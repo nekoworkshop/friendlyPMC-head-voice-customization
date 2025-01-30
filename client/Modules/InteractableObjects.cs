@@ -490,7 +490,15 @@ namespace friendlyPMC.Modules
 
                         bool isenemy = boss.bossGroup.IsEnemy(enemy);
 
-                        if (!isenemy && boss.bossGroup.IsPlayerEnemy(enemy)) isenemy = true;
+                        if (!isenemy && boss.bossGroup.IsPlayerEnemy(enemy))
+                        {
+                            isenemy = true;
+                            // - ensure we do not pick up a friendly PMC as an enemy
+                            if (friendlyPMC.friendlyPMCFLAG.Value && !friendlyPMC.badGuy.Value && !Utils.Utils.FlagGet("isBadGuy") && enemy.Side == player.Side)
+                            {
+                                isenemy = false;
+                            }
+                        }
 
                         if (isenemy)
                         {

@@ -254,6 +254,9 @@ namespace friendlyPMC.Components
                 (_groupRequestController.GetValue(_bot.BotRequestController) as BotGroupRequestController).OnAddRequest -= _bot.BotRequestController.method_0;
                 _groupRequestController.SetValue(_bot.BotRequestController, null);
 
+                _bot.Settings.GetEnemyBotTypes().RemoveAll(x => Utils.Props.friendlyBotTypes.Contains(x));
+                _bot.Settings.GetFriendlyBotTypes().AddRange(Utils.Props.friendlyBotTypes);
+
                 BotZone zone = _bot.BotsController.BotSpawner.GetClosestZone(_bot.GetPlayer.Transform.position, out var zoneDist);
                 BotsGroup group = _bot.BotsController.BotSpawner.GetGroupAndSetEnemies(_bot, zone);
 
