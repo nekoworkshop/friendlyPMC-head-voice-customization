@@ -256,13 +256,10 @@ namespace friendlyPMC.Components
                 (_groupRequestController.GetValue(_bot.BotRequestController) as BotGroupRequestController).OnAddRequest -= _bot.BotRequestController.method_0;
                 _groupRequestController.SetValue(_bot.BotRequestController, null);
 
-                BotZone zone = _bot.BotsController.BotSpawner.GetClosestZone(_bot.GetPlayer.Transform.position, out var zoneDist);
-                // - ensure group will stay friendly to same side, if flag is on
-                if (friendlyPMC.friendlyPMCFLAG.Value && !(friendlyPMC.badGuy.Value || Utils.Utils.FlagGet("isBadGuy")) && (_bot.IsRole(WildSpawnType.pmcUSEC) || _bot.IsRole(WildSpawnType.pmcBEAR)))
-                {
-                    _bot.Settings.FileSettings.Mind.FRIENDLY_BOT_TYPES = _bot.Settings.FileSettings.Mind.FRIENDLY_BOT_TYPES.AddToArray(_bot.Profile.Info.Settings.Role);
-                }
+                _bot.Settings.GetEnemyBotTypes().RemoveAll(x => Utils.Props.friendlyBotTypes.Contains(x));
+                _bot.Settings.GetFriendlyBotTypes().AddRange(Utils.Props.friendlyBotTypes);
 
+                BotZone zone = _bot.BotsController.BotSpawner.GetClosestZone(_bot.GetPlayer.Transform.position, out var zoneDist);
                 BotsGroup group = _bot.BotsController.BotSpawner.GetGroupAndSetEnemies(_bot, zone);
 
                 _bot.BotsGroup = group;

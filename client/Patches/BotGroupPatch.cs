@@ -283,13 +283,8 @@ namespace friendlyPMC.Patches
                 }
             }
 
-            initialBot.Settings.FileSettings.Mind.FRIENDLY_BOT_TYPES = Utils.Props.friendlyBotTypes.ToArray();
-
-            if (friendlyPMC.friendlyPMCFLAG.Value && !(friendlyPMC.badGuy.Value || Utils.Utils.FlagGet("isBadGuy")) && (initialBot.IsRole(WildSpawnType.pmcUSEC) || initialBot.IsRole(WildSpawnType.pmcBEAR)))
-            {
-                initialBot.Settings.FileSettings.Mind.FRIENDLY_BOT_TYPES = initialBot.Settings.FileSettings.Mind.FRIENDLY_BOT_TYPES.AddToArray(initialBot.Profile.Info.Settings.Role);
-            }
-
+            initialBot.Settings.GetFriendlyBotTypes().AddRange(Utils.Props.friendlyBotTypes);
+            
             initialBot.Settings.GetEnemyBotTypes().RemoveAll(x => Utils.Props.friendlyBotTypes.Contains(x));
         }
     }
