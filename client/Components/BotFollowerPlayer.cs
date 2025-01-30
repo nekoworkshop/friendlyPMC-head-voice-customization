@@ -249,7 +249,7 @@ namespace friendlyPMC.Components
             // if there is no group yet, make one and group the player with the bot (PickUp case here without spawn)
             else
             {
-                _bot.BotsGroup.RemoveAlly(_bot); // bot's current group might have other members - we don't need them
+                _bot.BotsGroup.RemoveAlly(_bot);
 
                 var botsGroupField = AccessTools.Field(typeof(BotMemoryClass), "botsGroup_0");
                 var _groupRequestController = AccessTools.Field(typeof(BotRequestController), "_groupRequestController");
@@ -257,6 +257,12 @@ namespace friendlyPMC.Components
                 _groupRequestController.SetValue(_bot.BotRequestController, null);
 
                 BotZone zone = _bot.BotsController.BotSpawner.GetClosestZone(_bot.GetPlayer.Transform.position, out var zoneDist);
+                // - ensure group will stay friendly to same side, if flag is on
+                if (friendlyPMC.friendlyPMCFLAG.Value && !(friendlyPMC.badGuy.Value || Utils.Utils.FlagGet("isBadGuy")) && (_bot.IsRole(WildSpawnType.pmcUSEC) || _bot.IsRole(WildSpawnType.pmcBEAR)))
+                {
+                    _bot.Settings.FileSettings.Mind.FRIENDLY_BOT_TYPES = _bot.Settings.FileSettings.Mind.FRIENDLY_BOT_TYPES.AddToArray(_bot.Profile.Info.Settings.Role);
+                }
+
                 BotsGroup group = _bot.BotsController.BotSpawner.GetGroupAndSetEnemies(_bot, zone);
 
                 _bot.BotsGroup = group;

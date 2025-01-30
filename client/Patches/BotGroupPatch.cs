@@ -2,7 +2,7 @@
 using EFT;
 using friendlyPMC.Components;
 using friendlyPMC.Modules;
-using HarmonyLib; 
+using HarmonyLib;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -36,7 +36,7 @@ namespace friendlyPMC.Patches
 
         public static bool PlayerHasKnightQuest(Profile playerProfile)
         {
-            if(playerProfile.QuestsData == null) return false;
+            if (playerProfile.QuestsData == null) return false;
             foreach (var data in playerProfile.QuestsData)
             {
                 if (data.Id == Utils.Props.Quests["Knight"][0])
@@ -84,19 +84,19 @@ namespace friendlyPMC.Patches
             var _rougeTypes = Utils.Props.BossFollowersType.ToList();
             _rougeTypes.Add(WildSpawnType.exUsec);
 
-            if(isInitialCause && _members != null)
+            if (isInitialCause && _members != null)
             {
                 var followerOfBoss = BossPlayers.GetFollowers().Find(x => x.GetBot().ProfileId == person.ProfileId);
 
-                if(
+                if (
                     (plBoss != null && PlayerHasKnightQuest(plBoss.realPlayer.Profile)) ||
                     (followerOfBoss != null && PlayerHasKnightQuest(followerOfBoss.GetBoss().realPlayer.Profile))
                 )
                 {
                     bool isRogue = false;
-                    foreach(var mem in _members)
+                    foreach (var mem in _members)
                     {
-                        if(_rougeTypes.Contains(mem.Profile.Info.Settings.Role))
+                        if (_rougeTypes.Contains(mem.Profile.Info.Settings.Role))
                         {
                             isRogue = true;
                             mem.Settings.FileSettings.Boss.SHALL_WARN = false;
@@ -104,7 +104,7 @@ namespace friendlyPMC.Patches
                         }
                     }
 
-                    if(isRogue) 
+                    if (isRogue)
                     {
                         __result = false;
                         return false;
@@ -135,7 +135,7 @@ namespace friendlyPMC.Patches
                     )
                 )
                 {
-                    foreach(var mem in _members)
+                    foreach (var mem in _members)
                     {
                         mem.Settings.FileSettings.Boss.SHALL_WARN = false;
                         mem.Settings.FileSettings.Patrol.MAX_YDIST_TO_START_WARN_REQUEST_TO_REQUESTER = 0f;
@@ -207,15 +207,15 @@ namespace friendlyPMC.Patches
             var _members = AccessTools.Field(typeof(BotsGroup), "_members").GetValue(__instance) as List<BotOwner>;
 
             var plBoss = BossPlayers.GetBoss(person.ProfileId);
-            
+
             bool isFriend = false;
 
-            if(_members !=null)
+            if (_members != null)
             {
-                foreach(var mem in _members)
+                foreach (var mem in _members)
                 {
                     // ignore BTR 
-                    if(
+                    if (
                         mem.Profile.Info.Settings.Role == WildSpawnType.shooterBTR
                     )
                     {
@@ -225,8 +225,8 @@ namespace friendlyPMC.Patches
                 }
             }
 
-            if(isFriend) return;
-            
+            if (isFriend) return;
+
             if (plBoss != null && plBoss.bossGroup != null && plBoss.bossGroup.Id != __instance.Id)
             {
                 // - skip if the group is of the Goons and they are just spawning
@@ -243,7 +243,7 @@ namespace friendlyPMC.Patches
                 try
                 {
                     BotsGroup bossGroup = plBoss.bossGroup;
-                    
+
                     if (_members != null)
                     {
                         foreach (var item in _members)
@@ -260,7 +260,7 @@ namespace friendlyPMC.Patches
             }
         }
     }
-    
+
     // this is used only in case of squad spawnt
     internal class BotsGroupPlayer : BotsGroup
     {
@@ -269,21 +269,27 @@ namespace friendlyPMC.Patches
             RemoveEnemy(player.Player());
             AddAlly(player.realPlayer);
             Side = player.realPlayer.Side;
-            
+
             foreach (var item in Enemies)
             {
                 WildSpawnType? Role = item.Value.Player?.Profile?.Info?.Settings?.Role;
-                if(
+                if (
                     Role.HasValue &&
                     Utils.Props.friendlyBotTypes.Contains(Role.Value)
                 )
                 {
-                    RemoveEnemy(item.Value.Player,item.Value.Cause);
+                    RemoveEnemy(item.Value.Player, item.Value.Cause);
                     break;
                 }
             }
 
             initialBot.Settings.FileSettings.Mind.FRIENDLY_BOT_TYPES = Utils.Props.friendlyBotTypes.ToArray();
+
+            if (friendlyPMC.friendlyPMCFLAG.Value && !(friendlyPMC.badGuy.Value || Utils.Utils.FlagGet("isBadGuy")) && (initialBot.IsRole(WildSpawnType.pmcUSEC) || initialBot.IsRole(WildSpawnType.pmcBEAR)))
+            {
+                initialBot.Settings.FileSettings.Mind.FRIENDLY_BOT_TYPES = initialBot.Settings.FileSettings.Mind.FRIENDLY_BOT_TYPES.AddToArray(initialBot.Profile.Info.Settings.Role);
+            }
+
             initialBot.Settings.GetEnemyBotTypes().RemoveAll(x => Utils.Props.friendlyBotTypes.Contains(x));
         }
     }
