@@ -36,7 +36,7 @@ namespace friendlyPMC.Actions
 
         protected float minDist = 10f;
 
-        protected float maxDist = 150f;
+        protected float maxDist = 100f;
 
         protected float searchPose = 0.1f;
 
@@ -290,7 +290,7 @@ namespace friendlyPMC.Actions
                                 CustomNavigationPoint cover = Utils.Covers.GetClosestCoverPoint(
                                     botOwner_0,
                                     protectBoss ? bossPos : bossPos,
-                                    30f,
+                                    40f,
                                     5f,
                                     (CustomNavigationPoint point) =>
                                     {

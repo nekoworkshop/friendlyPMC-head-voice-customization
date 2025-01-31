@@ -189,12 +189,6 @@ namespace friendlyPMC.Patches
             {
                 if (aggressor == null || aggressor.Profile == null || aggressor.Profile.Info == null || aggressor.Profile.Info.Settings == null) return;
 
-                Player alivePlayerByProfileID = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(aggressor.ProfileId);
-                if (alivePlayerByProfileID == null)
-                {
-                    return;
-                }
-
                 if (!Singleton<AbstractGame>.Instantiated) return;
                 if (GamePlayerOwner.MyPlayer == null) return;
                 if (GamePlayerOwner.MyPlayer.HealthController == null || !GamePlayerOwner.MyPlayer.HealthController.IsAlive)
@@ -207,14 +201,16 @@ namespace friendlyPMC.Patches
                 {
                     if (Utils.Props.BossFollowersType.Contains(__instance.Profile.Info.Settings.Role))
                     {
-                        foreach (var data in alivePlayerByProfileID.Profile.QuestsData)
+                        Profile bossProfile = BossPlayers.GetBoss(aggressor.ProfileId).Player().Profile;
+
+                        foreach (var data in bossProfile.QuestsData)
                         {
                             if (Utils.Props.Quests["Knight"][0] == data.Id && data.Status == EFT.Quests.EQuestStatus.Success)
                             {
 
-                                if (alivePlayerByProfileID.Profile.TryGetTraderInfo("67768b19fa281ca31708b187", out var traderInfo))
+                                if (bossProfile.TryGetTraderInfo("67768b19fa281ca31708b187", out var traderInfo))
                                 {
-                                    double standing = alivePlayerByProfileID.Profile.GetTraderStanding("67768b19fa281ca31708b187");
+                                    double standing = bossProfile.GetTraderStanding("67768b19fa281ca31708b187");
                                     traderInfo.SetStanding(Math.Max(0.1, standing - 0.1));
                                     Modules.Logger.LogInfo("Penalize standing with Knight trader for killing a Goon");
                                 }

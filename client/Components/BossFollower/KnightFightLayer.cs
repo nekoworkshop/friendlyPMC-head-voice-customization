@@ -179,7 +179,7 @@ namespace friendlyPMC.Components.BossFollower
                 else
                 {
                     // Find a cover point closer to the enemy
-                    GetClosestAttackCoverPoint(botOwner_0.Memory.GoalEnemy.CurrPosition);
+                    GetClosestAttackCoverPoint((botOwner_0.Position + botOwner_0.Memory.GoalEnemy.EnemyLastPosition) / 2f);
                     if (customNavigationPoint_0 != null)
                     {
                         // Move towards the cover point while suppressing the enemy
@@ -197,7 +197,7 @@ namespace friendlyPMC.Components.BossFollower
             else
             {
                 // Find a cover point closer to the enemy's last known position
-                GetClosestAttackCoverPoint(botOwner_0.Memory.GoalEnemy.CurrPosition);
+                GetClosestAttackCoverPoint((botOwner_0.Position + botOwner_0.Memory.GoalEnemy.EnemyLastPosition) / 2f);
                 if (customNavigationPoint_0 != null)
                 {
                     // Move towards the cover point while suppressing
@@ -277,16 +277,16 @@ namespace friendlyPMC.Components.BossFollower
             if (method_23() && botOwner_0.Brain.LastDecision != null)
             {
                 BotLogicDecision? lastDecision = botOwner_0.Brain.LastDecision;
-                if (!(lastDecision.GetValueOrDefault() == BotLogicDecision.attackMoving & lastDecision != null))
+                if (!(lastDecision.GetValueOrDefault() == (BotLogicDecision)CustomBotDecisions.attackRetreat & lastDecision != null))
                 {
                     if (botOwner_0.Memory.GoalEnemy != null && botOwner_0.Memory.GoalEnemy.CanShoot && botOwner_0.Memory.GoalEnemy.IsVisible)
                     {
                         return commonLayer.DogFight(out customNavigationPoint_0);
                     }
 
-                    GetClosestAttackCoverPoint(botOwner_0.Memory.GoalEnemy.CurrPosition);
+                    GetClosestAttackCoverPoint((botOwner_0.Position + botOwner_0.Memory.GoalEnemy.EnemyLastPosition) / 2f);
                     if (customNavigationPoint_0 != null)
-                        return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMoving, "enemyNear");
+                        return new AICoreActionResultStruct<BotLogicDecision>((BotLogicDecision)CustomBotDecisions.attackRetreat, "enemyNear");
                 }
             }
 

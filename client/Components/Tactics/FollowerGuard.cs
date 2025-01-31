@@ -222,6 +222,7 @@ namespace friendlyPMC.Components.Tactics
                             botOwner_0.Memory.AttackImmediately && Enemy.GetEnemiesAtLocation(botOwner_0, botOwner_0.Memory.GoalEnemy.ProfileId, enemyPos) < 3)
                         {
                             getClose = true;
+                            botOwner_0.Tactic.SetTactic(BotsGroup.BotCurrentTactic.Attack);
                         }
                         return new AICoreActionResultStruct<BotLogicDecision>(getClose ? BotLogicDecision.attackMoving : BotLogicDecision.goToCoverPointTactical, getClose ? "getInCloseSlow" : "relocate");
                     }

@@ -18,7 +18,6 @@ namespace friendlyPMC.Modules
         private List<string> _shallBeFollower;
         private List<int> _botsGroup;
 
-        private List<CustomNavigationPoint> _groupPoints;
 
         private List<string> _removedBosses;
 
@@ -54,8 +53,6 @@ namespace friendlyPMC.Modules
             _shallBeFollower = new List<string> { };
             _removedBosses = new List<string> { };
             _botsGroup = new List<int> { };
-
-            _groupPoints = new List<CustomNavigationPoint>();
         }
 
         public static void Dispose()
@@ -66,11 +63,11 @@ namespace friendlyPMC.Modules
                 Instance = null;
             }
         }
-       
+
 
         private pitAIBossPlayer AddBossPlayer(Player player)
         {
-            if(_bosses.ContainsKey(player.ProfileId)) return _bosses[player.ProfileId];
+            if (_bosses.ContainsKey(player.ProfileId)) return _bosses[player.ProfileId];
 
 
             WildSpawnType roleType = player.Profile.Info.Settings.Role;
@@ -90,7 +87,7 @@ namespace friendlyPMC.Modules
 
             string name = player.ProfileId;
 
-            if(string.IsNullOrEmpty(player.Profile.Info.GroupId))
+            if (string.IsNullOrEmpty(player.Profile.Info.GroupId))
             {
                 player.Profile.Info.GroupId = "bossGroup_" + name;
             }
@@ -102,73 +99,8 @@ namespace friendlyPMC.Modules
 
             _bosses[name] = playerBoss;
 
-            if (_groupPoints.Count > 0) return playerBoss;
-
-
-
-            AICoversData[] aICoversData = UnityEngine.Object.FindObjectsOfType<AICoversData>();
-
-            if (aICoversData != null)
-            {
-
-                foreach (AICoversData cover in aICoversData)
-                {
-                    int id = 0;
-                    for (int i = 0; i < cover.MaxX; i++)
-                    {
-                        id += i;
-                        for (int j = 0; j < cover.MaxY; j++)
-                        {
-                            id += j;
-                            for (int k = 0; k < cover.MaxZ; k++)
-                            {
-                                id += k;
-
-                                NavGraphVoxelSimple navGraphVoxelSimple = cover.VoxelesArray[i, j, k];
-                                if (navGraphVoxelSimple != null && navGraphVoxelSimple.Points != null)
-                                {
-                                    foreach (GroupPoint groupPoint in navGraphVoxelSimple.Points)
-                                    {
-                                        if (groupPoint.CoverLevel == CoverLevel.Stay || groupPoint.CoverLevel == CoverLevel.Sit)
-                                        {
-                                            Collider[] colliders = new Collider[10];
-                                            int numColliders = Physics.OverlapSphereNonAlloc(groupPoint.Position, 1.5f, colliders);
-
-                                            bool isgood = true;
-                                            for (int x = 0; i < numColliders; i++)
-                                            {
-                                                Collider collider = colliders[x];
-
-                                                if (_excludedColliderNames.Contains(collider.transform?.parent?.name))
-                                                {
-                                                    isgood = false;
-                                                    break;
-                                                }
-                                            }
-
-                                            if (isgood)
-                                            {
-                                                try
-                                                {
-                                                    _groupPoints.Add(groupPoint.CreateCustomNavigationPoint(id));
-                                                    id += 1;
-                                                } catch
-                                                {
-
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-
-            }
-
             return playerBoss;
-        
+
         }
 
         private bool RemoveBossPlayer(string name)
@@ -202,7 +134,7 @@ namespace friendlyPMC.Modules
                     _followers.Remove(_follower);
                     _follower.Dismiss();
                 });
-                
+
                 boss.Followers.Clear();
 
                 boss.DisposeBoss();
@@ -258,13 +190,13 @@ namespace friendlyPMC.Modules
                 return _follower;
             }
 
-            if(_shallBeFollower.Contains(bot.name)) _shallBeFollower.Remove(bot.name);
+            if (_shallBeFollower.Contains(bot.name)) _shallBeFollower.Remove(bot.name);
 
             bool isAIBoss = false;
 
             foreach (var item in Utils.Props.BossFollowersType)
             {
-                if(role == item)
+                if (role == item)
                 {
                     isAIBoss = true;
                     break;
@@ -278,14 +210,14 @@ namespace friendlyPMC.Modules
             else
             {
                 _follower = new BossFollowerPlayer(bot, player, role);
-                
+
             }
             try
             {
                 _follower.Init();
 
             }
-            catch( Exception e)
+            catch (Exception e)
             {
                 Modules.Logger.LogError("Failed to init follower");
                 Modules.Logger.LogError(e);
@@ -363,7 +295,7 @@ namespace friendlyPMC.Modules
         public BotFollowerPlayer GetFollower(BotOwner bot)
         {
             if (bot == null) return null;
-            
+
             BotFollowerPlayer _follower = null;
 
             foreach (var item in _followers)
@@ -380,7 +312,7 @@ namespace friendlyPMC.Modules
 
         private bool IsBoss(string id)
         {
-            if(_bosses == null) return false;
+            if (_bosses == null) return false;
 
             return _bosses.ContainsKey(id);
         }
@@ -425,14 +357,9 @@ namespace friendlyPMC.Modules
             return botFollowers;
         }
 
-        private List<CustomNavigationPoint> GetCovers()
-        {
-            return _groupPoints;
-        }
-
         public static pitAIBossPlayer GetBoss(string name)
         {
-            if(Instance  == null) return null;  
+            if (Instance == null) return null;
             return Instance.GetBossPlayer(name);
         }
 
@@ -471,10 +398,6 @@ namespace friendlyPMC.Modules
         {
             if (Instance == null || bot == null) return false;
             return Instance._shallBeFollower.Contains(bot.name);
-        }
-        public static List<CustomNavigationPoint> GetAICovers()
-        {
-            return Instance.GetCovers();
         }
 
         public static void AddGroupToBoss(pitAIBossPlayer player, BotsGroup group)
@@ -516,9 +439,9 @@ namespace friendlyPMC.Modules
 
         public static pitAIBossPlayer GetBossByGroup(int id)
         {
-            if(Instance == null) return null;
-            if(Instance._bosses.Count == 0) return null;
-            if(Instance._botsGroup.Contains(id))
+            if (Instance == null) return null;
+            if (Instance._bosses.Count == 0) return null;
+            if (Instance._botsGroup.Contains(id))
             {
                 foreach (var item in Instance._bosses)
                 {
@@ -550,12 +473,12 @@ namespace friendlyPMC.Modules
 
         public static BotFollowerPlayer AddFollower(BotOwner bot, pitAIBossPlayer player, bool squadMate = false, WildSpawnType role = WildSpawnType.assault, string tactic = "Default")
         {
-            return Instance.AddBotFollower(bot,player,squadMate,role,tactic);
+            return Instance.AddBotFollower(bot, player, squadMate, role, tactic);
         }
 
         public static void ShallBeFollower(BotOwner bot)
         {
-            if(!Instance._shallBeFollower.Contains(bot.name)) Instance._shallBeFollower.Add(bot.name);
+            if (!Instance._shallBeFollower.Contains(bot.name)) Instance._shallBeFollower.Add(bot.name);
         }
     }
 }

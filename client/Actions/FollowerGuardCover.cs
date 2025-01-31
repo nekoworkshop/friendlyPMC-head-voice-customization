@@ -42,13 +42,23 @@ namespace friendlyPMC.Actions
                 Vector3 bossPos = botOwner_0.BotFollower.BossToFollow.Player().Transform.position;
                 Vector3 botPosition = botOwner_0.GetPlayer.Transform.position;
                 bool protectBoss = (botOwner_0.Brain.BaseBrain as FollowerBrain).bossNeedsProtection;
+                ShootPointClass shootPointClass = botOwner_0.CurrentEnemyTargetPosition(true);
 
                 // get closest attack point from the bot's position
-                CustomNavigationPoint Spot = Utils.Covers.GetCover(
-                    botOwner_0,
-                    protectBoss ? bossPos : botPosition,
-                    CoverSearchType.shoot_toCover_toBot_Distances,
-                    Props.coverSearchRadius
+                CustomNavigationPoint Spot = Utils.Covers.GetClosestCoverPoint(
+                        botOwner_0,
+                        botPosition,
+                        maxDist,
+                        minDist,
+                        point =>
+                        {
+                            if (GClass344.CanShootToTarget(shootPointClass, point, botOwner_0.LookSensor.Mask, false))
+                            {
+                                point.CanIShootToEnemy = true;
+                                return true;
+                            }
+                            return false;
+                        }
                 );
 
                 if (Spot != null)
@@ -62,10 +72,10 @@ namespace friendlyPMC.Actions
                 _actionsQueue.Enqueue(() =>
                 {
                     // else get the next cover between the bot and the enemy
-                    ShootPointClass shootPointClass = botOwner_0.CurrentEnemyTargetPosition(true);
+                    shootPointClass = botOwner_0.CurrentEnemyTargetPosition(true);
                     CustomNavigationPoint Spot2 = Utils.Covers.GetClosestCoverPoint(
                         botOwner_0,
-                        (botOwner_0.Position + enemySpot) / 2f,
+                        (botPosition + enemySpot) / 2f,
                         maxDist * 2,
                         minDist,
                         point =>
