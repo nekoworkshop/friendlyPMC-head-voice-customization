@@ -1,23 +1,12 @@
 ﻿using EFT;
 using System.Collections.Generic;
-using System.Security.Cryptography;
 using UnityEngine;
 using UnityEngine.AI;
-using static RootMotion.FinalIK.IKSolver;
 namespace friendlyPMC.Actions
 {
     internal class FollowerGoCheck : BotRequest
     {
-        private bool _fromWait = false;
-
-        public bool FromWait
-        {
-            get
-            {
-                return _fromWait;
-            }
-        }
-
+        
         private bool _hasPoint = false;
         public bool HasPoint
         {
@@ -27,11 +16,9 @@ namespace friendlyPMC.Actions
             }
         }
 
-        public FollowerGoCheck(IPlayer requester, BotRequestType request = BotRequestType.goToPoint, bool fromWait = false) : base(requester, request)
+        public FollowerGoCheck(IPlayer requester, BotRequestType request = BotRequestType.goToPoint) : base(requester, request)
         {
-            _fromWait = fromWait;
-
-
+            
         }
 
         public override void Activate()

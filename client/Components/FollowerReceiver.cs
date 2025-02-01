@@ -292,10 +292,9 @@ namespace friendlyPMC.Components
 
                     FollowerHold holdit = new FollowerHold(playerRequester);
 
-                    if (holdit.SetGroup(botOwner_0.BotsGroup.RequestsController))
+                    if (botOwner_0.AIData.AskRequests.TryAdd(holdit, botOwner_0.BotsGroup.RequestsController))
                     {
                         holdit.AddPossibleExecutors(botOwner_0);
-
                         botOwner_0.Gesture.TryGestus(EInteraction.OkGesture, false);
                     }
                     else
@@ -318,15 +317,19 @@ namespace friendlyPMC.Components
                 {
                     bool hadHold = botOwner_0.BotRequestController.CurRequest?.BotRequestType == BotRequestType.wait;
 
-                    FollowerGoCheck gclass = new FollowerGoCheck(data.Player, goThere ? BotRequestType.goToPoint : BotRequestType.followMe, hadHold);
+                    FollowerGoCheck gclass = new FollowerGoCheck(data.Player, goThere ? BotRequestType.goToPoint : BotRequestType.followMe);
 
                     if (!botOwner_0.BotTalk.IsSilenced) botOwner_0.BotTalk.SetSilence(2f);
 
-                    StopCurrRequest(botOwner_0);
+                    if(!hadHold) StopCurrRequest(botOwner_0);
 
-                    if (gclass.SetGroup(botOwner_0.BotsGroup.RequestsController))
+                    Modules.Logger.LogInfo("Trying to add Come Here request");
+
+                    if (botOwner_0.AIData.AskRequests.TryAdd(gclass, botOwner_0.BotsGroup.RequestsController))
                     {
+                        Modules.Logger.LogInfo("Added Come Here request");
                         gclass.AddPossibleExecutors(botOwner_0);
+                        gclass.Take(botOwner_0);
                         if (gesture != EInteraction.ThereGesture) botOwner_0.Gesture.TryGestus(EInteraction.OkGesture, false);
                     }
                     else

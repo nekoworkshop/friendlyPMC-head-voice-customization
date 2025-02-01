@@ -1,13 +1,17 @@
 ﻿using EFT;
+using friendlyPMC.Actions;
+using HarmonyLib;
 using System.CodeDom.Compiler;
+using System.Collections.Generic;
 
 namespace friendlyPMC.Requests
 {
     internal class FollowerHold : BotRequest
     {
+        private List<BotRequest> botRequests = null;
         public FollowerHold(Player requester) : base(requester, BotRequestType.wait)
         {
-            this.EndIfCantExecute = true;
+            
         }
 
         public override EBotRequestMode RequestMode
@@ -27,9 +31,27 @@ namespace friendlyPMC.Requests
             return true;
         }
 
+        public override void Take(BotOwner executor)
+        {
+            botRequests = AccessTools.Field(typeof(BotGroupRequestController), "_listOfRequests").GetValue(executor.BotsGroup.RequestsController) as List<BotRequest>;
+            base.Take(executor);
+        }
+
         public override bool CanStartExecute(BotOwner executor)
         {
-            
+
+            if (botRequests != null)
+            {
+                var req = botRequests.Find(request => (request is FollowerGoCheck));
+                if(req != null)
+                {
+                    var reqExecutor = AccessTools.Field(typeof(BotRequest), "Executor").GetValue(req) as BotOwner;
+                    if(reqExecutor == executor)
+                    {
+                        return false;
+                    }
+                }
+            }
             return true;
         }
 

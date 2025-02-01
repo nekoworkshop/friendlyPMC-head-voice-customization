@@ -549,8 +549,9 @@ namespace friendlyPMC.Components.Tactics
 
             if (!botOwner_0.Memory.HaveEnemy || !botOwner_0.Memory.GoalEnemy.Person.HealthController.IsAlive) return null;
 
+            EnemyInfo goalEnemy = botOwner_0.Memory.GoalEnemy;
             Vector3 botPosition = botOwner_0.GetPlayer.Transform.position;
-            Vector3 enemyPosition = botOwner_0.Memory.GoalEnemy.CurrPosition;
+            Vector3 enemyPosition = goalEnemy.CurrPosition;
 
             AICoreActionResultStruct<BotLogicDecision>? aicoreActionResultStruct = InFightLogic();
 
@@ -559,10 +560,15 @@ namespace friendlyPMC.Components.Tactics
                 return aicoreActionResultStruct.Value;
             }
 
-            if (botOwner_0.DogFight.DogFightState == BotDogFightStatus.dogFight)
+            var dogFightState = botOwner_0.DogFight.DogFightState;
+            if (dogFightState == BotDogFightStatus.dogFight)
             {
                 //if(!botOwner_0.Memory.GoalEnemy.IsVisible) botOwner_0.Steering.LookToPoint(botOwner_0.Memory.GoalEnemy.GetCenterPart());
                 return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.dogFight, "cdg");
+            }
+            else if (dogFightState == BotDogFightStatus.shootFromPlace)
+            {
+                return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.shootFromPlace, "cdgfp");
             }
 
             // Check if the enemy is visible and can be shot
@@ -609,20 +615,28 @@ namespace friendlyPMC.Components.Tactics
                         // -- critical damage and enemy has enough distance, run for cover
                         if (health < 50f && Enemy.Distance(botOwner_0) > Enemy.EnemyDistance.VeryClose)
                         {
-                            botOwner_0.Tactic.SetTactic(BotsGroup.BotCurrentTactic.Ambush);
+                            if (botOwner_0.Tactic.IsCurTactic(BotsGroup.BotCurrentTactic.Ambush) == false)  botOwner_0.Tactic.SetTactic(BotsGroup.BotCurrentTactic.Ambush);
                             return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "damageCritical");
                         }
                         else
                         {
                             // -- else retreat while shooting
-                            botOwner_0.Tactic.SetTactic(BotsGroup.BotCurrentTactic.Ambush);
+                            if(botOwner_0.Tactic.IsCurTactic(BotsGroup.BotCurrentTactic.Attack) == false) botOwner_0.Tactic.SetTactic(BotsGroup.BotCurrentTactic.Attack);
                             if (!botOwner_0.Memory.GoalEnemy.IsVisible) botOwner_0.Steering.LookToPoint(botOwner_0.Memory.GoalEnemy.GetCenterPart());
                             return new AICoreActionResultStruct<BotLogicDecision>((BotLogicDecision)CustomBotDecisions.attackRetreat, "backOff");
                         }
                     }
                 }
-                // - nowhere to retreat, keep shooting
-                return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.dogFight, "cdg");
+            }
+
+
+            // nowhere to go, keep shooting
+            if (goalEnemy.IsVisible && goalEnemy.VisibleOnlyBySense == EEnemyPartVisibleType.visible)
+            {
+                if (botOwner_0.Memory.GoalEnemy.CanShoot)
+                {
+                    return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.shootFromPlace, "jklu1");
+                }
             }
 
             return null;
