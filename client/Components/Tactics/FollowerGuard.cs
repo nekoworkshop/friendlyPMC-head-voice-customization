@@ -120,14 +120,6 @@ namespace friendlyPMC.Components.Tactics
             base.DecisionChanged(prevDecision, nextDecision);
         }
 
-        public ShootPointClass GetShootPoint()
-        {
-            return botOwner_0.CurrentEnemyTargetPosition(true);
-        }
-
-
-
-
         public AICoreActionResultStruct<BotLogicDecision>? GetSuppressDecision()
         {
             if (list_1.Count > 0)

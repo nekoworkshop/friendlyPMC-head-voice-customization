@@ -31,7 +31,7 @@ namespace friendlyPMC.Actions
         {
             _fromWait = fromWait;
 
-            
+
         }
 
         public override void Activate()
@@ -49,11 +49,12 @@ namespace friendlyPMC.Actions
             Ray visionRay = new Ray(playerPosition, playerLookDirection);
 
             RaycastHit[] hits = new RaycastHit[10];
+            float distance = 50f;
             int numHits = Physics.SphereCastNonAlloc(
                     visionRay,
                     0.3f,
                     hits,
-                    28f,
+                    distance,
                     LayerMaskClass.HighPolyWithTerrainNoGrassMask
                 );
 
@@ -63,8 +64,8 @@ namespace friendlyPMC.Actions
                 RaycastHit hit = hits[i];
                 if (hit.collider != null && hit.collider.gameObject != null)
                 {
-                    if(Vector3.Distance(hit.point, playerPosition) < 28f)
-                    points.Add(hit.point);
+                    if (Vector3.Distance(hit.point, playerPosition) < distance)
+                        points.Add(hit.point);
                 }
             }
 
@@ -80,7 +81,7 @@ namespace friendlyPMC.Actions
                 }
             }
 
-            if(!_hasPoint)
+            if (!_hasPoint)
             {
 
                 Vector3 dir02 = Requester.LookDirection;

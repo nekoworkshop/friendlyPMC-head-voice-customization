@@ -1,5 +1,6 @@
 ﻿using EFT;
 using friendlyPMC.Components;
+using SPT.Reflection.CodeWrapper;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -74,6 +75,13 @@ namespace friendlyPMC.Modules
             player.Profile.Info.Settings.Role = WildSpawnType.bossKnight; // temp switch to boss role
             pitAIBossPlayer playerBoss = new pitAIBossPlayer(player);
             player.Profile.Info.Settings.Role = roleType; // revert role back to original
+
+            GClass583.Core.MAX_BASE_REQUESTS_PER_PLAYER = 999;
+            GClass583.Core.MAX_COME_WITH_ME_REQUESTS_PER_PLAYER = 999;
+            GClass583.Core.MAX_HOLD_REQUESTS_PER_PLAYER = 999;
+            GClass583.Core.MAX_GO_TO_REQUESTS_PER_PLAYER = 999;
+            GClass583.Core.MAX_WAIT_REQUESTS_PER_PLAYER = 999;
+            GClass583.Core.MAX_GET_IN_COVER_REQUESTS_PER_PLAYER = 999;
 
             if (!playerBoss.IAmBoos)
             {

@@ -633,6 +633,35 @@ namespace friendlyPMC.Components
 
             return commonLayer.EndGoToPoint();
         }
+        public override AICoreActionEndStruct EndRunToCover()
+        {
+            if (!botOwner_0.Memory.HaveEnemy)
+            {
+                return new AICoreActionEndStruct("enemy.None", true);
+            }
+
+            if (botOwner_0.Memory.GoalEnemy.CanShoot)
+            {
+                return new AICoreActionEndStruct("enemy.canSh", true);
+            }
+
+            return base.EndRunToCover();
+        }
+
+        public override AICoreActionEndStruct EndGoToCoverPointTactical()
+        {
+            if (!botOwner_0.Memory.HaveEnemy)
+            {
+                return new AICoreActionEndStruct("enemy.None", true);
+            }
+
+            if (botOwner_0.Memory.GoalEnemy.CanShoot)
+            {
+                return new AICoreActionEndStruct("enemy.canSh", true);
+            }
+
+            return base.EndGoToCoverPointTactical();
+        }
 
         public override AICoreActionEndStruct EndHeal()
         {

@@ -14,17 +14,16 @@ namespace friendlyPMC.Modules
                 return new FollowerOpenDoor(bot);
 
             if (type == BotLogicDecision.botTakeItem)
-            {
                 return new FollowerTakeLoot(bot);
-            }
 
             if (type == BotLogicDecision.attackMoving)
                 return new FollowerAttackMove(bot);
 
+            if (type == BotLogicDecision.attackMovingWithSuppress)
+                return new FollowerAttackMove(bot,true);
+
             if (type == (BotLogicDecision)CustomBotDecisions.attackRetreat)
-            {
                 return new FollowerAttackRetreat(bot);
-            }
 
             if (type == BotLogicDecision.holdPosition)
                 return new FollowerHoldPosition(bot);

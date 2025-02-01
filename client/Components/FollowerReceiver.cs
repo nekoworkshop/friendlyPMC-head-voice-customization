@@ -142,6 +142,7 @@ namespace friendlyPMC.Components
             if (botOwner_0.BotRequestController.CurRequest != null)
             {
                 botOwner_0.BotRequestController.CurRequest.Complete();
+                botOwner_0.BotRequestController.CurRequest = null;
             }
         }
 

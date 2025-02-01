@@ -11,9 +11,14 @@ namespace friendlyPMC.Actions
     {
 
         protected bool _autoCover = true;
+        protected bool _withSuppress = false;
 
-        public FollowerAttackMove(BotOwner bot) : base(bot)
+        private float float_3 = 0f;
+        private bool bool_0 = false;
+
+        public FollowerAttackMove(BotOwner bot,bool withSuppress = false) : base(bot)
         {
+            _withSuppress = withSuppress;
         }
 
         public override void Update()
@@ -40,8 +45,15 @@ namespace friendlyPMC.Actions
 
         public override void AimingAndShoot()
         {
+            if (float_3 < Time.time)
+            {
+                float_3 = Time.time + GClass824.Random(2f, 4f);
+                bool_0 = !bool_0;
+            }
+
             EnemyInfo goalEnemy = botOwner_0.Memory.GoalEnemy;
-            if (goalEnemy != null && goalEnemy.CanShoot && goalEnemy.IsVisible)
+
+            if ((bool_0 && _withSuppress) ||  (goalEnemy != null && goalEnemy.CanShoot && goalEnemy.IsVisible))
             {
                 gclass158_0.Update();
                 return;
@@ -49,7 +61,7 @@ namespace friendlyPMC.Actions
 
             if (goalEnemy != null)
             {
-                botOwner_0.Steering.LookToPoint(botOwner_0.Memory.GoalEnemy.GetCenterPart());
+                botOwner_0.Steering.LookToPoint(botOwner_0.Memory.GoalEnemy.EnemyLastPosition + new Vector3(0,0.5f, 0));
             }
         }
     }

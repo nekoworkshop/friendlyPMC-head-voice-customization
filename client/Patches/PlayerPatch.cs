@@ -223,10 +223,10 @@ namespace friendlyPMC.Patches
                 }
 
                 // have kills of the Goons count as quest kills when needed
-                string ProfileId = GamePlayerOwner.MyPlayer.ProfileId;
+                string myPlayerProfileId = GamePlayerOwner.MyPlayer.ProfileId;
                 Player player = GamePlayerOwner.MyPlayer;
 
-                if (BossPlayers.Instance == null || !BossPlayers.IsPlayerBoss(ProfileId))
+                if (BossPlayers.Instance == null || !BossPlayers.IsPlayerBoss(myPlayerProfileId))
                 {
                     return;
                 }
@@ -290,6 +290,21 @@ namespace friendlyPMC.Patches
                     if (knightKiller) Utils.Utils.FlagSet("knightKiller", false);
                     if (pipeKiller) Utils.Utils.FlagSet("pipeKiller", false);
                     if (birdEyeKiller) Utils.Utils.FlagSet("birdEyeKiller", false);
+                }
+                else
+                {
+                    // - kills made by the squadmates of the boss will help with quests kills
+                    BossPlayers.GetFollowersByBoss(myPlayerProfileId).ForEach(follower =>
+                    {
+                        BotOwner bot = follower.GetBot();
+                        if (follower.IsSquadMate && !bot.IsDead && bot.BotState == EBotState.Active && bot.ProfileId == aggressor.ProfileId)
+                        {
+                            list.ForEach(target =>
+                            {
+                                player.AbstractQuestControllerClass.CheckKillConditionCounter(target, __instance.ProfileId, new List<string> { }, weapon2, bodyPart, locationId, distance, __instance.Profile.Info.Settings.Role.ToStringNoBox<WildSpawnType>(), __instance.CurrentHour, __instance.HealthController.BodyPartEffects, __instance.HealthController.BodyPartEffects, __instance.TriggerZones, new string[] { });
+                            });
+                        }
+                    });
                 }
             }
             catch (Exception ex)

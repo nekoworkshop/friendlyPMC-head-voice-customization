@@ -342,7 +342,7 @@ namespace friendlyPMC.Components.Tactics
 
             coverTimer_1 = 1f + Time.time;
 
-            ShootPointClass shootPointClass = botOwner_0.CurrentEnemyTargetPosition(true);
+            ShootPointClass shootPointClass = botOwner_0.CurrentEnemyTargetPosition(false);
 
             customNavigationPoint_1 = Covers.GetClosestCoverPoint(botOwner_0, centerPosition, maxDistance, minDistance, point =>
             {

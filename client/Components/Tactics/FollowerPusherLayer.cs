@@ -452,7 +452,7 @@ namespace friendlyPMC.Components.Tactics
 
         public CustomNavigationPoint GetClosestAttackCoverPoint(Vector3 centerPosition, float maxDistance = 150f)
         {
-            ShootPointClass shootPointClass = botOwner_0.CurrentEnemyTargetPosition(true);
+            ShootPointClass shootPointClass = botOwner_0.CurrentEnemyTargetPosition(false);
 
             customNavigationPoint_0 = Utils.Covers.GetClosestCoverPoint(
                 botOwner_0,
