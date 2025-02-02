@@ -76,7 +76,7 @@ namespace friendlyPMC.Components
             {
                 return new AICoreActionResultStruct<BotLogicDecision>(HasBoss() ? BotLogicDecision.followerPatrol : HoldOrCover(botOwner_0), "req:Error");
             }
-            Modules.Logger.LogInfo("Request: " + request.BotRequestType.ToString());
+
             switch (request.BotRequestType)
             {
                 // on follow me request from the boss, just come closer to the boss or get out of hold position

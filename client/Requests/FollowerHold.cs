@@ -31,14 +31,12 @@ namespace friendlyPMC.Requests
             return true;
         }
 
-        public override void Take(BotOwner executor)
-        {
-            base.Take(executor);
-            botRequests = AccessTools.Field(typeof(BotGroupRequestController), "_listOfRequests").GetValue(executor.BotsGroup.RequestsController) as List<BotRequest>;
-        }
-
         public override bool CanStartExecute(BotOwner executor)
         {
+            if(botRequests == null)
+            {
+                botRequests = AccessTools.Field(typeof(BotGroupRequestController), "_listOfRequests").GetValue(executor.BotsGroup.RequestsController) as List<BotRequest>;
+            }
 
             if (botRequests != null)
             {

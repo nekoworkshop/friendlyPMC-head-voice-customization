@@ -1,9 +1,9 @@
 -- === 3.10 === ---:
-- #intesting - switch cover logic to the one used by the game (all we need is to keep an eye out for the closes zone to the player and upddate CoverPointMaster to that)
+- #testing - switch cover logic to the one used by the game (all we need is to keep an eye out for the closes zone to the player and upddate CoverPointMaster to that)
 - x - make followers count for kill-based quests
 - x - increase the distance the bot will go to when using "there gesture" command
-- investigate bug that happens when combing stop with follow me (phrase and gesture)
-- investigate shooting delay when doing DogFight
+- #testing - investigate bug that happens when combing stop with follow me (phrase and gesture)
+- #testing - investigate shooting delay when doing DogFight
 - investigate using reverse map what makes followers accquire enemies through walls
 - confirm bot will use grenade launcher when executing "suppression fire" request (fix if not)
 - see if we can make bot swap weapons when asked to loot (DeadBodyWork)
@@ -31,6 +31,7 @@ increased the distance the bot will go to when using "there gesture" command to 
 
 Add to known issues:
 - teleporting a follower while he is opening a door will make him glitch out and the only way to restore him is to have him open some other door
+- in very rare cases, your follower cand end up stuck in a healing animtion and there is no way to restore him
 ==================================================================================
 
 
