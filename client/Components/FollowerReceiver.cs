@@ -137,10 +137,16 @@ namespace friendlyPMC.Components
             return false;
         }
 
-        protected static void StopCurrRequest(BotOwner botOwner_0)
+        protected static void StopCurrRequest(BotOwner botOwner_0, Player requester = null)
         {
+            if(requester)
+            {
+                botOwner_0.BotRequestController.TryStopCurrent(requester, false);
+            }
+
             if (botOwner_0.BotRequestController.CurRequest != null)
             {
+                botOwner_0.BotsGroup.RequestsController.RemoveRequest(botOwner_0.BotRequestController.CurRequest);
                 botOwner_0.BotRequestController.CurRequest.Complete();
                 botOwner_0.BotRequestController.CurRequest = null;
             }
@@ -288,12 +294,13 @@ namespace friendlyPMC.Components
                         return;
                     }
 
-                    StopCurrRequest(botOwner_0);
+                    StopCurrRequest(botOwner_0,playerRequester);
 
                     FollowerHold holdit = new FollowerHold(playerRequester);
 
                     if (botOwner_0.AIData.AskRequests.TryAdd(holdit, botOwner_0.BotsGroup.RequestsController))
                     {
+                        Modules.Logger.LogInfo("Hold Request Added");
                         holdit.AddPossibleExecutors(botOwner_0);
                         botOwner_0.Gesture.TryGestus(EInteraction.OkGesture, false);
                     }
@@ -321,15 +328,18 @@ namespace friendlyPMC.Components
 
                     if (!botOwner_0.BotTalk.IsSilenced) botOwner_0.BotTalk.SetSilence(2f);
 
-                    if(!hadHold) StopCurrRequest(botOwner_0);
-
-                    Modules.Logger.LogInfo("Trying to add Come Here request");
+                    StopCurrRequest(botOwner_0, playerRequester);
 
                     if (botOwner_0.AIData.AskRequests.TryAdd(gclass, botOwner_0.BotsGroup.RequestsController))
                     {
-                        Modules.Logger.LogInfo("Added Come Here request");
+                        Modules.Logger.LogInfo("Come Request Added");
                         gclass.AddPossibleExecutors(botOwner_0);
-                        gclass.Take(botOwner_0);
+                        /*if (hadHold)
+                        {
+                            FollowerHold holdRequest = new FollowerHold(playerRequester);
+                            holdRequest.SetGroup(botOwner_0.BotsGroup.RequestsController);
+                            holdRequest.AddPossibleExecutors(botOwner_0);
+                        }*/
                         if (gesture != EInteraction.ThereGesture) botOwner_0.Gesture.TryGestus(EInteraction.OkGesture, false);
                     }
                     else
@@ -698,7 +708,7 @@ namespace friendlyPMC.Components
                     return;
                 }
 
-                StopCurrRequest(botOwner_0);
+                StopCurrRequest(botOwner_0, playerRequester);
 
                 if (isClose)
                 {

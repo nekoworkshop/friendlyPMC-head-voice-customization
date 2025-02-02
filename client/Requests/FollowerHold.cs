@@ -33,8 +33,8 @@ namespace friendlyPMC.Requests
 
         public override void Take(BotOwner executor)
         {
-            botRequests = AccessTools.Field(typeof(BotGroupRequestController), "_listOfRequests").GetValue(executor.BotsGroup.RequestsController) as List<BotRequest>;
             base.Take(executor);
+            botRequests = AccessTools.Field(typeof(BotGroupRequestController), "_listOfRequests").GetValue(executor.BotsGroup.RequestsController) as List<BotRequest>;
         }
 
         public override bool CanStartExecute(BotOwner executor)
@@ -53,19 +53,6 @@ namespace friendlyPMC.Requests
                 }
             }
             return true;
-        }
-
-        public override AICoreActionEndStruct EndHoldPosition()
-        {
-            if (Executor != null && 
-                (Executor.BotRequestController.CurRequest?.BotRequestType == BotRequestType.followMe ||
-                Executor.BotRequestController.CurRequest?.BotRequestType == BotRequestType.goToPoint)
-            )
-            {
-                return new AICoreActionEndStruct(true);
-            }
-
-            return new AICoreActionEndStruct(false);
         }
     }
 }

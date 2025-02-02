@@ -76,6 +76,7 @@ namespace friendlyPMC.Actions
             // cancel movement if we see the enemy
             if (botOwner_0.Memory.HaveEnemy && botOwner_0.Memory.GoalEnemy.CanShoot)
             {
+                Modules.Logger.LogInfo("Request canceled because of enemy");
                 botOwner_0.BotRequestController.CurRequest.Complete();
                 botOwner_0.BotRequestController.CurRequest = null;
                 checkTime = 0f;
@@ -100,6 +101,7 @@ namespace friendlyPMC.Actions
                         bool_1 = false;
                         bool_2 = false;
                         ischecking = false;
+                        Modules.Logger.LogInfo("Request canceled because of timeout");
                     }
                 }
                 return;
@@ -112,6 +114,7 @@ namespace friendlyPMC.Actions
                 {
                     r.Complete();
                     botOwner_0.BotRequestController.CurRequest = null;
+                    Modules.Logger.LogInfo("Request canceled because of bool_2");
                 }
                 return;
             }
@@ -143,13 +146,14 @@ namespace friendlyPMC.Actions
 
                 _point = point;
 
-                if (botOwner_0.GoToPoint(point, true, 0.5f,true,true,true) == NavMeshPathStatus.PathComplete)
+                if (botOwner_0.GoToPoint(point, true, 0.5f) == NavMeshPathStatus.PathComplete)
                 {
                     bool_1 = true;
                 }
                 else
                 {
                     botOwner_0.BotRequestController.CurRequest.Complete();
+                    Modules.Logger.LogInfo("Request canceled because of pathfinding");
                     return;
                 }
             }
