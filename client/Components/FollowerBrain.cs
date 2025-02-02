@@ -388,7 +388,7 @@ namespace friendlyPMC.Components
                 if (distance <= 35f)
                 {
                     FakeShot(shootdir);
-                    if (distance <= 20f)
+                    if (Utils.Utils.GetNavDistance(_owner.Position, position) <= 15f)
                     {
                         EnemyInfo enInfo = Utils.Enemy.MakeEnemy(_owner, enemy);
                         enInfo?.SetVisible(true);
@@ -432,7 +432,7 @@ namespace friendlyPMC.Components
                     if (processedSoundPositions.Count > 20) processedSoundPositions.RemoveAt(0);
                 }
 
-                if (distance <= 12f)
+                if (distance <= 8f)
                 {
                     FakeShot(dir);
                     EnemyInfo enInfo = Utils.Enemy.MakeEnemy(_owner, enemy);

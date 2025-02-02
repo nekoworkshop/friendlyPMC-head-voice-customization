@@ -19,30 +19,22 @@ namespace friendlyPMC.Patches
             return AccessTools.Method(typeof(BotMemoryClass), "AddEnemy");
         }
 
-        [PatchPostfix]
-        private static void PatchPostFix(BotMemoryClass __instance, [NotNull] IPlayer enemy, BotSettingsClass groupInfo, bool onActivation)
+        [PatchPrefix]
+        private static bool PatchPrefix(BotMemoryClass __instance, [NotNull] IPlayer enemy, BotSettingsClass groupInfo, bool onActivation)
         {
-            if (enemy == null) return;
+            if (enemy == null) return true;
 
             var botOwner_0 = AccessTools.Field(typeof(BotMemoryClass), "botOwner_0").GetValue(__instance) as BotOwner;
 
             // - do not assign enemies to followers if the enemy just spawned
-            if (BossPlayers.IsFollower(botOwner_0) && enemy != null && (groupInfo.Cause == EBotEnemyCause.addBotAtGroup || groupInfo.Cause == EBotEnemyCause.addBotNoGroup))
+            if (BossPlayers.IsFollower(botOwner_0))
             {
-                foreach (var enInfo in botOwner_0.EnemiesController.EnemyInfos)
-                {
-                    if (enInfo.Key.ProfileId == enemy.ProfileId)
-                    {
-                        enInfo.Value.SetVisible(false);
-                        enInfo.Value.GroupInfo.EnemyLastSeenTimeSense = 0f;
-                        if (__instance.GoalEnemy != null && __instance.GoalEnemy.ProfileId == enemy.ProfileId)
-                        {
-                            __instance.GoalEnemy = null;
-                        }
-                        break;
-                    }
-                }
+                /*if(enemy != null && (groupInfo.Cause == EBotEnemyCause.addBotAtGroup || groupInfo.Cause == EBotEnemyCause.addBotNoGroup))
+                    return false;*/
+                Modules.Logger.LogTrace($"Follower {botOwner_0.Profile.Nickname} added enemy {enemy.Profile.Nickname} because of cause {groupInfo.Cause}");
             }
+
+            return true;
         }
     }
     /**

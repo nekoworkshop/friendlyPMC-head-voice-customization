@@ -130,9 +130,11 @@ namespace friendlyPMC.Components
                 PatrolWay way = botOwner_0.PatrollingData.Way;
 
                 // switch to main weapon when out of combat - useful for bots that have launchers as secondary weapon
-                if (!_triedToSwitchToMain && botOwner_0.WeaponManager.Selector.LastEquipmentSlot == EquipmentSlot.SecondPrimaryWeapon)
+                if (!_triedToSwitchToMain && botOwner_0.WeaponManager.IsReady && botOwner_0.WeaponManager.Selector.LastEquipmentSlot == EquipmentSlot.SecondPrimaryWeapon)
                 {
                     botOwner_0.WeaponManager.Selector.TryChangeToMain();
+                    float_2 = Time.time + 5f;
+                    float_3 = Time.time + 5f;
                     _triedToSwitchToMain = true;
                 }
 

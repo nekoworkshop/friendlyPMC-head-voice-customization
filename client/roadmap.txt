@@ -6,6 +6,7 @@
 - #testing - investigate shooting delay when doing DogFight
 - investigate using reverse map what makes followers accquire enemies through walls
 - confirm bot will use grenade launcher when executing "suppression fire" request (fix if not)
+- x - make bot artillery check positions for friendly
 - see if we can make bot swap weapons when asked to loot (DeadBodyWork)
 - - this should also allow bot to put that weapon as seconday (in case of support without a grenade launcher)
 - add slider for how long with a bot be silenced
@@ -31,7 +32,7 @@ increased the distance the bot will go to when using "there gesture" command to 
 
 Add to known issues:
 - teleporting a follower while he is opening a door will make him glitch out and the only way to restore him is to have him open some other door
-- in very rare cases, your follower cand end up stuck in a healing animtion and there is no way to restore him
+- in very rare cases, your follower can end up stuck in a healing animtion and there is no way to restore him
 ==================================================================================
 
 

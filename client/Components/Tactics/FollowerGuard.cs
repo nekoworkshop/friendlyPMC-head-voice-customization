@@ -122,8 +122,18 @@ namespace friendlyPMC.Components.Tactics
 
         public AICoreActionResultStruct<BotLogicDecision>? GetSuppressDecision()
         {
+            Vector3 playerPos = commonLayer.HasBoss() ? commonLayer.GetBoss().Player().Transform.position : botOwner_0.GetPlayer.Position;
+
             if (list_1.Count > 0)
             {
+                List<Vector3> goodPoints = list_1.ApplyFilter((Vector3 pos) =>
+                {
+                    if (!GClass369.IsDangerPositionFarEnough(pos, new Vector3[] { playerPos }, 18f * 18f)) return false;
+                    return true;
+                });
+                list_1.Clear();
+                list_1.AddRange(goodPoints);
+
                 botOwner_0.SuppressShoot.InitToPoints(list_1, null);
                 float delay = (float)list_1.Count * 2f;
                 foreach (Vector3 position in list_1)
@@ -161,7 +171,6 @@ namespace friendlyPMC.Components.Tactics
                 // - check if player is too close when using grenade
                 if (useGrenade && botOwner_0.WeaponManager.Grenades.HaveGrenadeOfType(grenadeType.Value))
                 {
-                    Vector3 playerPos = commonLayer.HasBoss() ? commonLayer.GetBoss().Player().Transform.position : botOwner_0.GetPlayer.Position;
                     if (Vector3.Distance(playerPos, goalEnemy.CurrPosition) < 12f)
                     {
                         useGrenade = false;
@@ -360,7 +369,7 @@ namespace friendlyPMC.Components.Tactics
                             if (!GClass369.IsDangerPositionFarEnough(playerPos, new Vector3[]
                             {
                                 enemyPos
-                            }, 4f)) continue;
+                            }, 12f * 12f)) continue;
 
                             list_2.Add(enemyPos);
                         }
