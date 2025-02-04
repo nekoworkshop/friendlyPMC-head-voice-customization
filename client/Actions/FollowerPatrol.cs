@@ -161,7 +161,7 @@ namespace friendlyPMC.Actions
             if (bool_7)
             {
                 botOwner_0.GoToSomePointData.UpdateToGo(false);
-                if (!wasHit) botOwner_0.Steering.LookToMovingDirection();
+                //if (!wasHit) botOwner_0.Steering.LookToMovingDirection();
             }
 
             if (float_3 < Time.time)
@@ -252,7 +252,7 @@ namespace friendlyPMC.Actions
 
                             botOwner_0.GoToSomePointData.SetPoint(nearPoint.Position);
                             botOwner_0.GoToSomePointData.UpdateToGo(false);
-                            if (!wasHit) botOwner_0.Steering.LookToMovingDirection();
+                            if (!wasHit) botOwner_0.Steering.LookToPathDestPoint();
 
                             bool_7 = true;
                             float_3 = Time.time + 0.5f;
@@ -278,7 +278,7 @@ namespace friendlyPMC.Actions
                         botOwner_0.GoToSomePointData.SetPoint(navMeshHit.position);
                         botOwner_0.GoToSomePointData.UpdateToGo(false);
 
-                        if (!wasHit) botOwner_0.Steering.LookToMovingDirection();
+                        if (!wasHit) botOwner_0.Steering.LookToPathDestPoint();
 
                         bool_7 = true;
                         float_3 = Time.time + 0.5f;

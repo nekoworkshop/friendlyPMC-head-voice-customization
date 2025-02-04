@@ -185,21 +185,6 @@ namespace friendlyPMC.Components
             if (_bot.BotLight != null && _bot.BotLight.IsEnable) _bot.BotLight.TurnOff(false, true);
             // make bot follower of player
             _player.AddFollower(_bot);
-            // dispose of the original patrol mode
-            try
-            {
-                var followerAIBase = AccessTools.Field(typeof(PatrolDataFollower), "followerAIBase").GetValue(_bot.BotFollower.PatrolDataFollower) as GClass480;
-
-                if (followerAIBase != null)
-                {
-                    followerAIBase.Dispose();
-                }
-
-            }
-            catch (Exception e)
-            {
-                Modules.Logger.LogError(e);
-            }
             // make bot join the player's group
             if (_player.bossGroup != null)
             {

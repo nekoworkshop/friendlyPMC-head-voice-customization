@@ -2,16 +2,18 @@
 - #testing - switch cover logic to the one used by the game (all we need is to keep an eye out for the closes zone to the player and upddate CoverPointMaster to that)
 - x - make followers count for kill-based quests
 - x - increase the distance the bot will go to when using "there gesture" command
-- #testing - investigate bug that happens when combing stop with follow me (phrase and gesture)
-- #testing - investigate shooting delay when doing DogFight
+- x - investigate bug that happens when combing stop with follow me (phrase and gesture)
+- x - investigate shooting delay when doing DogFight
+- x - when asked to hold position and then go check, skip the "wait in position" part of go check
+- x - ensure that on "follow me" hold position is removed from requets (happens with BipPipe after doing "go check" command)
 - investigate using reverse map what makes followers accquire enemies through walls
-- confirm bot will use grenade launcher when executing "suppression fire" request (fix if not)
+- #testing - confirm bot will use grenade launcher when executing "suppression fire" request (fix if not)
 - x - make bot artillery check positions for friendly
 - see if we can make bot swap weapons when asked to loot (DeadBodyWork)
 - - this should also allow bot to put that weapon as seconday (in case of support without a grenade launcher)
 - add slider for how long with a bot be silenced
 - add "hold fire/fire at will" commands
-- add more trade items to Knight
+- add more trade items to Knight (more keys, some ammo and 2 more kits - a sniper and a shotgun)
 - see what else can be done to help make bots stop getting stuck after throwing a grenade
 
 --- ==== 4.0.0 (final phase - "The General" for followers quest) ==== ---:
@@ -28,6 +30,7 @@
 RELEASE NOTES (3.10.0)
 kills made by followers you spawned with (except Goons, PMC only) will now count for any kill-based quests
 code was refactored on cover and tactics logic to no longer rely on a set of covers within a limited range around the boss and instead let the bot decide where to go (this can make your followers spread out more)
+improvement on the combat tactics
 increased the distance the bot will go to when using "there gesture" command to 50 meters
 
 Add to known issues:

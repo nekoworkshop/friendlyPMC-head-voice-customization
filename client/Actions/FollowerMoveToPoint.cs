@@ -12,7 +12,7 @@ using Comfort.Common;
 
 namespace friendlyPMC.Actions
 {
-    public class FollowerMoveToPoint: GClass196
+    public class FollowerMoveToPoint : GClass196
     {
         private bool _shouldSprint = true;
 
@@ -116,7 +116,7 @@ namespace friendlyPMC.Actions
                 return;
             }
 
-            
+
             if (botOwner_0.BotRequestController.CurRequest == null) return;
 
 
@@ -163,7 +163,21 @@ namespace friendlyPMC.Actions
                 bool_1 = false;
                 bool_2 = true;
 
-                if (ischecking) checkTime = Time.time + GClass824.Random(4f, 6f);
+                if (ischecking)
+                {
+                    checkTime = Time.time + GClass824.Random(4f, 6f);
+                    var _listOfRequests = AccessTools.Field(typeof(BotGroupRequestController), "_listOfRequests").GetValue(botOwner_0.BotsGroup.RequestsController) as List<BotRequest>;
+                    var req = _listOfRequests.Find(request => (request is FollowerHold));
+                    if (req != null)
+                    {
+                        var reqExecutor = AccessTools.Field(typeof(BotRequest), "Executor").GetValue(req) as BotOwner;
+                        if (reqExecutor == botOwner_0)
+                        {
+                            checkTime = 0f;
+                        }
+                    }
+                }
+                //checkTime
 
                 return;
 
@@ -184,7 +198,7 @@ namespace friendlyPMC.Actions
                     wasHit = true;
                 }
 
-                if(!wasHit && !botOwner_0.Memory.HaveEnemy) botOwner_0.Steering.LookToMovingDirection(60f);
+                if (!wasHit && !botOwner_0.Memory.HaveEnemy) botOwner_0.Steering.LookToMovingDirection(60f);
                 botOwner_0.Mover.Sprint(_shouldSprint && !wasHit);
             }
         }

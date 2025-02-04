@@ -241,20 +241,18 @@ namespace friendlyPMC.Components
         public void AddFollower(BotOwner bot)
         {
             Followers.Add(bot);
+            // dispose of the original patrol mode
             bot.BotFollower.PatrolDataFollower.InitPlayer(realPlayer);
+
             bot.BotFollower.Index = Followers.Count - 1;
             bot.BotFollower.BossToFollow = this;
-
-            bot.BotFollower.PatrolDataFollower.Activate();
-            bot.BotFollower.PatrolDataFollower.SetIndex(bot.BotFollower.Index);
 
             PatrolMode mode = PatrolMode.follower;
             PatrolMode mode2 = PatrolMode.simple;
 
             PatrolPointChooserBasic pointChooser = PatrollingData.GetPointChooser(bot, mode2, bot.SpawnProfileData);
             bot.PatrollingData.SetMode(mode, pointChooser);
-            bot.Tactic.SetTactic(BotsGroup.BotCurrentTactic.Protect, false, -1f);
-            bot.BotFollower.BossFindAction();
+            //bot.BotFollower.BossFindAction();
         }
     }
     public class AIBossPlayerLogic : GClass405

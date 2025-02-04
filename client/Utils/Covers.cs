@@ -32,17 +32,7 @@ namespace friendlyPMC.Utils
 
                 if (boss != null && !GClass369.IsDangerPositionFarEnough(point.Position, bossPosition, 0.7f * 0.7f)) return false;
 
-                /* navMeshPath.ClearCorners();
-                bool result = NavMesh.CalculatePath(centerPosition, point.Position, -1, navMeshPath);
-                if (result && navMeshPath.status == NavMeshPathStatus.PathComplete)
-                {
-                    float dist = navMeshPath.CalculatePathLength();
-                    // cover far to reach
-                    if (dist > searchRadius)
-                    {
-                        return false;
-                    }
-                } */
+
                 if (extraChecks != null && !extraChecks(point)) return false;
 
                 return true;

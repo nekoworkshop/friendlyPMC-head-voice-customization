@@ -144,6 +144,11 @@ namespace friendlyPMC.Components.BossFollower
             AICoreActionResultStruct<BotLogicDecision>? preFightDecision = KnightPreFight();
             if (preFightDecision != null) return (AICoreActionResultStruct<BotLogicDecision>)preFightDecision;
 
+            if (commonLayer.ReachedCover)
+            {
+                return commonLayer.HoldPositionFor(GClass824.Random(2f, 3f));
+            }
+
             // do not go after distant enemies
             if (Utils.Enemy.Distance(botOwner_0) >= Utils.Enemy.EnemyDistance.Distant)
             {
@@ -399,10 +404,6 @@ namespace friendlyPMC.Components.BossFollower
 
             if (common != null) return (AICoreActionEndStruct)common;
 
-            AICoreActionEndStruct? push = pusherLayer.ShallEndDecision(curDecision);
-
-            if (push.HasValue) return push.Value;
-
             if (curDecision.Reason == "assaultRush" && Utils.Enemy.Distance(botOwner_0) <= Utils.Enemy.EnemyDistance.VeryClose)
             {
                 return new AICoreActionEndStruct("assault.closeEnough", true);
@@ -417,10 +418,6 @@ namespace friendlyPMC.Components.BossFollower
             return customNavigationPoint_0;
         }
 
-        public AICoreActionEndStruct EndGetInClose()
-        {
-            return commonLayer.EndGetInClose();
-        }
         public override AICoreActionEndStruct EndGoToPoint()
         {
             return commonLayer.EndGoToPoint();

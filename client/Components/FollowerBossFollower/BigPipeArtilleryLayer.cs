@@ -16,7 +16,7 @@ namespace friendlyPMC.Components.FollowerBossFollower
         protected GClass51 supportLayer;
         public BigPipeArtilleryLayer([NotNull] BotOwner owner, int priority) : base(owner, priority)
         {
-            supportLayer = new GClass51(owner,priority);
+            supportLayer = new GClass51(owner, priority);
         }
 
         public override string Name()
@@ -52,6 +52,17 @@ namespace friendlyPMC.Components.FollowerBossFollower
             AICoreActionResultStruct<BotLogicDecision>? preFightDecision = KnightPreFight();
             if (preFightDecision != null) return (AICoreActionResultStruct<BotLogicDecision>)preFightDecision;
 
+            if (commonLayer.ReachedCover)
+            {
+                return commonLayer.HoldPositionFor(GClass824.Random(2f, 3f));
+            }
+
+            // do not go after distant enemies
+            if (Utils.Enemy.Distance(botOwner_0) >= Utils.Enemy.EnemyDistance.Distant)
+            {
+                return new AICoreActionResultStruct<BotLogicDecision>((BotLogicDecision)CustomBotDecisions.CoverToCover, "coverBoss");
+            }
+
             AICoreActionResultStruct<BotLogicDecision> baseDecision;
 
             try
@@ -66,7 +77,7 @@ namespace friendlyPMC.Components.FollowerBossFollower
             }
 
             if (
-                baseDecision.Reason == "regroupToBossFast" || 
+                baseDecision.Reason == "regroupToBossFast" ||
                 baseDecision.Reason == "regroupToBoss" ||
                 baseDecision.Reason == "pushEnemy" ||
                 (commonLayer.OrderHasChangedRecently && request != null && request.BotRequestType == BotRequestType.attackClose) ||
@@ -95,16 +106,17 @@ namespace friendlyPMC.Components.FollowerBossFollower
             }
 
             if (
-                supportDecision.Action == BotLogicDecision.suppressFire || 
+                supportDecision.Action == BotLogicDecision.suppressFire ||
                 supportDecision.Action == BotLogicDecision.shootToSmoke ||
                 supportDecision.Action == BotLogicDecision.suppressGrenade
             )
             {
-                if(supportDecision.Action == BotLogicDecision.suppressGrenade) {
+                if (supportDecision.Action == BotLogicDecision.suppressGrenade)
+                {
                     var brain = (botOwner_0.Brain.BaseBrain as FollowerBrain);
-                    if(!brain.IsThrowingGrenade)brain.OnThrow();
+                    if (!brain.IsThrowingGrenade) brain.OnThrow();
                 }
-                
+
                 return supportDecision;
             }
 
@@ -119,6 +131,6 @@ namespace friendlyPMC.Components.FollowerBossFollower
 
             return baseDecision;
         }
-        
+
     }
 }

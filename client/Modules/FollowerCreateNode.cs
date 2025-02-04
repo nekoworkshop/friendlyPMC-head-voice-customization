@@ -20,7 +20,7 @@ namespace friendlyPMC.Modules
                 return new FollowerAttackMove(bot);
 
             if (type == BotLogicDecision.attackMovingWithSuppress)
-                return new FollowerAttackMove(bot,true);
+                return new FollowerAttackMove(bot, true);
 
             if (type == (BotLogicDecision)CustomBotDecisions.attackRetreat)
                 return new FollowerAttackRetreat(bot);
@@ -48,9 +48,6 @@ namespace friendlyPMC.Modules
 
             if (type == BotLogicDecision.goToEnemy)
                 return new FollowerGoToEnemy(bot);
-
-            if (type == (BotLogicDecision)CustomBotDecisions.RunToCover)
-                return new FollowerRunToCover(bot);
 
             if (type == BotLogicDecision.dogFight)
                 return new FollowerDogFight(bot);

@@ -570,6 +570,12 @@ namespace friendlyPMC.Components
             if (botOwner_0.Memory.HaveEnemy && botOwner_0.Memory.GoalEnemy.Owner.IsRole(WildSpawnType.marksman))
                 return commonLayer.MarksManFight(out customNavigationPoint_0);
 
+
+            if (commonLayer.ReachedCover)
+            {
+                return commonLayer.HoldPositionFor(GClass824.Random(2f, 3f));
+            }
+
             // ally tactic will make the bot always fight in hold mode
             if (allyTactic)
             {

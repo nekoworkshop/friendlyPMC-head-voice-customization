@@ -15,7 +15,7 @@ namespace friendlyPMC.Actions
 
         private float float_3 = 0f;
         private bool bool_0 = false;
-
+        private float float_4 = 0f; 
         public FollowerAttackMove(BotOwner bot,bool withSuppress = false) : base(bot)
         {
             _withSuppress = withSuppress;
@@ -59,9 +59,10 @@ namespace friendlyPMC.Actions
                 return;
             }
 
-            if (goalEnemy != null)
+            if (goalEnemy != null && float_4 < Time.time)
             {
-                botOwner_0.Steering.LookToPoint(botOwner_0.Memory.GoalEnemy.EnemyLastPosition + new Vector3(0,0.5f, 0));
+                float_4 = Time.time + GClass824.Random(2f, 3f);
+                botOwner_0.Steering.LookToPoint(botOwner_0.Memory.GoalEnemy.EnemyLastPosition + new Vector3(0,0.6f, 0));
             }
         }
     }

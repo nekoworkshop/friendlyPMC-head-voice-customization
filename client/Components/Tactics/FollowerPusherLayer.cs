@@ -103,12 +103,15 @@ namespace friendlyPMC.Components.Tactics
                     }
                     else
                     {
-                        GetApproachablePoint();
-                        if (distanceToEnemy >= Utils.Enemy.EnemyDistance.Mid)
+                        GetApproachablePoint(distanceToEnemy >= Utils.Enemy.EnemyDistance.Mid);
+                        if (customNavigationPoint_0 != null)
                         {
-                            return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "getInCloseFast");
+                            if (distanceToEnemy >= Utils.Enemy.EnemyDistance.Mid)
+                            {
+                                return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "getInCloseFast");
+                            }
+                            return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.goToCoverPointTactical, "getInCloseSlow");
                         }
-                        return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.goToCoverPointTactical, "getInCloseSlow");
                     }
                 }
 
@@ -165,10 +168,10 @@ namespace friendlyPMC.Components.Tactics
                     // -- enemy is distant but visible
                     else
                     {
-                        GetApproachablePoint();
+                        GetApproachablePoint(true);
                         if (customNavigationPoint_0 != null)
                         {
-                            return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "approachEnemyFast");
+                            return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "getInCloseFast");
                         }
                         else
                         {
@@ -187,10 +190,10 @@ namespace friendlyPMC.Components.Tactics
                 else
                 {
 
-                    GetApproachablePoint();
+                    GetApproachablePoint(distanceToEnemy > Utils.Enemy.EnemyDistance.Mid);
                     if (customNavigationPoint_0 != null)
                     {
-                        return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "approachEnemyFast");
+                        return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "getInCloseFast");
                     }
 
                     return EnemySearch();
@@ -206,11 +209,11 @@ namespace friendlyPMC.Components.Tactics
                     if (inCover)
                     {
                         // --- find an approachable point towards the enemy
-                        GetApproachablePoint();
+                        GetApproachablePoint(distanceToEnemy > Utils.Enemy.EnemyDistance.Mid);
                         if (customNavigationPoint_0 != null)
                         {
                             botOwner_0.Tactic.SetTactic(BotsGroup.BotCurrentTactic.Attack);
-                            return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.goToCoverPointTactical, "approachEnemy");
+                            return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.goToCoverPointTactical, "getInCloseSlow");
                         }
                         else
                         {
@@ -254,7 +257,7 @@ namespace friendlyPMC.Components.Tactics
                 else if (Time.time - lastEnemySeenTime < GClass824.Random(2f, 5f))
                 {
                     // -- find a cover point closer to the enemy's last known position
-                    GetApproachablePoint();
+                    GetApproachablePoint(distanceToEnemy > Utils.Enemy.EnemyDistance.Mid);
 
                     AICoreActionResultStruct<BotLogicDecision>? previousDecision = commonLayer.CurrentDecision;
 
@@ -286,6 +289,8 @@ namespace friendlyPMC.Components.Tactics
                 if (enemyVisible)
                 {
                     //botOwner_0.Steering.LookToPoint(botOwner_0.Memory.GoalEnemy.GetCenterPart());
+                    var result = commonLayer.DogFight(out customNavigationPoint_0);
+                    if (result.HasValue) return result.Value;
                     return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.dogFight, "dgf");
                 }
                 else
@@ -314,33 +319,10 @@ namespace friendlyPMC.Components.Tactics
             return new AICoreActionResultStruct<BotLogicDecision>((BotLogicDecision)CustomBotDecisions.EnemySearch, reason != null ? reason : "enemy.Search");
         }
 
-        public AICoreActionEndStruct? ShallEndDecision(AICoreActionResultStruct<BotLogicDecision> curDecision)
-        {
-            if (
-                curDecision.Action == (BotLogicDecision)CustomBotDecisions.EnemySearch
-            )
-            {
-                return EndEnemySearch();
-            }
-
-            return null;
-        }
-
         public override AICoreActionEndStruct EndRunToEnemy()
         {
-            if (!botOwner_0.Memory.HaveEnemy)
-            {
-                return new AICoreActionEndStruct("enemy.None", true);
-            }
-
-            if (botOwner_0.Memory.GoalEnemy.CanShoot)
-            {
-                return new AICoreActionEndStruct("enemy.canSh", true);
-            }
-
-            return base.EndRunToEnemy();
+            return commonLayer.EndRunToEnemy();
         }
-
 
         public AICoreActionEndStruct EndEnemySearch()
         {
@@ -352,7 +334,7 @@ namespace friendlyPMC.Components.Tactics
                 return new AICoreActionEndStruct("enemy.None", true);
             }
 
-            if (botOwner_0.Memory.GoalEnemy.CanShoot)
+            if (botOwner_0.Memory.GoalEnemy.CanShoot && botOwner_0.LookSensor.EnoughDistToShoot(out var info))
             {
                 return new AICoreActionEndStruct("enemy.canSh", true);
             }
@@ -475,9 +457,9 @@ namespace friendlyPMC.Components.Tactics
             return customNavigationPoint_0;
         }
 
-        public CustomNavigationPoint GetApproachablePoint()
+        public CustomNavigationPoint GetApproachablePoint(bool inbetween = false)
         {
-            customNavigationPoint_0 = commonLayer.GetApproachableCover();
+            customNavigationPoint_0 = commonLayer.GetApproachableCover(inbetween);
             return customNavigationPoint_0;
 
         }
