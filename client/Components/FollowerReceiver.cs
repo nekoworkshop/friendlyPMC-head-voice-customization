@@ -589,8 +589,6 @@ namespace friendlyPMC.Components
                     {
                         botOwner_0.BotTalk.TrySay(EPhraseTrigger.Covering, true);
                     }
-                    ;
-
 
                     return;
                 }

@@ -443,13 +443,12 @@ namespace friendlyPMC.Components
                     if (launcherDecicion.HasValue)
                     {
                         grSuppressTime = Time.time + 5f;
-                        botOwner_0.BotTalk.TrySay(EPhraseTrigger.Covering, false);
                         grSupport = true;
+
                         return launcherDecicion.Value;
                     }
                 }
 
-                botOwner_0.BotTalk.TrySay(EPhraseTrigger.Covering, false);
                 suppressTime = Time.time + 2.5f;
 
                 return guardLayer.method_29(false, guardLayer.method_31());

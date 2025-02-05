@@ -105,7 +105,13 @@ namespace friendlyPMC.Utils
             CustomNavigationPoint point = null;
             if (points.Count > 0)
             {
-                point = points.Random();
+                if (eligibilityCheck != null)
+                {
+                    points = points.FindAll((CustomNavigationPoint p) => eligibilityCheck(p));
+                }
+
+                if (points.Count > 0)
+                    point = points.Random();
             }
 
             botOwner.Memory.SetCoverPoints(point);

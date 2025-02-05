@@ -134,15 +134,30 @@ namespace friendlyPMC.Components.Tactics
                 list_1.Clear();
                 list_1.AddRange(goodPoints);
 
-                botOwner_0.SuppressShoot.InitToPoints(list_1, null);
-                float delay = (float)list_1.Count * 2f;
-                foreach (Vector3 position in list_1)
+                if (list_1.Count > 0)
                 {
-                    Singleton<BotEventHandler>.Instance.ArtilleryStart(position, 20f, delay);
+                    ShootPointClass shootPointClass = botOwner_0.CurrentEnemyTargetPosition(true);
+
+                    CustomNavigationPoint suppPosition = Covers.GetCoverPoint(botOwner_0, botOwner_0.Position, 70f, point =>
+                    {
+                        if (GClass344.CanShootToTarget(shootPointClass, point, botOwner_0.LookSensor.Mask, false))
+                        {
+                            point.CanIShootToEnemy = true;
+                            return true;
+                        }
+                        return false;
+                    });
+                    botOwner_0.SuppressShoot.InitToPoints(new List<Vector3> { list_1[0] }, suppPosition);
+
+                    float delay = (float)list_1.Count * 2f;
+                    foreach (Vector3 position in list_1)
+                    {
+                        Singleton<BotEventHandler>.Instance.ArtilleryStart(position, 20f, delay);
+                    }
+                    float_10 = Time.time + 60f;
+                    list_1.Clear();
+                    return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.suppressFire, "grSuppress");
                 }
-                float_10 = Time.time + 60f;
-                list_1.Clear();
-                return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.suppressFire, "grSuppress");
             }
 
             EnemyInfo goalEnemy = botOwner_0.Memory.GoalEnemy;
@@ -312,7 +327,7 @@ namespace friendlyPMC.Components.Tactics
         {
             if (!botOwner_0.WeaponManager.Selector.CanChangeToSecondWeapons) return null;
             GClass441 selector = botOwner_0.WeaponManager.Selector as GClass441;
-
+   
             if (selector != null && (selector.SecondPrimaryWeapon as Weapon) != null && (selector.SecondPrimaryWeapon as Weapon).IsGrenadeLauncher)
             {
                 RaycastHit[] hits = new RaycastHit[20];
@@ -381,7 +396,20 @@ namespace friendlyPMC.Components.Tactics
                 if (botOwner_0.WeaponManager.Selector.LastEquipmentSlot != EquipmentSlot.SecondPrimaryWeapon)
                     botOwner_0.WeaponManager.Selector.TryChangeWeapon(true);
 
-                botOwner_0.SuppressShoot.InitToPoints(list_2, null);
+                ShootPointClass shootPointClass = botOwner_0.CurrentEnemyTargetPosition(true);
+
+                CustomNavigationPoint suppPosition = Covers.GetCoverPoint(botOwner_0, botOwner_0.Position, 70f, point =>
+                {
+                    if (GClass344.CanShootToTarget(shootPointClass, point, botOwner_0.LookSensor.Mask, false))
+                    {
+                        point.CanIShootToEnemy = true;
+                        return true;
+                    }
+                    return false;
+                });
+ 
+                botOwner_0.SuppressShoot.InitToPoints(list_2, suppPosition);
+
                 float delay = (float)list_2.Count * 2f;
 
                 foreach (Vector3 position in list_2)

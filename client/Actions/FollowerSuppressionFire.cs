@@ -113,6 +113,11 @@ namespace friendlyPMC.Actions
                     return;
                 }
 
+                if (lastDecision.Reason == "suppressFireLauncher")
+                {
+                    grSupport = true;
+                }
+
                 // has spot to suppress from
                 if (botOwner_0.SuppressShoot.PointToSuppressFrom != null)
                 {
@@ -125,11 +130,7 @@ namespace friendlyPMC.Actions
                     return;
                 }
 
-                if (lastDecision.Reason == "suppressFireLauncher")
-                {
-                    grSupport = true;
-                }
-
+                
                 Vector3? point = botOwner_0.SuppressShoot.GetPoint();
 
                 // need to find a spot to suppress from
@@ -145,7 +146,7 @@ namespace friendlyPMC.Actions
                         return;
                     }
 
-                    Vector3? firePosition = Utils.Covers.FindShootPosition(botOwner_0, 12f, 70f, position =>
+                    Vector3? firePosition = Utils.Covers.FindShootPosition(botOwner_0, 12f, 50f, position =>
                     {
                         if (GClass344.CanShootToTarget(shootPointClass, position + botOwner_0.WeaponRoot.position, botOwner_0.LookSensor.Mask, false))
                         {
@@ -157,12 +158,14 @@ namespace friendlyPMC.Actions
                     }, shootPointClass.Point);
 
                     if (firePosition.HasValue)
-                    {
-                        grPosition = firePosition;
-                        grTarget = shootPointClass.Point;
-                        botOwner_0.GoToSomePointData.SetPoint(grPosition.Value);
+                    {   
+                        botOwner_0.GoToSomePointData.SetPoint(firePosition.Value);
                         botOwner_0.Steering.LookToPoint(shootPointClass.Point);
                         botOwner_0.GoToSomePointData.UpdateToGo(true);
+
+                        grPosition = firePosition;
+                        grTarget = shootPointClass.Point;
+
                         return;
                     }
                 }

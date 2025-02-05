@@ -163,6 +163,7 @@ namespace friendlyPMC.Actions
                 botOwner_0.GoToSomePointData.UpdateToGo(false);
                 //if (!wasHit) botOwner_0.Steering.LookToMovingDirection();
             }
+            else if (botOwner_0.Mover.TargetPose != 1f) botOwner_0.Mover.SetPose(1f);
 
             if (float_3 < Time.time)
             {
@@ -292,6 +293,8 @@ namespace friendlyPMC.Actions
                     nocover = false;
                     method_0(leaderPosition);
                     bool val = num > Math.Min(brain.followDistance + 3, 16);
+
+                    if (botOwner_0.Mover.TargetPose != 1f) botOwner_0.Mover.SetPose(1f);
 
                     if (val)
                         botOwner_0.Mover.Sprint(true, false);

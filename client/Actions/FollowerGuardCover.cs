@@ -73,10 +73,11 @@ namespace friendlyPMC.Actions
                 {
                     // else get the next cover between the bot and the enemy
                     shootPointClass = botOwner_0.CurrentEnemyTargetPosition(true);
+                    Vector3 middlePoint = botPosition + enemySpot;
                     CustomNavigationPoint Spot2 = Utils.Covers.GetClosestCoverPoint(
                         botOwner_0,
-                        (botPosition + enemySpot) / 2f,
-                        maxDist * 2,
+                        middlePoint / 2f,
+                        middlePoint.magnitude / 2f,
                         minDist,
                         point =>
                         {
@@ -151,10 +152,11 @@ namespace friendlyPMC.Actions
                                 _actionsQueue.Enqueue(() =>
                                 {
                                     shootPointClass = botOwner_0.CurrentEnemyTargetPosition(true);
+                                    middlePoint = bossPos + enemySpot;
                                     CustomNavigationPoint Spot5 = Utils.Covers.GetClosestCoverPoint(
                                         botOwner_0,
-                                        (bossPos + enemySpot) / 2f,
-                                        maxDist * 2,
+                                        middlePoint / 2f,
+                                        middlePoint.magnitude / 2f,
                                         minDist,
                                         point =>
                                         {
@@ -186,19 +188,20 @@ namespace friendlyPMC.Actions
                                 CustomNavigationPoint Spot4 = Utils.Covers.GetClosestCoverPoint(
                                     botOwner_0,
                                     botPosition,
-                                    maxDist,
+                                    30f,
                                     minDist,
                                     point =>
                                     {
                                         if (GClass344.CanShootToTarget(shootPointClass, point, botOwner_0.LookSensor.Mask, false))
                                         {
                                             point.CanIShootToEnemy = true;
-                                            return true;
                                         }
-                                        else if (point.CanIHide(new Vector3[] { enemySpot }, minDist, true))
+
+                                        if (point.CanIHide(new Vector3[] { enemySpot }, minDist, true))
                                         {
                                             return true;
                                         }
+
                                         return false;
                                     }
                                 );

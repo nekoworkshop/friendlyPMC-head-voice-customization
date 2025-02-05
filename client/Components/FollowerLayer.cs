@@ -144,11 +144,11 @@ namespace friendlyPMC.Components
                     botOwner_0.WeaponManager.Reload.TryReload();
                 }
 
-                if (!_triedFillMagazines && float_3 < Time.time)
+                if (!_triedFillMagazines && !botOwner_0.WeaponManager.Reload.Reloading && float_3 < Time.time)
                 {
                     botOwner_0.WeaponManager.Reload.TryFillMagazines();
                     _triedFillMagazines = true;
-                    float_3 = Time.time + 30f;
+                    float_3 = Time.time + 20f;
                 }
 
                 if (HasBoss())

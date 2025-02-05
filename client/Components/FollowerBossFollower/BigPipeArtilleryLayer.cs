@@ -13,10 +13,10 @@ namespace friendlyPMC.Components.FollowerBossFollower
     internal class BigPipeArtilleryLayer : KnightFightLayer
     {
 
-        protected GClass51 supportLayer;
+        protected GClass53 supportLayer;
         public BigPipeArtilleryLayer([NotNull] BotOwner owner, int priority) : base(owner, priority)
         {
-            supportLayer = new GClass51(owner, priority);
+            supportLayer = new GClass53(owner, priority);
         }
 
         public override string Name()

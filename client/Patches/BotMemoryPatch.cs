@@ -10,34 +10,6 @@ using JetBrains.Annotations;
 namespace friendlyPMC.Patches
 {
     /**
-     * Patch to stop followers from acquiring enemies through walls 
-     */
-    internal class BotMemoryAddEnemyPatch : ModulePatch
-    {
-        protected override MethodBase GetTargetMethod()
-        {
-            return AccessTools.Method(typeof(BotMemoryClass), "AddEnemy");
-        }
-
-        [PatchPrefix]
-        private static bool PatchPrefix(BotMemoryClass __instance, [NotNull] IPlayer enemy, BotSettingsClass groupInfo, bool onActivation)
-        {
-            if (enemy == null) return true;
-
-            var botOwner_0 = AccessTools.Field(typeof(BotMemoryClass), "botOwner_0").GetValue(__instance) as BotOwner;
-
-            // - do not assign enemies to followers if the enemy just spawned
-            if (BossPlayers.IsFollower(botOwner_0))
-            {
-                /*if(enemy != null && (groupInfo.Cause == EBotEnemyCause.addBotAtGroup || groupInfo.Cause == EBotEnemyCause.addBotNoGroup))
-                    return false;*/
-                Modules.Logger.LogTrace($"Follower {botOwner_0.Profile.Nickname} added enemy {enemy.Profile.Nickname} because of cause {groupInfo.Cause}");
-            }
-
-            return true;
-        }
-    }
-    /**
      * Patch to turn "Assist" followers into hostile on friendly fire
      * @notinuse
      */
@@ -103,4 +75,18 @@ namespace friendlyPMC.Patches
             }
         }
     }
+    // this is used for debug purposes that is why it stays disabled
+    /*[HarmonyPatch(typeof(BotMemoryClass), "GoalEnemy", MethodType.Setter)]
+    public static class GoalEnemyTracePatch
+    {
+        public static void Postfix(BotMemoryClass __instance, EnemyInfo value)
+        {
+            var botOwner_0 = AccessTools.Field(typeof(BotMemoryClass), "botOwner_0").GetValue(__instance) as BotOwner;
+
+            if(BossPlayers.IsFollower(botOwner_0) && value != null)
+            {
+                Modules.Logger.LogTrace($"Follower accquired an enemy because " + value.GroupInfo.Cause + "flags : " + value.HaveSeen + "; " + value.ShallKnowEnemy());
+            }
+        }
+    }*/
 }
