@@ -267,17 +267,19 @@ namespace friendlyPMC.Components
                 interestPosition = botOwner_0.GetPlayer.Transform.position;
             }
 
+            Utils.Enemy.EnemyDistance enemyDistance = Enemy.Distance(botOwner_0);
+
             if (allyTactic)
             {
                 if (botOwner_0.Memory.AttackImmediately && commonLayer.IsEnemyLowThreat())
                 {
-                    if (Enemy.Distance(botOwner_0) <= Enemy.EnemyDistance.Mid)
+                    if (enemyDistance <= Enemy.EnemyDistance.Mid)
                         return EngageEnemy();
                     else
                         return pusherLayer.EnemySearch();
                 }
 
-                if (Enemy.Distance(botOwner_0) > Enemy.EnemyDistance.Mid || !commonLayer.IsEnemyLowThreat()) return sniperLayer.GetDecision();
+                if (enemyDistance > Enemy.EnemyDistance.Mid || !commonLayer.IsEnemyLowThreat()) return sniperLayer.GetDecision();
 
                 return pusherLayer.EnemySearch();
             }
@@ -287,7 +289,7 @@ namespace friendlyPMC.Components
                 if (!ordersAreHold && !ordersAreAttack && holdTactic)
                 {
 
-                    if (botOwner_0.Memory.AttackImmediately && commonLayer.IsEnemyLowThreat() && Utils.Enemy.Distance(botOwner_0) <= Utils.Enemy.EnemyDistance.Close)
+                    if (botOwner_0.Memory.AttackImmediately && commonLayer.IsEnemyLowThreat() && enemyDistance <= Utils.Enemy.EnemyDistance.Close)
                         return EngageEnemy();
 
                 }
@@ -296,13 +298,13 @@ namespace friendlyPMC.Components
             }
             else if (ordersAreAttack || rushTactic) return EngageEnemy(ordersAreAttack);
 
-            if (botOwner_0.Memory.AttackImmediately && Enemy.Distance(botOwner_0) <= Enemy.EnemyDistance.Mid)
+            if (botOwner_0.Memory.AttackImmediately && enemyDistance <= Enemy.EnemyDistance.Mid)
             {
                 return EngageEnemy();
             }
             else
             {
-                if (Enemy.Distance(botOwner_0) >= Enemy.EnemyDistance.Mid || !botOwner_0.Memory.AttackImmediately)
+                if (enemyDistance >= Enemy.EnemyDistance.Mid || !botOwner_0.Memory.AttackImmediately)
                     return new AICoreActionResultStruct<BotLogicDecision>((BotLogicDecision)CustomBotDecisions.GuardToCover, "coverBoss");
                 else
                     return pusherLayer.EnemySearch();
@@ -587,6 +589,8 @@ namespace friendlyPMC.Components
             {
                 AICoreActionResultStruct<BotLogicDecision> decision = sniperLayer.GetDecision();
                 customNavigationPoint_0 = sniperLayer.NavigationPoint;
+
+                sniperLayer.CheckCanSwitchToSecondary(decision, Utils.Enemy.Distance(botOwner_0));
                 return decision;
             }
 
@@ -595,11 +599,28 @@ namespace friendlyPMC.Components
 
         public override AICoreActionEndStruct EndHoldPosition()
         {
-            if (ordersAreHold || allyTactic || (holdTactic && !ordersAreAttack)) return holderLayer.EndHoldPosition();
+            AICoreActionEndStruct endHold;
+            if (ordersAreHold || allyTactic || (holdTactic && !ordersAreAttack))
+                endHold = holderLayer.EndHoldPosition();
+            else if (guardTactic)
+                endHold = guardLayer.EndHoldPosition();
+            else
+                endHold = pusherLayer.EndHoldPosition();
 
-            if (guardTactic) return guardLayer.EndHoldPosition();
+            EnemyInfo goalEnemy = botOwner_0.Memory.GoalEnemy;
 
-            return pusherLayer.EndHoldPosition();
+            if (endHold.Value && sniperTactic && goalEnemy != null && !goalEnemy.IsVisible)
+            {
+                if (
+                    botOwner_0.WeaponManager.Selector.LastEquipmentSlot != EquipmentSlot.FirstPrimaryWeapon &&
+                    Utils.Enemy.DistanceProxy(botOwner_0, botOwner_0.GetPlayer.Transform.position) >= Utils.Enemy.ProxyDistance.Mid
+                )
+                {
+                    botOwner_0.WeaponManager.Selector.TryChangeToMain();
+                }
+            }
+
+            return endHold;
         }
 
         public override AICoreActionEndStruct EndSuppressFire()

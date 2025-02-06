@@ -231,7 +231,7 @@ namespace friendlyPMC
 
             // bot patches to help with various scenarios while being a follower of the player
             new BotGroupAddEnemyPatch().Enable();
-
+            new BotMemoryAddEnemyPatch().Enable();
             //new BotMemoryDamagePatch().Enable();
             new BotGroupUsecEnemyPatch().Enable();
             new ExUsecBrainHitPatch().Enable();
@@ -299,7 +299,6 @@ namespace friendlyPMC
             // set configuration manager
             SetConfiguration();
             // this is used for debug purposes that is why it stays disabled
-            //harmony.PatchAll(typeof(GoalEnemyTracePatch).Assembly);
         }
 
 

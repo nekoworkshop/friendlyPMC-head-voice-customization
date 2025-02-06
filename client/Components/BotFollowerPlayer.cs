@@ -204,6 +204,25 @@ namespace friendlyPMC.Components
                 // add the bot to the player's group, if not already (PickUp case here with spawn)
                 if (_bot.BotsGroup.Id != _player.bossGroup.Id)
                 {
+                    // - disable grouping that comes with questing bots
+                    try
+                    {
+                        if (Chainloader.PluginInfos.ContainsKey("com.DanW.QuestingBots"))
+                        {
+                            Type BotHiveMindMonitor = Type.GetType("SPTQuestingBots.BotLogic.HiveMind.BotHiveMindMonitor, SPTQuestingBots");
+
+                            if (BotHiveMindMonitor != null)
+                            {
+                                MethodInfo separateMethod = BotHiveMindMonitor.GetMethod("SeparateBotFromGroup", BindingFlags.Public | BindingFlags.Static);
+                                separateMethod?.Invoke(null, new object[] { _bot });
+                            }
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Modules.Logger.LogError(e);
+                    }
+
                     _bot.BotsGroup.RemoveAlly(_bot);
                     // - ensure the bot is not marked as enemy already by the others
                     _player.bossGroup.RemoveEnemy(_bot.GetPlayer);
@@ -232,6 +251,24 @@ namespace friendlyPMC.Components
             // if there is no group yet, make one and group the player with the bot (PickUp case here without spawn)
             else
             {
+                // - disable grouping that comes with questing bots
+                try
+                {
+                    if (Chainloader.PluginInfos.ContainsKey("com.DanW.QuestingBots"))
+                    {
+                        Type BotHiveMindMonitor = Type.GetType("SPTQuestingBots.BotLogic.HiveMind.BotHiveMindMonitor, SPTQuestingBots");
+
+                        if (BotHiveMindMonitor != null)
+                        {
+                            MethodInfo separateMethod = BotHiveMindMonitor.GetMethod("SeparateBotFromGroup", BindingFlags.Public | BindingFlags.Static);
+                            separateMethod?.Invoke(null, new object[] { _bot });
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    Modules.Logger.LogError(e);
+                }
                 _bot.BotsGroup.RemoveAlly(_bot);
 
                 var botsGroupField = AccessTools.Field(typeof(BotMemoryClass), "botsGroup_0");

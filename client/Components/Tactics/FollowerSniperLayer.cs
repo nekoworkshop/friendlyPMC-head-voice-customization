@@ -1,4 +1,5 @@
 ﻿using EFT;
+using EFT.InventoryLogic;
 using System;
 using UnityEngine;
 
@@ -161,6 +162,68 @@ namespace friendlyPMC.Components.Tactics
 
                 // - fallback #2, search for a sniping spot
                 return new AICoreActionResultStruct<BotLogicDecision>((BotLogicDecision)CustomBotDecisions.SniperSearch, "sniper.Search");
+            }
+        }
+
+        /**
+         * Have Sniper switch to secondary weapon (if avaialable) if he is getting into close combat
+         **/
+        public void CheckCanSwitchToSecondary(AICoreActionResultStruct<BotLogicDecision> decision, Utils.Enemy.EnemyDistance enemyDistance)
+        {
+            EnemyInfo goalEnemy = botOwner_0.Memory.GoalEnemy;
+            bool enemyClose = enemyDistance == Utils.Enemy.EnemyDistance.Close;
+            bool enemyVeryClose = enemyDistance <= Utils.Enemy.EnemyDistance.VeryClose;
+            // enemy very close, switch to close combat ASAP
+            if (goalEnemy != null && enemyVeryClose)
+            {
+                if (
+                    botOwner_0.WeaponManager.Selector.LastEquipmentSlot != EquipmentSlot.SecondPrimaryWeapon &&
+                    botOwner_0.WeaponManager.Selector.CanChangeToSecondWeapons &&
+                    (
+                        !botOwner_0.Memory.GoalEnemy.HaveSeen ||
+                        Time.time - botOwner_0.Memory.GoalEnemy.PersonalLastSeenTime > 1.5f
+                    )
+                )
+                {
+                    botOwner_0.WeaponManager.Selector.TryChangeWeapon(true);
+                }
+            }
+            else if (goalEnemy != null && customNavigationPoint_0 != null)
+            {
+                // switch to secondary weapon if we are getting closer to the enemy
+                var proxydist = Utils.Enemy.DistanceProxy(botOwner_0, customNavigationPoint_0.Position);
+                if (
+                    !botOwner_0.Memory.GoalEnemy.IsVisible &&
+                        (
+                            decision.Reason == "repositionFast" ||
+                            decision.Reason == "reposition" ||
+                            enemyClose
+                        )
+                    &&
+                    botOwner_0.WeaponManager.Selector.LastEquipmentSlot != EquipmentSlot.SecondPrimaryWeapon &&
+                    botOwner_0.WeaponManager.Selector.CanChangeToSecondWeapons &&
+                    proxydist < Utils.Enemy.ProxyDistance.Mid && proxydist > Utils.Enemy.ProxyDistance.VeryClose
+                )
+                {
+                    botOwner_0.WeaponManager.Selector.TryChangeWeapon(true);
+
+                }
+                // switch back to sniper if we are moving to a sniper shot
+                else if (
+                    Utils.Enemy.DistanceProxy(botOwner_0, customNavigationPoint_0.Position) >= Utils.Enemy.ProxyDistance.Mid &&
+                    !botOwner_0.Memory.GoalEnemy.IsVisible &&
+                        (
+                            decision.Reason == "repositionFast" ||
+                            decision.Reason == "reposition" ||
+                            decision.Reason == "relocateFast" ||
+                            decision.Reason == "sniper.Search"
+                        )
+                    &&
+                    botOwner_0.WeaponManager.Selector.LastEquipmentSlot != EquipmentSlot.FirstPrimaryWeapon
+                )
+                {
+                    botOwner_0.WeaponManager.Selector.TryChangeToMain();
+                }
             }
         }
         public AICoreActionEndStruct EndSniperSearch()
