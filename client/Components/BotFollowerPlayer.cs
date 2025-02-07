@@ -100,14 +100,36 @@ namespace friendlyPMC.Components
             // remove looting brain, if present
             if (Chainloader.PluginInfos.ContainsKey("me.skwizzy.lootingbots"))
             {
-                Type lootingBrain = Type.GetType("LootingBots.Patch.Components.LootingBrain, LootingBots");
+                Type lootingBrain = Type.GetType("LootingBots.Patch.Components.LootingBrain, skwizzy.LootingBots");
 
                 if (lootingBrain != null)
                 {
-                    if (_bot.GetPlayer.TryGetComponent(lootingBrain, out Component component))
+                    if (_bot.GetPlayer.gameObject.TryGetComponent(lootingBrain, out Component component))
                     {
+                        Modules.Logger.LogInfo("Looting brain found, removing it");
                         UnityEngine.Object.Destroy(component);
                     }
+                }
+                else
+                {
+                    Modules.Logger.LogInfo("Looting brain not found");
+                }
+            }
+            // remove questing brain, if present
+            if (QuestingPatch.isQuestingInstalled())
+            {
+                Type questingBrain = Type.GetType("SPTQuestingBots.BotLogic.Objective.BotObjectiveManager, SPTQuestingBots");
+                if (questingBrain != null)
+                {
+                    if (_bot.GetPlayer.gameObject.TryGetComponent(questingBrain, out Component component))
+                    {
+                        Modules.Logger.LogInfo("Questing brain found, removing it");
+                        UnityEngine.Object.Destroy(component);
+                    }
+                }
+                else
+                {
+                    Modules.Logger.LogInfo("Questing brain not found");
                 }
             }
 
@@ -204,23 +226,13 @@ namespace friendlyPMC.Components
                 // add the bot to the player's group, if not already (PickUp case here with spawn)
                 if (_bot.BotsGroup.Id != _player.bossGroup.Id)
                 {
-                    // - disable grouping that comes with questing bots
-                    try
+                    // - bot is some kind of boss of a group, we have to change that
+                    if (_bot.Boss.HaveFollowers() && (_bot.BotsGroup.BossGroup != null) && _bot.Boss.Followers.Count >= 1)
                     {
-                        if (Chainloader.PluginInfos.ContainsKey("com.DanW.QuestingBots"))
+                        foreach (BotOwner follower in _bot.Boss.Followers)
                         {
-                            Type BotHiveMindMonitor = Type.GetType("SPTQuestingBots.BotLogic.HiveMind.BotHiveMindMonitor, SPTQuestingBots");
-
-                            if (BotHiveMindMonitor != null)
-                            {
-                                MethodInfo separateMethod = BotHiveMindMonitor.GetMethod("SeparateBotFromGroup", BindingFlags.Public | BindingFlags.Static);
-                                separateMethod?.Invoke(null, new object[] { _bot });
-                            }
+                            follower.BotFollower.BossToFollow = null;
                         }
-                    }
-                    catch (Exception e)
-                    {
-                        Modules.Logger.LogError(e);
                     }
 
                     _bot.BotsGroup.RemoveAlly(_bot);
@@ -251,24 +263,6 @@ namespace friendlyPMC.Components
             // if there is no group yet, make one and group the player with the bot (PickUp case here without spawn)
             else
             {
-                // - disable grouping that comes with questing bots
-                try
-                {
-                    if (Chainloader.PluginInfos.ContainsKey("com.DanW.QuestingBots"))
-                    {
-                        Type BotHiveMindMonitor = Type.GetType("SPTQuestingBots.BotLogic.HiveMind.BotHiveMindMonitor, SPTQuestingBots");
-
-                        if (BotHiveMindMonitor != null)
-                        {
-                            MethodInfo separateMethod = BotHiveMindMonitor.GetMethod("SeparateBotFromGroup", BindingFlags.Public | BindingFlags.Static);
-                            separateMethod?.Invoke(null, new object[] { _bot });
-                        }
-                    }
-                }
-                catch (Exception e)
-                {
-                    Modules.Logger.LogError(e);
-                }
                 _bot.BotsGroup.RemoveAlly(_bot);
 
                 var botsGroupField = AccessTools.Field(typeof(BotMemoryClass), "botsGroup_0");
@@ -347,7 +341,7 @@ namespace friendlyPMC.Components
             settings.FileSettings.Mind.TIME_TO_FIND_ENEMY = 6f;
             settings.FileSettings.Mind.ATTACK_IMMEDIATLY_CHANCE_0_100 = 0f;
             settings.FileSettings.Mind.CAN_TALK = true;
-            settings.FileSettings.Mind.CAN_STAND_BY = true;
+            settings.FileSettings.Mind.CAN_STAND_BY = false;
             settings.FileSettings.Mind.CAN_TAKE_ANY_ITEM = true;
             settings.FileSettings.Mind.CAN_TAKE_ITEMS = true;
             settings.FileSettings.Mind.TALK_WITH_QUERY = true;

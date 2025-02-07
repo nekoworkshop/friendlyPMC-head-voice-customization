@@ -623,7 +623,7 @@ namespace friendlyPMC.Components.Tactics
                 if (Time.time - LastTimeHit < 2f && ((health < 70f && enemyDistance < Enemy.EnemyDistance.Mid) || health < 60f))
                 {
                     // -- find cover point behind
-                    customNavigationPoint_2 = Covers.GetCover(botOwner_0, botPosition - (botOwner_0.LookDirection * coverSearchRadius), CoverSearchType.closerToSelectedPoint, coverSearchRadius);
+                    customNavigationPoint_2 = GetClosestSafeCoverPoint(botPosition);
                     // -- found nothing, fallback to any cover
                     if (customNavigationPoint_2 == null)
                     {
@@ -638,14 +638,12 @@ namespace friendlyPMC.Components.Tactics
                         // -- critical damage and enemy has enough distance, run for cover
                         if (health < 50f && Enemy.Distance(botOwner_0) > Enemy.EnemyDistance.VeryClose)
                         {
-                            if (botOwner_0.Tactic.IsCurTactic(BotsGroup.BotCurrentTactic.Ambush) == false) botOwner_0.Tactic.SetTactic(BotsGroup.BotCurrentTactic.Ambush);
                             _reachedCover = false;
                             return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.runToCover, "damageCritical");
                         }
                         else
                         {
                             // -- else retreat while shooting
-                            if (botOwner_0.Tactic.IsCurTactic(BotsGroup.BotCurrentTactic.Attack) == false) botOwner_0.Tactic.SetTactic(BotsGroup.BotCurrentTactic.Attack);
                             if (!botOwner_0.Memory.GoalEnemy.IsVisible) botOwner_0.Steering.LookToPoint(botOwner_0.Memory.GoalEnemy.GetCenterPart());
                             _reachedCover = false;
                             return new AICoreActionResultStruct<BotLogicDecision>((BotLogicDecision)CustomBotDecisions.attackRetreat, "backOff");

@@ -35,7 +35,7 @@ namespace friendlyPMC.Actions
 
             if (goalEnemy != null && goalEnemy.CanShoot && goalEnemy.IsVisible)
             {
-                botOwner_0.Steering.LookToPoint(goalEnemy.CurrPosition);
+            botOwner_0.Steering.LookToPoint(goalEnemy.CurrPosition);
                 gclass136_1.Update();
                 return;
             }

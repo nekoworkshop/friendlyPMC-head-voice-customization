@@ -10,22 +10,33 @@
 - x - fix bot not using grenade launcher when asking to do suppression
 - x - when transitioning from combat to follow, ensure the bot is standing and try to tackle to run duck bug
 - x - make bot artillery check positions for friendly
+- x - marksman can switch to secondary weapon when in close combat
 
 - x - test if things are ok with QuestingBots mod
-- - making a boss bot created by QuestingBots a follower will result in him getting stuck
+- x - making a boss bot created by QuestingBots a follower will result in him getting stuck
+
+- x - see why shootfromplace decision crouches the bot
+- x - goToEnemy needs to get closer and close to the enemy
+
+- x - add to known issue the incompatibility with performance improvements mod
+
+- check ammo for secondary weapon when trying to switch to it in marksman tactic
+
+
 
 - #testing - switch cover logic to the one used by the game
-- - sniper search needs some improvement 
+- x - sniper search needs some improvement 
 
 - #testing - fix spawned followers sometimes seeing the Goons as enemies
-- #testing - marksman can switch to secondary weapon when in close combat
+
+- #totest - see what else can be done to help make bots stop getting stuck after throwing a grenade
 
 - fix pickup followers being seen as enemy by the Goons and vice versa
 
 - add slider for how long with a bot be silenced
 
 - add more trade items to Knight (more keys, some ammo and 2 more kits - a sniper and a shotgun)
-- see what else can be done to help make bots stop getting stuck after throwing a grenade
+
 
 - see how we can use HighLightMesh to highlight teammates (optional)
 
@@ -51,12 +62,13 @@ marksman can now switch to secondary weapon when in close combat - you are respo
 increased the distance the bot will go to when using "there gesture" command to 50 meters
 fixed supppression command not using grenade launcher in some cases
 code was refactored on cover and tactics logic to rely more on the in game cover system for a more stable build (note: this can make your followers spread out more)
-attempt to fix the run duck bug when transitioning from combat to follow
+attempt fix the run duck bug when transitioning from combat to follow
 resolved a conflict with QuestingBots mod and picked up followers
 
 Add to known issues:
 - teleporting a follower while he is opening a door will make him glitch out and the only way to restore him is to have him open some other door
-- in very rare cases, your follower can end up stuck in a healing animtion and there is no way to restore him
+- in very rare cases, your follower can end up stuck in a healing animtion and there is no way to restore him. A way to avoid that is to notice if he keeps healing after combat while the health does not seem to go up. Use the fix heal to fully heal him and prevent the bug from happening
+- performance improvements can create conflicts with this mod
 ==================================================================================
 
 

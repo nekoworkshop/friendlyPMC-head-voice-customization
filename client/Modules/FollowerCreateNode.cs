@@ -49,6 +49,9 @@ namespace friendlyPMC.Modules
             if (type == BotLogicDecision.goToEnemy)
                 return new FollowerGoToEnemy(bot);
 
+            if(type == BotLogicDecision.shootFromPlace)
+                return new FollowerShootFromPlace(bot);
+
             if (type == BotLogicDecision.dogFight)
                 return new FollowerDogFight(bot);
 

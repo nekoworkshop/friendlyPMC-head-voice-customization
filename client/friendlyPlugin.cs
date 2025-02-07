@@ -271,9 +271,9 @@ namespace friendlyPMC
 
             // attempt to patch some sain methods
             SAINPatch.PatchSAINIfInstalled(harmony);
-            // some error catchers here - they do not seem related to this mod but causing conflicts
-            /*new GClass1069Patch().Enable();
-            harmony.PatchAll(typeof(LookSensorPatch).Assembly);*/
+            // attempt to patch some questing methods
+            QuestingPatch.PatchQuestingIfInstalled(harmony);
+            new GrenadeThrowPatch().Enable();
             // patch hearing
             new HearingSensorPatch().Enable();
             new FootstepSoundPatch().Enable();

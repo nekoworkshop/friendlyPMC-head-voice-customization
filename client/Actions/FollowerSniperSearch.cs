@@ -279,7 +279,6 @@ namespace friendlyPMC.Actions
 
                         if (!_lastPosition.HasValue && botOwner_0.BotFollower.HaveBoss)
                         {
-
                             _actionsQueue.Enqueue(() =>
                             {
                                 // else find the closest cover to the boss and cover him
@@ -294,7 +293,8 @@ namespace friendlyPMC.Actions
                                     5f,
                                     (CustomNavigationPoint point) =>
                                     {
-                                        if (!GClass369.IsDangerPositionFarEnough(point.Position, new Vector3[] { bossPos }, 0.5f * 0.5f)) return false;
+                                        if (!GClass369.IsDangerPositionFarEnough(point.Position, new Vector3[] { bossPos }, 0.5f * 0.5f) || !point.CanIHide(new Vector3[] { enemySpot }, 5f, true)) return false;
+
                                         return true;
                                     }
                                 );

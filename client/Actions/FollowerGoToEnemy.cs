@@ -96,14 +96,11 @@ namespace friendlyPMC.Actions
 
         public void AimAndMove()
         {
-            Class115 @class = new Class115();
-            @class.gclass185_0 = this;
-            @class.recalcTime = 0f;
 
             bool flag;
             Vector3 centerPos;
             Vector3 enemyPos = botOwner_0.Memory.GoalEnemy.EnemyLastPosition;
-            if (botOwner_0.Memory.IsInCover && !this.botOwner_0.LookSensor.EnoughDistToShoot(out flag))
+            if (botOwner_0.Memory.IsInCover && !botOwner_0.LookSensor.EnoughDistToShoot(out flag))
             {
                 centerPos = (botOwner_0.Transform.position + enemyPos) / 2f;
             }
@@ -112,19 +109,35 @@ namespace friendlyPMC.Actions
                 centerPos = enemyPos;
             }
 
-            @class.withShoot = true;
-            CoverShootType coverShootType = @class.withShoot ? CoverShootType.shoot : CoverShootType.hide;
-            CoverSearchType searchType = this.botOwner_0.Tactic.SubTactic.SearchTypeAttackMoving(coverShootType);
 
-            if (this.float_1 < Time.time)
+            if (float_1 < Time.time)
             {
-                this.float_1 = Time.time + 2f;
-                this.botOwner_0.BotAttackManager.TryPointGetting(centerPos, coverShootType, GClass583.Core.START_DIST_TO_COV, searchType, this.botOwner_0.CurrentEnemyTargetPosition(true), new Action<CustomNavigationPoint>(@class.method_0), new Action(Class116.class116_0.method_0), true, false, true, null);
+                float_1 = Time.time + 2f;
+                var shootPointClass = botOwner_0.CurrentEnemyTargetPosition(true);
+                var point = Utils.Covers.GetClosestCoverPoint(botOwner_0, centerPos, 50f, 0.5f, cover =>
+                {
+                    if (GClass344.CanShootToTarget(shootPointClass, cover, botOwner_0.LookSensor.Mask, false))
+                    {
+                        cover.CanIShootToEnemy = true;
+                        return true;
+                    }
+
+                    return false;
+                });
+
+                if(point != null)
+                {
+                    botOwner_0.GoToPoint(point);
+                } 
+                else
+                {
+                    botOwner_0.GoToPoint(centerPos);
+                }
             }
 
             botOwner_0.BotAttackManager.UpdateNextTick();
 
-            this.AimingAndShoot();
+            AimingAndShoot();
         }
 
         // replication of MoveToEnemyData.TryToMoveToEnemy, but adapted to use our cover system
