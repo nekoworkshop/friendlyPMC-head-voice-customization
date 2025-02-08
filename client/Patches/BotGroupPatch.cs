@@ -76,7 +76,7 @@ namespace friendlyPMC.Patches
             var isAPlayerGroup = BossPlayers.IsBossGroup(__instance.Id);
             BotsGroup bossGroup = plBoss != null ? plBoss.bossGroup : null;
 
-            bool isInitialCause = (cause == EBotEnemyCause.initial || cause == EBotEnemyCause.AddNewMember || cause == EBotEnemyCause.warn);
+            bool isInitialCause = (cause == EBotEnemyCause.initial || cause == EBotEnemyCause.AddNewMember || cause == EBotEnemyCause.warn || cause == EBotEnemyCause.addBotNoGroup);
 
             // prevent Rogues from adding the player and his followers as enemies if they are friends with the Goons
             var _members = AccessTools.Field(typeof(BotsGroup), "_members").GetValue(__instance) as List<BotOwner>;
@@ -187,6 +187,11 @@ namespace friendlyPMC.Patches
                         return false;
                     }
                 }
+            }
+
+            if(person != null && Utils.Props.BossFollowersType.Contains(person.Profile.Info.Settings.Role))
+            {
+                Modules.Logger.LogTrace("Adding rogue as enemy because " + cause);
             }
 
             return true;

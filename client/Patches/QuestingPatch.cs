@@ -15,6 +15,8 @@ namespace friendlyPMC.Patches
     {
 
         private static Type questingBrainType = null;
+
+        private static Type registrationType = null;
         public static bool isQuestingInstalled()
         {
             return Chainloader.PluginInfos.ContainsKey("com.DanW.QuestingBots");
@@ -32,10 +34,23 @@ namespace friendlyPMC.Patches
                 questingBrainType = Type.GetType("SPTQuestingBots.BotLogic.Objective.BotObjectiveManager, SPTQuestingBots");
             }
 
+            if(registrationType == null)
+            {
+                registrationType = Type.GetType("SPTQuestingBots.Controllers.BotRegistrationManager, SPTQuestingBots");
+            }
+
+            if (registrationType != null)
+            {
+                harmony.Patch(AccessTools.Method(registrationType, "updateHostileGroupEnemies", new[] { typeof(BotsGroup) }), new HarmonyMethod(typeof(QuestingPatch).GetMethod(nameof(UpdateHostileGroupEnemiesPatch), BindingFlags.NonPublic | BindingFlags.Static)));
+            }
+
             if (questingBrainType != null)
             {
-                harmony.Patch(AccessTools.Method(questingBrainType, "Update"), new HarmonyMethod(typeof(QuestingPatch).GetMethod(nameof(PatchQuestingUpdate), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance)));
+                //harmony.Patch(AccessTools.Method(questingBrainType, "Update"), new HarmonyMethod(typeof(QuestingPatch).GetMethod(nameof(PatchQuestingUpdate), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance)));
+            }
 
+            if (questingBrainType != null && registrationType != null)
+            {
                 Modules.Logger.LogInfo("QuestingBots Patched");
             }
         }
@@ -64,6 +79,17 @@ namespace friendlyPMC.Patches
             }
 
             if (BossPlayers.IsFollower(botOwner))
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        [HarmonyPrefix]
+        private static bool UpdateHostileGroupEnemiesPatch(BotsGroup group)
+        {
+            if(BossPlayers.IsBossGroup(group.Id))
             {
                 return false;
             }

@@ -21,8 +21,8 @@
 - x - switch cover logic to the one used by the game
 - x - sniper search needs some improvement 
 
-- fix spawned followers sometimes seeing the Goons as enemies
-- fix pickup followers being seen as enemy by the Goons and vice versa
+- x - fix spawned followers sometimes seeing the Goons as enemies
+- x - fix pickup followers being seen as enemy by the Goons and vice versa
 
 - see what else can be done to help make bots stop getting stuck after throwing a grenade
 - - investigate why followers still use grenades when the option is disabled
@@ -65,6 +65,7 @@ Add to known issues:
 - in very rare cases, your follower can end up stuck in a healing animtion and there is no way to restore him. A way to avoid that is to notice if he keeps healing after combat while the health does not seem to go up. Use the fix heal to fully heal him and prevent the bug from happening
 - performance improvements can create conflicts with this mod
 - using the "pause" mod can result in your followers no longer having any footsteps sound
+- add explanation on why mods conflict with ours, especially the ones attempting to "fix" whatever they think is wrong with the game
 ==================================================================================
 
 

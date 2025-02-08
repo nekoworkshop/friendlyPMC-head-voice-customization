@@ -116,7 +116,7 @@ namespace friendlyPMC.Components
                 }
             }
             // remove questing brain, if present
-            if (QuestingPatch.isQuestingInstalled())
+            /*if (QuestingPatch.isQuestingInstalled())
             {
                 Type questingBrain = Type.GetType("SPTQuestingBots.BotLogic.Objective.BotObjectiveManager, SPTQuestingBots");
                 if (questingBrain != null)
@@ -131,7 +131,7 @@ namespace friendlyPMC.Components
                 {
                     Modules.Logger.LogInfo("Questing brain not found");
                 }
-            }
+            }*/
 
             // reset bot animation stances
             _bot.GetPlayer.MovementContext.SetPatrol(false);
@@ -306,38 +306,20 @@ namespace friendlyPMC.Components
                 _bot.Settings.GetEnemyBotTypes().RemoveAll(x => _rougeTypes.Contains(x));
                 _bot.Settings.GetFriendlyBotTypes().AddRange(_rougeTypes);
 
-                foreach (var item in _bot.EnemiesController.EnemyInfos)
-                {
-                    if (_rougeTypes.Contains(item.Key.Profile.Info.Settings.Role))
-                    {
-                        item.Value.SetIgnoreState(true);
-                    }
-                }
-
                 var _bots = AccessTools.Field(typeof(BotSpawner), "_bots").GetValue(_bot.BotsController.BotSpawner) as BotsClass;
 
                 foreach (var item in _bots.BotOwners)
                 {
-                    if (_rougeTypes.Contains(item.Profile.Info.Settings.Role))
-                    {
-                        foreach (var en in item.EnemiesController.EnemyInfos)
-                        {
-                            if (en.Key.ProfileId == _bot.ProfileId)
-                            {
-                                en.Value.SetIgnoreState(true);
-                                if (item.BotsGroup.Enemies.ContainsKey(_bot.GetPlayer))
-                                {
-                                    item.BotsGroup.RemoveEnemy(_bot.GetPlayer);
-                                }
-                                break;
-                            }
-                        }
+                    if (!_rougeTypes.Contains(item.Profile.Info.Settings.Role)) continue;
+;
+                    _bot.BotsGroup.RemoveEnemy(item);
+                    _bot.BotsGroup.AddNeutral(item);
+                    _bot.BotsGroup.AddAlly(item.GetPlayer);
 
-                        if (_bot.BotsGroup.Enemies.ContainsKey(item.GetPlayer))
-                        {
-                            _bot.BotsGroup.RemoveEnemy(item.GetPlayer);
-                        }
-                    }
+                    _bot.Memory.DeleteInfoAboutEnemy(item);
+
+                    item.BotsGroup.RemoveEnemy(_bot);
+                    item.BotsGroup.AddNeutral(_bot);
                 }
             }
 
