@@ -5,47 +5,9 @@ using friendlyPMC.Modules;
 using HarmonyLib;
 
 using System.Reflection;
-using JetBrains.Annotations;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace friendlyPMC.Patches
 {
-    /**
-    * Patch to stop followers from accidentally making the Goons enemies
-    */
-    internal class BotMemoryAddEnemyPatch : ModulePatch
-    {
-        protected override MethodBase GetTargetMethod()
-        {
-            return AccessTools.Method(typeof(BotMemoryClass), "AddEnemy");
-        }
-
-        [PatchPostfix]
-        private static void PatchPostfix(BotMemoryClass __instance, [NotNull] IPlayer enemy, BotSettingsClass groupInfo, bool onActivation)
-        {
-            if (enemy == null) return;
-
-            var botOwner_0 = AccessTools.Field(typeof(BotMemoryClass), "botOwner_0").GetValue(__instance) as BotOwner;
-
-            if (BossPlayers.IsFollower(botOwner_0) && (new List<EBotEnemyCause> { EBotEnemyCause.addBotAtGroup, EBotEnemyCause.addBotNoGroup, EBotEnemyCause.AddNewMember, EBotEnemyCause.warn, EBotEnemyCause.initial }).Contains(groupInfo.Cause))
-            {
-                var follower = BossPlayers.GetFollowers().Find(f => f.IsBot(botOwner_0));
-
-                var friendly = Utils.Props.BossFollowersType.ToList();
-                friendly.Add(WildSpawnType.exUsec);
-
-                if (follower != null && friendly.Contains(enemy.Profile.Info.Settings.Role) && BotGroupAddEnemyPatch.PlayerHasKnightQuest(follower.GetBoss().realPlayer.Profile))
-                {
-                    var enemyInfo = botOwner_0.EnemiesController.EnemyInfos.FirstOrDefault(e => e.Key.ProfileId == enemy.ProfileId);
-                    if (enemyInfo.Value != null)
-                    {
-                        enemyInfo.Value.IgnoreUntilAggression = true;
-                    }
-                }
-            }
-        }
-    }
     /**
      * Patch to turn "Assist" followers into hostile on friendly fire
      * @notinuse

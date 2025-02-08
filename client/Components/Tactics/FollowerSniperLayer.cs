@@ -185,7 +185,11 @@ namespace friendlyPMC.Components.Tactics
                     )
                 )
                 {
-                    botOwner_0.WeaponManager.Selector.TryChangeWeapon(true);
+                    Weapon SecondaryWeapon = botOwner_0.GetPlayer.InventoryController.Inventory.Equipment.GetSlot(EquipmentSlot.SecondPrimaryWeapon).ContainedItem as Weapon;
+                    if (SecondaryWeapon != null && SecondaryWeapon.GetCurrentMagazine() != null && SecondaryWeapon.GetCurrentMagazine().Cartridges.Count > 0)
+                    {
+                        botOwner_0.WeaponManager.Selector.TryChangeWeapon(true);
+                    }
                 }
             }
             else if (goalEnemy != null && customNavigationPoint_0 != null)

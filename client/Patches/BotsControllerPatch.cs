@@ -1210,7 +1210,7 @@ namespace friendlyPMC.Patches
         private static bool PatchPrefix(BossSpawnScenario __instance)
         {
 
-            if (!Singleton<AbstractGame>.Instantiated) return true;
+            if (!Singleton<AbstractGame>.Instantiated || GamePlayerOwner.MyPlayer == null) return true;
 
             if (GamePlayerOwner.MyPlayer.HealthController == null || !GamePlayerOwner.MyPlayer.HealthController.IsAlive)
             {

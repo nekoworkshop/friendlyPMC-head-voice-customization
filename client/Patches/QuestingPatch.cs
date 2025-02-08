@@ -34,19 +34,42 @@ namespace friendlyPMC.Patches
 
             if (questingBrainType != null)
             {
-                harmony.Patch(AccessTools.Method(questingBrainType, "Update"), new HarmonyMethod(typeof(QuestingPatch).GetMethod(nameof(PatchQuestingUpdate), BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance)));
+                harmony.Patch(AccessTools.Method(questingBrainType, "Update"), new HarmonyMethod(typeof(QuestingPatch).GetMethod(nameof(PatchQuestingUpdate), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance)));
+
+                Modules.Logger.LogInfo("QuestingBots Patched");
             }
         }
 
 
         [HarmonyPrefix]
-        private static bool PatchQuestingUpdate(object __instance, BotOwner ___botOwner)
+        private static bool PatchQuestingUpdate(object __instance)
         {
-            if(BossPlayers.IsFollower(___botOwner))
+            if (__instance == null)
+            {
+                return true;
+            }
+
+            var botOwnerField = AccessTools.Field(__instance.GetType(), "botOwner");
+
+            if (botOwnerField == null)
+            {
+                return true;
+            }
+
+            var botOwner = botOwnerField.GetValue(__instance) as BotOwner;
+
+            if (botOwner == null)
+            {
+                return true;
+            }
+
+            if (BossPlayers.IsFollower(botOwner))
             {
                 return false;
             }
+
             return true;
         }
+
     }
 }

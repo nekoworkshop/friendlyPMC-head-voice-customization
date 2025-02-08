@@ -1,5 +1,5 @@
 -- === 3.10 === ---:
-- investigate using reverse map what makes followers accquire enemies through walls (it's the game - we can't do anything about it)
+- x - investigate using reverse map what makes followers accquire enemies through walls (it's the game - we can't do anything about it)
 
 - x - make followers count for kill-based quests
 - x - increase the distance the bot will go to when using "there gesture" command
@@ -11,32 +11,27 @@
 - x - when transitioning from combat to follow, ensure the bot is standing and try to tackle to run duck bug
 - x - make bot artillery check positions for friendly
 - x - marksman can switch to secondary weapon when in close combat
-
 - x - test if things are ok with QuestingBots mod
 - x - making a boss bot created by QuestingBots a follower will result in him getting stuck
-
 - x - see why shootfromplace decision crouches the bot
 - x - goToEnemy needs to get closer and close to the enemy
-
 - x - add to known issue the incompatibility with performance improvements mod
+- x - check ammo for secondary weapon when trying to switch to it in marksman tactic
 
-- check ammo for secondary weapon when trying to switch to it in marksman tactic
-
-
-
-- #testing - switch cover logic to the one used by the game
+- x - switch cover logic to the one used by the game
 - x - sniper search needs some improvement 
 
-- #testing - fix spawned followers sometimes seeing the Goons as enemies
-
-- #totest - see what else can be done to help make bots stop getting stuck after throwing a grenade
-
+- fix spawned followers sometimes seeing the Goons as enemies
 - fix pickup followers being seen as enemy by the Goons and vice versa
+
+- see what else can be done to help make bots stop getting stuck after throwing a grenade
+- - investigate why followers still use grenades when the option is disabled
 
 - add slider for how long with a bot be silenced
 
 - add more trade items to Knight (more keys, some ammo and 2 more kits - a sniper and a shotgun)
 
+- add radar addon to see friendly bots on radar
 
 - see how we can use HighLightMesh to highlight teammates (optional)
 
@@ -69,6 +64,7 @@ Add to known issues:
 - teleporting a follower while he is opening a door will make him glitch out and the only way to restore him is to have him open some other door
 - in very rare cases, your follower can end up stuck in a healing animtion and there is no way to restore him. A way to avoid that is to notice if he keeps healing after combat while the health does not seem to go up. Use the fix heal to fully heal him and prevent the bug from happening
 - performance improvements can create conflicts with this mod
+- using the "pause" mod can result in your followers no longer having any footsteps sound
 ==================================================================================
 
 

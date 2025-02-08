@@ -231,7 +231,6 @@ namespace friendlyPMC
 
             // bot patches to help with various scenarios while being a follower of the player
             new BotGroupAddEnemyPatch().Enable();
-            new BotMemoryAddEnemyPatch().Enable();
             //new BotMemoryDamagePatch().Enable();
             new BotGroupUsecEnemyPatch().Enable();
             new ExUsecBrainHitPatch().Enable();

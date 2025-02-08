@@ -181,7 +181,7 @@ namespace friendlyPMC.Components.Tactics
 
             if (!botOwner_0.Memory.GoalEnemy.IsSuppressed() && goalEnemy.ShallISuppress())
             {
-                bool useGrenade = botOwner_0.Settings.FileSettings.Core.CanGrenade && GClass824.Random(0f, 2f) > 1f && Utils.Enemy.Distance(botOwner_0) <= Utils.Enemy.EnemyDistance.Close;
+                bool useGrenade = botOwner_0.Settings.FileSettings.Core.CanGrenade && GClass824.Random(0f, 2f) > 1f && Utils.Enemy.Distance(botOwner_0) == Utils.Enemy.EnemyDistance.Close;
                 ThrowWeapType? grenadeType = new ThrowWeapType?(ThrowWeapType.frag_grenade);
                 // - check if player is too close when using grenade
                 if (useGrenade && botOwner_0.WeaponManager.Grenades.HaveGrenadeOfType(grenadeType.Value))
@@ -191,7 +191,7 @@ namespace friendlyPMC.Components.Tactics
                         useGrenade = false;
                     }
                 }
-                return base.method_29(useGrenade, this.method_31());
+                return method_29(useGrenade, this.method_31());
             }
 
             return null;
@@ -327,7 +327,7 @@ namespace friendlyPMC.Components.Tactics
         {
             if (!botOwner_0.WeaponManager.Selector.CanChangeToSecondWeapons) return null;
             GClass441 selector = botOwner_0.WeaponManager.Selector as GClass441;
-   
+
             if (selector != null && (selector.SecondPrimaryWeapon as Weapon) != null && (selector.SecondPrimaryWeapon as Weapon).IsGrenadeLauncher)
             {
                 RaycastHit[] hits = new RaycastHit[20];
@@ -407,7 +407,7 @@ namespace friendlyPMC.Components.Tactics
                     }
                     return false;
                 });
- 
+
                 botOwner_0.SuppressShoot.InitToPoints(list_2, suppPosition);
 
                 float delay = (float)list_2.Count * 2f;

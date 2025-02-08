@@ -207,6 +207,8 @@ namespace friendlyPMC.Components
             if (_bot.BotLight != null && _bot.BotLight.IsEnable) _bot.BotLight.TurnOff(false, true);
             // make bot follower of player
             _player.AddFollower(_bot);
+
+            bool isPickedUp = !_IsSquadMate || _player.bossGroup == null || _player.bossGroup != _bot.BotsGroup;
             // make bot join the player's group
             if (_player.bossGroup != null)
             {
@@ -236,22 +238,18 @@ namespace friendlyPMC.Components
                     }
 
                     _bot.BotsGroup.RemoveAlly(_bot);
+                    _bot.BotsGroup = _player.bossGroup;
+
                     // - ensure the bot is not marked as enemy already by the others
                     _player.bossGroup.RemoveEnemy(_bot.GetPlayer);
-
-                    _bot.BotsGroup = _player.bossGroup;
-                    var botsGroupField = AccessTools.Field(typeof(BotMemoryClass), "botsGroup_0");
-                    botsGroupField.SetValue(_bot.Memory, _bot.BotsGroup);
-
-                    var _groupRequestController = AccessTools.Field(typeof(BotRequestController), "_groupRequestController");
-                    (_groupRequestController.GetValue(_bot.BotRequestController) as BotGroupRequestController).OnAddRequest -= _bot.BotRequestController.method_0;
-                    _groupRequestController.SetValue(_bot.BotRequestController, null);
-
+    
                     var botEnemies = _bot.EnemiesController.EnemyInfos.ToList();
                     foreach (var item in botEnemies)
                     {
                         _bot.Memory.DeleteInfoAboutEnemy(item.Key);
                     }
+
+                    isPickedUp = true;
 
                     _player.bossGroup.AddMember(_bot, false);
                     foreach (var en in _player.bossGroup.Enemies)
@@ -263,12 +261,9 @@ namespace friendlyPMC.Components
             // if there is no group yet, make one and group the player with the bot (PickUp case here without spawn)
             else
             {
-                _bot.BotsGroup.RemoveAlly(_bot);
+                isPickedUp = true;
 
-                var botsGroupField = AccessTools.Field(typeof(BotMemoryClass), "botsGroup_0");
-                var _groupRequestController = AccessTools.Field(typeof(BotRequestController), "_groupRequestController");
-                (_groupRequestController.GetValue(_bot.BotRequestController) as BotGroupRequestController).OnAddRequest -= _bot.BotRequestController.method_0;
-                _groupRequestController.SetValue(_bot.BotRequestController, null);
+                _bot.BotsGroup.RemoveAlly(_bot);
 
                 _bot.Settings.GetEnemyBotTypes().RemoveAll(x => Utils.Props.friendlyBotTypes.Contains(x));
                 _bot.Settings.GetFriendlyBotTypes().AddRange(Utils.Props.friendlyBotTypes);
@@ -277,8 +272,6 @@ namespace friendlyPMC.Components
                 BotsGroup group = _bot.BotsController.BotSpawner.GetGroupAndSetEnemies(_bot, zone);
 
                 _bot.BotsGroup = group;
-                botsGroupField.SetValue(_bot.Memory, group);
-                _groupRequestController.SetValue(_bot.BotRequestController, group.RequestsController);
 
                 // - go through the enemy filtering process
                 var groupEnemies = _bot.BotsGroup.Enemies;
@@ -292,6 +285,60 @@ namespace friendlyPMC.Components
                 BossPlayers.AddGroupToBoss(_player, group);
 
                 _bot.Memory.GoalEnemy = null;
+            }
+
+            if(isPickedUp)
+            {
+                // ensure bot sees the player's group as his group
+                var botsGroupField = AccessTools.Field(typeof(BotMemoryClass), "botsGroup_0");
+                var _groupRequestController = AccessTools.Field(typeof(BotRequestController), "_groupRequestController");
+                (_groupRequestController.GetValue(_bot.BotRequestController) as BotGroupRequestController).OnAddRequest -= _bot.BotRequestController.method_0;
+
+                botsGroupField.SetValue(_bot.Memory, _bot.BotsGroup);
+                _groupRequestController.SetValue(_bot.BotRequestController, null);
+            }
+
+            // ensure the Goons sees the new member as ally and vice versa
+            if (!Utils.Props.BossFollowersType.Contains(_bot.Profile.Info.Settings.Role) && BotGroupAddEnemyPatch.PlayerHasKnightQuest(_player.realPlayer.Profile))
+            {
+                var _rougeTypes = Utils.Props.BossFollowersType.ToList();
+                _rougeTypes.Add(WildSpawnType.exUsec);
+                _bot.Settings.GetEnemyBotTypes().RemoveAll(x => _rougeTypes.Contains(x));
+                _bot.Settings.GetFriendlyBotTypes().AddRange(_rougeTypes);
+
+                foreach (var item in _bot.EnemiesController.EnemyInfos)
+                {
+                    if (_rougeTypes.Contains(item.Key.Profile.Info.Settings.Role))
+                    {
+                        item.Value.SetIgnoreState(true);
+                    }
+                }
+
+                var _bots = AccessTools.Field(typeof(BotSpawner), "_bots").GetValue(_bot.BotsController.BotSpawner) as BotsClass;
+
+                foreach (var item in _bots.BotOwners)
+                {
+                    if (_rougeTypes.Contains(item.Profile.Info.Settings.Role))
+                    {
+                        foreach (var en in item.EnemiesController.EnemyInfos)
+                        {
+                            if (en.Key.ProfileId == _bot.ProfileId)
+                            {
+                                en.Value.SetIgnoreState(true);
+                                if (item.BotsGroup.Enemies.ContainsKey(_bot.GetPlayer))
+                                {
+                                    item.BotsGroup.RemoveEnemy(_bot.GetPlayer);
+                                }
+                                break;
+                            }
+                        }
+
+                        if (_bot.BotsGroup.Enemies.ContainsKey(item.GetPlayer))
+                        {
+                            _bot.BotsGroup.RemoveEnemy(item.GetPlayer);
+                        }
+                    }
+                }
             }
 
             // apply the settings modifier
