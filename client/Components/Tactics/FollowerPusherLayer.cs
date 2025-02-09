@@ -413,8 +413,6 @@ namespace friendlyPMC.Components.Tactics
                 }
 
 
-                //GetCoverPoint(botOwner_0.GetPlayer.Transform.position, nearSearchRadius);
-
                 return aICoreActionEndStruct_1;
             }
             catch (Exception e)
@@ -434,26 +432,7 @@ namespace friendlyPMC.Components.Tactics
 
         public CustomNavigationPoint GetClosestAttackCoverPoint(Vector3 centerPosition, float maxDistance = 150f)
         {
-            ShootPointClass shootPointClass = botOwner_0.CurrentEnemyTargetPosition(false);
-
-            customNavigationPoint_0 = Utils.Covers.GetClosestCoverPoint(
-                botOwner_0,
-                centerPosition,
-                maxDistance,
-                5f,
-                point =>
-                {
-
-                    if (GClass344.CanShootToTarget(shootPointClass, point, botOwner_0.LookSensor.Mask, false))
-                    {
-                        point.CanIShootToEnemy = true;
-                        return true;
-                    }
-                    return false;
-                }
-            );
-
-            if (customNavigationPoint_0 != null) botOwner_0.Tactic.SetTactic(BotsGroup.BotCurrentTactic.Attack);
+            customNavigationPoint_0 = commonLayer.GetClosestShootCover(centerPosition, 150f, 5f);
             return customNavigationPoint_0;
         }
 

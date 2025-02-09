@@ -243,6 +243,8 @@ namespace friendlyPMC.Actions
             {
                 Vector3 enemySpot = botOwner_0.Memory.GoalEnemy.CurrPosition;
                 ShootPointClass shootPointClass = botOwner_0.CurrentEnemyTargetPosition(true);
+                float _weaponShootDistMaxSqr = botOwner_0.LookSensor.MaxShootDist * botOwner_0.LookSensor.MaxShootDist;
+
                 // get closest cover to the bot from where he can shoot the enemy
                 CustomNavigationPoint Spot = Utils.Covers.GetClosestCoverPoint(
                     botOwner_0,
@@ -251,6 +253,7 @@ namespace friendlyPMC.Actions
                     minDist,
                     point =>
                     {
+                        if ((point.Position - shootPointClass.Point).sqrMagnitude >= _weaponShootDistMaxSqr) return false;
                         if (GClass344.CanShootToTarget(shootPointClass, point, botOwner_0.LookSensor.Mask, false))
                         {
                             point.CanIShootToEnemy = true;

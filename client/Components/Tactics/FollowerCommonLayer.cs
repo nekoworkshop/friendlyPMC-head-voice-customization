@@ -365,9 +365,15 @@ namespace friendlyPMC.Components.Tactics
 
             ShootPointClass shootPointClass = botOwner_0.CurrentEnemyTargetPosition(false);
 
+            float _weaponShootDistMaxSqr = botOwner_0.LookSensor.MaxShootDist * botOwner_0.LookSensor.MaxShootDist;
+
             customNavigationPoint_1 = Covers.GetClosestCoverPoint(botOwner_0, centerPosition, maxDistance, minDistance, point =>
             {
+                // does it need to be between the bot and the enemy
                 if (inbetween && !Covers.IsPointBetween(point.Position, botOwner_0.Position, centerPosition)) return false;
+                // has distance enough to shoot
+                if((point.Position - shootPointClass.Point).sqrMagnitude >= _weaponShootDistMaxSqr) return false;
+                // can shoot from this point
                 if (GClass344.CanShootToTarget(shootPointClass, point, botOwner_0.LookSensor.Mask, false))
                 {
                     point.CanIShootToEnemy = true;

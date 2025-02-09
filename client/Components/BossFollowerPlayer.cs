@@ -22,13 +22,8 @@ namespace friendlyPMC.Components
 
             NpcMessage.RemoveNpc(bot.ProfileId);
 
-            List<WildSpawnType> bossRoles = new List<WildSpawnType> {
-                WildSpawnType.bossKnight,
-                WildSpawnType.followerBigPipe,
-                WildSpawnType.followerBirdEye
-            };
             // when questing with bosses, there will not be any messages from them
-            if(!bossRoles.Contains(bossRole) || !Utils.Utils.FlagGet("questGoons"))
+            if(!Utils.Props.BossFollowersType.Contains(bossRole) || !Utils.Utils.FlagGet("questGoons"))
                 NpcMessage.AddNpc(bot, false, true);
         }
 

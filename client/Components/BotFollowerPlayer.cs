@@ -208,7 +208,8 @@ namespace friendlyPMC.Components
             // make bot follower of player
             _player.AddFollower(_bot);
 
-            bool isPickedUp = !_IsSquadMate || _player.bossGroup == null || _player.bossGroup != _bot.BotsGroup;
+            bool isPickedUp = !_IsSquadMate && (_player.bossGroup == null || _player.bossGroup.Id != _bot.BotsGroup.Id);
+
             // make bot join the player's group
             if (_player.bossGroup != null)
             {
@@ -299,7 +300,7 @@ namespace friendlyPMC.Components
             }
 
             // ensure the Goons sees the new member as ally and vice versa
-            if (!Utils.Props.BossFollowersType.Contains(_bot.Profile.Info.Settings.Role) && BotGroupAddEnemyPatch.PlayerHasKnightQuest(_player.realPlayer.Profile))
+            if (!Utils.Props.BossFollowersType.Contains(_botRole) && BotGroupAddEnemyPatch.PlayerHasKnightQuest(_player.realPlayer.Profile))
             {
                 var _rougeTypes = Utils.Props.BossFollowersType.ToList();
                 _rougeTypes.Add(WildSpawnType.exUsec);
