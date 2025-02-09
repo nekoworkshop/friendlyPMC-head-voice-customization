@@ -320,6 +320,9 @@ namespace friendlyPMC.Components
 
                     item.BotsGroup.RemoveEnemy(_bot);
                     item.BotsGroup.AddNeutral(_bot);
+                    item.BotsGroup.AddAlly(_bot.GetPlayer);
+
+                    item.Memory.DeleteInfoAboutEnemy(_bot);
                 }
             }
 
@@ -376,6 +379,7 @@ namespace friendlyPMC.Components
             settings.FileSettings.Mind.TALK_WITH_QUERY = true;
             settings.FileSettings.Mind.CAN_THROW_REQUESTS = true;
             settings.FileSettings.Mind.CAN_DROP_ITEMS = true;
+            settings.FileSettings.Mind.CAN_USE_MEDS = true;
             settings.FileSettings.Mind.MEDS_ONLY_SAFE_CONTAINER = false;
             settings.FileSettings.Mind.SURGE_KIT_ONLY_SAFE_CONTAINER = false;
 
@@ -508,7 +512,7 @@ namespace friendlyPMC.Components
             // - need no food
             bot.GetPlayer.HealthController.DisableMetabolism();
             // - and blackout does not affect them
-            bot.GetPlayer.ActiveHealthController.DoPainKiller();
+            //bot.GetPlayer.ActiveHealthController.DoPainKiller();
             // - have followers share the same groupId as the player
             _grouId = bot.GetPlayer.Profile.Info.GroupId;
             _teamId = bot.GetPlayer.Profile.Info.TeamId;

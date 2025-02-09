@@ -51,6 +51,8 @@ namespace friendlyPMC.Components
 
             
             bot.Settings.FileSettings.Look.LOOK_THROUGH_GRASS = false;
+
+            bot.Settings.FileSettings.Boss.EFFECT_REGENERATION_PER_MIN = 60f;
             if (bot.IsRole(WildSpawnType.followerBirdEye))
             {
                 //bot.Settings.FileSettings.Core.GainSightCoef = 0.1f;

@@ -268,10 +268,6 @@ namespace friendlyPMC
             new BotsEventsControllerSpawnPatch().Enable();
             new BossSpawnWaveManagerClassPatch().Enable();
 
-            // attempt to patch some sain methods
-            SAINPatch.PatchSAINIfInstalled(harmony);
-            // attempt to patch some questing methods
-            QuestingPatch.PatchQuestingIfInstalled(harmony);
             new GrenadeThrowPatch().Enable();
             // patch hearing
             new HearingSensorPatch().Enable();
@@ -297,7 +293,11 @@ namespace friendlyPMC
 
             // set configuration manager
             SetConfiguration();
-            // this is used for debug purposes that is why it stays disabled
+
+            // attempt to patch some sain methods
+            SAINPatch.PatchSAINIfInstalled(harmony);
+            // attempt to patch some questing methods
+            QuestingPatch.PatchQuestingIfInstalled(harmony);
         }
 
 

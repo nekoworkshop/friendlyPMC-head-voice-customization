@@ -172,7 +172,7 @@ namespace friendlyPMC.Utils
                         string botName = bt.Data.Profile.Nickname;
 
                         StringBuilder stringBuilder = new StringBuilder();
-                        stringBuilder.Append(botName);
+                        stringBuilder.Append(botName + " - " + dist + "m");
 
                         if (!bt.Data.HealthController.IsAlive)
                         {

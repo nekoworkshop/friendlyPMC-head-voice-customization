@@ -209,7 +209,7 @@ namespace friendlyPMC.Components.Tactics
                 if (!botOwner_0.Memory.IsInCover)
                 {
                     // - find cover to shoot from
-                    GetClosestAttackCoverPoint(botPosition);
+                    GetClosestAttackCoverPoint(botPosition,80f);
 
                     if (customNavigationPoint_0 != null)
                     {
