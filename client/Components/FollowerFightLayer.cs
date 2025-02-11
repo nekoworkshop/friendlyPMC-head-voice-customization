@@ -7,6 +7,7 @@ using friendlyPMC.Utils;
 using System;
 using UnityEngine;
 using UnityEngine.AI;
+using static UnityEngine.UI.GridLayoutGroup;
 
 namespace friendlyPMC.Components
 {
@@ -725,6 +726,11 @@ namespace friendlyPMC.Components
             )
             {
                 return commonLayer.EndHeal();
+            }
+
+            if(curDecision.Action == BotLogicDecision.suppressGrenade && botOwner_0.WeaponManager.Grenades.ThrowindNow)
+            {
+                return new AICoreActionEndStruct("grenade.Throw", false);
             }
 
             if (!botOwner_0.Memory.HaveEnemy)

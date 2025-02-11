@@ -243,7 +243,7 @@ namespace friendlyPMC.Components
 
                     // - ensure the bot is not marked as enemy already by the others
                     _player.bossGroup.RemoveEnemy(_bot.GetPlayer);
-    
+
                     var botEnemies = _bot.EnemiesController.EnemyInfos.ToList();
                     foreach (var item in botEnemies)
                     {
@@ -288,7 +288,7 @@ namespace friendlyPMC.Components
                 _bot.Memory.GoalEnemy = null;
             }
 
-            if(isPickedUp)
+            if (isPickedUp)
             {
                 // ensure bot sees the player's group as his group
                 var botsGroupField = AccessTools.Field(typeof(BotMemoryClass), "botsGroup_0");
@@ -312,7 +312,7 @@ namespace friendlyPMC.Components
                 foreach (var item in _bots.BotOwners)
                 {
                     if (!_rougeTypes.Contains(item.Profile.Info.Settings.Role)) continue;
-;
+                    ;
                     _bot.BotsGroup.RemoveEnemy(item);
                     _bot.BotsGroup.AddNeutral(item);
                     _bot.BotsGroup.AddAlly(item.GetPlayer);
@@ -501,6 +501,8 @@ namespace friendlyPMC.Components
             settings.FileSettings.Hearing.FAR_DIST = 35f;
 
             settings.FileSettings.Cover.SIT_DOWN_WHEN_HOLDING = true;
+
+            settings.FileSettings.Boss.EFFECT_REGENERATION_PER_MIN = 40f;
 
             bot.Settings = settings;
 

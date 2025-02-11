@@ -926,7 +926,12 @@ namespace friendlyPMC.Components.Tactics
 
             AICoreActionEndStruct? result = null;
 
-            if (botOwner_0.Medecine.FirstAid.Using || botOwner_0.Medecine.SurgicalKit.Using) return result;
+            if (botOwner_0.Medecine.FirstAid.Using || botOwner_0.Medecine.SurgicalKit.Using) return new AICoreActionEndStruct("healing",false);
+
+            if (curDecision.Action == BotLogicDecision.suppressGrenade && botOwner_0.WeaponManager.Grenades.ThrowindNow)
+            {
+                return new AICoreActionEndStruct("grenade.Throw", false);
+            }
 
             if (
                 curDecision.Action == (BotLogicDecision)CustomBotDecisions.EnemySearch
