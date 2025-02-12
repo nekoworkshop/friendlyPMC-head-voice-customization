@@ -36,9 +36,9 @@ namespace friendlyPMC.Components
 
             bool shouldUse = false; ;
 
-            if (brain != null && brain.UnderFire && !botOwner_0.Memory.HaveEnemy) 
+            if (brain != null && brain.UnderFire && !botOwner_0.Memory.HaveEnemy)
                 shouldUse = true;
-            else 
+            else
                 shouldUse = HasBoss() && !InteractableObjects.IsTaker(botOwner_0) && !InteractableObjects.IsOpener(botOwner_0);
 
             if (!shouldUse)
@@ -66,7 +66,7 @@ namespace friendlyPMC.Components
 
         protected virtual Vector3 GetBossPosition()
         {
-            return  HasBoss() ?  GetBoss().Position : botOwner_0.GetPlayer.Transform.position;
+            return HasBoss() ? GetBoss().Position : botOwner_0.GetPlayer.Transform.position;
         }
 
         public override AICoreActionResultStruct<BotLogicDecision> GetDecision()
@@ -130,9 +130,11 @@ namespace friendlyPMC.Components
                 PatrolWay way = botOwner_0.PatrollingData.Way;
 
                 // switch to main weapon when out of combat - useful for bots that have launchers as secondary weapon
-                if (!_triedToSwitchToMain && botOwner_0.WeaponManager.Selector.LastEquipmentSlot == EquipmentSlot.SecondPrimaryWeapon)
+                if (!_triedToSwitchToMain && botOwner_0.WeaponManager.IsReady && botOwner_0.WeaponManager.Selector.LastEquipmentSlot == EquipmentSlot.SecondPrimaryWeapon)
                 {
                     botOwner_0.WeaponManager.Selector.TryChangeToMain();
+                    float_2 = Time.time + 5f;
+                    float_3 = Time.time + 5f;
                     _triedToSwitchToMain = true;
                 }
 
@@ -142,11 +144,11 @@ namespace friendlyPMC.Components
                     botOwner_0.WeaponManager.Reload.TryReload();
                 }
 
-                if(!_triedFillMagazines && float_3 < Time.time)
+                if (!_triedFillMagazines && !botOwner_0.WeaponManager.Reload.Reloading && float_3 < Time.time)
                 {
                     botOwner_0.WeaponManager.Reload.TryFillMagazines();
                     _triedFillMagazines = true;
-                    float_3 = Time.time + 30f;
+                    float_3 = Time.time + 20f;
                 }
 
                 if (HasBoss())
@@ -185,7 +187,7 @@ namespace friendlyPMC.Components
 
         }
 
-            
+
         public override AICoreActionEndStruct EndSimplePatrol()
         {
             string reason;
@@ -204,15 +206,16 @@ namespace friendlyPMC.Components
             return aICoreActionEndStruct_1;
         }
 
-        public override AICoreActionEndStruct EndHeal() 
+        public override AICoreActionEndStruct EndHeal()
         {
             if (!botOwner_0.Medecine.FirstAid.Have2Do && !botOwner_0.Medecine.SurgicalKit.HaveWork)
             {
                 if (botOwner_0.Medecine.FirstAid.Using) botOwner_0.Medecine.FirstAid.CancelCurrent();
                 else if (botOwner_0.Medecine.SurgicalKit.Using) botOwner_0.Medecine.SurgicalKit.CancelCurrent();
-                
+
                 return new AICoreActionEndStruct("EndHeal", true);
-            } else if(heal_time + 30f < Time.time) 
+            }
+            else if (heal_time + 30f < Time.time)
             {
                 if (botOwner_0.Medecine.FirstAid.Using) botOwner_0.Medecine.FirstAid.CancelCurrent();
                 else if (botOwner_0.Medecine.SurgicalKit.Using) botOwner_0.Medecine.SurgicalKit.CancelCurrent();
@@ -226,7 +229,7 @@ namespace friendlyPMC.Components
         }
 
         public override AICoreActionEndStruct EndSuppressFire()
-        { 
+        {
             return new AICoreActionEndStruct("enemy.None", true);
         }
 
@@ -266,7 +269,7 @@ namespace friendlyPMC.Components
 
         public override AICoreActionEndStruct EndRunToCover()
         {
-            if(!botOwner_0.Memory.HaveEnemy) return new AICoreActionEndStruct("enemy,None", true);
+            if (!botOwner_0.Memory.HaveEnemy) return new AICoreActionEndStruct("enemy,None", true);
 
             if (botOwner_0.BewareGrenade.SawGrenadeSoFar(5f))
             {
@@ -276,7 +279,7 @@ namespace friendlyPMC.Components
             {
                 return new AICoreActionEndStruct("InCover", true);
             }
-            
+
             if (base.method_2())
             {
                 return new AICoreActionEndStruct("StartD", true);
@@ -290,11 +293,6 @@ namespace friendlyPMC.Components
             )
             {
                 return EndHeal();
-            }
-
-            if(curDecision.Action == (BotLogicDecision)CustomBotDecisions.RunToCover)
-            {
-
             }
 
             if (curDecision.Action == BotLogicDecision.runToCover && (curDecision.Reason == "runToHeal" || curDecision.Reason == "relocateFast"))

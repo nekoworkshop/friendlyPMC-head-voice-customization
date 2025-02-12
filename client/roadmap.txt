@@ -1,30 +1,36 @@
--- === 3.9.6 === ---:
-- x - make followers not throw grenades when the enemy is out of throwing range
-- x - fixed Knight trader standing not increasing when running with BirdEye or BigPipe
-- x - allow health multiplier to also affect the Goons
-- x - see if it is possible to make the bot switch enemy based on proximity and visibility
-- x - - check sounds nearby
-- x - - turn when being hit
-- x - update custom gear code on the sever side to use unique IDs for each item
-- x - fixed spawned followers not having secured container so extra ammo could not be added to them
-- x - when doing "enemy spotted" ray cast does not seem to work
-- x - "coverBoss" action seems to send the boss off running far off in the back
-
-- x - follower is seeing same side faction as enemy on doing "enemy contact" command
-
-- x - investigate if the death freeze bug still happening - can't replicate
-
-- x - add more trade items to Knight
-- x - add option to increase the display time of the ping team
-
 -- === 3.10 === ---:
-- switch cover logic to the one used by the game (all we need is to keep an eye out for the closes zone to the player and upddate CoverPointMaster to that)
-- update marskman tactic to switch to secondary like BirdEye
-- see if we can make bot swap weapons when asked to loot (DeadBodyWork)
-- - this should also allow bot to put that weapon as seconday (in case of support without a grenade launcher)
-- add "hold fire/fire at will" commands
-- add more trade items to Knight
-- see what else can be done to help make bots stop getting stuck after throwing a grenade
+- x - investigate using reverse map what makes followers accquire enemies through walls (it's the game - we can't do anything about it)
+
+- x - make followers count for kill-based quests
+- x - increase the distance the bot will go to when using "there gesture" command
+- x - investigate bug that happens when combing stop with follow me (phrase and gesture)
+- x - investigate shooting delay when doing DogFight
+- x - when asked to hold position and then go check, skip the "wait in position" part of go check
+- x - ensure that on "follow me" hold position is removed from requets (happens with BipPipe after doing "go check" command)
+- x - fix bot not using grenade launcher when asking to do suppression
+- x - when transitioning from combat to follow, ensure the bot is standing and try to tackle to run duck bug
+- x - make bot artillery check positions for friendly
+- x - marksman can switch to secondary weapon when in close combat
+- x - test if things are ok with QuestingBots mod
+- x - making a boss bot created by QuestingBots a follower will result in him getting stuck
+- x - see why shootfromplace decision crouches the bot
+- x - goToEnemy needs to get closer and close to the enemy
+- x - add to known issue the incompatibility with performance improvements mod
+- x - check ammo for secondary weapon when trying to switch to it in marksman tactic
+
+- x - switch cover logic to the one used by the game
+- x - sniper search needs some improvement 
+
+- x - fix spawned followers sometimes seeing the Goons as enemies
+- x - fix pickup followers being seen as enemy by the Goons and vice versa
+
+- x - see what else can be done to help make bots stop getting stuck after throwing a grenade
+- x - investigate why followers still use grenades when the option is disabled - fixed
+
+- x - add more trade items to Knight (more keys, some ammo and 2 more kits - a sniper and a shotgun)
+
+- see how we can use HighLightMesh to highlight teammates (optional)
+
 
 --- ==== 4.0.0 (final phase - "The General" for followers quest) ==== ---:
 - "The General" quests will unlock followers
@@ -35,26 +41,26 @@
 - player level to determine if he can pick up any extra followers and how many (maximum 3, disable configuration regarding this)
 - scav karma and level to determine with how many followers can the player spawn (maxium 3) and extra pickups (maximum 2 extras)
 - attempt to make transit work while in a group with followers (this needs profile and equipment saving of the bot in order to restore it after transit)
+- add "hold fire/fire at will" commands
+- see if we can make bot swap weapons when asked to loot (DeadBodyWork)
+- - this should also allow bot to put that weapon as seconday (in case of support without a grenade launcher)
 
 ==================================================================================
-RELEASE NOTES (3.9.6)
-fixed issue with Knight trader not increasing when running with BirdEye or BigPipe
-fixed spawned followers not having secured container so extra ammo could not be added to them
-fixed "enemy spotted" command not registering the enemy the player saw even if the bot didn't also see it
-updated follower to not throw grenades when the enemy is out of throwing range
-health multipler now also affects the Goons' health
-added option to increase the display time of the ping team (some keybinds will need to be re-assigned)
+RELEASE NOTES (3.10.0)
+kills made by followers you spawned with (except Goons) will now count for any kill-based quests (quest conditions will be applied to their kills)
+marksman can now switch to secondary weapon when in close combat - you are responsible for what weapons he has, take note!
+increased the distance the bot will go to when using "there gesture" command to 50 meters
+fixed supppression command not using grenade launcher in some cases
+code was refactored on cover and tactics logic to rely more on the in game cover system for a more stable build (note: this can make your followers spread out more)
+attempt fix the run duck bug when transitioning from combat to follow
+resolved some conflicts with QuestingBots mod
+ping squad now also display the bot's distance from the player
 
-Add to issues:
-"Performance improvements" mode can cause conflicts with this mod
-Followers might still end up stuck after throwing a grenade
+Add to known issues:
+- teleporting a follower while he is opening a door will make him glitch out and the only way to restore him is to have him open some other door
+- in very rare cases, your follower can end up stuck in a healing animtion and there is no way to restore him. A way to avoid that is to notice if he keeps healing after combat while the health does not seem to go up. Use the fix heal to fully heal him and prevent the bug from happening
+- sometimes followers will not heal a black limb - use the fix heal command
+- using the "pause" mod can result in your followers no longer having any footsteps sound
+- add explanation on why mods conflict with ours, especially the ones attempting to "fix" whatever they think is wrong with the game
 ==================================================================================
-
-
-REVISIT:
-- picked followers do not attack the player after turning hostile
-
-NOTES:
-- we can save a bot's profile after it was generated in order to be re-used by simply sending the profile to BE. We should save it by nickname. (we still need to figure out how to progress the bot's level with the player )
-- Support is Guard tactic in the code
 

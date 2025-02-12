@@ -66,10 +66,11 @@ namespace friendlyPMC.Actions
                     botOwner_0.Steering.LookToPoint(goalEnemy.GetCenterPart());
 
                     return;
-                } else if(!shouldSprint)
+                }
+                else if (!shouldSprint)
                 {
                     AimAndMove();
-                }    
+                }
             }
             else
             {
@@ -95,34 +96,48 @@ namespace friendlyPMC.Actions
 
         public void AimAndMove()
         {
-            Class115 @class = new Class115();
-            @class.gclass185_0 = this;
-            @class.recalcTime = 0f;
 
             bool flag;
             Vector3 centerPos;
-            if (botOwner_0.Memory.IsInCover && !this.botOwner_0.LookSensor.EnoughDistToShoot(out flag))
+            Vector3 enemyPos = botOwner_0.Memory.GoalEnemy.EnemyLastPosition;
+            if (botOwner_0.Memory.IsInCover && !botOwner_0.LookSensor.EnoughDistToShoot(out flag))
             {
-                centerPos = (botOwner_0.Transform.position + this.botOwner_0.Memory.GoalEnemy.EnemyLastPosition) / 2f;
+                centerPos = (botOwner_0.Transform.position + enemyPos) / 2f;
             }
             else
             {
-                centerPos = botOwner_0.Transform.position;
+                centerPos = enemyPos;
             }
-            
-            @class.withShoot = (botOwner_0.Tactic.IsCurTactic(BotsGroup.BotCurrentTactic.Attack) || botOwner_0.Tactic.IsCurTactic(BotsGroup.BotCurrentTactic.Protect));
-            CoverShootType coverShootType = @class.withShoot ? CoverShootType.shoot : CoverShootType.hide;
-            CoverSearchType searchType = this.botOwner_0.Tactic.SubTactic.SearchTypeAttackMoving(coverShootType);
 
-            if (this.float_1 < Time.time)
+
+            if (float_1 < Time.time)
             {
-                this.float_1 = Time.time + 2f;
-                this.botOwner_0.BotAttackManager.TryPointGetting(centerPos, coverShootType, GClass583.Core.START_DIST_TO_COV, searchType, this.botOwner_0.CurrentEnemyTargetPosition(true), new Action<CustomNavigationPoint>(@class.method_0), new Action(Class116.class116_0.method_0), true, false, true, null);
+                float_1 = Time.time + 2f;
+                var shootPointClass = botOwner_0.CurrentEnemyTargetPosition(true);
+                var point = Utils.Covers.GetClosestCoverPoint(botOwner_0, centerPos, 50f, 0.5f, cover =>
+                {
+                    if (GClass344.CanShootToTarget(shootPointClass, cover, botOwner_0.LookSensor.Mask, false))
+                    {
+                        cover.CanIShootToEnemy = true;
+                        return true;
+                    }
+
+                    return false;
+                });
+
+                if(point != null)
+                {
+                    botOwner_0.GoToPoint(point);
+                } 
+                else
+                {
+                    botOwner_0.GoToPoint(centerPos);
+                }
             }
-            
+
             botOwner_0.BotAttackManager.UpdateNextTick();
 
-            this.AimingAndShoot();
+            AimingAndShoot();
         }
 
         // replication of MoveToEnemyData.TryToMoveToEnemy, but adapted to use our cover system
@@ -158,7 +173,7 @@ namespace friendlyPMC.Actions
 
             CustomNavigationPoint customNavigationPoint = null;
 
-            List<CustomNavigationPoint> closePoints = Utils.Covers.GetCoverPoints(botOwner_0, targetPoint, 25f);
+            List<CustomNavigationPoint> closePoints = Utils.Covers.GetCoverPoints(botOwner_0, targetPoint, 20f);
             if (closePoints.Count > 0)
             {
                 customNavigationPoint = closePoints.RandomElement();
@@ -169,7 +184,7 @@ namespace friendlyPMC.Actions
                 CustomNavigationPoint freeClosePoint = Utils.Covers.GetClosestCoverPoint(botOwner_0, targetPoint, 30f, 1f);
                 if (freeClosePoint != null)
                 {
-                    freeClosePoint = customNavigationPoint;
+                    customNavigationPoint = freeClosePoint;
                 }
             }
 

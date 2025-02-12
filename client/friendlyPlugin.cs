@@ -26,6 +26,7 @@ using friendlyPMC.Components;
 using SPT.Common.Http;
 
 using SPT.Common.Utils;
+using EFT.InventoryLogic;
 
 namespace friendlyPMC
 {
@@ -47,6 +48,7 @@ namespace friendlyPMC
         RunToCover = 104,
         GuardToCover = 105,
         FollowBoss = 106,
+        attackRetreat = 107,
     }
 
     public enum CustomPhrases
@@ -139,7 +141,7 @@ namespace friendlyPMC
         public string[] friendlyEscaped { get; set; }
     }
 
-    [BepInPlugin("xyz.pit.friendlypmc", "friendlyPMC", "3.9.6")]
+    [BepInPlugin("xyz.pit.friendlypmc", "friendlyPMC", "3.10.0")]
     [BepInDependency("xyz.drakia.bigbrain")]
     [BepInDependency("com.Arys.UnityToolkit")]
     public class friendlyPMC : BaseUnityPlugin
@@ -229,8 +231,6 @@ namespace friendlyPMC
 
             // bot patches to help with various scenarios while being a follower of the player
             new BotGroupAddEnemyPatch().Enable();
-            new BotMemoryAddEnemyPatch().Enable();
-
             //new BotMemoryDamagePatch().Enable();
             new BotGroupUsecEnemyPatch().Enable();
             new ExUsecBrainHitPatch().Enable();
@@ -268,11 +268,7 @@ namespace friendlyPMC
             new BotsEventsControllerSpawnPatch().Enable();
             new BossSpawnWaveManagerClassPatch().Enable();
 
-            // attempt to patch some sain methods
-            SAINPatch.PatchSAINIfInstalled(harmony);
-            // some error catchers here - they do not seem related to this mod but causing conflicts
-            /*new GClass1069Patch().Enable();
-            harmony.PatchAll(typeof(LookSensorPatch).Assembly);*/
+            new GrenadeThrowPatch().Enable();
             // patch hearing
             new HearingSensorPatch().Enable();
             new FootstepSoundPatch().Enable();
@@ -297,8 +293,11 @@ namespace friendlyPMC
 
             // set configuration manager
             SetConfiguration();
-            // this is used for debug purposes that is why it stays disabled
-            //harmony.PatchAll(typeof(GoalEnemyTracePatch).Assembly);
+
+            // attempt to patch some sain methods
+            SAINPatch.PatchSAINIfInstalled(harmony);
+            // attempt to patch some questing methods
+            QuestingPatch.PatchQuestingIfInstalled(harmony);
         }
 
 
@@ -892,6 +891,12 @@ namespace friendlyPMC
 
                         (bot.Brain.BaseBrain as FollowerBrain).HandsReset();
                         bot.WeaponManager.Selector.TakePrevWeapon();
+
+                        GClass441 selector = bot.WeaponManager.Selector as GClass441;
+                        if (selector != null && (selector.SecondPrimaryWeapon as Weapon) != null && (selector.SecondPrimaryWeapon as Weapon).IsGrenadeLauncher)
+                        {
+                            selector.TryChangeToMain();
+                        }
                     }
                 }
             }

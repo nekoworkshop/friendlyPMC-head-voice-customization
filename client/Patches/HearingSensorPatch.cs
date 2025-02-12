@@ -80,7 +80,7 @@ namespace friendlyPMC.Patches
         }
 
         [PatchPostfix]
-        public static void Patch(Player __instance, BetterSource ___NestedStepSoundSource)
+        public static void PatchPostfix(Player __instance, BetterSource ___NestedStepSoundSource)
         {
             float volume = __instance.MovementContext.CovertMovementVolumeBySpeed * __instance.method_54();
             float range = ___NestedStepSoundSource.MaxDistance * 0.85f;
@@ -155,11 +155,11 @@ namespace friendlyPMC.Patches
 
                 if (brain == null || brain.WasHit || bot.Memory.HaveEnemy || bot.BotsGroup == null) return;
                 if (
-                    bot.HearingSensor.method_6(__instance.Transform.position, 50f, out var distance) &&
+                    bot.HearingSensor.method_6(__instance.Transform.position, 40f, out var distance) &&
                     (bot.EnemiesController.IsEnemy(__instance) || bot.BotsGroup.IsEnemy(__instance))
                 )
                 {
-                    if (distance < 25f)
+                    if (distance < 16f)
                     {
                         if (!reportEnemy) bot.BotsGroup.ReportAboutEnemy(__instance, EEnemyPartVisibleType.visible);
                         EnemyInfo info = Utils.Enemy.MakeEnemy(bot, __instance);

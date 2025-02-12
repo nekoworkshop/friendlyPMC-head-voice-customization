@@ -160,12 +160,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Actions\FollowerAttackRetreat.cs" />
     <Compile Include="Actions\FollowerCoverToCover.cs" />
     <Compile Include="Actions\FollowerDogFight.cs" />
     <Compile Include="Actions\FollowerGoToEnemy.cs" />
     <Compile Include="Actions\FollowerGuardCover.cs" />
     <Compile Include="Actions\FollowerMoveToPoint.cs" />
     <Compile Include="Actions\FollowerRunToCover.cs" />
+    <Compile Include="Actions\FollowerShootFromPlace.cs" />
     <Compile Include="Actions\FollowerSniperSearch.cs" />
     <Compile Include="Actions\FollowerSearch.cs" />
     <Compile Include="Actions\FollowerSuppressionFire.cs" />
@@ -201,9 +203,11 @@
     <Compile Include="Patches\ConditionCounterPatch.cs" />
     <Compile Include="Patches\ExUsecBrainPatch.cs" />
     <Compile Include="Patches\GestureMenuPatch.cs" />
+    <Compile Include="Patches\GrenadeThrowPatch.cs" />
     <Compile Include="Patches\HearingSensorPatch.cs" />
     <Compile Include="Patches\ItemPatch.cs" />
     <Compile Include="Patches\LookSensorPatch.cs" />
+    <Compile Include="Patches\QuestingPatch.cs" />
     <Compile Include="Patches\RaidStartPatch.cs" />
     <Compile Include="Patches\SAINPatch.cs" />
     <Compile Include="Patches\SocialPatch.cs" />

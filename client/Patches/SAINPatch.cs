@@ -94,7 +94,7 @@ namespace friendlyPMC.Patches
 
                 if (squadType != null && SAINEnableClass != null)
                 {
-                    Logger.LogInfo("Enabled SAIN PATCH");
+                    Logger.LogInfo("SAIN Patched");
                 }
             }
         }

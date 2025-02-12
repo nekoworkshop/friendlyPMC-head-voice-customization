@@ -166,31 +166,8 @@ namespace friendlyPMC.Actions
                     InteractableObjects.StoreItem(botOwner_0, item);
                 }
 
-                var req = botOwner_0.BotRequestController.CurRequest as FollowerTakeLootRequest;
-                var fromWait = req != null && req.FromWait;
-
                 await Task.Delay(1000);
                 ClearLoot();
-
-                // back to hold position
-                if (fromWait && !botOwner_0.Memory.HaveEnemy)
-                {
-                    IPlayer requester = req != null ? req.Requester : null;
-
-                    Player playerRequester = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(requester.ProfileId);
-
-                    if (botOwner_0.BotRequestController.CurRequest != null)
-                    {
-                        botOwner_0.BotRequestController.CurRequest.Complete();
-                    }
-
-                    FollowerHold holdit = new FollowerHold(playerRequester);
-
-                    if (holdit.SetGroup(botOwner_0.BotsGroup.RequestsController))
-                    {
-                        holdit.AddPossibleExecutors(botOwner_0);
-                    }
-                }
             }
             catch (Exception e)
             {

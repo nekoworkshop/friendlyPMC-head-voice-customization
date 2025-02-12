@@ -12,7 +12,7 @@ using Comfort.Common;
 
 namespace friendlyPMC.Actions
 {
-    public class FollowerMoveToPoint: GClass196
+    public class FollowerMoveToPoint : GClass196
     {
         private bool _shouldSprint = true;
 
@@ -77,6 +77,12 @@ namespace friendlyPMC.Actions
             if (botOwner_0.Memory.HaveEnemy && botOwner_0.Memory.GoalEnemy.CanShoot)
             {
                 botOwner_0.BotRequestController.CurRequest.Complete();
+                botOwner_0.BotRequestController.CurRequest = null;
+                checkTime = 0f;
+                bool_0 = false;
+                bool_1 = false;
+                bool_2 = false;
+                ischecking = false;
                 return;
             }
 
@@ -89,6 +95,11 @@ namespace friendlyPMC.Actions
                     {
                         r.Complete();
                         botOwner_0.BotRequestController.CurRequest = null;
+                        checkTime = 0f;
+                        bool_0 = false;
+                        bool_1 = false;
+                        bool_2 = false;
+                        ischecking = false;
                     }
                 }
                 return;
@@ -96,10 +107,16 @@ namespace friendlyPMC.Actions
 
             if (bool_2)
             {
+                BotRequest r = botOwner_0.BotRequestController.CurRequest;
+                if (r != null)
+                {
+                    r.Complete();
+                    botOwner_0.BotRequestController.CurRequest = null;
+                }
                 return;
             }
 
-            
+
             if (botOwner_0.BotRequestController.CurRequest == null) return;
 
 
@@ -146,51 +163,21 @@ namespace friendlyPMC.Actions
                 bool_1 = false;
                 bool_2 = true;
 
-                if (botOwner_0.BotRequestController.CurRequest?.BotRequestType == BotRequestType.wait)
+                if (ischecking)
                 {
-                    return;
-                }
-
-                if (
-                    botOwner_0.BotRequestController.CurRequest?.BotRequestType == BotRequestType.followMe ||
-                    botOwner_0.BotRequestController.CurRequest?.BotRequestType == BotRequestType.goToPoint
-                )
-                {
-                    var req = botOwner_0.BotRequestController.CurRequest as FollowerGoCheck;
-                    var requester = req != null ? req.Requester : null;
-
-                   
-                    // back to hold position
-                    if (req != null && req.FromWait && !botOwner_0.Memory.HaveEnemy)
+                    checkTime = Time.time + GClass824.Random(4f, 6f);
+                    var _listOfRequests = AccessTools.Field(typeof(BotGroupRequestController), "_listOfRequests").GetValue(botOwner_0.BotsGroup.RequestsController) as List<BotRequest>;
+                    var req = _listOfRequests.Find(request => (request is FollowerHold));
+                    if (req != null)
                     {
-                        req.Complete();
-                        botOwner_0.BotRequestController.CurRequest = null;
-
-                        ischecking = false;
-                        Player playerRequester = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(requester.ProfileId);
-
-                        if (botOwner_0.BotRequestController.TryStopCurrent(playerRequester, false))
+                        var reqExecutor = AccessTools.Field(typeof(BotRequest), "Executor").GetValue(req) as BotOwner;
+                        if (reqExecutor == botOwner_0)
                         {
-                            FollowerHold holdit = new FollowerHold(playerRequester);
-
-                            if (!botOwner_0.BotTalk.IsSilenced) botOwner_0.BotTalk.SetSilence(2f);
-
-                            if (botOwner_0.BotsGroup.RequestsController.TryAddRequest(holdit))
-                            {
-                                holdit.AddPossibleExecutors(botOwner_0);
-                                holdit.SetGroup(botOwner_0.BotsGroup.RequestsController);
-                                botOwner_0.Gesture.TryGestus(EInteraction.OkGesture, true);
-                            }
+                            checkTime = 0f;
                         }
-                    } 
-                    else if (req != null && !ischecking)
-                    {
-                        req.Complete();
-                        botOwner_0.BotRequestController.CurRequest = null;
                     }
                 }
-
-                if (ischecking) checkTime = Time.time + GClass824.Random(4f, 6f);
+                //checkTime
 
                 return;
 
@@ -211,7 +198,7 @@ namespace friendlyPMC.Actions
                     wasHit = true;
                 }
 
-                if(!wasHit && !botOwner_0.Memory.HaveEnemy) botOwner_0.Steering.LookToMovingDirection(60f);
+                if (!wasHit && !botOwner_0.Memory.HaveEnemy) botOwner_0.Steering.LookToMovingDirection(60f);
                 botOwner_0.Mover.Sprint(_shouldSprint && !wasHit);
             }
         }

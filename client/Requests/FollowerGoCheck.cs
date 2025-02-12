@@ -1,23 +1,12 @@
 ﻿using EFT;
 using System.Collections.Generic;
-using System.Security.Cryptography;
 using UnityEngine;
 using UnityEngine.AI;
-using static RootMotion.FinalIK.IKSolver;
 namespace friendlyPMC.Actions
 {
     internal class FollowerGoCheck : BotRequest
     {
-        private bool _fromWait = false;
-
-        public bool FromWait
-        {
-            get
-            {
-                return _fromWait;
-            }
-        }
-
+        
         private bool _hasPoint = false;
         public bool HasPoint
         {
@@ -27,10 +16,8 @@ namespace friendlyPMC.Actions
             }
         }
 
-        public FollowerGoCheck(IPlayer requester, BotRequestType request = BotRequestType.goToPoint, bool fromWait = false) : base(requester, request)
+        public FollowerGoCheck(IPlayer requester, BotRequestType request = BotRequestType.goToPoint) : base(requester, request)
         {
-            _fromWait = fromWait;
-
             
         }
 
@@ -49,11 +36,12 @@ namespace friendlyPMC.Actions
             Ray visionRay = new Ray(playerPosition, playerLookDirection);
 
             RaycastHit[] hits = new RaycastHit[10];
+            float distance = 50f;
             int numHits = Physics.SphereCastNonAlloc(
                     visionRay,
                     0.3f,
                     hits,
-                    28f,
+                    distance,
                     LayerMaskClass.HighPolyWithTerrainNoGrassMask
                 );
 
@@ -63,8 +51,8 @@ namespace friendlyPMC.Actions
                 RaycastHit hit = hits[i];
                 if (hit.collider != null && hit.collider.gameObject != null)
                 {
-                    if(Vector3.Distance(hit.point, playerPosition) < 28f)
-                    points.Add(hit.point);
+                    if (Vector3.Distance(hit.point, playerPosition) < distance)
+                        points.Add(hit.point);
                 }
             }
 
@@ -80,7 +68,7 @@ namespace friendlyPMC.Actions
                 }
             }
 
-            if(!_hasPoint)
+            if (!_hasPoint)
             {
 
                 Vector3 dir02 = Requester.LookDirection;

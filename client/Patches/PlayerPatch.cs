@@ -189,12 +189,6 @@ namespace friendlyPMC.Patches
             {
                 if (aggressor == null || aggressor.Profile == null || aggressor.Profile.Info == null || aggressor.Profile.Info.Settings == null) return;
 
-                Player alivePlayerByProfileID = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(aggressor.ProfileId);
-                if (alivePlayerByProfileID == null)
-                {
-                    return;
-                }
-
                 if (!Singleton<AbstractGame>.Instantiated) return;
                 if (GamePlayerOwner.MyPlayer == null) return;
                 if (GamePlayerOwner.MyPlayer.HealthController == null || !GamePlayerOwner.MyPlayer.HealthController.IsAlive)
@@ -207,14 +201,16 @@ namespace friendlyPMC.Patches
                 {
                     if (Utils.Props.BossFollowersType.Contains(__instance.Profile.Info.Settings.Role))
                     {
-                        foreach (var data in alivePlayerByProfileID.Profile.QuestsData)
+                        Profile bossProfile = BossPlayers.GetBoss(aggressor.ProfileId).Player().Profile;
+
+                        foreach (var data in bossProfile.QuestsData)
                         {
                             if (Utils.Props.Quests["Knight"][0] == data.Id && data.Status == EFT.Quests.EQuestStatus.Success)
                             {
 
-                                if (alivePlayerByProfileID.Profile.TryGetTraderInfo("67768b19fa281ca31708b187", out var traderInfo))
+                                if (bossProfile.TryGetTraderInfo("67768b19fa281ca31708b187", out var traderInfo))
                                 {
-                                    double standing = alivePlayerByProfileID.Profile.GetTraderStanding("67768b19fa281ca31708b187");
+                                    double standing = bossProfile.GetTraderStanding("67768b19fa281ca31708b187");
                                     traderInfo.SetStanding(Math.Max(0.1, standing - 0.1));
                                     Modules.Logger.LogInfo("Penalize standing with Knight trader for killing a Goon");
                                 }
@@ -227,10 +223,10 @@ namespace friendlyPMC.Patches
                 }
 
                 // have kills of the Goons count as quest kills when needed
-                string ProfileId = GamePlayerOwner.MyPlayer.ProfileId;
+                string myPlayerProfileId = GamePlayerOwner.MyPlayer.ProfileId;
                 Player player = GamePlayerOwner.MyPlayer;
 
-                if (BossPlayers.Instance == null || !BossPlayers.IsPlayerBoss(ProfileId))
+                if (BossPlayers.Instance == null || !BossPlayers.IsPlayerBoss(myPlayerProfileId))
                 {
                     return;
                 }
@@ -294,6 +290,21 @@ namespace friendlyPMC.Patches
                     if (knightKiller) Utils.Utils.FlagSet("knightKiller", false);
                     if (pipeKiller) Utils.Utils.FlagSet("pipeKiller", false);
                     if (birdEyeKiller) Utils.Utils.FlagSet("birdEyeKiller", false);
+                }
+                else
+                {
+                    // - kills made by the squadmates of the boss will help with quests kills
+                    BossPlayers.GetFollowersByBoss(myPlayerProfileId).ForEach(follower =>
+                    {
+                        BotOwner bot = follower.GetBot();
+                        if (follower.IsSquadMate && !bot.IsDead && bot.BotState == EBotState.Active && bot.ProfileId == aggressor.ProfileId)
+                        {
+                            list.ForEach(target =>
+                            {
+                                player.AbstractQuestControllerClass.CheckKillConditionCounter(target, __instance.ProfileId, new List<string> { }, weapon2, bodyPart, locationId, distance, __instance.Profile.Info.Settings.Role.ToStringNoBox<WildSpawnType>(), __instance.CurrentHour, __instance.HealthController.BodyPartEffects, __instance.HealthController.BodyPartEffects, __instance.TriggerZones, new string[] { });
+                            });
+                        }
+                    });
                 }
             }
             catch (Exception ex)

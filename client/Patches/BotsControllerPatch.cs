@@ -320,6 +320,9 @@ namespace friendlyPMC.Patches
                 {
                     customization["Equipment"] = eq;
                 }
+
+                // send health multiplier
+                customization["Health"] = friendlyPMC.heatlhMultiplier.Value;
             }
             var botPresets = AccessTools.Field(typeof(BotCreator), "ginterface21_0").GetValue(botCreator) as BotsPresets;
             var profileEndpoint = AccessTools.Field(typeof(BotsPresets), "iSession").GetValue(botPresets) as ProfileEndPoint;
@@ -401,119 +404,14 @@ namespace friendlyPMC.Patches
                 }
             }
 
-
             await UniTask.WhenAll(profileTasks);
 
-
+            // followers should use the same groupID as the player
             foreach (var item in profiles)
             {
                 Profile profile = item.Value;
-
-                // followers should use the same groupID as the player
                 profile.Info.GroupId = player.realPlayer.GroupId;
-                profile.Info.TeamId = player.Player().Profile.Info.TeamId;
-
-                // spawned followers will have a different health than the rest
-                foreach (EBodyPart part in Enum.GetValues(typeof(EBodyPart)))
-                {
-                    profile.Health.BodyParts.TryGetValue(part, out var bodyPart);
-                    if (bodyPart != null)
-                    {
-                        switch (part)
-                        {
-                            case EBodyPart.Head:
-                                bodyPart.Health.Minimum = bodyPart.Health.Minimum * friendlyPMC.heatlhMultiplier.Value;
-                                bodyPart.Health.Maximum = bodyPart.Health.Maximum * friendlyPMC.heatlhMultiplier.Value;
-                                bodyPart.Health.Current = bodyPart.Health.Maximum * friendlyPMC.heatlhMultiplier.Value;
-                                break;
-                            case EBodyPart.Chest:
-                                bodyPart.Health.Minimum = bodyPart.Health.Minimum * friendlyPMC.heatlhMultiplier.Value;
-                                bodyPart.Health.Maximum = bodyPart.Health.Maximum * friendlyPMC.heatlhMultiplier.Value;
-                                bodyPart.Health.Current = bodyPart.Health.Current * friendlyPMC.heatlhMultiplier.Value;
-                                break;
-                            case EBodyPart.Stomach:
-                                bodyPart.Health.Minimum = bodyPart.Health.Minimum * friendlyPMC.heatlhMultiplier.Value;
-                                bodyPart.Health.Maximum = bodyPart.Health.Maximum * friendlyPMC.heatlhMultiplier.Value;
-                                bodyPart.Health.Current = bodyPart.Health.Current * friendlyPMC.heatlhMultiplier.Value;
-                                break;
-                            case EBodyPart.RightArm:
-                            case EBodyPart.LeftArm:
-                                bodyPart.Health.Minimum = bodyPart.Health.Minimum * friendlyPMC.heatlhMultiplier.Value;
-                                bodyPart.Health.Maximum = bodyPart.Health.Maximum * friendlyPMC.heatlhMultiplier.Value;
-                                bodyPart.Health.Current = bodyPart.Health.Current * friendlyPMC.heatlhMultiplier.Value;
-                                break;
-                            case EBodyPart.RightLeg:
-                            case EBodyPart.LeftLeg:
-                                bodyPart.Health.Minimum = bodyPart.Health.Minimum * friendlyPMC.heatlhMultiplier.Value;
-                                bodyPart.Health.Maximum = bodyPart.Health.Maximum * friendlyPMC.heatlhMultiplier.Value;
-                                bodyPart.Health.Current = bodyPart.Health.Current * friendlyPMC.heatlhMultiplier.Value;
-                                break;
-
-                            default:
-                                break;
-                        }
-                    }
-                }
-
-                // adjust follower's skills based on level
-                float maxHealth = 2700f;
-                float maxVitality = 2500f;
-                float maxRecoil = 4500f;
-                float maxHeavy = 1500f;
-                float maxLight = 1500f;
-                float maxStress = 2500f;
-                float maxPerception = 4000f;
-
-                float healthIncrement = 40f;
-                float vitalityIncrement = 30f;
-                float recoilIncrement = 50f;
-                float heavyIncrement = 20f;
-                float lightIncrement = 20f;
-
-                float stressIncrement = 20f;
-                float perceptionIncrement = 40f;
-
-                int botLevel = profile.Info.Level;
-
-                // --- health
-                float scaledHealth = Utils.Utils.GetScaledValue(0f, healthIncrement, botLevel, maxHealth);
-                if (profile.Skills.Health.Current < scaledHealth)
-                    profile.Skills.Health.SetCurrent(scaledHealth, true);
-
-                // --- vitality
-                float scaledVitality = Utils.Utils.GetScaledValue(0f, vitalityIncrement, botLevel, maxVitality);
-                if (profile.Skills.Vitality.Current < scaledVitality)
-                    profile.Skills.Vitality.SetCurrent(scaledVitality, true);
-
-                // --- recoil
-                float scaledRecoil = Utils.Utils.GetScaledValue(0f, recoilIncrement, botLevel, maxRecoil);
-                if (profile.Skills.RecoilControl.Current < scaledRecoil)
-                    profile.Skills.RecoilControl.SetCurrent(scaledRecoil, true);
-
-                // --- heavy vests
-                float scaledHeavy = Utils.Utils.GetScaledValue(0f, heavyIncrement, botLevel, maxHeavy);
-                if (profile.Skills.HeavyVests.Current < scaledHeavy)
-                    profile.Skills.HeavyVests.SetCurrent(scaledHeavy, true);
-
-                // --- light vests
-                float scaledLight = Utils.Utils.GetScaledValue(0f, lightIncrement, botLevel, maxLight);
-                if (profile.Skills.LightVests.Current < scaledLight)
-                    profile.Skills.LightVests.SetCurrent(scaledLight, true);
-
-                // --- stress
-                float scaledStrees = Utils.Utils.GetScaledValue(0f, stressIncrement, botLevel, maxStress);
-                if (profile.Skills.StressResistance.Current < scaledStrees)
-                    profile.Skills.StressResistance.SetCurrent(scaledStrees, true);
-
-                // --- perception
-                float scaledPerception = Utils.Utils.GetScaledValue(0f, perceptionIncrement, profile.Info.Level, maxPerception);
-                if (profile.Skills.Perception.Current < scaledPerception)
-                    profile.Skills.Perception.SetCurrent(scaledPerception, true);
-
-                // -- grenade launcher
-                profile.Skills.Launcher.SetCurrent(scaledRecoil, true);
-                // -- grenade throwing
-                profile.Skills.Throwing.SetCurrent(scaledRecoil, true);
+                profile.Info.TeamId = player.realPlayer.Profile.Info.TeamId;
             }
 
             Modules.Logger.LogInfo("Return follower profile data");
@@ -1312,7 +1210,7 @@ namespace friendlyPMC.Patches
         private static bool PatchPrefix(BossSpawnScenario __instance)
         {
 
-            if (!Singleton<AbstractGame>.Instantiated) return true;
+            if (!Singleton<AbstractGame>.Instantiated || GamePlayerOwner.MyPlayer == null) return true;
 
             if (GamePlayerOwner.MyPlayer.HealthController == null || !GamePlayerOwner.MyPlayer.HealthController.IsAlive)
             {
