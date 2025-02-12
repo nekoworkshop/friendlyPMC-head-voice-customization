@@ -117,6 +117,16 @@ namespace friendlyPMC.Components.FollowerBossFollower
                     }
                 }
 
+                // come here request during fights
+                if (request != null && request.BotRequestType == BotRequestType.followMe)
+                    return new AICoreActionResultStruct<BotLogicDecision>((BotLogicDecision)CustomBotDecisions.MoveToPoint, "req:comeHere");
+
+                // go there request during fights
+                if (request != null && request.BotRequestType == BotRequestType.goToPoint)
+                {
+                    return new AICoreActionResultStruct<BotLogicDecision>((BotLogicDecision)CustomBotDecisions.MoveToPoint, "req:goCheck");
+                }
+
                 // do not pursue a marksman
                 if (botOwner_0.Memory.HaveEnemy && goalEnemy.Owner.IsRole(WildSpawnType.marksman))
                 {

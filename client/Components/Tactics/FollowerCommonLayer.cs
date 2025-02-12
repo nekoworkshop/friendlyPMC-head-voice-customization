@@ -372,7 +372,7 @@ namespace friendlyPMC.Components.Tactics
                 // does it need to be between the bot and the enemy
                 if (inbetween && !Covers.IsPointBetween(point.Position, botOwner_0.Position, centerPosition)) return false;
                 // has distance enough to shoot
-                if((point.Position - shootPointClass.Point).sqrMagnitude >= _weaponShootDistMaxSqr) return false;
+                if ((point.Position - shootPointClass.Point).sqrMagnitude >= _weaponShootDistMaxSqr) return false;
                 // can shoot from this point
                 if (GClass344.CanShootToTarget(shootPointClass, point, botOwner_0.LookSensor.Mask, false))
                 {
@@ -926,11 +926,26 @@ namespace friendlyPMC.Components.Tactics
 
             AICoreActionEndStruct? result = null;
 
-            if (botOwner_0.Medecine.FirstAid.Using || botOwner_0.Medecine.SurgicalKit.Using) return new AICoreActionEndStruct("healing",false);
+            if (botOwner_0.Medecine.FirstAid.Using || botOwner_0.Medecine.SurgicalKit.Using) return new AICoreActionEndStruct("healing", false);
 
             if (curDecision.Action == BotLogicDecision.suppressGrenade && botOwner_0.WeaponManager.Grenades.ThrowindNow)
             {
                 return new AICoreActionEndStruct("grenade.Throw", false);
+            }
+
+            if (curDecision.Action == (BotLogicDecision)CustomBotDecisions.MoveToPoint)
+            {
+                if (!botOwner_0.Memory.HaveEnemy) return new AICoreActionEndStruct("enemy.None", true);
+                if (botOwner_0.Memory.GoalEnemy.CanShoot) return new AICoreActionEndStruct("enemy.Shoot", true);
+
+                if (!(botOwner_0.BotRequestController.CurRequest != null &&
+                        (botOwner_0.BotRequestController.CurRequest.BotRequestType == BotRequestType.goToPoint ||
+                        botOwner_0.BotRequestController.CurRequest.BotRequestType == BotRequestType.followMe)
+                     )
+                   )
+                    return aICoreActionEndStruct;
+
+                return aICoreActionEndStruct_1;
             }
 
             if (

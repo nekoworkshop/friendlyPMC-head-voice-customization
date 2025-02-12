@@ -560,11 +560,11 @@ namespace friendlyPMC.Components
             }
 
             // come here request during fights
-            if (request != null && request.BotRequestType == BotRequestType.followMe && !allyTactic)
+            if (request != null && request.BotRequestType == BotRequestType.followMe)
                 return new AICoreActionResultStruct<BotLogicDecision>((BotLogicDecision)CustomBotDecisions.MoveToPoint, "req:comeHere");
 
             // go there request during fights
-            if (request != null && request.BotRequestType == BotRequestType.goToPoint && !allyTactic)
+            if (request != null && request.BotRequestType == BotRequestType.goToPoint)
             {
                 return new AICoreActionResultStruct<BotLogicDecision>((BotLogicDecision)CustomBotDecisions.MoveToPoint, "req:goCheck");
             }
@@ -728,7 +728,7 @@ namespace friendlyPMC.Components
                 return commonLayer.EndHeal();
             }
 
-            if(curDecision.Action == BotLogicDecision.suppressGrenade && botOwner_0.WeaponManager.Grenades.ThrowindNow)
+            if (curDecision.Action == BotLogicDecision.suppressGrenade && botOwner_0.WeaponManager.Grenades.ThrowindNow)
             {
                 return new AICoreActionEndStruct("grenade.Throw", false);
             }
@@ -763,21 +763,6 @@ namespace friendlyPMC.Components
             AICoreActionEndStruct? shallEndCommon = commonLayer.ShallEndCurrentDecisionCommon(curDecision);
 
             if (shallEndCommon.HasValue) return shallEndCommon.Value;
-
-            if (curDecision.Action == (BotLogicDecision)CustomBotDecisions.MoveToPoint)
-            {
-                if (!botOwner_0.Memory.HaveEnemy) return new AICoreActionEndStruct("enemy.None", true);
-                if (!botOwner_0.Memory.GoalEnemy.CanShoot) return new AICoreActionEndStruct("enemy.Shoot", true);
-
-                if (!(botOwner_0.BotRequestController.CurRequest != null &&
-                        (botOwner_0.BotRequestController.CurRequest.BotRequestType == BotRequestType.goToPoint ||
-                        botOwner_0.BotRequestController.CurRequest.BotRequestType == BotRequestType.followMe)
-                     )
-                   )
-                    return aICoreActionEndStruct;
-
-                return aICoreActionEndStruct_1;
-            }
 
             return base.ShallEndCurrentDecision(curDecision);
         }

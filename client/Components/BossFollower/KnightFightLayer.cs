@@ -247,8 +247,18 @@ namespace friendlyPMC.Components.BossFollower
                     request.Complete();
                 }
             }
-            // player requested a suppression fire
 
+            // come here request during fights
+            if (request != null && request.BotRequestType == BotRequestType.followMe)
+                return new AICoreActionResultStruct<BotLogicDecision>((BotLogicDecision)CustomBotDecisions.MoveToPoint, "req:comeHere");
+
+            // go there request during fights
+            if (request != null && request.BotRequestType == BotRequestType.goToPoint)
+            {
+                return new AICoreActionResultStruct<BotLogicDecision>((BotLogicDecision)CustomBotDecisions.MoveToPoint, "req:goCheck");
+            }
+
+            // player requested a suppression fire
             if (request != null && request.BotRequestType == BotRequestType.suppressionFire)
             {
                 AICoreActionResultStruct<BotLogicDecision> decision = guardLayer.method_29(false, BotLogicDecision.debugGrenade);

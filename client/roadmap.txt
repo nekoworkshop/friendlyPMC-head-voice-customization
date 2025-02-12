@@ -27,7 +27,7 @@
 - x - see what else can be done to help make bots stop getting stuck after throwing a grenade
 - x - investigate why followers still use grenades when the option is disabled - fixed
 
-- add more trade items to Knight (more keys, some ammo and 2 more kits - a sniper and a shotgun)
+- x - add more trade items to Knight (more keys, some ammo and 2 more kits - a sniper and a shotgun)
 
 - see how we can use HighLightMesh to highlight teammates (optional)
 
