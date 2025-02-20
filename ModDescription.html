@@ -66,7 +66,7 @@
 	<li><strong>Attention</strong> - A command introduced due to the glitchy behavior of Tarkov's AI to help reset your followers in case they are stuck or you want them to forget about an enemy (does not work if the enemy is still in view or too close)</li>
 	<li><strong>Regroup</strong> - Tell your followers to resume following if out of combat or come near your position if in combat</li>
 	<li><strong>Get Back</strong> - Tell your followers to follow you at a distance</li>
-	<li><strong>(<span style="color:rgb(255,215,0);">UPDATED</span>)On Your Own</strong> - Tell your followers to follow at a distance, to no longer prioritize covering you during fights, and to switch to their initial tactic (initial tactic can be changed to "Holder" when issuing "Hold Position"). When out of combat, the followers will patrol around you at a configurable distance. If you wish to stop the patrol, but still have them follow you at a distance, say "Follow Me".</li>
+	<li><strong>On Your Own</strong> - Tell your followers to follow at a distance, to no longer prioritize covering you during fights, and to switch to their initial tactic (initial tactic can be changed to "Holder" when issuing "Hold Position"). When out of combat, the followers will patrol around you at a configurable distance. If you wish to stop the patrol, but still have them follow you at a distance, say "Follow Me".</li>
 	<li><strong>Cover Me</strong> - Regroup, set them to follow you close, and make them cover you during fights</li>
 	<li><strong>Hold Position</strong> - Switch from the initial tactic to the "Holder" tactic</li>
 	<li><strong>Go Go GO</strong> - Switch back to the initial tactic</li>
@@ -89,10 +89,10 @@
 	<li><strong>Contact</strong> - Makes your followers look toward the direction you are looking and if you have an enemy in your visual they will pick him up. This is dependent on "Maximum scan distance" and if you can clearly see the enemy's head or torso.</li>
 	<li><strong>Over There</strong> - Same as Contact, but instead of voice signaling it does a hand gesture toward the direction</li>
 </ul>
-<p><strong>In GESTURES (these do not work while in combat, except for "That Direction" and "Come To Me"):</strong></p>
+<p><strong>In GESTURES (these do not work while in combat, except for "There Direction" and "Come To Me"):</strong></p>
 <ul>
 	<li><strong>Come To Me</strong> - The bot you are looking (maximum 15 meters) at will come near your position</li>
-	<li><strong>That Direction</strong> - The bot closest to you, within 15 meters distance, will go towards where the player is looking at a maximum of 25 meters distance.</li>
+	<li><strong>There Direction</strong> - The bot closest to you, within 20 meters distance, will go towards where the player is looking at a maximum of 50 meters distance.</li>
 	<li><strong>Stop</strong> - All bots within 15 meters distance will stop</li>
 </ul>
 <p>There are also commands under the quick gestures (Default Y) which become available when interaction is possible:</p>
@@ -104,7 +104,12 @@
 <p><br>As mentioned above, scavs and allies will not listen to all the commands. The commands available for them are: regroup, follow me, stop, and attention. You can imagine them being in the permanent "On Your Own" command.</p>
 <p><br>[/tab]</p>
 <p><br></p>
-<p>[tab='Gameplay Guide']<br><br><strong>Tactics Details:</strong></p>
+<p>[tab='Gameplay Guide']</p>
+<p><br></p>
+<p>It is best no to overuse the regroup, help me or cover me commands when in combat. Bots analyze their sorounding covers and choose the best for either hiding or shooting from. Instead of you trying to get them to your position, which can have weak covers and thus making them vulnerable, you should try and follow where they are going. Letting them lead is the recommended approach as you provide cover fire for them. This is especially the case when running with the Goons since they are already set to do their own thing.</p>
+<p><br></p>
+<p>Utilize the "There Gesture" to have them go in front while you get ready for any suprize attack. You followers have much better eye sight than you. Take advantage of that and either have them walk in front or look towards a certain direction by utilizing the direction commands.</p>
+<p><br><br><strong>Tactics Details:</strong></p>
 <ul>
 	<li><strong>[tt]Default[/tt]</strong> - A balanced tactic between hold position and push. Followers will stay around you if the enemy is too far, looking for spots to shoot from and if the enemy is close enough, and is weaker than them, they will attempt to push him.</li>
 	<li><strong>[tt]Support[/tt]</strong> - A follower with support tactic will provide frequent suppression fire, will be able to use grenades(even if SAIN disables that), and will be able to use the grenade launcher if he has it as a secondary weapon. He can use the launcher on his own or when asked to provide suppression fire.</li>
@@ -145,32 +150,40 @@
 <p><br></p>
 <p>Note: BirdEye has practically unlimited vision distance and we cannot do anything about it.[/tab]</p>
 <p><br></p>
-<p>[tab='Known Issues']</p>
+<p>[tab='Known Issues and Conflicts']</p>
 <p><br></p>
-<p>Mods that mess with meds can create problems for spawned followers.</p>
-<p>The</p>
-<p>"Performance improvements" mod can cause conflicts with this mod.</p>
+<p>The mod is sensitive to changes that touch bots behavior. A lot of bot mods do that in order to either improve or fix whatever they see as problematic. This in turn can result in this mod breaking as one thing that sets this one apart is the fact that you are a boss with followers. Almost all bot mods focus on hostility towards the player or improving the "senses" of a bot which in turn makes your followers hostile, not hostile towards anything, or just go crazy. So you <strong>will</strong> have problems when using it in combination with other bot mods that touch the AI. The mod is currently being developed with <strong>SAIN</strong>, <strong>Looting Bots</strong> and <strong>QuestingBots</strong> mods installed - thus I can only speak of compatibility in relation to them. Anything else, if you have problems, you have to figure out where the conflict is by following the rule of elimination: take your mods out one by one until you see the problem stops and thus reveal which is the one that it conflicts with. Otherwise, I will ignore your issue as I am not about to install all the mod packs everybody else uses.</p>
 <p><br></p>
-<p>Mods that mess with bot spawning via client-side changes (like Swag + donuts or having PMC spawning on in Questing Bots) can create problems for spawned followers. The mod has been tested with MOAR and things seem fine.</p>
+<p><strong>Known conflicts:</strong></p>
 <p><br></p>
-<p>Mods that change static loot containers can cause issues with Knight's Quests. If you reach the "They robbed us" quest, remove such mod until you complete that quest.</p>
+<p>The "Performance improvements" mod can cause conflicts with this mod.</p>
 <p><br></p>
-<p>Followers can end up running and ducking until they reach the player - this can happen when using teleportation too much or right after combat ends. Go within the follow range (~12 meters) to snap them out of it.</p>
+<p>The "Please just fight" mod can cause friendlies to turn hostile. Spawn followers I think are fine.</p>
+<p><br></p>
+<p>QuestingBots can spawn squads. When trying to pick up a follower who is part of a squad it can end up with the squad following you but only he is responsive to your commands.</p>
+<p><br></p>
+<p>The "Pause" mod can result in your followers no longer having any footsteps sound.</p>
+<p><br></p>
+<p>Mods that change static loot containers can cause issues with Knight's Quests. If you reach the "They robbed us" quest but you are not able to find the quest item, remove such mod until you complete that quest.</p>
+<p><br></p>
+<p><strong>Known Issues:</strong></p>
+<p><br></p>
+<p>Be careful with teleportation. You can teleport a bot while he is trying to open your door. This will break the bot, the only way to restore him is to get him to open another door. You can also end up having the followers running and ducking until they reach the player if you use teleportation too much. Go within the follow range (~12 meters) to snap them out of it</p>
 <p><br></p>
 <p>When followers use grenades, they do not check the impact radius in order to avoid you.</p>
 <p><br></p>
-<p>Followers might still end up stuck after throwing a grenade.</p>
+<p>Followers can end up stuck after throwing a grenade. Use the "fix heal" command to attempt to un-stuck them. (this is an ongoing issue, I try to fix it with every release, but it happens randomly with no clear indication thus making really hard to find the cause). You have the config option of disabling the use of grenades entirely if you find this too problematic.</p>
 <p><br></p>
-<p>Followers might still spawn with grenades in their pockets even though you assigned a custom equipment preset that has no grenades.</p>
+<p>In very rare cases, your follower can end up stuck in a healing animation and there is no way to restore him. A way to avoid that is to notice if he keeps healing after combat while the health does not seem to go up. Use the "fix heal" command to fully heal him and prevent the bug from happening.</p>
+<p><br></p>
+<p>Sometimes followers will not heal a black limb. Use the "fix heal" command to fully restore their health.</p>
 <p><br></p>
 <p>"Bad Guy" and "Friendly PMC side" flags do not guarantee every PMC will be friendly or hostile. The new PMC karma system can still affect the bots. But, it would be 1-2 per raid that can end up not obeying these flags.</p>
 <p><br></p>
-<p>Bots can sometimes pick up an enemy that they never saw or heard. Use the "Attention" command to reset. In some cases, you have to actually take the enemy out as they keep reacquiring him.</p>
+<p>Bots can sometimes pick up an enemy that they never saw or heard. Use the "Attention" command to reset. In some cases, you have to actually take the enemy out as they keep reacquiring him. (this is not fixable, this is part of the game's detection logic and you can't have workarounds without breaking the logic altogether)</p>
 <p><br></p>
 <p>Bots follow in a straight line and can end up intersecting with one another. Yes, that is the navigation logic of the game and cannot be resolved.</p>
 <p><br></p>
 <p>Map transit won't work while having followers</p>
-<p><br></p>
-<p>Even small bushes can make the enemy invisible to the followers when yelling "contact"</p>
 <p><br>[/tab]</p>
 <p><br>[/tabmenu]</p>

@@ -229,14 +229,14 @@ namespace friendlyPMC.Components
             GClass105 layer3 = new GClass105(_owner, 88);
             method_0(5, layer3, true);
             // - stay at position in prone mode
-            GClass123 layer8 = new GClass123(_owner, 10, false, CoverLevel.Lay);
-            method_0(7, layer8, true);
+            //GClass123 layer8 = new GClass123(_owner, 10, false, CoverLevel.Lay);
+            //method_0(7, layer8, true);
             // - item taker
             FollowerLootLayer layer9 = new FollowerLootLayer(_owner, 51);
-            method_0(8, layer9, true);
+            method_0(6, layer9, true);
             // - door opener 
             FollowerDoorLayer layer10 = new FollowerDoorLayer(_owner, 52);
-            method_0(9, layer10, true);
+            method_0(7, layer10, true);
         }
 
         public override string ShortName()
@@ -388,7 +388,7 @@ namespace friendlyPMC.Components
                 if (distance <= 35f)
                 {
                     FakeShot(shootdir);
-                    if (distance <= 20f)
+                    if (Utils.Utils.GetNavDistance(_owner.Position, position) <= 15f)
                     {
                         EnemyInfo enInfo = Utils.Enemy.MakeEnemy(_owner, enemy);
                         enInfo?.SetVisible(true);
@@ -432,7 +432,7 @@ namespace friendlyPMC.Components
                     if (processedSoundPositions.Count > 20) processedSoundPositions.RemoveAt(0);
                 }
 
-                if (distance <= 12f)
+                if (distance <= 8f)
                 {
                     FakeShot(dir);
                     EnemyInfo enInfo = Utils.Enemy.MakeEnemy(_owner, enemy);
@@ -568,6 +568,10 @@ namespace friendlyPMC.Components
                     if (_defaultTactic == "Guard" || _defaultTactic == friendlyPMC.GetTacticOptions()[1])
                     {
                         SetGrenadierSelector();
+                    }
+                    else if (_defaultTactic.ToLower() == "marksman")
+                    {
+                        _owner.Settings.FileSettings.Core.CanGrenade = false;
                     }
                 }
                 else if (tactic == null && _defaultTactic != null) tactic = _defaultTactic;

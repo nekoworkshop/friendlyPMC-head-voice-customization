@@ -172,7 +172,7 @@ namespace friendlyPMC.Utils
                         string botName = bt.Data.Profile.Nickname;
 
                         StringBuilder stringBuilder = new StringBuilder();
-                        stringBuilder.Append(botName);
+                        stringBuilder.Append(botName + " - " + dist + "m");
 
                         if (!bt.Data.HealthController.IsAlive)
                         {
@@ -294,6 +294,8 @@ namespace friendlyPMC.Utils
                         GUI.Box(bt.GuiRect, bt.GuiContent.text, guiStyle);
                     }
                 }
+
+            // GClass840.Find("Hidden/Outline")
         } 
 
         private void DrawEnemyMarkerGUI(BotData bt)

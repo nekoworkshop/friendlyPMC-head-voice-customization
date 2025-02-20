@@ -37,6 +37,9 @@ namespace friendlyPMC.Components
 
         public override bool ShallUseNow()
         {
+
+            if (botOwner_0.Medecine.FirstAid.Have2Do || botOwner_0.Medecine.SurgicalKit.HaveWork || botOwner_0.Medecine.Using) return false;
+
             if (botOwner_0.Memory.HaveEnemy)
             {
                 if (botOwner_0.BotRequestController.CurRequest?.BotRequestType == BotRequestType.wait)
@@ -56,8 +59,6 @@ namespace friendlyPMC.Components
             {
                 return false;
             }
-
-            if (botOwner_0.Medecine.FirstAid.Have2Do || botOwner_0.Medecine.SurgicalKit.HaveWork || botOwner_0.Medecine.Using) return false;
 
             return true;
         }

@@ -61,7 +61,7 @@ namespace friendlyPMC.Actions
         private bool doPeaceHardAim = false;
         private bool doSecondWpnWatch = false;
 
- 
+
 
         public FollowerPatrol(BotOwner owner) : base(owner)
         {
@@ -131,9 +131,9 @@ namespace friendlyPMC.Actions
 
             botOwner_0.DoorOpener.Update();
 
-            if(boss_0 == null)
+            if (boss_0 == null)
             {
-                if(brain == null || brain.playerBoss == null)
+                if (brain == null || brain.playerBoss == null)
                 {
                     botOwner_0.StopMove();
                     return;
@@ -147,8 +147,8 @@ namespace friendlyPMC.Actions
             {
                 if (!shouldPatrol) Follow();
                 else Patrol();
-            } 
-            catch(Exception e)
+            }
+            catch (Exception e)
             {
                 Modules.Logger.LogError(e);
                 botOwner_0.StopMove();
@@ -157,12 +157,13 @@ namespace friendlyPMC.Actions
         /** Boss following logic  **/
         protected virtual void Follow(bool following = false, float distance = 0f)
         {
-            
-            if(bool_7)
+
+            if (bool_7)
             {
                 botOwner_0.GoToSomePointData.UpdateToGo(false);
-                if (!wasHit) botOwner_0.Steering.LookToMovingDirection();
+                //if (!wasHit) botOwner_0.Steering.LookToMovingDirection();
             }
+            else if (botOwner_0.Mover.TargetPose != 1f) botOwner_0.Mover.SetPose(1f);
 
             if (float_3 < Time.time)
             {
@@ -192,7 +193,7 @@ namespace friendlyPMC.Actions
                 // we are in range of the boss
                 if (flag2)
                 {
-                    
+
 
                     if (bool_0)
                     {
@@ -200,9 +201,9 @@ namespace friendlyPMC.Actions
                         return;
                     }
 
-                    if(bool_7)
+                    if (bool_7)
                     {
-                        if(botOwner_0.GoToSomePointData.IsCome())
+                        if (botOwner_0.GoToSomePointData.IsCome())
                         {
                             bool_7 = false;
                         }
@@ -219,7 +220,7 @@ namespace friendlyPMC.Actions
                         // check if we can find a cover point near the boss to hide and wait
                         if (lastCoverPoint == null && !nocover)
                         {
-                            List<CustomNavigationPoint> coverPoints = boss_0.GetAreaCovers();
+                            List<CustomNavigationPoint> coverPoints = botOwner_0.Covers.GetClosePoints(boss_0.realPlayer.Transform.position, 30f);
 
                             float maxDist = reachDist;
                             float radius = maxDist;
@@ -252,7 +253,7 @@ namespace friendlyPMC.Actions
 
                             botOwner_0.GoToSomePointData.SetPoint(nearPoint.Position);
                             botOwner_0.GoToSomePointData.UpdateToGo(false);
-                            if (!wasHit) botOwner_0.Steering.LookToMovingDirection();
+                            if (!wasHit) botOwner_0.Steering.LookToPathDestPoint();
 
                             bool_7 = true;
                             float_3 = Time.time + 0.5f;
@@ -278,7 +279,7 @@ namespace friendlyPMC.Actions
                         botOwner_0.GoToSomePointData.SetPoint(navMeshHit.position);
                         botOwner_0.GoToSomePointData.UpdateToGo(false);
 
-                        if (!wasHit) botOwner_0.Steering.LookToMovingDirection();
+                        if (!wasHit) botOwner_0.Steering.LookToPathDestPoint();
 
                         bool_7 = true;
                         float_3 = Time.time + 0.5f;
@@ -292,6 +293,8 @@ namespace friendlyPMC.Actions
                     nocover = false;
                     method_0(leaderPosition);
                     bool val = num > Math.Min(brain.followDistance + 3, 16);
+
+                    if (botOwner_0.Mover.TargetPose != 1f) botOwner_0.Mover.SetPose(1f);
 
                     if (val)
                         botOwner_0.Mover.Sprint(true, false);
@@ -328,9 +331,9 @@ namespace friendlyPMC.Actions
                 flag2 = num < brain.followDistance;
 
                 // - boss might or not move, but bot is out range - keep moving
-                if(!flag2)
+                if (!flag2)
                 {
-                    Follow(true,num);
+                    Follow(true, num);
                     float_5 = Time.time + 5f;
                     return;
                 }
@@ -373,7 +376,8 @@ namespace friendlyPMC.Actions
                 botOwner_0.Mover.SetTargetMoveSpeed(1f);
                 Follow();
                 return;
-            } else
+            }
+            else
             {
                 leaderLastCamp = bossPosition;
             }
@@ -421,10 +425,11 @@ namespace friendlyPMC.Actions
 
             pitAIBossPlayer boss = BossPlayers.GetBoss(player_0.ProfileId);
 
-            if(boss == null)
+            if (boss == null)
             {
                 carePositions.Add(botPosition);
-            } else
+            }
+            else
             {
                 foreach (BotOwner follower in boss.Followers)
                 {
@@ -434,7 +439,7 @@ namespace friendlyPMC.Actions
 
             Vector3[] finalcarePositions = carePositions.ToArray();
             // - get a valid position to move to, must be reachable and far enough from other teammates
-            for (int i = 0; i <30; i++)
+            for (int i = 0; i < 30; i++)
             {
                 Vector3 randomPosition = bossPosition + UnityEngine.Random.insideUnitSphere * perimeterRadius;
 
@@ -445,7 +450,7 @@ namespace friendlyPMC.Actions
 
                 if (botOwner_0.GoToPoint(navMeshHit.position, true, -1f, false, true, true, false) == NavMeshPathStatus.PathComplete)
                 {
-                    
+
                     botOwner_0.Mover.Sprint(false, false);
                     botOwner_0.Mover.SetTargetMoveSpeed(0.5f);
                     if (!wasHit) botOwner_0.Steering.LookToPoint(navMeshHit.position + Vector3.up * 1.5f);
@@ -463,12 +468,12 @@ namespace friendlyPMC.Actions
 
                     // decide which peaceful action to do by randomly selecting one from the available
                     if (hasActions && UnityEngine.Random.value > 0.5f)
-                        doPeacefulActions = true;    
+                        doPeacefulActions = true;
 
-                    if(!doPeacefulActions && hasLook && UnityEngine.Random.value > 0.5f)
+                    if (!doPeacefulActions && hasLook && UnityEngine.Random.value > 0.5f)
                         doPeaceLook = true;
-                
-                    if(!doPeacefulActions && !doPeaceLook && hasHardAim && UnityEngine.Random.value > 0.5f)
+
+                    if (!doPeacefulActions && !doPeaceLook && hasHardAim && UnityEngine.Random.value > 0.5f)
                         doPeaceHardAim = true;
 
                     if (!doPeacefulActions && !doPeaceLook && !doPeaceHardAim && hasSecondWpnWatch && UnityEngine.Random.value > 0.5f)
@@ -524,7 +529,7 @@ namespace friendlyPMC.Actions
         {
             shouldPatrol = state;
 
-            if(state == false)
+            if (state == false)
             {
                 bool_6 = false;
                 float_6 = 0f;

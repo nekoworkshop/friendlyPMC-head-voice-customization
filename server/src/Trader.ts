@@ -86,9 +86,9 @@ export abstract class TraderBase {
 
 	AddToDb(tables: IDatabaseTables) {
 		tables.traders[this.traderBase._id] = {
-			assort: this.jsonUtil.deserialize(this.jsonUtil.serialize(this.traderAssort)) as ITraderAssort, // assorts are the 'offers' trader sells, can be a single item (e.g. carton of milk) or multiple items as a collection (e.g. a gun)
-			base: this.jsonUtil.deserialize(this.jsonUtil.serialize(this.traderBase)) as ITraderBase, // Deserialise/serialise creates a copy of the json and allows us to cast it as an ITraderBase
-			questassort: this.jsonUtil.deserialize(this.jsonUtil.serialize(this.traderQuests)), // questassort is empty as trader has no assorts unlocked by quests
+			assort: this.traderAssort as ITraderAssort, // assorts are the 'offers' trader sells, can be a single item (e.g. carton of milk) or multiple items as a collection (e.g. a gun)
+			base: this.traderBase as ITraderBase, // Deserialise/serialise creates a copy of the json and allows us to cast it as an ITraderBase
+			questassort: this.traderQuests, // questassort is empty as trader has no assorts unlocked by quests
 		};
 
 		this.traderHelper.addTraderToLocales(this.traderBase, tables, this.traderBase.name, this.traderBase._id, this.traderBase.nickname, this.traderBase.location, this.traderDescription);

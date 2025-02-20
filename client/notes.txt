@@ -1,0 +1,7 @@
+REVISIT:
+- picked followers do not attack the player after turning hostile
+- update marskman tactic to switch to secondary like BirdEye
+
+NOTES:
+- we can save a bot's profile after it was generated in order to be re-used by simply sending the profile to BE. We should save it by nickname. (we still need to figure out how to progress the bot's level with the player )
+- Support is Guard tactic in the code

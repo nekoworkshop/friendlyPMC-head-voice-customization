@@ -15,8 +15,6 @@ using BepInEx.Bootstrap;
 
 using DrakiaXYZ.BigBrain.Brains;
 using System.Reflection;
-using friendlyPMC.Utils;
-using Sirenix.Serialization.Utilities;
 using friendlyPMC.Patches;
 
 namespace friendlyPMC.Components
@@ -102,16 +100,38 @@ namespace friendlyPMC.Components
             // remove looting brain, if present
             if (Chainloader.PluginInfos.ContainsKey("me.skwizzy.lootingbots"))
             {
-                Type lootingBrain = Type.GetType("LootingBots.Patch.Components.LootingBrain, LootingBots");
+                Type lootingBrain = Type.GetType("LootingBots.Patch.Components.LootingBrain, skwizzy.LootingBots");
 
                 if (lootingBrain != null)
                 {
-                    if (_bot.GetPlayer.TryGetComponent(lootingBrain, out Component component))
+                    if (_bot.GetPlayer.gameObject.TryGetComponent(lootingBrain, out Component component))
                     {
+                        Modules.Logger.LogInfo("Looting brain found, removing it");
                         UnityEngine.Object.Destroy(component);
                     }
                 }
+                else
+                {
+                    Modules.Logger.LogInfo("Looting brain not found");
+                }
             }
+            // remove questing brain, if present
+            /*if (QuestingPatch.isQuestingInstalled())
+            {
+                Type questingBrain = Type.GetType("SPTQuestingBots.BotLogic.Objective.BotObjectiveManager, SPTQuestingBots");
+                if (questingBrain != null)
+                {
+                    if (_bot.GetPlayer.gameObject.TryGetComponent(questingBrain, out Component component))
+                    {
+                        Modules.Logger.LogInfo("Questing brain found, removing it");
+                        UnityEngine.Object.Destroy(component);
+                    }
+                }
+                else
+                {
+                    Modules.Logger.LogInfo("Questing brain not found");
+                }
+            }*/
 
             // reset bot animation stances
             _bot.GetPlayer.MovementContext.SetPatrol(false);
@@ -187,21 +207,9 @@ namespace friendlyPMC.Components
             if (_bot.BotLight != null && _bot.BotLight.IsEnable) _bot.BotLight.TurnOff(false, true);
             // make bot follower of player
             _player.AddFollower(_bot);
-            // dispose of the original patrol mode
-            try
-            {
-                var followerAIBase = AccessTools.Field(typeof(PatrolDataFollower), "followerAIBase").GetValue(_bot.BotFollower.PatrolDataFollower) as GClass480;
 
-                if (followerAIBase != null)
-                {
-                    followerAIBase.Dispose();
-                }
+            bool isPickedUp = !_IsSquadMate && (_player.bossGroup == null || _player.bossGroup.Id != _bot.BotsGroup.Id);
 
-            }
-            catch (Exception e)
-            {
-                Modules.Logger.LogError(e);
-            }
             // make bot join the player's group
             if (_player.bossGroup != null)
             {
@@ -221,23 +229,28 @@ namespace friendlyPMC.Components
                 // add the bot to the player's group, if not already (PickUp case here with spawn)
                 if (_bot.BotsGroup.Id != _player.bossGroup.Id)
                 {
+                    // - bot is some kind of boss of a group, we have to change that
+                    if (_bot.Boss.HaveFollowers() && (_bot.BotsGroup.BossGroup != null) && _bot.Boss.Followers.Count >= 1)
+                    {
+                        foreach (BotOwner follower in _bot.Boss.Followers)
+                        {
+                            follower.BotFollower.BossToFollow = null;
+                        }
+                    }
+
                     _bot.BotsGroup.RemoveAlly(_bot);
+                    _bot.BotsGroup = _player.bossGroup;
+
                     // - ensure the bot is not marked as enemy already by the others
                     _player.bossGroup.RemoveEnemy(_bot.GetPlayer);
-
-                    _bot.BotsGroup = _player.bossGroup;
-                    var botsGroupField = AccessTools.Field(typeof(BotMemoryClass), "botsGroup_0");
-                    botsGroupField.SetValue(_bot.Memory, _bot.BotsGroup);
-
-                    var _groupRequestController = AccessTools.Field(typeof(BotRequestController), "_groupRequestController");
-                    (_groupRequestController.GetValue(_bot.BotRequestController) as BotGroupRequestController).OnAddRequest -= _bot.BotRequestController.method_0;
-                    _groupRequestController.SetValue(_bot.BotRequestController, null);
 
                     var botEnemies = _bot.EnemiesController.EnemyInfos.ToList();
                     foreach (var item in botEnemies)
                     {
                         _bot.Memory.DeleteInfoAboutEnemy(item.Key);
                     }
+
+                    isPickedUp = true;
 
                     _player.bossGroup.AddMember(_bot, false);
                     foreach (var en in _player.bossGroup.Enemies)
@@ -249,12 +262,9 @@ namespace friendlyPMC.Components
             // if there is no group yet, make one and group the player with the bot (PickUp case here without spawn)
             else
             {
-                _bot.BotsGroup.RemoveAlly(_bot);
+                isPickedUp = true;
 
-                var botsGroupField = AccessTools.Field(typeof(BotMemoryClass), "botsGroup_0");
-                var _groupRequestController = AccessTools.Field(typeof(BotRequestController), "_groupRequestController");
-                (_groupRequestController.GetValue(_bot.BotRequestController) as BotGroupRequestController).OnAddRequest -= _bot.BotRequestController.method_0;
-                _groupRequestController.SetValue(_bot.BotRequestController, null);
+                _bot.BotsGroup.RemoveAlly(_bot);
 
                 _bot.Settings.GetEnemyBotTypes().RemoveAll(x => Utils.Props.friendlyBotTypes.Contains(x));
                 _bot.Settings.GetFriendlyBotTypes().AddRange(Utils.Props.friendlyBotTypes);
@@ -263,8 +273,6 @@ namespace friendlyPMC.Components
                 BotsGroup group = _bot.BotsController.BotSpawner.GetGroupAndSetEnemies(_bot, zone);
 
                 _bot.BotsGroup = group;
-                botsGroupField.SetValue(_bot.Memory, group);
-                _groupRequestController.SetValue(_bot.BotRequestController, group.RequestsController);
 
                 // - go through the enemy filtering process
                 var groupEnemies = _bot.BotsGroup.Enemies;
@@ -278,6 +286,45 @@ namespace friendlyPMC.Components
                 BossPlayers.AddGroupToBoss(_player, group);
 
                 _bot.Memory.GoalEnemy = null;
+            }
+
+            if (isPickedUp)
+            {
+                // ensure bot sees the player's group as his group
+                var botsGroupField = AccessTools.Field(typeof(BotMemoryClass), "botsGroup_0");
+                var _groupRequestController = AccessTools.Field(typeof(BotRequestController), "_groupRequestController");
+                (_groupRequestController.GetValue(_bot.BotRequestController) as BotGroupRequestController).OnAddRequest -= _bot.BotRequestController.method_0;
+
+                botsGroupField.SetValue(_bot.Memory, _bot.BotsGroup);
+                _groupRequestController.SetValue(_bot.BotRequestController, null);
+            }
+
+            // ensure the Goons sees the new member as ally and vice versa
+            if (!Utils.Props.BossFollowersType.Contains(_botRole) && BotGroupAddEnemyPatch.PlayerHasKnightQuest(_player.realPlayer.Profile))
+            {
+                var _rougeTypes = Utils.Props.BossFollowersType.ToList();
+                _rougeTypes.Add(WildSpawnType.exUsec);
+                _bot.Settings.GetEnemyBotTypes().RemoveAll(x => _rougeTypes.Contains(x));
+                _bot.Settings.GetFriendlyBotTypes().AddRange(_rougeTypes);
+
+                var _bots = AccessTools.Field(typeof(BotSpawner), "_bots").GetValue(_bot.BotsController.BotSpawner) as BotsClass;
+
+                foreach (var item in _bots.BotOwners)
+                {
+                    if (!_rougeTypes.Contains(item.Profile.Info.Settings.Role)) continue;
+                    ;
+                    _bot.BotsGroup.RemoveEnemy(item);
+                    _bot.BotsGroup.AddNeutral(item);
+                    _bot.BotsGroup.AddAlly(item.GetPlayer);
+
+                    _bot.Memory.DeleteInfoAboutEnemy(item);
+
+                    item.BotsGroup.RemoveEnemy(_bot);
+                    item.BotsGroup.AddNeutral(_bot);
+                    item.BotsGroup.AddAlly(_bot.GetPlayer);
+
+                    item.Memory.DeleteInfoAboutEnemy(_bot);
+                }
             }
 
             // apply the settings modifier
@@ -315,22 +362,25 @@ namespace friendlyPMC.Components
         {
             // increase bot's power
             BotDifficultySettingsClass settings = Singleton<GClass585>.Instance.GetSettings(BotDifficulty.hard, _botRole);
+
             // - hardcode some settings to make the bot more efficient
             settings.FileSettings.Move.REACH_DIST = 1.5f;
             settings.FileSettings.Move.REACH_DIST_COVER = 2f;
             settings.FileSettings.Move.REACH_DIST_RUN = 1f;
+            settings.FileSettings.Boss.BIG_PIPE_ARTILLERY_COUNT = 1;
 
             settings.FileSettings.Mind.DIST_TO_STOP_RUN_ENEMY = 15f;
             settings.FileSettings.Mind.TIME_TO_FORGOR_ABOUT_ENEMY_SEC = friendlyPMC.enemyRemember.Value;
             settings.FileSettings.Mind.TIME_TO_FIND_ENEMY = 6f;
             settings.FileSettings.Mind.ATTACK_IMMEDIATLY_CHANCE_0_100 = 0f;
             settings.FileSettings.Mind.CAN_TALK = true;
-            settings.FileSettings.Mind.CAN_STAND_BY = true;
+            settings.FileSettings.Mind.CAN_STAND_BY = false;
             settings.FileSettings.Mind.CAN_TAKE_ANY_ITEM = true;
             settings.FileSettings.Mind.CAN_TAKE_ITEMS = true;
             settings.FileSettings.Mind.TALK_WITH_QUERY = true;
             settings.FileSettings.Mind.CAN_THROW_REQUESTS = true;
             settings.FileSettings.Mind.CAN_DROP_ITEMS = true;
+            settings.FileSettings.Mind.CAN_USE_MEDS = true;
             settings.FileSettings.Mind.MEDS_ONLY_SAFE_CONTAINER = false;
             settings.FileSettings.Mind.SURGE_KIT_ONLY_SAFE_CONTAINER = false;
 
@@ -423,6 +473,7 @@ namespace friendlyPMC.Components
             settings.FileSettings.Aiming.ANYTIME_LIGHT_WHEN_AIM_100 = 70;
             settings.FileSettings.Aiming.BAD_SHOOTS_MAX = 3;
             settings.FileSettings.Aiming.BAD_SHOOTS_MIN = 1;
+            settings.FileSettings.Aiming.MAX_AIMING_UPGRADE_BY_TIME = 0.20f;
 
 
             settings.FileSettings.Look.CAN_USE_LIGHT = true;
@@ -433,7 +484,7 @@ namespace friendlyPMC.Components
             settings.FileSettings.Look.VISIBLE_ANG_NIGHTVISION = 120f;
             settings.FileSettings.Look.LOOK_THROUGH_PERIOD_BY_HIT = 5f;
             settings.FileSettings.Look.LightOnVisionDistance = 40.0f;
-
+            settings.FileSettings.Look.LOOK_LAST_POSENEMY_IF_NO_DANGER_SEC = 25f;
             settings.FileSettings.Look.VISIBLE_ANG_LIGHT = 45.0f;
             settings.FileSettings.Look.VISIBLE_DISNACE_WITH_LIGHT = 65.0f;
 
@@ -451,6 +502,8 @@ namespace friendlyPMC.Components
 
             settings.FileSettings.Cover.SIT_DOWN_WHEN_HOLDING = true;
 
+            settings.FileSettings.Boss.EFFECT_REGENERATION_PER_MIN = 40f;
+
             bot.Settings = settings;
 
             bot.ENEMY_LOOK_AT_ME = Mathf.Cos(settings.FileSettings.Mind.ENEMY_LOOK_AT_ME_ANG * 0.017453292f);
@@ -462,7 +515,7 @@ namespace friendlyPMC.Components
             // - need no food
             bot.GetPlayer.HealthController.DisableMetabolism();
             // - and blackout does not affect them
-            bot.GetPlayer.ActiveHealthController.DoPainKiller();
+            //bot.GetPlayer.ActiveHealthController.DoPainKiller();
             // - have followers share the same groupId as the player
             _grouId = bot.GetPlayer.Profile.Info.GroupId;
             _teamId = bot.GetPlayer.Profile.Info.TeamId;

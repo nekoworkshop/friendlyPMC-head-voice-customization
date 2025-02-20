@@ -383,7 +383,7 @@ class friendlyPMC {
 
 					return httpResponseUtil.emptyResponse();
 				}),
-				new RouteAction("/client/game/bot/followergenerate", (url: string, info: { Info: IGenerateBotsRequestData; Preset?: string; Custom?: { Body?: string; Feet?: string; Equipment?: string; Nickname?: string; English?: boolean; Voice?: string } }, sessionID: string, output: string): any => {
+				new RouteAction("/client/game/bot/followergenerate", (url: string, info: { Info: IGenerateBotsRequestData; Preset?: string; Custom?: { Body?: string; Feet?: string; Equipment?: string; Nickname?: string; English?: boolean; Voice?: string; Health?: number } }, sessionID: string, output: string): any => {
 					const pmcProfile = profileHelper.getPmcProfile(sessionID);
 					const playerProfile = profileHelper.getFullProfile(sessionID);
 
@@ -505,6 +505,76 @@ class friendlyPMC {
 										);
 								}
 							}
+
+							// health change
+							if (custom?.Health) {
+								objectForEach(bot.Health.BodyParts, (part, key) => {
+									part.Health.Maximum = part.Health.Maximum * custom.Health;
+									part.Health.Current = part.Health.Maximum;
+								});
+							}
+
+							// skills adjustment
+							const skillsToAdjust = ["Health", "Vitality", "RecoilControl", "HeavyVests", "LightVests", "StressResistance", "Perception", "Launcher", "Throwing"];
+
+							const botLevel = bot.Info.Level;
+
+							const maxHealth = 2700;
+							const maxVitality = 2500;
+							const maxRecoil = 4500;
+							const maxHeavy = 1500;
+							const maxLight = 1500;
+							const maxStress = 2500;
+							const maxPerception = 4000;
+
+							const healthIncrement = 40;
+							const vitalityIncrement = 30;
+							const recoilIncrement = 50;
+							const heavyIncrement = 20;
+							const lightIncrement = 20;
+
+							const stressIncrement = 20;
+							const perceptionIncrement = 40;
+
+							skillsToAdjust.forEach(skill => {
+								let botSkill = bot.Skills.Common.find(s => s.Id == skill);
+
+								if (!botSkill) {
+									botSkill = {
+										Id: skill,
+										Progress: 0,
+									};
+									bot.Skills.Common.push(botSkill);
+								}
+
+								switch (skill) {
+									case "Health":
+										botSkill.Progress = Math.min(0 + healthIncrement * botLevel, maxHealth);
+										break;
+									case "Vitality":
+										botSkill.Progress = Math.min(0 + vitalityIncrement * botLevel, maxVitality);
+										break;
+									case "RecoilControl":
+										botSkill.Progress = Math.min(0 + recoilIncrement * botLevel, maxRecoil);
+										break;
+									case "HeavyVests":
+										botSkill.Progress = Math.min(0 + heavyIncrement * botLevel, maxHeavy);
+										break;
+									case "LightVests":
+										botSkill.Progress = Math.min(0 + lightIncrement * botLevel, maxLight);
+										break;
+									case "StressResistance":
+										botSkill.Progress = Math.min(0 + stressIncrement * botLevel, maxStress);
+										break;
+									case "Perception":
+										botSkill.Progress = Math.min(0 + perceptionIncrement * botLevel, maxPerception);
+										break;
+									case "Launcher":
+									case "Throwing":
+										botSkill.Progress = Math.min(0 + recoilIncrement * botLevel, maxRecoil);
+										break;
+								}
+							});
 						}
 
 						conditionPromises.push(bot);

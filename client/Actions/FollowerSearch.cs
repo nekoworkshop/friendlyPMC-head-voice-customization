@@ -1,18 +1,12 @@
 ﻿using friendlyPMC.Components;
-
 using EFT;
-using HarmonyLib;
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-
 using UnityEngine;
 
 namespace friendlyPMC.Actions
 {
     /**
      * Enemy search action for a bot follower
+     * @notused
      */
     public class FollowerSearch : FollowerSniperSearch
     {
@@ -44,13 +38,22 @@ namespace friendlyPMC.Actions
             {
                 Vector3 enemySpot = botOwner_0.Memory.GoalEnemy.CurrPosition;
                 Vector3 botPosition = botOwner_0.GetPlayer.Transform.position;
+                ShootPointClass shootPointClass = botOwner_0.CurrentEnemyTargetPosition(true);
                 // get the closet cover to the bot from where he can shoot the enemy
-                CustomNavigationPoint Spot = Utils.Covers.GetClosestShootCover(
+                CustomNavigationPoint Spot = Utils.Covers.GetClosestCoverPoint(
                     botOwner_0,
-                    botPosition,
-                    5f,
+                    (botPosition + enemySpot) / 2f,
                     150f,
-                    null
+                    5f,
+                    point =>
+                    {
+                        if (GClass344.CanShootToTarget(shootPointClass, point, botOwner_0.LookSensor.Mask, false))
+                        {
+                            point.CanIShootToEnemy = true;
+                            return true;
+                        }
+                        return false;
+                    }
                 );
 
                 if (Spot != null) _lastSpot = Spot.Position;
@@ -60,10 +63,10 @@ namespace friendlyPMC.Actions
                     _actionsQueue.Enqueue(() =>
                     {
                         // else get the next cover between the bot and the enemy
-                        CustomNavigationPoint Spot2 = Utils.Covers.GetClosestCoverPointBetween(
+                        CustomNavigationPoint Spot2 = Utils.Covers.GetCover(
                             botOwner_0,
-                            botPosition,
-                            enemySpot
+                            (botPosition + enemySpot) / 2f,
+                            CoverSearchType.closerToSelectedPoint
                         );
 
                         if (Spot2 != null) _lastSpot = Spot2.Position;
@@ -93,9 +96,9 @@ namespace friendlyPMC.Actions
                                     // find a cover closer to the enemy - this emulates search
                                     _actionsQueue.Enqueue(() =>
                                     {
-                                       CustomNavigationPoint Spot3  = Utils.Covers.GetClosestCoverPoint(botOwner_0, enemySpot, 30f, 5f);
-                                        if(Spot3 != null) _lastSpot = Spot3.Position;
-                                        else if(botOwner_0.BotFollower.HaveBoss)
+                                        CustomNavigationPoint Spot3 = Utils.Covers.GetCover(botOwner_0, (botPosition + enemySpot) / 2f, CoverSearchType.shoot_toCover_toBot_Distances, 60f);
+                                        if (Spot3 != null) _lastSpot = Spot3.Position;
+                                        else if (botOwner_0.BotFollower.HaveBoss)
                                         {
                                             Vector3 bossPos = botOwner_0.BotFollower.BossToFollow.Position;
                                             Vector3 botPos = botOwner_0.GetPlayer.Transform.position;
@@ -109,8 +112,9 @@ namespace friendlyPMC.Actions
                                                     protectBoss ? bossPos : botPos,
                                                     30f,
                                                     5f,
-                                                    (CustomNavigationPoint point)=>{
-                                                        if(!GClass369.IsDangerPositionFarEnough(point.Position, new Vector3[]{ bossPos }, 0.5f * 0.5f)) return false;
+                                                    (CustomNavigationPoint point) =>
+                                                    {
+                                                        if (!GClass369.IsDangerPositionFarEnough(point.Position, new Vector3[] { bossPos }, 0.5f * 0.5f)) return false;
                                                         return true;
                                                     }
                                                 );

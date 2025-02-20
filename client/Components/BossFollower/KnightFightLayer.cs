@@ -144,6 +144,11 @@ namespace friendlyPMC.Components.BossFollower
             AICoreActionResultStruct<BotLogicDecision>? preFightDecision = KnightPreFight();
             if (preFightDecision != null) return (AICoreActionResultStruct<BotLogicDecision>)preFightDecision;
 
+            if (commonLayer.ReachedCover)
+            {
+                return commonLayer.HoldPositionFor(GClass824.Random(2f, 3f));
+            }
+
             // do not go after distant enemies
             if (Utils.Enemy.Distance(botOwner_0) >= Utils.Enemy.EnemyDistance.Distant)
             {
@@ -179,7 +184,7 @@ namespace friendlyPMC.Components.BossFollower
                 else
                 {
                     // Find a cover point closer to the enemy
-                    GetClosestAttackCoverPoint(botOwner_0.Memory.GoalEnemy.CurrPosition, 5f);
+                    GetClosestAttackCoverPoint((botOwner_0.Position + botOwner_0.Memory.GoalEnemy.EnemyLastPosition) / 2f);
                     if (customNavigationPoint_0 != null)
                     {
                         // Move towards the cover point while suppressing the enemy
@@ -197,7 +202,7 @@ namespace friendlyPMC.Components.BossFollower
             else
             {
                 // Find a cover point closer to the enemy's last known position
-                GetClosestAttackCoverPoint(botOwner_0.Memory.GoalEnemy.CurrPosition, 5f);
+                GetClosestAttackCoverPoint((botOwner_0.Position + botOwner_0.Memory.GoalEnemy.EnemyLastPosition) / 2f);
                 if (customNavigationPoint_0 != null)
                 {
                     // Move towards the cover point while suppressing
@@ -242,8 +247,18 @@ namespace friendlyPMC.Components.BossFollower
                     request.Complete();
                 }
             }
-            // player requested a suppression fire
 
+            // come here request during fights
+            if (request != null && request.BotRequestType == BotRequestType.followMe)
+                return new AICoreActionResultStruct<BotLogicDecision>((BotLogicDecision)CustomBotDecisions.MoveToPoint, "req:comeHere");
+
+            // go there request during fights
+            if (request != null && request.BotRequestType == BotRequestType.goToPoint)
+            {
+                return new AICoreActionResultStruct<BotLogicDecision>((BotLogicDecision)CustomBotDecisions.MoveToPoint, "req:goCheck");
+            }
+
+            // player requested a suppression fire
             if (request != null && request.BotRequestType == BotRequestType.suppressionFire)
             {
                 AICoreActionResultStruct<BotLogicDecision> decision = guardLayer.method_29(false, BotLogicDecision.debugGrenade);
@@ -277,16 +292,16 @@ namespace friendlyPMC.Components.BossFollower
             if (method_23() && botOwner_0.Brain.LastDecision != null)
             {
                 BotLogicDecision? lastDecision = botOwner_0.Brain.LastDecision;
-                if (!(lastDecision.GetValueOrDefault() == BotLogicDecision.attackMoving & lastDecision != null))
+                if (!(lastDecision.GetValueOrDefault() == (BotLogicDecision)CustomBotDecisions.attackRetreat & lastDecision != null))
                 {
                     if (botOwner_0.Memory.GoalEnemy != null && botOwner_0.Memory.GoalEnemy.CanShoot && botOwner_0.Memory.GoalEnemy.IsVisible)
                     {
                         return commonLayer.DogFight(out customNavigationPoint_0);
                     }
 
-                    GetClosestAttackCoverPoint(botOwner_0.Memory.GoalEnemy.CurrPosition, 10f);
+                    GetClosestAttackCoverPoint((botOwner_0.Position + botOwner_0.Memory.GoalEnemy.EnemyLastPosition) / 2f);
                     if (customNavigationPoint_0 != null)
-                        return new AICoreActionResultStruct<BotLogicDecision>(BotLogicDecision.attackMoving, "enemyNear");
+                        return new AICoreActionResultStruct<BotLogicDecision>((BotLogicDecision)CustomBotDecisions.attackRetreat, "enemyNear");
                 }
             }
 
@@ -378,7 +393,7 @@ namespace friendlyPMC.Components.BossFollower
 
             if (baseDecision.HasValue) return baseDecision.Value;
 
-            bool useGrenade = botOwner_0.Settings.FileSettings.Core.CanGrenade && GClass824.Random(0f, 2f) > 1f && Utils.Enemy.Distance(botOwner_0) <= Utils.Enemy.EnemyDistance.Close;
+            bool useGrenade = botOwner_0.Settings.FileSettings.Core.CanGrenade && GClass824.Random(0f, 2f) > 1f && Utils.Enemy.Distance(botOwner_0) == Utils.Enemy.EnemyDistance.Close;
 
             AICoreActionResultStruct<BotLogicDecision> decision = guardLayer.method_29(useGrenade, BotLogicDecision.debugGrenade);
 
@@ -399,10 +414,6 @@ namespace friendlyPMC.Components.BossFollower
 
             if (common != null) return (AICoreActionEndStruct)common;
 
-            AICoreActionEndStruct? push = pusherLayer.ShallEndDecision(curDecision);
-
-            if (push.HasValue) return push.Value;
-
             if (curDecision.Reason == "assaultRush" && Utils.Enemy.Distance(botOwner_0) <= Utils.Enemy.EnemyDistance.VeryClose)
             {
                 return new AICoreActionEndStruct("assault.closeEnough", true);
@@ -417,10 +428,6 @@ namespace friendlyPMC.Components.BossFollower
             return customNavigationPoint_0;
         }
 
-        public AICoreActionEndStruct EndGetInClose()
-        {
-            return commonLayer.EndGetInClose();
-        }
         public override AICoreActionEndStruct EndGoToPoint()
         {
             return commonLayer.EndGoToPoint();
@@ -465,9 +472,9 @@ namespace friendlyPMC.Components.BossFollower
             customNavigationPoint_0 = commonLayer.GetApproachableCover();
         }
 
-        protected void GetClosestAttackCoverPoint(Vector3 centerPosition, float minDistance = 5f)
+        protected void GetClosestAttackCoverPoint(Vector3 centerPosition)
         {
-            customNavigationPoint_0 = commonLayer.GetClosestShootCover(centerPosition, minDistance);
+            customNavigationPoint_0 = commonLayer.GetClosestShootCover(centerPosition);
         }
     }
 }
